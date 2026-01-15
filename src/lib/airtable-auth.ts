@@ -1,6 +1,7 @@
 // ============================================
 // AUTENTICACIÓN CON AIRTABLE - ChaskiBots EDU
 // Sistema de claves personalizadas por curso
+// Versión: 2.0 - REST API
 // ============================================
 
 // Usar API REST directa en lugar de librería airtable
