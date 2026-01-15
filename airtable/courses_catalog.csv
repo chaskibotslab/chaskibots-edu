@@ -1,0 +1,6 @@
+id,name,description,levelId,teacherId,teacherName,maxStudents,currentStudents,startDate,endDate,isActive,createdAt
+curso-inicial-1,Tecnología Inicial 1,Introducción a la tecnología para niños de 3-4 años,inicial-1,user-profesor-1,Profesor Demo,25,1,2024-02-01,2024-12-15,true,2024-01-15
+curso-inicial-2,Tecnología Inicial 2,Continuación del curso de tecnología para niños de 4-5 años,inicial-2,user-profesor-1,Profesor Demo,25,1,2024-02-01,2024-12-15,true,2024-01-15
+curso-1egb,Robótica 1° EGB,Curso de robótica para primero de básica,primero-egb,user-profesor-1,Profesor Demo,30,1,2024-02-01,2024-12-15,true,2024-01-15
+curso-robotica-8vo,Robótica 8vo EGB,Robótica avanzada con Arduino y programación,octavo-egb,user-profesor-1,Profesor Demo,30,3,2024-02-01,2024-12-15,true,2024-01-15
+curso-hacking-bach,Ciberseguridad Bachillerato,Hacking ético y seguridad informática,primero-bach,user-profesor-1,Profesor Demo,25,0,2024-02-01,2024-12-15,true,2024-01-15

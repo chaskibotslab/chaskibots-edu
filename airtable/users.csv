@@ -1,0 +1,12 @@
+id,accessCode,email,password,name,levelId,role,courseId,courseName,programId,programName,progress,createdAt,lastLogin,expiresAt,isActive
+user-admin,AD1ADMIN,admin@chaskibots.com,,Administrador,tercero-bach,admin,,,,,100,2024-01-01,2024-01-15,,true
+user-profesor-1,PR7K9M2N,profesor1@chaskibots.com,,Profesor Demo,octavo-egb,teacher,curso-8vo-A,8vo A Matutino,prog-8egb-robotica,Robótica Avanzada,0,2024-01-01,2024-01-15,,true
+user-inicial2-robotica,ES4X8P3Q,,,María García,inicial-2,student,curso-i2-robotica,Inicial 2 - Robótica,prog-inicial2-robotica,Robótica Básica,25,2024-01-01,2024-01-15,2025-12-31,true
+user-inicial2-programacion,ES5Y9R4S,,,Carlos López,inicial-2,student,curso-i2-prog,Inicial 2 - Programación,prog-inicial2-programacion,Programación Visual,15,2024-01-01,2024-01-15,2025-12-31,true
+user-inicial2-electronica,ES6Z0T5U,,,Ana Martínez,inicial-2,student,curso-i2-elec,Inicial 2 - Electrónica,prog-inicial2-electronica,Electrónica Creativa,30,2024-01-01,2024-01-15,2025-12-31,true
+user-inicial2-ia,ES7A1V6W,,,Pedro Sánchez,inicial-2,student,curso-i2-ia,Inicial 2 - IA,prog-inicial2-ia,IA para Niños,10,2024-01-01,2024-01-15,2025-12-31,true
+user-8egb-robotica1,ES8B2X7Y,,,Juan Pérez,octavo-egb,student,curso-8vo-A,8vo A Matutino,prog-8egb-robotica,Robótica Avanzada,45,2024-01-01,,,true
+user-8egb-python1,ES9C3Z8A,,,Laura Gómez,octavo-egb,student,curso-8vo-B,8vo B Vespertino,prog-8egb-programacion,Programación Python,20,2024-01-01,,,true
+user-8egb-hacking1,ESAB4D5E,,,Diego Torres,octavo-egb,student,curso-8vo-A,8vo A Matutino,prog-8egb-hacking,Hacking Ético,35,2024-01-01,,,true
+user-uni-python,ESCD6F7G,,,Roberto Vega,universidad,student,curso-uni-ds,Data Science 2024,prog-universidad-python,Python Profesional,60,2024-01-01,,,true
+user-curso-arduino,ESEF8H9J,,,Sofía Ruiz,curso-libre,student,curso-arduino-enero,Arduino Enero 2024,prog-curso-arduino,Arduino Maker,80,2024-01-01,,,true

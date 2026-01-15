@@ -1,0 +1,136 @@
+levelId,month,topic,project,order
+inicial-1,Septiembre,Bienvenida y conociendo el kit,Encender mi primer LED,1
+inicial-1,Octubre,Colores y circuitos básicos,Semáforo de colores,2
+inicial-1,Noviembre,Formas y patrones luminosos,Figuras con LEDs,3
+inicial-1,Diciembre,Proyecto especial navideño,Árbol de navidad LED,4
+inicial-1,Enero,Repaso y práctica libre,Creación libre,5
+inicial-1,Febrero,Secuencias de luces,Luces intermitentes,6
+inicial-1,Marzo,Creatividad y diseño,Tarjeta luminosa,7
+inicial-1,Abril,Trabajo en equipo,Proyecto grupal,8
+inicial-1,Mayo,Presentación final,Expo de proyectos,9
+inicial-2,Septiembre,Bienvenida y kit inicial,Mi primer circuito,1
+inicial-2,Octubre,Cinta conductora,Circuito con cinta,2
+inicial-2,Noviembre,Generador eólico,Molino de viento,3
+inicial-2,Diciembre,Proyecto navideño,Luces navideñas,4
+inicial-2,Enero,Repaso creativo,Proyecto libre,5
+inicial-2,Febrero,Energía y movimiento,Ventilador simple,6
+inicial-2,Marzo,Diseño de circuitos,Tarjeta interactiva,7
+inicial-2,Abril,Trabajo colaborativo,Proyecto en equipo,8
+inicial-2,Mayo,Expo final,Presentación de proyectos,9
+primero-egb,Septiembre,Introducción a robots,Conociendo las piezas,1
+primero-egb,Octubre,Robot con articulaciones,Armado básico,2
+primero-egb,Noviembre,Robot pintor,Diseño creativo,3
+primero-egb,Diciembre,Proyecto navideño,Robot decorativo,4
+primero-egb,Enero,Repaso y práctica,Mejoras al robot,5
+primero-egb,Febrero,Robot 4x4,Vehículo básico,6
+primero-egb,Marzo,Movimiento y dirección,Control de motores,7
+primero-egb,Abril,Proyecto integrador,Robot personalizado,8
+primero-egb,Mayo,Expo de robótica,Presentación final,9
+segundo-egb,Septiembre,Introducción al kit,Conociendo componentes,1
+segundo-egb,Octubre,Robot radiocontrolado,Control remoto básico,2
+segundo-egb,Noviembre,Navegación acuática,Robot flotante,3
+segundo-egb,Diciembre,Lámpara moderna,Proyecto de iluminación,4
+segundo-egb,Enero,Repaso técnico,Mejoras y ajustes,5
+segundo-egb,Febrero,Electrónica básica,Circuitos simples,6
+segundo-egb,Marzo,Diseño funcional,Proyecto creativo,7
+segundo-egb,Abril,Integración,Proyecto combinado,8
+segundo-egb,Mayo,Expo final,Demostración de proyectos,9
+tercero-egb,Septiembre,Kit de robots,Introducción,1
+tercero-egb,Octubre,Robot escalador,Mecanismos de tracción,2
+tercero-egb,Noviembre,Carrusel,Movimiento circular,3
+tercero-egb,Diciembre,Robot eólico,Energía renovable,4
+tercero-egb,Enero,Repaso,Práctica libre,5
+tercero-egb,Febrero,Mecánica avanzada,Engranajes,6
+tercero-egb,Marzo,Diseño,Proyecto personal,7
+tercero-egb,Abril,Colaboración,Trabajo en equipo,8
+tercero-egb,Mayo,Expo,Presentación,9
+cuarto-egb,Septiembre,Introducción,Conociendo el kit,1
+cuarto-egb,Octubre,Rueda de la fortuna,Mecanismo giratorio,2
+cuarto-egb,Noviembre,Radio FM,Electrónica de audio,3
+cuarto-egb,Diciembre,Proyecto especial,Combinación de proyectos,4
+cuarto-egb,Enero,Repaso,Mejoras técnicas,5
+cuarto-egb,Febrero,Señales de radio,Transmisión básica,6
+cuarto-egb,Marzo,Diseño avanzado,Personalización,7
+cuarto-egb,Abril,Proyecto final,Integración,8
+cuarto-egb,Mayo,Expo,Demostración,9
+quinto-egb,Septiembre,Kit avanzado,Introducción,1
+quinto-egb,Octubre,Rueda de la fortuna,Construcción,2
+quinto-egb,Noviembre,Radio RF-FM,Comunicación inalámbrica,3
+quinto-egb,Diciembre,Proyecto navideño,Aplicación práctica,4
+quinto-egb,Enero,Repaso,Optimización,5
+quinto-egb,Febrero,Frecuencias,Experimentación,6
+quinto-egb,Marzo,Diseño,Proyecto personal,7
+quinto-egb,Abril,Integración,Proyecto completo,8
+quinto-egb,Mayo,Expo,Presentación final,9
+sexto-egb,Septiembre,Robot 4 en 1,Introducción,1
+sexto-egb,Octubre,Transformaciones,Configuraciones del robot,2
+sexto-egb,Noviembre,Circuito electrónico,Generador aleatorio,3
+sexto-egb,Diciembre,Avión DIY,Aerodinámica básica,4
+sexto-egb,Enero,Repaso,Mejoras,5
+sexto-egb,Febrero,Micrófono,Sensores de sonido,6
+sexto-egb,Marzo,Programación básica,Lógica,7
+sexto-egb,Abril,Proyecto integrador,Combinación,8
+sexto-egb,Mayo,Expo,Demostración,9
+septimo-egb,Septiembre,Robot 4 en 1,Configuraciones avanzadas,1
+septimo-egb,Octubre,Circuitos,Electrónica intermedia,2
+septimo-egb,Noviembre,Avión DIY,Construcción aeronáutica,3
+septimo-egb,Diciembre,Proyecto especial,Innovación,4
+septimo-egb,Enero,Repaso,Optimización,5
+septimo-egb,Febrero,Sensores,Detección y respuesta,6
+septimo-egb,Marzo,Programación,Secuencias,7
+septimo-egb,Abril,Proyecto final,Integración total,8
+septimo-egb,Mayo,Expo,Presentación,9
+octavo-egb,Septiembre,ESP32 Introducción,Microcontroladores,1
+octavo-egb,Octubre,Carro Bluetooth,Control inalámbrico,2
+octavo-egb,Noviembre,Motores y drivers,TB6612FNG,3
+octavo-egb,Diciembre,Proyecto IoT básico,Conectividad,4
+octavo-egb,Enero,Repaso,Debugging,5
+octavo-egb,Febrero,WiFi,Comunicación de red,6
+octavo-egb,Marzo,Sensores avanzados,Integración,7
+octavo-egb,Abril,Proyecto completo,Robot autónomo,8
+octavo-egb,Mayo,Expo,Demostración técnica,9
+noveno-egb,Septiembre,Seguidor de línea,Introducción,1
+noveno-egb,Octubre,Sensores infrarrojos,Calibración,2
+noveno-egb,Noviembre,Algoritmos,Lógica de seguimiento,3
+noveno-egb,Diciembre,Competencia,Pista de pruebas,4
+noveno-egb,Enero,Optimización,Velocidad y precisión,5
+noveno-egb,Febrero,PID básico,Control de motores,6
+noveno-egb,Marzo,Programación avanzada,Mejoras de código,7
+noveno-egb,Abril,Proyecto final,Robot optimizado,8
+noveno-egb,Mayo,Competencia final,Demostración,9
+decimo-egb,Septiembre,Robot evita obstáculos,Introducción,1
+decimo-egb,Octubre,Sensor ultrasónico,Medición de distancia,2
+decimo-egb,Noviembre,Algoritmos de navegación,Toma de decisiones,3
+decimo-egb,Diciembre,Proyecto autónomo,Robot inteligente,4
+decimo-egb,Enero,Repaso,Mejoras de código,5
+decimo-egb,Febrero,Múltiples sensores,Fusión de datos,6
+decimo-egb,Marzo,IA básica,Comportamiento adaptativo,7
+decimo-egb,Abril,Proyecto completo,Robot autónomo,8
+decimo-egb,Mayo,Expo,Demostración final,9
+primero-bach,Septiembre,Robot Otto,Introducción,1
+primero-bach,Octubre,Servo motores,Control de movimiento,2
+primero-bach,Noviembre,Impresión 3D,Personalización,3
+primero-bach,Diciembre,Programación Arduino,Código avanzado,4
+primero-bach,Enero,Sensores,Ultrasónico y buzzer,5
+primero-bach,Febrero,Movimientos,Coreografías,6
+primero-bach,Marzo,Personalización,Diseño propio,7
+primero-bach,Abril,Proyecto final,Otto personalizado,8
+primero-bach,Mayo,Expo,Presentación de robots,9
+segundo-bach,Septiembre,Robot Soccer,Introducción,1
+segundo-bach,Octubre,Mini Sumo,Estrategias de combate,2
+segundo-bach,Noviembre,Programación avanzada,Algoritmos de competencia,3
+segundo-bach,Diciembre,Torneos internos,Práctica competitiva,4
+segundo-bach,Enero,Optimización,Mejoras mecánicas,5
+segundo-bach,Febrero,Estrategias,Tácticas avanzadas,6
+segundo-bach,Marzo,Diseño de chassis,Impresión 3D,7
+segundo-bach,Abril,Preparación,Competencia final,8
+segundo-bach,Mayo,Torneo,Competencia oficial,9
+tercero-bach,Septiembre,IoT Introducción,ESP32 y sensores,1
+tercero-bach,Octubre,Sensores ambientales,Temperatura y humedad,2
+tercero-bach,Noviembre,Conectividad,WiFi y cloud,3
+tercero-bach,Diciembre,Domótica básica,Casa inteligente,4
+tercero-bach,Enero,Automatización,Relés y actuadores,5
+tercero-bach,Febrero,Dashboard,Visualización de datos,6
+tercero-bach,Marzo,Proyecto IoT,Sistema completo,7
+tercero-bach,Abril,Integración,Proyecto final,8
+tercero-bach,Mayo,Expo,Demostración IoT,9

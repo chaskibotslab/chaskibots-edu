@@ -1,0 +1,52 @@
+levelId,activityName,activityType,description,difficulty,icon,enabled
+inicial-1,Reconocer Colores,camera,Usa la cámara para identificar colores básicos,facil,palette,true
+inicial-1,Escuchar y Repetir,voice,El sistema escucha y repite lo que dices,facil,mic,true
+inicial-1,Buscar Animales,camera,Encuentra animales en las imágenes,facil,search,true
+inicial-2,Detector de Objetos,camera,Detecta objetos comunes con la cámara,facil,camera,true
+inicial-2,Juego de Voz,voice,Juega con comandos de voz simples,facil,mic,true
+inicial-2,Clasificar Formas,upload,Sube imágenes y clasifica formas geométricas,facil,shapes,true
+primero-egb,Detección COCO-SSD,camera,Detecta 80 tipos de objetos en tiempo real,medio,camera,true
+primero-egb,Reconocimiento de Voz,voice,Convierte tu voz a texto,medio,mic,true
+primero-egb,Clasificador de Imágenes,upload,Clasifica imágenes con MobileNet,medio,upload,true
+segundo-egb,Visión por Computadora,camera,Aprende cómo las computadoras ven,medio,eye,true
+segundo-egb,Comandos de Voz,voice,Crea comandos de voz personalizados,medio,mic,true
+segundo-egb,Análisis de Imágenes,upload,Analiza el contenido de imágenes,medio,image,true
+tercero-egb,COCO-SSD Avanzado,camera,Detección de objetos con métricas,medio,camera,true
+tercero-egb,Speech Recognition,voice,Reconocimiento de voz avanzado,medio,mic,true
+tercero-egb,MobileNet Classifier,upload,Clasificación con redes neuronales,medio,brain,true
+cuarto-egb,Detección en Tiempo Real,camera,Detección optimizada de objetos,medio,zap,true
+cuarto-egb,Texto a Voz,voice,Convierte texto escrito a audio,medio,volume,true
+cuarto-egb,Redes Neuronales Básicas,upload,Introducción a redes neuronales,medio,network,true
+quinto-egb,Computer Vision Pro,camera,Visión por computadora avanzada,avanzado,eye,true
+quinto-egb,NLP Básico,voice,Procesamiento de lenguaje natural,avanzado,message,true
+quinto-egb,Deep Learning Intro,upload,Introducción al aprendizaje profundo,avanzado,brain,true
+sexto-egb,Object Detection Pro,camera,Detección profesional de objetos,avanzado,target,true
+sexto-egb,Asistente de Voz,voice,Crea tu propio asistente de voz,avanzado,bot,true
+sexto-egb,Transfer Learning,upload,Aprende sobre transferencia de aprendizaje,avanzado,share,true
+septimo-egb,AI Vision Lab,camera,Laboratorio de visión artificial,avanzado,flask,true
+septimo-egb,Chatbot Básico,voice,Crea un chatbot simple,avanzado,message-circle,true
+septimo-egb,Modelos Pre-entrenados,upload,Usa modelos pre-entrenados,avanzado,download,true
+octavo-egb,TensorFlow.js Camera,camera,Usa TensorFlow.js con la cámara,experto,code,true
+octavo-egb,Speech API Avanzado,voice,API de reconocimiento de voz avanzado,experto,mic,true
+octavo-egb,Custom Models,upload,Entrena modelos personalizados,experto,settings,true
+octavo-egb,Hacking Ético Intro,hacking,Introducción al hacking ético,experto,shield,true
+noveno-egb,Real-time AI,camera,IA en tiempo real optimizada,experto,zap,true
+noveno-egb,NLP Avanzado,voice,Procesamiento de lenguaje avanzado,experto,brain,true
+noveno-egb,Model Training,upload,Entrenamiento de modelos,experto,cpu,true
+noveno-egb,Seguridad de Redes,hacking,Fundamentos de seguridad en redes,experto,lock,true
+decimo-egb,Edge AI,camera,IA en dispositivos edge,experto,smartphone,true
+decimo-egb,Voice Assistant Pro,voice,Asistente de voz profesional,experto,headphones,true
+decimo-egb,Neural Networks,upload,Redes neuronales desde cero,experto,network,true
+decimo-egb,Pentesting Básico,hacking,Introducción al pentesting,experto,terminal,true
+primero-bach,Computer Vision Expert,camera,Visión por computadora experta,experto,scan,true
+primero-bach,AI Chatbot,voice,Chatbot con IA avanzada,experto,message-square,true
+primero-bach,Deep Learning,upload,Aprendizaje profundo avanzado,experto,layers,true
+primero-bach,Ethical Hacking,hacking,Hacking ético y seguridad,experto,shield-check,true
+segundo-bach,ML in Browser,camera,Machine Learning en el navegador,experto,chrome,true
+segundo-bach,Conversational AI,voice,IA conversacional,experto,users,true
+segundo-bach,Model Deployment,upload,Despliegue de modelos,experto,cloud,true
+segundo-bach,CTF Challenges,hacking,Desafíos Capture The Flag,experto,flag,true
+tercero-bach,Production AI,camera,IA para producción,experto,server,true
+tercero-bach,Advanced NLP,voice,NLP con transformers,experto,sparkles,true
+tercero-bach,MLOps Basics,upload,Operaciones de ML,experto,git-branch,true
+tercero-bach,Security Auditing,hacking,Auditoría de seguridad,experto,search,true

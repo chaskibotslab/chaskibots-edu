@@ -1,0 +1,62 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked
+inicial-1,Módulo 1: Bienvenida al Mundo Tech,¡Hola! Bienvenidos al curso,video,5 min,1,,Introducción al mundo de la tecnología para los más pequeños,false
+inicial-1,Módulo 1: Bienvenida al Mundo Tech,¿Qué es un robot?,video,8 min,2,,Conociendo qué son los robots y dónde los encontramos,false
+inicial-1,Módulo 1: Bienvenida al Mundo Tech,Robots en nuestra vida,activity,15 min,3,,Actividad: Identificar robots en casa y la escuela,false
+inicial-1,Módulo 1: Bienvenida al Mundo Tech,Colores de la tecnología,activity,10 min,4,,Aprendemos los colores de los LEDs y componentes,true
+inicial-1,Módulo 2: Conociendo Mi Kit,Mi caja de herramientas,video,10 min,5,,Exploramos los componentes del kit inicial,false
+inicial-1,Módulo 2: Conociendo Mi Kit,LEDs mágicos,activity,15 min,6,,Encendemos nuestro primer LED,false
+inicial-1,Módulo 2: Conociendo Mi Kit,Circuito con stickers,project,20 min,7,,Proyecto: Crear un circuito decorativo con stickers conductores,true
+inicial-2,Módulo 1: Introducción a Circuitos,¿Qué es un circuito?,video,10 min,1,,Aprende qué es un circuito eléctrico básico,false
+inicial-2,Módulo 1: Introducción a Circuitos,Mi Primer LED,activity,15 min,2,,Enciende tu primer LED con el kit inicial,false
+inicial-2,Módulo 1: Introducción a Circuitos,Generador Eólico,project,25 min,3,,Construye un generador eólico simple,true
+inicial-2,Módulo 2: Explorando la IA,Conociendo la IA,video,10 min,4,,¿Qué es la inteligencia artificial?,false
+inicial-2,Módulo 2: Explorando la IA,Detector de Colores,activity,15 min,5,,Usa la cámara para detectar colores,false
+primero-egb,Módulo 1: Mis Primeros Robots,Robot con Articulaciones,video,15 min,1,,Introducción al ensamblaje de robots articulados,false
+primero-egb,Módulo 1: Mis Primeros Robots,Ensamblando el Robot,activity,30 min,2,,Ensambla tu primer robot articulado paso a paso,false
+primero-egb,Módulo 1: Mis Primeros Robots,Robot Pintor,project,35 min,3,,Construye un robot que puede dibujar,true
+primero-egb,Módulo 2: Robot 4x4,Introducción al 4x4,video,10 min,4,,Conoce las partes del robot todo terreno,false
+primero-egb,Módulo 2: Robot 4x4,Armando el 4x4,activity,40 min,5,,Arma tu robot todo terreno,true
+segundo-egb,Módulo 1: Robots Avanzados,Robot Radiocontrolado,video,15 min,1,,Introducción a los robots con control remoto,false
+segundo-egb,Módulo 1: Robots Avanzados,Ensamblaje RC,activity,35 min,2,,Ensambla tu robot radiocontrolado,false
+segundo-egb,Módulo 2: Navegación Acuática,Robot Acuático,video,12 min,3,,Conoce cómo funcionan los robots acuáticos,false
+segundo-egb,Módulo 2: Navegación Acuática,Construyendo el Barco,project,40 min,4,,Construye tu robot de navegación acuática,true
+tercero-egb,Módulo 1: Robots Escaladores,Robot Escalador,video,15 min,1,,Introducción a los mecanismos de escalada,false
+tercero-egb,Módulo 1: Robots Escaladores,Ensamblaje Escalador,activity,35 min,2,,Ensambla tu robot escalador,false
+tercero-egb,Módulo 2: Energía Eólica,Robot Eólico,video,12 min,3,,Aprende sobre energía eólica y robots,false
+tercero-egb,Módulo 2: Energía Eólica,Construyendo Eólico,project,40 min,4,,Construye tu robot eólico,true
+cuarto-egb,Módulo 1: Electrónica Básica,Rueda de la Fortuna,video,15 min,1,,Introducción a circuitos con la rueda de la fortuna,false
+cuarto-egb,Módulo 1: Electrónica Básica,Ensamblaje Rueda,activity,30 min,2,,Ensambla tu rueda de la fortuna electrónica,false
+cuarto-egb,Módulo 2: Radio FM,Introducción a Radio FM,video,12 min,3,,Cómo funciona una radio FM,false
+cuarto-egb,Módulo 2: Radio FM,Construyendo Radio,project,35 min,4,,Construye tu radio FM 76-108MHz,true
+quinto-egb,Módulo 1: Radio Avanzada,Radio RF-FM,video,15 min,1,,Diferencias entre RF y FM,false
+quinto-egb,Módulo 1: Radio Avanzada,Ensamblaje Radio RF,activity,35 min,2,,Ensambla tu radio RF-FM,false
+sexto-egb,Módulo 1: Robot 4 en 1,Introducción Robot 4 en 1,video,15 min,1,,Conoce las 4 configuraciones del robot,false
+sexto-egb,Módulo 1: Robot 4 en 1,Configuración 1,activity,30 min,2,,Primera configuración del robot,false
+sexto-egb,Módulo 2: Circuitos Electrónicos,Generador Aleatorio,video,12 min,3,,Circuito generador aleatorio con micrófono,false
+sexto-egb,Módulo 2: Circuitos Electrónicos,Ensamblaje Circuito,project,35 min,4,,Construye el circuito generador,true
+septimo-egb,Módulo 1: Proyectos Avanzados,Robot 4 en 1 Avanzado,video,15 min,1,,Configuraciones avanzadas del robot,false
+septimo-egb,Módulo 1: Proyectos Avanzados,Avión DIY,project,40 min,2,,Construye tu avión DIY,false
+octavo-egb,Módulo 1: ESP32 Básico,Introducción a ESP32,video,20 min,1,,Conoce el microcontrolador ESP32,false
+octavo-egb,Módulo 1: ESP32 Básico,Configuración ESP32,tutorial,30 min,2,,Configura tu entorno de desarrollo,false
+octavo-egb,Módulo 2: Carro Bluetooth,Carro Bluetooth WiFi,video,15 min,3,,Introducción al carro controlado por Bluetooth,false
+octavo-egb,Módulo 2: Carro Bluetooth,Programación Carro,activity,45 min,4,,Programa tu carro Bluetooth,false
+octavo-egb,Módulo 2: Carro Bluetooth,Proyecto Final Carro,project,60 min,5,,Completa tu carro Bluetooth WiFi,true
+noveno-egb,Módulo 1: Sensores Infrarrojos,Introducción Sensores IR,video,15 min,1,,Cómo funcionan los sensores infrarrojos,false
+noveno-egb,Módulo 1: Sensores Infrarrojos,Seguidor de Línea,activity,40 min,2,,Programa tu seguidor de línea,false
+noveno-egb,Módulo 1: Sensores Infrarrojos,Proyecto Seguidor,project,50 min,3,,Completa el seguidor de línea con 2 sensores,true
+decimo-egb,Módulo 1: Sensores Ultrasónicos,Introducción Ultrasonido,video,15 min,1,,Cómo funcionan los sensores ultrasónicos,false
+decimo-egb,Módulo 1: Sensores Ultrasónicos,Robot Evita Obstáculos,activity,45 min,2,,Programa tu robot evita obstáculos,false
+decimo-egb,Módulo 1: Sensores Ultrasónicos,Proyecto Final,project,55 min,3,,Completa el robot evita obstáculos,true
+primero-bach,Módulo 1: Arduino Avanzado,Introducción Robot Otto,video,20 min,1,,Conoce el robot Otto y sus capacidades,false
+primero-bach,Módulo 1: Arduino Avanzado,Ensamblaje Otto,activity,45 min,2,,Ensambla tu robot Otto,false
+primero-bach,Módulo 1: Arduino Avanzado,Programación Otto,tutorial,40 min,3,,Programa movimientos básicos de Otto,false
+primero-bach,Módulo 1: Arduino Avanzado,Proyecto Otto,project,60 min,4,,Proyecto final con robot Otto,true
+segundo-bach,Módulo 1: Robótica Competitiva,Robot Soccer,video,20 min,1,,Introducción a robots de competencia,false
+segundo-bach,Módulo 1: Robótica Competitiva,Ensamblaje Soccer,activity,50 min,2,,Ensambla tu robot soccer,false
+segundo-bach,Módulo 2: Mini Sumo,Robot Mini Sumo,video,15 min,3,,Estrategias para mini sumo,false
+segundo-bach,Módulo 2: Mini Sumo,Programación Sumo,activity,45 min,4,,Programa tu robot mini sumo,false
+segundo-bach,Módulo 2: Mini Sumo,Proyecto Competencia,project,60 min,5,,Prepara tu robot para competir,true
+tercero-bach,Módulo 1: IoT Básico,Introducción a IoT,video,20 min,1,,¿Qué es el Internet de las Cosas?,false
+tercero-bach,Módulo 1: IoT Básico,Sensores IoT,activity,35 min,2,,Conecta sensores de temperatura luz y humedad,false
+tercero-bach,Módulo 2: Domótica,Casa Inteligente,video,15 min,3,,Introducción a la domótica,false
+tercero-bach,Módulo 2: Domótica,Proyecto Domótica,project,60 min,4,,Crea tu sistema de domótica con ESP32,true

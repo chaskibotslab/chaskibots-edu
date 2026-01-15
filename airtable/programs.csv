@@ -1,0 +1,17 @@
+id,name,description,levelId,levelName,type,duration,price,isActive,createdAt
+prog-inicial2-robotica,Robótica Básica,Introducción a la robótica con LEDs y circuitos simples,inicial-2,Inicial 2,robotica,6 meses,35,true,2024-01-01
+prog-inicial2-programacion,Programación Visual,Aprende a programar con bloques visuales,inicial-2,Inicial 2,programacion,6 meses,35,true,2024-01-01
+prog-inicial2-electronica,Electrónica Creativa,Proyectos creativos con componentes electrónicos,inicial-2,Inicial 2,electronica,6 meses,35,true,2024-01-01
+prog-inicial2-ia,IA para Niños,Introducción a la inteligencia artificial,inicial-2,Inicial 2,ia,6 meses,40,true,2024-01-01
+prog-1egb-robotica,Robótica 1° EGB,Robótica para primero de básica,primero-egb,1° EGB,robotica,10 meses,50,true,2024-01-01
+prog-1egb-programacion,Programación 1° EGB,Programación con Scratch Jr,primero-egb,1° EGB,programacion,10 meses,50,true,2024-01-01
+prog-8egb-robotica,Robótica Avanzada,Arduino y sensores avanzados,octavo-egb,8° EGB,robotica,10 meses,75,true,2024-01-01
+prog-8egb-programacion,Programación Python,Python desde cero,octavo-egb,8° EGB,programacion,10 meses,75,true,2024-01-01
+prog-8egb-hacking,Hacking Ético,Ciberseguridad y hacking ético,octavo-egb,8° EGB,hacking,10 meses,80,true,2024-01-01
+prog-8egb-ia,Inteligencia Artificial,Machine Learning y visión por computadora,octavo-egb,8° EGB,ia,10 meses,80,true,2024-01-01
+prog-1bach-fullstack,Desarrollo Web,HTML CSS JavaScript y React,primero-bach,1° BGU,programacion,10 meses,80,true,2024-01-01
+prog-1bach-ciberseguridad,Ciberseguridad Avanzada,Pentesting y seguridad de redes,primero-bach,1° BGU,hacking,10 meses,85,true,2024-01-01
+prog-universidad-python,Python Profesional,Python avanzado para ciencia de datos,universidad,Universidad,programacion,4 meses,120,true,2024-01-01
+prog-universidad-ml,Machine Learning,Curso completo de ML con TensorFlow,universidad,Universidad,ia,6 meses,150,true,2024-01-01
+prog-curso-arduino,Arduino Maker,Curso intensivo de Arduino,curso-libre,Curso Libre,robotica,2 meses,60,true,2024-01-01
+prog-curso-roblox,Desarrollo Roblox,Crea juegos en Roblox con Lua,curso-libre,Curso Libre,programacion,3 meses,70,true,2024-01-01

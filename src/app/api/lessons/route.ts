@@ -1,0 +1,194 @@
+import { NextResponse } from 'next/server'
+
+const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
+const AIRTABLE_LESSONS_TABLE = 'lessons'
+
+const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_LESSONS_TABLE}`
+
+function getVideoEmbedUrl(url: string): string {
+  if (!url) return ''
+  if (url.includes('drive.google.com')) {
+    const match = url.match(/\/file\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/)
+    if (match && match[1]) {
+      return `https://drive.google.com/file/d/${match[1]}/preview`
+    }
+  }
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}`
+    }
+  }
+  return url
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const levelId = searchParams.get('levelId')
+
+  try {
+    let url = AIRTABLE_API_URL
+    
+    if (levelId) {
+      url += `?filterByFormula={levelId}="${levelId}"&sort[0][field]=order&sort[0][direction]=asc`
+    } else {
+      url += `?sort[0][field]=order&sort[0][direction]=asc`
+    }
+
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Airtable lessons error:', errorText)
+      return NextResponse.json({ error: 'Error fetching lessons' }, { status: 500 })
+    }
+
+    const data = await response.json()
+    
+    const lessons = data.records.map((record: any) => ({
+      id: record.id,
+      levelId: record.fields.levelId || '',
+      moduleId: record.fields.moduleId || '',
+      moduleName: record.fields.moduleName || '',
+      title: record.fields.title || '',
+      type: record.fields.type || 'video',
+      duration: record.fields.duration || '5 min',
+      order: record.fields.order || 0,
+      videoUrl: record.fields.videoUrl || '',
+      videoEmbedUrl: getVideoEmbedUrl(record.fields.videoUrl || ''),
+      content: record.fields.content || '',
+      locked: record.fields.locked || false,
+    }))
+
+    return NextResponse.json(lessons)
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    
+    const response = await fetch(AIRTABLE_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        records: [{
+          fields: {
+            levelId: body.levelId,
+            moduleId: body.moduleId,
+            moduleName: body.moduleName,
+            title: body.title,
+            type: body.type,
+            duration: body.duration,
+            order: body.order || 0,
+            videoUrl: body.videoUrl,
+            content: body.content,
+            locked: body.locked || false,
+          }
+        }]
+      })
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Airtable error:', errorText)
+      return NextResponse.json({ error: 'Error creating lesson', message: errorText }, { status: 500 })
+    }
+
+    const data = await response.json()
+    return NextResponse.json({ success: true, record: data.records[0] })
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json()
+    
+    if (!body.id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 })
+    }
+
+    const fields: Record<string, any> = {}
+    if (body.levelId) fields.levelId = body.levelId
+    if (body.moduleId) fields.moduleId = body.moduleId
+    if (body.moduleName) fields.moduleName = body.moduleName
+    if (body.title) fields.title = body.title
+    if (body.type) fields.type = body.type
+    if (body.duration) fields.duration = body.duration
+    if (body.order !== undefined) fields.order = body.order
+    if (body.videoUrl !== undefined) fields.videoUrl = body.videoUrl
+    if (body.content !== undefined) fields.content = body.content
+    if (body.locked !== undefined) fields.locked = body.locked
+
+    const response = await fetch(AIRTABLE_API_URL, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        records: [{
+          id: body.id,
+          fields
+        }]
+      })
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Airtable error:', errorText)
+      return NextResponse.json({ error: 'Error updating lesson', message: errorText }, { status: 500 })
+    }
+
+    const data = await response.json()
+    return NextResponse.json({ success: true, record: data.records[0] })
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 })
+    }
+
+    const response = await fetch(`${AIRTABLE_API_URL}/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      },
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Airtable error:', errorText)
+      return NextResponse.json({ error: 'Error deleting lesson' }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
