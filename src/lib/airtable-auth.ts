@@ -3,21 +3,57 @@
 // Sistema de claves personalizadas por curso
 // ============================================
 
-import Airtable from 'airtable'
+// Usar API REST directa en lugar de librería airtable
+const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
+const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`
 
-// Configuración de Airtable - Lazy initialization para evitar errores durante build
-let _base: ReturnType<typeof Airtable.prototype.base> | null = null
+interface AirtableRecord {
+  id: string
+  fields: Record<string, unknown>
+  createdTime: string
+}
 
-function getBase(): ReturnType<typeof Airtable.prototype.base> {
-  if (!_base) {
-    if (!process.env.AIRTABLE_API_KEY) {
-      throw new Error('AIRTABLE_API_KEY environment variable is not set')
-    }
-    _base = new Airtable({ 
-      apiKey: process.env.AIRTABLE_API_KEY 
-    }).base(process.env.AIRTABLE_BASE_ID || '')
+interface AirtableResponse {
+  records: AirtableRecord[]
+  offset?: string
+}
+
+async function fetchTable(tableName: string, filterFormula?: string): Promise<AirtableRecord[]> {
+  const url = new URL(`${AIRTABLE_API_URL}/${tableName}`)
+  if (filterFormula) {
+    url.searchParams.append('filterByFormula', filterFormula)
+    url.searchParams.append('maxRecords', '1')
   }
-  return _base
+  
+  const response = await fetch(url.toString(), {
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-store',
+  })
+  
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(`Airtable API error: ${response.status} - ${errorText}`)
+  }
+  
+  const data: AirtableResponse = await response.json()
+  return data.records
+}
+
+async function updateRecord(tableName: string, recordId: string, fields: Record<string, unknown>): Promise<void> {
+  const url = `${AIRTABLE_API_URL}/${tableName}/${recordId}`
+  
+  await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ fields }),
+  })
 }
 
 
@@ -68,12 +104,7 @@ export async function validateAccessCode(accessCode: string): Promise<{
   error?: string
 }> {
   try {
-    const records = await getBase()(USERS_TABLE)
-      .select({
-        filterByFormula: `AND({accessCode} = '${accessCode}', {isActive} = TRUE())`,
-        maxRecords: 1
-      })
-      .firstPage()
+    const records = await fetchTable(USERS_TABLE, `{accessCode} = '${accessCode}'`)
 
     if (records.length === 0) {
       return { success: false, error: 'Código de acceso inválido' }
@@ -91,23 +122,25 @@ export async function validateAccessCode(accessCode: string): Promise<{
     }
 
     // Actualizar último login
-    await getBase()(USERS_TABLE).update(record.id, {
-      lastLogin: new Date().toISOString()
-    })
+    try {
+      await updateRecord(USERS_TABLE, record.id, { lastLogin: new Date().toISOString() })
+    } catch {
+      // Ignorar error de actualización
+    }
 
     const user: CourseUser = {
       id: record.id,
-      accessCode: fields.accessCode as string,
-      name: fields.name as string,
+      accessCode: (fields.accessCode as string) || '',
+      name: (fields.name as string) || 'Usuario',
       email: fields.email as string | undefined,
-      role: fields.role as 'admin' | 'teacher' | 'student',
-      courseId: fields.courseId as string,
-      courseName: fields.courseName as string,
-      programId: fields.programId as string || '',
-      programName: fields.programName as string || '',
-      levelId: fields.levelId as string,
-      isActive: fields.isActive as boolean,
-      createdAt: fields.createdAt as string,
+      role: (fields.role as 'admin' | 'teacher' | 'student') || 'student',
+      courseId: (fields.courseId as string) || '',
+      courseName: (fields.courseName as string) || '',
+      programId: (fields.programId as string) || '',
+      programName: (fields.programName as string) || '',
+      levelId: (fields.levelId as string) || '',
+      isActive: true,
+      createdAt: (fields.createdAt as string) || new Date().toISOString(),
       lastLogin: new Date().toISOString(),
       expiresAt: fields.expiresAt as string | undefined
     }
@@ -115,7 +148,8 @@ export async function validateAccessCode(accessCode: string): Promise<{
     return { success: true, user }
   } catch (error) {
     console.error('Error validating access code:', error)
-    return { success: false, error: 'Error de conexión con la base de datos' }
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    return { success: false, error: `Error: ${errorMsg}` }
   }
 }
 
@@ -126,13 +160,8 @@ export async function validateEmailPassword(email: string, password: string): Pr
   error?: string
 }> {
   try {
-    // Buscar usuario solo por email (sin filtro isActive para evitar problemas)
-    const records = await getBase()(USERS_TABLE)
-      .select({
-        filterByFormula: `{email} = '${email}'`,
-        maxRecords: 1
-      })
-      .firstPage()
+    // Buscar usuario solo por email
+    const records = await fetchTable(USERS_TABLE, `{email} = '${email}'`)
 
     if (records.length === 0) {
       return { success: false, error: 'Usuario no encontrado' }
@@ -148,9 +177,7 @@ export async function validateEmailPassword(email: string, password: string): Pr
 
     // Actualizar ultimo login (ignorar errores si falla)
     try {
-      await getBase()(USERS_TABLE).update(record.id, {
-        lastLogin: new Date().toISOString()
-      })
+      await updateRecord(USERS_TABLE, record.id, { lastLogin: new Date().toISOString() })
     } catch {
       // Ignorar error de actualización
     }
