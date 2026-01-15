@@ -13,4 +13,5 @@ const AdminProyectosContent = dynamic(() => import('./AdminProyectosContent'), {
 
 export default function ProjectsAdminPage() {
   return <AdminProyectosContent />
-}
+}  
+
