@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { Bot, Brain, Shield, Rocket, Users, Award, Play, ArrowRight, Zap, Cpu, Code, Sparkles, GraduationCap } from 'lucide-react'
 
 export default function HomePage() {
+  const router = useRouter()
   const [count1, setCount1] = useState(0)
   const [count2, setCount2] = useState(0)
   const [count3, setCount3] = useState(0)
@@ -158,7 +160,7 @@ export default function HomePage() {
             
             <div className="grid md:grid-cols-3 gap-6">
               {/* Robótica */}
-              <div className="card group hover:border-neon-cyan/50 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/login'}>
+              <div className="card group hover:border-neon-cyan/50 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => router.push('/login')}>
                 <div className="w-16 h-16 bg-gradient-to-br from-neon-cyan/20 to-neon-blue/20 rounded-2xl flex items-center justify-center mb-4 group-hover:shadow-neon-cyan transition-all group-hover:animate-pulse">
                   <Bot className="w-8 h-8 text-neon-cyan" />
                 </div>
@@ -175,7 +177,7 @@ export default function HomePage() {
               </div>
 
               {/* IA */}
-              <div className="card group hover:border-neon-purple/50 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/login'}>
+              <div className="card group hover:border-neon-purple/50 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => router.push('/login')}>
                 <div className="w-16 h-16 bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 rounded-2xl flex items-center justify-center mb-4 group-hover:shadow-neon-purple transition-all group-hover:animate-pulse">
                   <Brain className="w-8 h-8 text-neon-purple" />
                 </div>
@@ -192,7 +194,7 @@ export default function HomePage() {
               </div>
 
               {/* Hacking */}
-              <div className="card group hover:border-neon-green/50 hover:scale-105 transition-all duration-300 relative overflow-hidden cursor-pointer" onClick={() => window.location.href = '/login'}>
+              <div className="card group hover:border-neon-green/50 hover:scale-105 transition-all duration-300 relative overflow-hidden cursor-pointer" onClick={() => router.push('/login')}>
                 <div className="absolute top-3 right-3 px-2 py-1 bg-neon-orange/20 border border-neon-orange/40 rounded text-xs text-neon-orange">
                   Desde 8° EGB
                 </div>
