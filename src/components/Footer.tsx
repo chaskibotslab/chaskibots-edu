@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Zap, Mail, Globe, Youtube, Facebook } from 'lucide-react'
+import Image from 'next/image'
+import { Mail, Globe, Youtube, Facebook } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -9,9 +10,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-xl flex items-center justify-center shadow-neon-cyan">
-                <Zap className="w-6 h-6 text-dark-900" />
-              </div>
+              <Image 
+                src="/chaski.png" 
+                alt="ChaskiBots Logo" 
+                width={40} 
+                height={40}
+                className="rounded-xl"
+              />
               <div>
                 <span className="font-bold text-xl text-white">ChaskiBots</span>
                 <span className="text-[10px] text-neon-cyan block tracking-widest">EDUCATION PLATFORM</span>

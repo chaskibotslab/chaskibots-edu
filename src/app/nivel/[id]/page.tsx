@@ -15,6 +15,7 @@ import AIModule from '@/components/AIModule'
 import AIActivities from '@/components/AIActivities'
 import SimulatorTabs from '@/components/SimulatorTabs'
 import KitDisplay from '@/components/KitDisplay'
+import CourseAuthGuard from '@/components/CourseAuthGuard'
 
 interface APILesson {
   id: string
@@ -127,7 +128,8 @@ export default function NivelPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-900 flex">
+    <CourseAuthGuard levelId={levelId} levelName={level.name}>
+      <div className="min-h-screen bg-dark-900 flex">
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-dark-800 border-r border-dark-600 transition-all duration-300 overflow-hidden flex-shrink-0`}>
         <div className="h-full flex flex-col">
@@ -483,7 +485,8 @@ export default function NivelPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </CourseAuthGuard>
   )
 }

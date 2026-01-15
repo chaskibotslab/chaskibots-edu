@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/components/AuthProvider'
-import { Bot, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Loader2, Sparkles, Shield, Rocket } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -23,7 +24,6 @@ export default function LoginPage() {
     try {
       const result = await login(email, password)
       if (result.success) {
-        // Redirigir según el rol o a la página solicitada
         const params = new URLSearchParams(window.location.search)
         const redirect = params.get('redirect') || '/niveles'
         router.push(redirect)
@@ -38,20 +38,82 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-chaski-dark via-blue-900 to-indigo-900 px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <div className="w-14 h-14 bg-gradient-to-br from-chaski-accent to-blue-400 rounded-2xl flex items-center justify-center">
-              <Bot className="w-8 h-8 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white">ChaskiBots EDU</span>
+    <div className="min-h-screen flex">
+      {/* Panel izquierdo - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-chaski-dark via-blue-900 to-indigo-900 p-12 flex-col justify-between relative overflow-hidden">
+        {/* Decoración de fondo */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-chaski-accent rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="relative z-10">
+          <Link href="/" className="inline-flex items-center gap-4">
+            <Image 
+              src="/chaski.png" 
+              alt="ChaskiBots Logo" 
+              width={60} 
+              height={60}
+              className="rounded-2xl"
+            />
+            <span className="text-3xl font-bold text-white">ChaskiBots EDU</span>
           </Link>
         </div>
+        
+        <div className="relative z-10 space-y-8">
+          <h2 className="text-4xl font-bold text-white leading-tight">
+            Aprende robótica, IA y programación de forma divertida
+          </h2>
+          <p className="text-xl text-blue-200">
+            Plataforma educativa interactiva para estudiantes de todas las edades
+          </p>
+          
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 text-white">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <Rocket className="w-6 h-6" />
+              </div>
+              <span className="text-lg">Cursos interactivos paso a paso</span>
+            </div>
+            <div className="flex items-center gap-4 text-white">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <span className="text-lg">Proyectos prácticos y divertidos</span>
+            </div>
+            <div className="flex items-center gap-4 text-white">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <Shield className="w-6 h-6" />
+              </div>
+              <span className="text-lg">Ambiente seguro para aprender</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="relative z-10 text-blue-300 text-sm">
+          © 2024 ChaskiBots. Todos los derechos reservados.
+        </div>
+      </div>
 
-        {/* Login Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
+      {/* Panel derecho - Formulario */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 px-6 py-12">
+        <div className="w-full max-w-md">
+          {/* Logo móvil */}
+          <div className="lg:hidden text-center mb-8">
+            <Link href="/" className="inline-flex items-center gap-3">
+              <Image 
+                src="/chaski.png" 
+                alt="ChaskiBots Logo" 
+                width={50} 
+                height={50}
+                className="rounded-xl"
+              />
+              <span className="text-2xl font-bold text-chaski-dark">ChaskiBots EDU</span>
+            </Link>
+          </div>
+
+          {/* Login Card */}
+          <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
           <h1 className="text-2xl font-bold text-chaski-dark text-center mb-2">
             ¡Bienvenido de vuelta!
           </h1>
@@ -153,11 +215,12 @@ export default function LoginPage() {
         </div>
 
         {/* Info de acceso */}
-        <div className="mt-6 bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white text-sm">
-          <p className="font-semibold mb-3 text-center">🔐 Acceso a la plataforma</p>
-          <p className="text-xs text-center opacity-80">
-            Ingresa con tu correo y contrasena proporcionados por tu institucion.
+        <div className="mt-6 bg-gradient-to-r from-chaski-dark to-blue-900 rounded-xl p-4 text-white text-sm">
+          <p className="font-semibold mb-2 text-center">🔐 Acceso a la plataforma</p>
+          <p className="text-xs text-center opacity-90">
+            Ingresa con tu correo y contraseña proporcionados por tu institución.
           </p>
+        </div>
         </div>
       </div>
     </div>

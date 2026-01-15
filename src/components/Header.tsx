@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from './AuthProvider'
 import { Menu, X, User, LogOut, BookOpen, Bot, Brain, Shield, Zap } from 'lucide-react'
 
@@ -15,10 +16,13 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-xl flex items-center justify-center shadow-neon-cyan group-hover:shadow-neon-purple transition-all duration-300">
-              <Zap className="w-6 h-6 text-dark-900" />
-              <div className="absolute inset-0 bg-neon-cyan/20 rounded-xl animate-pulse" />
-            </div>
+            <Image 
+              src="/chaski.png" 
+              alt="ChaskiBots Logo" 
+              width={40} 
+              height={40}
+              className="rounded-xl shadow-lg group-hover:scale-105 transition-transform duration-300"
+            />
             <div className="flex flex-col">
               <span className="font-bold text-xl text-white">ChaskiBots</span>
               <span className="text-[10px] text-neon-cyan tracking-widest">EDUCATION PLATFORM</span>
