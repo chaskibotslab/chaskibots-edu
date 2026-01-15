@@ -175,7 +175,8 @@ export async function validateEmailPassword(email: string, password: string): Pr
     return { success: true, user }
   } catch (error) {
     console.error('Error validating email/password:', error)
-    return { success: false, error: 'Error de conexion con la base de datos' }
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    return { success: false, error: `Error: ${errorMsg}` }
   }
 }
 
