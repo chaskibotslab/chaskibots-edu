@@ -22,13 +22,25 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
   // Verificar si ya está autenticado para este curso
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Si el usuario está logueado, verificar si tiene acceso al curso
+      // Admin y teacher siempre tienen acceso a todos los cursos
+      if (user.role === 'admin' || user.role === 'teacher') {
+        setIsAuthorized(true)
+        return
+      }
+      
+      // Estudiante: verificar si su levelId coincide con el curso
+      // El levelId del usuario puede ser exacto o puede ser un nivel que incluye este curso
+      const userLevel = user.levelId || ''
+      
+      // Dar acceso si el levelId del usuario coincide con el curso
+      if (userLevel === levelId) {
+        setIsAuthorized(true)
+        return
+      }
+      
+      // También verificar si ya tiene acceso guardado en sesión
       const courseAccess = sessionStorage.getItem(`course_access_${levelId}`)
       if (courseAccess === 'granted') {
-        setIsAuthorized(true)
-      }
-      // Admin siempre tiene acceso
-      if (user.role === 'admin') {
         setIsAuthorized(true)
       }
     }
@@ -94,7 +106,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
     )
   }
 
-  // Mostrar formulario de contraseña del curso
+  // Mostrar mensaje de acceso denegado o formulario de contraseña
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-chaski-dark via-blue-900 to-indigo-900 px-4">
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
@@ -110,6 +122,13 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
           </p>
         </div>
 
+        {/* Mensaje informativo */}
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl text-sm mb-6">
+          <p className="font-medium mb-1">Tu cuenta está registrada para:</p>
+          <p className="text-amber-700">{user?.levelId || 'Sin nivel asignado'}</p>
+          <p className="mt-2 text-xs">Si necesitas acceso a este curso, contacta a tu profesor o administrador.</p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm text-center">
@@ -119,7 +138,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Contraseña del curso
+              O ingresa la contraseña del curso
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -128,7 +147,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-chaski-accent focus:border-transparent transition-all"
-                placeholder="Ingresa la contraseña"
+                placeholder="Contraseña del curso"
                 required
                 autoFocus
               />
