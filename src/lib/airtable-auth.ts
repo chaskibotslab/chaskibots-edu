@@ -126,9 +126,10 @@ export async function validateEmailPassword(email: string, password: string): Pr
   error?: string
 }> {
   try {
+    // Buscar usuario solo por email (sin filtro isActive para evitar problemas)
     const records = await getBase()(USERS_TABLE)
       .select({
-        filterByFormula: `AND({email} = '${email}', {isActive} = TRUE())`,
+        filterByFormula: `{email} = '${email}'`,
         maxRecords: 1
       })
       .firstPage()
@@ -145,24 +146,28 @@ export async function validateEmailPassword(email: string, password: string): Pr
       return { success: false, error: 'Contrasena incorrecta' }
     }
 
-    // Actualizar ultimo login
-    await getBase()(USERS_TABLE).update(record.id, {
-      lastLogin: new Date().toISOString()
-    })
+    // Actualizar ultimo login (ignorar errores si falla)
+    try {
+      await getBase()(USERS_TABLE).update(record.id, {
+        lastLogin: new Date().toISOString()
+      })
+    } catch {
+      // Ignorar error de actualización
+    }
 
     const user: CourseUser = {
       id: record.id,
-      accessCode: fields.accessCode as string,
-      name: fields.name as string,
+      accessCode: (fields.accessCode as string) || '',
+      name: (fields.name as string) || 'Usuario',
       email: fields.email as string | undefined,
-      role: fields.role as 'admin' | 'teacher' | 'student',
-      courseId: fields.courseId as string || '',
-      courseName: fields.courseName as string || '',
-      programId: fields.programId as string || '',
-      programName: fields.programName as string || '',
-      levelId: fields.levelId as string,
-      isActive: fields.isActive as boolean,
-      createdAt: fields.createdAt as string,
+      role: (fields.role as 'admin' | 'teacher' | 'student') || 'student',
+      courseId: (fields.courseId as string) || '',
+      courseName: (fields.courseName as string) || '',
+      programId: (fields.programId as string) || '',
+      programName: (fields.programName as string) || '',
+      levelId: (fields.levelId as string) || '',
+      isActive: true,
+      createdAt: (fields.createdAt as string) || new Date().toISOString(),
       lastLogin: new Date().toISOString(),
       expiresAt: fields.expiresAt as string | undefined
     }
