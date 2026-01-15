@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 
-const AdminProyectosContent = dynamic(() => import('./AdminProyectosContent'), { 
+const AdminIAContent = dynamic(() => import('./AdminIAContent'), { 
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-dark-900 flex items-center justify-center">
@@ -11,7 +11,6 @@ const AdminProyectosContent = dynamic(() => import('./AdminProyectosContent'), {
   )
 })
 
-export default function ProjectsAdminPage() {
-  return <AdminProyectosContent />
-}  
-
+export default function IAAdminPage() {
+  return <AdminIAContent />
+}
