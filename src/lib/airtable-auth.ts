@@ -56,6 +56,66 @@ async function updateRecord(tableName: string, recordId: string, fields: Record<
   })
 }
 
+async function createRecord(tableName: string, fields: Record<string, unknown>): Promise<AirtableRecord> {
+  const url = `${AIRTABLE_API_URL}/${tableName}`
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ fields }),
+  })
+  
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(`Airtable create error: ${response.status} - ${errorText}`)
+  }
+  
+  return await response.json()
+}
+
+async function deleteRecord(tableName: string, recordId: string): Promise<void> {
+  const url = `${AIRTABLE_API_URL}/${tableName}/${recordId}`
+  
+  await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+    },
+  })
+}
+
+async function fetchAllRecords(tableName: string): Promise<AirtableRecord[]> {
+  const allRecords: AirtableRecord[] = []
+  let offset: string | undefined
+  
+  do {
+    const url = new URL(`${AIRTABLE_API_URL}/${tableName}`)
+    if (offset) {
+      url.searchParams.append('offset', offset)
+    }
+    
+    const response = await fetch(url.toString(), {
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    if (!response.ok) {
+      throw new Error(`Airtable API error: ${response.status}`)
+    }
+    
+    const data: AirtableResponse = await response.json()
+    allRecords.push(...data.records)
+    offset = data.offset
+  } while (offset)
+  
+  return allRecords
+}
+
 
 // Interfaces
 export interface CourseUser {
@@ -234,7 +294,7 @@ export async function createCourseUser(
   try {
     const accessCode = generateAccessCode(role === 'teacher' ? 'PR' : 'ES')
 
-    const record = await getBase()(USERS_TABLE).create({
+    const record = await createRecord(USERS_TABLE, {
       accessCode,
       name,
       email: email || '',
@@ -307,23 +367,21 @@ export async function createBulkUsers(
 // Obtener TODOS los usuarios
 export async function getAllUsers(): Promise<CourseUser[]> {
   try {
-    const records = await getBase()(USERS_TABLE)
-      .select({})
-      .all()
+    const records = await fetchAllRecords(USERS_TABLE)
 
-    return records.map(record => ({
+    return records.map((record: AirtableRecord) => ({
       id: record.id,
-      accessCode: record.fields.accessCode as string,
-      name: record.fields.name as string,
+      accessCode: (record.fields.accessCode as string) || '',
+      name: (record.fields.name as string) || '',
       email: record.fields.email as string | undefined,
-      role: record.fields.role as 'admin' | 'teacher' | 'student',
-      courseId: record.fields.courseId as string || '',
-      courseName: record.fields.courseName as string || '',
-      programId: record.fields.programId as string || '',
-      programName: record.fields.programName as string || '',
-      levelId: record.fields.levelId as string,
-      isActive: record.fields.isActive as boolean,
-      createdAt: record.fields.createdAt as string,
+      role: (record.fields.role as 'admin' | 'teacher' | 'student') || 'student',
+      courseId: (record.fields.courseId as string) || '',
+      courseName: (record.fields.courseName as string) || '',
+      programId: (record.fields.programId as string) || '',
+      programName: (record.fields.programName as string) || '',
+      levelId: (record.fields.levelId as string) || '',
+      isActive: Boolean(record.fields.isActive),
+      createdAt: (record.fields.createdAt as string) || '',
       lastLogin: record.fields.lastLogin as string | undefined,
       expiresAt: record.fields.expiresAt as string | undefined
     }))
@@ -336,25 +394,21 @@ export async function getAllUsers(): Promise<CourseUser[]> {
 // Obtener usuarios de un curso
 export async function getCourseUsers(courseId: string): Promise<CourseUser[]> {
   try {
-    const records = await getBase()(USERS_TABLE)
-      .select({
-        filterByFormula: `{courseId} = '${courseId}'`
-      })
-      .all()
+    const records = await fetchTable(USERS_TABLE, `{courseId} = '${courseId}'`)
 
-    return records.map(record => ({
+    return records.map((record: AirtableRecord) => ({
       id: record.id,
-      accessCode: record.fields.accessCode as string,
-      name: record.fields.name as string,
+      accessCode: (record.fields.accessCode as string) || '',
+      name: (record.fields.name as string) || '',
       email: record.fields.email as string | undefined,
-      role: record.fields.role as 'admin' | 'teacher' | 'student',
-      courseId: record.fields.courseId as string || '',
-      courseName: record.fields.courseName as string || '',
-      programId: record.fields.programId as string || '',
-      programName: record.fields.programName as string || '',
-      levelId: record.fields.levelId as string,
-      isActive: record.fields.isActive as boolean,
-      createdAt: record.fields.createdAt as string,
+      role: (record.fields.role as 'admin' | 'teacher' | 'student') || 'student',
+      courseId: (record.fields.courseId as string) || '',
+      courseName: (record.fields.courseName as string) || '',
+      programId: (record.fields.programId as string) || '',
+      programName: (record.fields.programName as string) || '',
+      levelId: (record.fields.levelId as string) || '',
+      isActive: Boolean(record.fields.isActive),
+      createdAt: (record.fields.createdAt as string) || '',
       lastLogin: record.fields.lastLogin as string | undefined,
       expiresAt: record.fields.expiresAt as string | undefined
     }))
@@ -367,7 +421,7 @@ export async function getCourseUsers(courseId: string): Promise<CourseUser[]> {
 // Desactivar usuario
 export async function deactivateUser(userId: string): Promise<boolean> {
   try {
-    await getBase()(USERS_TABLE).update(userId, { isActive: false })
+    await updateRecord(USERS_TABLE, userId, { isActive: false })
     return true
   } catch (error) {
     console.error('Error deactivating user:', error)
@@ -383,7 +437,7 @@ export async function regenerateAccessCode(userId: string): Promise<{
 }> {
   try {
     const newCode = generateAccessCode()
-    await getBase()(USERS_TABLE).update(userId, { accessCode: newCode })
+    await updateRecord(USERS_TABLE, userId, { accessCode: newCode })
     return { success: true, newCode }
   } catch (error) {
     console.error('Error regenerating access code:', error)
@@ -405,7 +459,7 @@ export async function createCourse(
   maxStudents: number = 30
 ): Promise<{ success: boolean; course?: Course; error?: string }> {
   try {
-    const record = await getBase()(COURSES_TABLE).create({
+    const record = await createRecord(COURSES_TABLE, {
       name,
       description: description || '',
       levelId,
@@ -441,24 +495,20 @@ export async function createCourse(
 // Obtener todos los cursos
 export async function getAllCourses(): Promise<Course[]> {
   try {
-    const records = await getBase()(COURSES_TABLE)
-      .select({
-        filterByFormula: `{isActive} = TRUE()`
-      })
-      .all()
+    const records = await fetchAllRecords(COURSES_TABLE)
 
-    return records.map(record => ({
+    return records.map((record: AirtableRecord) => ({
       id: record.id,
-      name: record.fields.name as string,
+      name: (record.fields.name as string) || '',
       description: record.fields.description as string | undefined,
-      levelId: record.fields.levelId as string,
-      teacherId: record.fields.teacherId as string,
-      teacherName: record.fields.teacherName as string,
+      levelId: (record.fields.levelId as string) || '',
+      teacherId: (record.fields.teacherId as string) || '',
+      teacherName: (record.fields.teacherName as string) || '',
       accessCodes: [],
-      maxStudents: record.fields.maxStudents as number,
-      currentStudents: record.fields.currentStudents as number,
-      isActive: record.fields.isActive as boolean,
-      createdAt: record.fields.createdAt as string
+      maxStudents: (record.fields.maxStudents as number) || 30,
+      currentStudents: (record.fields.currentStudents as number) || 0,
+      isActive: Boolean(record.fields.isActive),
+      createdAt: (record.fields.createdAt as string) || ''
     }))
   } catch (error) {
     console.error('Error getting courses:', error)
@@ -469,24 +519,20 @@ export async function getAllCourses(): Promise<Course[]> {
 // Obtener cursos de un profesor
 export async function getTeacherCourses(teacherId: string): Promise<Course[]> {
   try {
-    const records = await getBase()(COURSES_TABLE)
-      .select({
-        filterByFormula: `AND({teacherId} = '${teacherId}', {isActive} = TRUE())`
-      })
-      .all()
+    const records = await fetchTable(COURSES_TABLE, `{teacherId} = '${teacherId}'`)
 
-    return records.map(record => ({
+    return records.map((record: AirtableRecord) => ({
       id: record.id,
-      name: record.fields.name as string,
+      name: (record.fields.name as string) || '',
       description: record.fields.description as string | undefined,
-      levelId: record.fields.levelId as string,
-      teacherId: record.fields.teacherId as string,
-      teacherName: record.fields.teacherName as string,
+      levelId: (record.fields.levelId as string) || '',
+      teacherId: (record.fields.teacherId as string) || '',
+      teacherName: (record.fields.teacherName as string) || '',
       accessCodes: [],
-      maxStudents: record.fields.maxStudents as number,
-      currentStudents: record.fields.currentStudents as number,
-      isActive: record.fields.isActive as boolean,
-      createdAt: record.fields.createdAt as string
+      maxStudents: (record.fields.maxStudents as number) || 30,
+      currentStudents: (record.fields.currentStudents as number) || 0,
+      isActive: Boolean(record.fields.isActive),
+      createdAt: (record.fields.createdAt as string) || ''
     }))
   } catch (error) {
     console.error('Error getting teacher courses:', error)
