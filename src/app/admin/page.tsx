@@ -135,10 +135,11 @@ export default function AdminPage() {
             <p className="text-xs text-gray-500 mb-2 px-4">Herramientas</p>
             <Link
               href="/admin/calificaciones"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-neon-green/30"
             >
-              <GraduationCap className="w-5 h-5" />
+              <GraduationCap className="w-5 h-5 text-neon-green" />
               <span>Calificaciones</span>
+              <span className="ml-auto text-xs bg-neon-green/20 text-neon-green px-2 py-0.5 rounded">Nuevo</span>
             </Link>
           </div>
         </nav>
