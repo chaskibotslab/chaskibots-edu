@@ -1,13 +1,29 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Play, Download, Trash2, Copy, Check, FileCode, FileText, RotateCcw } from 'lucide-react'
+import { Play, Download, Trash2, Copy, Check, FileCode, FileText, RotateCcw, QrCode, Hash } from 'lucide-react'
+import QRCode from 'qrcode'
 
 declare global {
   interface Window {
     loadPyodide: () => Promise<any>
     pyodide: any
   }
+}
+
+// Generar ID único basado en contenido y timestamp
+const generateTaskId = (code: string, studentName: string): string => {
+  const timestamp = Date.now()
+  const content = `${studentName}-${code}-${timestamp}`
+  let hash = 0
+  for (let i = 0; i < content.length; i++) {
+    const char = content.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  const uniqueId = Math.abs(hash).toString(36).toUpperCase()
+  const dateCode = new Date().toISOString().slice(2, 10).replace(/-/g, '')
+  return `CB-${dateCode}-${uniqueId.slice(0, 6)}`
 }
 
 const DEFAULT_CODE = `# Calculadora simple
@@ -119,6 +135,9 @@ export default function PythonSimulator() {
   const [isLoading, setIsLoading] = useState(true)
   const [copied, setCopied] = useState<string | null>(null)
   const [studentName, setStudentName] = useState('')
+  const [lastTaskId, setLastTaskId] = useState<string | null>(null)
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
+  const [showExportModal, setShowExportModal] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -245,35 +264,172 @@ ${output}
     downloadFile(content, filename, 'text/plain')
   }
 
-  const exportBoth = () => {
-    const filename = studentName 
-      ? `${studentName.replace(/\s+/g, '_')}_tarea.txt`
-      : 'tarea_python.txt'
+  const prepareExport = async () => {
+    const taskId = generateTaskId(code, studentName)
+    setLastTaskId(taskId)
     
-    const content = `╔════════════════════════════════════════════════════════════╗
-║              TAREA DE PYTHON - CHASKIBOTS                  ║
-╚════════════════════════════════════════════════════════════╝
+    // Generar QR con la información de verificación
+    const qrData = JSON.stringify({
+      id: taskId,
+      student: studentName || 'Anónimo',
+      date: new Date().toISOString(),
+      platform: 'ChaskiBots',
+      verify: `https://edu.chaskibots.com/verify/${taskId}`
+    })
+    
+    try {
+      const qrUrl = await QRCode.toDataURL(qrData, {
+        width: 200,
+        margin: 2,
+        color: { dark: '#00D9FF', light: '#1a1a2e' }
+      })
+      setQrDataUrl(qrUrl)
+    } catch (err) {
+      console.error('Error generating QR:', err)
+    }
+    
+    setShowExportModal(true)
+  }
+
+  const exportBoth = async () => {
+    const taskId = lastTaskId || generateTaskId(code, studentName)
+    const filename = studentName 
+      ? `${studentName.replace(/\s+/g, '_')}_${taskId}.txt`
+      : `tarea_${taskId}.txt`
+    
+    const content = `╔════════════════════════════════════════════════════════════════════╗
+║                  TAREA DE PYTHON - CHASKIBOTS                      ║
+║                    CERTIFICADO DE EJECUCIÓN                        ║
+╚════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  🔐 ID DE VERIFICACIÓN: ${taskId.padEnd(43)}│
+└─────────────────────────────────────────────────────────────────────┘
 
 📝 Estudiante: ${studentName || '_______________'}
 📅 Fecha: ${new Date().toLocaleString('es-EC')}
+🕐 Timestamp: ${Date.now()}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📄 CÓDIGO PYTHON:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${code}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🖥️ RESULTADO DE EJECUCIÓN:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${output}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ Generado con ChaskiBots Education Platform
-🌐 https://edu.chaskibots.com
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  ✅ CERTIFICADO GENERADO POR CHASKIBOTS EDUCATION PLATFORM         │
+│  🌐 https://edu.chaskibots.com                                      │
+│  🔐 ID: ${taskId.padEnd(58)}│
+│                                                                     │
+│  Este documento contiene un código único que puede ser verificado  │
+│  por el docente escaneando el código QR o ingresando el ID en:     │
+│  https://edu.chaskibots.com/verify/${taskId.padEnd(32)}│
+└─────────────────────────────────────────────────────────────────────┘
 `
     downloadFile(content, filename, 'text/plain')
+    setShowExportModal(false)
+  }
+
+  const exportWithQR = async () => {
+    const taskId = lastTaskId || generateTaskId(code, studentName)
+    
+    // Crear un canvas para combinar texto y QR
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    canvas.width = 800
+    canvas.height = 1200
+
+    // Fondo
+    ctx.fillStyle = '#1a1a2e'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Título
+    ctx.fillStyle = '#00D9FF'
+    ctx.font = 'bold 28px Arial'
+    ctx.textAlign = 'center'
+    ctx.fillText('TAREA DE PYTHON - CHASKIBOTS', canvas.width / 2, 50)
+
+    // ID
+    ctx.fillStyle = '#FFD700'
+    ctx.font = 'bold 18px monospace'
+    ctx.fillText(`ID: ${taskId}`, canvas.width / 2, 90)
+
+    // Info estudiante
+    ctx.fillStyle = '#FFFFFF'
+    ctx.font = '16px Arial'
+    ctx.textAlign = 'left'
+    ctx.fillText(`Estudiante: ${studentName || 'Sin nombre'}`, 30, 140)
+    ctx.fillText(`Fecha: ${new Date().toLocaleString('es-EC')}`, 30, 165)
+
+    // Código
+    ctx.fillStyle = '#00D9FF'
+    ctx.font = 'bold 16px Arial'
+    ctx.fillText('CÓDIGO PYTHON:', 30, 210)
+    
+    ctx.fillStyle = '#2d2d4a'
+    ctx.fillRect(20, 220, canvas.width - 40, 300)
+    
+    ctx.fillStyle = '#E0E0E0'
+    ctx.font = '12px monospace'
+    const codeLines = code.split('\n').slice(0, 20)
+    codeLines.forEach((line, i) => {
+      ctx.fillText(line.substring(0, 80), 30, 245 + i * 14)
+    })
+
+    // Resultado
+    ctx.fillStyle = '#00FF88'
+    ctx.font = 'bold 16px Arial'
+    ctx.fillText('RESULTADO:', 30, 550)
+    
+    ctx.fillStyle = '#1a3a1a'
+    ctx.fillRect(20, 560, canvas.width - 40, 200)
+    
+    ctx.fillStyle = '#00FF88'
+    ctx.font = '12px monospace'
+    const outputLines = output.split('\n').slice(0, 12)
+    outputLines.forEach((line, i) => {
+      ctx.fillText(line.substring(0, 80), 30, 585 + i * 14)
+    })
+
+    // QR Code
+    if (qrDataUrl) {
+      const qrImg = new Image()
+      qrImg.onload = () => {
+        ctx.drawImage(qrImg, canvas.width / 2 - 100, 780, 200, 200)
+        
+        ctx.fillStyle = '#FFFFFF'
+        ctx.font = '14px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText('Escanea para verificar', canvas.width / 2, 1000)
+        ctx.fillText(`ID: ${taskId}`, canvas.width / 2, 1020)
+        
+        // Footer
+        ctx.fillStyle = '#666666'
+        ctx.font = '12px Arial'
+        ctx.fillText('Generado por ChaskiBots Education Platform', canvas.width / 2, 1060)
+        ctx.fillText('https://edu.chaskibots.com', canvas.width / 2, 1080)
+
+        // Descargar imagen
+        const link = document.createElement('a')
+        link.download = studentName 
+          ? `${studentName.replace(/\s+/g, '_')}_${taskId}.png`
+          : `tarea_${taskId}.png`
+        link.href = canvas.toDataURL('image/png')
+        link.click()
+        setShowExportModal(false)
+      }
+      qrImg.src = qrDataUrl
+    }
   }
 
   return (
@@ -384,25 +540,96 @@ ${output}
             Código .py
           </button>
           <button
-            onClick={exportOutput}
-            disabled={!output}
-            className="bg-dark-700 hover:bg-dark-600 disabled:opacity-50 disabled:cursor-not-allowed text-gray-300 px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors"
-            title="Descargar resultado .txt"
-          >
-            <FileText className="w-4 h-4" />
-            Resultado .txt
-          </button>
-          <button
-            onClick={exportBoth}
+            onClick={prepareExport}
             disabled={!output}
             className="bg-neon-cyan hover:bg-neon-cyan/80 disabled:opacity-50 disabled:cursor-not-allowed text-dark-900 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
-            title="Descargar tarea completa"
+            title="Exportar tarea con ID único y QR"
           >
-            <Download className="w-4 h-4" />
+            <QrCode className="w-4 h-4" />
             Exportar Tarea
           </button>
         </div>
       </div>
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-800 border border-dark-600 rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <QrCode className="w-6 h-6 text-neon-cyan" />
+              Exportar Tarea
+            </h3>
+            
+            {/* Task ID */}
+            <div className="bg-dark-900 rounded-xl p-4 mb-4">
+              <p className="text-xs text-gray-500 mb-1">ID de Verificación:</p>
+              <div className="flex items-center gap-2">
+                <Hash className="w-5 h-5 text-yellow-400" />
+                <code className="text-yellow-400 font-mono text-lg">{lastTaskId}</code>
+                <button
+                  onClick={() => copyToClipboard(lastTaskId || '', 'taskId')}
+                  className="ml-auto p-1.5 bg-dark-700 hover:bg-dark-600 rounded text-gray-400 hover:text-white transition-colors"
+                >
+                  {copied === 'taskId' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* QR Code Preview */}
+            {qrDataUrl && (
+              <div className="flex justify-center mb-4">
+                <div className="bg-dark-900 p-4 rounded-xl">
+                  <img src={qrDataUrl} alt="QR Code" className="w-40 h-40" />
+                  <p className="text-xs text-gray-500 text-center mt-2">Escanea para verificar</p>
+                </div>
+              </div>
+            )}
+
+            {/* Student Info */}
+            <div className="bg-dark-900/50 rounded-xl p-3 mb-4 text-sm">
+              <p className="text-gray-400">
+                <span className="text-gray-500">Estudiante:</span> {studentName || 'Sin nombre'}
+              </p>
+              <p className="text-gray-400">
+                <span className="text-gray-500">Fecha:</span> {new Date().toLocaleString('es-EC')}
+              </p>
+            </div>
+
+            {/* Export Options */}
+            <div className="space-y-2">
+              <button
+                onClick={exportBoth}
+                className="w-full bg-dark-700 hover:bg-dark-600 text-white px-4 py-3 rounded-xl flex items-center gap-3 transition-colors"
+              >
+                <FileText className="w-5 h-5 text-gray-400" />
+                <div className="text-left">
+                  <p className="font-medium">Descargar .TXT</p>
+                  <p className="text-xs text-gray-500">Archivo de texto con código y resultado</p>
+                </div>
+              </button>
+              
+              <button
+                onClick={exportWithQR}
+                className="w-full bg-neon-cyan/20 hover:bg-neon-cyan/30 border border-neon-cyan/50 text-white px-4 py-3 rounded-xl flex items-center gap-3 transition-colors"
+              >
+                <QrCode className="w-5 h-5 text-neon-cyan" />
+                <div className="text-left">
+                  <p className="font-medium text-neon-cyan">Descargar Imagen con QR</p>
+                  <p className="text-xs text-gray-400">Imagen PNG con código QR de verificación</p>
+                </div>
+              </button>
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowExportModal(false)}
+              className="w-full mt-4 text-gray-500 hover:text-white text-sm transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Example Exercises */}
       <div className="px-4 py-3 border-t border-dark-600 bg-dark-800/50">
@@ -423,8 +650,8 @@ ${output}
       {/* Tip */}
       <div className="px-4 py-2 bg-blue-900/20 border-t border-blue-500/30">
         <p className="text-xs text-blue-300">
-          💡 <strong>Tip:</strong> Escribe tu nombre arriba para que aparezca en los archivos exportados. 
-          El botón "Exportar Tarea" genera un archivo con tu código y resultado para entregar al profesor.
+          💡 <strong>Tip:</strong> Escribe tu nombre arriba. Al exportar, recibirás un <strong>ID único</strong> y 
+          <strong> código QR</strong> que el profesor puede usar para verificar tu tarea.
         </p>
       </div>
     </div>
