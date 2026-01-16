@@ -29,25 +29,7 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            <Link href="/niveles" className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-700/50 rounded-lg transition-all duration-200">
-              <BookOpen className="w-4 h-4" />
-              Niveles
-            </Link>
-            <Link href="/robotica" className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-700/50 rounded-lg transition-all duration-200">
-              <Bot className="w-4 h-4" />
-              Robótica
-            </Link>
-            <Link href="/ia" className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-neon-purple hover:bg-dark-700/50 rounded-lg transition-all duration-200">
-              <Brain className="w-4 h-4" />
-              IA
-            </Link>
-            <Link href="/simuladores" className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-neon-green hover:bg-dark-700/50 rounded-lg transition-all duration-200">
-              <Zap className="w-4 h-4" />
-              Simuladores
-            </Link>
-          </nav>
+          {/* Desktop Navigation - Oculto por solicitud del usuario */}
 
           {/* User Menu */}
           <div className="flex items-center gap-3">
@@ -71,39 +53,11 @@ export default function Header() {
               </Link>
             )}
 
-            {/* Mobile menu button */}
-            <button
-              className="md:hidden p-2 text-gray-400 hover:text-neon-cyan transition-colors"
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            {/* Mobile menu button - Oculto */}
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {menuOpen && (
-          <div className="md:hidden py-4 border-t border-dark-600 animate-fadeIn">
-            <nav className="flex flex-col gap-1">
-              <Link href="/niveles" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-neon-cyan hover:bg-dark-700/50 rounded-lg transition-all">
-                <BookOpen className="w-5 h-5" />
-                Niveles Educativos
-              </Link>
-              <Link href="/robotica" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-neon-cyan hover:bg-dark-700/50 rounded-lg transition-all">
-                <Bot className="w-5 h-5" />
-                Robótica
-              </Link>
-              <Link href="/ia" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-neon-purple hover:bg-dark-700/50 rounded-lg transition-all">
-                <Brain className="w-5 h-5" />
-                Inteligencia Artificial
-              </Link>
-              <Link href="/simuladores" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-neon-green hover:bg-dark-700/50 rounded-lg transition-all">
-                <Zap className="w-5 h-5" />
-                Simuladores
-              </Link>
-            </nav>
-          </div>
-        )}
+        {/* Mobile Navigation - Oculto por solicitud del usuario */}
       </div>
     </header>
   )
