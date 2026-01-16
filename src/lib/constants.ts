@@ -43,7 +43,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: -1,
     color: 'from-fuchsia-500 to-pink-600', 
     neonColor: '#e879f9',
-    icon: '🧒',
+    icon: 'Baby',
     kitPrice: 30,
     hasHacking: false,
     hasAdvancedIA: false
@@ -57,7 +57,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 0,
     color: 'from-pink-500 to-rose-600', 
     neonColor: '#ff6b9d',
-    icon: '🎒',
+    icon: 'Backpack',
     kitPrice: 35,
     hasHacking: false,
     hasAdvancedIA: false
@@ -71,7 +71,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 1,
     color: 'from-orange-500 to-amber-600', 
     neonColor: '#ffa726',
-    icon: '✏️',
+    icon: 'Pencil',
     kitPrice: 50,
     hasHacking: false,
     hasAdvancedIA: false
@@ -85,7 +85,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 2,
     color: 'from-amber-500 to-yellow-600', 
     neonColor: '#ffca28',
-    icon: '📚',
+    icon: 'BookOpen',
     kitPrice: 50,
     hasHacking: false,
     hasAdvancedIA: false
@@ -99,7 +99,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 3,
     color: 'from-yellow-500 to-lime-600', 
     neonColor: '#c0ca33',
-    icon: '🔬',
+    icon: 'FlaskConical',
     kitPrice: 50,
     hasHacking: false,
     hasAdvancedIA: false
@@ -113,7 +113,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 4,
     color: 'from-lime-500 to-green-600', 
     neonColor: '#7cb342',
-    icon: '🤖',
+    icon: 'Bot',
     kitPrice: 50,
     hasHacking: false,
     hasAdvancedIA: false
@@ -127,7 +127,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 5,
     color: 'from-green-500 to-emerald-600', 
     neonColor: '#43a047',
-    icon: '💡',
+    icon: 'Lightbulb',
     kitPrice: 50,
     hasHacking: false,
     hasAdvancedIA: false
@@ -141,7 +141,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 6,
     color: 'from-emerald-500 to-teal-600', 
     neonColor: '#26a69a',
-    icon: '⚡',
+    icon: 'Zap',
     kitPrice: 70,
     hasHacking: false,
     hasAdvancedIA: true
@@ -155,7 +155,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 7,
     color: 'from-teal-500 to-cyan-600', 
     neonColor: '#00acc1',
-    icon: '🎮',
+    icon: 'Gamepad2',
     kitPrice: 70,
     hasHacking: false,
     hasAdvancedIA: true
@@ -169,7 +169,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 8,
     color: 'from-cyan-500 to-sky-600', 
     neonColor: '#039be5',
-    icon: '🔧',
+    icon: 'Wrench',
     kitPrice: 75,
     hasHacking: true,
     hasAdvancedIA: true
@@ -183,7 +183,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 9,
     color: 'from-sky-500 to-blue-600', 
     neonColor: '#1e88e5',
-    icon: '🛠️',
+    icon: 'Settings',
     kitPrice: 75,
     hasHacking: true,
     hasAdvancedIA: true
@@ -197,7 +197,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 10,
     color: 'from-blue-500 to-indigo-600', 
     neonColor: '#3949ab',
-    icon: '💻',
+    icon: 'Laptop',
     kitPrice: 75,
     hasHacking: true,
     hasAdvancedIA: true
@@ -211,7 +211,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 11,
     color: 'from-indigo-500 to-violet-600', 
     neonColor: '#5e35b1',
-    icon: '🧠',
+    icon: 'Brain',
     kitPrice: 80,
     hasHacking: true,
     hasAdvancedIA: true
@@ -225,7 +225,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 12,
     color: 'from-violet-500 to-purple-600', 
     neonColor: '#8e24aa',
-    icon: '🔐',
+    icon: 'ShieldCheck',
     kitPrice: 75,
     hasHacking: true,
     hasAdvancedIA: true
@@ -239,7 +239,7 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     gradeNumber: 13,
     color: 'from-purple-500 to-fuchsia-600', 
     neonColor: '#d81b60',
-    icon: '🚀',
+    icon: 'Rocket',
     kitPrice: 40,
     hasHacking: true,
     hasAdvancedIA: true

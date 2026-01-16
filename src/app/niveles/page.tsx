@@ -6,7 +6,16 @@ import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { EDUCATION_LEVELS } from '@/lib/constants'
-import { ArrowRight, Sparkles, Rocket, Brain, Bot } from 'lucide-react'
+import { 
+  ArrowRight, Sparkles, Rocket, Brain, Bot, Baby, Backpack, Pencil, 
+  BookOpen, FlaskConical, Lightbulb, Zap, Gamepad2, Wrench, Settings, 
+  Laptop, ShieldCheck, GraduationCap, Users, Code
+} from 'lucide-react'
+
+const ICON_MAP: Record<string, any> = {
+  Baby, Backpack, Pencil, BookOpen, FlaskConical, Bot, Lightbulb, 
+  Zap, Gamepad2, Wrench, Settings, Laptop, Brain, ShieldCheck, Rocket
+}
 
 export default function NivelesPage() {
   const [scrollY, setScrollY] = useState(0)
@@ -93,211 +102,153 @@ export default function NivelesPage() {
           </div>
         </section>
 
-        {/* Secciones de Niveles con diseño moderno */}
-        <div className="relative">
-          {/* Educación Inicial */}
-          <section className="relative py-20 px-4 overflow-hidden">
-            <div 
-              className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-orange-500/10 to-yellow-500/10"
-              style={{ transform: `translateY(${scrollY * 0.1}px)` }}
-            ></div>
-            <div className="max-w-6xl mx-auto relative z-10">
+        {/* Secciones de Niveles con diseño profesional */}
+        <div className="relative py-12">
+          <div className="max-w-6xl mx-auto px-4">
+            {/* Educación Inicial */}
+            <div className="mb-16">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg animate-float">
-                  🎒
+                <div className="w-12 h-12 bg-pink-500/10 rounded-xl flex items-center justify-center">
+                  <Baby className="w-6 h-6 text-pink-400" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold text-white">Educación Inicial</h2>
-                  <p className="text-gray-400">3-5 años • Primeros pasos en tecnología</p>
+                  <h2 className="text-2xl font-bold text-white">Educación Inicial</h2>
+                  <p className="text-gray-500 text-sm">3-5 años • Primeros pasos en tecnología</p>
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {EDUCATION_LEVELS.slice(0, 2).map((level, index) => (
-                  <Link
-                    key={level.id}
-                    href={`/nivel/${level.id}`}
-                    className={`group relative overflow-hidden rounded-3xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl stagger-${index + 1}`}
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${level.color} opacity-90 group-hover:opacity-100 transition-opacity`}></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                    <div className="relative p-8 min-h-[200px] flex flex-col justify-end">
-                      <div className="absolute top-6 right-6 text-6xl opacity-30 group-hover:opacity-50 group-hover:scale-110 transition-all duration-500">
-                        {level.icon}
+              <div className="grid grid-cols-2 gap-4">
+                {EDUCATION_LEVELS.slice(0, 2).map((level) => {
+                  const IconComponent = ICON_MAP[level.icon] || Bot
+                  return (
+                    <Link
+                      key={level.id}
+                      href={`/nivel/${level.id}`}
+                      className="group bg-dark-800 border border-dark-700 rounded-xl p-6 hover:border-pink-500/50 hover:bg-dark-700/50 transition-all duration-300"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center group-hover:bg-pink-500/10 transition-colors">
+                          <IconComponent className="w-6 h-6 text-gray-400 group-hover:text-pink-400 transition-colors" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-white">{level.name}</h3>
+                          <p className="text-gray-500 text-sm">{level.ageRange}</p>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-gray-600 group-hover:text-pink-400 group-hover:translate-x-1 transition-all" />
                       </div>
-                      <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">{level.icon}</div>
-                      <h3 className="text-2xl font-bold text-white mb-2">{level.name}</h3>
-                      <p className="text-white/80 mb-4">{level.ageRange}</p>
-                      <div className="flex items-center text-white font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                        <span>Explorar contenido</span>
-                        <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  )
+                })}
               </div>
             </div>
-          </section>
 
-          {/* Educación General Básica - Elemental */}
-          <section className="relative py-20 px-4 bg-dark-800 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-indigo-500/5"></div>
-            <div className="max-w-6xl mx-auto relative z-10">
+            {/* Educación Básica Elemental */}
+            <div className="mb-16">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg animate-float" style={{animationDelay: '0.5s'}}>
-                  📚
+                <div className="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-cyan-400" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold text-white">Educación Básica Elemental</h2>
-                  <p className="text-gray-400">5-9 años • Fundamentos de programación</p>
+                  <h2 className="text-2xl font-bold text-white">Educación Básica Elemental</h2>
+                  <p className="text-gray-500 text-sm">5-9 años • Fundamentos de programación</p>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {EDUCATION_LEVELS.slice(2, 6).map((level, index) => (
-                  <Link
-                    key={level.id}
-                    href={`/nivel/${level.id}`}
-                    className="group relative overflow-hidden rounded-2xl bg-dark-700 border border-dark-600 hover:border-neon-cyan/50 transition-all duration-300 hover:scale-105 hover:shadow-neon-cyan/20 hover:shadow-xl"
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${level.color} opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></div>
-                    <div className="relative p-6 text-center">
-                      <div className="text-4xl mb-3 group-hover:scale-125 transition-transform duration-300">{level.icon}</div>
-                      <h3 className="font-bold text-white mb-1">{level.name}</h3>
-                      <p className="text-xs text-gray-400 mb-3">{level.ageRange}</p>
-                      <div className="flex items-center justify-center text-neon-cyan text-sm font-medium opacity-0 group-hover:opacity-100 transition-all">
-                        Ver <ArrowRight className="w-4 h-4 ml-1" />
+                {EDUCATION_LEVELS.slice(2, 6).map((level) => {
+                  const IconComponent = ICON_MAP[level.icon] || Bot
+                  return (
+                    <Link
+                      key={level.id}
+                      href={`/nivel/${level.id}`}
+                      className="group bg-dark-800 border border-dark-700 rounded-xl p-5 hover:border-cyan-500/50 hover:bg-dark-700/50 transition-all duration-300"
+                    >
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center mb-3 group-hover:bg-cyan-500/10 transition-colors">
+                          <IconComponent className="w-6 h-6 text-gray-400 group-hover:text-cyan-400 transition-colors" />
+                        </div>
+                        <h3 className="font-semibold text-white text-sm">{level.name}</h3>
+                        <p className="text-gray-500 text-xs mt-1">{level.ageRange}</p>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  )
+                })}
               </div>
             </div>
-          </section>
 
-          {/* Educación General Básica - Media y Superior */}
-          <section className="relative py-20 px-4 overflow-hidden">
-            <div 
-              className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-blue-500/10"
-              style={{ transform: `translateY(${-scrollY * 0.05}px)` }}
-            ></div>
-            <div className="max-w-6xl mx-auto relative z-10">
+            {/* Educación Básica Media y Superior */}
+            <div className="mb-16">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg animate-float" style={{animationDelay: '1s'}}>
-                  🔬
+                <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
+                  <Code className="w-6 h-6 text-purple-400" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold text-white">Educación Básica Media y Superior</h2>
-                  <p className="text-gray-400">9-15 años • Proyectos avanzados</p>
+                  <h2 className="text-2xl font-bold text-white">Educación Básica Media y Superior</h2>
+                  <p className="text-gray-500 text-sm">9-15 años • Proyectos avanzados</p>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {EDUCATION_LEVELS.slice(6, 12).map((level, index) => (
-                  <Link
-                    key={level.id}
-                    href={`/nivel/${level.id}`}
-                    className="group relative overflow-hidden rounded-2xl bg-dark-700/50 backdrop-blur border border-dark-600 hover:border-neon-purple/50 transition-all duration-300 hover:scale-105"
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${level.color} opacity-0 group-hover:opacity-30 transition-opacity duration-500`}></div>
-                    <div className="relative p-6">
+                {EDUCATION_LEVELS.slice(6, 12).map((level) => {
+                  const IconComponent = ICON_MAP[level.icon] || Bot
+                  return (
+                    <Link
+                      key={level.id}
+                      href={`/nivel/${level.id}`}
+                      className="group bg-dark-800 border border-dark-700 rounded-xl p-5 hover:border-purple-500/50 hover:bg-dark-700/50 transition-all duration-300"
+                    >
                       <div className="flex items-center gap-4">
-                        <div className="text-4xl group-hover:scale-110 transition-transform duration-300">{level.icon}</div>
-                        <div>
-                          <h3 className="font-bold text-white">{level.name}</h3>
-                          <p className="text-sm text-gray-400">{level.ageRange}</p>
+                        <div className="w-10 h-10 bg-dark-700 rounded-lg flex items-center justify-center group-hover:bg-purple-500/10 transition-colors">
+                          <IconComponent className="w-5 h-5 text-gray-400 group-hover:text-purple-400 transition-colors" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-white text-sm">{level.name}</h3>
+                          <p className="text-gray-500 text-xs">{level.ageRange}</p>
                         </div>
                       </div>
-                      <div className="mt-4 flex items-center text-neon-purple text-sm font-medium opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0">
-                        Explorar <ArrowRight className="w-4 h-4 ml-1" />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  )
+                })}
               </div>
             </div>
-          </section>
 
-          {/* Bachillerato */}
-          <section className="relative py-20 px-4 bg-dark-800 overflow-hidden">
-            <div className="absolute inset-0">
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-teal-500/10"></div>
-              <div className="absolute bottom-0 right-0 w-96 h-96 bg-neon-green/10 rounded-full blur-[150px] animate-pulse"></div>
-            </div>
-            <div className="max-w-6xl mx-auto relative z-10">
+            {/* Bachillerato */}
+            <div className="mb-8">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg animate-float" style={{animationDelay: '1.5s'}}>
-                  🎓
+                <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-green-400" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold text-white">Bachillerato</h2>
-                  <p className="text-gray-400">15-18 años • Especialización y proyectos profesionales</p>
+                  <h2 className="text-2xl font-bold text-white">Bachillerato</h2>
+                  <p className="text-gray-500 text-sm">15-18 años • Especialización profesional</p>
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {EDUCATION_LEVELS.slice(12, 15).map((level, index) => (
-                  <Link
-                    key={level.id}
-                    href={`/nivel/${level.id}`}
-                    className="group relative overflow-hidden rounded-3xl transition-all duration-500 hover:scale-[1.03]"
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${level.color}`}></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-                    </div>
-                    <div className="relative p-8 min-h-[220px] flex flex-col justify-end">
-                      <div className="absolute top-4 right-4 glass-dark px-3 py-1 rounded-full text-xs text-white">
-                        Avanzado
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {EDUCATION_LEVELS.slice(12, 15).map((level) => {
+                  const IconComponent = ICON_MAP[level.icon] || Bot
+                  return (
+                    <Link
+                      key={level.id}
+                      href={`/nivel/${level.id}`}
+                      className="group bg-dark-800 border border-dark-700 rounded-xl p-6 hover:border-green-500/50 hover:bg-dark-700/50 transition-all duration-300"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center group-hover:bg-green-500/10 transition-colors">
+                          <IconComponent className="w-6 h-6 text-gray-400 group-hover:text-green-400 transition-colors" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-white">{level.name}</h3>
+                          <p className="text-gray-500 text-sm">{level.ageRange}</p>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-gray-600 group-hover:text-green-400 group-hover:translate-x-1 transition-all" />
                       </div>
-                      <div className="text-5xl mb-4 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300">{level.icon}</div>
-                      <h3 className="text-2xl font-bold text-white mb-2">{level.name}</h3>
-                      <p className="text-white/80 mb-4">{level.ageRange}</p>
-                      <div className="flex items-center text-white font-semibold">
-                        <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                          Acceder al contenido
-                        </span>
-                        <ArrowRight className="w-5 h-5 ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300" />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  )
+                })}
               </div>
             </div>
-          </section>
-
-          {/* CTA Final */}
-          <section className="relative py-20 px-4 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/10 via-neon-purple/10 to-neon-pink/10"></div>
-            <div className="max-w-4xl mx-auto relative z-10 text-center">
-              <div className="glass-dark rounded-3xl p-12">
-                <Sparkles className="w-12 h-12 text-neon-cyan mx-auto mb-6" />
-                <h3 className="text-3xl font-bold text-white mb-4">
-                  Contenido Adaptado a Cada Nivel
-                </h3>
-                <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-                  Cada nivel incluye videos, tutoriales, proyectos prácticos y acceso a simuladores 
-                  apropiados para la edad. El contenido sigue una progresión pedagógica diseñada 
-                  para maximizar el aprendizaje.
-                </p>
-                <div className="flex flex-wrap justify-center gap-4">
-                  <div className="flex items-center gap-2 text-neon-cyan">
-                    <div className="w-2 h-2 bg-neon-cyan rounded-full animate-pulse"></div>
-                    <span>Videos interactivos</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-neon-purple">
-                    <div className="w-2 h-2 bg-neon-purple rounded-full animate-pulse"></div>
-                    <span>Proyectos prácticos</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-neon-green">
-                    <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse"></div>
-                    <span>Simuladores online</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+          </div>
         </div>
       </main>
 

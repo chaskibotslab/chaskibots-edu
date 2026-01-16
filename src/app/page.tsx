@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { Bot, Brain, Shield, Rocket, Users, Award, Play, ArrowRight, Zap, Cpu, Code, Sparkles, GraduationCap } from 'lucide-react'
+import { Bot, Brain, Shield, Rocket, Users, Award, Play, ArrowRight, Zap, Cpu, Code, Sparkles, GraduationCap, Building2, UserCheck, Calendar, Camera } from 'lucide-react'
 
 export default function HomePage() {
   const router = useRouter()
@@ -181,7 +181,9 @@ export default function HomePage() {
             
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="card group hover:border-neon-orange/50 hover:scale-105 transition-all duration-300 text-center">
-                <div className="text-5xl mb-4">🏫</div>
+                <div className="w-16 h-16 mx-auto mb-4 bg-neon-orange/10 rounded-2xl flex items-center justify-center group-hover:bg-neon-orange/20 transition-colors">
+                  <Building2 className="w-8 h-8 text-neon-orange" />
+                </div>
                 <h3 className="text-xl font-bold text-white mb-2">Instituciones Educativas</h3>
                 <p className="text-gray-400 text-sm mb-4">
                   Trabajamos con escuelas, colegios y universidades implementando programas de robótica adaptados a cada nivel.
@@ -189,7 +191,9 @@ export default function HomePage() {
                 <div className="text-neon-orange font-semibold">+20 instituciones</div>
               </div>
               <div className="card group hover:border-neon-cyan/50 hover:scale-105 transition-all duration-300 text-center">
-                <div className="text-5xl mb-4">👨‍🏫</div>
+                <div className="w-16 h-16 mx-auto mb-4 bg-neon-cyan/10 rounded-2xl flex items-center justify-center group-hover:bg-neon-cyan/20 transition-colors">
+                  <UserCheck className="w-8 h-8 text-neon-cyan" />
+                </div>
                 <h3 className="text-xl font-bold text-white mb-2">Capacitación Docente</h3>
                 <p className="text-gray-400 text-sm mb-4">
                   Formamos a profesores en metodologías STEM para que puedan guiar a sus estudiantes en el mundo de la tecnología.
@@ -197,7 +201,9 @@ export default function HomePage() {
                 <div className="text-neon-cyan font-semibold">+100 docentes</div>
               </div>
               <div className="card group hover:border-neon-purple/50 hover:scale-105 transition-all duration-300 text-center">
-                <div className="text-5xl mb-4">🤖</div>
+                <div className="w-16 h-16 mx-auto mb-4 bg-neon-purple/10 rounded-2xl flex items-center justify-center group-hover:bg-neon-purple/20 transition-colors">
+                  <Calendar className="w-8 h-8 text-neon-purple" />
+                </div>
                 <h3 className="text-xl font-bold text-white mb-2">Talleres y Eventos</h3>
                 <p className="text-gray-400 text-sm mb-4">
                   Organizamos talleres prácticos, competencias de robótica y eventos tecnológicos para estudiantes de todas las edades.
@@ -208,7 +214,9 @@ export default function HomePage() {
 
             {/* Galería de Experiencias desde Airtable */}
             <div className="bg-dark-800 rounded-2xl p-6 border border-dark-600">
-              <h3 className="text-xl font-bold text-white mb-4 text-center">📸 Galería de Experiencias</h3>
+              <h3 className="text-xl font-bold text-white mb-4 text-center flex items-center justify-center gap-2">
+                <Camera className="w-5 h-5 text-gray-400" /> Galería de Experiencias
+              </h3>
               {loadingExp ? (
                 <div className="flex justify-center py-8">
                   <div className="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin"></div>
