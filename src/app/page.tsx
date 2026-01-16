@@ -14,6 +14,26 @@ export default function HomePage() {
   const [count2, setCount2] = useState(0)
   const [count3, setCount3] = useState(0)
   const [count4, setCount4] = useState(0)
+  const [experiencias, setExperiencias] = useState<any[]>([])
+  const [loadingExp, setLoadingExp] = useState(true)
+
+  // Cargar experiencias desde Airtable
+  useEffect(() => {
+    const fetchExperiencias = async () => {
+      try {
+        const res = await fetch('/api/experiencias')
+        if (res.ok) {
+          const data = await res.json()
+          setExperiencias(data)
+        }
+      } catch (error) {
+        console.error('Error loading experiencias:', error)
+      } finally {
+        setLoadingExp(false)
+      }
+    }
+    fetchExperiencias()
+  }, [])
 
   // Animación de contadores
   useEffect(() => {
@@ -186,25 +206,70 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Galería de fotos placeholder - se puede conectar a Airtable después */}
+            {/* Galería de Experiencias desde Airtable */}
             <div className="bg-dark-800 rounded-2xl p-6 border border-dark-600">
               <h3 className="text-xl font-bold text-white mb-4 text-center">📸 Galería de Experiencias</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="aspect-video bg-gradient-to-br from-neon-cyan/20 to-neon-blue/20 rounded-xl flex items-center justify-center border border-neon-cyan/30 hover:scale-105 transition-transform cursor-pointer">
-                  <span className="text-gray-500 text-sm">Foto 1</span>
+              {loadingExp ? (
+                <div className="flex justify-center py-8">
+                  <div className="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin"></div>
                 </div>
-                <div className="aspect-video bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 rounded-xl flex items-center justify-center border border-neon-purple/30 hover:scale-105 transition-transform cursor-pointer">
-                  <span className="text-gray-500 text-sm">Foto 2</span>
+              ) : experiencias.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {experiencias.slice(0, 8).map((exp, index) => (
+                    <div 
+                      key={exp.id} 
+                      className={`group relative aspect-video rounded-xl overflow-hidden border hover:scale-105 transition-all duration-300 cursor-pointer ${
+                        index % 4 === 0 ? 'border-neon-cyan/30 hover:border-neon-cyan' :
+                        index % 4 === 1 ? 'border-neon-purple/30 hover:border-neon-purple' :
+                        index % 4 === 2 ? 'border-neon-green/30 hover:border-neon-green' :
+                        'border-neon-orange/30 hover:border-neon-orange'
+                      }`}
+                    >
+                      {exp.url ? (
+                        <Image 
+                          src={exp.url} 
+                          alt={exp.titulo}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className={`absolute inset-0 bg-gradient-to-br ${
+                          index % 4 === 0 ? 'from-neon-cyan/20 to-neon-blue/20' :
+                          index % 4 === 1 ? 'from-neon-purple/20 to-neon-pink/20' :
+                          index % 4 === 2 ? 'from-neon-green/20 to-emerald-500/20' :
+                          'from-neon-orange/20 to-amber-500/20'
+                        }`}></div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute bottom-0 left-0 right-0 p-3">
+                          <p className="text-white text-sm font-semibold truncate">{exp.titulo}</p>
+                          <p className="text-gray-300 text-xs truncate">{exp.institucion}</p>
+                        </div>
+                      </div>
+                      {exp.tipo === 'video' && (
+                        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                          Video
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <div className="aspect-video bg-gradient-to-br from-neon-green/20 to-emerald-500/20 rounded-xl flex items-center justify-center border border-neon-green/30 hover:scale-105 transition-transform cursor-pointer">
-                  <span className="text-gray-500 text-sm">Foto 3</span>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[0,1,2,3].map((i) => (
+                    <div key={i} className={`aspect-video rounded-xl flex items-center justify-center border ${
+                      i === 0 ? 'bg-gradient-to-br from-neon-cyan/20 to-neon-blue/20 border-neon-cyan/30' :
+                      i === 1 ? 'bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 border-neon-purple/30' :
+                      i === 2 ? 'bg-gradient-to-br from-neon-green/20 to-emerald-500/20 border-neon-green/30' :
+                      'bg-gradient-to-br from-neon-orange/20 to-amber-500/20 border-neon-orange/30'
+                    } hover:scale-105 transition-transform cursor-pointer`}>
+                      <span className="text-gray-500 text-sm">Próximamente</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="aspect-video bg-gradient-to-br from-neon-orange/20 to-amber-500/20 rounded-xl flex items-center justify-center border border-neon-orange/30 hover:scale-105 transition-transform cursor-pointer">
-                  <span className="text-gray-500 text-sm">Foto 4</span>
-                </div>
-              </div>
+              )}
               <p className="text-center text-gray-500 text-sm mt-4">
-                Próximamente: Galería completa con fotos y videos de nuestras experiencias
+                {experiencias.length > 0 ? `${experiencias.length} experiencias en instituciones educativas` : 'Agrega fotos desde Airtable para mostrar aquí'}
               </p>
             </div>
           </div>

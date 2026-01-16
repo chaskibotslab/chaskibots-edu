@@ -1,0 +1,9 @@
+titulo,descripcion,tipo,url,institucion,orden,activo
+"Taller de Robótica Inicial","Estudiantes de inicial aprendiendo sus primeros circuitos con LEDs y sensores básicos.","foto","","Escuela Ejemplo 1",1,true
+"Competencia de Robots","Evento anual de competencia de robots seguidores de línea con estudiantes de bachillerato.","foto","","Colegio Ejemplo 2",2,true
+"Capacitación Docente STEM","Formación de profesores en metodologías de enseñanza de robótica y programación.","foto","","Universidad Ejemplo",3,true
+"Proyecto Arduino Avanzado","Estudiantes de media construyendo un brazo robótico controlado por Arduino.","video","","Instituto Técnico",4,true
+"Feria de Ciencias","Presentación de proyectos de robótica e IA en feria de ciencias regional.","foto","","Varios Colegios",5,true
+"Taller de IA para Niños","Niños experimentando con reconocimiento de imágenes y detección de objetos.","foto","","Escuela Primaria",6,true
+"Hackathon Juvenil","Evento de programación y hacking ético para jóvenes de bachillerato.","video","","Centro de Innovación",7,true
+"Clase de Python","Estudiantes aprendiendo programación con Python usando simuladores online.","foto","","Colegio Técnico",8,true
