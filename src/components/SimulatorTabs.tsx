@@ -159,64 +159,10 @@ const simulators = [
   },
   // Robótica - Brazos Robóticos y Simuladores
   {
-    id: 'robodk',
-    name: 'RoboDK Online',
-    description: 'Simulador de robots industriales - Demo online',
-    url: 'https://robodk.com/simulate',
-    icon: Bot,
-    category: 'robotica',
-    requiresLogin: false
-  },
-  {
-    id: 'webots',
-    name: 'Webots Online',
-    description: 'Simulador de robots 3D profesional - Sin registro',
-    url: 'https://webots.cloud/',
-    icon: Bot,
-    category: 'robotica',
-    requiresLogin: false
-  },
-  {
-    id: 'robot-arm-sim',
-    name: 'Robot Arm Simulator',
-    description: 'Simulador de brazo robótico 6 ejes - Sin registro',
-    url: 'https://www.roboticsbusinessreview.com/robot-arm-simulator/',
-    icon: Joystick,
-    category: 'robotica',
-    requiresLogin: false
-  },
-  {
-    id: 'mycobot',
-    name: 'myCobot Simulator',
-    description: 'Simulador brazo robótico myCobot - Sin registro',
-    url: 'https://www.elephantrobotics.com/en/mycobot-en/',
-    icon: Bot,
-    category: 'robotica',
-    requiresLogin: false
-  },
-  {
     id: 'gazebo-web',
     name: 'Gazebo Web',
-    description: 'Simulador ROS/Gazebo en navegador - Demo',
+    description: 'Simulador ROS/Gazebo en navegador - Sin registro',
     url: 'https://app.gazebosim.org/',
-    icon: Bot,
-    category: 'robotica',
-    requiresLogin: false
-  },
-  {
-    id: 'ros-development',
-    name: 'ROS Development Studio',
-    description: 'IDE ROS online con RViz - Cuenta gratuita',
-    url: 'https://app.theconstructsim.com/',
-    icon: Wrench,
-    category: 'robotica',
-    requiresLogin: true
-  },
-  {
-    id: 'coppeliasim',
-    name: 'CoppeliaSim Web',
-    description: 'Simulador robótico avanzado - Demo',
-    url: 'https://www.coppeliarobotics.com/helpFiles/index.html',
     icon: Bot,
     category: 'robotica',
     requiresLogin: false
@@ -224,7 +170,7 @@ const simulators = [
   {
     id: 'dobot-sim',
     name: 'Dobot Simulator',
-    description: 'Simulador brazo Dobot Magician',
+    description: 'Simulador brazo Dobot Magician - Sin registro',
     url: 'https://www.dobot-robots.com/products/education/magician.html',
     icon: Joystick,
     category: 'robotica',
