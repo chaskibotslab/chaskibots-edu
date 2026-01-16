@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { 
   ExternalLink, Puzzle, Cat, Gamepad2, Zap, CircuitBoard, Code, Terminal, 
-  Cpu, Bot, Cog, Eye, Box, GitBranch, Network
+  Cpu, Bot, Cog, Eye, Box, GitBranch, Network, Joystick, Wrench
 } from 'lucide-react'
 
 const categories = [
@@ -11,6 +11,7 @@ const categories = [
   { id: 'python', name: 'Python', icon: Code },
   { id: 'micropython', name: 'MicroPython', icon: Cpu },
   { id: 'electronica', name: 'Electrónica', icon: Zap },
+  { id: 'robotica', name: 'Robótica', icon: Bot },
   { id: 'cnc', name: 'CNC/Industrial', icon: Cog },
   { id: '3d', name: 'Diseño 3D', icon: Box },
   { id: 'logica', name: 'Lógica Digital', icon: GitBranch },
@@ -103,11 +104,38 @@ const simulators = [
   },
   // Electrónica
   {
-    id: 'wokwi',
+    id: 'wokwi-arduino',
     name: 'Wokwi Arduino',
-    description: 'Simulador de Arduino y ESP32 - Sin registro',
+    description: 'Simulador de Arduino UNO - Sin registro',
     url: 'https://wokwi.com/projects/new/arduino-uno',
     icon: Zap,
+    category: 'electronica',
+    requiresLogin: false
+  },
+  {
+    id: 'wokwi-esp32',
+    name: 'Wokwi ESP32',
+    description: 'Simulador de ESP32 con WiFi/BT - Sin registro',
+    url: 'https://wokwi.com/projects/new/esp32',
+    icon: Cpu,
+    category: 'electronica',
+    requiresLogin: false
+  },
+  {
+    id: 'wokwi-esp32-c3',
+    name: 'ESP32-C3 RISC-V',
+    description: 'ESP32-C3 con arquitectura RISC-V - Sin registro',
+    url: 'https://wokwi.com/projects/new/esp32-c3-devkitm-1',
+    icon: Cpu,
+    category: 'electronica',
+    requiresLogin: false
+  },
+  {
+    id: 'wokwi-esp32-s2',
+    name: 'ESP32-S2',
+    description: 'ESP32-S2 con USB nativo - Sin registro',
+    url: 'https://wokwi.com/projects/new/esp32-s2-devkitm-1',
+    icon: Cpu,
     category: 'electronica',
     requiresLogin: false
   },
@@ -127,6 +155,79 @@ const simulators = [
     url: 'https://www.falstad.com/circuit/circuitjs.html',
     icon: Zap,
     category: 'electronica',
+    requiresLogin: false
+  },
+  // Robótica - Brazos Robóticos y Simuladores
+  {
+    id: 'robodk',
+    name: 'RoboDK Online',
+    description: 'Simulador de robots industriales - Demo online',
+    url: 'https://robodk.com/simulate',
+    icon: Bot,
+    category: 'robotica',
+    requiresLogin: false
+  },
+  {
+    id: 'webots',
+    name: 'Webots Online',
+    description: 'Simulador de robots 3D profesional - Sin registro',
+    url: 'https://webots.cloud/',
+    icon: Bot,
+    category: 'robotica',
+    requiresLogin: false
+  },
+  {
+    id: 'robot-arm-sim',
+    name: 'Robot Arm Simulator',
+    description: 'Simulador de brazo robótico 6 ejes - Sin registro',
+    url: 'https://www.roboticsbusinessreview.com/robot-arm-simulator/',
+    icon: Joystick,
+    category: 'robotica',
+    requiresLogin: false
+  },
+  {
+    id: 'mycobot',
+    name: 'myCobot Simulator',
+    description: 'Simulador brazo robótico myCobot - Sin registro',
+    url: 'https://www.elephantrobotics.com/en/mycobot-en/',
+    icon: Bot,
+    category: 'robotica',
+    requiresLogin: false
+  },
+  {
+    id: 'gazebo-web',
+    name: 'Gazebo Web',
+    description: 'Simulador ROS/Gazebo en navegador - Demo',
+    url: 'https://app.gazebosim.org/',
+    icon: Bot,
+    category: 'robotica',
+    requiresLogin: false
+  },
+  {
+    id: 'ros-development',
+    name: 'ROS Development Studio',
+    description: 'IDE ROS online con RViz - Cuenta gratuita',
+    url: 'https://app.theconstructsim.com/',
+    icon: Wrench,
+    category: 'robotica',
+    requiresLogin: true
+  },
+  {
+    id: 'coppeliasim',
+    name: 'CoppeliaSim Web',
+    description: 'Simulador robótico avanzado - Demo',
+    url: 'https://www.coppeliarobotics.com/helpFiles/index.html',
+    icon: Bot,
+    category: 'robotica',
+    requiresLogin: false
+  },
+  {
+    id: 'dobot-sim',
+    name: 'Dobot Simulator',
+    description: 'Simulador brazo Dobot Magician',
+    url: 'https://www.dobot-robots.com/products/education/magician.html',
+    icon: Joystick,
+    category: 'robotica',
     requiresLogin: false
   },
   // CNC/Industrial
@@ -149,11 +250,20 @@ const simulators = [
     requiresLogin: false
   },
   {
-    id: 'robot-virtual',
-    name: 'Robot Virtual',
-    description: 'Simulador de brazos robóticos - Sin registro',
-    url: 'https://www.robotvirtualworlds.com/virtualbrick/',
-    icon: Bot,
+    id: 'jscut',
+    name: 'JSCut',
+    description: 'CAM para CNC en navegador - Sin registro',
+    url: 'http://jscut.org/jscut.html',
+    icon: Cog,
+    category: 'cnc',
+    requiresLogin: false
+  },
+  {
+    id: 'camotics',
+    name: 'CAMotics Web',
+    description: 'Simulador de fresado CNC - Sin registro',
+    url: 'https://camotics.org/',
+    icon: Eye,
     category: 'cnc',
     requiresLogin: false
   },
