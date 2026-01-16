@@ -130,6 +130,17 @@ export default function AdminPage() {
             <Settings className="w-5 h-5" />
             <span>Configuración</span>
           </button>
+
+          <div className="mt-4 pt-4 border-t border-dark-600">
+            <p className="text-xs text-gray-500 mb-2 px-4">Herramientas</p>
+            <Link
+              href="/admin/calificaciones"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all"
+            >
+              <GraduationCap className="w-5 h-5" />
+              <span>Calificaciones</span>
+            </Link>
+          </div>
         </nav>
 
         <div className="p-4 border-t border-dark-600">

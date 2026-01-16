@@ -1,0 +1,793 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { EDUCATION_LEVELS } from '@/lib/constants'
+import {
+  getStudents,
+  getStudentsByLevel,
+  addStudent,
+  updateStudent,
+  deleteStudent,
+  getGrades,
+  getGradesByStudent,
+  addGrade,
+  updateGrade,
+  deleteGrade,
+  getLevelSummary,
+  getStudentSummary,
+  exportGradesToCSV,
+  exportStudentsToCSV,
+  seedSampleData,
+  Student,
+  Grade,
+  GradeSummary
+} from '@/lib/gradingService'
+import {
+  Users, Plus, Edit, Trash2, Save, X, Search,
+  GraduationCap, Award, FileText, Download, ChevronDown,
+  ChevronRight, Star, TrendingUp, Clock, CheckCircle,
+  AlertCircle, Filter, BarChart3, UserPlus
+} from 'lucide-react'
+
+type ViewMode = 'students' | 'grades' | 'summary'
+
+export default function GradingPanel() {
+  const [selectedLevel, setSelectedLevel] = useState<string>('')
+  const [viewMode, setViewMode] = useState<ViewMode>('students')
+  const [students, setStudents] = useState<Student[]>([])
+  const [grades, setGrades] = useState<Grade[]>([])
+  const [summaries, setSummaries] = useState<GradeSummary[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+  
+  // Modal states
+  const [showAddStudent, setShowAddStudent] = useState(false)
+  const [showAddGrade, setShowAddGrade] = useState(false)
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null)
+  const [editingGrade, setEditingGrade] = useState<Grade | null>(null)
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  
+  // Form states
+  const [newStudentName, setNewStudentName] = useState('')
+  const [newStudentEmail, setNewStudentEmail] = useState('')
+  const [newGradeScore, setNewGradeScore] = useState<number>(10)
+  const [newGradeFeedback, setNewGradeFeedback] = useState('')
+  const [newGradeLesson, setNewGradeLesson] = useState('')
+  const [newGradeTaskId, setNewGradeTaskId] = useState('')
+
+  useEffect(() => {
+    seedSampleData()
+    loadData()
+  }, [])
+
+  useEffect(() => {
+    loadData()
+  }, [selectedLevel])
+
+  const loadData = () => {
+    setIsLoading(true)
+    try {
+      if (selectedLevel) {
+        setStudents(getStudentsByLevel(selectedLevel))
+        setSummaries(getLevelSummary(selectedLevel))
+        const levelGrades = getGrades().filter(g => g.levelId === selectedLevel)
+        setGrades(levelGrades)
+      } else {
+        setStudents(getStudents())
+        setGrades(getGrades())
+        setSummaries([])
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleAddStudent = () => {
+    if (!newStudentName.trim() || !selectedLevel) return
+    
+    addStudent({
+      name: newStudentName.trim(),
+      levelId: selectedLevel,
+      email: newStudentEmail.trim() || undefined
+    })
+    
+    setNewStudentName('')
+    setNewStudentEmail('')
+    setShowAddStudent(false)
+    loadData()
+  }
+
+  const handleUpdateStudent = () => {
+    if (!editingStudent || !newStudentName.trim()) return
+    
+    updateStudent(editingStudent.id, {
+      name: newStudentName.trim(),
+      email: newStudentEmail.trim() || undefined
+    })
+    
+    setEditingStudent(null)
+    setNewStudentName('')
+    setNewStudentEmail('')
+    loadData()
+  }
+
+  const handleDeleteStudent = (id: string) => {
+    if (confirm('¿Estás seguro de eliminar este estudiante? También se eliminarán sus calificaciones.')) {
+      deleteStudent(id)
+      loadData()
+    }
+  }
+
+  const handleAddGrade = () => {
+    if (!selectedStudent || !newGradeLesson.trim()) return
+    
+    addGrade({
+      studentId: selectedStudent.id,
+      lessonId: newGradeLesson.trim(),
+      levelId: selectedStudent.levelId,
+      score: newGradeScore,
+      feedback: newGradeFeedback.trim() || undefined,
+      taskId: newGradeTaskId.trim() || undefined,
+      submittedAt: new Date().toISOString(),
+      gradedAt: new Date().toISOString()
+    })
+    
+    setNewGradeScore(10)
+    setNewGradeFeedback('')
+    setNewGradeLesson('')
+    setNewGradeTaskId('')
+    setShowAddGrade(false)
+    setSelectedStudent(null)
+    loadData()
+  }
+
+  const handleUpdateGrade = () => {
+    if (!editingGrade) return
+    
+    updateGrade(editingGrade.id, {
+      score: newGradeScore,
+      feedback: newGradeFeedback.trim() || undefined,
+      gradedAt: new Date().toISOString()
+    })
+    
+    setEditingGrade(null)
+    setNewGradeScore(10)
+    setNewGradeFeedback('')
+    loadData()
+  }
+
+  const handleDeleteGrade = (id: string) => {
+    if (confirm('¿Estás seguro de eliminar esta calificación?')) {
+      deleteGrade(id)
+      loadData()
+    }
+  }
+
+  const handleExportCSV = (type: 'students' | 'grades') => {
+    const csv = type === 'students' 
+      ? exportStudentsToCSV(selectedLevel || undefined)
+      : exportGradesToCSV(selectedLevel || undefined)
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${type}_${selectedLevel || 'todos'}_${new Date().toISOString().slice(0, 10)}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const filteredStudents = students.filter(s => 
+    s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (s.email && s.email.toLowerCase().includes(searchTerm.toLowerCase()))
+  )
+
+  const getScoreColor = (score: number) => {
+    if (score >= 9) return 'text-green-400'
+    if (score >= 7) return 'text-yellow-400'
+    if (score >= 5) return 'text-orange-400'
+    return 'text-red-400'
+  }
+
+  const getScoreBg = (score: number) => {
+    if (score >= 9) return 'bg-green-500/20 border-green-500/30'
+    if (score >= 7) return 'bg-yellow-500/20 border-yellow-500/30'
+    if (score >= 5) return 'bg-orange-500/20 border-orange-500/30'
+    return 'bg-red-500/20 border-red-500/30'
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <GraduationCap className="w-7 h-7 text-neon-cyan" />
+            Sistema de Calificaciones
+          </h2>
+          <p className="text-gray-400 text-sm mt-1">
+            Gestiona estudiantes y calificaciones por nivel académico
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleExportCSV('students')}
+            className="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm flex items-center gap-2 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Exportar Estudiantes
+          </button>
+          <button
+            onClick={() => handleExportCSV('grades')}
+            className="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm flex items-center gap-2 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Exportar Calificaciones
+          </button>
+        </div>
+      </div>
+
+      {/* Level Selector */}
+      <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
+        <label className="block text-sm text-gray-400 mb-2">Seleccionar Nivel Académico</label>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedLevel('')}
+            className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+              selectedLevel === ''
+                ? 'bg-neon-cyan text-dark-900 font-medium'
+                : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+            }`}
+          >
+            Todos
+          </button>
+          {EDUCATION_LEVELS.map(level => (
+            <button
+              key={level.id}
+              onClick={() => setSelectedLevel(level.id)}
+              className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                selectedLevel === level.id
+                  ? 'bg-neon-cyan text-dark-900 font-medium'
+                  : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+              }`}
+            >
+              {level.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* View Mode Tabs */}
+      <div className="flex gap-2 border-b border-dark-600 pb-2">
+        <button
+          onClick={() => setViewMode('students')}
+          className={`px-4 py-2 rounded-t-lg flex items-center gap-2 transition-colors ${
+            viewMode === 'students'
+              ? 'bg-dark-700 text-white border-b-2 border-neon-cyan'
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          Estudiantes ({filteredStudents.length})
+        </button>
+        <button
+          onClick={() => setViewMode('grades')}
+          className={`px-4 py-2 rounded-t-lg flex items-center gap-2 transition-colors ${
+            viewMode === 'grades'
+              ? 'bg-dark-700 text-white border-b-2 border-neon-cyan'
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <Award className="w-4 h-4" />
+          Calificaciones ({grades.length})
+        </button>
+        <button
+          onClick={() => setViewMode('summary')}
+          className={`px-4 py-2 rounded-t-lg flex items-center gap-2 transition-colors ${
+            viewMode === 'summary'
+              ? 'bg-dark-700 text-white border-b-2 border-neon-cyan'
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4" />
+          Resumen
+        </button>
+      </div>
+
+      {/* Search and Add */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Buscar estudiante..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-neon-cyan"
+          />
+        </div>
+        {selectedLevel && viewMode === 'students' && (
+          <button
+            onClick={() => setShowAddStudent(true)}
+            className="px-4 py-2 bg-neon-cyan text-dark-900 font-medium rounded-lg flex items-center gap-2 hover:bg-neon-cyan/80 transition-colors"
+          >
+            <UserPlus className="w-4 h-4" />
+            Agregar Estudiante
+          </button>
+        )}
+      </div>
+
+      {/* Content */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan"></div>
+        </div>
+      ) : (
+        <>
+          {/* Students View */}
+          {viewMode === 'students' && (
+            <div className="grid gap-4">
+              {filteredStudents.length === 0 ? (
+                <div className="bg-dark-800 border border-dark-600 rounded-xl p-8 text-center">
+                  <Users className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-400">
+                    {selectedLevel 
+                      ? 'No hay estudiantes en este nivel. Agrega uno nuevo.'
+                      : 'Selecciona un nivel para ver los estudiantes.'}
+                  </p>
+                </div>
+              ) : (
+                filteredStudents.map(student => {
+                  const summary = getStudentSummary(student.id)
+                  const studentGrades = getGradesByStudent(student.id)
+                  
+                  return (
+                    <div
+                      key={student.id}
+                      className="bg-dark-800 border border-dark-600 rounded-xl p-4 hover:border-dark-500 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-full flex items-center justify-center text-white font-bold">
+                            {student.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <h3 className="text-white font-medium">{student.name}</h3>
+                            <p className="text-gray-500 text-sm">
+                              {student.email || 'Sin email'} • {EDUCATION_LEVELS.find(l => l.id === student.levelId)?.name}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedStudent(student)
+                              setShowAddGrade(true)
+                            }}
+                            className="p-2 text-green-400 hover:bg-green-500/20 rounded-lg transition-colors"
+                            title="Agregar calificación"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingStudent(student)
+                              setNewStudentName(student.name)
+                              setNewStudentEmail(student.email || '')
+                            }}
+                            className="p-2 text-gray-400 hover:bg-dark-700 rounded-lg transition-colors"
+                            title="Editar"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteStudent(student.id)}
+                            className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
+                            title="Eliminar"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Stats */}
+                      {summary && (
+                        <div className="mt-4 grid grid-cols-3 gap-4">
+                          <div className="bg-dark-900/50 rounded-lg p-3 text-center">
+                            <p className="text-2xl font-bold text-neon-cyan">{summary.averageScore}</p>
+                            <p className="text-xs text-gray-500">Promedio</p>
+                          </div>
+                          <div className="bg-dark-900/50 rounded-lg p-3 text-center">
+                            <p className="text-2xl font-bold text-neon-purple">{summary.totalGrades}</p>
+                            <p className="text-xs text-gray-500">Calificaciones</p>
+                          </div>
+                          <div className="bg-dark-900/50 rounded-lg p-3 text-center">
+                            <p className="text-2xl font-bold text-neon-green">{summary.completedLessons}</p>
+                            <p className="text-xs text-gray-500">Lecciones</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Recent Grades */}
+                      {studentGrades.length > 0 && (
+                        <div className="mt-4">
+                          <p className="text-xs text-gray-500 mb-2">Últimas calificaciones:</p>
+                          <div className="flex gap-2 flex-wrap">
+                            {studentGrades.slice(-5).map(grade => (
+                              <span
+                                key={grade.id}
+                                className={`px-2 py-1 rounded text-sm font-medium border ${getScoreBg(grade.score)} ${getScoreColor(grade.score)}`}
+                              >
+                                {grade.score}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          )}
+
+          {/* Grades View */}
+          {viewMode === 'grades' && (
+            <div className="bg-dark-800 border border-dark-600 rounded-xl overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-dark-900">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Estudiante</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Lección</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">Nota</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Feedback</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">ID Tarea</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Fecha</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-dark-600">
+                  {grades.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                        No hay calificaciones registradas
+                      </td>
+                    </tr>
+                  ) : (
+                    grades.map(grade => {
+                      const student = students.find(s => s.id === grade.studentId)
+                      return (
+                        <tr key={grade.id} className="hover:bg-dark-700/50">
+                          <td className="px-4 py-3 text-white">{student?.name || 'Desconocido'}</td>
+                          <td className="px-4 py-3 text-gray-400">{grade.lessonId}</td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`px-3 py-1 rounded-full font-bold ${getScoreBg(grade.score)} ${getScoreColor(grade.score)}`}>
+                              {grade.score}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-400 max-w-xs truncate">{grade.feedback || '-'}</td>
+                          <td className="px-4 py-3 text-gray-500 font-mono text-xs">{grade.taskId || '-'}</td>
+                          <td className="px-4 py-3 text-gray-500 text-sm">
+                            {new Date(grade.submittedAt).toLocaleDateString('es-EC')}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <div className="flex items-center justify-center gap-1">
+                              <button
+                                onClick={() => {
+                                  setEditingGrade(grade)
+                                  setNewGradeScore(grade.score)
+                                  setNewGradeFeedback(grade.feedback || '')
+                                }}
+                                className="p-1.5 text-gray-400 hover:bg-dark-600 rounded transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteGrade(grade.id)}
+                                className="p-1.5 text-red-400 hover:bg-red-500/20 rounded transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Summary View */}
+          {viewMode === 'summary' && (
+            <div className="space-y-4">
+              {!selectedLevel ? (
+                <div className="bg-dark-800 border border-dark-600 rounded-xl p-8 text-center">
+                  <BarChart3 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-400">Selecciona un nivel para ver el resumen de calificaciones.</p>
+                </div>
+              ) : summaries.length === 0 ? (
+                <div className="bg-dark-800 border border-dark-600 rounded-xl p-8 text-center">
+                  <BarChart3 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-400">No hay datos de calificaciones para este nivel.</p>
+                </div>
+              ) : (
+                <>
+                  {/* Level Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-neon-cyan/20 rounded-lg flex items-center justify-center">
+                          <Users className="w-5 h-5 text-neon-cyan" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-white">{summaries.length}</p>
+                          <p className="text-xs text-gray-500">Estudiantes</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-neon-purple/20 rounded-lg flex items-center justify-center">
+                          <Award className="w-5 h-5 text-neon-purple" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-white">{grades.length}</p>
+                          <p className="text-xs text-gray-500">Calificaciones</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-white">
+                            {summaries.length > 0 
+                              ? (summaries.reduce((a, b) => a + b.averageScore, 0) / summaries.length).toFixed(1)
+                              : '0'}
+                          </p>
+                          <p className="text-xs text-gray-500">Promedio General</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                          <Star className="w-5 h-5 text-yellow-400" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-white">
+                            {summaries.length > 0 ? Math.max(...summaries.map(s => s.averageScore)).toFixed(1) : '0'}
+                          </p>
+                          <p className="text-xs text-gray-500">Mejor Promedio</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ranking */}
+                  <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
+                    <h3 className="text-white font-medium mb-4 flex items-center gap-2">
+                      <Award className="w-5 h-5 text-yellow-400" />
+                      Ranking de Estudiantes
+                    </h3>
+                    <div className="space-y-2">
+                      {summaries.map((summary, index) => (
+                        <div
+                          key={summary.studentId}
+                          className="flex items-center gap-3 p-3 bg-dark-900/50 rounded-lg"
+                        >
+                          <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                            index === 0 ? 'bg-yellow-500 text-dark-900' :
+                            index === 1 ? 'bg-gray-400 text-dark-900' :
+                            index === 2 ? 'bg-orange-600 text-white' :
+                            'bg-dark-700 text-gray-400'
+                          }`}>
+                            {index + 1}
+                          </span>
+                          <div className="flex-1">
+                            <p className="text-white font-medium">{summary.studentName}</p>
+                            <p className="text-xs text-gray-500">
+                              {summary.totalGrades} calificaciones • {summary.completedLessons} lecciones
+                            </p>
+                          </div>
+                          <div className={`text-xl font-bold ${getScoreColor(summary.averageScore)}`}>
+                            {summary.averageScore}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Add Student Modal */}
+      {(showAddStudent || editingStudent) && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-800 border border-dark-600 rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <UserPlus className="w-6 h-6 text-neon-cyan" />
+              {editingStudent ? 'Editar Estudiante' : 'Agregar Estudiante'}
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Nombre *</label>
+                <input
+                  type="text"
+                  value={newStudentName}
+                  onChange={(e) => setNewStudentName(e.target.value)}
+                  placeholder="Nombre completo"
+                  className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-neon-cyan"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Email (opcional)</label>
+                <input
+                  type="email"
+                  value={newStudentEmail}
+                  onChange={(e) => setNewStudentEmail(e.target.value)}
+                  placeholder="correo@ejemplo.com"
+                  className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-neon-cyan"
+                />
+              </div>
+              {!editingStudent && (
+                <div className="bg-dark-900/50 rounded-lg p-3">
+                  <p className="text-sm text-gray-400">
+                    Nivel: <span className="text-white font-medium">
+                      {EDUCATION_LEVELS.find(l => l.id === selectedLevel)?.fullName}
+                    </span>
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowAddStudent(false)
+                  setEditingStudent(null)
+                  setNewStudentName('')
+                  setNewStudentEmail('')
+                }}
+                className="flex-1 px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={editingStudent ? handleUpdateStudent : handleAddStudent}
+                disabled={!newStudentName.trim()}
+                className="flex-1 px-4 py-2 bg-neon-cyan text-dark-900 font-medium rounded-lg hover:bg-neon-cyan/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {editingStudent ? 'Guardar' : 'Agregar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Grade Modal */}
+      {(showAddGrade || editingGrade) && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-800 border border-dark-600 rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <Award className="w-6 h-6 text-neon-cyan" />
+              {editingGrade ? 'Editar Calificación' : 'Nueva Calificación'}
+            </h3>
+            
+            {selectedStudent && !editingGrade && (
+              <div className="bg-dark-900/50 rounded-lg p-3 mb-4">
+                <p className="text-sm text-gray-400">
+                  Estudiante: <span className="text-white font-medium">{selectedStudent.name}</span>
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {!editingGrade && (
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Lección / Actividad *</label>
+                  <input
+                    type="text"
+                    value={newGradeLesson}
+                    onChange={(e) => setNewGradeLesson(e.target.value)}
+                    placeholder="Ej: Lección 1 - Variables"
+                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-neon-cyan"
+                  />
+                </div>
+              )}
+              
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Calificación (0-10) *</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="10"
+                  step="0.5"
+                  value={newGradeScore}
+                  onChange={(e) => setNewGradeScore(parseFloat(e.target.value) || 0)}
+                  className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-2xl font-bold text-center focus:outline-none focus:border-neon-cyan"
+                />
+                <div className="flex justify-between mt-1">
+                  {[0, 2.5, 5, 7.5, 10].map(score => (
+                    <button
+                      key={score}
+                      onClick={() => setNewGradeScore(score)}
+                      className={`px-2 py-1 rounded text-xs ${
+                        newGradeScore === score 
+                          ? 'bg-neon-cyan text-dark-900' 
+                          : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                      }`}
+                    >
+                      {score}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Feedback (opcional)</label>
+                <textarea
+                  value={newGradeFeedback}
+                  onChange={(e) => setNewGradeFeedback(e.target.value)}
+                  placeholder="Comentarios sobre el trabajo..."
+                  rows={3}
+                  className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-neon-cyan resize-none"
+                />
+              </div>
+
+              {!editingGrade && (
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">ID de Tarea (opcional)</label>
+                  <input
+                    type="text"
+                    value={newGradeTaskId}
+                    onChange={(e) => setNewGradeTaskId(e.target.value)}
+                    placeholder="Ej: CB-250116-A3F2B1"
+                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white font-mono placeholder:text-gray-500 focus:outline-none focus:border-neon-cyan"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    El ID de verificación del simulador Python
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowAddGrade(false)
+                  setEditingGrade(null)
+                  setSelectedStudent(null)
+                  setNewGradeScore(10)
+                  setNewGradeFeedback('')
+                  setNewGradeLesson('')
+                  setNewGradeTaskId('')
+                }}
+                className="flex-1 px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={editingGrade ? handleUpdateGrade : handleAddGrade}
+                disabled={!editingGrade && !newGradeLesson.trim()}
+                className="flex-1 px-4 py-2 bg-neon-cyan text-dark-900 font-medium rounded-lg hover:bg-neon-cyan/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {editingGrade ? 'Guardar' : 'Calificar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
