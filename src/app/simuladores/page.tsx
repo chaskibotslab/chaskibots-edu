@@ -4,7 +4,8 @@ import { useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import SimulatorTabs from '@/components/SimulatorTabs'
-import { Code, Copy, Check, Terminal, Lightbulb, BookOpen } from 'lucide-react'
+import PythonSimulator from '@/components/PythonSimulator'
+import { Code, Copy, Check, Terminal, Lightbulb, BookOpen, Download } from 'lucide-react'
 
 export default function SimuladoresPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
@@ -232,16 +233,30 @@ for i in range(1, 11):
             </div>
           </div>
 
+          {/* Simulador Python Propio con Exportación */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
+                <Download className="w-5 h-5 text-green-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Simulador Python ChaskiBots</h2>
+                <p className="text-gray-400 text-sm">Ejecuta código y exporta tu tarea (código + resultado)</p>
+              </div>
+            </div>
+            <PythonSimulator />
+          </div>
+
           <SimulatorTabs />
 
-          <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
-            <h3 className="font-bold text-chaski-dark text-lg mb-2">
+          <div className="mt-8 bg-dark-800 border border-dark-600 rounded-2xl p-6">
+            <h3 className="font-bold text-white text-lg mb-2">
               💡 Consejo
             </h3>
-            <p className="text-gray-600">
-              Si algún simulador no carga correctamente dentro de la página, usa el botón 
-              "Abrir en su web" para acceder directamente. Algunos sitios tienen restricciones 
-              de seguridad que impiden cargar en iframes.
+            <p className="text-gray-400">
+              Si algún simulador externo no carga correctamente, usa el botón 
+              "Abrir en su web" para acceder directamente. El simulador Python de ChaskiBots 
+              funciona completamente en tu navegador sin necesidad de conexión externa.
             </p>
           </div>
         </div>
