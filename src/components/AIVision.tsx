@@ -33,6 +33,55 @@ const TRANSLATIONS: Record<string, string> = {
   'pizza': 'pizza', 'donut': 'dona', 'cake': 'pastel', 'chair': 'silla', 'couch': 'sofa',
   'bed': 'cama', 'tv': 'television', 'laptop': 'laptop', 'mouse': 'mouse', 'keyboard': 'teclado',
   'cell phone': 'celular', 'book': 'libro', 'clock': 'reloj', 'scissors': 'tijeras',
+  'traffic light': 'semaforo', 'fire hydrant': 'hidrante', 'stop sign': 'senal de pare',
+  'parking meter': 'parquimetro', 'bench': 'banca', 'frisbee': 'frisbee', 'skis': 'esquis',
+  'snowboard': 'snowboard', 'sports ball': 'pelota', 'kite': 'cometa', 'baseball bat': 'bate',
+  'baseball glove': 'guante', 'skateboard': 'patineta', 'surfboard': 'tabla de surf',
+  'tennis racket': 'raqueta', 'wine glass': 'copa', 'bowl': 'tazon', 'broccoli': 'brocoli',
+  'carrot': 'zanahoria', 'hot dog': 'hot dog', 'potted plant': 'planta', 'dining table': 'mesa',
+  'toilet': 'inodoro', 'remote': 'control remoto', 'microwave': 'microondas', 'oven': 'horno',
+  'toaster': 'tostadora', 'sink': 'lavabo', 'refrigerator': 'refrigerador', 'vase': 'florero',
+  'teddy bear': 'oso de peluche', 'hair drier': 'secadora', 'toothbrush': 'cepillo de dientes',
+  'suitcase': 'maleta',
+}
+
+const COCO_CATEGORIES = {
+  personas: ['persona'],
+  vehiculos: ['bicicleta', 'carro', 'motocicleta', 'avion', 'autobus', 'tren', 'camion', 'barco'],
+  animales: ['pajaro', 'gato', 'perro', 'caballo', 'oveja', 'vaca', 'elefante', 'oso', 'cebra', 'jirafa'],
+  accesorios: ['mochila', 'paraguas', 'bolso', 'corbata', 'maleta'],
+  deportes: ['frisbee', 'esquis', 'snowboard', 'pelota', 'cometa', 'bate', 'guante', 'patineta', 'tabla de surf', 'raqueta'],
+  cocina: ['botella', 'copa', 'taza', 'tenedor', 'cuchillo', 'cuchara', 'tazon'],
+  comida: ['banana', 'manzana', 'sandwich', 'naranja', 'brocoli', 'zanahoria', 'hot dog', 'pizza', 'dona', 'pastel'],
+  muebles: ['silla', 'sofa', 'cama', 'mesa', 'inodoro'],
+  electronica: ['television', 'laptop', 'mouse', 'control remoto', 'teclado', 'celular', 'microondas', 'horno', 'tostadora', 'refrigerador'],
+  objetos: ['libro', 'reloj', 'florero', 'tijeras', 'oso de peluche', 'secadora', 'cepillo de dientes', 'planta', 'lavabo'],
+  exterior: ['semaforo', 'hidrante', 'senal de pare', 'parquimetro', 'banca'],
+}
+
+const AI_LEARNING_INFO = {
+  detector: {
+    title: 'Como funciona el Detector de Objetos',
+    skills: [
+      'Reconocimiento de patrones visuales',
+      'Procesamiento de imagenes en tiempo real',
+      'Clasificacion multi-clase',
+      'Localizacion espacial (bounding boxes)',
+    ],
+    howItWorks: 'COCO-SSD usa una red neuronal convolucional (CNN) entrenada con mas de 200,000 imagenes del dataset COCO. Analiza cada frame de video, extrae caracteristicas visuales y predice que objetos estan presentes y donde se ubican.',
+    realWorld: ['Autos autonomos', 'Camaras de seguridad', 'Robots industriales', 'Asistentes de conduccion', 'Control de calidad'],
+  },
+  classifier: {
+    title: 'Como funciona el Clasificador de Imagenes',
+    skills: [
+      'Extraccion de caracteristicas',
+      'Redes neuronales profundas',
+      'Probabilidad y confianza',
+      'Transfer learning',
+    ],
+    howItWorks: 'MobileNet es una red neuronal ligera que puede clasificar imagenes en mas de 1000 categorias. Fue entrenada con millones de imagenes de ImageNet y optimizada para funcionar en dispositivos moviles.',
+    realWorld: ['Busqueda de imagenes', 'Filtros de redes sociales', 'Organizacion de fotos', 'Diagnostico medico', 'Control de calidad'],
+  },
 }
 
 const DRAWABLE_ITEMS = [
@@ -600,6 +649,55 @@ void loop() {
                 </button>
               </div>
             )}
+
+            {/* Informacion Educativa */}
+            <div className="mt-6 space-y-4">
+              {/* Como funciona */}
+              <div className="bg-gradient-to-r from-cyan-900/20 to-blue-900/20 border border-cyan-500/30 rounded-xl p-4">
+                <h4 className="text-white font-bold mb-2 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-neon-cyan" /> {AI_LEARNING_INFO.detector.title}
+                </h4>
+                <p className="text-gray-300 text-sm mb-3">{AI_LEARNING_INFO.detector.howItWorks}</p>
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-neon-cyan text-xs font-semibold mb-1">Destrezas que desarrollas:</p>
+                    <ul className="text-gray-400 text-xs space-y-1">
+                      {AI_LEARNING_INFO.detector.skills.map((skill, i) => (
+                        <li key={i} className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 bg-neon-cyan rounded-full"></span> {skill}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-neon-purple text-xs font-semibold mb-1">Aplicaciones reales:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {AI_LEARNING_INFO.detector.realWorld.map((app, i) => (
+                        <span key={i} className="px-2 py-0.5 bg-neon-purple/20 text-neon-purple rounded text-xs">{app}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lista de objetos detectables */}
+              <div className="bg-dark-700/50 border border-dark-600 rounded-xl p-4">
+                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-neon-orange" /> 80 Objetos que puedo detectar
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {Object.entries(COCO_CATEGORIES).map(([category, items]) => (
+                    <div key={category} className="bg-dark-800/50 rounded-lg p-2">
+                      <p className="text-neon-cyan text-xs font-semibold capitalize mb-1">{category}</p>
+                      <p className="text-gray-400 text-xs">{items.join(', ')}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-gray-500 text-xs mt-3 text-center">
+                  Intenta mostrar estos objetos a la camara para ver como la IA los detecta!
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -700,6 +798,40 @@ void loop() {
                 </div>
               </div>
             )}
+
+            {/* Informacion Educativa del Clasificador */}
+            <div className="mt-6 bg-gradient-to-r from-orange-900/20 to-pink-900/20 border border-orange-500/30 rounded-xl p-4">
+              <h4 className="text-white font-bold mb-2 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-neon-orange" /> {AI_LEARNING_INFO.classifier.title}
+              </h4>
+              <p className="text-gray-300 text-sm mb-3">{AI_LEARNING_INFO.classifier.howItWorks}</p>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div>
+                  <p className="text-neon-orange text-xs font-semibold mb-1">Destrezas que desarrollas:</p>
+                  <ul className="text-gray-400 text-xs space-y-1">
+                    {AI_LEARNING_INFO.classifier.skills.map((skill, i) => (
+                      <li key={i} className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-neon-orange rounded-full"></span> {skill}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-neon-pink text-xs font-semibold mb-1">Aplicaciones reales:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {AI_LEARNING_INFO.classifier.realWorld.map((app, i) => (
+                      <span key={i} className="px-2 py-0.5 bg-neon-pink/20 text-neon-pink rounded text-xs">{app}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-3 p-3 bg-dark-800/50 rounded-lg">
+                <p className="text-gray-400 text-xs">
+                  <strong className="text-white">Dato curioso:</strong> MobileNet puede clasificar imagenes en mas de 1000 categorias diferentes, 
+                  desde animales y objetos hasta comida y vehiculos. Fue disenada para ser lo suficientemente ligera para funcionar en tu celular!
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}
