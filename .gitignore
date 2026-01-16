@@ -2,3 +2,12 @@ node_modules
 .next
 *.pack
 *.pack.gz
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+.env*
+*.xlsx
+*.pdf
+*.docx
+*.png

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Mail, Globe, Youtube, Facebook } from 'lucide-react'
+import { Mail, Globe, Youtube, Facebook, Phone } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -69,6 +69,13 @@ export default function Footer() {
                 <a href="https://chaskibots.com" target="_blank" rel="noopener noreferrer" 
                    className="hover:text-neon-cyan transition-colors">
                   www.chaskibots.com
+                </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-neon-green" />
+                <a href="https://wa.me/593968653593" target="_blank" rel="noopener noreferrer"
+                   className="hover:text-neon-green transition-colors">
+                  0968653593
                 </a>
               </li>
             </ul>

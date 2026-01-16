@@ -274,45 +274,212 @@ export const SUBJECT_AREAS = [
 ]
 
 export const SIMULATORS = [
+  // Programación por bloques (sin registro)
   {
     id: 'blockly',
     name: 'Blockly Games',
-    description: 'Juegos de programación por bloques',
+    description: 'Juegos de programación por bloques - Sin registro',
     url: 'https://blockly.games/?lang=es',
-    icon: '🧩',
-    levels: ['inicial-1', 'inicial-2', 'primero-egb', 'segundo-egb', 'tercero-egb', 'cuarto-egb']
+    icon: 'Puzzle',
+    levels: ['inicial-1', 'inicial-2', 'primero-egb', 'segundo-egb', 'tercero-egb', 'cuarto-egb'],
+    category: 'bloques',
+    requiresLogin: false
   },
   {
     id: 'scratch',
     name: 'Scratch',
-    description: 'Editor de proyectos con bloques',
+    description: 'Editor de proyectos con bloques - Sin registro para probar',
     url: 'https://scratch.mit.edu/projects/editor/',
-    icon: '🐱',
-    levels: ['tercero-egb', 'cuarto-egb', 'quinto-egb', 'sexto-egb', 'septimo-egb']
+    icon: 'Cat',
+    levels: ['tercero-egb', 'cuarto-egb', 'quinto-egb', 'sexto-egb', 'septimo-egb'],
+    category: 'bloques',
+    requiresLogin: false
   },
   {
     id: 'makecode-arcade',
     name: 'MakeCode Arcade',
-    description: 'Crea videojuegos 2D',
+    description: 'Crea videojuegos 2D - Sin registro',
     url: 'https://arcade.makecode.com/#editor',
-    icon: '🎮',
-    levels: ['quinto-egb', 'sexto-egb', 'septimo-egb', 'octavo-egb']
+    icon: 'Gamepad2',
+    levels: ['quinto-egb', 'sexto-egb', 'septimo-egb', 'octavo-egb'],
+    category: 'bloques',
+    requiresLogin: false
   },
   {
+    id: 'makecode-microbit',
+    name: 'MakeCode micro:bit',
+    description: 'Programa micro:bit con bloques o JavaScript - Sin registro',
+    url: 'https://makecode.microbit.org/',
+    icon: 'Cpu',
+    levels: ['cuarto-egb', 'quinto-egb', 'sexto-egb', 'septimo-egb', 'octavo-egb'],
+    category: 'bloques',
+    requiresLogin: false
+  },
+  // Python (sin registro)
+  {
+    id: 'trinket-python',
+    name: 'Trinket Python',
+    description: 'Ejecuta Python en el navegador - Sin registro',
+    url: 'https://trinket.io/python',
+    icon: 'Code',
+    levels: ['sexto-egb', 'septimo-egb', 'octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'python',
+    requiresLogin: false
+  },
+  {
+    id: 'programiz-python',
+    name: 'Programiz Python',
+    description: 'Compilador Python online - Sin registro',
+    url: 'https://www.programiz.com/python-programming/online-compiler/',
+    icon: 'Terminal',
+    levels: ['sexto-egb', 'septimo-egb', 'octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'python',
+    requiresLogin: false
+  },
+  {
+    id: 'replit-python',
+    name: 'Replit Python',
+    description: 'IDE Python completo en la nube',
+    url: 'https://replit.com/languages/python3',
+    icon: 'Code2',
+    levels: ['octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'python',
+    requiresLogin: false
+  },
+  // MicroPython (sin registro)
+  {
+    id: 'micropython-simulator',
+    name: 'MicroPython Simulator',
+    description: 'Simula MicroPython en ESP32/Pico - Sin registro',
+    url: 'https://wokwi.com/projects/new/micropython-esp32',
+    icon: 'Microchip',
+    levels: ['octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'micropython',
+    requiresLogin: false
+  },
+  {
+    id: 'micropython-pico',
+    name: 'Raspberry Pi Pico Simulator',
+    description: 'Simula Raspberry Pi Pico con MicroPython - Sin registro',
+    url: 'https://wokwi.com/projects/new/micropython-pi-pico',
+    icon: 'CircuitBoard',
+    levels: ['noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'micropython',
+    requiresLogin: false
+  },
+  // Arduino y Electrónica (sin registro)
+  {
     id: 'wokwi',
-    name: 'Wokwi',
-    description: 'Simulador de Arduino y ESP32',
-    url: 'https://wokwi.com/',
-    icon: '⚡',
-    levels: ['septimo-egb', 'octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach']
+    name: 'Wokwi Arduino',
+    description: 'Simulador de Arduino y ESP32 - Sin registro',
+    url: 'https://wokwi.com/projects/new/arduino-uno',
+    icon: 'Zap',
+    levels: ['septimo-egb', 'octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'electronica',
+    requiresLogin: false
   },
   {
     id: 'tinkercad',
     name: 'Tinkercad Circuits',
-    description: 'Simulación de electrónica',
+    description: 'Simulación de electrónica y Arduino',
     url: 'https://www.tinkercad.com/circuits',
-    icon: '🔌',
-    levels: ['sexto-egb', 'septimo-egb', 'octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach']
+    icon: 'Cable',
+    levels: ['sexto-egb', 'septimo-egb', 'octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'electronica',
+    requiresLogin: true
+  },
+  {
+    id: 'falstad-circuit',
+    name: 'Falstad Circuit Simulator',
+    description: 'Simulador de circuitos electrónicos - Sin registro',
+    url: 'https://www.falstad.com/circuit/circuitjs.html',
+    icon: 'Activity',
+    levels: ['octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'electronica',
+    requiresLogin: false
+  },
+  // Robótica Industrial y CNC (sin registro)
+  {
+    id: 'robot-virtual',
+    name: 'Robot Virtual Works',
+    description: 'Simulador de brazos robóticos industriales - Sin registro',
+    url: 'https://www.robotvirtualworlds.com/virtualbrick/',
+    icon: 'Bot',
+    levels: ['noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'robotica-industrial',
+    requiresLogin: false
+  },
+  {
+    id: 'openbuilds-cam',
+    name: 'OpenBuilds CAM',
+    description: 'Generador de G-Code para CNC - Sin registro',
+    url: 'https://cam.openbuilds.com/',
+    icon: 'Cog',
+    levels: ['decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'cnc',
+    requiresLogin: false
+  },
+  {
+    id: 'ncviewer',
+    name: 'NC Viewer',
+    description: 'Visualizador de código G-Code CNC - Sin registro',
+    url: 'https://ncviewer.com/',
+    icon: 'Eye',
+    levels: ['decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'cnc',
+    requiresLogin: false
+  },
+  {
+    id: 'jscut',
+    name: 'JSCut',
+    description: 'CAM para CNC desde SVG - Sin registro',
+    url: 'http://jscut.org/jscut.html',
+    icon: 'Scissors',
+    levels: ['primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'cnc',
+    requiresLogin: false
+  },
+  // Diseño 3D (sin registro para probar)
+  {
+    id: 'tinkercad-3d',
+    name: 'Tinkercad 3D',
+    description: 'Diseño 3D para impresión - Fácil de usar',
+    url: 'https://www.tinkercad.com/3d-design',
+    icon: 'Box',
+    levels: ['sexto-egb', 'septimo-egb', 'octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: '3d',
+    requiresLogin: true
+  },
+  {
+    id: 'blockscad',
+    name: 'BlocksCAD',
+    description: 'Diseño 3D con bloques de programación - Sin registro',
+    url: 'https://www.blockscad3d.com/editor/',
+    icon: 'Boxes',
+    levels: ['quinto-egb', 'sexto-egb', 'septimo-egb', 'octavo-egb', 'noveno-egb'],
+    category: '3d',
+    requiresLogin: false
+  },
+  // Simuladores de lógica y compuertas
+  {
+    id: 'logic-gates',
+    name: 'Logic Gate Simulator',
+    description: 'Simulador de compuertas lógicas - Sin registro',
+    url: 'https://logic.ly/demo/',
+    icon: 'GitBranch',
+    levels: ['septimo-egb', 'octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'logica',
+    requiresLogin: false
+  },
+  {
+    id: 'circuitverse',
+    name: 'CircuitVerse',
+    description: 'Simulador de circuitos digitales - Sin registro para probar',
+    url: 'https://circuitverse.org/simulator',
+    icon: 'Network',
+    levels: ['octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'],
+    category: 'logica',
+    requiresLogin: false
   },
 ]
 
