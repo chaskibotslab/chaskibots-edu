@@ -27,6 +27,31 @@ export default function HackingPage() {
             </p>
           </div>
 
+          {/* Sección Educativa - Qué Aprenderás */}
+          <div className="bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-500/30 rounded-2xl p-6 mb-12">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+              <span className="text-3xl">🎯</span> ¿Qué destrezas desarrollarás?
+            </h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h4 className="font-semibold text-neon-green mb-2">Pensamiento Crítico</h4>
+                <p className="text-gray-400 text-sm">Aprenderás a analizar sistemas desde la perspectiva de un atacante para encontrar y corregir debilidades antes que otros.</p>
+              </div>
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h4 className="font-semibold text-neon-cyan mb-2">Resolución de Problemas</h4>
+                <p className="text-gray-400 text-sm">Desarrollarás habilidades para identificar vulnerabilidades y crear soluciones de seguridad efectivas.</p>
+              </div>
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h4 className="font-semibold text-neon-purple mb-2">Ética Digital</h4>
+                <p className="text-gray-400 text-sm">Comprenderás la responsabilidad que conlleva el conocimiento técnico y cómo usarlo para proteger, no para dañar.</p>
+              </div>
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h4 className="font-semibold text-neon-orange mb-2">Habilidades Profesionales</h4>
+                <p className="text-gray-400 text-sm">La ciberseguridad es una de las carreras más demandadas. Estas habilidades te preparan para el futuro laboral.</p>
+              </div>
+            </div>
+          </div>
+
           {/* Features */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             <div className="card text-center">
@@ -34,27 +59,36 @@ export default function HackingPage() {
                 <Lock className="w-7 h-7 text-green-600" />
               </div>
               <h3 className="font-bold text-chaski-dark mb-2">Seguridad Básica</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm mb-3">
                 Contraseñas seguras, privacidad y navegación segura en internet.
               </p>
+              <div className="bg-green-50 rounded-lg p-3 text-left">
+                <p className="text-xs text-green-700"><strong>¿Cómo funciona?</strong> Aprenderás a crear contraseñas fuertes, usar autenticación de dos factores y reconocer sitios web falsos.</p>
+              </div>
             </div>
             <div className="card text-center">
               <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Eye className="w-7 h-7 text-blue-600" />
               </div>
               <h3 className="font-bold text-chaski-dark mb-2">Análisis de Vulnerabilidades</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm mb-3">
                 Detecta y comprende las debilidades en sistemas y aplicaciones.
               </p>
+              <div className="bg-blue-50 rounded-lg p-3 text-left">
+                <p className="text-xs text-blue-700"><strong>¿Cómo funciona?</strong> Usarás herramientas para escanear sistemas, identificar puertos abiertos y encontrar configuraciones inseguras.</p>
+              </div>
             </div>
             <div className="card text-center">
               <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Key className="w-7 h-7 text-purple-600" />
               </div>
               <h3 className="font-bold text-chaski-dark mb-2">Criptografía</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm mb-3">
                 Cifrado, mensajes secretos y protección de datos.
               </p>
+              <div className="bg-purple-50 rounded-lg p-3 text-left">
+                <p className="text-xs text-purple-700"><strong>¿Cómo funciona?</strong> Aprenderás algoritmos de cifrado como AES y RSA, y cómo se protegen las comunicaciones en internet.</p>
+              </div>
             </div>
           </div>
 

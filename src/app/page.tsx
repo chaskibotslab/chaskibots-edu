@@ -148,8 +148,70 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Subject Areas - Cards Interactivas */}
+        {/* Experiencias ChaskiBots */}
         <section className="py-20 px-4 bg-dark-900">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-center text-white mb-4">
+              Nuestras <span className="text-neon-orange">Experiencias</span>
+            </h2>
+            <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">
+              ChaskiBots ha llevado robótica educativa a instituciones de todo el país. 
+              Conoce nuestro impacto en la educación STEM.
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="card group hover:border-neon-orange/50 hover:scale-105 transition-all duration-300 text-center">
+                <div className="text-5xl mb-4">🏫</div>
+                <h3 className="text-xl font-bold text-white mb-2">Instituciones Educativas</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Trabajamos con escuelas, colegios y universidades implementando programas de robótica adaptados a cada nivel.
+                </p>
+                <div className="text-neon-orange font-semibold">+20 instituciones</div>
+              </div>
+              <div className="card group hover:border-neon-cyan/50 hover:scale-105 transition-all duration-300 text-center">
+                <div className="text-5xl mb-4">👨‍🏫</div>
+                <h3 className="text-xl font-bold text-white mb-2">Capacitación Docente</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Formamos a profesores en metodologías STEM para que puedan guiar a sus estudiantes en el mundo de la tecnología.
+                </p>
+                <div className="text-neon-cyan font-semibold">+100 docentes</div>
+              </div>
+              <div className="card group hover:border-neon-purple/50 hover:scale-105 transition-all duration-300 text-center">
+                <div className="text-5xl mb-4">🤖</div>
+                <h3 className="text-xl font-bold text-white mb-2">Talleres y Eventos</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Organizamos talleres prácticos, competencias de robótica y eventos tecnológicos para estudiantes de todas las edades.
+                </p>
+                <div className="text-neon-purple font-semibold">+50 eventos</div>
+              </div>
+            </div>
+
+            {/* Galería de fotos placeholder - se puede conectar a Airtable después */}
+            <div className="bg-dark-800 rounded-2xl p-6 border border-dark-600">
+              <h3 className="text-xl font-bold text-white mb-4 text-center">📸 Galería de Experiencias</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="aspect-video bg-gradient-to-br from-neon-cyan/20 to-neon-blue/20 rounded-xl flex items-center justify-center border border-neon-cyan/30 hover:scale-105 transition-transform cursor-pointer">
+                  <span className="text-gray-500 text-sm">Foto 1</span>
+                </div>
+                <div className="aspect-video bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 rounded-xl flex items-center justify-center border border-neon-purple/30 hover:scale-105 transition-transform cursor-pointer">
+                  <span className="text-gray-500 text-sm">Foto 2</span>
+                </div>
+                <div className="aspect-video bg-gradient-to-br from-neon-green/20 to-emerald-500/20 rounded-xl flex items-center justify-center border border-neon-green/30 hover:scale-105 transition-transform cursor-pointer">
+                  <span className="text-gray-500 text-sm">Foto 3</span>
+                </div>
+                <div className="aspect-video bg-gradient-to-br from-neon-orange/20 to-amber-500/20 rounded-xl flex items-center justify-center border border-neon-orange/30 hover:scale-105 transition-transform cursor-pointer">
+                  <span className="text-gray-500 text-sm">Foto 4</span>
+                </div>
+              </div>
+              <p className="text-center text-gray-500 text-sm mt-4">
+                Próximamente: Galería completa con fotos y videos de nuestras experiencias
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Subject Areas - Cards Interactivas */}
+        <section className="py-20 px-4 bg-dark-800">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center text-white mb-4">
               Áreas de <span className="text-neon-cyan">Aprendizaje</span>

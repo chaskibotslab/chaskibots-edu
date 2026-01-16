@@ -21,6 +21,33 @@ export default function SimuladoresPage() {
             </p>
           </div>
 
+          {/* Sección Educativa - Qué Aprenderás */}
+          <div className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 border border-blue-500/30 rounded-2xl p-6 mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+              <span className="text-3xl">🎯</span> ¿Qué destrezas desarrollarás?
+            </h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h4 className="font-semibold text-neon-cyan mb-2">🐍 Python</h4>
+                <p className="text-gray-400 text-sm">Aprende lógica de programación, variables, bucles y funciones. Python es el lenguaje más usado en IA y ciencia de datos.</p>
+              </div>
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h4 className="font-semibold text-neon-green mb-2">⚡ Tinkercad</h4>
+                <p className="text-gray-400 text-sm">Diseña circuitos electrónicos y programa Arduino virtualmente. Perfecto para aprender electrónica sin componentes físicos.</p>
+              </div>
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h4 className="font-semibold text-neon-purple mb-2">🤖 Wokwi</h4>
+                <p className="text-gray-400 text-sm">Simula microcontroladores ESP32 y Arduino con sensores reales. Ideal para proyectos IoT y robótica avanzada.</p>
+              </div>
+            </div>
+            <div className="mt-4 bg-dark-700/50 rounded-xl p-4">
+              <p className="text-gray-300 text-sm">
+                <strong className="text-neon-orange">💡 ¿Por qué usar simuladores?</strong> Te permiten experimentar, cometer errores y aprender sin riesgo de dañar componentes. 
+                Puedes probar tu código antes de cargarlo en hardware real, ahorrando tiempo y recursos.
+              </p>
+            </div>
+          </div>
+
           <SimulatorTabs />
 
           <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
