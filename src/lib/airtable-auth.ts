@@ -103,10 +103,13 @@ async function fetchAllRecords(tableName: string): Promise<AirtableRecord[]> {
         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
+      cache: 'no-store',
     })
     
     if (!response.ok) {
-      throw new Error(`Airtable API error: ${response.status}`)
+      const errorText = await response.text()
+      console.error(`Airtable API error for ${tableName}:`, response.status, errorText)
+      throw new Error(`Airtable API error: ${response.status} - ${errorText}`)
     }
     
     const data: AirtableResponse = await response.json()
@@ -114,6 +117,7 @@ async function fetchAllRecords(tableName: string): Promise<AirtableRecord[]> {
     offset = data.offset
   } while (offset)
   
+  console.log(`[Airtable] Fetched ${allRecords.length} records from ${tableName}`)
   return allRecords
 }
 

@@ -97,8 +97,12 @@ export default function UsersManager() {
       const coursesData = await coursesRes.json()
       
       // Cargar cursos
+      console.log('[UsersManager] Courses response:', coursesData)
       if (coursesData.courses && coursesData.courses.length > 0) {
         setCourses(coursesData.courses)
+        console.log('[UsersManager] Courses loaded:', coursesData.courses.length)
+      } else {
+        console.log('[UsersManager] No courses found, using empty array')
       }
       
       console.log('[UsersManager] Levels loaded:', levelsData?.length || 0)
