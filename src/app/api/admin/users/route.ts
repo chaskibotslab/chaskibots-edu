@@ -15,20 +15,24 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const courseId = searchParams.get('courseId')
 
+    console.log('[API Users] Fetching users, courseId:', courseId)
+
     // Si hay courseId, filtrar por curso
     if (courseId) {
       const users = await getCourseUsers(courseId)
+      console.log('[API Users] Got', users.length, 'users for course')
       return NextResponse.json({ success: true, users })
     }
 
     // Si no hay courseId, obtener todos los usuarios
     const users = await getAllUsers()
+    console.log('[API Users] Got', users.length, 'total users from Airtable')
     return NextResponse.json({ success: true, users })
 
   } catch (error) {
-    console.error('Error getting users:', error)
+    console.error('[API Users] Error getting users:', error)
     return NextResponse.json(
-      { success: false, error: 'Error al obtener usuarios' },
+      { success: false, error: 'Error al obtener usuarios', users: [] },
       { status: 500 }
     )
   }

@@ -368,7 +368,9 @@ export async function createBulkUsers(
 // Obtener TODOS los usuarios
 export async function getAllUsers(): Promise<CourseUser[]> {
   try {
+    console.log('[Airtable] Fetching all users from table:', USERS_TABLE)
     const records = await fetchAllRecords(USERS_TABLE)
+    console.log('[Airtable] Got', records.length, 'user records')
 
     return records.map((record: AirtableRecord) => ({
       id: record.id,
