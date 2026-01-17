@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import { ALL_COURSES } from '@/data/courses'
+import UsersManagerComponent from '@/components/admin/UsersManager'
 import {
   Users, BookOpen, Settings, LogOut, Home, Bell,
   Plus, Edit, Trash2, Eye, Lock, Unlock, Search,
@@ -419,7 +420,7 @@ export default function AdminPage() {
 
           {/* Users Tab */}
           {activeTab === 'users' && (
-            <UsersManager />
+            <UsersManagerComponent />
           )}
 
           {/* Logs Tab */}
@@ -621,175 +622,4 @@ function CoursesManager() {
   )
 }
 
-// Componente para gestionar usuarios
-function UsersManager() {
-  const [showNewUserModal, setShowNewUserModal] = useState(false)
-  const [users] = useState([
-    { id: 'admin-1', name: 'Administrador', email: 'admin@chaskibots.com', role: 'admin', levelId: null },
-    { id: 'teacher-1', name: 'Profesor Demo', email: 'profesor@chaskibots.com', role: 'teacher', levelId: 'inicial-1' },
-    { id: 'student-1', name: 'Estudiante Demo', email: 'estudiante@chaskibots.com', role: 'student', levelId: 'inicial-1' },
-  ])
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Buscar usuarios..."
-            className="pl-10 pr-4 py-2 bg-dark-800 border border-dark-600 rounded-lg text-white focus:border-neon-cyan focus:outline-none w-64"
-          />
-        </div>
-        <button
-          onClick={() => setShowNewUserModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Nuevo Usuario</span>
-        </button>
-      </div>
-
-      <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-dark-600">
-              <th className="text-left p-4 text-gray-400 font-medium">Usuario</th>
-              <th className="text-left p-4 text-gray-400 font-medium">Rol</th>
-              <th className="text-left p-4 text-gray-400 font-medium">Nivel</th>
-              <th className="text-right p-4 text-gray-400 font-medium">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="border-b border-dark-600/50 hover:bg-dark-700/30">
-                <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      user.role === 'admin' ? 'bg-neon-cyan/20' :
-                      user.role === 'teacher' ? 'bg-neon-purple/20' : 'bg-neon-pink/20'
-                    }`}>
-                      <span className={`font-bold ${
-                        user.role === 'admin' ? 'text-neon-cyan' :
-                        user.role === 'teacher' ? 'text-neon-purple' : 'text-neon-pink'
-                      }`}>
-                        {user.name.charAt(0)}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-white font-medium">{user.name}</p>
-                      <p className="text-gray-400 text-sm">{user.email}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    user.role === 'admin' ? 'bg-neon-cyan/20 text-neon-cyan' :
-                    user.role === 'teacher' ? 'bg-neon-purple/20 text-neon-purple' : 'bg-neon-pink/20 text-neon-pink'
-                  }`}>
-                    {user.role === 'admin' ? 'Administrador' :
-                     user.role === 'teacher' ? 'Profesor' : 'Estudiante'}
-                  </span>
-                </td>
-                <td className="p-4 text-gray-400">
-                  {user.levelId || '-'}
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center justify-end gap-2">
-                    <button className="p-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-700 rounded-lg transition-colors" title="Editar">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-dark-700 rounded-lg transition-colors" title="Resetear contraseña">
-                      <Key className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-700 rounded-lg transition-colors" title="Eliminar">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Modal para nuevo usuario */}
-      {showNewUserModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-dark-800 rounded-xl border border-dark-600 w-full max-w-md p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white">Nuevo Usuario</h3>
-              <button
-                onClick={() => setShowNewUserModal(false)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form className="space-y-4">
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">Nombre</label>
-                <input
-                  type="text"
-                  placeholder="Nombre completo"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">Email</label>
-                <input
-                  type="email"
-                  placeholder="correo@ejemplo.com"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">Contraseña</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">Rol</label>
-                <select className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none">
-                  <option value="student">Estudiante</option>
-                  <option value="teacher">Profesor</option>
-                  <option value="admin">Administrador</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">Nivel Asignado</label>
-                <select className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none">
-                  <option value="">Sin nivel asignado</option>
-                  {EDUCATION_LEVELS.map(level => (
-                    <option key={level.id} value={level.id}>{level.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowNewUserModal(false)}
-                  className="flex-1 px-4 py-3 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-3 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Save className="w-5 h-5" />
-                  Guardar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
+// Componente UsersManager ahora se importa de @/components/admin/UsersManager
