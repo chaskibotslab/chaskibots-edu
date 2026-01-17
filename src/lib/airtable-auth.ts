@@ -577,3 +577,45 @@ export async function getTeacherCourses(teacherId: string): Promise<Course[]> {
     return []
   }
 }
+
+// Actualizar curso
+export async function updateCourse(
+  courseId: string,
+  data: {
+    name?: string
+    description?: string
+    levelId?: string
+    teacherId?: string
+    teacherName?: string
+    maxStudents?: number
+    isActive?: boolean
+  }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const updateData: Record<string, unknown> = {}
+    if (data.name !== undefined) updateData.name = data.name
+    if (data.description !== undefined) updateData.description = data.description
+    if (data.levelId !== undefined) updateData.levelId = data.levelId
+    if (data.teacherId !== undefined) updateData.teacherId = data.teacherId
+    if (data.teacherName !== undefined) updateData.teacherName = data.teacherName
+    if (data.maxStudents !== undefined) updateData.maxStudents = data.maxStudents
+    if (data.isActive !== undefined) updateData.isActive = data.isActive
+
+    await updateRecord(COURSES_TABLE, courseId, updateData)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating course:', error)
+    return { success: false, error: 'Error al actualizar curso' }
+  }
+}
+
+// Eliminar curso
+export async function deleteCourse(courseId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await deleteRecord(COURSES_TABLE, courseId)
+    return { success: true }
+  } catch (error) {
+    console.error('Error deleting course:', error)
+    return { success: false, error: 'Error al eliminar curso' }
+  }
+}

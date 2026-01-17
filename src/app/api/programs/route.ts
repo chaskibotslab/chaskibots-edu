@@ -94,3 +94,69 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+// PATCH - Actualizar programa
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { programId, name, description, levelId, levelName, type, duration, price, isActive } = body
+
+    if (!programId) {
+      return NextResponse.json(
+        { success: false, error: 'programId es requerido' },
+        { status: 400 }
+      )
+    }
+
+    const fields: Record<string, unknown> = {}
+    if (name !== undefined) fields.name = name
+    if (description !== undefined) fields.description = description
+    if (levelId !== undefined) fields.levelId = levelId
+    if (levelName !== undefined) fields.levelName = levelName
+    if (type !== undefined) fields.type = type
+    if (duration !== undefined) fields.duration = duration
+    if (price !== undefined) fields.price = price
+    if (isActive !== undefined) fields.isActive = isActive
+
+    await base('programs').update(programId, fields)
+
+    return NextResponse.json({
+      success: true,
+      message: 'Programa actualizado exitosamente'
+    })
+  } catch (error) {
+    console.error('Error updating program:', error)
+    return NextResponse.json(
+      { success: false, error: 'Error al actualizar programa' },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE - Eliminar programa
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const programId = searchParams.get('programId')
+
+    if (!programId) {
+      return NextResponse.json(
+        { success: false, error: 'programId es requerido' },
+        { status: 400 }
+      )
+    }
+
+    await base('programs').destroy(programId)
+
+    return NextResponse.json({
+      success: true,
+      message: 'Programa eliminado exitosamente'
+    })
+  } catch (error) {
+    console.error('Error deleting program:', error)
+    return NextResponse.json(
+      { success: false, error: 'Error al eliminar programa' },
+      { status: 500 }
+    )
+  }
+}
