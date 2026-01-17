@@ -165,10 +165,15 @@ export default function UsersManager() {
         if (res.ok) {
           await loadData()
           resetForm()
+          alert('Usuario creado exitosamente')
+        } else {
+          const errorData = await res.json()
+          alert(`Error al crear usuario: ${errorData.error || 'Error desconocido'}`)
         }
       }
     } catch (error) {
       console.error('Error saving user:', error)
+      alert('Error de conexión al crear usuario')
     }
     setSaving(false)
   }

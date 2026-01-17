@@ -285,15 +285,18 @@ function generateAccessCode(prefix: string = 'CK'): string {
 // Crear usuario con código de acceso
 export async function createCourseUser(
   name: string,
-  role: 'teacher' | 'student',
+  role: 'admin' | 'teacher' | 'student',
   courseId: string,
   courseName: string,
   levelId: string,
   email?: string,
-  expiresAt?: string
+  expiresAt?: string,
+  programId?: string,
+  programName?: string
 ): Promise<{ success: boolean; user?: CourseUser; error?: string }> {
   try {
-    const accessCode = generateAccessCode(role === 'teacher' ? 'PR' : 'ES')
+    const prefix = role === 'admin' ? 'AD' : role === 'teacher' ? 'PR' : 'ES'
+    const accessCode = generateAccessCode(prefix)
 
     const record = await createRecord(USERS_TABLE, {
       accessCode,
@@ -303,6 +306,8 @@ export async function createCourseUser(
       courseId,
       courseName,
       levelId,
+      programId: programId || '',
+      programName: programName || '',
       isActive: true,
       createdAt: new Date().toISOString(),
       expiresAt: expiresAt || ''
@@ -316,8 +321,8 @@ export async function createCourseUser(
       role,
       courseId,
       courseName,
-      programId: '',
-      programName: '',
+      programId: programId || '',
+      programName: programName || '',
       levelId,
       isActive: true,
       createdAt: new Date().toISOString(),
@@ -327,7 +332,8 @@ export async function createCourseUser(
     return { success: true, user }
   } catch (error) {
     console.error('Error creating user:', error)
-    return { success: false, error: 'Error al crear usuario' }
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    return { success: false, error: `Error al crear usuario: ${errorMsg}` }
   }
 }
 

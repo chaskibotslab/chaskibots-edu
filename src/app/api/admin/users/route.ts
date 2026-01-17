@@ -51,7 +51,9 @@ export async function POST(request: NextRequest) {
       email,
       expiresAt,
       count,
-      namePrefix
+      namePrefix,
+      programId,
+      programName
     } = body
 
     // Crear múltiples usuarios
@@ -105,7 +107,9 @@ export async function POST(request: NextRequest) {
       finalCourseName,
       levelId,
       email,
-      expiresAt
+      expiresAt,
+      programId,
+      programName
     )
 
     if (!result.success) {
