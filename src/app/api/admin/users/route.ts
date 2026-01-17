@@ -87,18 +87,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear usuario individual
-    if (!name || !role || !courseId || !courseName || !levelId) {
+    if (!name || !role || !levelId) {
       return NextResponse.json(
-        { success: false, error: 'Faltan campos requeridos' },
+        { success: false, error: 'Faltan campos requeridos: nombre, rol y nivel' },
         { status: 400 }
       )
     }
 
+    // Generar courseId si no se proporciona
+    const finalCourseId = courseId || `curso-${Date.now()}`
+    const finalCourseName = courseName || 'Sin asignar'
+
     const result = await createCourseUser(
       name,
       role,
-      courseId,
-      courseName,
+      finalCourseId,
+      finalCourseName,
       levelId,
       email,
       expiresAt

@@ -21,6 +21,12 @@ export default function AdminPage() {
   const { user, isAdmin, isAuthenticated, isLoading, logout, accessLogs } = useAuth()
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard')
   const [searchTerm, setSearchTerm] = useState('')
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalCourses: Object.keys(ALL_COURSES).length,
+    totalLevels: EDUCATION_LEVELS.length,
+    recentLogins: 0
+  })
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -30,6 +36,29 @@ export default function AdminPage() {
       router.push('/')
     }
   }, [isLoading, isAuthenticated, isAdmin, router])
+
+  // Cargar estadísticas reales de Airtable
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await fetch('/api/admin/users')
+        if (res.ok) {
+          const data = await res.json()
+          const users = data.users || []
+          setStats(prev => ({
+            ...prev,
+            totalUsers: users.length,
+            recentLogins: accessLogs.filter((log: any) => log.action === 'login').length
+          }))
+        }
+      } catch (error) {
+        console.error('Error loading stats:', error)
+      }
+    }
+    if (isAdmin) {
+      loadStats()
+    }
+  }, [isAdmin, accessLogs])
 
   if (isLoading) {
     return (
@@ -41,13 +70,6 @@ export default function AdminPage() {
 
   if (!isAdmin) {
     return null
-  }
-
-  const stats = {
-    totalUsers: 3,
-    totalCourses: Object.keys(ALL_COURSES).length,
-    totalLevels: EDUCATION_LEVELS.length,
-    recentLogins: accessLogs.filter(log => log.action === 'login').length
   }
 
   return (
