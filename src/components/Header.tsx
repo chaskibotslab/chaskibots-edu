@@ -4,10 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from './AuthProvider'
-import { Menu, X, User, LogOut, BookOpen, Bot, Brain, Shield, Zap } from 'lucide-react'
+import { Menu, X, User, LogOut, BookOpen, Bot, Brain, Shield, Zap, Settings } from 'lucide-react'
 
 export default function Header() {
-  const { user, logout, isAuthenticated } = useAuth()
+  const { user, logout, isAuthenticated, isAdmin } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -35,6 +35,15 @@ export default function Header() {
           <div className="flex items-center gap-3">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
+                {isAdmin && (
+                  <Link 
+                    href="/admin" 
+                    className="hidden sm:flex items-center gap-2 px-3 py-2 bg-neon-purple/20 border border-neon-purple/30 rounded-lg hover:border-neon-purple/60 hover:bg-neon-purple/30 transition-all"
+                  >
+                    <Settings className="w-4 h-4 text-neon-purple" />
+                    <span className="text-sm font-medium text-neon-purple">Admin</span>
+                  </Link>
+                )}
                 <Link href="/dashboard" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-dark-700 border border-neon-cyan/30 rounded-lg hover:border-neon-cyan/60 transition-all">
                   <User className="w-4 h-4 text-neon-cyan" />
                   <span className="text-sm font-medium text-white">{user?.name}</span>
