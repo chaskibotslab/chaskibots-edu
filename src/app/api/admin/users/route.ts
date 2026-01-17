@@ -220,3 +220,53 @@ export async function PATCH(request: NextRequest) {
     )
   }
 }
+
+// DELETE - Eliminar usuario
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { userId } = body
+
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'userId es requerido' },
+        { status: 400 }
+      )
+    }
+
+    // Eliminar usuario de Airtable
+    const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
+    const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
+    
+    const response = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/users/${userId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        },
+      }
+    )
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Error deleting user from Airtable:', errorText)
+      return NextResponse.json(
+        { success: false, error: 'Error al eliminar usuario de Airtable' },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Usuario eliminado exitosamente'
+    })
+
+  } catch (error) {
+    console.error('Error deleting user:', error)
+    return NextResponse.json(
+      { success: false, error: 'Error al eliminar usuario' },
+      { status: 500 }
+    )
+  }
+}

@@ -247,6 +247,28 @@ export default function UsersManager() {
     }
   }
 
+  const handleDelete = async (userId: string, userName: string) => {
+    if (!confirm(`¿Estás seguro de eliminar al usuario "${userName}"? Esta acción no se puede deshacer.`)) {
+      return
+    }
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      })
+      if (res.ok) {
+        await loadData()
+      } else {
+        const error = await res.json()
+        alert(error.error || 'Error al eliminar usuario')
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      alert('Error al eliminar usuario')
+    }
+  }
+
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code)
     setCopiedCode(code)
@@ -620,8 +642,16 @@ export default function UsersManager() {
                     <button
                       onClick={() => handleEdit(user)}
                       className="p-1.5 text-gray-400 hover:text-neon-cyan transition-colors"
+                      title="Editar usuario"
                     >
                       <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user.id, user.name)}
+                      className="p-1.5 text-gray-400 hover:text-red-400 transition-colors"
+                      title="Eliminar usuario"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </td>
