@@ -5,7 +5,6 @@ import {
   getCourseUsers,
   getAllUsers,
   updateUser,
-  deactivateUser,
   regenerateAccessCode 
 } from '@/lib/airtable-auth'
 
@@ -156,8 +155,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (action === 'deactivate') {
-      const success = await deactivateUser(userId)
-      if (!success) {
+      const result = await updateUser(userId, { isActive: false })
+      if (!result.success) {
         return NextResponse.json(
           { success: false, error: 'Error al desactivar usuario' },
           { status: 400 }
@@ -166,6 +165,20 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Usuario desactivado exitosamente'
+      })
+    }
+
+    if (action === 'activate') {
+      const result = await updateUser(userId, { isActive: true })
+      if (!result.success) {
+        return NextResponse.json(
+          { success: false, error: 'Error al activar usuario' },
+          { status: 400 }
+        )
+      }
+      return NextResponse.json({
+        success: true,
+        message: 'Usuario activado exitosamente'
       })
     }
 
