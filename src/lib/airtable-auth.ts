@@ -301,7 +301,8 @@ export async function createCourseUser(
     // Formato de fecha para Airtable (YYYY-MM-DD)
     const today = new Date().toISOString().split('T')[0]
     
-    const record = await createRecord(USERS_TABLE, {
+    // Construir objeto de datos sin campos vacíos de fecha
+    const recordData: Record<string, unknown> = {
       accessCode,
       name,
       email: email || '',
@@ -312,9 +313,15 @@ export async function createCourseUser(
       programId: programId || '',
       programName: programName || '',
       isActive: true,
-      createdAt: today,
-      expiresAt: expiresAt || ''
-    })
+      createdAt: today
+    }
+    
+    // Solo agregar expiresAt si tiene valor válido
+    if (expiresAt && expiresAt.trim() !== '') {
+      recordData.expiresAt = expiresAt
+    }
+    
+    const record = await createRecord(USERS_TABLE, recordData)
 
     const user: CourseUser = {
       id: record.id,
