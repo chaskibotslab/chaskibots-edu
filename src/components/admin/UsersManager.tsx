@@ -337,9 +337,13 @@ export default function UsersManager() {
     ? programs.filter(p => p.levelId === formData.levelId || p.levelId === 'all')
     : programs
 
+  // Mostrar todos los cursos si no hay filtro o si no hay coincidencias
   const filteredCourses = formData.levelId
     ? courses.filter(c => c.levelId === formData.levelId)
     : courses
+  
+  // Si no hay cursos filtrados pero hay cursos disponibles, mostrar todos
+  const displayCourses = filteredCourses.length > 0 ? filteredCourses : courses
 
   const handleCourseChange = (courseId: string) => {
     const course = courses.find(c => c.id === courseId)
@@ -583,7 +587,7 @@ export default function UsersManager() {
                 className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
               >
                 <option value="">Sin asignar</option>
-                {filteredCourses.map(course => (
+                {displayCourses.map(course => (
                   <option key={course.id} value={course.id}>{course.name}</option>
                 ))}
               </select>
