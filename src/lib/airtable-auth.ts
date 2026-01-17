@@ -221,29 +221,7 @@ export async function validateEmailPassword(email: string, password: string): Pr
   error?: string
 }> {
   try {
-    // Usuario admin de desarrollo (siempre disponible)
-    if (email === 'admin@chaskibots.com' && password === 'chaski2025') {
-      return {
-        success: true,
-        user: {
-          id: 'admin-dev',
-          accessCode: 'ADMIN-DEV',
-          name: 'Administrador ChaskiBots',
-          email: 'admin@chaskibots.com',
-          role: 'admin',
-          courseId: '',
-          courseName: '',
-          programId: '',
-          programName: '',
-          levelId: '',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString()
-        }
-      }
-    }
-
-    // Buscar usuario solo por email
+    // Buscar usuario solo por email en Airtable
     const records = await fetchTable(USERS_TABLE, `{email} = '${email}'`)
 
     if (records.length === 0) {
