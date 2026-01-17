@@ -5,6 +5,7 @@ import {
   Plus, Edit, Trash2, Save, X, Users, Key, Copy, Check,
   Loader2, Filter, RefreshCw, Download
 } from 'lucide-react'
+import { EDUCATION_LEVELS } from '@/lib/constants'
 
 interface User {
   id: string
@@ -86,11 +87,40 @@ export default function UsersManager() {
       const levelsData = await levelsRes.json()
       const programsData = await programsRes.json()
       
+      console.log('[UsersManager] Levels loaded:', levelsData?.length || 0)
+      console.log('[UsersManager] Programs loaded:', programsData?.programs?.length || 0)
+      
       if (usersData.users) setUsers(usersData.users)
-      if (Array.isArray(levelsData)) setLevels(levelsData)
-      if (programsData.programs) setPrograms(programsData.programs)
+      
+      // Usar datos de Airtable o fallback a constantes
+      if (Array.isArray(levelsData) && levelsData.length > 0) {
+        setLevels(levelsData)
+      } else {
+        // Fallback: usar EDUCATION_LEVELS de constantes
+        const fallbackLevels = EDUCATION_LEVELS.map(l => ({ id: l.id, name: l.name }))
+        setLevels(fallbackLevels)
+        console.log('[UsersManager] Using fallback levels:', fallbackLevels.length)
+      }
+      
+      if (programsData.programs && programsData.programs.length > 0) {
+        setPrograms(programsData.programs)
+      } else {
+        // Fallback: programas básicos por nivel
+        const fallbackPrograms = [
+          { id: 'prog-robotica', name: 'Robótica', levelId: 'all' },
+          { id: 'prog-programacion', name: 'Programación', levelId: 'all' },
+          { id: 'prog-electronica', name: 'Electrónica', levelId: 'all' },
+          { id: 'prog-ia', name: 'Inteligencia Artificial', levelId: 'all' },
+          { id: 'prog-hacking', name: 'Hacking Ético', levelId: 'all' }
+        ]
+        setPrograms(fallbackPrograms)
+        console.log('[UsersManager] Using fallback programs')
+      }
     } catch (error) {
       console.error('Error loading data:', error)
+      // En caso de error, usar fallbacks
+      const fallbackLevels = EDUCATION_LEVELS.map(l => ({ id: l.id, name: l.name }))
+      setLevels(fallbackLevels)
     }
     setLoading(false)
   }
@@ -259,7 +289,7 @@ export default function UsersManager() {
   })
 
   const filteredPrograms = formData.levelId 
-    ? programs.filter(p => p.levelId === formData.levelId)
+    ? programs.filter(p => p.levelId === formData.levelId || p.levelId === 'all')
     : programs
 
   const exportUsers = () => {
