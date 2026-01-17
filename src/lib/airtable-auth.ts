@@ -298,6 +298,9 @@ export async function createCourseUser(
     const prefix = role === 'admin' ? 'AD' : role === 'teacher' ? 'PR' : 'ES'
     const accessCode = generateAccessCode(prefix)
 
+    // Formato de fecha para Airtable (YYYY-MM-DD)
+    const today = new Date().toISOString().split('T')[0]
+    
     const record = await createRecord(USERS_TABLE, {
       accessCode,
       name,
@@ -309,7 +312,7 @@ export async function createCourseUser(
       programId: programId || '',
       programName: programName || '',
       isActive: true,
-      createdAt: new Date().toISOString(),
+      createdAt: today,
       expiresAt: expiresAt || ''
     })
 

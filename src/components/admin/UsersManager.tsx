@@ -34,10 +34,17 @@ interface Program {
   levelId: string
 }
 
+interface Course {
+  id: string
+  name: string
+  levelId: string
+}
+
 export default function UsersManager() {
   const [users, setUsers] = useState<User[]>([])
   const [levels, setLevels] = useState<Level[]>([])
   const [programs, setPrograms] = useState<Program[]>([])
+  const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
@@ -77,15 +84,22 @@ export default function UsersManager() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [usersRes, levelsRes, programsRes] = await Promise.all([
+      const [usersRes, levelsRes, programsRes, coursesRes] = await Promise.all([
         fetch('/api/admin/users'),
         fetch('/api/levels'),
-        fetch('/api/programs')
+        fetch('/api/programs'),
+        fetch('/api/admin/courses')
       ])
       
       const usersData = await usersRes.json()
       const levelsData = await levelsRes.json()
       const programsData = await programsRes.json()
+      const coursesData = await coursesRes.json()
+      
+      // Cargar cursos
+      if (coursesData.courses && coursesData.courses.length > 0) {
+        setCourses(coursesData.courses)
+      }
       
       console.log('[UsersManager] Levels loaded:', levelsData?.length || 0)
       console.log('[UsersManager] Programs loaded:', programsData?.programs?.length || 0)
@@ -319,6 +333,19 @@ export default function UsersManager() {
     ? programs.filter(p => p.levelId === formData.levelId || p.levelId === 'all')
     : programs
 
+  const filteredCourses = formData.levelId
+    ? courses.filter(c => c.levelId === formData.levelId)
+    : courses
+
+  const handleCourseChange = (courseId: string) => {
+    const course = courses.find(c => c.id === courseId)
+    setFormData({
+      ...formData,
+      courseId,
+      courseName: course?.name || ''
+    })
+  }
+
   const exportUsers = () => {
     const csv = [
       'Código,Nombre,Email,Nivel,Rol,Programa,Curso,Activo',
@@ -545,14 +572,17 @@ export default function UsersManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Curso/Clase</label>
-              <input
-                type="text"
-                value={formData.courseName}
-                onChange={(e) => setFormData({ ...formData, courseName: e.target.value })}
-                placeholder="8vo A Matutino"
+              <label className="block text-sm text-gray-400 mb-1">Curso/Clase (opcional)</label>
+              <select
+                value={formData.courseId}
+                onChange={(e) => handleCourseChange(e.target.value)}
                 className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
-              />
+              >
+                <option value="">Sin asignar</option>
+                {filteredCourses.map(course => (
+                  <option key={course.id} value={course.id}>{course.name}</option>
+                ))}
+              </select>
             </div>
           </div>
 
