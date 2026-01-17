@@ -419,6 +419,43 @@ export async function getCourseUsers(courseId: string): Promise<CourseUser[]> {
   }
 }
 
+// Actualizar usuario
+export async function updateUser(
+  userId: string,
+  data: {
+    name?: string
+    email?: string
+    levelId?: string
+    role?: 'admin' | 'teacher' | 'student'
+    courseId?: string
+    courseName?: string
+    programId?: string
+    programName?: string
+    expiresAt?: string
+    isActive?: boolean
+  }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const updateData: Record<string, unknown> = {}
+    if (data.name !== undefined) updateData.name = data.name
+    if (data.email !== undefined) updateData.email = data.email
+    if (data.levelId !== undefined) updateData.levelId = data.levelId
+    if (data.role !== undefined) updateData.role = data.role
+    if (data.courseId !== undefined) updateData.courseId = data.courseId
+    if (data.courseName !== undefined) updateData.courseName = data.courseName
+    if (data.programId !== undefined) updateData.programId = data.programId
+    if (data.programName !== undefined) updateData.programName = data.programName
+    if (data.expiresAt !== undefined) updateData.expiresAt = data.expiresAt
+    if (data.isActive !== undefined) updateData.isActive = data.isActive
+
+    await updateRecord(USERS_TABLE, userId, updateData)
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating user:', error)
+    return { success: false, error: 'Error al actualizar usuario' }
+  }
+}
+
 // Desactivar usuario
 export async function deactivateUser(userId: string): Promise<boolean> {
   try {

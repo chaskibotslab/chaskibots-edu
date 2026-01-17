@@ -4,6 +4,7 @@ import {
   createBulkUsers, 
   getCourseUsers,
   getAllUsers,
+  updateUser,
   deactivateUser,
   regenerateAccessCode 
 } from '@/lib/airtable-auth'
@@ -161,6 +162,31 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Usuario desactivado exitosamente'
+      })
+    }
+
+    if (action === 'update') {
+      const { name, email, levelId, role, courseId, courseName, programId, programName, expiresAt } = body
+      const result = await updateUser(userId, {
+        name,
+        email,
+        levelId,
+        role,
+        courseId,
+        courseName,
+        programId,
+        programName,
+        expiresAt
+      })
+      if (!result.success) {
+        return NextResponse.json(
+          { success: false, error: result.error },
+          { status: 400 }
+        )
+      }
+      return NextResponse.json({
+        success: true,
+        message: 'Usuario actualizado exitosamente'
       })
     }
 

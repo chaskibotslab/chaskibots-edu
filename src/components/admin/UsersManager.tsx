@@ -109,23 +109,33 @@ export default function UsersManager() {
     e.preventDefault()
     setSaving(true)
 
-    const accessCode = editingId ? undefined : generateAccessCode(formData.role)
-    
     try {
-      const method = editingId ? 'PATCH' : 'POST'
-      const res = await fetch('/api/admin/users', {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          accessCode,
-          userId: editingId
+      if (editingId) {
+        // Actualizar usuario existente
+        const res = await fetch('/api/admin/users', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: editingId,
+            action: 'update',
+            ...formData
+          })
         })
-      })
-
-      if (res.ok) {
-        await loadData()
-        resetForm()
+        if (res.ok) {
+          await loadData()
+          resetForm()
+        }
+      } else {
+        // Crear nuevo usuario
+        const res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        })
+        if (res.ok) {
+          await loadData()
+          resetForm()
+        }
       }
     } catch (error) {
       console.error('Error saving user:', error)
