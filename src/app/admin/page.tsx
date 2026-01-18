@@ -162,7 +162,21 @@ export default function AdminPage() {
             >
               <GraduationCap className="w-5 h-5 text-neon-green" />
               <span>Calificaciones</span>
-              <span className="ml-auto text-xs bg-neon-green/20 text-neon-green px-2 py-0.5 rounded">Nuevo</span>
+            </Link>
+            <Link
+              href="/admin/tareas"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-yellow-500/30"
+            >
+              <BookOpen className="w-5 h-5 text-yellow-400" />
+              <span>Gestión de Tareas</span>
+              <span className="ml-auto text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">Nuevo</span>
+            </Link>
+            <Link
+              href="/admin/contenido"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-neon-cyan/30"
+            >
+              <Brain className="w-5 h-5 text-neon-cyan" />
+              <span>Contenido</span>
             </Link>
           </div>
         </nav>

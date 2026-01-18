@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { 
   Send, CheckCircle, Clock, FileText, Code, Cpu, Zap, 
   BookOpen, Loader2, ChevronDown, ChevronUp, Award,
-  Lightbulb, Wrench, CircuitBoard, Bot
+  Lightbulb, Wrench, CircuitBoard, Bot, Calendar, AlertCircle
 } from 'lucide-react'
 
 interface Task {
@@ -34,8 +34,23 @@ interface TaskSubmission {
   code?: string
 }
 
-// Tareas de ejemplo por nivel
-const SAMPLE_TASKS: Record<string, Task[]> = {
+interface APITask {
+  id: string
+  levelId: string
+  title: string
+  description: string
+  type: 'concept' | 'code' | 'project' | 'quiz'
+  category: 'robotica' | 'electronica' | 'programacion' | 'ia' | 'general'
+  difficulty: 'basico' | 'intermedio' | 'avanzado'
+  points: number
+  dueDate?: string
+  isActive: boolean
+  questions: string[]
+  createdAt: string
+}
+
+// Tareas de fallback si no hay conexión a Airtable
+const FALLBACK_TASKS: Record<string, Task[]> = {
   'inicial-1': [
     {
       id: 'task-ini1-1',
@@ -233,10 +248,39 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
   const [submitted, setSubmitted] = useState<string[]>([])
   const [name, setName] = useState(studentName)
 
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    // Cargar tareas del nivel
-    const levelTasks = SAMPLE_TASKS[levelId] || getDefaultTasks(levelId)
-    setTasks(levelTasks)
+    // Cargar tareas desde Airtable
+    async function loadTasks() {
+      setLoading(true)
+      try {
+        const res = await fetch(`/api/tasks?levelId=${levelId}`)
+        const data = await res.json()
+        if (data.tasks && data.tasks.length > 0) {
+          // Convertir APITask a Task con questions como objetos
+          const convertedTasks: Task[] = data.tasks.map((t: APITask) => ({
+            ...t,
+            questions: t.questions.map((q, idx) => ({
+              id: `q${idx + 1}`,
+              question: q,
+              type: t.type === 'code' ? 'code' : 'text'
+            }))
+          }))
+          setTasks(convertedTasks)
+        } else {
+          // Fallback a tareas locales
+          const levelTasks = FALLBACK_TASKS[levelId] || getDefaultTasks(levelId)
+          setTasks(levelTasks)
+        }
+      } catch (error) {
+        console.log('Using fallback tasks')
+        const levelTasks = FALLBACK_TASKS[levelId] || getDefaultTasks(levelId)
+        setTasks(levelTasks)
+      }
+      setLoading(false)
+    }
+    loadTasks()
   }, [levelId])
 
   const handleAnswerChange = (taskId: string, questionId: string, value: string) => {
@@ -324,8 +368,15 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
       </div>
 
       {/* Tasks List */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+        </div>
+      ) : (
       <div className="space-y-4">
-        {tasks.map(task => (
+        {tasks.map(task => {
+          const isExpired = task.dueDate && new Date(task.dueDate) < new Date()
+          return (
           <div
             key={task.id}
             className={`bg-dark-800 border rounded-xl overflow-hidden transition-all ${
@@ -367,6 +418,12 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
                     <Award className="w-3 h-3" /> {task.points} pts
                   </span>
                   <span>{task.questions?.length || 0} preguntas</span>
+                  {task.dueDate && (
+                    <span className={`flex items-center gap-1 ${isExpired ? 'text-red-400' : 'text-gray-500'}`}>
+                      <Calendar className="w-3 h-3" /> 
+                      {isExpired ? 'Vencida' : `Entrega: ${task.dueDate}`}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -425,10 +482,11 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
               </div>
             )}
           </div>
-        ))}
+        )})}
       </div>
+      )}
 
-      {tasks.length === 0 && (
+      {tasks.length === 0 && !loading && (
         <div className="bg-dark-800 border border-dark-600 rounded-xl p-8 text-center">
           <FileText className="w-12 h-12 text-gray-600 mx-auto mb-3" />
           <p className="text-gray-400">No hay tareas disponibles para este nivel</p>
