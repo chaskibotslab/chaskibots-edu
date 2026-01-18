@@ -26,10 +26,11 @@ import {
   Users, Plus, Edit, Trash2, Save, X, Search,
   GraduationCap, Award, FileText, Download, ChevronDown,
   ChevronRight, Star, TrendingUp, Clock, CheckCircle,
-  AlertCircle, Filter, BarChart3, UserPlus
+  AlertCircle, Filter, BarChart3, UserPlus, Send
 } from 'lucide-react'
+import SubmissionsPanel from './SubmissionsPanel'
 
-type ViewMode = 'students' | 'grades' | 'summary'
+type ViewMode = 'students' | 'grades' | 'summary' | 'submissions'
 
 export default function GradingPanel() {
   const [selectedLevel, setSelectedLevel] = useState<string>('')
@@ -292,6 +293,17 @@ export default function GradingPanel() {
         >
           <BarChart3 className="w-4 h-4" />
           Resumen
+        </button>
+        <button
+          onClick={() => setViewMode('submissions')}
+          className={`px-4 py-2 rounded-t-lg flex items-center gap-2 transition-colors ${
+            viewMode === 'submissions'
+              ? 'bg-dark-700 text-white border-b-2 border-neon-green'
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <Send className="w-4 h-4" />
+          Entregas
         </button>
       </div>
 
@@ -606,6 +618,11 @@ export default function GradingPanel() {
                 </>
               )}
             </div>
+          )}
+
+          {/* Submissions View */}
+          {viewMode === 'submissions' && (
+            <SubmissionsPanel />
           )}
         </>
       )}

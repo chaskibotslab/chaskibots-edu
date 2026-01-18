@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Play, Download, Trash2, Copy, Check, FileCode, FileText, RotateCcw, QrCode, Hash } from 'lucide-react'
+import { Play, Download, Trash2, Copy, Check, FileCode, FileText, RotateCcw, QrCode, Hash, Send, Loader2 } from 'lucide-react'
 import QRCode from 'qrcode'
 
 declare global {
@@ -138,6 +138,9 @@ export default function PythonSimulator() {
   const [lastTaskId, setLastTaskId] = useState<string | null>(null)
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
   const [showExportModal, setShowExportModal] = useState(false)
+  const [isSending, setIsSending] = useState(false)
+  const [sendSuccess, setSendSuccess] = useState(false)
+  const [selectedLevel, setSelectedLevel] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -550,6 +553,98 @@ ${output}
           </button>
         </div>
       </div>
+
+      {/* Send to Teacher Section */}
+      {output && (
+        <div className="px-4 py-3 border-t border-dark-600 bg-gradient-to-r from-green-900/20 to-emerald-900/20">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex-1">
+              <p className="text-sm text-white font-medium flex items-center gap-2">
+                <Send className="w-4 h-4 text-green-400" />
+                Enviar al Profesor
+              </p>
+              <p className="text-xs text-gray-400">Tu código y resultado se enviarán para calificación</p>
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <select
+                value={selectedLevel}
+                onChange={(e) => setSelectedLevel(e.target.value)}
+                className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-sm text-white flex-1 sm:flex-none"
+              >
+                <option value="">Selecciona tu nivel...</option>
+                <option value="inicial-1">Inicial 1</option>
+                <option value="inicial-2">Inicial 2</option>
+                <option value="primero-egb">1° EGB</option>
+                <option value="segundo-egb">2° EGB</option>
+                <option value="tercero-egb">3° EGB</option>
+                <option value="cuarto-egb">4° EGB</option>
+                <option value="quinto-egb">5° EGB</option>
+                <option value="sexto-egb">6° EGB</option>
+                <option value="septimo-egb">7° EGB</option>
+                <option value="octavo-egb">8° EGB</option>
+                <option value="noveno-egb">9° EGB</option>
+                <option value="decimo-egb">10° EGB</option>
+                <option value="primero-bach">1° Bachillerato</option>
+                <option value="segundo-bach">2° Bachillerato</option>
+                <option value="tercero-bach">3° Bachillerato</option>
+              </select>
+              <button
+                onClick={async () => {
+                  if (!studentName.trim()) {
+                    alert('Por favor escribe tu nombre arriba')
+                    return
+                  }
+                  if (!selectedLevel) {
+                    alert('Por favor selecciona tu nivel')
+                    return
+                  }
+                  setIsSending(true)
+                  try {
+                    const taskId = generateTaskId(code, studentName)
+                    const res = await fetch('/api/submissions', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        taskId,
+                        studentName,
+                        levelId: selectedLevel,
+                        code,
+                        output
+                      })
+                    })
+                    if (res.ok) {
+                      setSendSuccess(true)
+                      setTimeout(() => setSendSuccess(false), 5000)
+                    } else {
+                      alert('Error al enviar. Inténtalo de nuevo.')
+                    }
+                  } catch (error) {
+                    alert('Error de conexión')
+                  }
+                  setIsSending(false)
+                }}
+                disabled={isSending || sendSuccess}
+                className="bg-green-600 hover:bg-green-500 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap"
+              >
+                {isSending ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
+                ) : sendSuccess ? (
+                  <><Check className="w-4 h-4" /> ¡Enviado!</>
+                ) : (
+                  <><Send className="w-4 h-4" /> Enviar</>
+                )}
+              </button>
+            </div>
+          </div>
+          {sendSuccess && (
+            <div className="mt-2 p-2 bg-green-500/20 border border-green-500/30 rounded-lg">
+              <p className="text-green-400 text-sm">
+                ✅ Tu tarea fue enviada correctamente. El profesor la verá en su panel de calificaciones.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Export Modal */}
       {showExportModal && (
