@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { 
   Play, RotateCcw, Copy, Check, ChevronRight, ChevronDown,
-  BookOpen, Code, Terminal, Lightbulb, Zap
+  BookOpen, Code, Terminal, Lightbulb, Zap, Send, Loader2
 } from 'lucide-react'
 
 interface PythonSimulatorProps {
@@ -348,6 +348,9 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
   const [copied, setCopied] = useState(false)
   const [activeGuide, setActiveGuide] = useState<number | null>(null)
   const [showGuides, setShowGuides] = useState(true)
+  const [studentName, setStudentName] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [sendSuccess, setSendSuccess] = useState(false)
   const outputRef = useRef<HTMLDivElement>(null)
 
   const getLevel = (): 'basico' | 'intermedio' | 'avanzado' => {
@@ -607,6 +610,42 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
     setOutput([])
   }
 
+  const handleSendToTeacher = async () => {
+    if (!studentName.trim()) {
+      alert('Por favor escribe tu nombre')
+      return
+    }
+    if (output.length === 0) {
+      alert('Primero ejecuta tu código')
+      return
+    }
+
+    setIsSending(true)
+    try {
+      const taskId = `PY-${Date.now().toString(36).toUpperCase()}`
+      const res = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          taskId,
+          studentName,
+          levelId,
+          code,
+          output: output.join('\n')
+        })
+      })
+      if (res.ok) {
+        setSendSuccess(true)
+        setTimeout(() => setSendSuccess(false), 5000)
+      } else {
+        alert('Error al enviar. Inténtalo de nuevo.')
+      }
+    } catch (error) {
+      alert('Error de conexión')
+    }
+    setIsSending(false)
+  }
+
   useEffect(() => {
     if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight
@@ -749,6 +788,50 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
           </div>
         </div>
       </div>
+
+      {/* Enviar al Profesor */}
+      {output.length > 0 && (
+        <div className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 rounded-xl p-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex-1">
+              <p className="text-sm text-white font-medium flex items-center gap-2">
+                <Send className="w-4 h-4 text-purple-400" />
+                Enviar al Profesor
+              </p>
+              <p className="text-xs text-gray-400">Tu código y resultado se enviarán para calificación</p>
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <input
+                type="text"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                placeholder="Tu nombre..."
+                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-white flex-1 sm:w-40"
+              />
+              <button
+                onClick={handleSendToTeacher}
+                disabled={isSending || sendSuccess}
+                className="bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors whitespace-nowrap"
+              >
+                {isSending ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
+                ) : sendSuccess ? (
+                  <><Check className="w-4 h-4" /> ¡Enviado!</>
+                ) : (
+                  <><Send className="w-4 h-4" /> Enviar</>
+                )}
+              </button>
+            </div>
+          </div>
+          {sendSuccess && (
+            <div className="mt-3 p-2 bg-green-500/20 border border-green-500/30 rounded-lg">
+              <p className="text-green-400 text-sm text-center">
+                ✅ Tu código fue enviado correctamente. El profesor lo verá en su panel de calificaciones.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tips */}
       <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
