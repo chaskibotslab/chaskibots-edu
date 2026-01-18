@@ -17,6 +17,7 @@ import SimulatorTabs from '@/components/SimulatorTabs'
 import KitDisplay from '@/components/KitDisplay'
 import CourseAuthGuard from '@/components/CourseAuthGuard'
 import TasksPanel from '@/components/TasksPanel'
+import { useAuth } from '@/components/AuthProvider'
 
 interface APILesson {
   id: string
@@ -36,6 +37,8 @@ interface APILesson {
 export default function NivelPage() {
   const params = useParams()
   const levelId = params.id as string
+  const { user } = useAuth()
+  const isTeacher = user?.role === 'admin' || user?.role === 'teacher'
   const [activeTab, setActiveTab] = useState<'lessons' | 'kit' | 'calendar' | 'ai' | 'simulators' | 'tasks'>('lessons')
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -209,6 +212,28 @@ export default function NivelPage() {
                 ></div>
               </div>
             </div>
+
+            {/* Opciones de Profesor */}
+            {isTeacher && (
+              <div className="mt-6 pt-4 border-t border-dark-600">
+                <p className="text-xs text-gray-500 mb-2 px-1">Herramientas del Profesor</p>
+                <Link
+                  href="/admin/entregas"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20"
+                >
+                  <GraduationCap className="w-5 h-5" />
+                  <span>Ver Entregas</span>
+                  <span className="ml-auto text-xs bg-purple-500/30 px-1.5 py-0.5 rounded">Nuevo</span>
+                </Link>
+                <Link
+                  href="/admin/tareas"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all text-gray-400 hover:bg-dark-700 mt-1"
+                >
+                  <Settings className="w-5 h-5" />
+                  <span>Gestionar Tareas</span>
+                </Link>
+              </div>
+            )}
           </nav>
         </div>
       </aside>
