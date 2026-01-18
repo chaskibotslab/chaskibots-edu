@@ -52,20 +52,24 @@ export async function GET(request: Request) {
 
     const data = await response.json()
     
-    const lessons = data.records.map((record: any) => ({
-      id: record.id,
-      levelId: record.fields.levelId || '',
-      moduleId: record.fields.moduleId || '',
-      moduleName: record.fields.moduleName || '',
-      title: record.fields.title || '',
-      type: record.fields.type || 'video',
-      duration: record.fields.duration || '5 min',
-      order: record.fields.order || 0,
-      videoUrl: record.fields.videoUrl || '',
-      videoEmbedUrl: getVideoEmbedUrl(record.fields.videoUrl || ''),
-      content: record.fields.content || '',
-      locked: record.fields.locked || false,
-    }))
+    const lessons = data.records.map((record: any) => {
+      const moduleName = record.fields.moduleName || ''
+      const moduleId = moduleName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'sin-modulo'
+      return {
+        id: record.id,
+        levelId: record.fields.levelId || '',
+        moduleId,
+        moduleName,
+        title: record.fields.title || '',
+        type: record.fields.type || 'video',
+        duration: record.fields.duration || '5 min',
+        order: record.fields.order || 0,
+        videoUrl: record.fields.videoUrl || '',
+        videoEmbedUrl: getVideoEmbedUrl(record.fields.videoUrl || ''),
+        content: record.fields.content || '',
+        locked: record.fields.locked || false,
+      }
+    })
 
     return NextResponse.json(lessons)
   } catch (error) {
@@ -88,14 +92,13 @@ export async function POST(request: Request) {
         records: [{
           fields: {
             levelId: body.levelId,
-            moduleId: body.moduleId,
             moduleName: body.moduleName,
             title: body.title,
             type: body.type,
             duration: body.duration,
             order: body.order || 0,
-            videoUrl: body.videoUrl,
-            content: body.content,
+            videoUrl: body.videoUrl || '',
+            content: body.content || '',
             locked: body.locked || false,
           }
         }]
@@ -126,7 +129,6 @@ export async function PUT(request: Request) {
 
     const fields: Record<string, any> = {}
     if (body.levelId) fields.levelId = body.levelId
-    if (body.moduleId) fields.moduleId = body.moduleId
     if (body.moduleName) fields.moduleName = body.moduleName
     if (body.title) fields.title = body.title
     if (body.type) fields.type = body.type
