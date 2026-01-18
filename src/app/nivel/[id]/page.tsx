@@ -16,6 +16,7 @@ import AIActivities from '@/components/AIActivities'
 import SimulatorTabs from '@/components/SimulatorTabs'
 import KitDisplay from '@/components/KitDisplay'
 import CourseAuthGuard from '@/components/CourseAuthGuard'
+import TasksPanel from '@/components/TasksPanel'
 
 interface APILesson {
   id: string
@@ -35,7 +36,7 @@ interface APILesson {
 export default function NivelPage() {
   const params = useParams()
   const levelId = params.id as string
-  const [activeTab, setActiveTab] = useState<'lessons' | 'kit' | 'calendar' | 'ai' | 'simulators'>('lessons')
+  const [activeTab, setActiveTab] = useState<'lessons' | 'kit' | 'calendar' | 'ai' | 'simulators' | 'tasks'>('lessons')
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [apiLessons, setApiLessons] = useState<APILesson[]>([])
@@ -185,6 +186,13 @@ export default function NivelPage() {
               >
                 <Cpu className="w-5 h-5" />
                 <span>Simuladores</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('tasks')}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'tasks' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' : 'text-gray-400 hover:bg-dark-700'}`}
+              >
+                <FileText className="w-5 h-5" />
+                <span>Tareas</span>
               </button>
             </div>
 
@@ -482,6 +490,13 @@ export default function NivelPage() {
                 </div>
               </div>
               <SimulatorTabs />
+            </div>
+          )}
+
+          {/* Tasks Tab */}
+          {activeTab === 'tasks' && (
+            <div className="max-w-4xl mx-auto">
+              <TasksPanel levelId={levelId} />
             </div>
           )}
         </div>
