@@ -103,7 +103,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Convertir array de preguntas a string separado por |
-    const questionsStr = Array.isArray(questions) ? questions.join('|') : questions || ''
+    const questionsStr = Array.isArray(questions) 
+      ? questions.filter((q: string) => q && q.trim()).join('|') 
+      : (questions || '')
+
+    // Construir campos - solo incluir los que tienen valor
+    const fields: Record<string, any> = {
+      levelId: String(levelId),
+      title: String(title),
+      isActive: true,
+      createdAt: new Date().toISOString().split('T')[0]
+    }
+
+    if (description) fields.description = String(description)
+    if (type) fields.type = String(type)
+    if (category) fields.category = String(category)
+    if (difficulty) fields.difficulty = String(difficulty)
+    if (points) fields.points = Number(points) || 10
+    if (dueDate) fields.dueDate = String(dueDate)
+    if (questionsStr) fields.questions = questionsStr
+
+    console.log('Creating task with fields:', fields)
 
     const response = await fetch(AIRTABLE_API_URL, {
       method: 'POST',
@@ -112,28 +132,14 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        records: [{
-          fields: {
-            levelId,
-            title,
-            description: description || '',
-            type: type || 'concept',
-            category: category || 'general',
-            difficulty: difficulty || 'basico',
-            points: points || 10,
-            dueDate: dueDate || '',
-            isActive: true,
-            questions: questionsStr,
-            createdAt: new Date().toISOString().split('T')[0]
-          }
-        }]
+        records: [{ fields }]
       })
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Airtable error:', errorText)
-      return NextResponse.json({ error: 'Error creating task' }, { status: 500 })
+      console.error('Airtable error creating task:', errorText)
+      return NextResponse.json({ error: `Error creating task: ${errorText}` }, { status: 500 })
     }
 
     const data = await response.json()
