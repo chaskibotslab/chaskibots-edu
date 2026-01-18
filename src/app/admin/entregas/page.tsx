@@ -42,10 +42,11 @@ export default function EntregasPage() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    if (!isLoading && !isAdmin) {
+    // Permitir acceso a admin y profesores
+    if (!isLoading && !user) {
       router.push('/')
     }
-  }, [isAdmin, isLoading, router])
+  }, [user, isLoading, router])
 
   useEffect(() => {
     loadSubmissions()

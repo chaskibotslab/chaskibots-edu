@@ -341,6 +341,11 @@ print(f"Total de comparaciones: {pasos}")`,
   ]
 }
 
+interface Task {
+  id: string
+  title: string
+}
+
 export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
   const [code, setCode] = useState('# Escribe tu código Python aquí\nprint("¡Hola Mundo!")')
   const [output, setOutput] = useState<string[]>([])
@@ -349,9 +354,27 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
   const [activeGuide, setActiveGuide] = useState<number | null>(null)
   const [showGuides, setShowGuides] = useState(true)
   const [studentName, setStudentName] = useState('')
+  const [selectedTask, setSelectedTask] = useState('')
+  const [tasks, setTasks] = useState<Task[]>([])
   const [isSending, setIsSending] = useState(false)
   const [sendSuccess, setSendSuccess] = useState(false)
   const outputRef = useRef<HTMLDivElement>(null)
+
+  // Cargar tareas del nivel
+  useEffect(() => {
+    async function loadTasks() {
+      try {
+        const res = await fetch(`/api/tasks?levelId=${levelId}`)
+        const data = await res.json()
+        if (data.tasks) {
+          setTasks(data.tasks.map((t: any) => ({ id: t.id, title: t.title })))
+        }
+      } catch (error) {
+        console.log('No tasks available')
+      }
+    }
+    loadTasks()
+  }, [levelId])
 
   const getLevel = (): 'basico' | 'intermedio' | 'avanzado' => {
     if (['primero-bach', 'segundo-bach', 'tercero-bach'].includes(levelId)) return 'avanzado'
@@ -622,7 +645,10 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
 
     setIsSending(true)
     try {
-      const taskId = `PY-${Date.now().toString(36).toUpperCase()}`
+      // Usar tarea seleccionada o generar ID único
+      const taskId = selectedTask || `PY-${Date.now().toString(36).toUpperCase()}`
+      const taskTitle = tasks.find(t => t.id === selectedTask)?.title || 'Código Python'
+      
       const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -630,8 +656,9 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
           taskId,
           studentName,
           levelId,
+          lessonId: selectedTask,
           code,
-          output: output.join('\n')
+          output: `Tarea: ${taskTitle}\n\n${output.join('\n')}`
         })
       })
       if (res.ok) {
@@ -792,26 +819,42 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
       {/* Enviar al Profesor */}
       {output.length > 0 && (
         <div className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 rounded-xl p-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div className="flex-1">
-              <p className="text-sm text-white font-medium flex items-center gap-2">
-                <Send className="w-4 h-4 text-purple-400" />
-                Enviar al Profesor
-              </p>
-              <p className="text-xs text-gray-400">Tu código y resultado se enviarán para calificación</p>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white font-medium flex items-center gap-2">
+                  <Send className="w-4 h-4 text-purple-400" />
+                  Enviar al Profesor
+                </p>
+                <p className="text-xs text-gray-400">Tu código y resultado se enviarán para calificación</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <input
                 type="text"
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
                 placeholder="Tu nombre..."
-                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-white flex-1 sm:w-40"
+                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-white"
               />
+              
+              <select
+                value={selectedTask}
+                onChange={(e) => setSelectedTask(e.target.value)}
+                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-white"
+              >
+                <option value="">Selecciona tarea (opcional)</option>
+                {tasks.map(task => (
+                  <option key={task.id} value={task.id}>{task.title}</option>
+                ))}
+                <option value="">Práctica libre</option>
+              </select>
+              
               <button
                 onClick={handleSendToTeacher}
                 disabled={isSending || sendSuccess}
-                className="bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors whitespace-nowrap"
+                className="bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
               >
                 {isSending ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>

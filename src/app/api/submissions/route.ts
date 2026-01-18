@@ -156,18 +156,22 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json()
-    const { submissionId, grade, feedback, gradedBy } = body
+    const { id, submissionId, grade, feedback, gradedBy, status, gradedAt } = body
 
-    if (!submissionId) {
-      return NextResponse.json({ error: 'submissionId es requerido' }, { status: 400 })
+    const recordId = id || submissionId
+    if (!recordId) {
+      return NextResponse.json({ error: 'id o submissionId es requerido' }, { status: 400 })
     }
 
-    const fields: Record<string, any> = {
-      status: 'graded',
-      gradedAt: new Date().toISOString()
-    }
+    const fields: Record<string, any> = {}
     
-    if (grade !== undefined) fields.grade = grade
+    if (status) fields.status = status
+    else fields.status = 'graded'
+    
+    if (gradedAt) fields.gradedAt = gradedAt
+    else fields.gradedAt = new Date().toISOString()
+    
+    if (grade !== undefined) fields.grade = Number(grade)
     if (feedback) fields.feedback = feedback
     if (gradedBy) fields.gradedBy = gradedBy
 
@@ -179,7 +183,7 @@ export async function PATCH(request: NextRequest) {
       },
       body: JSON.stringify({
         records: [{
-          id: submissionId,
+          id: recordId,
           fields
         }]
       })
@@ -201,11 +205,23 @@ export async function PATCH(request: NextRequest) {
 // DELETE - Eliminar entrega
 export async function DELETE(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { submissionId } = body
+    const { searchParams } = new URL(request.url)
+    const idFromQuery = searchParams.get('id')
+    
+    let submissionId = idFromQuery
+    
+    // Si no hay id en query, intentar leer del body
+    if (!submissionId) {
+      try {
+        const body = await request.json()
+        submissionId = body.id || body.submissionId
+      } catch {
+        // No body
+      }
+    }
 
     if (!submissionId) {
-      return NextResponse.json({ error: 'submissionId es requerido' }, { status: 400 })
+      return NextResponse.json({ error: 'id es requerido' }, { status: 400 })
     }
 
     const response = await fetch(`${AIRTABLE_API_URL}/${submissionId}`, {
