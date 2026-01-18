@@ -35,10 +35,12 @@ const CATEGORIES = [
 ]
 
 const TYPES = [
-  { id: 'concept', name: 'Conceptual' },
-  { id: 'code', name: 'Código' },
-  { id: 'project', name: 'Proyecto' },
-  { id: 'quiz', name: 'Quiz' },
+  { id: 'concept', name: 'Conceptual', desc: 'Preguntas teóricas' },
+  { id: 'code', name: 'Código', desc: 'Ejercicios de programación' },
+  { id: 'project', name: 'Proyecto', desc: 'Proyecto práctico' },
+  { id: 'quiz', name: 'Quiz', desc: 'Evaluación rápida' },
+  { id: 'drawing', name: 'Dibujo', desc: 'Diagramas y esquemas' },
+  { id: 'upload', name: 'Subir Archivo', desc: 'Documentos, fotos, etc.' },
 ]
 
 const DIFFICULTIES = [
@@ -63,12 +65,14 @@ export default function AdminTareasPage() {
     levelId: '',
     title: '',
     description: '',
-    type: 'concept' as Task['type'],
+    type: 'concept' as string,
     category: 'robotica' as Task['category'],
     difficulty: 'basico' as Task['difficulty'],
     points: 10,
     dueDate: '',
-    questions: ['']
+    questions: [''],
+    attachmentUrl: '',
+    attachmentType: 'none' as 'none' | 'drive' | 'link' | 'pdf'
   })
 
   useEffect(() => {
@@ -103,7 +107,9 @@ export default function AdminTareasPage() {
       difficulty: 'basico',
       points: 10,
       dueDate: '',
-      questions: ['']
+      questions: [''],
+      attachmentUrl: '',
+      attachmentType: 'none'
     })
     setShowModal(true)
   }
@@ -119,7 +125,9 @@ export default function AdminTareasPage() {
       difficulty: task.difficulty,
       points: task.points,
       dueDate: task.dueDate || '',
-      questions: task.questions.length > 0 ? task.questions : ['']
+      questions: task.questions.length > 0 ? task.questions : [''],
+      attachmentUrl: (task as any).attachmentUrl || '',
+      attachmentType: (task as any).attachmentType || 'none'
     })
     setShowModal(true)
   }
@@ -536,6 +544,41 @@ export default function AdminTareasPage() {
                     className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
                   />
                 </div>
+              </div>
+
+              {/* Attachment / Document */}
+              <div className="p-3 bg-dark-700/50 rounded-lg border border-dark-600">
+                <label className="block text-sm text-gray-400 mb-2">📎 Material de Apoyo (opcional)</label>
+                <div className="grid md:grid-cols-2 gap-3">
+                  <select
+                    value={formData.attachmentType}
+                    onChange={(e) => setFormData(prev => ({ ...prev, attachmentType: e.target.value as any }))}
+                    className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  >
+                    <option value="none">Sin adjunto</option>
+                    <option value="drive">Google Drive</option>
+                    <option value="link">Enlace externo</option>
+                    <option value="pdf">PDF / Documento</option>
+                  </select>
+                  {formData.attachmentType !== 'none' && (
+                    <input
+                      type="url"
+                      value={formData.attachmentUrl}
+                      onChange={(e) => setFormData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
+                      placeholder={
+                        formData.attachmentType === 'drive' 
+                          ? 'https://drive.google.com/...' 
+                          : formData.attachmentType === 'pdf'
+                          ? 'URL del PDF o documento'
+                          : 'https://...'
+                      }
+                      className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    />
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Puedes adjuntar un enlace a Google Drive, un PDF o cualquier recurso externo para los estudiantes.
+                </p>
               </div>
 
               {/* Questions */}

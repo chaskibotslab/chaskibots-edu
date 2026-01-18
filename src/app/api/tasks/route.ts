@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { levelId, title, description, type, category, difficulty, points, dueDate, questions } = body
+    const { levelId, title, description, type, category, difficulty, points, dueDate, questions, attachmentUrl, attachmentType } = body
 
     if (!levelId || !title) {
       return NextResponse.json(
@@ -122,6 +122,8 @@ export async function POST(request: NextRequest) {
     if (points) fields.points = Number(points) || 10
     if (dueDate) fields.dueDate = String(dueDate)
     if (questionsStr) fields.questions = questionsStr
+    if (attachmentUrl) fields.attachmentUrl = String(attachmentUrl)
+    if (attachmentType && attachmentType !== 'none') fields.attachmentType = String(attachmentType)
 
     console.log('Creating task with fields:', fields)
 
