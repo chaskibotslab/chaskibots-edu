@@ -7,7 +7,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import {
   ArrowLeft, Save, Plus, Trash2, Edit, Video,
-  FileText, ChevronDown, ChevronRight,
+  FileText, ChevronDown, ChevronRight, ChevronUp,
   GripVertical, Eye, X, Check, ExternalLink, Loader2, RefreshCw
 } from 'lucide-react'
 
@@ -174,30 +174,65 @@ export default function ContenidoAdminPage() {
   const handleCreateModule = async () => {
     if (!newModuleName.trim()) return
     setSaving(true)
-    const moduleId = `mod-${Date.now()}`
     try {
       const response = await fetch('/api/lessons', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           levelId: selectedLevel,
-          moduleId,
           moduleName: newModuleName,
-          title: 'Nueva lección',
+          title: 'Nueva lección (editar)',
           type: 'video',
           duration: '5 min',
-          order: 1
+          order: modules.length + 1
         })
       })
       if (response.ok) {
         loadLessons()
         setShowNewModuleModal(false)
         setNewModuleName('')
+      } else {
+        const error = await response.json()
+        alert(error.message || 'Error al crear módulo')
       }
     } catch (error) {
       alert('Error al crear módulo')
     }
     setSaving(false)
+  }
+
+  const handleMoveLesson = async (lessonId: string, direction: 'up' | 'down') => {
+    const lesson = lessons.find(l => l.id === lessonId)
+    if (!lesson) return
+    
+    const moduleLessons = lessons
+      .filter(l => l.moduleName === lesson.moduleName)
+      .sort((a, b) => a.order - b.order)
+    
+    const currentIndex = moduleLessons.findIndex(l => l.id === lessonId)
+    const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+    
+    if (swapIndex < 0 || swapIndex >= moduleLessons.length) return
+    
+    const swapLesson = moduleLessons[swapIndex]
+    
+    try {
+      await Promise.all([
+        fetch('/api/lessons', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: lesson.id, order: swapLesson.order })
+        }),
+        fetch('/api/lessons', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: swapLesson.id, order: lesson.order })
+        })
+      ])
+      loadLessons()
+    } catch (error) {
+      alert('Error al mover lección')
+    }
   }
 
   const handleUpdateModuleName = async (moduleId: string, newName: string) => {
@@ -433,6 +468,20 @@ export default function ContenidoAdminPage() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => handleMoveLesson(lesson.id, 'up')}
+                                  className="p-1 text-gray-500 hover:text-white hover:bg-dark-600 rounded"
+                                  title="Mover arriba"
+                                >
+                                  <ChevronUp className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleMoveLesson(lesson.id, 'down')}
+                                  className="p-1 text-gray-500 hover:text-white hover:bg-dark-600 rounded"
+                                  title="Mover abajo"
+                                >
+                                  <ChevronDown className="w-4 h-4" />
+                                </button>
                                 <button
                                   onClick={() => openEditModal(lesson)}
                                   className="p-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-600 rounded-lg"
