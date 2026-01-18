@@ -93,13 +93,22 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { taskId, studentName, studentEmail, levelId, lessonId, code, output } = body
+    const { taskId, studentName, studentEmail, levelId, lessonId, code, output, drawing, files } = body
 
     if (!taskId || !studentName || !code) {
       return NextResponse.json(
         { error: 'taskId, studentName y code son requeridos' },
         { status: 400 }
       )
+    }
+
+    // Preparar información de adjuntos
+    let attachments = ''
+    if (drawing) {
+      attachments += '[DIBUJO_ADJUNTO]'
+    }
+    if (files && files.length > 0) {
+      attachments += `[ARCHIVOS:${files.map((f: any) => f.name).join(',')}]`
     }
 
     const response = await fetch(AIRTABLE_API_URL, {
@@ -117,7 +126,7 @@ export async function POST(request: NextRequest) {
             levelId: levelId || '',
             lessonId: lessonId || '',
             code,
-            output: output || '',
+            output: (output || '') + (attachments ? `\n${attachments}` : ''),
             submittedAt: new Date().toISOString(),
             status: 'pending'
           }

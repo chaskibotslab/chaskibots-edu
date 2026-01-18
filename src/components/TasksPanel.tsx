@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react'
 import { 
   Send, CheckCircle, Clock, FileText, Code, Cpu, Zap, 
   BookOpen, Loader2, ChevronDown, ChevronUp, Award,
-  Lightbulb, Wrench, CircuitBoard, Bot, Calendar, AlertCircle
+  Lightbulb, Wrench, CircuitBoard, Bot, Calendar, AlertCircle,
+  Pencil, Upload, Image
 } from 'lucide-react'
+import DrawingCanvas from './DrawingCanvas'
+import FileUpload from './FileUpload'
 
 interface Task {
   id: string
@@ -18,14 +21,24 @@ interface Task {
   questions?: TaskQuestion[]
   dueDate?: string
   points: number
+  allowDrawing?: boolean
+  allowFiles?: boolean
 }
 
 interface TaskQuestion {
   id: string
   question: string
-  type: 'text' | 'multiple' | 'code'
+  type: 'text' | 'multiple' | 'code' | 'drawing' | 'file'
   options?: string[]
   correctAnswer?: string
+}
+
+interface UploadedFile {
+  name: string
+  type: string
+  size: number
+  url: string
+  base64?: string
 }
 
 interface TaskSubmission {
@@ -244,6 +257,8 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
   const [tasks, setTasks] = useState<Task[]>([])
   const [expandedTask, setExpandedTask] = useState<string | null>(null)
   const [answers, setAnswers] = useState<Record<string, Record<string, string>>>({})
+  const [drawings, setDrawings] = useState<Record<string, string>>({}) // taskId -> base64 image
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadedFile[]>>({}) // taskId -> files
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState<string[]>([])
   const [name, setName] = useState(studentName)
@@ -293,6 +308,14 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
     }))
   }
 
+  const handleDrawingSave = (taskId: string, imageData: string) => {
+    setDrawings(prev => ({ ...prev, [taskId]: imageData }))
+  }
+
+  const handleFilesUpload = (taskId: string, files: UploadedFile[]) => {
+    setUploadedFiles(prev => ({ ...prev, [taskId]: files }))
+  }
+
   const handleSubmit = async (task: Task) => {
     if (!name.trim()) {
       alert('Por favor escribe tu nombre')
@@ -300,10 +323,15 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
     }
 
     const taskAnswers = answers[task.id] || {}
-    const unanswered = task.questions?.filter(q => !taskAnswers[q.id]?.trim())
+    const taskDrawing = drawings[task.id]
+    const taskFiles = uploadedFiles[task.id] || []
     
-    if (unanswered && unanswered.length > 0) {
-      alert('Por favor responde todas las preguntas')
+    // Verificar respuestas de texto
+    const textQuestions = task.questions?.filter(q => q.type === 'text' || q.type === 'code') || []
+    const unansweredText = textQuestions.filter(q => !taskAnswers[q.id]?.trim())
+    
+    if (unansweredText.length > 0) {
+      alert('Por favor responde todas las preguntas de texto')
       return
     }
 
@@ -315,19 +343,46 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
         `${q.question}\nRespuesta: ${taskAnswers[q.id] || ''}`
       ).join('\n\n') || ''
 
+      // Agregar info de dibujo y archivos
+      let attachmentsInfo = ''
+      if (taskDrawing) {
+        attachmentsInfo += '\n\n📎 DIBUJO ADJUNTO: [imagen base64 incluida]'
+      }
+      if (taskFiles.length > 0) {
+        attachmentsInfo += `\n\n📎 ARCHIVOS ADJUNTOS (${taskFiles.length}):\n`
+        attachmentsInfo += taskFiles.map(f => `- ${f.name} (${(f.size / 1024).toFixed(1)} KB)`).join('\n')
+      }
+
       const taskId = `TASK-${Date.now().toString(36).toUpperCase()}`
+
+      // Preparar datos con archivos adjuntos
+      const submissionData: any = {
+        taskId,
+        studentName: name,
+        levelId,
+        lessonId: task.id,
+        code: formattedAnswers + attachmentsInfo,
+        output: `Tarea: ${task.title}\nCategoría: ${task.category}\nPuntos: ${task.points}`
+      }
+
+      // Si hay dibujo, agregarlo como campo separado
+      if (taskDrawing) {
+        submissionData.drawing = taskDrawing
+      }
+
+      // Si hay archivos, agregar sus base64
+      if (taskFiles.length > 0) {
+        submissionData.files = taskFiles.map(f => ({
+          name: f.name,
+          type: f.type,
+          data: f.base64
+        }))
+      }
 
       const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          taskId,
-          studentName: name,
-          levelId,
-          lessonId: task.id,
-          code: formattedAnswers,
-          output: `Tarea: ${task.title}\nCategoría: ${task.category}\nPuntos: ${task.points}`
-        })
+        body: JSON.stringify(submissionData)
       })
 
       if (res.ok) {
@@ -465,7 +520,32 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
                     </div>
                   ))}
 
-                  <div className="flex justify-end pt-2">
+                  {/* Sección de Dibujo */}
+                  <div className="space-y-2 pt-4 border-t border-dark-600">
+                    <div className="flex items-center gap-2 text-white">
+                      <Pencil className="w-4 h-4 text-neon-purple" />
+                      <span className="font-medium">Dibujo (opcional)</span>
+                    </div>
+                    <p className="text-xs text-gray-400">Puedes hacer un dibujo para complementar tu respuesta</p>
+                    <DrawingCanvas onSave={(data) => handleDrawingSave(task.id, data)} />
+                    {drawings[task.id] && (
+                      <p className="text-xs text-green-400 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" /> Dibujo guardado
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Sección de Archivos */}
+                  <div className="space-y-2 pt-4 border-t border-dark-600">
+                    <div className="flex items-center gap-2 text-white">
+                      <Upload className="w-4 h-4 text-neon-orange" />
+                      <span className="font-medium">Archivos adjuntos (opcional)</span>
+                    </div>
+                    <p className="text-xs text-gray-400">Sube fotos, PDFs, documentos Word o Excel</p>
+                    <FileUpload onUpload={(files) => handleFilesUpload(task.id, files)} />
+                  </div>
+
+                  <div className="flex justify-end pt-4">
                     <button
                       onClick={() => handleSubmit(task)}
                       disabled={submitting === task.id}
