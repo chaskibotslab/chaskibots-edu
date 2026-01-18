@@ -31,9 +31,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, levelId, teacherId, teacherName, description, maxStudents } = body
 
-    if (!name || !levelId || !teacherId || !teacherName) {
+    if (!name || !levelId) {
       return NextResponse.json(
-        { success: false, error: 'Faltan campos requeridos' },
+        { success: false, error: 'Nombre y nivel son requeridos' },
         { status: 400 }
       )
     }
@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
     const result = await createCourse(
       name,
       levelId,
-      teacherId,
-      teacherName,
+      teacherId || '',
+      teacherName || '',
       description,
       maxStudents
     )
@@ -116,8 +116,8 @@ export async function PATCH(request: NextRequest) {
 // DELETE - Eliminar curso
 export async function DELETE(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const courseId = searchParams.get('courseId')
+    const body = await request.json()
+    const { courseId } = body
 
     if (!courseId) {
       return NextResponse.json(

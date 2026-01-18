@@ -571,9 +571,119 @@ export default function AdminPage() {
   )
 }
 
-// Componente para gestionar cursos
+// Componente para gestionar cursos desde Airtable
 function CoursesManager() {
-  const courses = Object.entries(ALL_COURSES)
+  const [courses, setCourses] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingCourse, setEditingCourse] = useState<any>(null)
+  const [saving, setSaving] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    levelId: '',
+    programId: '',
+    teacherName: '',
+    maxStudents: 30
+  })
+
+  useEffect(() => {
+    loadCourses()
+  }, [])
+
+  const loadCourses = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/admin/courses')
+      const data = await res.json()
+      if (data.courses) {
+        setCourses(data.courses)
+      }
+    } catch (error) {
+      console.error('Error loading courses:', error)
+    }
+    setLoading(false)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      const url = '/api/admin/courses'
+      const method = editingCourse ? 'PATCH' : 'POST'
+      const body = editingCourse 
+        ? { ...formData, courseId: editingCourse.id, action: 'update' }
+        : formData
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (res.ok) {
+        loadCourses()
+        resetForm()
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Error al guardar curso')
+      }
+    } catch (error) {
+      console.error('Error saving course:', error)
+      alert('Error al guardar curso')
+    }
+    setSaving(false)
+  }
+
+  const handleDelete = async (courseId: string) => {
+    if (!confirm('¿Estás seguro de eliminar este curso?')) return
+    try {
+      const res = await fetch('/api/admin/courses', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ courseId })
+      })
+      if (res.ok) {
+        loadCourses()
+      }
+    } catch (error) {
+      console.error('Error deleting course:', error)
+    }
+  }
+
+  const handleEdit = (course: any) => {
+    setEditingCourse(course)
+    setFormData({
+      name: course.name || '',
+      description: course.description || '',
+      levelId: course.levelId || '',
+      programId: course.programId || '',
+      teacherName: course.teacherName || '',
+      maxStudents: course.maxStudents || 30
+    })
+    setShowForm(true)
+  }
+
+  const resetForm = () => {
+    setShowForm(false)
+    setEditingCourse(null)
+    setFormData({
+      name: '',
+      description: '',
+      levelId: '',
+      programId: '',
+      teacherName: '',
+      maxStudents: 30
+    })
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -586,59 +696,139 @@ function CoursesManager() {
             className="pl-10 pr-4 py-2 bg-dark-800 border border-dark-600 rounded-lg text-white focus:border-neon-cyan focus:outline-none w-64"
           />
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 transition-colors">
-          <Plus className="w-5 h-5" />
-          <span>Nuevo Curso</span>
+        <button 
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 transition-colors"
+        >
+          {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+          <span>{showForm ? 'Cancelar' : 'Nuevo Curso'}</span>
         </button>
       </div>
 
-      <div className="grid gap-4">
-        {courses.map(([id, course]) => (
-          <div key={id} className="bg-dark-800 rounded-xl border border-dark-600 p-6 hover:border-neon-cyan/30 transition-colors">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold text-white mb-2">{course.title}</h3>
-                <p className="text-gray-400 mb-4">{course.description}</p>
-                <div className="flex items-center gap-6 text-sm">
-                  <span className="text-gray-400">
-                    <BookOpen className="w-4 h-4 inline mr-1" />
-                    {course.modules.length} módulos
-                  </span>
-                  <span className="text-gray-400">
-                    <Clock className="w-4 h-4 inline mr-1" />
-                    {course.totalLessons} lecciones
-                  </span>
-                  <span className="text-neon-cyan">
-                    ${course.kit.price} kit
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors">
-                  <Eye className="w-5 h-5" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-700 rounded-lg transition-colors">
-                  <Edit className="w-5 h-5" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-700 rounded-lg transition-colors">
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
+      {/* Formulario */}
+      {showForm && (
+        <form onSubmit={handleSubmit} className="bg-dark-800 rounded-xl border border-dark-600 p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-white mb-4">
+            {editingCourse ? 'Editar Curso' : 'Nuevo Curso'}
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Nombre del Curso</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Nivel</label>
+              <select
+                value={formData.levelId}
+                onChange={(e) => setFormData({...formData, levelId: e.target.value})}
+                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                required
+              >
+                <option value="">Seleccionar...</option>
+                {EDUCATION_LEVELS.map(level => (
+                  <option key={level.id} value={level.id}>{level.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm text-gray-400 mb-1">Descripción</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                rows={2}
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Profesor</label>
+              <input
+                type="text"
+                value={formData.teacherName}
+                onChange={(e) => setFormData({...formData, teacherName: e.target.value})}
+                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Máx. Estudiantes</label>
+              <input
+                type="number"
+                value={formData.maxStudents}
+                onChange={(e) => setFormData({...formData, maxStudents: parseInt(e.target.value)})}
+                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+              />
             </div>
           </div>
-        ))}
-      </div>
+          <div className="flex justify-end gap-3 pt-4">
+            <button type="button" onClick={resetForm} className="px-4 py-2 text-gray-400 hover:text-white">
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-2 bg-neon-green text-dark-900 font-semibold rounded-lg hover:bg-neon-green/90 disabled:opacity-50"
+            >
+              {saving ? <div className="w-4 h-4 border-2 border-dark-900 border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+              {editingCourse ? 'Actualizar' : 'Crear'} Curso
+            </button>
+          </div>
+        </form>
+      )}
 
-      <div className="bg-dark-800/50 border-2 border-dashed border-dark-600 rounded-xl p-8 text-center">
-        <Plus className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-        <h4 className="text-white font-medium mb-2">Agregar Nuevo Curso</h4>
-        <p className="text-gray-400 text-sm mb-4">
-          Para agregar un nuevo curso, crea un archivo en<br />
-          <code className="text-neon-cyan">src/data/courses/[nivel].ts</code>
-        </p>
-        <button className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600 transition-colors">
-          Ver Documentación
-        </button>
+      {/* Lista de cursos */}
+      <div className="grid gap-4">
+        {courses.length === 0 ? (
+          <div className="bg-dark-800/50 border-2 border-dashed border-dark-600 rounded-xl p-8 text-center">
+            <Plus className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+            <h4 className="text-white font-medium mb-2">No hay cursos</h4>
+            <p className="text-gray-400 text-sm">Crea tu primer curso usando el botón "Nuevo Curso"</p>
+          </div>
+        ) : (
+          courses.map((course) => (
+            <div key={course.id} className="bg-dark-800 rounded-xl border border-dark-600 p-6 hover:border-neon-cyan/30 transition-colors">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-white mb-2">{course.name}</h3>
+                  <p className="text-gray-400 mb-4">{course.description || 'Sin descripción'}</p>
+                  <div className="flex items-center gap-6 text-sm">
+                    <span className="text-gray-400">
+                      <GraduationCap className="w-4 h-4 inline mr-1" />
+                      {course.levelId}
+                    </span>
+                    <span className="text-gray-400">
+                      <Users className="w-4 h-4 inline mr-1" />
+                      {course.currentStudents || 0}/{course.maxStudents || 30} estudiantes
+                    </span>
+                    {course.teacherName && (
+                      <span className="text-neon-cyan">
+                        👨‍🏫 {course.teacherName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => handleEdit(course)}
+                    className="p-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-700 rounded-lg transition-colors"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(course.id)}
+                    className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-700 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   )
