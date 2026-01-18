@@ -8,8 +8,24 @@ import {
   FileText, Plus, Edit, Trash2, Save, X, Search,
   ArrowLeft, Calendar, Award, CheckCircle, Clock,
   Bot, CircuitBoard, Code, Lightbulb, BookOpen,
-  ChevronDown, ChevronUp, Eye, EyeOff, Filter, Loader2
+  ChevronDown, ChevronUp, Eye, EyeOff, Filter, Loader2,
+  Type, ListChecks, Pencil, Upload, Image
 } from 'lucide-react'
+
+// Tipos de pregunta disponibles
+const QUESTION_TYPES = [
+  { id: 'text', name: 'Texto', icon: Type, desc: 'Respuesta escrita' },
+  { id: 'multiple', name: 'Opción Múltiple', icon: ListChecks, desc: 'Seleccionar respuesta' },
+  { id: 'drawing', name: 'Dibujo', icon: Pencil, desc: 'Dibujar o esquema' },
+  { id: 'upload', name: 'Subir Archivo', icon: Upload, desc: 'PDF, imagen, documento' },
+  { id: 'image', name: 'Foto/Captura', icon: Image, desc: 'Tomar o subir foto' },
+]
+
+interface Question {
+  text: string
+  type: 'text' | 'multiple' | 'drawing' | 'upload' | 'image'
+  options: string[]
+}
 
 interface Task {
   id: string
@@ -70,7 +86,7 @@ export default function AdminTareasPage() {
     difficulty: 'basico' as Task['difficulty'],
     points: 10,
     dueDate: '',
-    questions: [''],
+    questions: [{ text: '', type: 'text' as Question['type'], options: [] as string[] }],
     attachmentUrl: '',
     attachmentType: 'none' as 'none' | 'drive' | 'link' | 'pdf'
   })
@@ -107,11 +123,29 @@ export default function AdminTareasPage() {
       difficulty: 'basico',
       points: 10,
       dueDate: '',
-      questions: [''],
+      questions: [{ text: '', type: 'text', options: [] }],
       attachmentUrl: '',
       attachmentType: 'none'
     })
     setShowModal(true)
+  }
+
+  // Convertir preguntas antiguas (string[]) a nuevo formato
+  const parseQuestions = (questions: string[]): Question[] => {
+    if (!questions || questions.length === 0) {
+      return [{ text: '', type: 'text', options: [] }]
+    }
+    return questions.map(q => {
+      // Intentar parsear si es JSON
+      if (typeof q === 'string' && q.startsWith('{')) {
+        try {
+          return JSON.parse(q)
+        } catch {
+          return { text: q, type: 'text', options: [] }
+        }
+      }
+      return { text: q, type: 'text', options: [] }
+    })
   }
 
   const openEditModal = (task: Task) => {
@@ -125,7 +159,7 @@ export default function AdminTareasPage() {
       difficulty: task.difficulty,
       points: task.points,
       dueDate: task.dueDate || '',
-      questions: task.questions.length > 0 ? task.questions : [''],
+      questions: parseQuestions(task.questions),
       attachmentUrl: (task as any).attachmentUrl || '',
       attachmentType: (task as any).attachmentType || 'none'
     })
@@ -140,9 +174,14 @@ export default function AdminTareasPage() {
 
     setSaving(true)
     try {
+      // Convertir preguntas a formato string para guardar
+      const questionsToSave = formData.questions
+        .filter(q => q.text.trim())
+        .map(q => JSON.stringify(q))
+      
       const payload = {
         ...formData,
-        questions: formData.questions.filter(q => q.trim()),
+        questions: questionsToSave,
         ...(editingTask ? { taskId: editingTask.id } : {})
       }
 
@@ -195,7 +234,7 @@ export default function AdminTareasPage() {
   const addQuestion = () => {
     setFormData(prev => ({
       ...prev,
-      questions: [...prev.questions, '']
+      questions: [...prev.questions, { text: '', type: 'text' as Question['type'], options: [] }]
     }))
   }
 
@@ -206,10 +245,43 @@ export default function AdminTareasPage() {
     }))
   }
 
-  const updateQuestion = (index: number, value: string) => {
+  const updateQuestion = (index: number, field: keyof Question, value: any) => {
     setFormData(prev => ({
       ...prev,
-      questions: prev.questions.map((q, i) => i === index ? value : q)
+      questions: prev.questions.map((q, i) => i === index ? { ...q, [field]: value } : q)
+    }))
+  }
+
+  const addOption = (questionIndex: number) => {
+    setFormData(prev => ({
+      ...prev,
+      questions: prev.questions.map((q, i) => 
+        i === questionIndex 
+          ? { ...q, options: [...(q.options || []), ''] }
+          : q
+      )
+    }))
+  }
+
+  const updateOption = (questionIndex: number, optionIndex: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      questions: prev.questions.map((q, i) => 
+        i === questionIndex 
+          ? { ...q, options: q.options?.map((o, oi) => oi === optionIndex ? value : o) || [] }
+          : q
+      )
+    }))
+  }
+
+  const removeOption = (questionIndex: number, optionIndex: number) => {
+    setFormData(prev => ({
+      ...prev,
+      questions: prev.questions.map((q, i) => 
+        i === questionIndex 
+          ? { ...q, options: q.options?.filter((_, oi) => oi !== optionIndex) || [] }
+          : q
+      )
     }))
   }
 
@@ -583,8 +655,8 @@ export default function AdminTareasPage() {
 
               {/* Questions */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm text-gray-400">Preguntas</label>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm text-gray-400">Preguntas / Actividades</label>
                   <button
                     type="button"
                     onClick={addQuestion}
@@ -593,26 +665,103 @@ export default function AdminTareasPage() {
                     <Plus className="w-4 h-4" /> Agregar pregunta
                   </button>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {formData.questions.map((question, index) => (
-                    <div key={index} className="flex gap-2">
-                      <span className="text-gray-500 text-sm mt-2">{index + 1}.</span>
-                      <input
-                        type="text"
-                        value={question}
-                        onChange={(e) => updateQuestion(index, e.target.value)}
-                        placeholder="Escribe la pregunta..."
-                        className="flex-1 px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
-                      />
-                      {formData.questions.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeQuestion(index)}
-                          className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
+                    <div key={index} className="p-3 bg-dark-700/50 rounded-lg border border-dark-600">
+                      <div className="flex items-start gap-2 mb-2">
+                        <span className="text-gray-500 text-sm mt-2 font-bold">{index + 1}.</span>
+                        <div className="flex-1 space-y-2">
+                          {/* Tipo de pregunta */}
+                          <div className="flex gap-2 flex-wrap">
+                            {QUESTION_TYPES.map(qt => {
+                              const Icon = qt.icon
+                              return (
+                                <button
+                                  key={qt.id}
+                                  type="button"
+                                  onClick={() => updateQuestion(index, 'type', qt.id)}
+                                  className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+                                    question.type === qt.id 
+                                      ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50' 
+                                      : 'bg-dark-600 text-gray-400 hover:bg-dark-500'
+                                  }`}
+                                  title={qt.desc}
+                                >
+                                  <Icon className="w-3 h-3" />
+                                  {qt.name}
+                                </button>
+                              )
+                            })}
+                          </div>
+                          
+                          {/* Texto de la pregunta */}
+                          <input
+                            type="text"
+                            value={question.text}
+                            onChange={(e) => updateQuestion(index, 'text', e.target.value)}
+                            placeholder={
+                              question.type === 'drawing' ? 'Ej: Dibuja el circuito del LED...' :
+                              question.type === 'upload' ? 'Ej: Sube tu código o documento...' :
+                              question.type === 'image' ? 'Ej: Toma una foto de tu proyecto...' :
+                              question.type === 'multiple' ? 'Escribe la pregunta de opción múltiple...' :
+                              'Escribe la pregunta...'
+                            }
+                            className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+                          />
+                          
+                          {/* Opciones para opción múltiple */}
+                          {question.type === 'multiple' && (
+                            <div className="pl-4 space-y-2">
+                              <p className="text-xs text-gray-500">Opciones de respuesta:</p>
+                              {question.options.map((option, optIndex) => (
+                                <div key={optIndex} className="flex gap-2 items-center">
+                                  <span className="text-gray-500 text-xs">{String.fromCharCode(65 + optIndex)}.</span>
+                                  <input
+                                    type="text"
+                                    value={option}
+                                    onChange={(e) => updateOption(index, optIndex, e.target.value)}
+                                    placeholder={`Opción ${String.fromCharCode(65 + optIndex)}`}
+                                    className="flex-1 px-2 py-1 bg-dark-600 border border-dark-500 rounded text-white text-sm"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeOption(index, optIndex)}
+                                    className="p-1 text-red-400 hover:bg-red-500/20 rounded"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              ))}
+                              <button
+                                type="button"
+                                onClick={() => addOption(index)}
+                                className="text-xs text-neon-cyan hover:underline flex items-center gap-1"
+                              >
+                                <Plus className="w-3 h-3" /> Agregar opción
+                              </button>
+                            </div>
+                          )}
+                          
+                          {/* Indicador de tipo */}
+                          <p className="text-xs text-gray-500">
+                            {question.type === 'text' && '📝 El estudiante escribirá su respuesta'}
+                            {question.type === 'multiple' && '☑️ El estudiante seleccionará una opción'}
+                            {question.type === 'drawing' && '🎨 El estudiante dibujará su respuesta'}
+                            {question.type === 'upload' && '📎 El estudiante subirá un archivo'}
+                            {question.type === 'image' && '📷 El estudiante tomará o subirá una foto'}
+                          </p>
+                        </div>
+                        
+                        {formData.questions.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeQuestion(index)}
+                            className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
