@@ -1,16 +1,26 @@
 id,name,description,levelId,levelName,type,duration,price,isActive,createdAt
-prog-inicial2-robotica,Robótica Básica,Introducción a la robótica con LEDs y circuitos simples,inicial-2,Inicial 2,robotica,6 meses,35,true,2024-01-01
-prog-inicial2-programacion,Programación Visual,Aprende a programar con bloques visuales,inicial-2,Inicial 2,programacion,6 meses,35,true,2024-01-01
-prog-inicial2-electronica,Electrónica Creativa,Proyectos creativos con componentes electrónicos,inicial-2,Inicial 2,electronica,6 meses,35,true,2024-01-01
-prog-inicial2-ia,IA para Niños,Introducción a la inteligencia artificial,inicial-2,Inicial 2,ia,6 meses,40,true,2024-01-01
+prog-inicial1-robotica,Robótica Inicial 1,Introducción a la tecnología para niños de 3-4 años,inicial-1,Inicial 1,robotica,9 meses,30,true,2024-01-01
+prog-inicial2-robotica,Robótica Básica,Introducción a la robótica con LEDs y circuitos simples,inicial-2,Inicial 2,robotica,9 meses,35,true,2024-01-01
+prog-inicial2-programacion,Programación Visual,Aprende a programar con bloques visuales,inicial-2,Inicial 2,programacion,9 meses,35,true,2024-01-01
+prog-inicial2-electronica,Electrónica Creativa,Proyectos creativos con componentes electrónicos,inicial-2,Inicial 2,electronica,9 meses,35,true,2024-01-01
+prog-inicial2-ia,IA para Niños,Introducción a la inteligencia artificial,inicial-2,Inicial 2,ia,9 meses,40,true,2024-01-01
 prog-1egb-robotica,Robótica 1° EGB,Robótica para primero de básica,primero-egb,1° EGB,robotica,10 meses,50,true,2024-01-01
-prog-1egb-programacion,Programación 1° EGB,Programación con Scratch Jr,primero-egb,1° EGB,programacion,10 meses,50,true,2024-01-01
-prog-8egb-robotica,Robótica Avanzada,Arduino y sensores avanzados,octavo-egb,8° EGB,robotica,10 meses,75,true,2024-01-01
+prog-2egb-robotica,Robótica 2° EGB,Robótica para segundo de básica,segundo-egb,2° EGB,robotica,10 meses,50,true,2024-01-01
+prog-3egb-robotica,Robótica 3° EGB,Robótica para tercero de básica,tercero-egb,3° EGB,robotica,10 meses,50,true,2024-01-01
+prog-4egb-robotica,Robótica 4° EGB,Robótica para cuarto de básica,cuarto-egb,4° EGB,robotica,10 meses,50,true,2024-01-01
+prog-5egb-robotica,Robótica 5° EGB,Robótica para quinto de básica,quinto-egb,5° EGB,robotica,10 meses,50,true,2024-01-01
+prog-6egb-robotica,Robótica 6° EGB,Robótica para sexto de básica,sexto-egb,6° EGB,robotica,10 meses,70,true,2024-01-01
+prog-7egb-robotica,Robótica 7° EGB,Robótica para séptimo de básica,septimo-egb,7° EGB,robotica,10 meses,70,true,2024-01-01
+prog-8egb-robotica,Robótica Avanzada,Arduino y sensores avanzados con ESP32,octavo-egb,8° EGB,robotica,10 meses,75,true,2024-01-01
 prog-8egb-programacion,Programación Python,Python desde cero,octavo-egb,8° EGB,programacion,10 meses,75,true,2024-01-01
 prog-8egb-hacking,Hacking Ético,Ciberseguridad y hacking ético,octavo-egb,8° EGB,hacking,10 meses,80,true,2024-01-01
 prog-8egb-ia,Inteligencia Artificial,Machine Learning y visión por computadora,octavo-egb,8° EGB,ia,10 meses,80,true,2024-01-01
-prog-1bach-fullstack,Desarrollo Web,HTML CSS JavaScript y React,primero-bach,1° BGU,programacion,10 meses,80,true,2024-01-01
+prog-9egb-robotica,Robótica 9° EGB,Seguidor de línea con sensores IR,noveno-egb,9° EGB,robotica,10 meses,75,true,2024-01-01
+prog-10egb-robotica,Robótica 10° EGB,Robot evita obstáculos con ultrasonido,decimo-egb,10° EGB,robotica,10 meses,75,true,2024-01-01
+prog-1bach-robotica,Robótica 1° Bach,Robot Otto con Arduino,primero-bach,1° BGU,robotica,10 meses,80,true,2024-01-01
 prog-1bach-ciberseguridad,Ciberseguridad Avanzada,Pentesting y seguridad de redes,primero-bach,1° BGU,hacking,10 meses,85,true,2024-01-01
+prog-2bach-robotica,Robótica Competitiva,Robot Soccer y Mini Sumo,segundo-bach,2° BGU,robotica,10 meses,75,true,2024-01-01
+prog-3bach-iot,IoT y Domótica,Internet de las Cosas con ESP32,tercero-bach,3° BGU,robotica,10 meses,40,true,2024-01-01
 prog-universidad-python,Python Profesional,Python avanzado para ciencia de datos,universidad,Universidad,programacion,4 meses,120,true,2024-01-01
 prog-universidad-ml,Machine Learning,Curso completo de ML con TensorFlow,universidad,Universidad,ia,6 meses,150,true,2024-01-01
 prog-curso-arduino,Arduino Maker,Curso intensivo de Arduino,curso-libre,Curso Libre,robotica,2 meses,60,true,2024-01-01

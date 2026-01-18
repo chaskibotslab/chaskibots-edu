@@ -1,6 +1,19 @@
-id,name,description,levelId,teacherId,teacherName,maxStudents,currentStudents,startDate,endDate,isActive,createdAt
-curso-inicial-1,Tecnología Inicial 1,Introducción a la tecnología para niños de 3-4 años,inicial-1,user-profesor-1,Profesor Demo,25,1,2024-02-01,2024-12-15,true,2024-01-15
-curso-inicial-2,Tecnología Inicial 2,Continuación del curso de tecnología para niños de 4-5 años,inicial-2,user-profesor-1,Profesor Demo,25,1,2024-02-01,2024-12-15,true,2024-01-15
-curso-1egb,Robótica 1° EGB,Curso de robótica para primero de básica,primero-egb,user-profesor-1,Profesor Demo,30,1,2024-02-01,2024-12-15,true,2024-01-15
-curso-robotica-8vo,Robótica 8vo EGB,Robótica avanzada con Arduino y programación,octavo-egb,user-profesor-1,Profesor Demo,30,3,2024-02-01,2024-12-15,true,2024-01-15
-curso-hacking-bach,Ciberseguridad Bachillerato,Hacking ético y seguridad informática,primero-bach,user-profesor-1,Profesor Demo,25,0,2024-02-01,2024-12-15,true,2024-01-15
+id,name,description,levelId,programId,teacherName,maxStudents,currentStudents,startDate,endDate,isActive,createdAt
+curso-inicial-1,Tecnología Inicial 1,Introducción a la tecnología para niños de 3-4 años,inicial-1,prog-inicial1-robotica,Profesor Demo,25,1,2024-02-01,2024-12-15,true,2024-01-15
+curso-inicial-2,Tecnología Inicial 2,Continuación del curso de tecnología para niños de 4-5 años,inicial-2,prog-inicial2-robotica,Profesor Demo,25,4,2024-02-01,2024-12-15,true,2024-01-15
+curso-1egb,Robótica 1° EGB,Curso de robótica para primero de básica,primero-egb,prog-1egb-robotica,Profesor Demo,30,1,2024-02-01,2024-12-15,true,2024-01-15
+curso-2egb,Robótica 2° EGB,Curso de robótica para segundo de básica,segundo-egb,prog-2egb-robotica,Profesor Demo,30,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-3egb,Robótica 3° EGB,Curso de robótica para tercero de básica,tercero-egb,prog-3egb-robotica,Profesor Demo,30,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-4egb,Robótica 4° EGB,Curso de robótica para cuarto de básica,cuarto-egb,prog-4egb-robotica,Profesor Demo,30,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-5egb,Robótica 5° EGB,Curso de robótica para quinto de básica,quinto-egb,prog-5egb-robotica,Profesor Demo,30,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-6egb,Robótica 6° EGB,Curso de robótica para sexto de básica,sexto-egb,prog-6egb-robotica,Profesor Demo,30,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-7egb,Robótica 7° EGB,Curso de robótica para séptimo de básica,septimo-egb,prog-7egb-robotica,Profesor Demo,30,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-robotica-8vo,Robótica 8vo EGB,Robótica avanzada con Arduino y programación,octavo-egb,prog-8egb-robotica,Profesor Demo,30,4,2024-02-01,2024-12-15,true,2024-01-15
+curso-9egb,Robótica 9° EGB,Seguidor de línea con sensores infrarrojos,noveno-egb,prog-9egb-robotica,Profesor Demo,30,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-10egb,Robótica 10° EGB,Robot evita obstáculos con ultrasonido,decimo-egb,prog-10egb-robotica,Profesor Demo,30,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-1bach,Robótica 1° Bach,Robot Otto con Arduino,primero-bach,prog-1bach-robotica,Profesor Demo,25,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-hacking-bach,Ciberseguridad Bachillerato,Hacking ético y seguridad informática,primero-bach,prog-1bach-ciberseguridad,Profesor Demo,25,1,2024-02-01,2024-12-15,true,2024-01-15
+curso-2bach,Robótica 2° Bach,Robot Soccer y Mini Sumo,segundo-bach,prog-2bach-robotica,Profesor Demo,25,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-3bach,IoT 3° Bach,Internet de las Cosas con ESP32,tercero-bach,prog-3bach-iot,Profesor Demo,25,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-universidad,Python Universidad,Python profesional y Data Science,universidad,prog-universidad-python,Profesor Demo,30,0,2024-02-01,2024-12-15,true,2024-01-15
+curso-libre-arduino,Arduino Maker,Curso libre de Arduino para todas las edades,curso-libre,prog-curso-arduino,Profesor Demo,20,0,2024-02-01,2024-12-15,true,2024-01-15

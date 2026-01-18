@@ -1,22 +1,25 @@
-# 📊 Configuración de Tablas en Airtable
+# 📊 Configuración de Tablas en Airtable - ChaskiBots EDU
 
-## Tablas Necesarias para ChaskiBots EDU
+## ⚠️ IMPORTANTE: Tipos de Campo
 
-Debes crear estas tablas en tu base de Airtable (`appGayG3c8NkjCjav`).
+**TODOS los campos de texto deben ser "Single line text", NO "Single Select".**
+Esto evita errores como `INVALID_MULTIPLE_CHOICE_OPTIONS`.
 
-## 📋 Resumen de Tablas
+## 📋 Tablas a Importar (en orden)
 
-| Tabla | Archivo CSV | Descripción |
-|-------|-------------|-------------|
-| `kits_para_importar` | kits_para_importar.csv | Kits de robótica por nivel |
-| `lessons` | lessons.csv | Lecciones y videos |
-| `year_plans` | year_plans.csv | Plan del año escolar |
-| `ai_activities` | ai_activities.csv | Actividades de IA |
-| `simulators` | simulators.csv | Simuladores disponibles |
-| `levels` | levels.csv | Niveles educativos |
-| `programs` | programs.csv | Programas por nivel |
-| `users` | users.csv | Usuarios y códigos de acceso |
-| `courses_catalog` | courses_catalog.csv | Catálogo de cursos |
+| # | Tabla | Archivo CSV | Registros | Descripción |
+|---|-------|-------------|-----------|-------------|
+| 1 | `levels` | levels.csv | 17 | Niveles educativos |
+| 2 | `programs` | programs.csv | 26 | Programas por nivel |
+| 3 | `courses_catalog` | courses_catalog.csv | 18 | Cursos/clases |
+| 4 | `users` | users.csv | 11 | Usuarios y códigos |
+| 5 | `lessons` | lessons.csv | 62 | Lecciones |
+| 6 | `kits` | kits.csv | 16 | Kits de robótica |
+| 7 | `ai_activities` | ai_activities.csv | 52 | Actividades IA |
+| 8 | `simulators` | simulators.csv | 7 | Simuladores |
+| 9 | `year_plans` | year_plans.csv | 136 | Plan anual |
+| 10 | `projects` | projects.csv | 22 | Proyectos avanzados |
+| 11 | `experiencias` | experiencias.csv | 8 | Galería |
 
 ## 🎯 Estructura del Sistema
 
@@ -46,22 +49,25 @@ Esta tabla almacena todos los usuarios del sistema con sus códigos de acceso.
 
 | Campo | Tipo en Airtable | Descripción | Requerido |
 |-------|------------------|-------------|-----------|
-| `id` | Single line text | ID único del usuario | ✅ |
 | `accessCode` | Single line text | **Código de acceso único** (ej: ES4X8P3Q) | ✅ |
 | `email` | Email | Email del usuario (opcional para estudiantes) | ❌ |
 | `password` | Single line text | Contraseña (solo para login tradicional) | ❌ |
 | `name` | Single line text | Nombre completo | ✅ |
-| `levelId` | Single line text | ID del nivel educativo | ✅ |
-| `role` | Single select | Opciones: `admin`, `teacher`, `student` | ✅ |
+| `levelId` | **Single line text** | ID del nivel educativo (NO usar Single Select) | ✅ |
+| `role` | **Single line text** | admin, teacher, student (NO usar Single Select) | ✅ |
 | `courseId` | Single line text | ID del curso/clase asignado | ❌ |
 | `courseName` | Single line text | Nombre del curso/clase | ❌ |
-| `programId` | Single line text | **ID del programa** (ej: prog-inicial2-robotica) | ✅ |
-| `programName` | Single line text | **Nombre del programa** (ej: Robótica Básica) | ✅ |
+| `programId` | Single line text | **ID del programa** (ej: prog-inicial2-robotica) | ❌ |
+| `programName` | Single line text | **Nombre del programa** (ej: Robótica Básica) | ❌ |
 | `progress` | Number | Porcentaje de progreso (0-100) | ❌ |
-| `createdAt` | Date | Fecha de creación | ✅ |
+| `createdAt` | Date | Fecha de creación (formato: YYYY-MM-DD) | ✅ |
 | `lastLogin` | Date | Último acceso | ❌ |
 | `expiresAt` | Date | Fecha de expiración del acceso | ❌ |
 | `isActive` | Checkbox | Si el usuario está activo | ✅ |
+
+### ⚠️ IMPORTANTE: 
+- `levelId` y `role` deben ser **Single line text**, NO Single Select
+- Airtable genera automáticamente un ID interno, no necesitas campo `id`
 
 ### Formato de Códigos de Acceso:
 - **Admin**: `AD` + 6 caracteres (ej: `AD1ADMIN`)
