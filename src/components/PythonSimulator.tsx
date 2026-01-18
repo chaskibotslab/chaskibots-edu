@@ -531,16 +531,90 @@ ${output}
             <Play className="w-4 h-4" />
             {isRunning ? 'Ejecutando...' : 'Ejecutar'}
           </button>
+          
+          {/* Botón Enviar al Profesor - Siempre visible */}
+          {output && (
+            <button
+              onClick={async () => {
+                if (!studentName.trim()) {
+                  alert('Por favor escribe tu nombre en el campo de arriba')
+                  return
+                }
+                if (!selectedLevel) {
+                  alert('Por favor selecciona tu nivel del menú')
+                  return
+                }
+                setIsSending(true)
+                try {
+                  const taskId = generateTaskId(code, studentName)
+                  const res = await fetch('/api/submissions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      taskId,
+                      studentName,
+                      levelId: selectedLevel,
+                      code,
+                      output
+                    })
+                  })
+                  if (res.ok) {
+                    setSendSuccess(true)
+                    setTimeout(() => setSendSuccess(false), 5000)
+                  } else {
+                    alert('Error al enviar. Inténtalo de nuevo.')
+                  }
+                } catch (error) {
+                  alert('Error de conexión')
+                }
+                setIsSending(false)
+              }}
+              disabled={isSending || sendSuccess}
+              className="bg-neon-purple hover:bg-neon-purple/80 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+            >
+              {isSending ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
+              ) : sendSuccess ? (
+                <><Check className="w-4 h-4" /> ¡Enviado!</>
+              ) : (
+                <><Send className="w-4 h-4" /> Enviar al Profesor</>
+              )}
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          {output && (
+            <select
+              value={selectedLevel}
+              onChange={(e) => setSelectedLevel(e.target.value)}
+              className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-sm text-white"
+            >
+              <option value="">Tu nivel...</option>
+              <option value="inicial-1">Inicial 1</option>
+              <option value="inicial-2">Inicial 2</option>
+              <option value="primero-egb">1° EGB</option>
+              <option value="segundo-egb">2° EGB</option>
+              <option value="tercero-egb">3° EGB</option>
+              <option value="cuarto-egb">4° EGB</option>
+              <option value="quinto-egb">5° EGB</option>
+              <option value="sexto-egb">6° EGB</option>
+              <option value="septimo-egb">7° EGB</option>
+              <option value="octavo-egb">8° EGB</option>
+              <option value="noveno-egb">9° EGB</option>
+              <option value="decimo-egb">10° EGB</option>
+              <option value="primero-bach">1° Bach</option>
+              <option value="segundo-bach">2° Bach</option>
+              <option value="tercero-bach">3° Bach</option>
+            </select>
+          )}
           <button
             onClick={exportCode}
             className="bg-dark-700 hover:bg-dark-600 text-gray-300 px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors"
             title="Descargar código .py"
           >
             <FileCode className="w-4 h-4" />
-            Código .py
+            .py
           </button>
           <button
             onClick={prepareExport}
@@ -549,13 +623,22 @@ ${output}
             title="Exportar tarea con ID único y QR"
           >
             <QrCode className="w-4 h-4" />
-            Exportar Tarea
+            QR
           </button>
         </div>
       </div>
 
-      {/* Send to Teacher Section */}
-      {output && (
+      {/* Send Success Message */}
+      {sendSuccess && (
+        <div className="px-4 py-2 bg-green-500/20 border-t border-green-500/30">
+          <p className="text-green-400 text-sm text-center">
+            ✅ Tu código fue enviado al profesor. Lo verá en su panel de calificaciones.
+          </p>
+        </div>
+      )}
+
+      {/* Send to Teacher Section - Hidden, keeping for backwards compatibility */}
+      {false && output && (
         <div className="px-4 py-3 border-t border-dark-600 bg-gradient-to-r from-green-900/20 to-emerald-900/20">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <div className="flex-1">
