@@ -11,7 +11,7 @@ import {
   Users, BookOpen, Settings, LogOut, Home, Bell,
   Plus, Edit, Trash2, Eye, Lock, Unlock, Search,
   ChevronRight, Clock, Shield, GraduationCap,
-  BarChart3, Activity, Key, Mail, Save, X, Package, Brain
+  BarChart3, Activity, Key, Mail, Save, X, Package, Brain, FileText
 } from 'lucide-react'
 
 type AdminTab = 'dashboard' | 'courses' | 'users' | 'logs' | 'settings'
@@ -164,12 +164,19 @@ export default function AdminPage() {
               <span>Calificaciones</span>
             </Link>
             <Link
+              href="/admin/entregas"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-purple-500/30"
+            >
+              <FileText className="w-5 h-5 text-purple-400" />
+              <span>Entregas de Estudiantes</span>
+              <span className="ml-auto text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded">Nuevo</span>
+            </Link>
+            <Link
               href="/admin/tareas"
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-yellow-500/30"
             >
               <BookOpen className="w-5 h-5 text-yellow-400" />
               <span>Gestión de Tareas</span>
-              <span className="ml-auto text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">Nuevo</span>
             </Link>
             <Link
               href="/admin/contenido"
