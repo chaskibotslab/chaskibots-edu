@@ -305,22 +305,32 @@ export async function createCourseUser(
     // Formato de fecha para Airtable (YYYY-MM-DD)
     const today = new Date().toISOString().split('T')[0]
     
-    // Construir objeto de datos sin campos vacíos de fecha
+    // Construir objeto de datos - solo incluir campos con valores válidos
     const recordData: Record<string, unknown> = {
       accessCode,
       name,
-      email: email || '',
       role,
-      courseId,
-      courseName,
       levelId,
-      programId: programId || '',
-      programName: programName || '',
       isActive: true,
       createdAt: today
     }
     
-    // Solo agregar expiresAt si tiene valor válido
+    // Solo agregar campos opcionales si tienen valor válido (no vacío)
+    if (email && email.trim() !== '') {
+      recordData.email = email
+    }
+    if (courseId && courseId.trim() !== '' && courseId !== 'Sin asignar') {
+      recordData.courseId = courseId
+    }
+    if (courseName && courseName.trim() !== '' && courseName !== 'Sin asignar') {
+      recordData.courseName = courseName
+    }
+    if (programId && programId.trim() !== '') {
+      recordData.programId = programId
+    }
+    if (programName && programName.trim() !== '') {
+      recordData.programName = programName
+    }
     if (expiresAt && expiresAt.trim() !== '') {
       recordData.expiresAt = expiresAt
     }
@@ -459,15 +469,20 @@ export async function updateUser(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const updateData: Record<string, unknown> = {}
-    if (data.name !== undefined) updateData.name = data.name
-    if (data.email !== undefined) updateData.email = data.email
-    if (data.levelId !== undefined) updateData.levelId = data.levelId
-    if (data.role !== undefined) updateData.role = data.role
-    if (data.courseId !== undefined) updateData.courseId = data.courseId
-    if (data.courseName !== undefined) updateData.courseName = data.courseName
-    if (data.programId !== undefined) updateData.programId = data.programId
-    if (data.programName !== undefined) updateData.programName = data.programName
-    if (data.expiresAt !== undefined) updateData.expiresAt = data.expiresAt
+    if (data.name !== undefined && data.name.trim() !== '') updateData.name = data.name
+    if (data.email !== undefined && data.email.trim() !== '') updateData.email = data.email
+    if (data.levelId !== undefined && data.levelId.trim() !== '') updateData.levelId = data.levelId
+    if (data.role !== undefined && data.role.trim() !== '') updateData.role = data.role
+    // Solo actualizar courseId si tiene un valor válido (no vacío ni "Sin asignar")
+    if (data.courseId !== undefined && data.courseId.trim() !== '' && data.courseId !== 'Sin asignar') {
+      updateData.courseId = data.courseId
+    }
+    if (data.courseName !== undefined && data.courseName.trim() !== '' && data.courseName !== 'Sin asignar') {
+      updateData.courseName = data.courseName
+    }
+    if (data.programId !== undefined && data.programId.trim() !== '') updateData.programId = data.programId
+    if (data.programName !== undefined && data.programName.trim() !== '') updateData.programName = data.programName
+    if (data.expiresAt !== undefined && data.expiresAt.trim() !== '') updateData.expiresAt = data.expiresAt
     if (data.isActive !== undefined) updateData.isActive = data.isActive
 
     await updateRecord(USERS_TABLE, userId, updateData)
