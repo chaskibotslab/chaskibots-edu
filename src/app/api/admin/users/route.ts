@@ -96,9 +96,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generar courseId si no se proporciona
-    const finalCourseId = courseId || `curso-${Date.now()}`
-    const finalCourseName = courseName || 'Sin asignar'
+    // No generar valores automáticos - dejar vacío si no se proporciona
+    const finalCourseId = courseId || ''
+    const finalCourseName = courseName || ''
 
     const result = await createCourseUser(
       name,
@@ -108,8 +108,8 @@ export async function POST(request: NextRequest) {
       levelId,
       email,
       expiresAt,
-      programId,
-      programName
+      programId || '',
+      programName || ''
     )
 
     if (!result.success) {
