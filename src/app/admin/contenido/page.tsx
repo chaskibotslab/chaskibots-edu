@@ -52,6 +52,19 @@ export default function ContenidoAdminPage() {
     content: '',
     locked: false
   })
+  const [showNewLessonModal, setShowNewLessonModal] = useState(false)
+  const [showNewModuleModal, setShowNewModuleModal] = useState(false)
+  const [editingModuleId, setEditingModuleId] = useState<string | null>(null)
+  const [newModuleName, setNewModuleName] = useState('')
+  const [newLessonData, setNewLessonData] = useState({
+    title: '',
+    type: 'video',
+    duration: '5 min',
+    videoUrl: '',
+    content: '',
+    moduleId: '',
+    moduleName: ''
+  })
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -126,6 +139,97 @@ export default function ContenidoAdminPage() {
       setMessage({ type: 'error', text: 'Error de conexión' })
     }
     setSaving(false)
+  }
+
+  const handleCreateLesson = async () => {
+    if (!newLessonData.title || !newLessonData.moduleId) {
+      setMessage({ type: 'error', text: 'Título y módulo son requeridos' })
+      return
+    }
+    setSaving(true)
+    try {
+      const response = await fetch('/api/lessons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          levelId: selectedLevel,
+          ...newLessonData,
+          order: lessons.filter(l => l.moduleId === newLessonData.moduleId).length + 1
+        })
+      })
+      if (response.ok) {
+        loadLessons()
+        setShowNewLessonModal(false)
+        setNewLessonData({ title: '', type: 'video', duration: '5 min', videoUrl: '', content: '', moduleId: '', moduleName: '' })
+      } else {
+        const error = await response.json()
+        alert(error.message || 'Error al crear lección')
+      }
+    } catch (error) {
+      alert('Error de conexión')
+    }
+    setSaving(false)
+  }
+
+  const handleCreateModule = async () => {
+    if (!newModuleName.trim()) return
+    setSaving(true)
+    const moduleId = `mod-${Date.now()}`
+    try {
+      const response = await fetch('/api/lessons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          levelId: selectedLevel,
+          moduleId,
+          moduleName: newModuleName,
+          title: 'Nueva lección',
+          type: 'video',
+          duration: '5 min',
+          order: 1
+        })
+      })
+      if (response.ok) {
+        loadLessons()
+        setShowNewModuleModal(false)
+        setNewModuleName('')
+      }
+    } catch (error) {
+      alert('Error al crear módulo')
+    }
+    setSaving(false)
+  }
+
+  const handleUpdateModuleName = async (moduleId: string, newName: string) => {
+    const moduleLessons = lessons.filter(l => l.moduleId === moduleId)
+    try {
+      for (const lesson of moduleLessons) {
+        await fetch('/api/lessons', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: lesson.id, moduleName: newName })
+        })
+      }
+      loadLessons()
+      setEditingModuleId(null)
+    } catch (error) {
+      alert('Error al actualizar módulo')
+    }
+  }
+
+  const handleDeleteLesson = async (lessonId: string) => {
+    if (!confirm('¿Eliminar esta lección?')) return
+    try {
+      const response = await fetch(`/api/lessons?id=${lessonId}`, { method: 'DELETE' })
+      if (response.ok) loadLessons()
+    } catch (error) {
+      alert('Error al eliminar')
+    }
+  }
+
+  const openNewLessonModal = (moduleId: string, moduleName: string) => {
+    setNewLessonData({ ...newLessonData, moduleId, moduleName })
+    setShowNewLessonModal(true)
   }
 
   const lessonsByModule = lessons.reduce((acc, lesson) => {
@@ -245,7 +349,10 @@ export default function ContenidoAdminPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-white">Módulos y Lecciones</h3>
-                  <button className="flex items-center gap-2 px-3 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600">
+                  <button 
+                    onClick={() => setShowNewModuleModal(true)}
+                    className="flex items-center gap-2 px-3 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+                  >
                     <Plus className="w-4 h-4" />
                     Nuevo Módulo
                   </button>
@@ -269,12 +376,29 @@ export default function ContenidoAdminPage() {
                         ) : (
                           <ChevronRight className="w-5 h-5 text-gray-400" />
                         )}
-                        <div className="flex-1">
-                          <h4 className="text-white font-medium">{module.name}</h4>
+                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                          {editingModuleId === module.id ? (
+                            <input
+                              type="text"
+                              defaultValue={module.name}
+                              autoFocus
+                              className="bg-dark-600 border border-neon-cyan rounded px-2 py-1 text-white text-sm w-64"
+                              onBlur={(e) => handleUpdateModuleName(module.id, e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleUpdateModuleName(module.id, e.currentTarget.value)
+                                if (e.key === 'Escape') setEditingModuleId(null)
+                              }}
+                            />
+                          ) : (
+                            <h4 className="text-white font-medium">{module.name}</h4>
+                          )}
                           <p className="text-sm text-gray-400">{module.lessons.length} lecciones</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button className="p-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-600 rounded-lg">
+                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                          <button 
+                            onClick={() => setEditingModuleId(module.id)}
+                            className="p-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-600 rounded-lg"
+                          >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-600 rounded-lg">
@@ -319,13 +443,20 @@ export default function ContenidoAdminPage() {
                                 <button className="p-2 text-gray-400 hover:text-blue-400 hover:bg-dark-600 rounded-lg" title="Ver">
                                   <Eye className="w-4 h-4" />
                                 </button>
-                                <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-600 rounded-lg" title="Eliminar">
+                                <button 
+                                  onClick={() => handleDeleteLesson(lesson.id)}
+                                  className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-600 rounded-lg" 
+                                  title="Eliminar"
+                                >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
                               </div>
                             </div>
                           ))}
-                          <button className="w-full flex items-center justify-center gap-2 p-3 text-gray-400 hover:text-neon-cyan hover:bg-dark-700/30">
+                          <button 
+                            onClick={() => openNewLessonModal(module.id, module.name)}
+                            className="w-full flex items-center justify-center gap-2 p-3 text-gray-400 hover:text-neon-cyan hover:bg-dark-700/30"
+                          >
                             <Plus className="w-4 h-4" />
                             Agregar Lección
                           </button>
@@ -467,6 +598,120 @@ export default function ContenidoAdminPage() {
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Guardar Lección
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Nuevo Módulo */}
+      {showNewModuleModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-800 rounded-xl border border-dark-600 w-full max-w-md">
+            <div className="flex items-center justify-between p-4 border-b border-dark-600">
+              <h3 className="text-xl font-semibold text-white">Nuevo Módulo</h3>
+              <button onClick={() => setShowNewModuleModal(false)} className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Nombre del Módulo</label>
+                <input
+                  type="text"
+                  value={newModuleName}
+                  onChange={(e) => setNewModuleName(e.target.value)}
+                  placeholder="Ej: Módulo 1: Introducción"
+                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 p-4 border-t border-dark-600">
+              <button onClick={() => setShowNewModuleModal(false)} className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600">
+                Cancelar
+              </button>
+              <button onClick={handleCreateModule} disabled={saving || !newModuleName.trim()} className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 disabled:opacity-50">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                Crear Módulo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Nueva Lección */}
+      {showNewLessonModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-800 rounded-xl border border-dark-600 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-dark-600">
+              <h3 className="text-xl font-semibold text-white">Nueva Lección - {newLessonData.moduleName}</h3>
+              <button onClick={() => setShowNewLessonModal(false)} className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Título de la Lección</label>
+                <input
+                  type="text"
+                  value={newLessonData.title}
+                  onChange={(e) => setNewLessonData({ ...newLessonData, title: e.target.value })}
+                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Tipo</label>
+                  <select
+                    value={newLessonData.type}
+                    onChange={(e) => setNewLessonData({ ...newLessonData, type: e.target.value })}
+                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                  >
+                    <option value="video">Video</option>
+                    <option value="activity">Actividad</option>
+                    <option value="tutorial">Tutorial</option>
+                    <option value="project">Proyecto</option>
+                    <option value="quiz">Quiz</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Duración</label>
+                  <input
+                    type="text"
+                    value={newLessonData.duration}
+                    onChange={(e) => setNewLessonData({ ...newLessonData, duration: e.target.value })}
+                    placeholder="ej: 3 min"
+                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">URL del Video (opcional)</label>
+                <input
+                  type="url"
+                  value={newLessonData.videoUrl}
+                  onChange={(e) => setNewLessonData({ ...newLessonData, videoUrl: e.target.value })}
+                  placeholder="https://drive.google.com/file/d/ID/preview"
+                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Contenido / Descripción</label>
+                <textarea
+                  rows={3}
+                  value={newLessonData.content}
+                  onChange={(e) => setNewLessonData({ ...newLessonData, content: e.target.value })}
+                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 p-4 border-t border-dark-600">
+              <button onClick={() => setShowNewLessonModal(false)} className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600">
+                Cancelar
+              </button>
+              <button onClick={handleCreateLesson} disabled={saving || !newLessonData.title.trim()} className="flex items-center gap-2 px-4 py-2 bg-neon-green text-dark-900 rounded-lg font-medium hover:bg-neon-green/90 disabled:opacity-50">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                Crear Lección
               </button>
             </div>
           </div>
