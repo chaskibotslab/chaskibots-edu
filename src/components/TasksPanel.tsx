@@ -28,7 +28,7 @@ interface Task {
 interface TaskQuestion {
   id: string
   question: string
-  type: 'text' | 'multiple' | 'code' | 'drawing' | 'file'
+  type: 'text' | 'multiple' | 'code' | 'drawing' | 'upload' | 'image'
   options?: string[]
   correctAnswer?: string
 }
@@ -274,14 +274,36 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
         const data = await res.json()
         if (data.tasks && data.tasks.length > 0) {
           // Convertir APITask a Task con questions como objetos
-          const convertedTasks: Task[] = data.tasks.map((t: APITask) => ({
-            ...t,
-            questions: t.questions.map((q, idx) => ({
-              id: `q${idx + 1}`,
-              question: q,
-              type: t.type === 'code' ? 'code' : 'text'
-            }))
-          }))
+          const convertedTasks: Task[] = data.tasks.map((t: APITask) => {
+            // Parsear preguntas - pueden ser JSON o texto plano
+            const parsedQuestions = t.questions.map((q, idx) => {
+              // Intentar parsear como JSON (nuevo formato)
+              if (q.startsWith('{')) {
+                try {
+                  const parsed = JSON.parse(q)
+                  return {
+                    id: `q${idx + 1}`,
+                    question: parsed.text || parsed.question || q,
+                    type: parsed.type || 'text',
+                    options: parsed.options || []
+                  }
+                } catch {
+                  // Si falla el parse, usar como texto plano
+                }
+              }
+              // Formato antiguo: texto plano
+              return {
+                id: `q${idx + 1}`,
+                question: q,
+                type: t.type === 'code' ? 'code' : 'text' as const
+              }
+            })
+            
+            return {
+              ...t,
+              questions: parsedQuestions
+            }
+          })
           setTasks(convertedTasks)
         } else {
           // Fallback a tareas locales
@@ -500,15 +522,9 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
                       <label className="block text-sm text-white">
                         <span className="text-neon-cyan font-medium">{idx + 1}.</span> {question.question}
                       </label>
-                      {question.type === 'code' ? (
-                        <textarea
-                          value={answers[task.id]?.[question.id] || ''}
-                          onChange={(e) => handleAnswerChange(task.id, question.id, e.target.value)}
-                          placeholder="Escribe tu código aquí..."
-                          rows={6}
-                          className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-white font-mono text-sm resize-none focus:outline-none focus:border-neon-cyan"
-                        />
-                      ) : (
+                      
+                      {/* Tipo: Texto */}
+                      {question.type === 'text' && (
                         <textarea
                           value={answers[task.id]?.[question.id] || ''}
                           onChange={(e) => handleAnswerChange(task.id, question.id, e.target.value)}
@@ -517,33 +533,101 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
                           className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white resize-none focus:outline-none focus:border-neon-cyan"
                         />
                       )}
+                      
+                      {/* Tipo: Código */}
+                      {question.type === 'code' && (
+                        <textarea
+                          value={answers[task.id]?.[question.id] || ''}
+                          onChange={(e) => handleAnswerChange(task.id, question.id, e.target.value)}
+                          placeholder="Escribe tu código aquí..."
+                          rows={6}
+                          className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-white font-mono text-sm resize-none focus:outline-none focus:border-neon-cyan"
+                        />
+                      )}
+                      
+                      {/* Tipo: Opción múltiple */}
+                      {question.type === 'multiple' && question.options && (
+                        <div className="space-y-2 pl-4">
+                          {question.options.map((option, optIdx) => (
+                            <label key={optIdx} className="flex items-center gap-3 cursor-pointer group">
+                              <input
+                                type="radio"
+                                name={`${task.id}-${question.id}`}
+                                value={option}
+                                checked={answers[task.id]?.[question.id] === option}
+                                onChange={(e) => handleAnswerChange(task.id, question.id, e.target.value)}
+                                className="w-4 h-4 text-neon-cyan bg-dark-700 border-dark-500 focus:ring-neon-cyan"
+                              />
+                              <span className="text-gray-300 group-hover:text-white transition-colors">
+                                {String.fromCharCode(65 + optIdx)}. {option}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Tipo: Dibujo */}
+                      {question.type === 'drawing' && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-400">🎨 Dibuja tu respuesta en el canvas</p>
+                          <DrawingCanvas onSave={(data) => handleDrawingSave(task.id, data)} />
+                          {drawings[task.id] && (
+                            <p className="text-xs text-green-400 flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3" /> Dibujo guardado
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Tipo: Subir archivo */}
+                      {question.type === 'upload' && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-400">📎 Sube tu archivo (PDF, documento, código)</p>
+                          <FileUpload onUpload={(files) => handleFilesUpload(task.id, files)} />
+                        </div>
+                      )}
+                      
+                      {/* Tipo: Foto/Imagen */}
+                      {question.type === 'image' && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-400">📷 Toma o sube una foto de tu proyecto</p>
+                          <FileUpload 
+                            onUpload={(files) => handleFilesUpload(task.id, files)} 
+                            acceptedTypes={['image/*']}
+                          />
+                        </div>
+                      )}
                     </div>
                   ))}
 
-                  {/* Sección de Dibujo */}
-                  <div className="space-y-2 pt-4 border-t border-dark-600">
-                    <div className="flex items-center gap-2 text-white">
-                      <Pencil className="w-4 h-4 text-neon-purple" />
-                      <span className="font-medium">Dibujo (opcional)</span>
+                  {/* Sección de Dibujo opcional - solo si NO hay preguntas tipo drawing */}
+                  {!task.questions?.some(q => q.type === 'drawing') && (
+                    <div className="space-y-2 pt-4 border-t border-dark-600">
+                      <div className="flex items-center gap-2 text-white">
+                        <Pencil className="w-4 h-4 text-neon-purple" />
+                        <span className="font-medium">Dibujo (opcional)</span>
+                      </div>
+                      <p className="text-xs text-gray-400">Puedes hacer un dibujo para complementar tu respuesta</p>
+                      <DrawingCanvas onSave={(data) => handleDrawingSave(task.id, data)} />
+                      {drawings[task.id] && (
+                        <p className="text-xs text-green-400 flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" /> Dibujo guardado
+                        </p>
+                      )}
                     </div>
-                    <p className="text-xs text-gray-400">Puedes hacer un dibujo para complementar tu respuesta</p>
-                    <DrawingCanvas onSave={(data) => handleDrawingSave(task.id, data)} />
-                    {drawings[task.id] && (
-                      <p className="text-xs text-green-400 flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3" /> Dibujo guardado
-                      </p>
-                    )}
-                  </div>
+                  )}
 
-                  {/* Sección de Archivos */}
-                  <div className="space-y-2 pt-4 border-t border-dark-600">
-                    <div className="flex items-center gap-2 text-white">
-                      <Upload className="w-4 h-4 text-neon-orange" />
-                      <span className="font-medium">Archivos adjuntos (opcional)</span>
+                  {/* Sección de Archivos opcional - solo si NO hay preguntas tipo upload/image */}
+                  {!task.questions?.some(q => q.type === 'upload' || q.type === 'image') && (
+                    <div className="space-y-2 pt-4 border-t border-dark-600">
+                      <div className="flex items-center gap-2 text-white">
+                        <Upload className="w-4 h-4 text-neon-orange" />
+                        <span className="font-medium">Archivos adjuntos (opcional)</span>
+                      </div>
+                      <p className="text-xs text-gray-400">Sube fotos, PDFs, documentos Word o Excel</p>
+                      <FileUpload onUpload={(files) => handleFilesUpload(task.id, files)} />
                     </div>
-                    <p className="text-xs text-gray-400">Sube fotos, PDFs, documentos Word o Excel</p>
-                    <FileUpload onUpload={(files) => handleFilesUpload(task.id, files)} />
-                  </div>
+                  )}
 
                   <div className="flex justify-end pt-4">
                     <button

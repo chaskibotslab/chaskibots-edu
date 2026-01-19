@@ -27,7 +27,8 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
     const canvas = canvasRef.current
     if (!canvas) return
     
-    const ctx = canvas.getContext('2d')
+    // Usar willReadFrequently para optimizar getImageData
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return
     
     // Fondo blanco
@@ -41,7 +42,7 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
   const saveToHistory = () => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return
     
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
@@ -53,7 +54,7 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
     
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return
     
     const newHistory = [...history]
@@ -70,7 +71,7 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
   const clearCanvas = () => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return
     
     ctx.fillStyle = '#ffffff'
@@ -82,7 +83,7 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return
 
     setIsDrawing(true)
@@ -107,7 +108,7 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
     
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return
 
     const rect = canvas.getBoundingClientRect()
