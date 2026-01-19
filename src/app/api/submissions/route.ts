@@ -221,24 +221,29 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, submissionId, grade, feedback, gradedBy, status, gradedAt } = body
+    const { id, submissionId, grade, feedback, gradedBy, status } = body
 
     const recordId = id || submissionId
     if (!recordId) {
       return NextResponse.json({ error: 'id o submissionId es requerido' }, { status: 400 })
     }
 
-    const fields: Record<string, any> = {}
+    // Solo enviar campos que existen en Airtable
+    const fields: Record<string, any> = {
+      status: status || 'graded'
+    }
     
-    if (status) fields.status = status
-    else fields.status = 'graded'
-    
-    if (gradedAt) fields.gradedAt = gradedAt
-    else fields.gradedAt = new Date().toISOString()
-    
-    if (grade !== undefined) fields.grade = Number(grade)
-    if (feedback) fields.feedback = feedback
-    if (gradedBy) fields.gradedBy = gradedBy
+    if (grade !== undefined && grade !== null && grade !== '') {
+      fields.grade = Number(grade)
+    }
+    if (feedback) {
+      fields.feedback = String(feedback)
+    }
+    if (gradedBy) {
+      fields.gradedBy = String(gradedBy)
+    }
+
+    console.log('PATCH submission:', recordId, fields)
 
     const response = await fetch(AIRTABLE_API_URL, {
       method: 'PATCH',
@@ -256,13 +261,13 @@ export async function PATCH(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Airtable error:', errorText)
-      return NextResponse.json({ error: 'Error updating submission' }, { status: 500 })
+      console.error('Airtable PATCH error:', errorText)
+      return NextResponse.json({ error: 'Error updating submission', details: errorText }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, message: 'Calificación guardada' })
   } catch (error) {
-    console.error('Error:', error)
+    console.error('PATCH Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

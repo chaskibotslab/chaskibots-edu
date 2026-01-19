@@ -8,7 +8,8 @@ import { EDUCATION_LEVELS } from '@/lib/constants'
 import {
   ArrowLeft, FileText, Search, Filter, Check, X, Clock,
   Eye, Trash2, Download, ChevronDown, Loader2, Code,
-  Calendar, User, GraduationCap, Star, MessageSquare
+  Calendar, User, GraduationCap, Star, MessageSquare,
+  Image, Paperclip
 } from 'lucide-react'
 
 interface Submission {
@@ -354,7 +355,7 @@ export default function EntregasPage() {
                   </h4>
                   <div className="bg-dark-900 rounded-lg p-4 h-64 overflow-auto">
                     <pre className="text-sm text-gray-300 font-mono whitespace-pre-wrap">
-                      {selectedSubmission.code}
+                      {selectedSubmission.code.replace(/\[DIBUJO_ADJUNTO_BASE64\]/g, '').replace(/\[ARCHIVOS:[^\]]+\]/g, '')}
                     </pre>
                   </div>
                 </div>
@@ -369,6 +370,65 @@ export default function EntregasPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Adjuntos - Dibujos y Archivos */}
+              {(selectedSubmission.code.includes('[DIBUJO_ADJUNTO_BASE64]') || 
+                selectedSubmission.code.includes('[ARCHIVOS:') ||
+                selectedSubmission.output?.includes('📁 ARCHIVOS EN DRIVE')) && (
+                <div className="mt-4 p-4 bg-dark-700 rounded-lg border border-dark-600">
+                  <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+                    <Paperclip className="w-4 h-4 text-orange-400" />
+                    Archivos Adjuntos
+                  </h4>
+                  
+                  {/* Indicador de dibujo */}
+                  {selectedSubmission.code.includes('[DIBUJO_ADJUNTO_BASE64]') && (
+                    <div className="flex items-center gap-2 p-2 bg-purple-500/10 rounded-lg mb-2">
+                      <Image className="w-5 h-5 text-purple-400" />
+                      <span className="text-sm text-purple-300">Dibujo adjunto (guardado en la entrega)</span>
+                    </div>
+                  )}
+                  
+                  {/* Archivos locales */}
+                  {selectedSubmission.code.includes('[ARCHIVOS:') && (
+                    <div className="space-y-2">
+                      {selectedSubmission.code.match(/\[ARCHIVOS:([^\]]+)\]/)?.[1]?.split(',').map((fileName, idx) => (
+                        <div key={idx} className="flex items-center gap-2 p-2 bg-blue-500/10 rounded-lg">
+                          <FileText className="w-5 h-5 text-blue-400" />
+                          <span className="text-sm text-blue-300">{fileName.trim()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Links de Drive */}
+                  {selectedSubmission.output?.includes('📁 ARCHIVOS EN DRIVE') && (
+                    <div className="mt-2 space-y-2">
+                      {selectedSubmission.output.split('\n').filter(line => 
+                        line.includes('https://drive.google.com')
+                      ).map((line, idx) => {
+                        const match = line.match(/^(.+?):\s*(https:\/\/[^\s]+)/)
+                        if (match) {
+                          return (
+                            <a
+                              key={idx}
+                              href={match[2]}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 p-2 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-colors"
+                            >
+                              <Download className="w-5 h-5 text-green-400" />
+                              <span className="text-sm text-green-300">{match[1]}</span>
+                              <span className="text-xs text-gray-500 ml-auto">Abrir en Drive →</span>
+                            </a>
+                          )
+                        }
+                        return null
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Grading Form */}
               <div className="mt-4 grid md:grid-cols-2 gap-4">
