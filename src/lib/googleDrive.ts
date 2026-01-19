@@ -11,14 +11,22 @@ const MAIN_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || '1rxUZrF96yBW7BTl4C
 function formatPrivateKey(key: string): string {
   if (!key) return ''
   
-  // Si ya tiene los headers PEM, solo reemplazar \n
-  if (key.includes('-----BEGIN')) {
-    return key.replace(/\\n/g, '\n')
+  // Primero reemplazar \n literales por saltos de línea reales
+  let formattedKey = key.replace(/\\n/g, '\n')
+  
+  // Si ya tiene los headers PEM, retornar
+  if (formattedKey.includes('-----BEGIN')) {
+    return formattedKey
   }
   
   // Si es base64 sin headers, agregar headers PEM
-  const cleanKey = key.replace(/\\n/g, '').replace(/\s/g, '')
-  return `-----BEGIN PRIVATE KEY-----\n${cleanKey}\n-----END PRIVATE KEY-----\n`
+  // Limpiar espacios y saltos de línea extras
+  const cleanKey = formattedKey.replace(/\s/g, '')
+  
+  // Dividir en líneas de 64 caracteres (formato PEM estándar)
+  const lines = cleanKey.match(/.{1,64}/g) || [cleanKey]
+  
+  return `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----\n`
 }
 
 // Credenciales de la cuenta de servicio
