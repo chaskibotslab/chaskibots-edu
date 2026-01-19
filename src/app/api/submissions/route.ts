@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { uploadCodeToDrive, uploadImageToDrive, uploadFileToDrive } from '@/lib/googleDrive'
+import { uploadCodeToDrive, uploadImageToDrive, uploadFileToDrive, isDriveConfigured } from '@/lib/googleDrive'
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
@@ -103,51 +103,54 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Intentar subir archivos a Google Drive
+    // Intentar subir archivos a Google Drive (solo si está configurado)
     let driveLinks: string[] = []
     let uploadError = false
+    const driveEnabled = isDriveConfigured()
 
-    try {
-      // Subir código a Drive
-      if (code && process.env.GOOGLE_PRIVATE_KEY) {
-        const codeResult = await uploadCodeToDrive(
-          code,
-          output || '',
-          levelId || 'general',
-          studentName,
-          taskId
-        )
-        driveLinks.push(`Código: ${codeResult.webViewLink}`)
-      }
-
-      // Subir dibujo a Drive
-      if (drawing && process.env.GOOGLE_PRIVATE_KEY) {
-        const drawingResult = await uploadImageToDrive(
-          drawing,
-          levelId || 'general',
-          studentName,
-          taskId
-        )
-        driveLinks.push(`Dibujo: ${drawingResult.webViewLink}`)
-      }
-
-      // Subir archivos adicionales a Drive
-      if (files && files.length > 0 && process.env.GOOGLE_PRIVATE_KEY) {
-        for (const file of files) {
-          const fileResult = await uploadFileToDrive(
-            file.data,
-            file.name,
-            file.type || 'application/octet-stream',
+    if (driveEnabled) {
+      try {
+        // Subir código a Drive
+        if (code) {
+          const codeResult = await uploadCodeToDrive(
+            code,
+            output || '',
             levelId || 'general',
             studentName,
             taskId
           )
-          driveLinks.push(`${file.name}: ${fileResult.webViewLink}`)
+          driveLinks.push(`Código: ${codeResult.webViewLink}`)
         }
+
+        // Subir dibujo a Drive
+        if (drawing) {
+          const drawingResult = await uploadImageToDrive(
+            drawing,
+            levelId || 'general',
+            studentName,
+            taskId
+          )
+          driveLinks.push(`Dibujo: ${drawingResult.webViewLink}`)
+        }
+
+        // Subir archivos adicionales a Drive
+        if (files && files.length > 0) {
+          for (const file of files) {
+            const fileResult = await uploadFileToDrive(
+              file.data,
+              file.name,
+              file.type || 'application/octet-stream',
+              levelId || 'general',
+              studentName,
+              taskId
+            )
+            driveLinks.push(`${file.name}: ${fileResult.webViewLink}`)
+          }
+        }
+      } catch (driveError) {
+        console.error('Error uploading to Drive (continuing without Drive):', driveError)
+        uploadError = true
       }
-    } catch (driveError) {
-      console.error('Error uploading to Drive (continuing without Drive):', driveError)
-      uploadError = true
     }
 
     // Preparar información de adjuntos para Airtable
@@ -160,6 +163,14 @@ export async function POST(request: NextRequest) {
       if (files && files.length > 0) {
         attachmentsInfo += `\n[ARCHIVOS:${files.map((f: any) => f.name).join(',')}]`
       }
+    }
+
+    // Construir output final con links de Drive incluidos
+    let finalOutput = output || ''
+    if (driveLinks.length > 0) {
+      finalOutput += '\n\n📁 ARCHIVOS EN DRIVE:\n' + driveLinks.join('\n')
+    } else if (attachmentsInfo) {
+      finalOutput += attachmentsInfo
     }
 
     const response = await fetch(AIRTABLE_API_URL, {
@@ -177,10 +188,9 @@ export async function POST(request: NextRequest) {
             levelId: levelId || '',
             lessonId: lessonId || '',
             code,
-            output: (output || '') + attachmentsInfo,
+            output: finalOutput,
             submittedAt: new Date().toISOString(),
-            status: 'pending',
-            driveLinks: driveLinks.join('\n') || ''
+            status: 'pending'
           }
         }]
       })

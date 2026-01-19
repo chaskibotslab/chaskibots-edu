@@ -7,16 +7,35 @@ const SCOPES = ['https://www.googleapis.com/auth/drive.file']
 // ID de la carpeta principal de ChaskiBots en Drive
 const MAIN_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || '1rxUZrF96yBW7BTl4CMLM7FXF03JYaqpp'
 
+// Función para formatear la clave privada correctamente
+function formatPrivateKey(key: string): string {
+  if (!key) return ''
+  
+  // Si ya tiene los headers PEM, solo reemplazar \n
+  if (key.includes('-----BEGIN')) {
+    return key.replace(/\\n/g, '\n')
+  }
+  
+  // Si es base64 sin headers, agregar headers PEM
+  const cleanKey = key.replace(/\\n/g, '').replace(/\s/g, '')
+  return `-----BEGIN PRIVATE KEY-----\n${cleanKey}\n-----END PRIVATE KEY-----\n`
+}
+
 // Credenciales de la cuenta de servicio
 const credentials = {
   type: 'service_account',
   project_id: process.env.GOOGLE_PROJECT_ID || 'chaskibots-edu',
   private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID || '',
-  private_key: (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+  private_key: formatPrivateKey(process.env.GOOGLE_PRIVATE_KEY || ''),
   client_email: process.env.GOOGLE_CLIENT_EMAIL || 'chaskibots-drive@chaskibots-edu.iam.gserviceaccount.com',
   client_id: process.env.GOOGLE_CLIENT_ID || '',
   auth_uri: 'https://accounts.google.com/o/oauth2/auth',
   token_uri: 'https://oauth2.googleapis.com/token',
+}
+
+// Verificar si Drive está configurado correctamente
+export function isDriveConfigured(): boolean {
+  return !!(process.env.GOOGLE_PRIVATE_KEY && process.env.GOOGLE_CLIENT_EMAIL)
 }
 
 // Crear cliente de autenticación
