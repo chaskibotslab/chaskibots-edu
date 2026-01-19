@@ -66,24 +66,28 @@ export async function GET(request: NextRequest) {
       const questionsStr = record.fields.questions || ''
       const questions = questionsStr.split('|').filter((q: string) => q.trim())
       
-      // Parsear metadatos (type, category, difficulty guardados como JSON)
-      let metadata = { type: 'concept', category: 'general', difficulty: 'basico' }
-      if (record.fields.metadata) {
-        try {
-          metadata = JSON.parse(record.fields.metadata)
-        } catch {
-          // Si falla el parse, usar valores por defecto
-        }
+      // Parsear metadatos desde prefijo en description: [type|category|difficulty] descripcion
+      let taskType = 'concept'
+      let category = 'general'
+      let difficulty = 'basico'
+      let description = record.fields.description || ''
+      
+      const metaMatch = description.match(/^\[([^|]+)\|([^|]+)\|([^\]]+)\]\s*(.*)$/)
+      if (metaMatch) {
+        taskType = metaMatch[1] || 'concept'
+        category = metaMatch[2] || 'general'
+        difficulty = metaMatch[3] || 'basico'
+        description = metaMatch[4] || ''
       }
       
       return {
         id: record.id,
         levelId: record.fields.levelId || '',
         title: record.fields.title || '',
-        description: record.fields.description || '',
-        type: record.fields.type || metadata.type || 'concept',
-        category: record.fields.category || metadata.category || 'general',
-        difficulty: record.fields.difficulty || metadata.difficulty || 'basico',
+        description,
+        type: taskType,
+        category,
+        difficulty,
         points: record.fields.points || 10,
         dueDate: record.fields.dueDate || '',
         isActive: record.fields.isActive !== false,
@@ -117,29 +121,22 @@ export async function POST(request: NextRequest) {
       ? questions.filter((q: string) => q && q.trim()).join('|') 
       : (questions || '')
 
-    // Construir campos - solo incluir los que tienen valor
-    // NOTA: type, category, difficulty se guardan como texto para evitar errores de Single Select en Airtable
+    // Construir campos - solo incluir los que existen en Airtable
+    // NOTA: type, category, difficulty se guardan como prefijo en description
+    const metaPrefix = `[${type || 'concept'}|${category || 'general'}|${difficulty || 'basico'}]`
+    const fullDescription = `${metaPrefix} ${description || ''}`
+    
     const fields: Record<string, any> = {
       levelId: String(levelId),
       title: String(title),
       isActive: true,
-      createdAt: new Date().toISOString().split('T')[0]
+      createdAt: new Date().toISOString().split('T')[0],
+      description: fullDescription
     }
 
-    // Guardar metadatos como JSON en un campo de texto para evitar problemas con Single Select
-    const metadata = {
-      type: type || 'concept',
-      category: category || 'general',
-      difficulty: difficulty || 'basico'
-    }
-    fields.metadata = JSON.stringify(metadata)
-
-    if (description) fields.description = String(description)
     if (points) fields.points = Number(points) || 10
     if (dueDate) fields.dueDate = String(dueDate)
     if (questionsStr) fields.questions = questionsStr
-    if (attachmentUrl) fields.attachmentUrl = String(attachmentUrl)
-    if (attachmentType && attachmentType !== 'none') fields.attachmentType = String(attachmentType)
 
     console.log('Creating task with fields:', fields)
 
