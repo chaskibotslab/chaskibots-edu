@@ -66,14 +66,24 @@ export async function GET(request: NextRequest) {
       const questionsStr = record.fields.questions || ''
       const questions = questionsStr.split('|').filter((q: string) => q.trim())
       
+      // Parsear metadatos (type, category, difficulty guardados como JSON)
+      let metadata = { type: 'concept', category: 'general', difficulty: 'basico' }
+      if (record.fields.metadata) {
+        try {
+          metadata = JSON.parse(record.fields.metadata)
+        } catch {
+          // Si falla el parse, usar valores por defecto
+        }
+      }
+      
       return {
         id: record.id,
         levelId: record.fields.levelId || '',
         title: record.fields.title || '',
         description: record.fields.description || '',
-        type: record.fields.type || 'concept',
-        category: record.fields.category || 'general',
-        difficulty: record.fields.difficulty || 'basico',
+        type: record.fields.type || metadata.type || 'concept',
+        category: record.fields.category || metadata.category || 'general',
+        difficulty: record.fields.difficulty || metadata.difficulty || 'basico',
         points: record.fields.points || 10,
         dueDate: record.fields.dueDate || '',
         isActive: record.fields.isActive !== false,
@@ -108,6 +118,7 @@ export async function POST(request: NextRequest) {
       : (questions || '')
 
     // Construir campos - solo incluir los que tienen valor
+    // NOTA: type, category, difficulty se guardan como texto para evitar errores de Single Select en Airtable
     const fields: Record<string, any> = {
       levelId: String(levelId),
       title: String(title),
@@ -115,10 +126,15 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString().split('T')[0]
     }
 
+    // Guardar metadatos como JSON en un campo de texto para evitar problemas con Single Select
+    const metadata = {
+      type: type || 'concept',
+      category: category || 'general',
+      difficulty: difficulty || 'basico'
+    }
+    fields.metadata = JSON.stringify(metadata)
+
     if (description) fields.description = String(description)
-    if (type) fields.type = String(type)
-    if (category) fields.category = String(category)
-    if (difficulty) fields.difficulty = String(difficulty)
     if (points) fields.points = Number(points) || 10
     if (dueDate) fields.dueDate = String(dueDate)
     if (questionsStr) fields.questions = questionsStr
