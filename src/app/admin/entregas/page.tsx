@@ -9,7 +9,7 @@ import {
   ArrowLeft, FileText, Search, Filter, Check, X, Clock,
   Eye, Trash2, Download, ChevronDown, Loader2, Code,
   Calendar, User, GraduationCap, Star, MessageSquare,
-  Image, Paperclip
+  Image, Paperclip, Edit3, RotateCcw
 } from 'lucide-react'
 
 interface Submission {
@@ -305,10 +305,18 @@ export default function EntregasPage() {
                           setGradeInput(submission.grade?.toString() || '')
                           setFeedbackInput(submission.feedback || '')
                         }}
-                        className="p-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg transition-colors"
-                        title="Ver y calificar"
+                        className={`p-2 rounded-lg transition-colors ${
+                          submission.status === 'graded'
+                            ? 'bg-green-500/20 hover:bg-green-500/30 text-green-400'
+                            : 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-400'
+                        }`}
+                        title={submission.status === 'graded' ? 'Editar calificación' : 'Calificar'}
                       >
-                        <Eye className="w-5 h-5" />
+                        {submission.status === 'graded' ? (
+                          <Edit3 className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
                       </button>
                       <button
                         onClick={() => handleDelete(submission.id)}
