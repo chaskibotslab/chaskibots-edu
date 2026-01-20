@@ -233,8 +233,9 @@ export async function PATCH(request: NextRequest) {
       status: status || 'graded'
     }
     
+    // grade debe ser string porque Airtable lo tiene como texto
     if (grade !== undefined && grade !== null && grade !== '') {
-      fields.grade = Number(grade)
+      fields.grade = String(grade)
     }
     if (feedback) {
       fields.feedback = String(feedback)

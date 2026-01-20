@@ -71,8 +71,8 @@ export default function EntregasPage() {
     if (!selectedSubmission) return
     
     const grade = parseFloat(gradeInput)
-    if (isNaN(grade) || grade < 0 || grade > 100) {
-      alert('La calificación debe ser un número entre 0 y 100')
+    if (isNaN(grade) || grade < 0 || grade > 10) {
+      alert('La calificación debe ser un número entre 0 y 10')
       return
     }
 
@@ -284,7 +284,7 @@ export default function EntregasPage() {
                         {submission.grade !== undefined && (
                           <span className="flex items-center gap-1 text-green-400">
                             <Star className="w-4 h-4" />
-                            {submission.grade}/100
+                            {submission.grade}/10
                           </span>
                         )}
                       </div>
@@ -434,16 +434,17 @@ export default function EntregasPage() {
               <div className="mt-4 grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
-                    Calificación (0-100)
+                    Calificación (0-10)
                   </label>
                   <input
                     type="number"
                     min="0"
-                    max="100"
+                    max="10"
+                    step="0.5"
                     value={gradeInput}
                     onChange={(e) => setGradeInput(e.target.value)}
                     className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
-                    placeholder="Ej: 85"
+                    placeholder="Ej: 8.5"
                   />
                 </div>
                 <div>
