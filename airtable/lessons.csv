@@ -24,18 +24,54 @@ tercero-egb,Módulo 1: Robots Escaladores,Robot Escalador,video,15 min,1,,Introd
 tercero-egb,Módulo 1: Robots Escaladores,Ensamblaje Escalador,activity,35 min,2,,Ensambla tu robot escalador,false
 tercero-egb,Módulo 2: Energía Eólica,Robot Eólico,video,12 min,3,,Aprende sobre energía eólica y robots,false
 tercero-egb,Módulo 2: Energía Eólica,Construyendo Eólico,project,40 min,4,,Construye tu robot eólico,true
-cuarto-egb,Módulo 1: Electrónica Básica,Rueda de la Fortuna,video,15 min,1,,Introducción a circuitos con la rueda de la fortuna,false
-cuarto-egb,Módulo 1: Electrónica Básica,Ensamblaje Rueda,activity,30 min,2,,Ensambla tu rueda de la fortuna electrónica,false
-cuarto-egb,Módulo 2: Radio FM,Introducción a Radio FM,video,12 min,3,,Cómo funciona una radio FM,false
-cuarto-egb,Módulo 2: Radio FM,Construyendo Radio,project,35 min,4,,Construye tu radio FM 76-108MHz,true
-quinto-egb,Módulo 1: Radio Avanzada,Radio RF-FM,video,15 min,1,,Diferencias entre RF y FM,false
-quinto-egb,Módulo 1: Radio Avanzada,Ensamblaje Radio RF,activity,35 min,2,,Ensambla tu radio RF-FM,false
-sexto-egb,Módulo 1: Robot 4 en 1,Introducción Robot 4 en 1,video,15 min,1,,Conoce las 4 configuraciones del robot,false
-sexto-egb,Módulo 1: Robot 4 en 1,Configuración 1,activity,30 min,2,,Primera configuración del robot,false
-sexto-egb,Módulo 2: Circuitos Electrónicos,Generador Aleatorio,video,12 min,3,,Circuito generador aleatorio con micrófono,false
-sexto-egb,Módulo 2: Circuitos Electrónicos,Ensamblaje Circuito,project,35 min,4,,Construye el circuito generador,true
-septimo-egb,Módulo 1: Proyectos Avanzados,Robot 4 en 1 Avanzado,video,15 min,1,,Configuraciones avanzadas del robot,false
-septimo-egb,Módulo 1: Proyectos Avanzados,Avión DIY,project,40 min,2,,Construye tu avión DIY,false
+cuarto-egb,Semana 1-2: Kit Extra,Práctica 1-2: LED Básico y Pulsador,activity,40 min,1,,LED con resistencia 220Ω. Polaridad (pata larga +). Pulsador cierra/abre circuito. Concepto: interruptor y limitación de corriente.,false
+cuarto-egb,Semana 1-2: Kit Extra,Práctica 3-4: Potenciómetro y Buzzer,activity,45 min,2,,Potenciómetro controla brillo LED (divisor voltaje). Buzzer con transistor 2N2222A. Diferentes frecuencias = tonos diferentes.,false
+cuarto-egb,Semana 1-2: Kit Extra,Práctica 5-6: Transistor y Alarma,activity,50 min,3,,Transistor como switch electrónico (Base Colector Emisor). Proyecto integrado: pulsador activa buzzer + LED parpadeante.,false
+cuarto-egb,Semana 3-5: Avión Motorizado,Construcción Avanzada del Avión,project,60 min,4,,Alas de balsa reforzadas. Motor brushless potente. Balance preciso del centro de gravedad. Mejora respecto a 3º EGB.,false
+cuarto-egb,Semana 3-5: Avión Motorizado,Electrónica de Navegación,activity,45 min,5,,LEDs de navegación del Kit Extra: verde ala derecha rojo ala izquierda. Buzzer de despegue. Circuito con switch.,false
+cuarto-egb,Semana 3-5: Avión Motorizado,Vuelo Nocturno y Competencia,activity,50 min,6,,LEDs de colores efecto visual. Vuelos al atardecer. Competencia: distancia + estabilidad. Seguridad en vuelo.,false
+cuarto-egb,Semana 6-9: Rueda de la Fortuna,Mecánica de Estructura,project,60 min,7,,Rueda 40cm diámetro. Motor con reducción 1:100. Base estable cartón/MDF. 8 góndolas colgantes balanceadas.,false
+cuarto-egb,Semana 6-9: Rueda de la Fortuna,Sistema de Rotación e Iluminación,activity,55 min,8,,Transmisión de engranajes. Motor lento con torque. 8 LEDs en paralelo. Secuencias: todas juntas alternadas persecución.,false
+cuarto-egb,Semana 6-9: Rueda de la Fortuna,Música y Presentación,activity,45 min,9,,Buzzer con melodía simple. Sincronizar luces con música. Feria de atracciones miniatura completa.,false
+cuarto-egb,Semana 10-12: Radio FM,Ensamblaje de Radio,project,60 min,10,,Kit radio FM 76-108MHz. Identificar componentes en PCB. Soldar componentes pequeños (práctica soldadura fina).,false
+cuarto-egb,Semana 10-12: Radio FM,Sintonización y Antena,activity,45 min,11,,Capacitor variable para sintonizar. Antena telescópica o cable 75cm. Buscar emisoras locales. Ajustar volumen.,false
+cuarto-egb,Semana 10-12: Radio FM,Conceptos de Ondas y Física,video,30 min,12,,¿Cómo viaja el sonido por ondas? Modulación FM vs AM. Frecuencias y espectro electromagnético. Historia de la radio.,true
+quinto-egb,Semana 1-2: Kit Extra Repaso,Kit Extra Rápido e Independiente,activity,45 min,1,,Mismas 6 prácticas que 4º pero más rápido. Mayor independencia. Énfasis en aplicaciones prácticas y creatividad.,false
+quinto-egb,Semana 1-2: Kit Extra Repaso,Circuitos Complejos en Protoboard,activity,50 min,2,,Usar protoboard con más componentes simultáneos. Proyectos personalizados. Introducción a circuitos más complejos.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Diseño y Planificación,video,30 min,3,,Rueda 50cm diámetro. 12 góndolas. Diseño personalizado (tema: feria espacio fantasía). Planificación completa.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Construcción Mecánica Reforzada,project,70 min,4,,Estructura reforzada. Motor con control velocidad variable. Base giratoria con rodamientos. Balance perfecto.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Sistema Iluminación Complejo,activity,60 min,5,,12 LEDs + 1 LED RGB central. Secuencias con temporizador 555. Efectos: persecución fade arcoíris.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Control de Velocidad,activity,45 min,6,,Potenciómetro del Kit Extra controla velocidad motor. Lento para subir pasajeros rápido para emoción.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Sonidos Efectos y Presentación,activity,50 min,7,,Buzzer con diferentes tonos. Sensor proximidad opcional. Competencia: diseño más creativo mejor iluminación.,false
+quinto-egb,Semana 9-12: Radio RF-FM,Ensamblaje Completo Radio Avanzada,project,70 min,8,,Kit radio más avanzado. Más componentes mayor sensibilidad. Soldar 40+ piezas con precisión.,false
+quinto-egb,Semana 9-12: Radio RF-FM,Calibración Precisa,activity,50 min,9,,Ajuste fino de frecuencias. Capacitor variable. Bobina para mejorar recepción. Filtros de ruido.,false
+quinto-egb,Semana 9-12: Radio RF-FM,Amplificador de Audio,activity,55 min,10,,Agregar etapa amplificadora. Altavoz de mejor calidad. Control de volumen y tono (graves/agudos).,false
+quinto-egb,Semana 9-12: Radio RF-FM,Teoría de Comunicaciones,video,35 min,11,,Modulación AM vs FM. Ancho de banda. Propagación de ondas. Aplicaciones: WiFi Bluetooth radio.,false
+quinto-egb,Semana 9-12: Radio RF-FM,Competencia Final Radio,project,45 min,12,,Demostración de radio funcionando. Sintonizar emisoras. Calidad de audio. Presentación técnica.,true
+sexto-egb,Semana 1-2: Kit Extra Aplicado,Mini-Proyectos con Kit Extra,activity,50 min,1,,Semáforo automático con LEDs. Sistema seguridad con buzzer. Indicador nivel batería. Control remoto IR simple.,false
+sexto-egb,Semana 1-2: Kit Extra Aplicado,Aplicaciones Prácticas Reales,activity,45 min,2,,Usar componentes del Kit para proyectos personales pequeños. Creatividad y aplicación de conocimientos.,false
+sexto-egb,Semana 3-6: Carro Solar,Energía Fotovoltaica,video,30 min,3,,¿Cómo funcionan celdas solares? Luz→electricidad. Panel solar 6V/100mA. Medir voltaje con multímetro.,false
+sexto-egb,Semana 3-6: Carro Solar,Construcción del Chasis,project,60 min,4,,Chasis ligero plástico/cartón. Panel solar en techo. 2 motores pequeños bajo consumo. 4 ruedas eficientes.,false
+sexto-egb,Semana 3-6: Carro Solar,Sistema de Almacenamiento,activity,50 min,5,,Batería recargable NiMH. Circuito de carga solar. Diodo evita descarga inversa. Pruebas de carga.,false
+sexto-egb,Semana 3-6: Carro Solar,Pruebas y Competencia Solar,activity,45 min,6,,Pruebas exterior sol directo. Interior con lámpara. Competencia: ¿cuánto tiempo funciona después de 1h carga?,false
+sexto-egb,Semana 7-12: Robot 4 en 1,Construcción Base del Robot,project,60 min,7,,Chasis robusto. 2 motores con driver L293D. Espacio para 4 sistemas sensores. Portapilas central.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,MODO 1 - Control por Voz/Aplauso,activity,50 min,8,,Micrófono electret detecta sonido. Circuito amplificador. 1 palmada=avanza 2=gira 3=detiene.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,MODO 2 - Control Infrarrojo,activity,50 min,9,,Receptor IR y control remoto. Comandos: adelante atrás izquierda derecha stop. Programar respuestas.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,MODO 3 - Seguidor de Línea,activity,55 min,10,,2 sensores IR parte inferior. Detectan línea negra sobre blanco. Lógica: si sensor pierde línea→gira.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,MODO 4 - Evita Obstáculos Táctil,activity,50 min,11,,2 bumpers (switches) adelante. Toca obstáculo→retrocede→gira 90°→continúa. Navegación por contacto.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,Competencias y Comparación,project,60 min,12,,Carrera con cada modo. ¿Cuál más preciso? ¿Más rápido? ¿Más autónomo? Sensores = sentidos del robot.,true
+septimo-egb,Semana 1: Kit Extra,Kit Extra Rápido Experto,activity,40 min,1,,Las 6 prácticas en una semana. Ya dominan componentes. Mayor velocidad y autonomía total.,false
+septimo-egb,Semana 2: Programación Visual,Scratch/Blockly Introducción,tutorial,50 min,2,,Programación sin código. Bloques tipo puzzle. Conceptos: secuencias bucles (repeat) condicionales (if).,false
+septimo-egb,Semana 2: Programación Visual,Programas en Scratch,activity,55 min,3,,Programa 1: Secuencia simple. Programa 2: Bucle repeat 10. Programa 3: Condicional si toca borde rebotar. Programa 4: Variables contador.,false
+septimo-egb,Semana 3-6: Carro Robot Avanzado,Planificación Multi-Sensor,video,30 min,4,,Robot con 3 sensores: ultrasónico (adelante) IR (abajo línea) bumpers (laterales). Todo integrado.,false
+septimo-egb,Semana 3-6: Carro Robot Avanzado,Construcción e Integración,project,70 min,5,,Chasis grande para sensores. Driver L298N. Conexiones organizadas. Cable management profesional.,false
+septimo-egb,Semana 3-6: Carro Robot Avanzado,Lógica de Comportamiento,tutorial,45 min,6,,Escribir pseudocódigo en papel: SI obstáculo a 20cm ENTONCES detener y girar. Lógica completa.,false
+septimo-egb,Semana 3-6: Carro Robot Avanzado,Pruebas y Ajustes,activity,50 min,7,,Probar cada sensor individualmente. Luego combinados. Pista con línea + obstáculos. Ajustar tiempos.,false
+septimo-egb,Semana 7-10: Robot 4en1 Mejorado,Construcción Versión Mejorada,project,60 min,8,,Mismos 4 modos que 6º pero mejorados. Sensores más sensibles. Mejor control motores. Más robusto.,false
+septimo-egb,Semana 7-10: Robot 4en1 Mejorado,Personalización con Bloques,activity,50 min,9,,Usar bloques simulador para diseñar comportamiento. Ajustar sensibilidad. Velocidades variables.,false
+septimo-egb,Semana 7-10: Robot 4en1 Mejorado,Secuencias Complejas,activity,55 min,10,,Programar: avanza→detecta línea→sigue 1m→busca obstáculo→empuja. Combinar múltiples modos.,false
+septimo-egb,Semana 11-12: Preparación 8º EGB,Introducción a Microcontroladores,video,35 min,11,,¿Qué es microcontrolador? Arduino vs ESP32. Pines digitales vs analógicos. Diferencia robot mecánico vs programable.,false
+septimo-egb,Semana 11-12: Preparación 8º EGB,Primer Contacto con Código,tutorial,45 min,12,,Ver código Arduino IDE sin programar. Estructura: setup() loop(). Leer código LED parpadeante. Comparar con Scratch.,true
 octavo-egb,Semana 1-2: Kit Extra y Arduino IDE,Kit Extra Completo,activity,60 min,1,,Las 6 prácticas del Kit Extra en 5 días. Preparación para programación real con microcontroladores.,false
 octavo-egb,Semana 1-2: Kit Extra y Arduino IDE,Setup Arduino IDE,tutorial,45 min,2,,Instalar Arduino IDE. Configurar placa ESP32. Drivers USB. Primer programa Blink. Conceptos: pinMode digitalWrite delay.,false
 octavo-egb,Semana 3-4: LEDs y Semáforo,LEDs de la PCB RC DRAGON,tutorial,30 min,3,,Identificar LEDs D1 D6 en PCB. Encenderlos con código. Parpadeo alternado. Concepto OUTPUT digital.,false
