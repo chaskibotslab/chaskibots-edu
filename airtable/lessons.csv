@@ -6,24 +6,50 @@ inicial-1,Módulo 1: Bienvenida al Mundo Tech,Colores de la tecnología,activity
 inicial-1,Módulo 2: Conociendo Mi Kit,Mi caja de herramientas,video,10 min,5,,Exploramos los componentes del kit inicial,false
 inicial-1,Módulo 2: Conociendo Mi Kit,LEDs mágicos,activity,15 min,6,,Encendemos nuestro primer LED,false
 inicial-1,Módulo 2: Conociendo Mi Kit,Circuito con stickers,project,20 min,7,,Proyecto: Crear un circuito decorativo con stickers conductores,true
-inicial-2,Módulo 1: Introducción a Circuitos,¿Qué es un circuito?,video,10 min,1,,Aprende qué es un circuito eléctrico básico,false
-inicial-2,Módulo 1: Introducción a Circuitos,Mi Primer LED,activity,15 min,2,,Enciende tu primer LED con el kit inicial,false
-inicial-2,Módulo 1: Introducción a Circuitos,Generador Eólico,project,25 min,3,,Construye un generador eólico simple,true
-inicial-2,Módulo 2: Explorando la IA,Conociendo la IA,video,10 min,4,,¿Qué es la inteligencia artificial?,false
-inicial-2,Módulo 2: Explorando la IA,Detector de Colores,activity,15 min,5,,Usa la cámara para detectar colores,false
-primero-egb,Módulo 1: Mis Primeros Robots,Robot con Articulaciones,video,15 min,1,,Introducción al ensamblaje de robots articulados,false
-primero-egb,Módulo 1: Mis Primeros Robots,Ensamblando el Robot,activity,30 min,2,,Ensambla tu primer robot articulado paso a paso,false
-primero-egb,Módulo 1: Mis Primeros Robots,Robot Pintor,project,35 min,3,,Construye un robot que puede dibujar,true
-primero-egb,Módulo 2: Robot 4x4,Introducción al 4x4,video,10 min,4,,Conoce las partes del robot todo terreno,false
-primero-egb,Módulo 2: Robot 4x4,Armando el 4x4,activity,40 min,5,,Arma tu robot todo terreno,true
-segundo-egb,Módulo 1: Robots Avanzados,Robot Radiocontrolado,video,15 min,1,,Introducción a los robots con control remoto,false
-segundo-egb,Módulo 1: Robots Avanzados,Ensamblaje RC,activity,35 min,2,,Ensambla tu robot radiocontrolado,false
-segundo-egb,Módulo 2: Navegación Acuática,Robot Acuático,video,12 min,3,,Conoce cómo funcionan los robots acuáticos,false
-segundo-egb,Módulo 2: Navegación Acuática,Construyendo el Barco,project,40 min,4,,Construye tu robot de navegación acuática,true
-tercero-egb,Módulo 1: Robots Escaladores,Robot Escalador,video,15 min,1,,Introducción a los mecanismos de escalada,false
-tercero-egb,Módulo 1: Robots Escaladores,Ensamblaje Escalador,activity,35 min,2,,Ensambla tu robot escalador,false
-tercero-egb,Módulo 2: Energía Eólica,Robot Eólico,video,12 min,3,,Aprende sobre energía eólica y robots,false
-tercero-egb,Módulo 2: Energía Eólica,Construyendo Eólico,project,40 min,4,,Construye tu robot eólico,true
+inicial-2,Semana 1-2: Electricidad Básica,¿Qué necesita electricidad?,video,15 min,1,,Clasificar objetos que usan electricidad. Experimento con linterna (quitar/poner pilas). Circuito abierto vs cerrado.,false
+inicial-2,Semana 1-2: Electricidad Básica,Primer Circuito con LED,activity,25 min,2,,Pegar cinta de cobre en plantilla. Colocar pila CR2032 y LED 3mm. ¡Enciende! Aprender polaridad (+ y -).,false
+inicial-2,Semana 3-4: Circuitos Creativos,Circuito en Paralelo,activity,30 min,3,,Crear circuito con 2 LEDs. Camino se divide en Y. Si un LED falla el otro funciona (redundancia).,false
+inicial-2,Semana 3-4: Circuitos Creativos,Proyecto Arte Eléctrico,project,35 min,4,,Decorar circuito con dibujos. Agregar más LEDs de colores. Galería de arte eléctrico.,false
+inicial-2,Semana 5-6: Generador Eólico,Energía Renovable,video,15 min,5,,¿De dónde viene electricidad? Energía renovable vs no renovable. Ensamblar generador eólico.,false
+inicial-2,Semana 5-6: Generador Eólico,Experimentos con Viento,activity,25 min,6,,Soplar→LED enciende. Viento suave vs fuerte. LED más/menos brillante. Decorar hélice. Energía limpia.,false
+inicial-2,Semana 7-8: Introducción Robots,¿Qué es un Robot?,video,20 min,7,,Videos de robots (aspiradora brazo carro). Robot = máquina que hace tareas sola. Dibujar robot imaginario.,false
+inicial-2,Semana 7-8: Introducción Robots,Feria de Robótica,project,30 min,8,,Presentar proyectos a padres. Explicar cómo funcionan. Certificado Pequeño Ingeniero.,true
+primero-egb,Semana 1-4: Robot Pintor,Base y Ruedas,activity,30 min,1,,Ensamblar base acrílica. Instalar 2 ruedas traseras con tornillos. Porta-marcador como tercera pata.,false
+primero-egb,Semana 1-4: Robot Pintor,Motor y Leva Excéntrica,activity,35 min,2,,Fijar motor en centro. Instalar leva descentrada en eje. Girar a mano→vibración. Concepto: peso desequilibrado.,false
+primero-egb,Semana 1-4: Robot Pintor,Soldadura Supervisada 1:1,tutorial,40 min,3,,Soldadura con cautín supervisión 1:1. Soldar: portapilas→interruptor→motor. Verificar con multímetro. ¡Motor gira!,false
+primero-egb,Semana 1-4: Robot Pintor,Pruebas y Competencia,project,35 min,4,,Colocar marcador. Robot dibuja patrones al vibrar. Diferentes superficies. Competencia: patrón más creativo.,false
+primero-egb,Semana 5-8: Carro Jet,Concepto de Propulsión,video,20 min,5,,Acción-reacción. Ensamblar chasis. Instalar 4 ruedas. Concepto: empuje hacia atrás = avance.,false
+primero-egb,Semana 5-8: Carro Jet,Motor y Hélice,activity,35 min,6,,Fijar motor en parte trasera. Instalar hélice bien ajustada. Girar→genera viento. ⚠️No tocar hélice en movimiento.,false
+primero-egb,Semana 5-8: Carro Jet,Circuito Eléctrico Jet,tutorial,40 min,7,,Soldadura del circuito mismo proceso. Motor gira→hélice empuja aire. Verificar funcionamiento.,false
+primero-egb,Semana 5-8: Carro Jet,Carreras y Conceptos IA,activity,30 min,8,,Pista de 3 metros. Competencia velocidad. ¿Puede evitar chocar? No necesita sensores. Intro IA.,false
+primero-egb,Semana 9-12: Robot Perro,Biomimética,video,20 min,9,,Bio(vida)+Mímesis(imitar). Cómo caminan perros. Ensamblar cuerpo + 4 patas articuladas.,false
+primero-egb,Semana 9-12: Robot Perro,Mecanismo de Caminata,activity,40 min,10,,Motor central con 4 levas desfasadas 90°. Conectar a patas. Girar a mano→patas se mueven alternadas.,false
+primero-egb,Semana 9-12: Robot Perro,Circuito y Decoración,tutorial,35 min,11,,Soldar circuito. Decorar: ojos cola de cartulina nariz. Pruebas de caminata.,false
+primero-egb,Semana 9-12: Robot Perro,Exposición Final 3 Robots,project,45 min,12,,Presentar 3 robots a padres. Explicar funcionamiento. Demostración. Certificados.,true
+segundo-egb,Semana 1-4: Pez Robótico,Movimiento Ondulatorio,video,20 min,1,,Cómo nadan peces (cola se mueve lado a lado). Ensamblar cuerpo del pez. Cola articulada.,false
+segundo-egb,Semana 1-4: Pez Robótico,Motor y Mecanismo,activity,35 min,2,,Motor genera oscilación. Barra conecta motor a cola. Probar movimiento en seco (sin agua).,false
+segundo-egb,Semana 1-4: Pez Robótico,Impermeabilización,tutorial,40 min,3,,⚠️Agua+electricidad=peligro. Sellar compartimento motor con silicona. Soldar circuito supervisión 1:2.,false
+segundo-egb,Semana 1-4: Pez Robótico,Pruebas en Agua,project,35 min,4,,Piscina inflable pequeña. ¿Flota? ¿Se mueve? Ajustar peso con plastilina. Competencia de natación.,false
+segundo-egb,Semana 5-8: Lámpara Moderna,Diseño y Planificación,video,20 min,5,,Tipos de lámparas. Boceto personal. Ensamblar estructura base de lámpara.,false
+segundo-egb,Semana 5-8: Lámpara Moderna,Circuito 5 LEDs Paralelo,activity,40 min,6,,5 LEDs en paralelo diferentes colores. Calcular resistencias necesarias. Diseño del circuito.,false
+segundo-egb,Semana 5-8: Lámpara Moderna,Soldadura Compleja,tutorial,45 min,7,,Supervisión 1:2. Soldar 5 LEDs + resistencias. Verificar cada LED individualmente.,false
+segundo-egb,Semana 5-8: Lámpara Moderna,Decoración y Exposición,project,35 min,8,,Pantalla decorativa (papel translúcido tela). Pintar base. Galería de lámparas.,false
+segundo-egb,Semana 9-12: Carro RC,Control Remoto Conceptos,video,20 min,9,,¿Cómo funcionan controles remotos? (ondas radio). Ensamblar chasis RC. 2 motores: dirección + tracción.,false
+segundo-egb,Semana 9-12: Carro RC,Sistema de Dirección,activity,40 min,10,,Servomotor para volante. Calibrar ángulos (izq centro der). Probar giros manualmente.,false
+segundo-egb,Semana 9-12: Carro RC,Circuito RC Completo,tutorial,45 min,11,,Receptor RF + controlador. Soldar conexiones. Emparejar control remoto con receptor.,false
+segundo-egb,Semana 9-12: Carro RC,Carreras y Competencias,project,40 min,12,,Pista con curvas. Control a distancia. Slalom. Concepto: navegación manual vs autónoma.,true
+tercero-egb,Semana 1-4: Carrusel Giratorio,Mecanismos Rotacionales,video,20 min,1,,Cómo funcionan carruseles. Base giratoria central. Ensamblar plataforma circular grande.,false
+tercero-egb,Semana 1-4: Carrusel Giratorio,Transmisión Vertical,activity,40 min,2,,Motor horizontal→eje vertical. Engranajes cónicos 90°. Instalar 6-8 asientos colgantes.,false
+tercero-egb,Semana 1-4: Carrusel Giratorio,Iluminación Decorativa,tutorial,35 min,3,,LEDs en borde giratorio. Contactos rotatorios (escobillas cobre). Circuito con switch. Soldadura.,false
+tercero-egb,Semana 1-4: Carrusel Giratorio,Decoración y Música,project,40 min,4,,Pintar carrusel colores vivos. Buzzer con melodía simple. Presentación con luces y música.,false
+tercero-egb,Semana 5-8: Planeador Motorizado,Aerodinámica Básica,video,20 min,5,,Por qué vuelan aviones (sustentación). Ensamblar alas de balsa/foam. Probar planeando sin motor.,false
+tercero-egb,Semana 5-8: Planeador Motorizado,Motor de Propulsión,activity,40 min,6,,Hélice frontal. Balance centro de gravedad. Instalar motor en nariz. Agregar peso si necesario.,false
+tercero-egb,Semana 5-8: Planeador Motorizado,Circuito de Vuelo,tutorial,35 min,7,,Batería ligera LiPo 3.7V con supervisión. Interruptor de seguridad. Soldar circuito compacto.,false
+tercero-egb,Semana 5-8: Planeador Motorizado,Vuelos de Prueba,project,45 min,8,,⚠️Solo exterior área despejada. Lanzar y observar trayectoria. Ajustar timón/alerones. Competencia distancia.,false
+tercero-egb,Semana 9-12: Carro Eólico,Energía del Viento,video,20 min,9,,Molinos históricos. Ensamblar chasis. Diseñar aspas grandes (cartón o plástico).,false
+tercero-egb,Semana 9-12: Carro Eólico,Transmisión Eólica,activity,40 min,10,,Viento→aspas→eje→ruedas. Sistema de engranajes aumentar velocidad. Probar con ventilador.,false
+tercero-egb,Semana 9-12: Carro Eólico,Optimización,activity,35 min,11,,Diferentes tamaños aspas. Diferentes ángulos. Medir: ¿cuál más eficiente? Registrar resultados.,false
+tercero-egb,Semana 9-12: Carro Eólico,Carreras Eólicas,project,45 min,12,,Pista con 3 ventiladores. ¿Qué carro llega más lejos? Concepto: energía renovable en transporte.,true
 cuarto-egb,Semana 1-2: Kit Extra,Práctica 1-2: LED Básico y Pulsador,activity,40 min,1,,LED con resistencia 220Ω. Polaridad (pata larga +). Pulsador cierra/abre circuito. Concepto: interruptor y limitación de corriente.,false
 cuarto-egb,Semana 1-2: Kit Extra,Práctica 3-4: Potenciómetro y Buzzer,activity,45 min,2,,Potenciómetro controla brillo LED (divisor voltaje). Buzzer con transistor 2N2222A. Diferentes frecuencias = tonos diferentes.,false
 cuarto-egb,Semana 1-2: Kit Extra,Práctica 5-6: Transistor y Alarma,activity,50 min,3,,Transistor como switch electrónico (Base Colector Emisor). Proyecto integrado: pulsador activa buzzer + LED parpadeante.,false
