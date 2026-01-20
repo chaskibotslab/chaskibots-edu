@@ -51,12 +51,27 @@ primero-bach,Módulo 1: Arduino Avanzado,Introducción Robot Otto,video,20 min,1
 primero-bach,Módulo 1: Arduino Avanzado,Ensamblaje Otto,activity,45 min,2,,Ensambla tu robot Otto,false
 primero-bach,Módulo 1: Arduino Avanzado,Programación Otto,tutorial,40 min,3,,Programa movimientos básicos de Otto,false
 primero-bach,Módulo 1: Arduino Avanzado,Proyecto Otto,project,60 min,4,,Proyecto final con robot Otto,true
-segundo-bach,Módulo 1: Robótica Competitiva,Robot Soccer,video,20 min,1,,Introducción a robots de competencia,false
-segundo-bach,Módulo 1: Robótica Competitiva,Ensamblaje Soccer,activity,50 min,2,,Ensambla tu robot soccer,false
-segundo-bach,Módulo 2: Mini Sumo,Robot Mini Sumo,video,15 min,3,,Estrategias para mini sumo,false
-segundo-bach,Módulo 2: Mini Sumo,Programación Sumo,activity,45 min,4,,Programa tu robot mini sumo,false
-segundo-bach,Módulo 2: Mini Sumo,Proyecto Competencia,project,60 min,5,,Prepara tu robot para competir,true
-tercero-bach,Módulo 1: IoT Básico,Introducción a IoT,video,20 min,1,,¿Qué es el Internet de las Cosas?,false
-tercero-bach,Módulo 1: IoT Básico,Sensores IoT,activity,35 min,2,,Conecta sensores de temperatura luz y humedad,false
-tercero-bach,Módulo 2: Domótica,Casa Inteligente,video,15 min,3,,Introducción a la domótica,false
-tercero-bach,Módulo 2: Domótica,Proyecto Domótica,project,60 min,4,,Crea tu sistema de domótica con ESP32,true
+segundo-bach,Semana 1-2: Kit Extra y Repaso,Kit Extra Rápido,video,20 min,1,,Práctica de componentes del Kit Extra. Preparación para sensores de borde. Dominio de componentes electrónicos básicos.,false
+segundo-bach,Semana 1-2: Kit Extra y Repaso,Repaso Control RC,tutorial,30 min,2,,Revisar código base de 8º EGB. Control de motores con PCB RC DRAGON V2. Funciones: adelante() atras() izquierda() derecha() detener(). Pines: AIN1=14 AIN2=12 PWMA=27 BIN1=26 BIN2=25 PWMB=33 STBY=5.,false
+segundo-bach,Semana 3-4: Sensores de Borde,Montar Sensores IR,activity,40 min,3,,Instalar 2 sensores IR TCRT5000 en bordes inferiores del robot. Sensor izquierdo→GPIO13 Sensor derecho→GPIO15. Código: int bordeIzq=digitalRead(13); Superficie negra=1 línea blanca=0.,false
+segundo-bach,Semana 3-4: Sensores de Borde,Función detectoBorde(),tutorial,35 min,4,,Crear función bool detectoBorde() que retorna true si cualquier sensor detecta línea blanca. Crear evitarBorde() que retrocede y gira. Pruebas en ring de práctica.,false
+segundo-bach,Semana 5-6: Modo Minisumo,Construcción Robot Minisumo,project,60 min,5,,Chasis bajo y ancho (máx 10x10cm). Centro de gravedad bajo. Peso adicional en parte delantera. Pala frontal de metal o plástico duro. Ruedas con máxima tracción.,false
+segundo-bach,Semana 5-6: Modo Minisumo,Estrategia buscarOponente(),tutorial,40 min,6,,Algoritmo de búsqueda circular: avanza 1 segundo→gira 45°→repite. Al detectar borde: evitarBorde() y continuar. Con sensor ultrasónico opcional: detecta oponente y embiste.,false
+segundo-bach,Semana 7-8: Modo Soccer,Construcción Robot Soccer,project,60 min,7,,Chasis más alto que minisumo. Mecanismo de pateo frontal (servo + brazo mecánico). Sensor IR frontal para detectar pelota infrarroja especial.,false
+segundo-bach,Semana 7-8: Modo Soccer,Algoritmo de Juego,tutorial,45 min,8,,if(detectaPelota()) { acercarseAPelota(); patear(); } else { buscarPelota(); } if(detectoBorde()) evitarBorde(); Coordinación de múltiples robots en equipo.,false
+segundo-bach,Semana 9-10: Estrategias Avanzadas,Estrategias de Ataque,video,25 min,9,,Estrategia agresiva: embiste al máximo. Defensiva: espera en centro contraataque. Mixta: alterna búsqueda y espera. Análisis de oponente: ¿rápido? ¿pesado?,false
+segundo-bach,Semana 9-10: Estrategias Avanzadas,Optimización de Código,tutorial,40 min,10,,Velocidad máxima en embiste. Giros rápidos (menos delay). Reducir código innecesario. Usar millis() para temporizadores no bloqueantes.,false
+segundo-bach,Semana 11-12: Competencias,Torneo Interno Minisumo,activity,90 min,11,,Ring circular 77cm diámetro estándar. Borde blanco 2cm. Eliminatorias mejor de 3 rounds. Gana quien saca al oponente del ring.,false
+segundo-bach,Semana 11-12: Competencias,Torneo Soccer Final,project,90 min,12,,Cancha 120x90cm. 2vs2 o 3vs3. Pelota infrarroja. Premiación: mejor estrategia robot más robusto código más eficiente.,true
+tercero-bach,Semana 1-2: Kit Extra y WiFi,Kit Extra Aplicado IoT,activity,40 min,1,,Mini-proyectos IoT: Sistema de alarma con buzzer+LED. Indicador de temperatura con LEDs (frío=azul caliente=rojo). Control LED con potenciómetro (dimmer).,false
+tercero-bach,Semana 1-2: Kit Extra y WiFi,Conectar ESP32 a WiFi,tutorial,35 min,2,,Librería WiFi.h. WiFi.begin(ssid password). Obtener IP: WiFi.localIP(). Crear servidor web simple. Acceder desde navegador en smartphone.,false
+tercero-bach,Semana 3-4: Servidor Web,Página Web de Control,tutorial,45 min,3,,Interfaz HTML embebida en ESP32. Botones ON/OFF para 4 relés. server.on('/relay1/on' []() { digitalWrite(25 HIGH); }); Acceso desde red local.,false
+tercero-bach,Semana 3-4: Servidor Web,Sensores en Tiempo Real,activity,40 min,4,,Temperatura DHT22 con librería DHT.h. Luminosidad LDR: analogRead(34). Actualización automática cada 5 segundos con JavaScript.,false
+tercero-bach,Semana 5-7: Telegram Bot,Crear Bot en Telegram,tutorial,30 min,5,,Hablar con @BotFather. Obtener token API. Librería UniversalTelegramBot.h. bot.sendMessage(chat_id 'Hola desde ESP32');,false
+tercero-bach,Semana 5-7: Telegram Bot,Comandos del Bot,tutorial,45 min,6,,Comandos: /temp /luz /lampara_on /lampara_off /ventilador_on /ventilador_off /status. Respuestas automáticas del ESP32.,false
+tercero-bach,Semana 5-7: Telegram Bot,Alertas Automáticas,activity,40 min,7,,if(temperatura>30) bot.sendMessage('⚠️ Temperatura alta'). if(luminosidad<20) bot.sendMessage('🌙 Está oscuro'). Notificaciones de movimiento.,false
+tercero-bach,Semana 8-10: Casa Inteligente,Diseño del Sistema,video,25 min,8,,Planificar casa miniatura: Sala (lámpara sensor luz) Cocina (ventilador sensor temp) Dormitorio (LED RGB alarma) Puerta (cerradura sensor). Maqueta en cartón o 3D.,false
+tercero-bach,Semana 8-10: Casa Inteligente,Construcción e Integración,project,90 min,9,,Cablear componentes en protoboard. Relés conectados a LEDs. Sensores en habitaciones. ESP32 como cerebro central de la casa.,false
+tercero-bach,Semana 8-10: Casa Inteligente,Automatizaciones,tutorial,50 min,10,,Auto1: Si oscurece→encender luces. Auto2: Si temp>28°C→ventilador. Auto3: Si sonido fuerte→luz+alerta. Modo Ausente: apagar todo excepto seguridad.,false
+tercero-bach,Semana 11-12: Presentación,Interfaz Mejorada,activity,45 min,11,,Dashboard con gráficas (Chart.js). App móvil opcional (MIT App Inventor o Blynk). Integración voz opcional (Google Assistant/Alexa).,false
+tercero-bach,Semana 11-12: Presentación,Exposición Final,project,60 min,12,,Presentar casa inteligente. Demostración en vivo: control remoto automatizaciones alertas. Explicar código y arquitectura. Defender decisiones de diseño.,true
