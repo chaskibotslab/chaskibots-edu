@@ -5,10 +5,11 @@ import {
   Send, CheckCircle, Clock, FileText, Code, Cpu, Zap, 
   BookOpen, Loader2, ChevronDown, ChevronUp, Award,
   Lightbulb, Wrench, CircuitBoard, Bot, Calendar, AlertCircle,
-  Pencil, Upload, Image
+  Pencil, Upload, Image, Star, ClipboardList
 } from 'lucide-react'
 import DrawingCanvas from './DrawingCanvas'
 import FileUpload from './FileUpload'
+import MisCalificaciones from './MisCalificaciones'
 
 interface Task {
   id: string
@@ -262,6 +263,7 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState<string[]>([])
   const [name, setName] = useState(studentName)
+  const [activeTab, setActiveTab] = useState<'tareas' | 'calificaciones'>('tareas')
 
   const [loading, setLoading] = useState(true)
 
@@ -422,7 +424,7 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header con pestañas */}
       <div className="bg-gradient-to-r from-neon-cyan/10 to-neon-green/10 border border-neon-cyan/30 rounded-xl p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -442,7 +444,39 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
             />
           </div>
         </div>
+        
+        {/* Pestañas */}
+        <div className="flex gap-2 mt-4 border-t border-dark-600 pt-4">
+          <button
+            onClick={() => setActiveTab('tareas')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === 'tareas'
+                ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50'
+                : 'bg-dark-700 text-gray-400 hover:text-white border border-transparent'
+            }`}
+          >
+            <ClipboardList className="w-4 h-4" />
+            Tareas Pendientes
+          </button>
+          <button
+            onClick={() => setActiveTab('calificaciones')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === 'calificaciones'
+                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
+                : 'bg-dark-700 text-gray-400 hover:text-white border border-transparent'
+            }`}
+          >
+            <Star className="w-4 h-4" />
+            Mis Calificaciones
+          </button>
+        </div>
       </div>
+
+      {/* Contenido según pestaña */}
+      {activeTab === 'calificaciones' ? (
+        <MisCalificaciones studentName={name} levelId={levelId} />
+      ) : (
+      <>
 
       {/* Tasks List */}
       {loading ? (
@@ -655,6 +689,8 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
           <FileText className="w-12 h-12 text-gray-600 mx-auto mb-3" />
           <p className="text-gray-400">No hay tareas disponibles para este nivel</p>
         </div>
+      )}
+      </>
       )}
     </div>
   )
