@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { uploadCodeToDrive, uploadImageToDrive, uploadFileToDrive, isDriveConfigured } from '@/lib/googleDrive'
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
@@ -22,6 +21,8 @@ export interface Submission {
   feedback?: string
   gradedAt?: string
   gradedBy?: string
+  drawing?: string // base64 del dibujo
+  files?: string // JSON con archivos [{name, type, data}]
 }
 
 // GET - Obtener entregas
@@ -81,6 +82,8 @@ export async function GET(request: NextRequest) {
       feedback: record.fields.feedback || '',
       gradedAt: record.fields.gradedAt || '',
       gradedBy: record.fields.gradedBy || '',
+      drawing: record.fields.drawing || '',
+      files: record.fields.files || '',
     }))
 
     return NextResponse.json({ success: true, submissions })
@@ -103,69 +106,55 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Intentar subir archivos a Google Drive
-    let driveLinks: string[] = []
-    let uploadError = false
-    const driveEnabled = isDriveConfigured()
-
-    if (driveEnabled) {
-      try {
-        // Subir código a Drive
-        if (code) {
-          const codeResult = await uploadCodeToDrive(
-            code,
-            output || '',
-            levelId || 'general',
-            studentName,
-            taskId
-          )
-          driveLinks.push(`📄 Código: ${codeResult.webViewLink}`)
-        }
-
-        // Subir dibujo a Drive
-        if (drawing) {
-          const drawingResult = await uploadImageToDrive(
-            drawing,
-            levelId || 'general',
-            studentName,
-            taskId
-          )
-          driveLinks.push(`🎨 Dibujo: ${drawingResult.webViewLink}`)
-        }
-
-        // Subir archivos adicionales a Drive
-        if (files && files.length > 0) {
-          for (const file of files) {
-            const fileResult = await uploadFileToDrive(
-              file.data,
-              file.name,
-              file.type || 'application/octet-stream',
-              levelId || 'general',
-              studentName,
-              taskId
-            )
-            driveLinks.push(`📎 ${file.name}: ${fileResult.webViewLink}`)
-          }
-        }
-      } catch (driveError) {
-        console.error('Error uploading to Drive:', driveError)
-        uploadError = true
-      }
+    // Preparar información de adjuntos
+    let attachments: string[] = []
+    
+    // Guardar dibujo como base64 en el campo drawing
+    let drawingData = ''
+    if (drawing) {
+      drawingData = drawing // Guardar el base64 completo
+      attachments.push('🎨 Dibujo incluido')
+    }
+    
+    // Guardar nombres de archivos
+    let filesData = ''
+    if (files && files.length > 0) {
+      // Guardar info de archivos como JSON
+      filesData = JSON.stringify(files.map((f: any) => ({
+        name: f.name,
+        type: f.type,
+        data: f.data // base64
+      })))
+      attachments.push(`📎 ${files.length} archivo(s): ${files.map((f: any) => f.name).join(', ')}`)
     }
 
-    // Construir output final con links de Drive
+    // Construir output final
     let finalOutput = output || ''
-    if (driveLinks.length > 0) {
-      finalOutput += '\n\n📁 ARCHIVOS EN DRIVE:\n' + driveLinks.join('\n')
-    } else if (drawing || (files && files.length > 0)) {
-      // Si no se pudo subir a Drive, guardar indicadores
-      if (drawing) finalOutput += '\n\n🎨 DIBUJO ADJUNTO: Sí'
-      if (files && files.length > 0) {
-        finalOutput += `\n\n📎 ARCHIVOS (${files.length}): ${files.map((f: any) => f.name).join(', ')}`
-      }
+    if (attachments.length > 0) {
+      finalOutput += '\n\n📁 ADJUNTOS:\n' + attachments.join('\n')
     }
 
-    // Guardar en Airtable
+    // Guardar en Airtable (campos: drawing y files para los datos)
+    const fields: any = {
+      taskId,
+      studentName,
+      studentEmail: studentEmail || '',
+      levelId: levelId || '',
+      lessonId: lessonId || '',
+      code,
+      output: finalOutput,
+      submittedAt: new Date().toISOString(),
+      status: 'pending'
+    }
+    
+    // Solo agregar campos si tienen datos (evitar campos vacíos que pueden causar error)
+    if (drawingData) {
+      fields.drawing = drawingData
+    }
+    if (filesData) {
+      fields.files = filesData
+    }
+
     const response = await fetch(AIRTABLE_API_URL, {
       method: 'POST',
       headers: {
@@ -174,17 +163,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         records: [{
-          fields: {
-            taskId,
-            studentName,
-            studentEmail: studentEmail || '',
-            levelId: levelId || '',
-            lessonId: lessonId || '',
-            code,
-            output: finalOutput,
-            submittedAt: new Date().toISOString(),
-            status: 'pending'
-          }
+          fields
         }]
       })
     })
@@ -192,6 +171,36 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Airtable error:', errorText)
+      
+      // Si falla por campos desconocidos, intentar sin drawing/files
+      if (errorText.includes('UNKNOWN_FIELD')) {
+        console.log('Retrying without drawing/files fields...')
+        delete fields.drawing
+        delete fields.files
+        
+        const retryResponse = await fetch(AIRTABLE_API_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            records: [{
+              fields
+            }]
+          })
+        })
+        
+        if (retryResponse.ok) {
+          const data = await retryResponse.json()
+          return NextResponse.json({ 
+            success: true, 
+            submission: data.records[0],
+            message: 'Tarea enviada (sin campos de adjuntos en Airtable)'
+          })
+        }
+      }
+      
       return NextResponse.json({ error: 'Error creating submission' }, { status: 500 })
     }
 
@@ -199,12 +208,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       submission: data.records[0],
-      driveLinks,
-      message: uploadError 
-        ? 'Tarea enviada (archivos guardados localmente)' 
-        : driveLinks.length > 0 
-          ? 'Tarea enviada y archivos guardados en Drive'
-          : 'Tarea enviada correctamente'
+      message: 'Tarea enviada correctamente'
     })
   } catch (error) {
     console.error('Error:', error)

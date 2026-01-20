@@ -27,6 +27,8 @@ interface Submission {
   feedback?: string
   gradedAt?: string
   gradedBy?: string
+  drawing?: string
+  files?: string
 }
 
 export default function EntregasPage() {
@@ -379,61 +381,76 @@ export default function EntregasPage() {
                 </div>
               </div>
 
-              {/* Adjuntos - Links de Drive */}
-              {selectedSubmission.output?.includes('📁 ARCHIVOS EN DRIVE') && (
+              {/* Adjuntos - Dibujo y Archivos */}
+              {(selectedSubmission.drawing || selectedSubmission.files || 
+                selectedSubmission.output?.includes('📁 ADJUNTOS')) && (
                 <div className="mt-4 p-4 bg-dark-700 rounded-lg border border-dark-600">
                   <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
                     <Paperclip className="w-4 h-4 text-green-400" />
-                    Archivos en Google Drive
+                    Archivos Adjuntos del Estudiante
                   </h4>
-                  <div className="space-y-2">
-                    {selectedSubmission.output.split('\n').filter(line => 
-                      line.includes('https://drive.google.com')
-                    ).map((line, idx) => {
-                      const match = line.match(/^([📄🎨📎][^:]+):\s*(https:\/\/[^\s]+)/)
-                      if (match) {
-                        return (
-                          <a
-                            key={idx}
-                            href={match[2]}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 p-3 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-colors border border-green-500/30"
-                          >
-                            <Download className="w-5 h-5 text-green-400" />
-                            <span className="text-sm text-green-300 flex-1">{match[1]}</span>
-                            <span className="text-xs text-gray-400">Abrir en Drive →</span>
-                          </a>
-                        )
-                      }
-                      return null
-                    })}
-                  </div>
-                </div>
-              )}
-              
-              {/* Adjuntos sin Drive (fallback) */}
-              {!selectedSubmission.output?.includes('📁 ARCHIVOS EN DRIVE') && 
-               (selectedSubmission.output?.includes('🎨 DIBUJO ADJUNTO') ||
-                selectedSubmission.output?.includes('📎 ARCHIVOS')) && (
-                <div className="mt-4 p-4 bg-dark-700 rounded-lg border border-dark-600">
-                  <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
-                    <Paperclip className="w-4 h-4 text-orange-400" />
-                    Archivos Adjuntos
-                  </h4>
-                  {selectedSubmission.output?.includes('🎨 DIBUJO ADJUNTO') && (
-                    <div className="flex items-center gap-2 p-2 bg-purple-500/10 rounded-lg mb-2">
-                      <Image className="w-5 h-5 text-purple-400" />
-                      <span className="text-sm text-purple-300">Dibujo adjunto</span>
+                  
+                  {/* Mostrar dibujo como imagen */}
+                  {selectedSubmission.drawing && (
+                    <div className="mb-4">
+                      <p className="text-sm text-purple-300 mb-2 flex items-center gap-2">
+                        <Image className="w-4 h-4" />
+                        🎨 Dibujo del estudiante:
+                      </p>
+                      <div className="bg-white rounded-lg p-2 inline-block">
+                        <img 
+                          src={selectedSubmission.drawing} 
+                          alt="Dibujo del estudiante"
+                          className="max-w-full max-h-64 rounded"
+                        />
+                      </div>
+                      <a
+                        href={selectedSubmission.drawing}
+                        download={`dibujo_${selectedSubmission.studentName}.png`}
+                        className="mt-2 flex items-center gap-2 p-2 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg transition-colors w-fit"
+                      >
+                        <Download className="w-4 h-4 text-purple-400" />
+                        <span className="text-sm text-purple-300">Descargar dibujo</span>
+                      </a>
                     </div>
                   )}
-                  {selectedSubmission.output?.includes('📎 ARCHIVOS') && (
-                    <div className="flex items-center gap-2 p-2 bg-blue-500/10 rounded-lg">
-                      <FileText className="w-5 h-5 text-blue-400" />
-                      <span className="text-sm text-blue-300">
-                        {selectedSubmission.output.match(/📎 ARCHIVOS[^:]*: ([^\n]+)/)?.[1] || 'Archivos adjuntos'}
-                      </span>
-                    </div>
+                  
+                  {/* Mostrar archivos */}
+                  {selectedSubmission.files && (() => {
+                    try {
+                      const filesArray = JSON.parse(selectedSubmission.files)
+                      return (
+                        <div className="space-y-2">
+                          <p className="text-sm text-blue-300 flex items-center gap-2">
+                            <FileText className="w-4 h-4" />
+                            📎 Archivos adjuntos ({filesArray.length}):
+                          </p>
+                          {filesArray.map((file: any, idx: number) => (
+                            <a
+                              key={idx}
+                              href={file.data}
+                              download={file.name}
+                              className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/30"
+                            >
+                              <Download className="w-5 h-5 text-blue-400" />
+                              <span className="text-sm text-blue-300 flex-1">{file.name}</span>
+                              <span className="text-xs text-gray-400">Descargar →</span>
+                            </a>
+                          ))}
+                        </div>
+                      )
+                    } catch {
+                      return null
+                    }
+                  })()}
+                  
+                  {/* Fallback si no hay datos pero hay indicadores en output */}
+                  {!selectedSubmission.drawing && !selectedSubmission.files && 
+                   selectedSubmission.output?.includes('📁 ADJUNTOS') && (
+                    <p className="text-sm text-gray-400">
+                      Los archivos fueron enviados pero no se pudieron guardar en la base de datos.
+                      Por favor, crea los campos "drawing" y "files" en tu tabla de Airtable.
+                    </p>
                   )}
                 </div>
               )}
