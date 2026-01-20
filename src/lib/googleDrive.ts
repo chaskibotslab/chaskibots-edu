@@ -4,8 +4,8 @@ import { Readable } from 'stream'
 // Configuración de Google Drive
 const SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
-// ID de la carpeta principal de ChaskiBots en Drive
-const MAIN_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || '1rxUZrF96yBW7BTl4CMLM7FXF03JYaqpp'
+// ID de la carpeta principal de ChaskiBots en Drive (ChaskiBots-EDU compartida)
+const MAIN_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || '1kX397yuC2Nbvys9tYCHpvpI04iJ3OxO8'
 
 // Función para formatear la clave privada correctamente
 function formatPrivateKey(key: string): string {

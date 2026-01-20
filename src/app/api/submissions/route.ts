@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { uploadCodeToDrive, uploadImageToDrive, uploadFileToDrive, isDriveConfigured } from '@/lib/googleDrive'
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
@@ -102,23 +103,67 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Preparar información de adjuntos
-    let attachmentsInfo = ''
-    
-    // Guardar indicador de dibujo
-    if (drawing) {
-      attachmentsInfo += '\n\n🎨 DIBUJO ADJUNTO: Sí'
-    }
-    
-    // Guardar nombres de archivos
-    if (files && files.length > 0) {
-      const fileNames = files.map((f: any) => f.name).join(', ')
-      attachmentsInfo += `\n\n📎 ARCHIVOS ADJUNTOS (${files.length}): ${fileNames}`
+    // Intentar subir archivos a Google Drive
+    let driveLinks: string[] = []
+    let uploadError = false
+    const driveEnabled = isDriveConfigured()
+
+    if (driveEnabled) {
+      try {
+        // Subir código a Drive
+        if (code) {
+          const codeResult = await uploadCodeToDrive(
+            code,
+            output || '',
+            levelId || 'general',
+            studentName,
+            taskId
+          )
+          driveLinks.push(`📄 Código: ${codeResult.webViewLink}`)
+        }
+
+        // Subir dibujo a Drive
+        if (drawing) {
+          const drawingResult = await uploadImageToDrive(
+            drawing,
+            levelId || 'general',
+            studentName,
+            taskId
+          )
+          driveLinks.push(`🎨 Dibujo: ${drawingResult.webViewLink}`)
+        }
+
+        // Subir archivos adicionales a Drive
+        if (files && files.length > 0) {
+          for (const file of files) {
+            const fileResult = await uploadFileToDrive(
+              file.data,
+              file.name,
+              file.type || 'application/octet-stream',
+              levelId || 'general',
+              studentName,
+              taskId
+            )
+            driveLinks.push(`📎 ${file.name}: ${fileResult.webViewLink}`)
+          }
+        }
+      } catch (driveError) {
+        console.error('Error uploading to Drive:', driveError)
+        uploadError = true
+      }
     }
 
-    // Construir output final
+    // Construir output final con links de Drive
     let finalOutput = output || ''
-    finalOutput += attachmentsInfo
+    if (driveLinks.length > 0) {
+      finalOutput += '\n\n📁 ARCHIVOS EN DRIVE:\n' + driveLinks.join('\n')
+    } else if (drawing || (files && files.length > 0)) {
+      // Si no se pudo subir a Drive, guardar indicadores
+      if (drawing) finalOutput += '\n\n🎨 DIBUJO ADJUNTO: Sí'
+      if (files && files.length > 0) {
+        finalOutput += `\n\n📎 ARCHIVOS (${files.length}): ${files.map((f: any) => f.name).join(', ')}`
+      }
+    }
 
     // Guardar en Airtable
     const response = await fetch(AIRTABLE_API_URL, {
@@ -135,7 +180,7 @@ export async function POST(request: NextRequest) {
             studentEmail: studentEmail || '',
             levelId: levelId || '',
             lessonId: lessonId || '',
-            code: drawing ? code + '\n\n[DIBUJO_BASE64_INCLUIDO]' : code,
+            code,
             output: finalOutput,
             submittedAt: new Date().toISOString(),
             status: 'pending'
@@ -154,7 +199,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       submission: data.records[0],
-      message: 'Tarea enviada correctamente'
+      driveLinks,
+      message: uploadError 
+        ? 'Tarea enviada (archivos guardados localmente)' 
+        : driveLinks.length > 0 
+          ? 'Tarea enviada y archivos guardados en Drive'
+          : 'Tarea enviada correctamente'
     })
   } catch (error) {
     console.error('Error:', error)

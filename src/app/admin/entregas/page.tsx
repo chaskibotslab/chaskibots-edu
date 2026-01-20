@@ -379,31 +379,59 @@ export default function EntregasPage() {
                 </div>
               </div>
 
-              {/* Adjuntos - Dibujos y Archivos */}
-              {(selectedSubmission.code.includes('[DIBUJO_BASE64_INCLUIDO]') || 
-                selectedSubmission.output?.includes('🎨 DIBUJO ADJUNTO') ||
-                selectedSubmission.output?.includes('📎 ARCHIVOS ADJUNTOS')) && (
+              {/* Adjuntos - Links de Drive */}
+              {selectedSubmission.output?.includes('📁 ARCHIVOS EN DRIVE') && (
+                <div className="mt-4 p-4 bg-dark-700 rounded-lg border border-dark-600">
+                  <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+                    <Paperclip className="w-4 h-4 text-green-400" />
+                    Archivos en Google Drive
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedSubmission.output.split('\n').filter(line => 
+                      line.includes('https://drive.google.com')
+                    ).map((line, idx) => {
+                      const match = line.match(/^([📄🎨📎][^:]+):\s*(https:\/\/[^\s]+)/)
+                      if (match) {
+                        return (
+                          <a
+                            key={idx}
+                            href={match[2]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 p-3 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-colors border border-green-500/30"
+                          >
+                            <Download className="w-5 h-5 text-green-400" />
+                            <span className="text-sm text-green-300 flex-1">{match[1]}</span>
+                            <span className="text-xs text-gray-400">Abrir en Drive →</span>
+                          </a>
+                        )
+                      }
+                      return null
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {/* Adjuntos sin Drive (fallback) */}
+              {!selectedSubmission.output?.includes('📁 ARCHIVOS EN DRIVE') && 
+               (selectedSubmission.output?.includes('🎨 DIBUJO ADJUNTO') ||
+                selectedSubmission.output?.includes('📎 ARCHIVOS')) && (
                 <div className="mt-4 p-4 bg-dark-700 rounded-lg border border-dark-600">
                   <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
                     <Paperclip className="w-4 h-4 text-orange-400" />
-                    Archivos Adjuntos del Estudiante
+                    Archivos Adjuntos
                   </h4>
-                  
-                  {/* Indicador de dibujo */}
-                  {(selectedSubmission.code.includes('[DIBUJO_BASE64_INCLUIDO]') || 
-                    selectedSubmission.output?.includes('🎨 DIBUJO ADJUNTO')) && (
+                  {selectedSubmission.output?.includes('🎨 DIBUJO ADJUNTO') && (
                     <div className="flex items-center gap-2 p-2 bg-purple-500/10 rounded-lg mb-2">
                       <Image className="w-5 h-5 text-purple-400" />
-                      <span className="text-sm text-purple-300">🎨 Dibujo adjunto incluido en la entrega</span>
+                      <span className="text-sm text-purple-300">Dibujo adjunto</span>
                     </div>
                   )}
-                  
-                  {/* Archivos adjuntos */}
-                  {selectedSubmission.output?.includes('📎 ARCHIVOS ADJUNTOS') && (
+                  {selectedSubmission.output?.includes('📎 ARCHIVOS') && (
                     <div className="flex items-center gap-2 p-2 bg-blue-500/10 rounded-lg">
                       <FileText className="w-5 h-5 text-blue-400" />
                       <span className="text-sm text-blue-300">
-                        {selectedSubmission.output.match(/📎 ARCHIVOS ADJUNTOS[^:]*: ([^\n]+)/)?.[1] || 'Archivos adjuntos'}
+                        {selectedSubmission.output.match(/📎 ARCHIVOS[^:]*: ([^\n]+)/)?.[1] || 'Archivos adjuntos'}
                       </span>
                     </div>
                   )}
