@@ -1,1 +1,1 @@
-taskId,studentName,studentEmail,levelId,lessonId,code,output,submittedAt,status,grade,feedback,gradedAt,gradedBy
+taskId,studentName,studentEmail,levelId,lessonId,code,output,submittedAt,status,grade,feedback,gradedBy,drawing,files
