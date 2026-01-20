@@ -36,21 +36,54 @@ sexto-egb,Módulo 2: Circuitos Electrónicos,Generador Aleatorio,video,12 min,3,
 sexto-egb,Módulo 2: Circuitos Electrónicos,Ensamblaje Circuito,project,35 min,4,,Construye el circuito generador,true
 septimo-egb,Módulo 1: Proyectos Avanzados,Robot 4 en 1 Avanzado,video,15 min,1,,Configuraciones avanzadas del robot,false
 septimo-egb,Módulo 1: Proyectos Avanzados,Avión DIY,project,40 min,2,,Construye tu avión DIY,false
-octavo-egb,Módulo 1: ESP32 Básico,Introducción a ESP32,video,20 min,1,,Conoce el microcontrolador ESP32,false
-octavo-egb,Módulo 1: ESP32 Básico,Configuración ESP32,tutorial,30 min,2,,Configura tu entorno de desarrollo,false
-octavo-egb,Módulo 2: Carro Bluetooth,Carro Bluetooth WiFi,video,15 min,3,,Introducción al carro controlado por Bluetooth,false
-octavo-egb,Módulo 2: Carro Bluetooth,Programación Carro,activity,45 min,4,,Programa tu carro Bluetooth,false
-octavo-egb,Módulo 2: Carro Bluetooth,Proyecto Final Carro,project,60 min,5,,Completa tu carro Bluetooth WiFi,true
-noveno-egb,Módulo 1: Sensores Infrarrojos,Introducción Sensores IR,video,15 min,1,,Cómo funcionan los sensores infrarrojos,false
-noveno-egb,Módulo 1: Sensores Infrarrojos,Seguidor de Línea,activity,40 min,2,,Programa tu seguidor de línea,false
-noveno-egb,Módulo 1: Sensores Infrarrojos,Proyecto Seguidor,project,50 min,3,,Completa el seguidor de línea con 2 sensores,true
-decimo-egb,Módulo 1: Sensores Ultrasónicos,Introducción Ultrasonido,video,15 min,1,,Cómo funcionan los sensores ultrasónicos,false
-decimo-egb,Módulo 1: Sensores Ultrasónicos,Robot Evita Obstáculos,activity,45 min,2,,Programa tu robot evita obstáculos,false
-decimo-egb,Módulo 1: Sensores Ultrasónicos,Proyecto Final,project,55 min,3,,Completa el robot evita obstáculos,true
-primero-bach,Módulo 1: Arduino Avanzado,Introducción Robot Otto,video,20 min,1,,Conoce el robot Otto y sus capacidades,false
-primero-bach,Módulo 1: Arduino Avanzado,Ensamblaje Otto,activity,45 min,2,,Ensambla tu robot Otto,false
-primero-bach,Módulo 1: Arduino Avanzado,Programación Otto,tutorial,40 min,3,,Programa movimientos básicos de Otto,false
-primero-bach,Módulo 1: Arduino Avanzado,Proyecto Otto,project,60 min,4,,Proyecto final con robot Otto,true
+octavo-egb,Semana 1-2: Kit Extra y Arduino IDE,Kit Extra Completo,activity,60 min,1,,Las 6 prácticas del Kit Extra en 5 días. Preparación para programación real con microcontroladores.,false
+octavo-egb,Semana 1-2: Kit Extra y Arduino IDE,Setup Arduino IDE,tutorial,45 min,2,,Instalar Arduino IDE. Configurar placa ESP32. Drivers USB. Primer programa Blink. Conceptos: pinMode digitalWrite delay.,false
+octavo-egb,Semana 3-4: LEDs y Semáforo,LEDs de la PCB RC DRAGON,tutorial,30 min,3,,Identificar LEDs D1 D6 en PCB. Encenderlos con código. Parpadeo alternado. Concepto OUTPUT digital.,false
+octavo-egb,Semana 3-4: LEDs y Semáforo,Semáforo con LEDs,activity,40 min,4,,Secuencias Verde→Amarillo→Rojo. Delays diferentes. Funciones personalizadas para cada estado.,false
+octavo-egb,Semana 5-6: Control de Motores,Control de UN Motor,tutorial,45 min,5,,⚡PRÁCTICA CRÍTICA: Control motores TB6612FNG. Pines AIN1=14 AIN2=12 PWMA=27. ledcWrite() en ESP32. Configurar canales PWM.,false
+octavo-egb,Semana 5-6: Control de Motores,Control de DOS Motores,activity,50 min,6,,Motor B: BIN1=26 BIN2=25 PWMB=33 STBY=5. Coordinar ambos. Funciones adelante() atras() girarIzquierda() girarDerecha().,false
+octavo-egb,Semana 7-8: Bluetooth,Bluetooth Serial,tutorial,40 min,7,,Librería BluetoothSerial. Recibir datos de smartphone. Comandos: F=adelante B=atrás L=izquierda R=derecha S=stop.,false
+octavo-egb,Semana 7-8: Bluetooth,Integración Bluetooth + Motores,activity,50 min,8,,Combinar todo: recibir comando→ejecutar movimiento. App Serial Bluetooth Terminal. Control velocidad variable 0-9.,false
+octavo-egb,Semana 9-10: Ensamblaje Carro,Ensamblaje del Chasis,project,60 min,9,,Montar motores en chasis 3D. Instalar ruedas 65mm. Colocar PCB. Organizar cables. Portapilas 3xAA en parte trasera.,false
+octavo-egb,Semana 9-10: Ensamblaje Carro,Código Completo y Pruebas,tutorial,50 min,10,,Cargar código final. Probar todos los movimientos. Ajustar velocidades. Agregar bocina buzzer y LEDs direccionales.,false
+octavo-egb,Semana 11-12: Competencias,Optimización y Debugging,activity,45 min,11,,Solucionar problemas: ruedas desbalanceadas motor no responde. Verificar conexiones. Mejorar respuesta.,false
+octavo-egb,Semana 11-12: Competencias,Competencia Carro Bluetooth,project,90 min,12,,Carrera de obstáculos. Slalom. Estacionamiento en reversa. Presentación del proyecto final.,true
+noveno-egb,Semana 1-2: Kit Extra y Repaso,Kit Extra Rápido,activity,45 min,1,,Repaso Kit Extra en 1 semana. Énfasis en sensores y lectura de valores digitales.,false
+noveno-egb,Semana 1-2: Kit Extra y Repaso,Repaso Programación ESP32,tutorial,40 min,2,,Revisar conceptos de 8º: pinMode digitalRead digitalWrite. Preparación para sensores IR.,false
+noveno-egb,Semana 3-4: Sensores IR,Leer UN Sensor IR,tutorial,35 min,3,,Conectar sensor IR TCRT5000 a GPIO18. digitalRead(18). Sensor sobre línea negra=0 sobre blanco=1. LED indicador.,false
+noveno-egb,Semana 3-4: Sensores IR,Leer DOS Sensores,activity,40 min,4,,Sensor izq GPIO18 sensor der GPIO19. Leer ambos en loop. Mostrar valores en Serial Monitor.,false
+noveno-egb,Semana 5-6: Lógica Seguidor,Lógica if-else Seguimiento,tutorial,45 min,5,,Pseudocódigo: SI ambos en línea(0 0)→Adelante. SI izq fuera(1 0)→Gira derecha. SI der fuera(0 1)→Gira izquierda.,false
+noveno-egb,Semana 5-6: Lógica Seguidor,Implementar Lógica en Código,activity,50 min,6,,int izq=digitalRead(18); int der=digitalRead(19); if(izq==0 && der==0) adelante(); else if... Integrar con motores L298N.,false
+noveno-egb,Semana 7-8: Integración,Control Motores según Sensores,activity,55 min,7,,Conectar motores al L298N. Integrar lógica de sensores con movimiento. Pruebas básicas de seguimiento.,false
+noveno-egb,Semana 7-8: Integración,Ensamblaje Robot Seguidor,project,60 min,8,,Montar sensores en parte delantera (3cm separación). Motores en chasis. ESP32 Super Mini en centro.,false
+noveno-egb,Semana 9-10: Calibración,Calibración de Sensores,tutorial,40 min,9,,Ajustar altura sensores (5mm sobre piso). Probar diferentes superficies. Línea negra 2cm ancho sobre blanco.,false
+noveno-egb,Semana 9-10: Calibración,Pruebas y Ajustes,activity,50 min,10,,Pista con curvas. Velocidad muy alta→se sale. Muy baja→lento. Encontrar balance óptimo.,false
+noveno-egb,Semana 11-12: Competencias,Optimización Final,activity,45 min,11,,Mejorar respuesta en curvas cerradas. Ajustar velocidades por sensor. Código más eficiente.,false
+noveno-egb,Semana 11-12: Competencias,Carrera Seguidor de Línea,project,90 min,12,,Competencia en pista con curvas cerradas. El más rápido sin salirse gana. Presentación proyecto.,true
+decimo-egb,Semana 1-2: Kit Extra,Kit Extra Avanzado,activity,45 min,1,,Repaso rápido Kit Extra. Énfasis en sensores y toma de decisiones autónomas.,false
+decimo-egb,Semana 1-2: Kit Extra,Preparación PCB RC DRAGON,tutorial,40 min,2,,Verificar soldadura regulador 7805. Conexiones sensor ultrasónico: TRIGGER→GPIO13 ECHO→GPIO15.,false
+decimo-egb,Semana 3-4: Sensor Ultrasónico,Funcionamiento HC-SR04,video,25 min,3,,Principio: envía pulso ultrasónico mide tiempo retorno. Distancia=(duración×0.034)/2 cm.,false
+decimo-egb,Semana 3-4: Sensor Ultrasónico,Medir Distancia con Código,tutorial,45 min,4,,digitalWrite(TRIGGER HIGH); delayMicroseconds(10); long duracion=pulseIn(ECHO HIGH); int distancia=duracion*0.034/2;,false
+decimo-egb,Semana 5-6: Algoritmo Evasión,Lógica de Decisión,tutorial,40 min,5,,SI distancia>20cm→Adelante (camino libre). SI distancia<20cm→Detener retroceder girar.,false
+decimo-egb,Semana 5-6: Algoritmo Evasión,Implementar Algoritmo,activity,50 min,6,,if(distancia>20) adelante(); else { detener(); delay(300); atras(); delay(500); girarDerecha(); delay(600); },false
+decimo-egb,Semana 7-8: Integración PCB,Montar Sensor en Robot,activity,45 min,7,,Sensor ultrasónico en parte delantera. Cables organizados. Verificar alimentación 5V del regulador 7805.,false
+decimo-egb,Semana 7-8: Integración PCB,Pruebas con Obstáculos,activity,50 min,8,,Probar en pista con obstáculos. Ajustar distancia de detección. Verificar respuesta de motores.,false
+decimo-egb,Semana 9-10: Optimización,Ensamblaje Completo,project,60 min,9,,Robot terminado con sensor montado. Verificar todas las conexiones. Cargar código final.,false
+decimo-egb,Semana 9-10: Optimización,Optimización Algoritmo,tutorial,45 min,10,,¿Gira siempre derecha? Agregar random o alternar izq/der. Mejorar búsqueda de espacio libre.,false
+decimo-egb,Semana 11-12: Competencias,Pruebas de Campo,activity,50 min,11,,Pista con múltiples obstáculos. ¿Evita todos? ¿Se queda atrapado en esquinas? Ajustar parámetros.,false
+decimo-egb,Semana 11-12: Competencias,Competencia Laberinto,project,90 min,12,,Laberinto simple. Robot debe salir sin tocar paredes. Tiempo + eficiencia. Presentación final.,true
+primero-bach,Semana 1-2: Kit Extra y Servos,Kit Extra Experto,activity,40 min,1,,Kit Extra en 1 semana. Ya son expertos. Práctica rápida y autónoma.,false
+primero-bach,Semana 1-2: Kit Extra y Servos,Introducción Servomotores,tutorial,45 min,2,,Diferencia DC motor vs servo. Control de ángulo preciso 0-180°. Librería Servo.h. servo.attach(9); servo.write(90);,false
+primero-bach,Semana 3-4: Construcción Otto,Ensamblaje del Cuerpo,project,60 min,3,,Imprimir partes 3D: cabeza cuerpo piernas pies. Ensamblar estructura. Instalar 4 servos (2 caderas 2 tobillos).,false
+primero-bach,Semana 3-4: Construcción Otto,Conexión Electrónica,tutorial,50 min,4,,Arduino Nano en centro. Servos: cadera izq→pin2 cadera der→pin3 tobillo izq→pin4 tobillo der→pin5. Sensor ultrasónico en cabeza.,false
+primero-bach,Semana 5-6: Calibración Otto,Calibración de Servos,tutorial,45 min,5,,Todos los servos a 90° (posición neutral). Ajustar tornillos para que Otto esté de pie recto. Funciones de calibración.,false
+primero-bach,Semana 5-6: Calibración Otto,Primer Movimiento - Caminar,activity,60 min,6,,Secuencia: 1.Levantar pie izq(tobillo 110°) 2.Inclinar cadera 3.Adelantar pie 4.Bajar pie. Repetir espejo pie derecho.,false
+primero-bach,Semana 7-8: Movimientos,Movimientos Adicionales,activity,50 min,7,,Bailar: mover caderas lado a lado. Saltar: ambos tobillos arriba/abajo. Inclinarse: doblar cadera adelante.,false
+primero-bach,Semana 7-8: Movimientos,Sensor Ultrasónico Otto,tutorial,45 min,8,,Detectar obstáculos. Si distancia<15cm→detener y retroceder. Evita chocar mientras camina.,false
+primero-bach,Semana 9-10: Comportamiento,Sonidos y Expresiones,activity,45 min,9,,Buzzer para sonidos: feliz triste asustado. LED RGB o matriz para ojos expresivos.,false
+primero-bach,Semana 9-10: Comportamiento,Comportamiento Autónomo,tutorial,50 min,10,,Combinar: Otto camina→detecta obstáculo→sonido asustado→retrocede→gira→continúa. Lógica completa.,false
+primero-bach,Semana 11-12: Competencias,Personalización Otto,activity,45 min,11,,Decorar Otto (pintura stickers). Crear coreografía única. Programar respuestas a diferentes distancias.,false
+primero-bach,Semana 11-12: Competencias,Competencias Otto,project,90 min,12,,Carrera caminata 10m. Evita obstáculos laberinto. Coreografía más creativa. Presentación final proyectos.,true
 segundo-bach,Semana 1-2: Kit Extra y Repaso,Kit Extra Rápido,video,20 min,1,,Práctica de componentes del Kit Extra. Preparación para sensores de borde. Dominio de componentes electrónicos básicos.,false
 segundo-bach,Semana 1-2: Kit Extra y Repaso,Repaso Control RC,tutorial,30 min,2,,Revisar código base de 8º EGB. Control de motores con PCB RC DRAGON V2. Funciones: adelante() atras() izquierda() derecha() detener(). Pines: AIN1=14 AIN2=12 PWMA=27 BIN1=26 BIN2=25 PWMB=33 STBY=5.,false
 segundo-bach,Semana 3-4: Sensores de Borde,Montar Sensores IR,activity,40 min,3,,Instalar 2 sensores IR TCRT5000 en bordes inferiores del robot. Sensor izquierdo→GPIO13 Sensor derecho→GPIO15. Código: int bordeIzq=digitalRead(13); Superficie negra=1 línea blanca=0.,false
