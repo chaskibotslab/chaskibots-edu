@@ -22,6 +22,13 @@ interface Submission {
   gradedBy?: string
 }
 
+// Extraer el nombre de la tarea del campo output
+const getTaskName = (output: string): string => {
+  if (!output) return 'Tarea'
+  const match = output.match(/Tarea:\s*(.+?)(?:\n|$)/)
+  return match ? match[1].trim() : 'Tarea'
+}
+
 interface MisCalificacionesProps {
   studentName: string
   levelId: string
@@ -184,7 +191,7 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="font-medium text-white">{submission.taskId}</h4>
+                  <h4 className="font-medium text-white">{getTaskName(submission.output)}</h4>
                   {getStatusBadge(submission.status)}
                 </div>
                 <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
