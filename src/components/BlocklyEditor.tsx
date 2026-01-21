@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge, Monitor, FileCode, FolderOpen, Loader2, Trash2, Globe, Lock } from 'lucide-react'
+import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge, Monitor, FileCode, FolderOpen, Loader2, Trash2, Globe, Lock, Maximize2, Minimize2 } from 'lucide-react'
+import Image from 'next/image'
 import RobotSimulator from './RobotSimulator'
 
 interface BlocklyProject {
@@ -527,6 +528,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
   const [currentProjectName, setCurrentProjectName] = useState('')
   const [newProjectName, setNewProjectName] = useState('')
   const [isPublicProject, setIsPublicProject] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
     // Cargar Blockly dinámicamente
@@ -784,19 +786,27 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
   }
 
   return (
-    <div className="flex flex-col h-full bg-dark-900 rounded-xl overflow-hidden border border-dark-600">
+    <div className={`flex flex-col bg-dark-900 overflow-hidden border border-dark-600 ${
+      isFullscreen 
+        ? 'fixed inset-0 z-50 rounded-none' 
+        : 'h-full rounded-xl'
+    }`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-neon-cyan/20 to-neon-purple/20 border-b border-dark-600 p-4">
+      <div className="bg-gradient-to-r from-neon-cyan/20 to-neon-purple/20 border-b border-dark-600 p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-neon-cyan/20 rounded-xl flex items-center justify-center">
-              <Bot className="w-6 h-6 text-neon-cyan" />
-            </div>
+            <Image 
+              src="/images/logo.png" 
+              alt="ChaskiBots" 
+              width={40} 
+              height={40}
+              className="rounded-xl"
+            />
             <div>
-              <h2 className="text-lg font-bold text-white">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 ChaskiBlocks
                 {currentProjectName && (
-                  <span className="text-sm font-normal text-neon-purple ml-2">
+                  <span className="text-sm font-normal text-neon-purple">
                     — {currentProjectName}
                   </span>
                 )}
@@ -815,14 +825,14 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                   className="flex items-center gap-2 px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm transition-colors"
                 >
                   <FolderOpen className="w-4 h-4" />
-                  Mis Proyectos
+                  <span className="hidden sm:inline">Mis Proyectos</span>
                 </button>
                 <button
                   onClick={() => setShowSaveModal(true)}
                   className="flex items-center gap-2 px-3 py-2 bg-neon-cyan/20 hover:bg-neon-cyan/30 text-neon-cyan rounded-lg text-sm transition-colors"
                 >
                   <Save className="w-4 h-4" />
-                  Guardar
+                  <span className="hidden sm:inline">Guardar</span>
                 </button>
               </>
             )}
@@ -831,7 +841,14 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
               className="flex items-center gap-2 px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
-              Nuevo
+              <span className="hidden sm:inline">Nuevo</span>
+            </button>
+            <button
+              onClick={() => setIsFullscreen(!isFullscreen)}
+              className="flex items-center gap-2 px-3 py-2 bg-neon-purple/20 hover:bg-neon-purple/30 text-neon-purple rounded-lg text-sm transition-colors"
+              title={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+            >
+              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
           </div>
         </div>
