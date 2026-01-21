@@ -533,8 +533,17 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
     const loadBlockly = async () => {
       if (typeof window === 'undefined') return
       
-      const Blockly = (await import('blockly')).default
+      const BlocklyModule = (await import('blockly')).default
       await import('blockly/blocks')
+      
+      // Asignar Blockly a window para que eval pueda acceder
+      ;(window as any).Blockly = BlocklyModule
+      const Blockly = (window as any).Blockly
+      
+      // Crear generador Arduino
+      Blockly.Arduino = new Blockly.Generator('Arduino')
+      Blockly.Arduino.ORDER_ATOMIC = 0
+      Blockly.Arduino.ORDER_NONE = 99
       
       // Registrar bloques personalizados
       eval(CUSTOM_BLOCKS)
