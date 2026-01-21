@@ -1,10 +1,24 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { 
   ExternalLink, Puzzle, Cat, Gamepad2, Zap, CircuitBoard, Code, Terminal, 
-  Cpu, Bot, Cog, Eye, Box, GitBranch, Network, Joystick, Wrench
+  Cpu, Bot, Cog, Eye, Box, GitBranch, Network, Joystick, Wrench, Sparkles
 } from 'lucide-react'
+
+// Cargar BlocklyEditor dinámicamente para evitar errores de SSR
+const BlocklyEditor = dynamic(() => import('./BlocklyEditor'), { 
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-[600px] bg-dark-800 rounded-xl">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan mx-auto mb-4"></div>
+        <p className="text-gray-400">Cargando ChaskiBlocks...</p>
+      </div>
+    </div>
+  )
+})
 
 const categories = [
   { id: 'bloques', name: 'Bloques', icon: Puzzle },
@@ -19,6 +33,16 @@ const categories = [
 
 const simulators = [
   // Bloques
+  {
+    id: 'chaskiblocks',
+    name: 'ChaskiBlocks',
+    description: 'Editor de bloques para robótica - ¡Exclusivo ChaskiBots!',
+    url: '',
+    icon: Sparkles,
+    category: 'bloques',
+    requiresLogin: false,
+    isInternal: true
+  },
   {
     id: 'blockly',
     name: 'Blockly Games',
@@ -311,44 +335,51 @@ export default function SimulatorTabs() {
       </div>
 
       {/* Active Simulator Panel */}
-      <div className="bg-dark-800 border border-dark-600 rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-          <div>
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              {(() => {
-                const Icon = activeSimulator.icon
-                return <Icon className="w-6 h-6 text-neon-cyan" />
-              })()}
-              {activeSimulator.name}
-            </h3>
-            <p className="text-gray-400 mt-1">{activeSimulator.description}</p>
+      {activeSimulator.id === 'chaskiblocks' ? (
+        /* ChaskiBlocks - Editor interno */
+        <div className="h-[700px]">
+          <BlocklyEditor />
+        </div>
+      ) : (
+        <div className="bg-dark-800 border border-dark-600 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+            <div>
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                {(() => {
+                  const Icon = activeSimulator.icon
+                  return <Icon className="w-6 h-6 text-neon-cyan" />
+                })()}
+                {activeSimulator.name}
+              </h3>
+              <p className="text-gray-400 mt-1">{activeSimulator.description}</p>
+            </div>
+            <a
+              href={activeSimulator.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-neon-cyan text-dark-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-neon-cyan/80 transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Abrir en su web
+            </a>
           </div>
-          <a
-            href={activeSimulator.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-neon-cyan text-dark-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-neon-cyan/80 transition-colors"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Abrir en su web
-          </a>
-        </div>
 
-        <div className="relative rounded-xl overflow-hidden bg-dark-900 border border-dark-600">
-          <iframe
-            src={activeSimulator.url}
-            className="w-full h-[600px] border-none"
-            title={activeSimulator.name}
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; camera; microphone"
-            sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals"
-          />
-        </div>
+          <div className="relative rounded-xl overflow-hidden bg-dark-900 border border-dark-600">
+            <iframe
+              src={activeSimulator.url}
+              className="w-full h-[600px] border-none"
+              title={activeSimulator.name}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; camera; microphone"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals"
+            />
+          </div>
 
-        <p className="text-sm text-gray-500 mt-4 text-center">
-          Si el simulador no carga correctamente, usa el botón "Abrir en su web" para acceder directamente.
-        </p>
-      </div>
+          <p className="text-sm text-gray-500 mt-4 text-center">
+            Si el simulador no carga correctamente, usa el botón "Abrir en su web" para acceder directamente.
+          </p>
+        </div>
+      )}
     </div>
   )
 }
