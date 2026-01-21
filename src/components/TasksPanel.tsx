@@ -252,9 +252,10 @@ const getDifficultyBadge = (difficulty: string) => {
 interface TasksPanelProps {
   levelId: string
   studentName?: string
+  studentEmail?: string
 }
 
-export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProps) {
+export default function TasksPanel({ levelId, studentName = '', studentEmail = '' }: TasksPanelProps) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [expandedTask, setExpandedTask] = useState<string | null>(null)
   const [answers, setAnswers] = useState<Record<string, Record<string, string>>>({})
@@ -263,7 +264,6 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState<string[]>([])
   const [submittedTaskIds, setSubmittedTaskIds] = useState<Set<string>>(new Set()) // IDs de tareas ya enviadas desde API
-  const [name, setName] = useState(studentName)
   const [activeTab, setActiveTab] = useState<'tareas' | 'calificaciones'>('tareas')
 
   const [loading, setLoading] = useState(true)
@@ -271,13 +271,13 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
   // Cargar entregas previas del estudiante para saber qué tareas ya envió
   useEffect(() => {
     async function loadMySubmissions() {
-      if (!name.trim()) return
+      if (!studentName || !studentName.trim()) return
       try {
         const res = await fetch(`/api/submissions?levelId=${levelId}`)
         const data = await res.json()
         if (data.submissions) {
           const mySubmissions = data.submissions.filter(
-            (s: any) => s.studentName.toLowerCase() === name.toLowerCase()
+            (s: any) => s.studentName.toLowerCase() === studentName.toLowerCase()
           )
           // Guardar los lessonId (que es el task.id) de las tareas ya enviadas
           const taskIds = new Set(mySubmissions.map((s: any) => s.lessonId))
@@ -288,7 +288,7 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
       }
     }
     loadMySubmissions()
-  }, [name, levelId])
+  }, [studentName, levelId])
 
   useEffect(() => {
     // Cargar tareas desde Airtable
@@ -364,8 +364,8 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
   }
 
   const handleSubmit = async (task: Task) => {
-    if (!name.trim()) {
-      alert('Por favor escribe tu nombre')
+    if (!studentName || !studentName.trim()) {
+      alert('Debes iniciar sesión para enviar tareas')
       return
     }
 
@@ -405,7 +405,8 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
       // Preparar datos con archivos adjuntos
       const submissionData: any = {
         taskId,
-        studentName: name,
+        studentName: studentName,
+        studentEmail: studentEmail,
         levelId,
         lessonId: task.id,
         code: formattedAnswers + attachmentsInfo,
@@ -457,15 +458,12 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
             </h3>
             <p className="text-sm text-gray-400">Completa las tareas y envíalas al profesor</p>
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Tu nombre completo"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm placeholder:text-gray-500 w-48"
-            />
-          </div>
+          {studentName && (
+            <div className="flex items-center gap-2 bg-dark-700 px-3 py-2 rounded-lg border border-dark-600">
+              <span className="text-sm text-gray-400">Estudiante:</span>
+              <span className="text-sm text-white font-medium">{studentName}</span>
+            </div>
+          )}
         </div>
         
         {/* Pestañas */}
@@ -497,7 +495,7 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
 
       {/* Contenido según pestaña */}
       {activeTab === 'calificaciones' ? (
-        <MisCalificaciones studentName={name} levelId={levelId} />
+        <MisCalificaciones studentName={studentName} levelId={levelId} />
       ) : (
       <>
 

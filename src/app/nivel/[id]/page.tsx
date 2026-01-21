@@ -521,7 +521,7 @@ export default function NivelPage() {
           {/* Tasks Tab */}
           {activeTab === 'tasks' && (
             <div className="max-w-4xl mx-auto">
-              <TasksPanel levelId={levelId} />
+              <TasksPanel levelId={levelId} studentName={user?.name || ''} studentEmail={user?.email || ''} />
             </div>
           )}
         </div>
