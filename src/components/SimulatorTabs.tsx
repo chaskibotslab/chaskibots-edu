@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import { useAuth } from './AuthProvider'
 import { 
   ExternalLink, Puzzle, Cat, Gamepad2, Zap, CircuitBoard, Code, Terminal, 
   Cpu, Bot, Cog, Eye, Box, GitBranch, Network, Joystick, Wrench, Sparkles
@@ -278,6 +279,7 @@ const simulators = [
 ]
 
 export default function SimulatorTabs() {
+  const { user } = useAuth()
   const [activeCategory, setActiveCategory] = useState('bloques')
   const [activeSimulator, setActiveSimulator] = useState(simulators[0])
 
@@ -338,7 +340,7 @@ export default function SimulatorTabs() {
       {activeSimulator.id === 'chaskiblocks' ? (
         /* ChaskiBlocks - Editor interno */
         <div className="h-[700px]">
-          <BlocklyEditor />
+          <BlocklyEditor userId={user?.id} userName={user?.name} />
         </div>
       ) : (
         <div className="bg-dark-800 border border-dark-600 rounded-2xl p-6">

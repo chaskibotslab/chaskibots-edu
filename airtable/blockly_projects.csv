@@ -1,0 +1,2 @@
+id,userId,userName,projectName,projectData,levelId,createdAt,updatedAt,isPublic
+proj_example,user123,Estudiante Demo,Mi Robot Bailarín,"{""blocks"":""<xml>...</xml>""}",nivel-1,2025-01-21T10:00:00Z,2025-01-21T10:00:00Z,false

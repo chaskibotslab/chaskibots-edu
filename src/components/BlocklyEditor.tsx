@@ -1,8 +1,17 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge, Monitor, FileCode } from 'lucide-react'
+import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge, Monitor, FileCode, FolderOpen, Loader2, Trash2, Globe, Lock } from 'lucide-react'
 import RobotSimulator from './RobotSimulator'
+
+interface BlocklyProject {
+  id: string
+  projectName: string
+  projectData: string
+  createdAt: string
+  updatedAt: string
+  isPublic: boolean
+}
 
 // Definición de bloques personalizados para robótica
 const CUSTOM_BLOCKS = `
@@ -496,15 +505,28 @@ const TOOLBOX_XML = `
 
 interface BlocklyEditorProps {
   onCodeChange?: (code: string) => void
+  userId?: string
+  userName?: string
 }
 
-export default function BlocklyEditor({ onCodeChange }: BlocklyEditorProps) {
+export default function BlocklyEditor({ onCodeChange, userId, userName }: BlocklyEditorProps) {
   const blocklyDiv = useRef<HTMLDivElement>(null)
   const workspaceRef = useRef<any>(null)
   const [generatedCode, setGeneratedCode] = useState('')
   const [copied, setCopied] = useState(false)
   const [isBlocklyLoaded, setIsBlocklyLoaded] = useState(false)
   const [rightPanelTab, setRightPanelTab] = useState<'code' | 'simulator'>('simulator')
+  
+  // Estados para proyectos
+  const [showProjectsModal, setShowProjectsModal] = useState(false)
+  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [projects, setProjects] = useState<BlocklyProject[]>([])
+  const [loadingProjects, setLoadingProjects] = useState(false)
+  const [savingProject, setSavingProject] = useState(false)
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null)
+  const [currentProjectName, setCurrentProjectName] = useState('')
+  const [newProjectName, setNewProjectName] = useState('')
+  const [isPublicProject, setIsPublicProject] = useState(false)
 
   useEffect(() => {
     // Cargar Blockly dinámicamente
@@ -618,6 +640,136 @@ export default function BlocklyEditor({ onCodeChange }: BlocklyEditorProps) {
     if (workspaceRef.current) {
       workspaceRef.current.clear()
       setGeneratedCode('')
+      setCurrentProjectId(null)
+      setCurrentProjectName('')
+    }
+  }
+
+  // Obtener XML del workspace actual
+  const getWorkspaceXml = (): string => {
+    if (!workspaceRef.current) return ''
+    const Blockly = (window as any).Blockly
+    if (!Blockly) return ''
+    const xml = Blockly.Xml.workspaceToDom(workspaceRef.current)
+    return Blockly.Xml.domToText(xml)
+  }
+
+  // Cargar XML al workspace
+  const loadWorkspaceXml = (xmlText: string) => {
+    if (!workspaceRef.current || !xmlText) return
+    const Blockly = (window as any).Blockly
+    if (!Blockly) return
+    workspaceRef.current.clear()
+    const xml = Blockly.utils.xml.textToDom(xmlText)
+    Blockly.Xml.domToWorkspace(xml, workspaceRef.current)
+  }
+
+  // Cargar proyectos del usuario
+  const loadProjects = async () => {
+    if (!userId) return
+    setLoadingProjects(true)
+    try {
+      const res = await fetch(`/api/blockly-projects?userId=${userId}`)
+      const data = await res.json()
+      if (data.projects) {
+        setProjects(data.projects)
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error)
+    }
+    setLoadingProjects(false)
+  }
+
+  // Guardar proyecto
+  const handleSaveProject = async () => {
+    if (!userId) {
+      alert('Debes iniciar sesión para guardar proyectos')
+      return
+    }
+    
+    const projectData = getWorkspaceXml()
+    if (!projectData || projectData === '<xml xmlns="https://developers.google.com/blockly/xml"></xml>') {
+      alert('No hay bloques para guardar')
+      return
+    }
+
+    setSavingProject(true)
+    try {
+      if (currentProjectId) {
+        // Actualizar proyecto existente
+        const res = await fetch('/api/blockly-projects', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            projectId: currentProjectId,
+            projectName: currentProjectName || newProjectName,
+            projectData,
+            isPublic: isPublicProject
+          })
+        })
+        if (res.ok) {
+          alert('¡Proyecto guardado!')
+          setShowSaveModal(false)
+        }
+      } else {
+        // Crear nuevo proyecto
+        if (!newProjectName.trim()) {
+          alert('Escribe un nombre para el proyecto')
+          setSavingProject(false)
+          return
+        }
+        const res = await fetch('/api/blockly-projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            userName: userName || 'Anónimo',
+            projectName: newProjectName,
+            projectData,
+            isPublic: isPublicProject
+          })
+        })
+        const data = await res.json()
+        if (res.ok && data.project) {
+          setCurrentProjectId(data.project.id)
+          setCurrentProjectName(newProjectName)
+          alert('¡Proyecto creado!')
+          setShowSaveModal(false)
+          setNewProjectName('')
+        }
+      }
+    } catch (error) {
+      console.error('Error saving project:', error)
+      alert('Error al guardar')
+    }
+    setSavingProject(false)
+  }
+
+  // Cargar un proyecto
+  const handleLoadProject = (project: BlocklyProject) => {
+    loadWorkspaceXml(project.projectData)
+    setCurrentProjectId(project.id)
+    setCurrentProjectName(project.projectName)
+    setShowProjectsModal(false)
+    updateCode()
+  }
+
+  // Eliminar proyecto
+  const handleDeleteProject = async (projectId: string) => {
+    if (!confirm('¿Eliminar este proyecto?')) return
+    try {
+      const res = await fetch(`/api/blockly-projects?projectId=${projectId}`, {
+        method: 'DELETE'
+      })
+      if (res.ok) {
+        setProjects(prev => prev.filter(p => p.id !== projectId))
+        if (currentProjectId === projectId) {
+          setCurrentProjectId(null)
+          setCurrentProjectName('')
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting project:', error)
     }
   }
 
@@ -631,17 +783,45 @@ export default function BlocklyEditor({ onCodeChange }: BlocklyEditorProps) {
               <Bot className="w-6 h-6 text-neon-cyan" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">ChaskiBlocks</h2>
+              <h2 className="text-lg font-bold text-white">
+                ChaskiBlocks
+                {currentProjectName && (
+                  <span className="text-sm font-normal text-neon-purple ml-2">
+                    — {currentProjectName}
+                  </span>
+                )}
+              </h2>
               <p className="text-xs text-gray-400">Programación visual para robótica</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {userId && (
+              <>
+                <button
+                  onClick={() => {
+                    loadProjects()
+                    setShowProjectsModal(true)
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm transition-colors"
+                >
+                  <FolderOpen className="w-4 h-4" />
+                  Mis Proyectos
+                </button>
+                <button
+                  onClick={() => setShowSaveModal(true)}
+                  className="flex items-center gap-2 px-3 py-2 bg-neon-cyan/20 hover:bg-neon-cyan/30 text-neon-cyan rounded-lg text-sm transition-colors"
+                >
+                  <Save className="w-4 h-4" />
+                  Guardar
+                </button>
+              </>
+            )}
             <button
               onClick={handleReset}
               className="flex items-center gap-2 px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
-              Limpiar
+              Nuevo
             </button>
           </div>
         </div>
@@ -739,6 +919,155 @@ export default function BlocklyEditor({ onCodeChange }: BlocklyEditorProps) {
           )}
         </div>
       </div>
+
+      {/* Modal: Mis Proyectos */}
+      {showProjectsModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-800 rounded-2xl border border-dark-600 w-full max-w-lg max-h-[80vh] overflow-hidden">
+            <div className="p-4 border-b border-dark-600 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <FolderOpen className="w-5 h-5 text-neon-cyan" />
+                Mis Proyectos
+              </h3>
+              <button
+                onClick={() => setShowProjectsModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto max-h-[60vh]">
+              {loadingProjects ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+                </div>
+              ) : projects.length === 0 ? (
+                <div className="text-center py-8">
+                  <FolderOpen className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-400">No tienes proyectos guardados</p>
+                  <p className="text-xs text-gray-500 mt-1">Crea bloques y guárdalos</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {projects.map(project => (
+                    <div
+                      key={project.id}
+                      className="bg-dark-700 rounded-xl p-3 hover:bg-dark-600 transition-colors group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div 
+                          className="flex-1 cursor-pointer"
+                          onClick={() => handleLoadProject(project)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-medium text-white">{project.projectName}</h4>
+                            {project.isPublic ? (
+                              <Globe className="w-3 h-3 text-green-400" />
+                            ) : (
+                              <Lock className="w-3 h-3 text-gray-500" />
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(project.updatedAt).toLocaleDateString('es-ES', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteProject(project.id)}
+                          className="p-2 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Guardar Proyecto */}
+      {showSaveModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-800 rounded-2xl border border-dark-600 w-full max-w-md">
+            <div className="p-4 border-b border-dark-600 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Save className="w-5 h-5 text-neon-cyan" />
+                {currentProjectId ? 'Guardar Cambios' : 'Nuevo Proyecto'}
+              </h3>
+              <button
+                onClick={() => setShowSaveModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Nombre del proyecto</label>
+                <input
+                  type="text"
+                  value={currentProjectId ? currentProjectName : newProjectName}
+                  onChange={(e) => currentProjectId 
+                    ? setCurrentProjectName(e.target.value) 
+                    : setNewProjectName(e.target.value)
+                  }
+                  placeholder="Mi Robot Increíble"
+                  className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl text-white placeholder:text-gray-500 focus:border-neon-cyan focus:outline-none"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setIsPublicProject(!isPublicProject)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors ${
+                    isPublicProject 
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
+                      : 'bg-dark-700 text-gray-400 border border-dark-600'
+                  }`}
+                >
+                  {isPublicProject ? <Globe className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                  {isPublicProject ? 'Público' : 'Privado'}
+                </button>
+                <span className="text-xs text-gray-500">
+                  {isPublicProject ? 'Otros pueden ver tu proyecto' : 'Solo tú puedes verlo'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 border-t border-dark-600 flex gap-3">
+              <button
+                onClick={() => setShowSaveModal(false)}
+                className="flex-1 px-4 py-3 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-xl text-sm font-medium transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveProject}
+                disabled={savingProject}
+                className="flex-1 px-4 py-3 bg-neon-cyan hover:bg-neon-cyan/80 text-dark-900 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
+              >
+                {savingProject ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Guardar
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
