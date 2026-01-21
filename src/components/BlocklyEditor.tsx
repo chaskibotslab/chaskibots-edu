@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge } from 'lucide-react'
+import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge, Monitor, FileCode } from 'lucide-react'
+import RobotSimulator from './RobotSimulator'
 
 // Definición de bloques personalizados para robótica
 const CUSTOM_BLOCKS = `
@@ -503,6 +504,7 @@ export default function BlocklyEditor({ onCodeChange }: BlocklyEditorProps) {
   const [generatedCode, setGeneratedCode] = useState('')
   const [copied, setCopied] = useState(false)
   const [isBlocklyLoaded, setIsBlocklyLoaded] = useState(false)
+  const [rightPanelTab, setRightPanelTab] = useState<'code' | 'simulator'>('simulator')
 
   useEffect(() => {
     // Cargar Blockly dinámicamente
@@ -664,42 +666,77 @@ export default function BlocklyEditor({ onCodeChange }: BlocklyEditorProps) {
           )}
         </div>
 
-        {/* Code Panel */}
-        <div className="w-96 bg-dark-800 border-l border-dark-600 flex flex-col">
-          <div className="p-3 border-b border-dark-600 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Code className="w-4 h-4 text-neon-green" />
-              <span className="text-sm font-medium text-white">Código Arduino</span>
-            </div>
+        {/* Right Panel - Tabs */}
+        <div className="w-[450px] bg-dark-800 border-l border-dark-600 flex flex-col">
+          {/* Tabs */}
+          <div className="flex border-b border-dark-600">
             <button
-              onClick={handleCopyCode}
-              className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
-                copied 
-                  ? 'bg-green-500/20 text-green-400' 
-                  : 'bg-dark-700 hover:bg-dark-600 text-gray-300'
+              onClick={() => setRightPanelTab('simulator')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                rightPanelTab === 'simulator'
+                  ? 'bg-purple-500/20 text-purple-400 border-b-2 border-purple-400'
+                  : 'text-gray-400 hover:text-white hover:bg-dark-700'
               }`}
             >
-              <Copy className="w-3 h-3" />
-              {copied ? '¡Copiado!' : 'Copiar'}
+              <Monitor className="w-4 h-4" />
+              Simulador
+            </button>
+            <button
+              onClick={() => setRightPanelTab('code')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                rightPanelTab === 'code'
+                  ? 'bg-green-500/20 text-green-400 border-b-2 border-green-400'
+                  : 'text-gray-400 hover:text-white hover:bg-dark-700'
+              }`}
+            >
+              <FileCode className="w-4 h-4" />
+              Código Arduino
             </button>
           </div>
-          <div className="flex-1 overflow-auto p-3">
-            <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
-              {generatedCode || '// Arrastra bloques para generar código\n// El código Arduino aparecerá aquí'}
-            </pre>
-          </div>
-          
-          {/* Tips */}
-          <div className="p-3 border-t border-dark-600 bg-dark-900/50">
-            <div className="flex items-start gap-2">
-              <Lightbulb className="w-4 h-4 text-yellow-400 mt-0.5" />
-              <div>
-                <p className="text-xs text-gray-400">
-                  <span className="text-yellow-400 font-medium">Tip:</span> Arrastra bloques desde la izquierda y conéctalos para crear tu programa.
-                </p>
+
+          {/* Tab Content */}
+          {rightPanelTab === 'simulator' ? (
+            <div className="flex-1 overflow-auto">
+              <RobotSimulator />
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col">
+              <div className="p-3 border-b border-dark-600 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Code className="w-4 h-4 text-neon-green" />
+                  <span className="text-sm font-medium text-white">Código Generado</span>
+                </div>
+                <button
+                  onClick={handleCopyCode}
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+                    copied 
+                      ? 'bg-green-500/20 text-green-400' 
+                      : 'bg-dark-700 hover:bg-dark-600 text-gray-300'
+                  }`}
+                >
+                  <Copy className="w-3 h-3" />
+                  {copied ? '¡Copiado!' : 'Copiar'}
+                </button>
+              </div>
+              <div className="flex-1 overflow-auto p-3 bg-dark-900">
+                <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
+                  {generatedCode || '// Arrastra bloques para generar código\n// El código Arduino aparecerá aquí\n\n// Ejemplo:\n// void setup() {\n//   Serial.begin(9600);\n// }\n// \n// void loop() {\n//   // Tu código aquí\n// }'}
+                </pre>
+              </div>
+              
+              {/* Tips */}
+              <div className="p-3 border-t border-dark-600 bg-dark-900/50">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-4 h-4 text-yellow-400 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-gray-400">
+                      <span className="text-yellow-400 font-medium">Tip:</span> Copia este código y pégalo en Arduino IDE para programar tu robot real.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
