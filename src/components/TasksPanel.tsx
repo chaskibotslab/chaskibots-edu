@@ -7,9 +7,12 @@ import {
   Lightbulb, Wrench, CircuitBoard, Bot, Calendar, AlertCircle,
   Pencil, Upload, Image, Star, ClipboardList
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import DrawingCanvas from './DrawingCanvas'
 import FileUpload from './FileUpload'
 import MisCalificaciones from './MisCalificaciones'
+
+const BlocklyEditor = dynamic(() => import('./BlocklyEditor'), { ssr: false })
 
 interface Task {
   id: string
@@ -29,7 +32,7 @@ interface Task {
 interface TaskQuestion {
   id: string
   question: string
-  type: 'text' | 'multiple' | 'code' | 'drawing' | 'upload' | 'image'
+  type: 'text' | 'multiple' | 'code' | 'drawing' | 'upload' | 'image' | 'blocks'
   options?: string[]
   correctAnswer?: string
 }
@@ -651,6 +654,23 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                             onUpload={(files) => handleFilesUpload(task.id, files)} 
                             acceptedTypes={['image/*']}
                           />
+                        </div>
+                      )}
+                      
+                      {/* Tipo: Bloques (ChaskiBlocks) */}
+                      {question.type === 'blocks' && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-400">🧩 Programa con bloques usando ChaskiBlocks</p>
+                          <div className="h-[500px] border border-dark-600 rounded-lg overflow-hidden">
+                            <BlocklyEditor 
+                              onCodeChange={(code) => handleAnswerChange(task.id, question.id, code)}
+                            />
+                          </div>
+                          {answers[task.id]?.[question.id] && (
+                            <p className="text-xs text-green-400 flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3" /> Código generado
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
