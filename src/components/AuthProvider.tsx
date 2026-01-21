@@ -49,10 +49,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser))
+        const parsedUser = JSON.parse(savedUser)
+        setUser(parsedUser)
+        
+        // Sincronizar cookie de sesión para el middleware (protección server-side)
+        const sessionData = btoa(JSON.stringify({ id: parsedUser.id, role: parsedUser.role, email: parsedUser.email }))
+        document.cookie = `chaskibots_session=${sessionData}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
       } catch {
         localStorage.removeItem('chaskibots_user')
+        document.cookie = 'chaskibots_session=; path=/; max-age=0'
       }
+    } else {
+      // No hay usuario, asegurar que no haya cookie
+      document.cookie = 'chaskibots_session=; path=/; max-age=0'
     }
     
     if (savedLogs) {
@@ -115,6 +124,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(loggedUser)
       localStorage.setItem('chaskibots_user', JSON.stringify(loggedUser))
       
+      // Guardar sesión en cookie para el middleware (protección server-side)
+      const sessionData = btoa(JSON.stringify({ id: loggedUser.id, role: loggedUser.role, email: loggedUser.email }))
+      document.cookie = `chaskibots_session=${sessionData}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
+      
       // Registrar acceso
       const loginLog: AccessLog = {
         userId: loggedUser.id,
@@ -152,6 +165,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setUser(null)
     localStorage.removeItem('chaskibots_user')
+    // Eliminar cookie de sesión
+    document.cookie = 'chaskibots_session=; path=/; max-age=0'
   }
 
   return (
