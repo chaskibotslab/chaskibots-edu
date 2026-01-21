@@ -262,10 +262,33 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadedFile[]>>({}) // taskId -> files
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState<string[]>([])
+  const [submittedTaskIds, setSubmittedTaskIds] = useState<Set<string>>(new Set()) // IDs de tareas ya enviadas desde API
   const [name, setName] = useState(studentName)
   const [activeTab, setActiveTab] = useState<'tareas' | 'calificaciones'>('tareas')
 
   const [loading, setLoading] = useState(true)
+
+  // Cargar entregas previas del estudiante para saber qué tareas ya envió
+  useEffect(() => {
+    async function loadMySubmissions() {
+      if (!name.trim()) return
+      try {
+        const res = await fetch(`/api/submissions?levelId=${levelId}`)
+        const data = await res.json()
+        if (data.submissions) {
+          const mySubmissions = data.submissions.filter(
+            (s: any) => s.studentName.toLowerCase() === name.toLowerCase()
+          )
+          // Guardar los lessonId (que es el task.id) de las tareas ya enviadas
+          const taskIds = new Set(mySubmissions.map((s: any) => s.lessonId))
+          setSubmittedTaskIds(taskIds as Set<string>)
+        }
+      } catch (error) {
+        console.error('Error loading submissions:', error)
+      }
+    }
+    loadMySubmissions()
+  }, [name, levelId])
 
   useEffect(() => {
     // Cargar tareas desde Airtable
@@ -487,11 +510,12 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
       <div className="space-y-4">
         {tasks.map(task => {
           const isExpired = task.dueDate && new Date(task.dueDate) < new Date()
+          const isAlreadySubmitted = submitted.includes(task.id) || submittedTaskIds.has(task.id)
           return (
           <div
             key={task.id}
             className={`bg-dark-800 border rounded-xl overflow-hidden transition-all ${
-              submitted.includes(task.id) 
+              isAlreadySubmitted 
                 ? 'border-green-500/50' 
                 : expandedTask === task.id 
                   ? 'border-neon-cyan/50' 
@@ -502,10 +526,10 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
             <button
               onClick={() => setExpandedTask(expandedTask === task.id ? null : task.id)}
               className="w-full p-4 flex items-center gap-4 text-left"
-              disabled={submitted.includes(task.id)}
+              disabled={isAlreadySubmitted}
             >
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getCategoryColor(task.category)}`}>
-                {submitted.includes(task.id) ? (
+                {isAlreadySubmitted ? (
                   <CheckCircle className="w-6 h-6 text-green-400" />
                 ) : (
                   getCategoryIcon(task.category)
@@ -516,7 +540,7 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
                 <div className="flex items-center gap-2 flex-wrap">
                   <h4 className="font-medium text-white">{task.title}</h4>
                   {getDifficultyBadge(task.difficulty)}
-                  {submitted.includes(task.id) && (
+                  {isAlreadySubmitted && (
                     <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full flex items-center gap-1">
                       <CheckCircle className="w-3 h-3" /> Enviado
                     </span>
@@ -538,7 +562,7 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
                 </div>
               </div>
 
-              {!submitted.includes(task.id) && (
+              {!isAlreadySubmitted && (
                 expandedTask === task.id ? (
                   <ChevronUp className="w-5 h-5 text-gray-400" />
                 ) : (
@@ -548,7 +572,7 @@ export default function TasksPanel({ levelId, studentName = '' }: TasksPanelProp
             </button>
 
             {/* Task Content */}
-            {expandedTask === task.id && !submitted.includes(task.id) && (
+            {expandedTask === task.id && !isAlreadySubmitted && (
               <div className="px-4 pb-4 border-t border-dark-600">
                 <div className="pt-4 space-y-4">
                   {task.questions?.map((question, idx) => (

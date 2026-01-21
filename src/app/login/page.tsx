@@ -270,13 +270,24 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              ¿No tienes cuenta?{' '}
-              <Link href="/register" className="text-chaski-blue font-semibold hover:underline">
-                Regístrate aquí
-              </Link>
+          <div className="mt-6 text-center bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
+            <p className="text-gray-700 font-medium mb-2">
+              ¿No tienes cuenta?
             </p>
+            <p className="text-sm text-gray-600 mb-3">
+              Para registrarte, contáctanos:
+            </p>
+            <div className="flex items-center justify-center gap-2 text-chaski-dark font-bold">
+              <span className="text-xl">📞</span>
+              <a href="tel:+593968653593" className="text-lg hover:text-chaski-blue">0968653593</a>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              📍 Machachi - Ecuador
+            </p>
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <Image src="/chaski.png" alt="ChaskiBots" width={24} height={24} className="rounded" />
+              <span className="text-sm font-semibold text-chaski-dark">ChaskiBots</span>
+            </div>
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-100">

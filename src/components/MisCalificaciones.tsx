@@ -37,7 +37,10 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
   }, [studentName, levelId])
 
   const loadMySubmissions = async () => {
-    if (!studentName) return
+    if (!studentName || !studentName.trim()) {
+      setLoading(false)
+      return
+    }
     
     setLoading(true)
     try {
@@ -46,7 +49,7 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
       if (data.submissions) {
         // Filtrar solo las entregas de este estudiante
         const mySubmissions = data.submissions.filter(
-          (s: Submission) => s.studentName.toLowerCase() === studentName.toLowerCase()
+          (s: Submission) => s.studentName.toLowerCase().trim() === studentName.toLowerCase().trim()
         )
         setSubmissions(mySubmissions)
       }
@@ -99,6 +102,17 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
     return (
       <div className="flex items-center justify-center py-8">
         <Loader2 className="w-6 h-6 text-neon-cyan animate-spin" />
+      </div>
+    )
+  }
+
+  // Si no hay nombre, mostrar mensaje
+  if (!studentName || !studentName.trim()) {
+    return (
+      <div className="bg-dark-800 border border-yellow-500/30 rounded-xl p-6 text-center">
+        <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
+        <p className="text-white font-medium">Ingresa tu nombre primero</p>
+        <p className="text-sm text-gray-400 mt-1">Escribe tu nombre completo en el campo de arriba para ver tus calificaciones</p>
       </div>
     )
   }
