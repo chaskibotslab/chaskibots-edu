@@ -235,8 +235,9 @@ export async function validateEmailPassword(email: string, password: string): Pr
     const record = records[0]
     const fields = record.fields
 
-    // Verificar password
-    if (fields.password !== password) {
+    // Verificar password - puede ser el campo password o el accessCode
+    const storedPassword = fields.password || fields.accessCode
+    if (storedPassword !== password) {
       return { success: false, error: 'Contrasena incorrecta' }
     }
 
