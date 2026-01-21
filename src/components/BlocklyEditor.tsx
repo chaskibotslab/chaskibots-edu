@@ -550,6 +550,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
         
         // Tema personalizado ChaskiBots
         const chaskiTheme = Blockly.Theme.defineTheme('chaski', {
+          'name': 'chaski',
           'base': Blockly.Themes.Classic,
           'componentStyles': {
             'workspaceBackgroundColour': '#1a1a2e',
@@ -569,10 +570,10 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
             'weight': 'bold',
             'size': 12
           }
-        })
+        } as any)
         
         workspaceRef.current = Blockly.inject(blocklyDiv.current, {
-          toolbox: toolbox,
+          toolbox: toolbox || undefined,
           theme: chaskiTheme,
           grid: {
             spacing: 20,
