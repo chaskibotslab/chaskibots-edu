@@ -1,13 +1,14 @@
 'use client'
 
-import { useRef, useState, useCallback, useEffect } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useRef, useState, useCallback, useEffect, Suspense } from 'react'
+import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import * as THREE from 'three'
 import { 
-  Play, Pause, RotateCcw, Lightbulb, Eye, ArrowUp, ArrowDown,
-  ArrowLeft, ArrowRight, Square, Gauge, Box, Map, Trophy, Flag, ChevronLeft, ChevronRight,
-  Maximize2, Minimize2
+  RotateCcw, ArrowUp, ArrowDown,
+  ArrowLeft, ArrowRight, Square, Map, Trophy, ChevronLeft, ChevronRight,
+  Maximize2, Minimize2, Lightbulb, Eye, Gauge
 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -271,7 +272,7 @@ function Obstacle({ position, size }: { position: [number, number, number], size
   )
 }
 
-// Componente de Punto de Inicio
+// Componente de Punto de Inicio - INICIO visible
 function StartPoint({ position }: { position: [number, number, number] }) {
   const ringRef = useRef<THREE.Mesh>(null)
   
@@ -283,116 +284,154 @@ function StartPoint({ position }: { position: [number, number, number] }) {
   
   return (
     <group position={position}>
-      {/* Base verde */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-        <circleGeometry args={[0.4, 32]} />
-        <meshStandardMaterial color="#22c55e" transparent opacity={0.8} />
-      </mesh>
-      {/* Anillo animado */}
-      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
-        <ringGeometry args={[0.35, 0.45, 32]} />
-        <meshStandardMaterial color="#4ade80" transparent opacity={0.6} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Bandera de inicio */}
-      <mesh position={[0, 0.5, 0]}>
-        <cylinderGeometry args={[0.03, 0.03, 1, 8]} />
-        <meshStandardMaterial color="#166534" />
-      </mesh>
-      <mesh position={[0.15, 0.8, 0]}>
-        <boxGeometry args={[0.3, 0.2, 0.02]} />
-        <meshStandardMaterial color="#22c55e" emissive="#22c55e" emissiveIntensity={0.3} />
-      </mesh>
-    </group>
-  )
-}
-
-// Componente del modelo 3D de ChaskiBots (usando geometría simple como fallback)
-function ChaskiModel({ position, reached }: { position: [number, number, number], reached: boolean }) {
-  const modelRef = useRef<THREE.Group>(null)
-  const logoRef = useRef<THREE.Mesh>(null)
-  
-  useFrame((state) => {
-    if (modelRef.current) {
-      // Rotación suave
-      modelRef.current.rotation.y = state.clock.elapsedTime * 0.5
-    }
-    if (logoRef.current) {
-      // Efecto de flotación
-      logoRef.current.position.y = 0.4 + Math.sin(state.clock.elapsedTime * 2) * 0.08
-    }
-  })
-  
-  return (
-    <group position={position}>
-      {/* Base con glow */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-        <circleGeometry args={[0.7, 32]} />
-        <meshStandardMaterial 
-          color={reached ? "#fbbf24" : "#00f5d4"} 
-          transparent 
-          opacity={0.5}
-          emissive={reached ? "#fbbf24" : "#00f5d4"}
-          emissiveIntensity={0.6}
-        />
-      </mesh>
-      {/* Anillo exterior animado */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
-        <ringGeometry args={[0.65, 0.8, 32]} />
-        <meshStandardMaterial 
-          color={reached ? "#fcd34d" : "#00f5d4"} 
-          transparent 
-          opacity={0.4} 
-          side={THREE.DoubleSide}
-          emissive={reached ? "#fcd34d" : "#00f5d4"}
-          emissiveIntensity={0.3}
-        />
-      </mesh>
-      {/* Estrella/Trofeo 3D giratorio */}
-      <group ref={modelRef}>
-        {/* Estrella central */}
-        <mesh ref={logoRef} position={[0, 0.4, 0]}>
-          <octahedronGeometry args={[0.25, 0]} />
+      {/* Texto INICIO - Cartel */}
+      <group position={[0, 0.7, 0]}>
+        <mesh>
+          <boxGeometry args={[0.8, 0.25, 0.05]} />
           <meshStandardMaterial 
-            color={reached ? "#fbbf24" : "#00f5d4"}
-            metalness={0.8}
-            roughness={0.2}
-            emissive={reached ? "#fbbf24" : "#00f5d4"}
-            emissiveIntensity={reached ? 0.8 : 0.4}
-          />
-        </mesh>
-        {/* Anillo decorativo */}
-        <mesh position={[0, 0.4, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[0.35, 0.03, 8, 32]} />
-          <meshStandardMaterial 
-            color={reached ? "#d97706" : "#0891b2"}
-            metalness={0.7}
-            roughness={0.3}
-          />
-        </mesh>
-        {/* Base del trofeo */}
-        <mesh position={[0, 0.1, 0]}>
-          <cylinderGeometry args={[0.15, 0.2, 0.15, 16]} />
-          <meshStandardMaterial 
-            color={reached ? "#d97706" : "#0e7490"}
-            metalness={0.6}
-            roughness={0.4}
+            color="#3b82f6"
+            emissive="#3b82f6"
+            emissiveIntensity={0.5}
           />
         </mesh>
       </group>
-      {/* Luz puntual para destacar */}
+      
+      {/* Base azul - INICIO */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+        <circleGeometry args={[0.6, 32]} />
+        <meshStandardMaterial 
+          color="#3b82f6" 
+          transparent 
+          opacity={0.7}
+          emissive="#3b82f6"
+          emissiveIntensity={0.4}
+        />
+      </mesh>
+      
+      {/* Anillo animado */}
+      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
+        <ringGeometry args={[0.55, 0.7, 32]} />
+        <meshStandardMaterial 
+          color="#60a5fa" 
+          transparent 
+          opacity={0.5} 
+          side={THREE.DoubleSide}
+          emissive="#60a5fa"
+          emissiveIntensity={0.3}
+        />
+      </mesh>
+      
+      {/* Bandera de inicio */}
+      <mesh position={[0, 0.35, 0]}>
+        <cylinderGeometry args={[0.04, 0.04, 0.7, 8]} />
+        <meshStandardMaterial color="#1d4ed8" />
+      </mesh>
+      <mesh position={[0.2, 0.55, 0]}>
+        <boxGeometry args={[0.35, 0.25, 0.02]} />
+        <meshStandardMaterial color="#3b82f6" emissive="#3b82f6" emissiveIntensity={0.4} />
+      </mesh>
+      
+      {/* Luz puntual */}
       <pointLight 
         position={[0, 0.8, 0]} 
-        intensity={reached ? 3 : 1.5} 
-        color={reached ? "#fbbf24" : "#00f5d4"} 
+        intensity={1.5} 
+        color="#3b82f6" 
         distance={3}
       />
     </group>
   )
 }
 
-// Componente de Meta/Goal (fallback si no carga el modelo)
-function GoalPoint({ position, radius, reached }: { position: [number, number, number], radius: number, reached: boolean }) {
-  return <ChaskiModel position={position} reached={reached} />
+// Componente del modelo 3D de ChaskiBots cargando el OBJ
+function ChaskiOBJModel({ reached }: { reached: boolean }) {
+  const obj = useLoader(OBJLoader, '/models/tinker.obj')
+  const modelRef = useRef<THREE.Group>(null)
+  
+  useEffect(() => {
+    if (obj) {
+      obj.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.material = new THREE.MeshStandardMaterial({
+            color: reached ? '#fbbf24' : '#00f5d4',
+            metalness: 0.6,
+            roughness: 0.3,
+            emissive: reached ? '#fbbf24' : '#00f5d4',
+            emissiveIntensity: reached ? 0.5 : 0.2
+          })
+        }
+      })
+    }
+  }, [obj, reached])
+  
+  useFrame((state) => {
+    if (modelRef.current) {
+      modelRef.current.rotation.y = state.clock.elapsedTime * 0.5
+      modelRef.current.position.y = 0.3 + Math.sin(state.clock.elapsedTime * 2) * 0.05
+    }
+  })
+  
+  return (
+    <group ref={modelRef}>
+      <primitive object={obj.clone()} scale={[0.006, 0.006, 0.006]} />
+    </group>
+  )
+}
+
+// Componente de Meta/Goal con modelo 3D de ChaskiBots
+function GoalPoint({ position, reached }: { position: [number, number, number], reached: boolean }) {
+  return (
+    <group position={position}>
+      {/* Texto FINAL */}
+      <group position={[0, 0.8, 0]}>
+        <mesh>
+          <boxGeometry args={[0.8, 0.2, 0.05]} />
+          <meshStandardMaterial 
+            color={reached ? "#fbbf24" : "#22c55e"}
+            emissive={reached ? "#fbbf24" : "#22c55e"}
+            emissiveIntensity={0.5}
+          />
+        </mesh>
+      </group>
+      
+      {/* Base con glow - META */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+        <circleGeometry args={[0.8, 32]} />
+        <meshStandardMaterial 
+          color={reached ? "#fbbf24" : "#22c55e"} 
+          transparent 
+          opacity={0.6}
+          emissive={reached ? "#fbbf24" : "#22c55e"}
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+      
+      {/* Anillo exterior */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
+        <ringGeometry args={[0.75, 0.9, 32]} />
+        <meshStandardMaterial 
+          color={reached ? "#fcd34d" : "#4ade80"} 
+          transparent 
+          opacity={0.5} 
+          side={THREE.DoubleSide}
+          emissive={reached ? "#fcd34d" : "#4ade80"}
+          emissiveIntensity={0.4}
+        />
+      </mesh>
+      
+      {/* Modelo 3D de ChaskiBots */}
+      <Suspense fallback={null}>
+        <ChaskiOBJModel reached={reached} />
+      </Suspense>
+      
+      {/* Luz puntual para destacar */}
+      <pointLight 
+        position={[0, 1, 0]} 
+        intensity={reached ? 4 : 2} 
+        color={reached ? "#fbbf24" : "#22c55e"} 
+        distance={4}
+      />
+    </group>
+  )
 }
 
 // Componente del Grid manual
@@ -548,8 +587,8 @@ function Scene({
       {/* Punto de inicio */}
       <StartPoint position={startPos} />
       
-      {/* Meta */}
-      <GoalPoint position={goalPos} radius={challenge.goal.radius} reached={goalReached} />
+      {/* Meta - FINAL con modelo ChaskiBots */}
+      <GoalPoint position={goalPos} reached={goalReached} />
       
       {/* Obstáculos */}
       {obstacles3D.map((obs, i) => (
@@ -879,12 +918,12 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
 
   return (
     <div className={`bg-dark-800 rounded-xl border border-dark-600 overflow-hidden transition-all duration-300 ${
-      isExpanded ? 'fixed inset-4 z-50' : ''
+      isExpanded ? 'fixed inset-4 z-50 flex flex-col' : ''
     }`}>
       {/* Overlay para modo expandido */}
       {isExpanded && (
         <div 
-          className="fixed inset-0 bg-black/70 -z-10" 
+          className="fixed inset-0 bg-black/80 -z-10" 
           onClick={() => setIsExpanded(false)}
         />
       )}
@@ -900,20 +939,12 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={runDemo}
-              disabled={isRunning || goalReached}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                isRunning 
-                  ? 'bg-yellow-500/20 text-yellow-400' 
-                  : goalReached
-                    ? 'bg-green-500/30 text-green-300'
-                    : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-              }`}
-            >
-              {goalReached ? <Trophy className="w-3 h-3" /> : isRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-              {goalReached ? '¡Meta!' : isRunning ? 'Ejecutando...' : 'Demo'}
-            </button>
+            {goalReached && (
+              <span className="flex items-center gap-1 px-3 py-1.5 bg-green-500/30 text-green-300 rounded-lg text-xs font-medium">
+                <Trophy className="w-3 h-3" />
+                ¡Meta alcanzada!
+              </span>
+            )}
             <button
               onClick={resetRobot}
               className="flex items-center gap-1 px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-xs font-medium transition-colors"
@@ -990,9 +1021,9 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
         </div>
       )}
 
-      <div className={`flex ${isExpanded ? 'flex-1' : ''}`}>
+      <div className={`flex ${isExpanded ? 'flex-1 min-h-0' : ''}`}>
         {/* Canvas 3D */}
-        <div className={`flex-1 bg-dark-900 relative ${isExpanded ? 'h-full' : 'h-[400px]'}`}>
+        <div className={`flex-1 bg-dark-900 relative ${isExpanded ? 'min-h-0' : 'h-[400px]'}`}>
           <Canvas shadows>
             <Scene 
               robotState={robotState} 
@@ -1004,7 +1035,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
         </div>
 
         {/* Panel de control */}
-        <div className="w-48 bg-dark-900 border-l border-dark-600 p-3 space-y-4">
+        <div className={`w-48 bg-dark-900 border-l border-dark-600 p-3 space-y-4 ${isExpanded ? 'overflow-y-auto' : ''}`}>
           {/* Controles de dirección */}
           <div>
             <p className="text-xs text-gray-400 mb-2 font-medium">Control Manual</p>
