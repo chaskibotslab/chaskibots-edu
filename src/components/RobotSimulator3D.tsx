@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, Environment, Grid, Text } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import * as THREE from 'three'
 import { 
   Play, Pause, RotateCcw, Lightbulb, Eye, ArrowUp, ArrowDown,
@@ -91,12 +91,12 @@ function Robot({ state, obstacles }: { state: RobotState, obstacles: Array<{x: n
           <meshStandardMaterial color="#9333ea" metalness={0.5} roughness={0.5} />
         </mesh>
         {/* Ojos del sensor */}
-        <mesh position={[-0.08, 0, -0.06]}>
-          <cylinderGeometry args={[0.04, 0.04, 0.02, 16]} rotation={[Math.PI / 2, 0, 0]} />
+        <mesh position={[-0.08, 0, -0.06]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.04, 0.04, 0.02, 16]} />
           <meshStandardMaterial color="#c084fc" metalness={0.6} roughness={0.4} />
         </mesh>
-        <mesh position={[0.08, 0, -0.06]}>
-          <cylinderGeometry args={[0.04, 0.04, 0.02, 16]} rotation={[Math.PI / 2, 0, 0]} />
+        <mesh position={[0.08, 0, -0.06]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.04, 0.04, 0.02, 16]} />
           <meshStandardMaterial color="#c084fc" metalness={0.6} roughness={0.4} />
         </mesh>
       </group>
@@ -169,6 +169,38 @@ function Obstacle({ position, size }: { position: [number, number, number], size
   )
 }
 
+// Componente del Grid manual
+function CustomGrid() {
+  const gridRef = useRef<THREE.Group>(null)
+  
+  useEffect(() => {
+    if (gridRef.current) {
+      // Crear líneas del grid manualmente
+      const size = 10
+      const divisions = 20
+      const step = size / divisions
+      
+      const material = new THREE.LineBasicMaterial({ color: '#2a2a4a', transparent: true, opacity: 0.5 })
+      
+      for (let i = -size/2; i <= size/2; i += step) {
+        // Líneas horizontales
+        const pointsH = [new THREE.Vector3(-size/2, 0, i), new THREE.Vector3(size/2, 0, i)]
+        const geometryH = new THREE.BufferGeometry().setFromPoints(pointsH)
+        const lineH = new THREE.Line(geometryH, material)
+        gridRef.current.add(lineH)
+        
+        // Líneas verticales
+        const pointsV = [new THREE.Vector3(i, 0, -size/2), new THREE.Vector3(i, 0, size/2)]
+        const geometryV = new THREE.BufferGeometry().setFromPoints(pointsV)
+        const lineV = new THREE.Line(geometryV, material)
+        gridRef.current.add(lineV)
+      }
+    }
+  }, [])
+  
+  return <group ref={gridRef} position={[0, 0.01, 0]} />
+}
+
 // Componente del Piso con logo
 function Floor() {
   return (
@@ -179,21 +211,11 @@ function Floor() {
         <meshStandardMaterial color="#1a1a2e" />
       </mesh>
       
-      {/* Grid */}
-      <Grid 
-        args={[10, 10]} 
-        cellSize={0.5} 
-        cellThickness={0.5} 
-        cellColor="#2a2a4a" 
-        sectionSize={2} 
-        sectionThickness={1} 
-        sectionColor="#3a3a5a"
-        fadeDistance={15}
-        position={[0, 0.01, 0]}
-      />
+      {/* Grid manual */}
+      <CustomGrid />
 
       {/* Borde del área de juego */}
-      <mesh position={[0, 0.05, 0]}>
+      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[4.9, 5, 64]} />
         <meshStandardMaterial color="#00f5d4" transparent opacity={0.3} side={THREE.DoubleSide} />
       </mesh>
