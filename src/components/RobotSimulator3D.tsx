@@ -51,8 +51,11 @@ interface Challenge {
 }
 
 // Área de juego: 400x400 unidades (centrado en 200,200)
+// El círculo 3D tiene radio 5, que equivale a 200 unidades desde el centro
+// Todos los obstáculos deben estar entre 40 y 360 para quedar dentro del círculo
 const ARENA_SIZE = 400
 const ARENA_CENTER = 200
+const ARENA_MARGIN = 50 // Margen desde el borde
 
 const CHALLENGES: Challenge[] = [
   {
@@ -61,12 +64,12 @@ const CHALLENGES: Challenge[] = [
     description: 'Llega a la meta en línea recta',
     difficulty: 'easy',
     obstacles: [
-      // Paredes laterales para guiar
-      { x: 50, z: 50, w: 300, h: 15 },
-      { x: 50, z: 335, w: 300, h: 15 },
+      // Paredes laterales para guiar - dentro del área
+      { x: 80, z: 120, w: 240, h: 15 },
+      { x: 80, z: 265, w: 240, h: 15 },
     ],
-    start: { x: 60, z: 200, angle: 0 },
-    goal: { x: 340, z: 200, radius: 35 }
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 330, z: 200, radius: 30 }
   },
   {
     id: 'obstacles',
@@ -74,13 +77,13 @@ const CHALLENGES: Challenge[] = [
     description: 'Esquiva los bloques para llegar a la meta',
     difficulty: 'easy',
     obstacles: [
-      { x: 120, z: 100, w: 60, h: 60 },
-      { x: 220, z: 240, w: 60, h: 60 },
-      { x: 120, z: 280, w: 60, h: 60 },
-      { x: 280, z: 120, w: 60, h: 60 },
+      { x: 130, z: 130, w: 50, h: 50 },
+      { x: 200, z: 220, w: 50, h: 50 },
+      { x: 130, z: 250, w: 50, h: 50 },
+      { x: 250, z: 150, w: 50, h: 50 },
     ],
-    start: { x: 50, z: 200, angle: 0 },
-    goal: { x: 350, z: 200, radius: 35 }
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 330, z: 200, radius: 30 }
   },
   {
     id: 'slalom',
@@ -88,52 +91,51 @@ const CHALLENGES: Challenge[] = [
     description: 'Zigzaguea entre los postes',
     difficulty: 'medium',
     obstacles: [
-      // Postes verticales espaciados uniformemente
-      { x: 100, z: 50, w: 30, h: 130 },
-      { x: 100, z: 220, w: 30, h: 130 },
-      { x: 180, z: 120, w: 30, h: 160 },
-      { x: 260, z: 50, w: 30, h: 130 },
-      { x: 260, z: 220, w: 30, h: 130 },
+      // Postes verticales espaciados - todos dentro del área
+      { x: 120, z: 100, w: 25, h: 80 },
+      { x: 120, z: 220, w: 25, h: 80 },
+      { x: 185, z: 150, w: 25, h: 100 },
+      { x: 250, z: 100, w: 25, h: 80 },
+      { x: 250, z: 220, w: 25, h: 80 },
     ],
-    start: { x: 40, z: 200, angle: 0 },
-    goal: { x: 360, z: 200, radius: 35 }
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 330, z: 200, radius: 30 }
   },
   {
     id: 'corridor',
     name: 'Corredor',
-    description: 'Navega por el pasillo estrecho',
+    description: 'Navega por el pasillo en L',
     difficulty: 'medium',
     obstacles: [
-      // Paredes del corredor en L
-      { x: 30, z: 30, w: 15, h: 250 },
-      { x: 100, z: 100, w: 15, h: 180 },
-      { x: 30, z: 265, w: 200, h: 15 },
-      { x: 100, z: 265, w: 200, h: 15 },
-      { x: 285, z: 120, w: 15, h: 160 },
-      { x: 355, z: 120, w: 15, h: 250 },
+      // Paredes del corredor en L - dentro del área
+      { x: 70, z: 70, w: 15, h: 180 },
+      { x: 130, z: 130, w: 15, h: 120 },
+      { x: 70, z: 235, w: 150, h: 15 },
+      { x: 130, z: 235, w: 150, h: 15 },
+      { x: 265, z: 150, w: 15, h: 100 },
+      { x: 320, z: 150, w: 15, h: 160 },
     ],
-    start: { x: 65, z: 60, angle: 90 },
-    goal: { x: 320, z: 340, radius: 35 }
+    start: { x: 100, z: 100, angle: 90 },
+    goal: { x: 290, z: 280, radius: 30 }
   },
   {
     id: 'maze',
     name: 'Laberinto',
-    description: 'Encuentra el camino a través del laberinto',
+    description: 'Encuentra el camino',
     difficulty: 'hard',
     obstacles: [
-      // Paredes del laberinto
-      { x: 80, z: 30, w: 15, h: 180 },
-      { x: 80, z: 250, w: 15, h: 120 },
-      { x: 160, z: 100, w: 15, h: 200 },
-      { x: 160, z: 30, w: 100, h: 15 },
-      { x: 240, z: 30, w: 15, h: 120 },
-      { x: 240, z: 200, w: 15, h: 170 },
-      { x: 160, z: 285, w: 95, h: 15 },
-      { x: 320, z: 100, w: 15, h: 200 },
-      { x: 255, z: 100, w: 80, h: 15 },
+      // Laberinto compacto dentro del área
+      { x: 100, z: 80, w: 15, h: 120 },
+      { x: 100, z: 230, w: 15, h: 90 },
+      { x: 170, z: 130, w: 15, h: 140 },
+      { x: 170, z: 80, w: 80, h: 15 },
+      { x: 235, z: 80, w: 15, h: 100 },
+      { x: 235, z: 210, w: 15, h: 110 },
+      { x: 170, z: 255, w: 80, h: 15 },
+      { x: 300, z: 130, w: 15, h: 140 },
     ],
-    start: { x: 40, z: 350, angle: -90 },
-    goal: { x: 360, z: 60, radius: 35 }
+    start: { x: 70, z: 300, angle: -90 },
+    goal: { x: 330, z: 100, radius: 30 }
   }
 ]
 
@@ -304,71 +306,93 @@ function StartPoint({ position }: { position: [number, number, number] }) {
   )
 }
 
-// Componente de Meta/Goal
-function GoalPoint({ position, radius, reached }: { position: [number, number, number], radius: number, reached: boolean }) {
-  const ringRef = useRef<THREE.Mesh>(null)
-  const glowRef = useRef<THREE.Mesh>(null)
+// Componente del modelo 3D de ChaskiBots (usando geometría simple como fallback)
+function ChaskiModel({ position, reached }: { position: [number, number, number], reached: boolean }) {
+  const modelRef = useRef<THREE.Group>(null)
+  const logoRef = useRef<THREE.Mesh>(null)
   
   useFrame((state) => {
-    if (ringRef.current) {
-      ringRef.current.rotation.z = -state.clock.elapsedTime * 0.8
+    if (modelRef.current) {
+      // Rotación suave
+      modelRef.current.rotation.y = state.clock.elapsedTime * 0.5
     }
-    if (glowRef.current) {
-      const scale = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.1
-      glowRef.current.scale.set(scale, scale, 1)
+    if (logoRef.current) {
+      // Efecto de flotación
+      logoRef.current.position.y = 0.4 + Math.sin(state.clock.elapsedTime * 2) * 0.08
     }
   })
   
-  const scale = 0.025
-  const size = radius * scale
-  
   return (
     <group position={position}>
-      {/* Base dorada/trofeo */}
+      {/* Base con glow */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-        <circleGeometry args={[size, 32]} />
+        <circleGeometry args={[0.7, 32]} />
         <meshStandardMaterial 
-          color={reached ? "#fbbf24" : "#f59e0b"} 
+          color={reached ? "#fbbf24" : "#00f5d4"} 
           transparent 
-          opacity={0.8}
-          emissive={reached ? "#fbbf24" : "#000000"}
-          emissiveIntensity={reached ? 1 : 0}
+          opacity={0.5}
+          emissive={reached ? "#fbbf24" : "#00f5d4"}
+          emissiveIntensity={0.6}
         />
       </mesh>
-      {/* Anillo animado */}
-      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
-        <ringGeometry args={[size * 0.8, size * 1.1, 32]} />
-        <meshStandardMaterial color="#fcd34d" transparent opacity={0.6} side={THREE.DoubleSide} />
+      {/* Anillo exterior animado */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
+        <ringGeometry args={[0.65, 0.8, 32]} />
+        <meshStandardMaterial 
+          color={reached ? "#fcd34d" : "#00f5d4"} 
+          transparent 
+          opacity={0.4} 
+          side={THREE.DoubleSide}
+          emissive={reached ? "#fcd34d" : "#00f5d4"}
+          emissiveIntensity={0.3}
+        />
       </mesh>
-      {/* Glow effect */}
-      <mesh ref={glowRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-        <circleGeometry args={[size * 1.3, 32]} />
-        <meshStandardMaterial color="#fbbf24" transparent opacity={0.2} />
-      </mesh>
-      {/* Trofeo 3D */}
-      <group position={[0, 0.3, 0]}>
-        {/* Copa */}
-        <mesh position={[0, 0.15, 0]}>
-          <cylinderGeometry args={[0.12, 0.08, 0.25, 16]} />
-          <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
+      {/* Estrella/Trofeo 3D giratorio */}
+      <group ref={modelRef}>
+        {/* Estrella central */}
+        <mesh ref={logoRef} position={[0, 0.4, 0]}>
+          <octahedronGeometry args={[0.25, 0]} />
+          <meshStandardMaterial 
+            color={reached ? "#fbbf24" : "#00f5d4"}
+            metalness={0.8}
+            roughness={0.2}
+            emissive={reached ? "#fbbf24" : "#00f5d4"}
+            emissiveIntensity={reached ? 0.8 : 0.4}
+          />
+        </mesh>
+        {/* Anillo decorativo */}
+        <mesh position={[0, 0.4, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.35, 0.03, 8, 32]} />
+          <meshStandardMaterial 
+            color={reached ? "#d97706" : "#0891b2"}
+            metalness={0.7}
+            roughness={0.3}
+          />
         </mesh>
         {/* Base del trofeo */}
-        <mesh position={[0, -0.05, 0]}>
-          <cylinderGeometry args={[0.05, 0.1, 0.15, 16]} />
-          <meshStandardMaterial color="#d97706" metalness={0.6} roughness={0.3} />
-        </mesh>
-        {/* Asas */}
-        <mesh position={[0.15, 0.15, 0]} rotation={[0, 0, Math.PI / 4]}>
-          <torusGeometry args={[0.06, 0.015, 8, 16, Math.PI]} />
-          <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
-        </mesh>
-        <mesh position={[-0.15, 0.15, 0]} rotation={[0, Math.PI, Math.PI / 4]}>
-          <torusGeometry args={[0.06, 0.015, 8, 16, Math.PI]} />
-          <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
+        <mesh position={[0, 0.1, 0]}>
+          <cylinderGeometry args={[0.15, 0.2, 0.15, 16]} />
+          <meshStandardMaterial 
+            color={reached ? "#d97706" : "#0e7490"}
+            metalness={0.6}
+            roughness={0.4}
+          />
         </mesh>
       </group>
+      {/* Luz puntual para destacar */}
+      <pointLight 
+        position={[0, 0.8, 0]} 
+        intensity={reached ? 3 : 1.5} 
+        color={reached ? "#fbbf24" : "#00f5d4"} 
+        distance={3}
+      />
     </group>
   )
+}
+
+// Componente de Meta/Goal (fallback si no carga el modelo)
+function GoalPoint({ position, radius, reached }: { position: [number, number, number], radius: number, reached: boolean }) {
+  return <ChaskiModel position={position} reached={reached} />
 }
 
 // Componente del Grid manual
@@ -420,20 +444,26 @@ function Floor() {
   
   return (
     <group>
-      {/* Piso principal */}
+      {/* Piso principal - más claro */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <planeGeometry args={[10, 10]} />
-        <meshStandardMaterial color="#1a1a2e" />
+        <meshStandardMaterial color="#2a2a4e" />
+      </mesh>
+      
+      {/* Área de juego circular - más visible */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+        <circleGeometry args={[5, 64]} />
+        <meshStandardMaterial color="#3a3a6e" />
       </mesh>
       
       {/* Logo como fondo en el piso */}
       {textureLoaded && logoTexture.current && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, 0]}>
           <planeGeometry args={[4, 4]} />
           <meshBasicMaterial 
             map={logoTexture.current} 
             transparent 
-            opacity={0.08}
+            opacity={0.15}
             depthWrite={false}
           />
         </mesh>
@@ -442,10 +472,10 @@ function Floor() {
       {/* Grid manual */}
       <CustomGrid />
 
-      {/* Borde del área de juego */}
+      {/* Borde del área de juego - más brillante */}
       <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[4.9, 5, 64]} />
-        <meshStandardMaterial color="#00f5d4" transparent opacity={0.3} side={THREE.DoubleSide} />
+        <ringGeometry args={[4.85, 5, 64]} />
+        <meshStandardMaterial color="#00f5d4" transparent opacity={0.6} side={THREE.DoubleSide} emissive="#00f5d4" emissiveIntensity={0.3} />
       </mesh>
     </group>
   )
@@ -494,17 +524,24 @@ function Scene({
         maxPolarAngle={Math.PI / 2.1}
       />
       
-      {/* Iluminación */}
-      <ambientLight intensity={0.4} />
+      {/* Iluminación mejorada - más brillante */}
+      <ambientLight intensity={0.8} />
       <directionalLight 
         position={[5, 10, 5]} 
-        intensity={1} 
+        intensity={1.5} 
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
       />
-      <pointLight position={[-5, 5, -5]} intensity={0.5} color="#9333ea" />
-      <pointLight position={[5, 5, 5]} intensity={0.3} color="#00f5d4" />
+      <directionalLight 
+        position={[-5, 8, -5]} 
+        intensity={0.8} 
+      />
+      <pointLight position={[-3, 4, -3]} intensity={1} color="#9333ea" />
+      <pointLight position={[3, 4, 3]} intensity={1} color="#00f5d4" />
+      <pointLight position={[0, 6, 0]} intensity={0.8} color="#ffffff" />
+      {/* Luz hemisférica para iluminación general */}
+      <hemisphereLight args={['#87ceeb', '#1a1a2e', 0.6]} />
 
       <Floor />
       
