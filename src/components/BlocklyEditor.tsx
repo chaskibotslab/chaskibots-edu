@@ -1047,9 +1047,19 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
       <div className="flex flex-1 overflow-hidden" style={{ minHeight: '600px' }}>
         {/* Blockly Workspace */}
         <div className="flex-1 relative min-h-full">
+          {/* Logo de fondo del workspace */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+            <Image 
+              src="/chaski.png" 
+              alt="ChaskiBots" 
+              width={300} 
+              height={300}
+              className="opacity-[0.03]"
+            />
+          </div>
           <div 
             ref={blocklyDiv} 
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 w-full h-full z-10"
           />
           {!isBlocklyLoaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-dark-800 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neon-cyan/5 via-dark-800 to-dark-900">

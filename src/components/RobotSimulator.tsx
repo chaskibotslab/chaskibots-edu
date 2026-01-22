@@ -258,6 +258,66 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
     draw()
   }, [draw])
 
+  // Obstáculos del escenario (constante)
+  const obstacles = useRef([
+    { x: 50, y: 50, w: 60, h: 60 },
+    { x: 300, y: 100, w: 80, h: 40 },
+    { x: 100, y: 280, w: 50, h: 80 },
+    { x: 320, y: 280, w: 70, h: 70 }
+  ]).current
+
+  // Función para detectar colisión con obstáculos
+  const checkCollision = useCallback((x: number, y: number, robotRadius: number = 35): boolean => {
+    // Verificar límites del canvas
+    if (x < robotRadius || x > 400 - robotRadius || y < robotRadius || y > 400 - robotRadius) {
+      return true
+    }
+    
+    // Verificar colisión con cada obstáculo
+    for (const obs of obstacles) {
+      // Encontrar el punto más cercano del rectángulo al centro del robot
+      const closestX = Math.max(obs.x, Math.min(x, obs.x + obs.w))
+      const closestY = Math.max(obs.y, Math.min(y, obs.y + obs.h))
+      
+      // Calcular distancia al punto más cercano
+      const distanceX = x - closestX
+      const distanceY = y - closestY
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY)
+      
+      if (distance < robotRadius) {
+        return true
+      }
+    }
+    
+    return false
+  }, [obstacles])
+
+  // Calcular distancia ultrasónica real
+  const calculateUltrasonicDistance = useCallback((x: number, y: number, angle: number): number => {
+    const radAngle = (angle * Math.PI) / 180
+    const maxDistance = 150
+    
+    for (let dist = 0; dist < maxDistance; dist += 5) {
+      const checkX = x + Math.sin(radAngle) * dist
+      const checkY = y - Math.cos(radAngle) * dist
+      
+      // Verificar límites
+      if (checkX < 0 || checkX > 400 || checkY < 0 || checkY > 400) {
+        return dist
+      }
+      
+      // Verificar obstáculos
+      for (const obs of obstacles) {
+        if (checkX >= obs.x && checkX <= obs.x + obs.w &&
+            checkY >= obs.y && checkY <= obs.y + obs.h) {
+          return dist
+        }
+      }
+    }
+    
+    return maxDistance
+  }, [obstacles])
+
   // Ejecutar comandos
   const executeCommand = useCallback((cmd: SimulatorCommand) => {
     setRobotState(prev => {
@@ -269,11 +329,17 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
           newState.leftMotor = cmd.params.speed || 150
           newState.rightMotor = cmd.params.speed || 150
           const radForward = (prev.angle * Math.PI) / 180
-          newState.x += Math.sin(radForward) * 2
-          newState.y -= Math.cos(radForward) * 2
-          // Limitar al canvas
-          newState.x = Math.max(40, Math.min(360, newState.x))
-          newState.y = Math.max(40, Math.min(360, newState.y))
+          const newXForward = prev.x + Math.sin(radForward) * 3
+          const newYForward = prev.y - Math.cos(radForward) * 3
+          
+          // Solo mover si no hay colisión
+          if (!checkCollision(newXForward, newYForward)) {
+            newState.x = newXForward
+            newState.y = newYForward
+          } else {
+            // Colisión detectada - activar sensor IR
+            newState.irSensor = true
+          }
           break
           
         case 'move_backward':
@@ -281,10 +347,16 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
           newState.leftMotor = cmd.params.speed || 150
           newState.rightMotor = cmd.params.speed || 150
           const radBackward = (prev.angle * Math.PI) / 180
-          newState.x -= Math.sin(radBackward) * 2
-          newState.y += Math.cos(radBackward) * 2
-          newState.x = Math.max(40, Math.min(360, newState.x))
-          newState.y = Math.max(40, Math.min(360, newState.y))
+          const newXBackward = prev.x - Math.sin(radBackward) * 3
+          const newYBackward = prev.y + Math.cos(radBackward) * 3
+          
+          // Solo mover si no hay colisión
+          if (!checkCollision(newXBackward, newYBackward)) {
+            newState.x = newXBackward
+            newState.y = newYBackward
+          } else {
+            newState.irSensor = true
+          }
           break
           
         case 'turn_left':
@@ -330,12 +402,17 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
           break
       }
       
-      // Calcular distancia ultrasónica (simplificado)
-      newState.ultrasonicDistance = 50 + Math.random() * 100
+      // Calcular distancia ultrasónica real basada en posición y ángulo
+      newState.ultrasonicDistance = calculateUltrasonicDistance(newState.x, newState.y, newState.angle)
+      
+      // Resetear sensor IR si no hay colisión
+      if (!checkCollision(newState.x, newState.y)) {
+        newState.irSensor = false
+      }
       
       return newState
     })
-  }, [])
+  }, [checkCollision, calculateUltrasonicDistance])
 
   // Demo de movimiento mejorado
   const runDemo = () => {
