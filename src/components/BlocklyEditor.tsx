@@ -1,9 +1,23 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge, Monitor, FileCode, FolderOpen, Loader2, Trash2, Globe, Lock, Maximize2, Minimize2 } from 'lucide-react'
+import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge, Monitor, FileCode, FolderOpen, Loader2, Trash2, Globe, Lock, Maximize2, Minimize2, Box, Layers } from 'lucide-react'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import RobotSimulator from './RobotSimulator'
+
+// Importar simulador 3D dinámicamente para evitar errores de SSR
+const RobotSimulator3D = dynamic(() => import('./RobotSimulator3D'), { 
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full bg-dark-900">
+      <div className="text-center">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-400 mx-auto mb-2" />
+        <p className="text-xs text-gray-400">Cargando simulador 3D...</p>
+      </div>
+    </div>
+  )
+})
 
 interface BlocklyProject {
   id: string
@@ -529,6 +543,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
   const [newProjectName, setNewProjectName] = useState('')
   const [isPublicProject, setIsPublicProject] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [simulatorMode, setSimulatorMode] = useState<'2d' | '3d'>('3d')
 
   useEffect(() => {
     // Cargar Blockly dinámicamente
@@ -1111,8 +1126,36 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
 
           {/* Tab Content */}
           {rightPanelTab === 'simulator' ? (
-            <div className="flex-1 overflow-auto">
-              <RobotSimulator />
+            <div className="flex-1 overflow-auto flex flex-col">
+              {/* Toggle 2D/3D */}
+              <div className="p-2 border-b border-dark-600 flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setSimulatorMode('2d')}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    simulatorMode === '2d'
+                      ? 'bg-purple-500/30 text-purple-300 border border-purple-500/50'
+                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                  }`}
+                >
+                  <Layers className="w-3 h-3" />
+                  2D
+                </button>
+                <button
+                  onClick={() => setSimulatorMode('3d')}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    simulatorMode === '3d'
+                      ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/50'
+                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                  }`}
+                >
+                  <Box className="w-3 h-3" />
+                  3D
+                </button>
+              </div>
+              {/* Simulador */}
+              <div className="flex-1">
+                {simulatorMode === '2d' ? <RobotSimulator /> : <RobotSimulator3D />}
+              </div>
             </div>
           ) : (
             <div className="flex-1 flex flex-col">
