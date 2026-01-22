@@ -577,6 +577,70 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
         return code + nextCode
       }
       
+      // Función para generar código de un bloque
+      ArduinoGenerator.blockToCode = function(block: any, opt_thisOnly?: boolean) {
+        if (!block) return ''
+        if (block.isEnabled && !block.isEnabled()) return ''
+        
+        const func = this.forBlock[block.type] || this[block.type]
+        if (!func) {
+          console.warn('No generator for block type: ' + block.type)
+          return ''
+        }
+        
+        let code = func.call(this, block)
+        if (Array.isArray(code)) {
+          return code // Es una expresión con orden
+        }
+        
+        if (opt_thisOnly) return code || ''
+        
+        // Procesar siguiente bloque
+        const nextBlock = block.nextConnection && block.nextConnection.targetBlock()
+        const nextCode = nextBlock ? this.blockToCode(nextBlock) : ''
+        return (code || '') + nextCode
+      }
+      
+      // Función para obtener código de un valor
+      ArduinoGenerator.valueToCode = function(block: any, name: string, outerOrder: number) {
+        const targetBlock = block.getInputTargetBlock(name)
+        if (!targetBlock) return ''
+        
+        const tuple = this.blockToCode(targetBlock)
+        if (!tuple) return ''
+        
+        if (Array.isArray(tuple)) {
+          return tuple[0] // Retornar solo el código, ignorar orden por ahora
+        }
+        return tuple
+      }
+      
+      // Función para obtener código de statements
+      ArduinoGenerator.statementToCode = function(block: any, name: string) {
+        const targetBlock = block.getInputTargetBlock(name)
+        if (!targetBlock) return ''
+        return this.blockToCode(targetBlock)
+      }
+      
+      // Función principal para convertir workspace a código
+      ArduinoGenerator.workspaceToCode = function(workspace: any) {
+        if (!workspace) return ''
+        
+        this.init()
+        
+        const blocks = workspace.getTopBlocks(true)
+        let code = ''
+        
+        for (const block of blocks) {
+          const blockCode = this.blockToCode(block)
+          if (blockCode) {
+            code += blockCode
+          }
+        }
+        
+        return this.finish(code)
+      }
+      
       // Asignar a Blockly
       BlocklyAny.Arduino = ArduinoGenerator
       
