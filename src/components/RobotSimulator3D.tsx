@@ -6,7 +6,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import * as THREE from 'three'
 import { 
-  RotateCcw, ArrowUp, ArrowDown, Play, Pause,
+  RotateCcw, ArrowUp, ArrowDown,
   ArrowLeft, ArrowRight, Square, Map, Trophy, ChevronLeft, ChevronRight,
   Maximize2, Minimize2, Lightbulb, Eye, Gauge
 } from 'lucide-react'
@@ -945,27 +945,6 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
                 ¡Meta alcanzada!
               </span>
             )}
-            {/* Botón Ejecutar/Pausar */}
-            <button
-              onClick={() => {
-                if (isRunning) {
-                  setIsRunning(false)
-                } else {
-                  runDemo()
-                }
-              }}
-              disabled={goalReached}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                goalReached 
-                  ? 'bg-gray-500/20 text-gray-500 cursor-not-allowed'
-                  : isRunning 
-                    ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30' 
-                    : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-              }`}
-            >
-              {isRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-              {isRunning ? 'Pausar' : 'Ejecutar'}
-            </button>
             <button
               onClick={resetRobot}
               className="flex items-center gap-1 px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-xs font-medium transition-colors"
