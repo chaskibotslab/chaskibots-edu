@@ -864,10 +864,18 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
             style={{ minHeight: '500px' }}
           />
           {!isBlocklyLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-dark-800">
+            <div className="absolute inset-0 flex items-center justify-center bg-dark-800 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neon-cyan/5 via-dark-800 to-dark-900">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan mx-auto mb-4"></div>
+                <Image 
+                  src="/images/logo.png" 
+                  alt="ChaskiBots" 
+                  width={80} 
+                  height={80}
+                  className="mx-auto mb-4 opacity-50 animate-pulse"
+                />
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan mx-auto mb-4"></div>
                 <p className="text-gray-400">Cargando editor de bloques...</p>
+                <p className="text-xs text-gray-500 mt-2">ChaskiBlocks v1.0</p>
               </div>
             </div>
           )}
