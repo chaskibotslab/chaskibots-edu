@@ -1152,9 +1152,14 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                   3D
                 </button>
               </div>
-              {/* Simulador */}
-              <div className="flex-1">
-                {simulatorMode === '2d' ? <RobotSimulator /> : <RobotSimulator3D />}
+              {/* Simulador - Mantener ambos montados para evitar problemas de renderizado */}
+              <div className="flex-1 relative">
+                <div className={`absolute inset-0 ${simulatorMode === '2d' ? 'block' : 'hidden'}`}>
+                  <RobotSimulator />
+                </div>
+                <div className={`absolute inset-0 ${simulatorMode === '3d' ? 'block' : 'hidden'}`}>
+                  <RobotSimulator3D />
+                </div>
               </div>
             </div>
           ) : (
