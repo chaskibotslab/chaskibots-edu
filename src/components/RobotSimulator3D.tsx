@@ -6,7 +6,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import * as THREE from 'three'
 import { 
-  RotateCcw, ArrowUp, ArrowDown,
+  RotateCcw, ArrowUp, ArrowDown, Play, Pause,
   ArrowLeft, ArrowRight, Square, Map, Trophy, ChevronLeft, ChevronRight,
   Maximize2, Minimize2, Lightbulb, Eye, Gauge
 } from 'lucide-react'
@@ -929,7 +929,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
       )}
       
       {/* Header con logo */}
-      <div className="bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-b border-dark-600 p-3">
+      <div className="bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-b border-dark-600 p-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Image src="/chaski.png" alt="ChaskiBots" width={32} height={32} className="rounded-lg" />
@@ -945,6 +945,27 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
                 ¡Meta alcanzada!
               </span>
             )}
+            {/* Botón Ejecutar/Pausar */}
+            <button
+              onClick={() => {
+                if (isRunning) {
+                  setIsRunning(false)
+                } else {
+                  runDemo()
+                }
+              }}
+              disabled={goalReached}
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                goalReached 
+                  ? 'bg-gray-500/20 text-gray-500 cursor-not-allowed'
+                  : isRunning 
+                    ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30' 
+                    : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+              }`}
+            >
+              {isRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+              {isRunning ? 'Pausar' : 'Ejecutar'}
+            </button>
             <button
               onClick={resetRobot}
               className="flex items-center gap-1 px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-xs font-medium transition-colors"
@@ -964,7 +985,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
       </div>
 
       {/* Selector de desafío */}
-      <div className="bg-dark-900/50 border-b border-dark-600 p-2">
+      <div className="bg-dark-900/50 border-b border-dark-600 p-2 flex-shrink-0">
         <div className="flex items-center justify-between">
           <button
             onClick={() => changeChallenge('prev')}
@@ -1012,7 +1033,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
 
       {/* Mensaje de victoria */}
       {goalReached && (
-        <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-b border-yellow-500/30 p-3">
+        <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-b border-yellow-500/30 p-3 flex-shrink-0">
           <div className="flex items-center justify-center gap-2">
             <Trophy className="w-5 h-5 text-yellow-400" />
             <span className="text-sm font-bold text-yellow-300">¡Felicidades! Llegaste a la meta</span>
@@ -1021,10 +1042,10 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
         </div>
       )}
 
-      <div className={`flex ${isExpanded ? 'flex-1 min-h-0' : ''}`}>
+      <div className={`flex ${isExpanded ? 'flex-1 min-h-0 overflow-hidden' : ''}`}>
         {/* Canvas 3D */}
-        <div className={`flex-1 bg-dark-900 relative ${isExpanded ? 'min-h-0' : 'h-[400px]'}`}>
-          <Canvas shadows>
+        <div className={`flex-1 bg-dark-900 relative ${isExpanded ? 'h-full' : 'h-[400px]'}`}>
+          <Canvas shadows className="w-full h-full">
             <Scene 
               robotState={robotState} 
               obstacles={obstacles} 
@@ -1035,7 +1056,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
         </div>
 
         {/* Panel de control */}
-        <div className={`w-48 bg-dark-900 border-l border-dark-600 p-3 space-y-4 ${isExpanded ? 'overflow-y-auto' : ''}`}>
+        <div className={`w-48 bg-dark-900 border-l border-dark-600 p-3 space-y-4 flex-shrink-0 ${isExpanded ? 'overflow-y-auto max-h-full' : ''}`}>
           {/* Controles de dirección */}
           <div>
             <p className="text-xs text-gray-400 mb-2 font-medium">Control Manual</p>
