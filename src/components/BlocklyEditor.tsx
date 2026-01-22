@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge, Monitor, FileCode, FolderOpen, Loader2, Trash2, Globe, Lock, Maximize2, Minimize2, Box, Layers } from 'lucide-react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
@@ -524,6 +524,14 @@ interface BlocklyEditorProps {
   userName?: string
 }
 
+// Tipo para comandos del simulador
+interface SimulatorCommand {
+  type: 'move_forward' | 'move_backward' | 'turn_left' | 'turn_right' | 'stop' | 
+        'led_on' | 'led_off' | 'buzzer' | 'servo' | 'delay' | 'motor'
+  params: any
+  duration?: number
+}
+
 export default function BlocklyEditor({ onCodeChange, userId, userName }: BlocklyEditorProps) {
   const blocklyDiv = useRef<HTMLDivElement>(null)
   const workspaceRef = useRef<any>(null)
@@ -544,6 +552,112 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
   const [isPublicProject, setIsPublicProject] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [simulatorMode, setSimulatorMode] = useState<'2d' | '3d'>('3d')
+  
+  // Función para extraer comandos de los bloques de Blockly
+  const getBlocklyCommands = useCallback((): SimulatorCommand[] => {
+    if (!workspaceRef.current) return []
+    
+    const Blockly = (window as any).Blockly
+    if (!Blockly) return []
+    
+    const commands: SimulatorCommand[] = []
+    const topBlocks = workspaceRef.current.getTopBlocks(true)
+    
+    const processBlock = (block: any) => {
+      if (!block) return
+      
+      const blockType = block.type
+      
+      switch (blockType) {
+        case 'robot_move_forward':
+          commands.push({
+            type: 'move_forward',
+            params: { speed: block.getFieldValue('SPEED') || 100 },
+            duration: block.getFieldValue('TIME') || 1000
+          })
+          break
+        case 'robot_move_backward':
+          commands.push({
+            type: 'move_backward',
+            params: { speed: block.getFieldValue('SPEED') || 100 },
+            duration: block.getFieldValue('TIME') || 1000
+          })
+          break
+        case 'robot_turn_left':
+          commands.push({
+            type: 'turn_left',
+            params: { angle: block.getFieldValue('ANGLE') || 90 },
+            duration: 500
+          })
+          break
+        case 'robot_turn_right':
+          commands.push({
+            type: 'turn_right',
+            params: { angle: block.getFieldValue('ANGLE') || 90 },
+            duration: 500
+          })
+          break
+        case 'robot_stop':
+          commands.push({
+            type: 'stop',
+            params: {},
+            duration: 100
+          })
+          break
+        case 'led_on':
+          commands.push({
+            type: 'led_on',
+            params: { pin: block.getFieldValue('PIN') || 13 },
+            duration: 100
+          })
+          break
+        case 'led_off':
+          commands.push({
+            type: 'led_off',
+            params: { pin: block.getFieldValue('PIN') || 13 },
+            duration: 100
+          })
+          break
+        case 'delay_ms':
+          commands.push({
+            type: 'delay',
+            params: {},
+            duration: block.getFieldValue('MS') || 1000
+          })
+          break
+        case 'servo_move':
+          commands.push({
+            type: 'servo',
+            params: { angle: block.getFieldValue('ANGLE') || 90 },
+            duration: 500
+          })
+          break
+        case 'buzzer_tone':
+          commands.push({
+            type: 'buzzer',
+            params: { 
+              frequency: block.getFieldValue('FREQ') || 440,
+              pin: block.getFieldValue('PIN') || 8
+            },
+            duration: block.getFieldValue('DURATION') || 500
+          })
+          break
+      }
+      
+      // Procesar el siguiente bloque conectado
+      const nextBlock = block.getNextBlock()
+      if (nextBlock) {
+        processBlock(nextBlock)
+      }
+    }
+    
+    // Procesar todos los bloques superiores
+    topBlocks.forEach((block: any) => {
+      processBlock(block)
+    })
+    
+    return commands
+  }, [])
 
   useEffect(() => {
     // Cargar Blockly dinámicamente
@@ -1158,7 +1272,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                   <RobotSimulator />
                 </div>
                 <div className={`absolute inset-0 ${simulatorMode === '3d' ? 'block' : 'hidden'}`}>
-                  <RobotSimulator3D />
+                  <RobotSimulator3D onRequestCommands={getBlocklyCommands} />
                 </div>
               </div>
             </div>

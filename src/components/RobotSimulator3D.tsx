@@ -6,7 +6,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import * as THREE from 'three'
 import { 
-  RotateCcw, ArrowUp, ArrowDown,
+  RotateCcw, ArrowUp, ArrowDown, Play, Pause,
   ArrowLeft, ArrowRight, Square, Map, Trophy, ChevronLeft, ChevronRight,
   Maximize2, Minimize2, Lightbulb, Eye, Gauge
 } from 'lucide-react'
@@ -38,6 +38,7 @@ interface SimulatorCommand {
 interface RobotSimulator3DProps {
   commands?: SimulatorCommand[]
   onStateChange?: (state: RobotState) => void
+  onRequestCommands?: () => SimulatorCommand[]
 }
 
 // Definición de laberintos/desafíos
@@ -601,8 +602,10 @@ function Scene({
 }
 
 // Componente principal
-export default function RobotSimulator3D({ commands = [], onStateChange }: RobotSimulator3DProps) {
+export default function RobotSimulator3D({ commands = [], onStateChange, onRequestCommands }: RobotSimulator3DProps) {
   const [isRunning, setIsRunning] = useState(false)
+  const [programCommands, setProgramCommands] = useState<SimulatorCommand[]>([])
+  const runningRef = useRef(false)
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0)
   const [goalReached, setGoalReached] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -800,74 +803,65 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
     })
   }, [checkCollision, calculateUltrasonicDistance])
 
-  // Demo de movimiento
-  const runDemo = () => {
-    if (isRunning) return
+  // Ejecutar programa de Blockly
+  const runProgram = useCallback(() => {
+    if (isRunning || goalReached) return
+    
+    // Obtener comandos de Blockly
+    const cmds = onRequestCommands ? onRequestCommands() : []
+    
+    if (cmds.length === 0) {
+      alert('¡No hay bloques de robot para ejecutar!\n\nArrasta bloques de la categoría "🤖 Robot" al área de trabajo.')
+      return
+    }
+    
+    setProgramCommands(cmds)
     setIsRunning(true)
+    runningRef.current = true
     
-    const sequence = [
-      { action: 'led_on', pin: 13, repeat: 1 },
-      { action: 'move_forward', repeat: 30 },
-      { action: 'led_on', pin: 12, repeat: 1 },
-      { action: 'turn_right', repeat: 30 },
-      { action: 'led_on', pin: 11, repeat: 1 },
-      { action: 'move_forward', repeat: 25 },
-      { action: 'led_on', pin: 10, repeat: 1 },
-      { action: 'turn_left', repeat: 30 },
-      { action: 'servo', angle: 45, repeat: 1 },
-      { action: 'move_forward', repeat: 20 },
-      { action: 'servo', angle: 135, repeat: 1 },
-      { action: 'stop', repeat: 1 },
-    ]
-    
-    let seqIndex = 0
-    let repeatCount = 0
+    let cmdIndex = 0
+    let stepCount = 0
     
     const interval = setInterval(() => {
-      if (seqIndex >= sequence.length) {
+      if (!runningRef.current || cmdIndex >= cmds.length || goalReached) {
         clearInterval(interval)
         setIsRunning(false)
+        runningRef.current = false
         setRobotState(prev => ({
           ...prev,
           isMoving: false,
           leftMotor: 0,
           rightMotor: 0,
-          buzzerFreq: 0,
-          leds: { 13: false, 12: false, 11: false, 10: false }
+          buzzerFreq: 0
         }))
         return
       }
       
-      const current = sequence[seqIndex]
+      const cmd = cmds[cmdIndex]
+      const duration = cmd.duration || 1000
+      const stepsNeeded = Math.ceil(duration / 50)
       
-      switch (current.action) {
-        case 'led_on':
-          executeCommand({ type: 'led_on', params: { pin: current.pin } })
-          break
-        case 'move_forward':
-          executeCommand({ type: 'move_forward', params: { speed: 150 } })
-          break
-        case 'turn_left':
-          executeCommand({ type: 'turn_left', params: { angle: 15 } })
-          break
-        case 'turn_right':
-          executeCommand({ type: 'turn_right', params: { angle: 15 } })
-          break
-        case 'servo':
-          executeCommand({ type: 'servo', params: { angle: current.angle } })
-          break
-        case 'stop':
-          executeCommand({ type: 'stop', params: {} })
-          break
-      }
+      executeCommand(cmd)
       
-      repeatCount++
-      if (repeatCount >= current.repeat) {
-        seqIndex++
-        repeatCount = 0
+      stepCount++
+      if (stepCount >= stepsNeeded) {
+        cmdIndex++
+        stepCount = 0
       }
     }, 50)
-  }
+  }, [isRunning, goalReached, onRequestCommands, executeCommand])
+  
+  // Pausar programa
+  const pauseProgram = useCallback(() => {
+    runningRef.current = false
+    setIsRunning(false)
+    setRobotState(prev => ({
+      ...prev,
+      isMoving: false,
+      leftMotor: 0,
+      rightMotor: 0
+    }))
+  }, [])
 
   const resetRobot = () => {
     setIsRunning(false)
@@ -944,6 +938,29 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
                 <Trophy className="w-3 h-3" />
                 ¡Meta alcanzada!
               </span>
+            )}
+            {/* Botón Ejecutar/Pausar Programa */}
+            {onRequestCommands && (
+              <button
+                onClick={() => {
+                  if (isRunning) {
+                    pauseProgram()
+                  } else {
+                    runProgram()
+                  }
+                }}
+                disabled={goalReached}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  goalReached 
+                    ? 'bg-gray-500/20 text-gray-500 cursor-not-allowed'
+                    : isRunning 
+                      ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30' 
+                      : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                }`}
+              >
+                {isRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                {isRunning ? 'Pausar' : 'Ejecutar'}
+              </button>
             )}
             <button
               onClick={resetRobot}
