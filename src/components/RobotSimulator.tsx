@@ -337,43 +337,84 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
     })
   }, [])
 
-  // Demo de movimiento
+  // Demo de movimiento mejorado
   const runDemo = () => {
+    if (isRunning) return
     setIsRunning(true)
-    let step = 0
-    const demoCommands: SimulatorCommand[] = [
-      { type: 'led_on', params: { pin: 13 } },
-      { type: 'move_forward', params: { speed: 150 }, duration: 1000 },
-      { type: 'led_on', params: { pin: 12 } },
-      { type: 'turn_right', params: { angle: 90 }, duration: 500 },
-      { type: 'led_on', params: { pin: 11 } },
-      { type: 'move_forward', params: { speed: 150 }, duration: 800 },
-      { type: 'led_on', params: { pin: 10 } },
-      { type: 'turn_left', params: { angle: 90 }, duration: 500 },
-      { type: 'servo', params: { angle: 45 } },
-      { type: 'move_forward', params: { speed: 150 }, duration: 600 },
-      { type: 'servo', params: { angle: 135 } },
-      { type: 'buzzer', params: { freq: 1000 } },
-      { type: 'stop', params: {} },
+    
+    // Secuencia de demo con repeticiones para movimiento fluido
+    const sequence = [
+      // Encender LED rojo y avanzar
+      { action: 'led_on', pin: 13, repeat: 1 },
+      { action: 'move_forward', repeat: 30 },
+      // Encender LED verde y girar derecha
+      { action: 'led_on', pin: 12, repeat: 1 },
+      { action: 'turn_right', repeat: 30 },
+      // Encender LED azul y avanzar
+      { action: 'led_on', pin: 11, repeat: 1 },
+      { action: 'move_forward', repeat: 25 },
+      // Encender LED amarillo y girar izquierda
+      { action: 'led_on', pin: 10, repeat: 1 },
+      { action: 'turn_left', repeat: 30 },
+      // Mover servo
+      { action: 'servo', angle: 45, repeat: 1 },
+      { action: 'move_forward', repeat: 20 },
+      { action: 'servo', angle: 135, repeat: 1 },
+      // Parar
+      { action: 'stop', repeat: 1 },
     ]
-
+    
+    let seqIndex = 0
+    let repeatCount = 0
+    
     const interval = setInterval(() => {
-      if (step < demoCommands.length) {
-        executeCommand(demoCommands[step])
-        step++
-      } else {
+      if (seqIndex >= sequence.length) {
         clearInterval(interval)
         setIsRunning(false)
-        // Apagar todo
+        // Apagar LEDs
         setRobotState(prev => ({
           ...prev,
           isMoving: false,
           leftMotor: 0,
           rightMotor: 0,
-          buzzerFreq: 0
+          buzzerFreq: 0,
+          leds: { 13: false, 12: false, 11: false, 10: false }
         }))
+        return
       }
-    }, 100)
+      
+      const current = sequence[seqIndex]
+      
+      switch (current.action) {
+        case 'led_on':
+          executeCommand({ type: 'led_on', params: { pin: current.pin } })
+          break
+        case 'move_forward':
+          executeCommand({ type: 'move_forward', params: { speed: 150 } })
+          break
+        case 'move_backward':
+          executeCommand({ type: 'move_backward', params: { speed: 150 } })
+          break
+        case 'turn_left':
+          executeCommand({ type: 'turn_left', params: { angle: 15 } })
+          break
+        case 'turn_right':
+          executeCommand({ type: 'turn_right', params: { angle: 15 } })
+          break
+        case 'servo':
+          executeCommand({ type: 'servo', params: { angle: current.angle } })
+          break
+        case 'stop':
+          executeCommand({ type: 'stop', params: {} })
+          break
+      }
+      
+      repeatCount++
+      if (repeatCount >= current.repeat) {
+        seqIndex++
+        repeatCount = 0
+      }
+    }, 50)
 
     return () => clearInterval(interval)
   }
