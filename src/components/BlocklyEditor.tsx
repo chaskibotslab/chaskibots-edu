@@ -535,17 +535,34 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
     const loadBlockly = async () => {
       if (typeof window === 'undefined') return
       
-      const BlocklyModule = (await import('blockly')).default
+      const BlocklyModule = await import('blockly')
       await import('blockly/blocks')
       
       // Asignar Blockly a window para que eval pueda acceder
-      ;(window as any).Blockly = BlocklyModule
-      const Blockly = (window as any).Blockly
+      const Blockly = BlocklyModule.default || BlocklyModule
+      ;(window as any).Blockly = Blockly
       
-      // Crear generador Arduino
-      Blockly.Arduino = new Blockly.Generator('Arduino')
-      Blockly.Arduino.ORDER_ATOMIC = 0
-      Blockly.Arduino.ORDER_NONE = 99
+      // Crear generador Arduino usando la clase Generator de Blockly
+      const BlocklyAny = Blockly as any
+      const Generator = (BlocklyModule as any).Generator || BlocklyAny.Generator
+      if (Generator) {
+        BlocklyAny.Arduino = new Generator('Arduino')
+        BlocklyAny.Arduino.ORDER_ATOMIC = 0
+        BlocklyAny.Arduino.ORDER_NONE = 99
+      } else {
+        // Fallback: crear objeto simple para generador
+        BlocklyAny.Arduino = {
+          ORDER_ATOMIC: 0,
+          ORDER_NONE: 99,
+          init: function() { this.definitions_ = {}; this.setups_ = {}; },
+          finish: function(code: string) { return code; },
+          scrubNakedValue: function(line: string) { return line + ';\\n'; },
+          scrub_: function(_block: any, code: string) { return code; },
+          blockToCode: function() { return ''; },
+          valueToCode: function() { return ''; },
+          statementToCode: function() { return ''; }
+        }
+      }
       
       // Registrar bloques personalizados
       eval(CUSTOM_BLOCKS)
@@ -796,7 +813,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image 
-              src="/images/logo.png" 
+              src="/chaski.png" 
               alt="ChaskiBots" 
               width={40} 
               height={40}
@@ -867,7 +884,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
             <div className="absolute inset-0 flex items-center justify-center bg-dark-800 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neon-cyan/5 via-dark-800 to-dark-900">
               <div className="text-center">
                 <Image 
-                  src="/images/logo.png" 
+                  src="/chaski.png" 
                   alt="ChaskiBots" 
                   width={80} 
                   height={80}
