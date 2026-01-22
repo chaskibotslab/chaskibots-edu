@@ -542,33 +542,14 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
       const Blockly = BlocklyModule.default || BlocklyModule
       ;(window as any).Blockly = Blockly
       
-      // Crear generador Arduino - importar CodeGenerator de blockly
+      // Crear generador Arduino
       const BlocklyAny = Blockly as any
       
-      // Intentar obtener la clase Generator de diferentes ubicaciones
-      let ArduinoGenerator: any = null
-      try {
-        // Blockly v10+ usa CodeGenerator
-        const { CodeGenerator } = await import('blockly/core/generator')
-        ArduinoGenerator = new CodeGenerator('Arduino')
-      } catch {
-        try {
-          // Fallback para otras versiones
-          if (BlocklyAny.Generator) {
-            ArduinoGenerator = new BlocklyAny.Generator('Arduino')
-          }
-        } catch {
-          // Crear generador manual
-        }
-      }
-      
-      // Si no se pudo crear, usar objeto manual
-      if (!ArduinoGenerator) {
-        ArduinoGenerator = {
-          name_: 'Arduino',
-          FUNCTION_NAME_PLACEHOLDER_: '%{BKY_FUNCTION_NAME}%',
-          FUNCTION_NAME_PLACEHOLDER_REGEXP_: /%\{BKY_FUNCTION_NAME\}%/g,
-        }
+      // Crear objeto generador manualmente (compatible con todas las versiones de Blockly)
+      const ArduinoGenerator: any = {
+        name_: 'Arduino',
+        FUNCTION_NAME_PLACEHOLDER_: '%{BKY_FUNCTION_NAME}%',
+        FUNCTION_NAME_PLACEHOLDER_REGEXP_: /%\{BKY_FUNCTION_NAME\}%/g,
       }
       
       // Configurar propiedades del generador
