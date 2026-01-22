@@ -804,6 +804,18 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
     }
   }, [])
 
+  // Redimensionar Blockly cuando cambie fullscreen
+  useEffect(() => {
+    if (workspaceRef.current) {
+      const Blockly = (window as any).Blockly
+      if (Blockly) {
+        setTimeout(() => {
+          Blockly.svgResize(workspaceRef.current)
+        }, 100)
+      }
+    }
+  }, [isFullscreen])
+
   const updateCode = () => {
     if (!workspaceRef.current) return
     
@@ -1032,13 +1044,12 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden" style={{ minHeight: '600px' }}>
         {/* Blockly Workspace */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative min-h-full">
           <div 
             ref={blocklyDiv} 
-            className="absolute inset-0"
-            style={{ minHeight: '500px' }}
+            className="absolute inset-0 w-full h-full"
           />
           {!isBlocklyLoaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-dark-800 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neon-cyan/5 via-dark-800 to-dark-900">

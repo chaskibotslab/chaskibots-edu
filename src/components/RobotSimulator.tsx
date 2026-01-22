@@ -202,12 +202,6 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
       ctx.restore()
     }
 
-    // Logo ChaskiBots
-    ctx.fillStyle = '#00f5d4'
-    ctx.font = 'bold 14px Inter, sans-serif'
-    ctx.textAlign = 'right'
-    ctx.fillText('ChaskiBots', canvas.width - 10, canvas.height - 10)
-
   }, [robotState])
 
   // Función para dibujar rectángulo redondeado
