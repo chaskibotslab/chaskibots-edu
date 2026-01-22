@@ -542,33 +542,148 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
       const Blockly = BlocklyModule.default || BlocklyModule
       ;(window as any).Blockly = Blockly
       
-      // Crear generador Arduino usando la clase Generator de Blockly
+      // Crear generador Arduino - importar CodeGenerator de blockly
       const BlocklyAny = Blockly as any
-      const Generator = (BlocklyModule as any).Generator || BlocklyAny.Generator
-      if (Generator) {
-        BlocklyAny.Arduino = new Generator('Arduino')
-        BlocklyAny.Arduino.ORDER_ATOMIC = 0
-        BlocklyAny.Arduino.ORDER_NONE = 99
-      } else {
-        // Fallback: crear objeto simple para generador
-        BlocklyAny.Arduino = {
-          ORDER_ATOMIC: 0,
-          ORDER_NONE: 99,
-          init: function() { this.definitions_ = {}; this.setups_ = {}; },
-          finish: function(code: string) { return code; },
-          scrubNakedValue: function(line: string) { return line + ';\\n'; },
-          scrub_: function(_block: any, code: string) { return code; },
-          blockToCode: function() { return ''; },
-          valueToCode: function() { return ''; },
-          statementToCode: function() { return ''; }
+      
+      // Intentar obtener la clase Generator de diferentes ubicaciones
+      let ArduinoGenerator: any = null
+      try {
+        // Blockly v10+ usa CodeGenerator
+        const { CodeGenerator } = await import('blockly/core/generator')
+        ArduinoGenerator = new CodeGenerator('Arduino')
+      } catch {
+        try {
+          // Fallback para otras versiones
+          if (BlocklyAny.Generator) {
+            ArduinoGenerator = new BlocklyAny.Generator('Arduino')
+          }
+        } catch {
+          // Crear generador manual
         }
       }
+      
+      // Si no se pudo crear, usar objeto manual
+      if (!ArduinoGenerator) {
+        ArduinoGenerator = {
+          name_: 'Arduino',
+          FUNCTION_NAME_PLACEHOLDER_: '%{BKY_FUNCTION_NAME}%',
+          FUNCTION_NAME_PLACEHOLDER_REGEXP_: /%\{BKY_FUNCTION_NAME\}%/g,
+        }
+      }
+      
+      // Configurar propiedades del generador
+      ArduinoGenerator.ORDER_ATOMIC = 0
+      ArduinoGenerator.ORDER_NONE = 99
+      ArduinoGenerator.definitions_ = Object.create(null)
+      ArduinoGenerator.setups_ = Object.create(null)
+      ArduinoGenerator.forBlock = ArduinoGenerator.forBlock || {}
+      
+      ArduinoGenerator.init = function() {
+        this.definitions_ = Object.create(null)
+        this.setups_ = Object.create(null)
+      }
+      
+      ArduinoGenerator.finish = function(code: string) {
+        const defs = Object.values(this.definitions_ || {}).join('\n')
+        const setups = Object.values(this.setups_ || {}).join('\n')
+        return defs + '\n\nvoid setup() {\n  Serial.begin(9600);\n' + setups + '\n}\n\nvoid loop() {\n' + code + '}\n'
+      }
+      
+      ArduinoGenerator.scrubNakedValue = function(line: string) { return line + ';\n' }
+      ArduinoGenerator.scrub_ = function(block: any, code: string) {
+        const nextBlock = block.nextConnection && block.nextConnection.targetBlock()
+        const nextCode = nextBlock ? this.blockToCode(nextBlock) : ''
+        return code + nextCode
+      }
+      
+      // Asignar a Blockly
+      BlocklyAny.Arduino = ArduinoGenerator
       
       // Registrar bloques personalizados
       eval(CUSTOM_BLOCKS)
       
-      // Registrar generadores
-      eval(ARDUINO_GENERATORS)
+      // Registrar generadores usando forBlock (Blockly v10+) y el método antiguo
+      const registerGenerator = (blockType: string, generatorFn: any) => {
+        BlocklyAny.Arduino[blockType] = generatorFn
+        if (BlocklyAny.Arduino.forBlock) {
+          BlocklyAny.Arduino.forBlock[blockType] = generatorFn
+        }
+      }
+      
+      // Registrar todos los generadores manualmente
+      registerGenerator('robot_move_forward', function(block: any) {
+        const speed = block.getFieldValue('SPEED'), time = block.getFieldValue('TIME')
+        BlocklyAny.Arduino.definitions_['motor_pins'] = '// Pines de motores\nint motorA1 = 5;\nint motorA2 = 6;\nint motorB1 = 9;\nint motorB2 = 10;'
+        BlocklyAny.Arduino.setups_['motor_setup'] = '  pinMode(motorA1, OUTPUT);\n  pinMode(motorA2, OUTPUT);\n  pinMode(motorB1, OUTPUT);\n  pinMode(motorB2, OUTPUT);'
+        return '  analogWrite(motorA1, ' + speed + ');\n  analogWrite(motorA2, 0);\n  analogWrite(motorB1, ' + speed + ');\n  analogWrite(motorB2, 0);\n  delay(' + time + ');\n'
+      })
+      registerGenerator('robot_move_backward', function(block: any) {
+        const speed = block.getFieldValue('SPEED'), time = block.getFieldValue('TIME')
+        BlocklyAny.Arduino.definitions_['motor_pins'] = '// Pines de motores\nint motorA1 = 5;\nint motorA2 = 6;\nint motorB1 = 9;\nint motorB2 = 10;'
+        return '  analogWrite(motorA1, 0);\n  analogWrite(motorA2, ' + speed + ');\n  analogWrite(motorB1, 0);\n  analogWrite(motorB2, ' + speed + ');\n  delay(' + time + ');\n'
+      })
+      registerGenerator('robot_turn_left', function(block: any) {
+        const angle = block.getFieldValue('ANGLE'), time = Math.round(angle * 5)
+        return '  analogWrite(motorA1, 0);\n  analogWrite(motorA2, 150);\n  analogWrite(motorB1, 150);\n  analogWrite(motorB2, 0);\n  delay(' + time + ');\n'
+      })
+      registerGenerator('robot_turn_right', function(block: any) {
+        const angle = block.getFieldValue('ANGLE'), time = Math.round(angle * 5)
+        return '  analogWrite(motorA1, 150);\n  analogWrite(motorA2, 0);\n  analogWrite(motorB1, 0);\n  analogWrite(motorB2, 150);\n  delay(' + time + ');\n'
+      })
+      registerGenerator('robot_stop', function() {
+        return '  analogWrite(motorA1, 0);\n  analogWrite(motorA2, 0);\n  analogWrite(motorB1, 0);\n  analogWrite(motorB2, 0);\n'
+      })
+      registerGenerator('led_on', function(block: any) {
+        const pin = block.getFieldValue('PIN')
+        BlocklyAny.Arduino.setups_['led_' + pin] = '  pinMode(' + pin + ', OUTPUT);'
+        return '  digitalWrite(' + pin + ', HIGH);\n'
+      })
+      registerGenerator('led_off', function(block: any) {
+        const pin = block.getFieldValue('PIN')
+        BlocklyAny.Arduino.setups_['led_' + pin] = '  pinMode(' + pin + ', OUTPUT);'
+        return '  digitalWrite(' + pin + ', LOW);\n'
+      })
+      registerGenerator('led_blink', function(block: any) {
+        const pin = block.getFieldValue('PIN'), delayMs = block.getFieldValue('DELAY')
+        BlocklyAny.Arduino.setups_['led_' + pin] = '  pinMode(' + pin + ', OUTPUT);'
+        return '  digitalWrite(' + pin + ', HIGH);\n  delay(' + delayMs + ');\n  digitalWrite(' + pin + ', LOW);\n  delay(' + delayMs + ');\n'
+      })
+      registerGenerator('sensor_ultrasonic', function(block: any) {
+        const trig = block.getFieldValue('TRIG'), echo = block.getFieldValue('ECHO')
+        BlocklyAny.Arduino.definitions_['ultrasonic_func'] = 'long readUltrasonic(int trigPin, int echoPin) {\n  digitalWrite(trigPin, LOW);\n  delayMicroseconds(2);\n  digitalWrite(trigPin, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(trigPin, LOW);\n  long duration = pulseIn(echoPin, HIGH);\n  return duration * 0.034 / 2;\n}'
+        BlocklyAny.Arduino.setups_['ultrasonic_' + trig] = '  pinMode(' + trig + ', OUTPUT);\n  pinMode(' + echo + ', INPUT);'
+        return ['readUltrasonic(' + trig + ', ' + echo + ')', BlocklyAny.Arduino.ORDER_ATOMIC]
+      })
+      registerGenerator('sensor_ir', function(block: any) {
+        const pin = block.getFieldValue('PIN')
+        BlocklyAny.Arduino.setups_['ir_' + pin] = '  pinMode(' + pin + ', INPUT);'
+        return ['digitalRead(' + pin + ') == LOW', BlocklyAny.Arduino.ORDER_ATOMIC]
+      })
+      registerGenerator('servo_move', function(block: any) {
+        const pin = block.getFieldValue('PIN'), angle = block.getFieldValue('ANGLE')
+        BlocklyAny.Arduino.definitions_['servo_lib'] = '#include <Servo.h>\nServo servo_' + pin + ';'
+        BlocklyAny.Arduino.setups_['servo_' + pin] = '  servo_' + pin + '.attach(' + pin + ');'
+        return '  servo_' + pin + '.write(' + angle + ');\n  delay(500);\n'
+      })
+      registerGenerator('motor_dc', function(block: any) {
+        const motor = block.getFieldValue('MOTOR'), speed = block.getFieldValue('SPEED'), dir = block.getFieldValue('DIR')
+        const pin1 = motor === 'A' ? 'motorA1' : 'motorB1', pin2 = motor === 'A' ? 'motorA2' : 'motorB2'
+        BlocklyAny.Arduino.definitions_['motor_pins'] = '// Pines de motores\nint motorA1 = 5;\nint motorA2 = 6;\nint motorB1 = 9;\nint motorB2 = 10;'
+        return dir === 'FWD' ? '  analogWrite(' + pin1 + ', ' + speed + ');\n  analogWrite(' + pin2 + ', 0);\n' : '  analogWrite(' + pin1 + ', 0);\n  analogWrite(' + pin2 + ', ' + speed + ');\n'
+      })
+      registerGenerator('delay_ms', function(block: any) { return '  delay(' + block.getFieldValue('MS') + ');\n' })
+      registerGenerator('buzzer_tone', function(block: any) {
+        const pin = block.getFieldValue('PIN'), freq = block.getFieldValue('FREQ'), duration = block.getFieldValue('DURATION')
+        BlocklyAny.Arduino.setups_['buzzer_' + pin] = '  pinMode(' + pin + ', OUTPUT);'
+        return '  tone(' + pin + ', ' + freq + ', ' + duration + ');\n  delay(' + duration + ');\n'
+      })
+      registerGenerator('math_number', function(block: any) { return [parseFloat(block.getFieldValue('NUM')), BlocklyAny.Arduino.ORDER_ATOMIC] })
+      registerGenerator('text', function(block: any) { return ['"' + block.getFieldValue('TEXT') + '"', BlocklyAny.Arduino.ORDER_ATOMIC] })
+      registerGenerator('logic_boolean', function(block: any) { return [block.getFieldValue('BOOL') === 'TRUE' ? 'true' : 'false', BlocklyAny.Arduino.ORDER_ATOMIC] })
+      registerGenerator('serial_print', function(block: any) {
+        const text = BlocklyAny.Arduino.valueToCode ? BlocklyAny.Arduino.valueToCode(block, 'TEXT', BlocklyAny.Arduino.ORDER_NONE) || '""' : '""'
+        return '  Serial.println(' + text + ');\n'
+      })
       
       if (blocklyDiv.current && !workspaceRef.current) {
         // Crear el toolbox desde XML
