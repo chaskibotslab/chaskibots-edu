@@ -6,7 +6,8 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import * as THREE from 'three'
 import { 
   Play, Pause, RotateCcw, Lightbulb, Eye, ArrowUp, ArrowDown,
-  ArrowLeft, ArrowRight, Square, Gauge, Box, Map, Trophy, Flag, ChevronLeft, ChevronRight
+  ArrowLeft, ArrowRight, Square, Gauge, Box, Map, Trophy, Flag, ChevronLeft, ChevronRight,
+  Maximize2, Minimize2
 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -49,84 +50,90 @@ interface Challenge {
   difficulty: 'easy' | 'medium' | 'hard'
 }
 
+// Área de juego: 400x400 unidades (centrado en 200,200)
+const ARENA_SIZE = 400
+const ARENA_CENTER = 200
+
 const CHALLENGES: Challenge[] = [
   {
     id: 'basic',
-    name: 'Camino Básico',
-    description: 'Llega a la meta evitando los obstáculos',
+    name: 'Camino Recto',
+    description: 'Llega a la meta en línea recta',
     difficulty: 'easy',
     obstacles: [
-      { x: 150, z: 100, w: 100, h: 20 },
-      { x: 150, z: 200, w: 100, h: 20 },
-      { x: 150, z: 300, w: 100, h: 20 },
+      // Paredes laterales para guiar
+      { x: 50, z: 50, w: 300, h: 15 },
+      { x: 50, z: 335, w: 300, h: 15 },
     ],
     start: { x: 60, z: 200, angle: 0 },
-    goal: { x: 340, z: 200, radius: 40 }
+    goal: { x: 340, z: 200, radius: 35 }
   },
   {
-    id: 'zigzag',
-    name: 'Zig-Zag',
-    description: 'Navega por el camino en zigzag',
+    id: 'obstacles',
+    name: 'Obstáculos',
+    description: 'Esquiva los bloques para llegar a la meta',
+    difficulty: 'easy',
+    obstacles: [
+      { x: 120, z: 100, w: 60, h: 60 },
+      { x: 220, z: 240, w: 60, h: 60 },
+      { x: 120, z: 280, w: 60, h: 60 },
+      { x: 280, z: 120, w: 60, h: 60 },
+    ],
+    start: { x: 50, z: 200, angle: 0 },
+    goal: { x: 350, z: 200, radius: 35 }
+  },
+  {
+    id: 'slalom',
+    name: 'Slalom',
+    description: 'Zigzaguea entre los postes',
     difficulty: 'medium',
     obstacles: [
-      { x: 0, z: 80, w: 280, h: 20 },
-      { x: 120, z: 160, w: 280, h: 20 },
-      { x: 0, z: 240, w: 280, h: 20 },
-      { x: 120, z: 320, w: 280, h: 20 },
-    ],
-    start: { x: 60, z: 40, angle: 90 },
-    goal: { x: 60, z: 360, radius: 35 }
-  },
-  {
-    id: 'maze',
-    name: 'Laberinto',
-    description: 'Encuentra la salida del laberinto',
-    difficulty: 'hard',
-    obstacles: [
-      // Paredes externas
-      { x: 80, z: 0, w: 20, h: 150 },
-      { x: 80, z: 200, w: 20, h: 200 },
-      { x: 300, z: 0, w: 20, h: 200 },
-      { x: 300, z: 250, w: 20, h: 150 },
-      // Paredes internas
-      { x: 150, z: 80, w: 20, h: 120 },
-      { x: 150, z: 250, w: 20, h: 100 },
-      { x: 230, z: 50, w: 20, h: 150 },
-      { x: 230, z: 280, w: 20, h: 120 },
+      // Postes verticales espaciados uniformemente
+      { x: 100, z: 50, w: 30, h: 130 },
+      { x: 100, z: 220, w: 30, h: 130 },
+      { x: 180, z: 120, w: 30, h: 160 },
+      { x: 260, z: 50, w: 30, h: 130 },
+      { x: 260, z: 220, w: 30, h: 130 },
     ],
     start: { x: 40, z: 200, angle: 0 },
     goal: { x: 360, z: 200, radius: 35 }
   },
   {
-    id: 'slalom',
-    name: 'Slalom',
-    description: 'Esquiva los obstáculos en línea',
+    id: 'corridor',
+    name: 'Corredor',
+    description: 'Navega por el pasillo estrecho',
     difficulty: 'medium',
     obstacles: [
-      { x: 80, z: 120, w: 40, h: 160 },
-      { x: 160, z: 120, w: 40, h: 160 },
-      { x: 240, z: 120, w: 40, h: 160 },
-      { x: 320, z: 120, w: 40, h: 160 },
+      // Paredes del corredor en L
+      { x: 30, z: 30, w: 15, h: 250 },
+      { x: 100, z: 100, w: 15, h: 180 },
+      { x: 30, z: 265, w: 200, h: 15 },
+      { x: 100, z: 265, w: 200, h: 15 },
+      { x: 285, z: 120, w: 15, h: 160 },
+      { x: 355, z: 120, w: 15, h: 250 },
     ],
-    start: { x: 40, z: 200, angle: 0 },
-    goal: { x: 370, z: 200, radius: 30 }
+    start: { x: 65, z: 60, angle: 90 },
+    goal: { x: 320, z: 340, radius: 35 }
   },
   {
-    id: 'spiral',
-    name: 'Espiral',
-    description: 'Sigue el camino en espiral hasta el centro',
+    id: 'maze',
+    name: 'Laberinto',
+    description: 'Encuentra el camino a través del laberinto',
     difficulty: 'hard',
     obstacles: [
-      { x: 50, z: 50, w: 300, h: 20 },
-      { x: 330, z: 50, w: 20, h: 250 },
-      { x: 100, z: 280, w: 250, h: 20 },
-      { x: 100, z: 100, w: 20, h: 200 },
-      { x: 100, z: 100, w: 180, h: 20 },
-      { x: 260, z: 100, w: 20, h: 130 },
-      { x: 150, z: 210, w: 130, h: 20 },
+      // Paredes del laberinto
+      { x: 80, z: 30, w: 15, h: 180 },
+      { x: 80, z: 250, w: 15, h: 120 },
+      { x: 160, z: 100, w: 15, h: 200 },
+      { x: 160, z: 30, w: 100, h: 15 },
+      { x: 240, z: 30, w: 15, h: 120 },
+      { x: 240, z: 200, w: 15, h: 170 },
+      { x: 160, z: 285, w: 95, h: 15 },
+      { x: 320, z: 100, w: 15, h: 200 },
+      { x: 255, z: 100, w: 80, h: 15 },
     ],
-    start: { x: 30, z: 30, angle: 90 },
-    goal: { x: 200, z: 160, radius: 30 }
+    start: { x: 40, z: 350, angle: -90 },
+    goal: { x: 360, z: 60, radius: 35 }
   }
 ]
 
@@ -398,6 +405,19 @@ function CustomGrid() {
 
 // Componente del Piso con logo
 function Floor() {
+  const logoTexture = useRef<THREE.Texture | null>(null)
+  const [textureLoaded, setTextureLoaded] = useState(false)
+  
+  useEffect(() => {
+    const loader = new THREE.TextureLoader()
+    loader.load('/chaski.png', (texture) => {
+      texture.wrapS = THREE.ClampToEdgeWrapping
+      texture.wrapT = THREE.ClampToEdgeWrapping
+      logoTexture.current = texture
+      setTextureLoaded(true)
+    })
+  }, [])
+  
   return (
     <group>
       {/* Piso principal */}
@@ -405,6 +425,19 @@ function Floor() {
         <planeGeometry args={[10, 10]} />
         <meshStandardMaterial color="#1a1a2e" />
       </mesh>
+      
+      {/* Logo como fondo en el piso */}
+      {textureLoaded && logoTexture.current && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+          <planeGeometry args={[4, 4]} />
+          <meshBasicMaterial 
+            map={logoTexture.current} 
+            transparent 
+            opacity={0.08}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
       
       {/* Grid manual */}
       <CustomGrid />
@@ -496,6 +529,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
   const [isRunning, setIsRunning] = useState(false)
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0)
   const [goalReached, setGoalReached] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
   
   const currentChallenge = CHALLENGES[currentChallengeIndex]
   
@@ -807,7 +841,17 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
   }
 
   return (
-    <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
+    <div className={`bg-dark-800 rounded-xl border border-dark-600 overflow-hidden transition-all duration-300 ${
+      isExpanded ? 'fixed inset-4 z-50' : ''
+    }`}>
+      {/* Overlay para modo expandido */}
+      {isExpanded && (
+        <div 
+          className="fixed inset-0 bg-black/70 -z-10" 
+          onClick={() => setIsExpanded(false)}
+        />
+      )}
+      
       {/* Header con logo */}
       <div className="bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-b border-dark-600 p-3">
         <div className="flex items-center justify-between">
@@ -839,6 +883,13 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
             >
               <RotateCcw className="w-3 h-3" />
               Reset
+            </button>
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center gap-1 px-2 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg text-xs font-medium transition-colors"
+              title={isExpanded ? 'Minimizar' : 'Expandir'}
+            >
+              {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -902,20 +953,10 @@ export default function RobotSimulator3D({ commands = [], onStateChange }: Robot
         </div>
       )}
 
-      <div className="flex">
+      <div className={`flex ${isExpanded ? 'flex-1' : ''}`}>
         {/* Canvas 3D */}
-        <div className="flex-1 h-[400px] bg-dark-900 relative">
-          {/* Logo watermark */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-            <Image 
-              src="/chaski.png" 
-              alt="" 
-              width={150} 
-              height={150} 
-              className="opacity-[0.03]"
-            />
-          </div>
-          <Canvas shadows className="relative z-10">
+        <div className={`flex-1 bg-dark-900 relative ${isExpanded ? 'h-full' : 'h-[400px]'}`}>
+          <Canvas shadows>
             <Scene 
               robotState={robotState} 
               obstacles={obstacles} 
