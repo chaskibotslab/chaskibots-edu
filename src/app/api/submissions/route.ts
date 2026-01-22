@@ -97,11 +97,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('POST /api/submissions - body keys:', Object.keys(body))
+    
     const { taskId, studentName, studentEmail, levelId, lessonId, code, output, drawing, files } = body
 
-    if (!taskId || !studentName || !code) {
+    // Si hay dibujo pero no hay código, usar placeholder
+    const finalCode = code || (drawing ? '[Respuesta con dibujo]' : '')
+    
+    if (!taskId || !studentName) {
+      console.log('Missing required fields:', { taskId, studentName })
       return NextResponse.json(
-        { error: 'taskId, studentName y code son requeridos' },
+        { error: 'taskId y studentName son requeridos' },
         { status: 400 }
       )
     }
@@ -141,11 +147,13 @@ export async function POST(request: NextRequest) {
       studentEmail: studentEmail || '',
       levelId: levelId || '',
       lessonId: lessonId || '',
-      code,
+      code: finalCode,
       output: finalOutput,
       submittedAt: new Date().toISOString(),
       status: 'pending'
     }
+    
+    console.log('Creating submission with fields:', { taskId, studentName, levelId, hasDrawing: !!drawingData, hasFiles: !!filesData })
     
     // Solo agregar campos si tienen datos (evitar campos vacíos que pueden causar error)
     if (drawingData) {
