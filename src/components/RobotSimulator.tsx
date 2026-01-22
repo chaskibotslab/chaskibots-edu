@@ -36,9 +36,11 @@ interface RobotSimulatorProps {
 
 export default function RobotSimulator({ commands = [], onStateChange }: RobotSimulatorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const logoRef = useRef<HTMLImageElement | null>(null)
   const animationRef = useRef<number>()
   const [isRunning, setIsRunning] = useState(false)
   const [currentCommandIndex, setCurrentCommandIndex] = useState(0)
+  const [logoLoaded, setLogoLoaded] = useState(false)
   const [robotState, setRobotState] = useState<RobotState>({
     x: 200,
     y: 200,
@@ -54,6 +56,16 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
     isMoving: false
   })
 
+  // Cargar logo al montar
+  useEffect(() => {
+    const img = new Image()
+    img.src = '/chaski.png'
+    img.onload = () => {
+      logoRef.current = img
+      setLogoLoaded(true)
+    }
+  }, [])
+
   // Dibujar el robot y el escenario
   const draw = useCallback(() => {
     const canvas = canvasRef.current
@@ -62,9 +74,20 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Limpiar canvas
+    // Limpiar canvas con fondo oscuro
     ctx.fillStyle = '#1a1a2e'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Dibujar logo de ChaskiBots como fondo (centrado y con opacidad)
+    if (logoRef.current && logoLoaded) {
+      ctx.save()
+      ctx.globalAlpha = 0.08
+      const logoSize = 200
+      const logoX = (canvas.width - logoSize) / 2
+      const logoY = (canvas.height - logoSize) / 2
+      ctx.drawImage(logoRef.current, logoX, logoY, logoSize, logoSize)
+      ctx.restore()
+    }
 
     // Dibujar grid
     ctx.strokeStyle = '#2a2a4a'
@@ -82,19 +105,30 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
       ctx.stroke()
     }
 
-    // Dibujar obstáculos
-    ctx.fillStyle = '#4a4a6a'
+    // Dibujar obstáculos con estilo mejorado
+    ctx.fillStyle = '#3a3a5a'
+    ctx.strokeStyle = '#5a5a7a'
+    ctx.lineWidth = 2
+    
+    // Obstáculo 1
     ctx.fillRect(50, 50, 60, 60)
+    ctx.strokeRect(50, 50, 60, 60)
+    // Obstáculo 2
     ctx.fillRect(300, 100, 80, 40)
+    ctx.strokeRect(300, 100, 80, 40)
+    // Obstáculo 3
     ctx.fillRect(100, 280, 50, 80)
+    ctx.strokeRect(100, 280, 50, 80)
+    // Obstáculo 4
     ctx.fillRect(320, 280, 70, 70)
+    ctx.strokeRect(320, 280, 70, 70)
 
     // Calcular distancia al obstáculo más cercano (simulación simple)
     const obstacles = [
-      { x: 80, y: 80, w: 60, h: 60 },
-      { x: 340, y: 120, w: 80, h: 40 },
-      { x: 125, y: 320, w: 50, h: 80 },
-      { x: 355, y: 315, w: 70, h: 70 }
+      { x: 50, y: 50, w: 60, h: 60 },
+      { x: 300, y: 100, w: 80, h: 40 },
+      { x: 100, y: 280, w: 50, h: 80 },
+      { x: 320, y: 280, w: 70, h: 70 }
     ]
 
     // Dibujar robot
@@ -202,7 +236,7 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
       ctx.restore()
     }
 
-  }, [robotState])
+  }, [robotState, logoLoaded])
 
   // Función para dibujar rectángulo redondeado
   const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
