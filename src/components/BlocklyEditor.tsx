@@ -1014,7 +1014,9 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
         </div>
 
         {/* Right Panel - Tabs */}
-        <div className="w-[450px] bg-dark-800 border-l border-dark-600 flex flex-col">
+        <div className={`bg-dark-800 border-l border-dark-600 flex flex-col ${
+          isFullscreen ? 'w-[500px]' : 'w-[400px]'
+        }`}>
           {/* Tabs */}
           <div className="flex border-b border-dark-600">
             <button
