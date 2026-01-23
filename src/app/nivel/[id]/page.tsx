@@ -226,6 +226,13 @@ export default function NivelPage() {
                   <span className="ml-auto text-xs bg-purple-500/30 px-1.5 py-0.5 rounded">Nuevo</span>
                 </Link>
                 <Link
+                  href="/admin/calificaciones"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all text-green-400 hover:bg-green-500/10 mt-1"
+                >
+                  <GraduationCap className="w-5 h-5" />
+                  <span>Calificaciones</span>
+                </Link>
+                <Link
                   href="/admin/tareas"
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all text-gray-400 hover:bg-dark-700 mt-1"
                 >
