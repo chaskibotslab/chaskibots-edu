@@ -170,6 +170,33 @@ export default function SubmissionsPanel() {
   }
 
   const pendingCount = submissions.filter(s => s.status === 'pending').length
+  const gradedCount = submissions.filter(s => s.status === 'graded').length
+  const [syncing, setSyncing] = useState(false)
+  
+  // Sincronizar TODAS las entregas calificadas al sistema local
+  const syncAllGradedSubmissions = async () => {
+    const gradedSubmissions = submissions.filter(s => s.status === 'graded' && s.grade !== undefined)
+    
+    if (gradedSubmissions.length === 0) {
+      alert('No hay entregas calificadas para sincronizar')
+      return
+    }
+    
+    setSyncing(true)
+    let synced = 0
+    
+    for (const submission of gradedSubmissions) {
+      try {
+        syncGradeToLocalSystem(submission, submission.grade!, submission.feedback || '')
+        synced++
+      } catch (error) {
+        console.error('Error syncing submission:', submission.id, error)
+      }
+    }
+    
+    setSyncing(false)
+    alert(`✅ Se sincronizaron ${synced} calificaciones al sistema de estudiantes.\n\nAhora puedes ver los estudiantes y sus calificaciones en las pestañas "Estudiantes" y "Calificaciones".`)
+  }
 
   return (
     <div className="space-y-6">
@@ -190,6 +217,21 @@ export default function SubmissionsPanel() {
             <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-medium">
               {pendingCount} pendientes
             </span>
+          )}
+          {gradedCount > 0 && (
+            <button
+              onClick={syncAllGradedSubmissions}
+              disabled={syncing}
+              className="flex items-center gap-1 px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+              title="Sincronizar todas las calificaciones al sistema de estudiantes"
+            >
+              {syncing ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <CheckCircle className="w-4 h-4" />
+              )}
+              Sincronizar {gradedCount}
+            </button>
           )}
           <button
             onClick={loadSubmissions}

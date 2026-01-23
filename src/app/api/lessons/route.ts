@@ -82,33 +82,55 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
-    const response = await fetch(AIRTABLE_API_URL, {
+    // Campos básicos requeridos - NO incluir 'type' si Airtable tiene opciones restringidas
+    const fields: Record<string, any> = {
+      levelId: body.levelId || '',
+      moduleName: body.moduleName || '',
+      title: body.title || '',
+      duration: body.duration || '5 min',
+      order: body.order || 0,
+    }
+    
+    // Solo agregar campos opcionales si tienen valor
+    if (body.videoUrl) fields.videoUrl = body.videoUrl
+    if (body.content) fields.content = body.content
+    if (body.locked !== undefined) fields.locked = body.locked
+    
+    // Intentar primero sin el campo 'type' que puede causar problemas
+    let response = await fetch(AIRTABLE_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        records: [{
-          fields: {
-            levelId: body.levelId,
-            moduleName: body.moduleName,
-            title: body.title,
-            type: body.type,
-            duration: body.duration,
-            order: body.order || 0,
-            videoUrl: body.videoUrl || '',
-            content: body.content || '',
-            locked: body.locked || false,
-          }
-        }]
+        records: [{ fields }]
       })
     })
 
+    // Si falla, intentar con el campo type
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Airtable error:', errorText)
-      return NextResponse.json({ error: 'Error creating lesson', message: errorText }, { status: 500 })
+      
+      // Si el error NO es por type, reintentar con type
+      if (!errorText.includes('INVALID_MULTIPLE_CHOICE') && body.type) {
+        fields.type = body.type
+        response = await fetch(AIRTABLE_API_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            records: [{ fields }]
+          })
+        })
+      }
+      
+      if (!response.ok) {
+        console.error('Airtable error:', errorText)
+        return NextResponse.json({ error: 'Error creating lesson', message: errorText }, { status: 500 })
+      }
     }
 
     const data = await response.json()
