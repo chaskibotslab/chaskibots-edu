@@ -131,6 +131,8 @@ export interface CourseUser {
   role: 'admin' | 'teacher' | 'student'
   courseId: string        // ID del curso/clase
   courseName: string      // Nombre del curso/clase
+  schoolId: string        // ID del colegio/institución
+  schoolName: string      // Nombre del colegio
   programId: string       // ID del programa (ej: prog-inicial2-robotica)
   programName: string     // Nombre del programa (ej: Robótica Básica)
   levelId: string         // Nivel educativo
@@ -201,6 +203,8 @@ export async function validateAccessCode(accessCode: string): Promise<{
       role: (fields.role as 'admin' | 'teacher' | 'student') || 'student',
       courseId: (fields.courseId as string) || '',
       courseName: (fields.courseName as string) || '',
+      schoolId: (fields.schoolId as string) || '',
+      schoolName: (fields.schoolName as string) || '',
       programId: (fields.programId as string) || '',
       programName: (fields.programName as string) || '',
       levelId: (fields.levelId as string) || '',
@@ -256,6 +260,8 @@ export async function validateEmailPassword(email: string, password: string): Pr
       role: (fields.role as 'admin' | 'teacher' | 'student') || 'student',
       courseId: (fields.courseId as string) || '',
       courseName: (fields.courseName as string) || '',
+      schoolId: (fields.schoolId as string) || '',
+      schoolName: (fields.schoolName as string) || '',
       programId: (fields.programId as string) || '',
       programName: (fields.programName as string) || '',
       levelId: (fields.levelId as string) || '',
@@ -297,7 +303,9 @@ export async function createCourseUser(
   email?: string,
   expiresAt?: string,
   programId?: string,
-  programName?: string
+  programName?: string,
+  schoolId?: string,
+  schoolName?: string
 ): Promise<{ success: boolean; user?: CourseUser; error?: string }> {
   try {
     const prefix = role === 'admin' ? 'AD' : role === 'teacher' ? 'PR' : 'ES'
@@ -326,6 +334,12 @@ export async function createCourseUser(
     if (courseName && courseName.trim() !== '' && courseName !== 'Sin asignar') {
       recordData.courseName = courseName
     }
+    if (schoolId && schoolId.trim() !== '') {
+      recordData.schoolId = schoolId
+    }
+    if (schoolName && schoolName.trim() !== '') {
+      recordData.schoolName = schoolName
+    }
     if (programId && programId.trim() !== '') {
       recordData.programId = programId
     }
@@ -346,6 +360,8 @@ export async function createCourseUser(
       role,
       courseId,
       courseName,
+      schoolId: schoolId || '',
+      schoolName: schoolName || '',
       programId: programId || '',
       programName: programName || '',
       levelId,
@@ -411,6 +427,8 @@ export async function getAllUsers(): Promise<CourseUser[]> {
       role: (record.fields.role as 'admin' | 'teacher' | 'student') || 'student',
       courseId: (record.fields.courseId as string) || '',
       courseName: (record.fields.courseName as string) || '',
+      schoolId: (record.fields.schoolId as string) || '',
+      schoolName: (record.fields.schoolName as string) || '',
       programId: (record.fields.programId as string) || '',
       programName: (record.fields.programName as string) || '',
       levelId: (record.fields.levelId as string) || '',
@@ -438,6 +456,8 @@ export async function getCourseUsers(courseId: string): Promise<CourseUser[]> {
       role: (record.fields.role as 'admin' | 'teacher' | 'student') || 'student',
       courseId: (record.fields.courseId as string) || '',
       courseName: (record.fields.courseName as string) || '',
+      schoolId: (record.fields.schoolId as string) || '',
+      schoolName: (record.fields.schoolName as string) || '',
       programId: (record.fields.programId as string) || '',
       programName: (record.fields.programName as string) || '',
       levelId: (record.fields.levelId as string) || '',
@@ -462,6 +482,8 @@ export async function updateUser(
     role?: 'admin' | 'teacher' | 'student'
     courseId?: string
     courseName?: string
+    schoolId?: string
+    schoolName?: string
     programId?: string
     programName?: string
     expiresAt?: string
@@ -480,6 +502,12 @@ export async function updateUser(
     }
     if (data.courseName !== undefined && data.courseName.trim() !== '' && data.courseName !== 'Sin asignar') {
       updateData.courseName = data.courseName
+    }
+    if (data.schoolId !== undefined && data.schoolId.trim() !== '') {
+      updateData.schoolId = data.schoolId
+    }
+    if (data.schoolName !== undefined && data.schoolName.trim() !== '') {
+      updateData.schoolName = data.schoolName
     }
     if (data.programId !== undefined && data.programId.trim() !== '') updateData.programId = data.programId
     if (data.programName !== undefined && data.programName.trim() !== '') updateData.programName = data.programName

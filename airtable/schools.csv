@@ -1,0 +1,2 @@
+id,name,code,address,city,country,phone,email,logo,isActive,createdAt,maxStudents,maxTeachers
+school-demo,Colegio Demo ChaskiBots,DEMO,Av. Principal 123,Quito,Ecuador,+593999999999,contacto@colegiodemo.edu.ec,,true,2024-01-01,100,10

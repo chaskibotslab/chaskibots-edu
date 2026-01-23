@@ -13,6 +13,7 @@ export interface Grade {
   lessonId: string
   levelId: string
   courseId?: string
+  schoolId?: string
   score: number
   feedback?: string
   taskId?: string
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const levelId = searchParams.get('levelId')
     const courseId = searchParams.get('courseId')
+    const schoolId = searchParams.get('schoolId')
     const studentId = searchParams.get('studentId')
 
     let filterFormula = ''
@@ -34,6 +36,7 @@ export async function GET(request: NextRequest) {
     
     if (levelId) filters.push(`{levelId}="${levelId}"`)
     if (courseId) filters.push(`{courseId}="${courseId}"`)
+    if (schoolId) filters.push(`{schoolId}="${schoolId}"`)
     if (studentId) filters.push(`{studentId}="${studentId}"`)
     
     if (filters.length > 0) {
@@ -74,6 +77,7 @@ export async function GET(request: NextRequest) {
       lessonId: record.fields.lessonId || '',
       levelId: record.fields.levelId || '',
       courseId: record.fields.courseId || '',
+      schoolId: record.fields.schoolId || '',
       score: parseFloat(record.fields.score) || 0,
       feedback: record.fields.feedback || '',
       taskId: record.fields.taskId || '',
@@ -93,7 +97,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { studentId, studentName, lessonId, levelId, courseId, score, feedback, taskId, submittedAt, gradedBy } = body
+    const { studentId, studentName, lessonId, levelId, courseId, schoolId, score, feedback, taskId, submittedAt, gradedBy } = body
 
     if (!studentName || score === undefined) {
       return NextResponse.json({ error: 'studentName y score son requeridos' }, { status: 400 })
@@ -105,6 +109,7 @@ export async function POST(request: NextRequest) {
       lessonId: lessonId || '',
       levelId: levelId || '',
       courseId: courseId || '',
+      schoolId: schoolId || '',
       score: String(score),
       submittedAt: submittedAt || new Date().toISOString(),
       gradedAt: new Date().toISOString(),

@@ -1,12 +1,12 @@
-accessCode,email,password,name,levelId,role,courseId,courseName,programId,programName,progress,createdAt,lastLogin,expiresAt,isActive
-AD1ADMIN,admin@chaskibots.com,1234,Administrador,tercero-bach,admin,,,,,100,2024-01-01,2024-01-15,,true
-PR7K9M2N,profesor1@chaskibots.com,111,Profesor Demo,octavo-egb,teacher,curso-robotica-8vo,Robótica 8vo EGB,prog-8egb-robotica,Robótica Avanzada,0,2024-01-01,2024-01-15,,true
-ES4X8P3Q,,,María García,inicial-2,student,curso-inicial-2,Tecnología Inicial 2,prog-inicial2-robotica,Robótica Básica,25,2024-01-01,2024-01-15,2025-12-31,true
-ES5Y9R4S,,,Carlos López,inicial-2,student,curso-inicial-2,Tecnología Inicial 2,prog-inicial2-programacion,Programación Visual,15,2024-01-01,2024-01-15,2025-12-31,true
-ES6Z0T5U,,,Clara Feo Martínez,inicial-2,student,curso-inicial-2,Tecnología Inicial 2,prog-inicial2-electronica,Electrónica Creativa,30,2024-01-01,2024-01-15,2025-12-31,true
-ES7A1V6W,,,Pedro Sánchez,inicial-2,student,curso-inicial-2,Tecnología Inicial 2,prog-inicial2-ia,IA para Niños,10,2024-01-01,2024-01-15,2025-12-31,true
-ES8B2X7Y,,,Juan Pérez,octavo-egb,student,curso-robotica-8vo,Robótica 8vo EGB,prog-8egb-robotica,Robótica Avanzada,45,2024-01-01,,,true
-ES9C3Z8A,,,Laura Gómez,octavo-egb,student,curso-robotica-8vo,Robótica 8vo EGB,prog-8egb-programacion,Programación Python,20,2024-01-01,,,true
-ESAB4D5E,,,Diego Torres,octavo-egb,student,curso-robotica-8vo,Robótica 8vo EGB,prog-8egb-hacking,Hacking Ético,35,2024-01-01,,,true
-ESCD6F7G,,,Roberto Vega,universidad,student,curso-hacking-bach,Ciberseguridad Bachillerato,prog-universidad-python,Python Profesional,60,2024-01-01,,,true
-ESEF8H9J,,,Sofía Ruiz,curso-libre,student,curso-1egb,Robótica 1° EGB,prog-curso-arduino,Arduino Maker,80,2024-01-01,,,true
+accessCode,email,password,name,levelId,role,courseId,courseName,schoolId,schoolName,programId,programName,progress,createdAt,lastLogin,expiresAt,isActive
+AD1ADMIN,admin@chaskibots.com,1234,Administrador,tercero-bach,admin,,,,,,,100,2024-01-01,2024-01-15,,true
+PR7K9M2N,profesor1@chaskibots.com,111,Profesor Demo,octavo-egb,teacher,curso-robotica-8vo,Robótica 8vo EGB,school-demo,Colegio Demo ChaskiBots,prog-8egb-robotica,Robótica Avanzada,0,2024-01-01,2024-01-15,,true
+ES4X8P3Q,,,María García,inicial-2,student,curso-inicial-2,Tecnología Inicial 2,school-demo,Colegio Demo ChaskiBots,prog-inicial2-robotica,Robótica Básica,25,2024-01-01,2024-01-15,2025-12-31,true
+ES5Y9R4S,,,Carlos López,inicial-2,student,curso-inicial-2,Tecnología Inicial 2,school-demo,Colegio Demo ChaskiBots,prog-inicial2-programacion,Programación Visual,15,2024-01-01,2024-01-15,2025-12-31,true
+ES6Z0T5U,,,Clara Feo Martínez,inicial-2,student,curso-inicial-2,Tecnología Inicial 2,school-demo,Colegio Demo ChaskiBots,prog-inicial2-electronica,Electrónica Creativa,30,2024-01-01,2024-01-15,2025-12-31,true
+ES7A1V6W,,,Pedro Sánchez,inicial-2,student,curso-inicial-2,Tecnología Inicial 2,school-demo,Colegio Demo ChaskiBots,prog-inicial2-ia,IA para Niños,10,2024-01-01,2024-01-15,2025-12-31,true
+ES8B2X7Y,,,Juan Pérez,octavo-egb,student,curso-robotica-8vo,Robótica 8vo EGB,school-demo,Colegio Demo ChaskiBots,prog-8egb-robotica,Robótica Avanzada,45,2024-01-01,,,true
+ES9C3Z8A,,,Laura Gómez,octavo-egb,student,curso-robotica-8vo,Robótica 8vo EGB,school-demo,Colegio Demo ChaskiBots,prog-8egb-programacion,Programación Python,20,2024-01-01,,,true
+ESAB4D5E,,,Diego Torres,octavo-egb,student,curso-robotica-8vo,Robótica 8vo EGB,school-demo,Colegio Demo ChaskiBots,prog-8egb-hacking,Hacking Ético,35,2024-01-01,,,true
+ESCD6F7G,,,Roberto Vega,universidad,student,curso-hacking-bach,Ciberseguridad Bachillerato,school-demo,Colegio Demo ChaskiBots,prog-universidad-python,Python Profesional,60,2024-01-01,,,true
+ESEF8H9J,,,Sofía Ruiz,curso-libre,student,curso-1egb,Robótica 1° EGB,school-demo,Colegio Demo ChaskiBots,prog-curso-arduino,Arduino Maker,80,2024-01-01,,,true

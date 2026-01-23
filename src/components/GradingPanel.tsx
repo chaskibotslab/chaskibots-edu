@@ -92,9 +92,14 @@ export default function GradingPanel() {
         params.append('levelId', selectedLevel)
       }
       
-      // Si es profesor (no admin), filtrar por su courseId
-      if (isTeacher && !isAdmin && user?.courseId) {
-        params.append('courseId', user.courseId)
+      // Si es profesor (no admin), filtrar por su schoolId y courseId
+      if (isTeacher && !isAdmin) {
+        if (user?.schoolId) {
+          params.append('schoolId', user.schoolId)
+        }
+        if (user?.courseId) {
+          params.append('courseId', user.courseId)
+        }
       }
       
       if (params.toString()) {

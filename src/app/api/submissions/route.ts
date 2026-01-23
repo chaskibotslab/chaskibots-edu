@@ -14,6 +14,7 @@ export interface Submission {
   levelId: string
   lessonId?: string
   courseId?: string
+  schoolId?: string
   code: string
   output: string
   submittedAt: string
@@ -34,6 +35,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
     const taskId = searchParams.get('taskId')
     const courseId = searchParams.get('courseId')
+    const schoolId = searchParams.get('schoolId')
 
     let filterFormula = ''
     const filters: string[] = []
@@ -42,6 +44,7 @@ export async function GET(request: NextRequest) {
     if (status) filters.push(`{status}="${status}"`)
     if (taskId) filters.push(`{taskId}="${taskId}"`)
     if (courseId) filters.push(`{courseId}="${courseId}"`)
+    if (schoolId) filters.push(`{schoolId}="${schoolId}"`)
     
     if (filters.length > 0) {
       filterFormula = filters.length === 1 
@@ -78,6 +81,7 @@ export async function GET(request: NextRequest) {
       levelId: record.fields.levelId || '',
       lessonId: record.fields.lessonId || '',
       courseId: record.fields.courseId || '',
+      schoolId: record.fields.schoolId || '',
       code: record.fields.code || '',
       output: record.fields.output || '',
       submittedAt: record.fields.submittedAt || '',
