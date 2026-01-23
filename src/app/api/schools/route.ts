@@ -111,10 +111,19 @@ export async function POST(request: NextRequest) {
     if (address) fields.address = address
     if (city) fields.city = city
     if (country) fields.country = country
-    if (phone) fields.phone = phone
+    // Formatear teléfono para Airtable (agregar código de país si no lo tiene)
+    if (phone) {
+      let formattedPhone = phone.toString().replace(/\D/g, '') // Solo números
+      if (formattedPhone.startsWith('0')) {
+        formattedPhone = '+593' + formattedPhone.substring(1) // Ecuador
+      } else if (!formattedPhone.startsWith('+')) {
+        formattedPhone = '+593' + formattedPhone
+      }
+      fields.phone = formattedPhone
+    }
     if (email) fields.email = email
-    if (maxStudents) fields.maxStudents = maxStudents
-    if (maxTeachers) fields.maxTeachers = maxTeachers
+    if (maxStudents) fields.maxStudents = Number(maxStudents)
+    if (maxTeachers) fields.maxTeachers = Number(maxTeachers)
 
     console.log('Fields to send:', fields)
 
