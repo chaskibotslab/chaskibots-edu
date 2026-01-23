@@ -9,6 +9,8 @@ export interface User {
   avatar?: string
   role: 'admin' | 'teacher' | 'student'
   levelId?: string
+  courseId?: string
+  schoolId?: string
   progress: number
   createdAt: string
   lastLogin?: string
@@ -116,6 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: data.user.email || email,
         role: data.user.role,
         levelId: data.user.levelId,
+        courseId: data.user.courseId,
+        schoolId: data.user.schoolId,
         progress: 0,
         createdAt: data.user.createdAt || new Date().toISOString(),
         lastLogin: new Date().toISOString()

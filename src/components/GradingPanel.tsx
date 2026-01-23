@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { EDUCATION_LEVELS } from '@/lib/constants'
+import { useAuth } from '@/components/AuthProvider'
 
 // Interfaces para datos de Airtable
 interface Student {
@@ -48,6 +49,7 @@ import SubmissionsPanel from './SubmissionsPanel'
 type ViewMode = 'students' | 'grades' | 'summary' | 'submissions'
 
 export default function GradingPanel() {
+  const { user, isAdmin, isTeacher } = useAuth()
   const [selectedLevel, setSelectedLevel] = useState<string>('')
   const [viewMode, setViewMode] = useState<ViewMode>('students')
   const [students, setStudents] = useState<Student[]>([])
@@ -84,8 +86,19 @@ export default function GradingPanel() {
     try {
       // Cargar calificaciones desde Airtable
       let gradesUrl = '/api/grades'
+      const params = new URLSearchParams()
+      
       if (selectedLevel) {
-        gradesUrl += `?levelId=${selectedLevel}`
+        params.append('levelId', selectedLevel)
+      }
+      
+      // Si es profesor (no admin), filtrar por su courseId
+      if (isTeacher && !isAdmin && user?.courseId) {
+        params.append('courseId', user.courseId)
+      }
+      
+      if (params.toString()) {
+        gradesUrl += `?${params.toString()}`
       }
       
       const gradesRes = await fetch(gradesUrl)
