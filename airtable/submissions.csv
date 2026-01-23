@@ -1,2 +1,2 @@
-taskId,studentName,studentEmail,levelId,lessonId,code,output,submittedAt,status,grade,feedback,gradedBy,drawing,files
-EJEMPLO-BORRAR,Estudiante Demo,demo@test.com,inicial-2,lesson-1,print('Hola'),Hola,2026-01-20T10:00:00Z,pending,,,,,
+taskId,studentName,studentEmail,levelId,lessonId,courseId,code,output,submittedAt,status,grade,feedback,gradedBy,drawing,files
+EJEMPLO-BORRAR,Estudiante Demo,demo@test.com,inicial-2,lesson-1,curso-inicial-2,print('Hola'),Hola,2026-01-20T10:00:00Z,pending,,,,,
