@@ -6,12 +6,6 @@ import {
   FileCode, Clock, CheckCircle, AlertCircle, Eye, X,
   Award, Send, Filter, RefreshCw, Trash2, ChevronDown
 } from 'lucide-react'
-import {
-  getStudents,
-  addStudent,
-  addGrade,
-  getGrades
-} from '@/lib/gradingService'
 
 interface Submission {
   id: string
@@ -74,8 +68,8 @@ export default function SubmissionsPanel() {
         })
       })
       if (res.ok) {
-        // Sincronizar con el sistema de calificaciones local
-        syncGradeToLocalSystem(selectedSubmission, gradeInput, feedbackInput)
+        // Sincronizar con Airtable (tabla grades)
+        await syncGradeToAirtable(selectedSubmission, gradeInput, feedbackInput)
         
         loadSubmissions()
         setSelectedSubmission(null)
@@ -88,46 +82,30 @@ export default function SubmissionsPanel() {
     setSaving(false)
   }
   
-  // Sincronizar calificación con el sistema local de estudiantes
-  const syncGradeToLocalSystem = (submission: Submission, grade: number, feedback: string) => {
+  // Sincronizar calificación con Airtable (tabla grades)
+  const syncGradeToAirtable = async (submission: Submission, grade: number, feedback: string) => {
     try {
-      const students = getStudents()
-      
-      // Buscar si el estudiante ya existe (por nombre y nivel)
-      let student = students.find(
-        s => s.name.toLowerCase() === submission.studentName.toLowerCase() && 
-             s.levelId === submission.levelId
-      )
-      
-      // Si no existe, crearlo
-      if (!student) {
-        student = addStudent({
-          name: submission.studentName,
-          levelId: submission.levelId || '2-bgu', // Default si no hay nivel
-          email: undefined
-        })
-      }
-      
-      // Verificar si ya existe una calificación para esta tarea
-      const existingGrades = getGrades()
-      const existingGrade = existingGrades.find(
-        g => g.studentId === student!.id && g.taskId === submission.taskId
-      )
-      
-      // Solo agregar si no existe ya
-      if (!existingGrade && student) {
-        addGrade({
-          studentId: student.id,
-          lessonId: submission.taskId, // Usar taskId como lessonId
-          levelId: submission.levelId || student.levelId,
+      // Crear calificación en Airtable
+      const response = await fetch('/api/grades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: submission.studentName,
+          lessonId: submission.taskId,
+          levelId: submission.levelId || '',
           score: grade,
           feedback: feedback,
           taskId: submission.taskId,
-          submittedAt: submission.submittedAt || new Date().toISOString()
+          submittedAt: submission.submittedAt || new Date().toISOString(),
+          gradedBy: 'admin'
         })
+      })
+      
+      if (!response.ok) {
+        console.error('Error syncing grade to Airtable')
       }
     } catch (error) {
-      console.error('Error syncing grade to local system:', error)
+      console.error('Error syncing grade to Airtable:', error)
     }
   }
 
@@ -187,7 +165,7 @@ export default function SubmissionsPanel() {
     
     for (const submission of gradedSubmissions) {
       try {
-        syncGradeToLocalSystem(submission, submission.grade!, submission.feedback || '')
+        syncGradeToAirtable(submission, submission.grade!, submission.feedback || '')
         synced++
       } catch (error) {
         console.error('Error syncing submission:', submission.id, error)
