@@ -9,25 +9,59 @@ Esto evita errores como `INVALID_MULTIPLE_CHOICE_OPTIONS`.
 
 | # | Tabla | Archivo CSV | Registros | Descripción |
 |---|-------|-------------|-----------|-------------|
-| 1 | `levels` | levels.csv | 17 | Niveles educativos |
-| 2 | `programs` | programs.csv | 26 | Programas por nivel |
-| 3 | `courses_catalog` | courses_catalog.csv | 18 | Cursos/clases |
-| 4 | `users` | users.csv | 11 | Usuarios y códigos |
-| 5 | `lessons` | lessons.csv | 62 | Lecciones |
-| 6 | `kits` | kits.csv | 16 | Kits de robótica |
-| 7 | `ai_activities` | ai_activities.csv | 52 | Actividades IA |
-| 8 | `simulators` | simulators.csv | 7 | Simuladores |
-| 9 | `year_plans` | year_plans.csv | 136 | Plan anual |
-| 10 | `projects` | projects.csv | 22 | Proyectos avanzados |
-| 11 | `experiencias` | experiencias.csv | 8 | Galería |
+| 1 | `schools` | schools.csv | 1 | **🏫 Colegios/Instituciones** |
+| 2 | `levels` | levels.csv | 17 | Niveles educativos |
+| 3 | `programs` | programs.csv | 26 | Programas por nivel |
+| 4 | `courses_catalog` | courses_catalog.csv | 18 | Cursos/clases |
+| 5 | `users` | users.csv | 11 | Usuarios y códigos |
+| 6 | `lessons` | lessons.csv | 62 | Lecciones |
+| 7 | `kits` | kits.csv | 16 | Kits de robótica |
+| 8 | `ai_activities` | ai_activities.csv | 52 | Actividades IA |
+| 9 | `simulators` | simulators.csv | 7 | Simuladores |
+| 10 | `year_plans` | year_plans.csv | 136 | Plan anual |
+| 11 | `projects` | projects.csv | 22 | Proyectos avanzados |
+| 12 | `experiencias` | experiencias.csv | 8 | Galería |
+| 13 | `grades` | grades.csv | 1 | Calificaciones |
+| 14 | `submissions` | submissions.csv | 1 | Entregas de estudiantes |
 
 ## 🎯 Estructura del Sistema
 
 ```
-NIVELES (levels)
-    └── PROGRAMAS (programs) - Múltiples programas por nivel
-            └── CURSOS/CLASES (courses_catalog) - Grupos de estudiantes
-                    └── USUARIOS (users) - Estudiantes con código de acceso
+COLEGIOS (schools) - Instituciones educativas
+    └── NIVELES (levels) - Niveles educativos
+            └── PROGRAMAS (programs) - Múltiples programas por nivel
+                    └── CURSOS/CLASES (courses_catalog) - Grupos de estudiantes
+                            └── USUARIOS (users) - Estudiantes con código de acceso
+```
+
+---
+
+## 🏫 Tabla: `schools` (Colegios/Instituciones)
+
+Esta tabla almacena los colegios e instituciones educativas. **IMPORTAR PRIMERO**.
+
+### Campos:
+
+| Campo | Tipo en Airtable | Descripción | Requerido |
+|-------|------------------|-------------|-----------|
+| `id` | Single line text | ID único del colegio (ej: school-001) | ✅ |
+| `name` | Single line text | Nombre completo del colegio | ✅ |
+| `code` | Single line text | Código corto (ej: UESF) | ✅ |
+| `address` | Single line text | Dirección física | ❌ |
+| `city` | Single line text | Ciudad | ❌ |
+| `country` | Single line text | País (default: Ecuador) | ❌ |
+| `phone` | Single line text | Teléfono de contacto | ❌ |
+| `email` | Email | Email de contacto | ❌ |
+| `logo` | Attachment | Logo del colegio | ❌ |
+| `isActive` | Checkbox | Si el colegio está activo | ✅ |
+| `createdAt` | Date | Fecha de creación | ✅ |
+| `maxStudents` | Number | Máximo de estudiantes permitidos | ❌ |
+| `maxTeachers` | Number | Máximo de profesores permitidos | ❌ |
+
+### Datos de ejemplo:
+```csv
+id,name,code,address,city,country,phone,email,logo,isActive,createdAt,maxStudents,maxTeachers
+school-demo,Colegio Demo ChaskiBots,DEMO,Av. Principal 123,Quito,Ecuador,+593999999999,contacto@colegiodemo.edu.ec,,true,2024-01-01,100,10
 ```
 
 **Ejemplo:**
@@ -57,6 +91,8 @@ Esta tabla almacena todos los usuarios del sistema con sus códigos de acceso.
 | `role` | **Single line text** | admin, teacher, student (NO usar Single Select) | ✅ |
 | `courseId` | Single line text | ID del curso/clase asignado | ❌ |
 | `courseName` | Single line text | Nombre del curso/clase | ❌ |
+| `schoolId` | Single line text | **🏫 ID del colegio** (ej: school-demo) | ❌ |
+| `schoolName` | Single line text | **🏫 Nombre del colegio** | ❌ |
 | `programId` | Single line text | **ID del programa** (ej: prog-inicial2-robotica) | ❌ |
 | `programName` | Single line text | **Nombre del programa** (ej: Robótica Básica) | ❌ |
 | `progress` | Number | Porcentaje de progreso (0-100) | ❌ |
@@ -68,6 +104,7 @@ Esta tabla almacena todos los usuarios del sistema con sus códigos de acceso.
 ### ⚠️ IMPORTANTE: 
 - `levelId` y `role` deben ser **Single line text**, NO Single Select
 - Airtable genera automáticamente un ID interno, no necesitas campo `id`
+- **`schoolId` y `schoolName`** son necesarios para filtrar datos por colegio
 
 ### Formato de Códigos de Acceso:
 - **Admin**: `AD` + 6 caracteres (ej: `AD1ADMIN`)
@@ -76,10 +113,10 @@ Esta tabla almacena todos los usuarios del sistema con sus códigos de acceso.
 
 ### Datos de ejemplo:
 ```csv
-id,accessCode,email,password,name,levelId,role,courseId,courseName,progress,createdAt,lastLogin,expiresAt,isActive
-user-admin,AD1ADMIN,admin@chaskibots.com,admin2024,Administrador,tercero-bach,admin,,,100,2024-01-01,2024-01-15,,true
-user-profesor-1,PR7K9M2N,profesor1@chaskibots.com,profe123,Profesor Demo,primero-bach,teacher,curso-robotica-8vo,Robótica 8vo EGB,0,2024-01-01,2024-01-15,,true
-user-8egb-demo1,ES7A1V6W,,,Estudiante 1 - 8vo,octavo-egb,student,curso-robotica-8vo,Robótica 8vo EGB,0,2024-01-01,,,true
+accessCode,email,password,name,levelId,role,courseId,courseName,schoolId,schoolName,programId,programName,progress,createdAt,lastLogin,expiresAt,isActive
+AD1ADMIN,admin@chaskibots.com,1234,Administrador,tercero-bach,admin,,,,,,,100,2024-01-01,2024-01-15,,true
+PR7K9M2N,profesor1@chaskibots.com,111,Profesor Demo,octavo-egb,teacher,curso-robotica-8vo,Robótica 8vo EGB,school-demo,Colegio Demo ChaskiBots,prog-8egb-robotica,Robótica Avanzada,0,2024-01-01,2024-01-15,,true
+ES4X8P3Q,,,María García,inicial-2,student,curso-inicial-2,Tecnología Inicial 2,school-demo,Colegio Demo ChaskiBots,prog-inicial2-robotica,Robótica Básica,25,2024-01-01,2024-01-15,2025-12-31,true
 ```
 
 ---
@@ -272,4 +309,85 @@ Nivel: Universidad
               └── Usuario: Roberto Vega
                     └── Código: ESCD6F7G
                           └── Al ingresar código → Ve contenido de Python Profesional
+```
+
+---
+
+## 📝 Tabla: `grades` (Calificaciones)
+
+Esta tabla almacena las calificaciones de los estudiantes.
+
+### Campos:
+
+| Campo | Tipo en Airtable | Descripción | Requerido |
+|-------|------------------|-------------|-----------|
+| `studentName` | Single line text | Nombre del estudiante | ✅ |
+| `studentId` | Single line text | ID del estudiante | ❌ |
+| `lessonId` | Single line text | ID de la lección | ✅ |
+| `levelId` | Single line text | ID del nivel | ❌ |
+| `courseId` | Single line text | ID del curso | ❌ |
+| `schoolId` | Single line text | **🏫 ID del colegio** | ❌ |
+| `score` | Number | Calificación (0-10) | ✅ |
+| `feedback` | Long text | Retroalimentación del profesor | ❌ |
+| `taskId` | Single line text | ID de la tarea | ❌ |
+| `submittedAt` | Date | Fecha de entrega | ✅ |
+| `gradedAt` | Date | Fecha de calificación | ❌ |
+| `gradedBy` | Single line text | Email del profesor que calificó | ❌ |
+
+### Datos de ejemplo:
+```csv
+studentName,studentId,lessonId,levelId,courseId,schoolId,score,feedback,taskId,submittedAt,gradedAt,gradedBy
+"María García","est-001","leccion-1","inicial-2","curso-inicial-2","school-demo","9","Excelente trabajo","tarea-001","2024-01-15T10:00:00Z","2024-01-15T12:00:00Z","profesor@ejemplo.com"
+```
+
+---
+
+## 📤 Tabla: `submissions` (Entregas de Estudiantes)
+
+Esta tabla almacena las entregas de tareas de los estudiantes desde los simuladores.
+
+### Campos:
+
+| Campo | Tipo en Airtable | Descripción | Requerido |
+|-------|------------------|-------------|-----------|
+| `taskId` | Single line text | ID de la tarea | ✅ |
+| `studentName` | Single line text | Nombre del estudiante | ✅ |
+| `studentEmail` | Email | Email del estudiante | ❌ |
+| `levelId` | Single line text | ID del nivel | ✅ |
+| `lessonId` | Single line text | ID de la lección | ❌ |
+| `courseId` | Single line text | ID del curso | ❌ |
+| `schoolId` | Single line text | **🏫 ID del colegio** | ❌ |
+| `code` | Long text | Código enviado | ✅ |
+| `output` | Long text | Salida del código | ❌ |
+| `submittedAt` | Date | Fecha de entrega | ✅ |
+| `status` | Single line text | pending, graded, returned | ✅ |
+| `grade` | Number | Calificación asignada | ❌ |
+| `feedback` | Long text | Retroalimentación | ❌ |
+| `gradedBy` | Single line text | Profesor que calificó | ❌ |
+| `drawing` | Long text | Dibujo en base64 | ❌ |
+| `files` | Long text | Archivos adjuntos JSON | ❌ |
+
+### Datos de ejemplo:
+```csv
+taskId,studentName,studentEmail,levelId,lessonId,courseId,schoolId,code,output,submittedAt,status,grade,feedback,gradedBy,drawing,files
+TAREA-001,María García,maria@test.com,inicial-2,lesson-1,curso-inicial-2,school-demo,print('Hola'),Hola,2024-01-20T10:00:00Z,pending,,,,,
+```
+
+---
+
+## 🏫 Sistema de Colegios
+
+El sistema permite separar datos por colegio/institución:
+
+1. **Crear colegio** en `/admin/colegios`
+2. **Asignar usuarios** al colegio al crearlos
+3. **Los profesores** solo ven datos de su colegio y curso
+4. **Los admins** ven todos los datos
+
+### Flujo:
+```
+Admin crea Colegio "UESF" (school-demo)
+    └── Admin crea Profesor asignado a UESF + curso "8vo-A"
+            └── Admin crea Estudiantes asignados a UESF + curso "8vo-A"
+                    └── Profesor solo ve entregas/calificaciones de 8vo-A de UESF
 ```
