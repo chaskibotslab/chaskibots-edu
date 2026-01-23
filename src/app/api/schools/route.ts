@@ -86,8 +86,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Nombre y código son requeridos' }, { status: 400 })
     }
 
+    // Verificar que las variables de entorno estén configuradas
+    if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
+      console.error('Missing Airtable credentials')
+      return NextResponse.json({ 
+        error: 'Configuración de Airtable incompleta. Verifica AIRTABLE_API_KEY y AIRTABLE_BASE_ID' 
+      }, { status: 500 })
+    }
+
     // Generar ID único para el colegio
     const schoolId = `school-${code.toLowerCase().replace(/\s+/g, '-')}-${Date.now().toString(36)}`
+
+    console.log('Creating school:', { schoolId, name, code })
+    console.log('Airtable URL:', AIRTABLE_API_URL)
 
     const response = await fetch(AIRTABLE_API_URL, {
       method: 'POST',
@@ -116,7 +127,20 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Airtable create school error:', errorText)
-      return NextResponse.json({ error: 'Error creating school' }, { status: 500 })
+      
+      // Dar mensaje más específico según el error
+      if (errorText.includes('NOT_FOUND') || errorText.includes('TABLE_NOT_FOUND')) {
+        return NextResponse.json({ 
+          error: 'La tabla "schools" no existe en Airtable. Debes crearla primero importando el archivo schools.csv' 
+        }, { status: 400 })
+      }
+      if (errorText.includes('UNKNOWN_FIELD_NAME')) {
+        return NextResponse.json({ 
+          error: 'Faltan campos en la tabla schools de Airtable. Verifica que tenga todos los campos requeridos.' 
+        }, { status: 400 })
+      }
+      
+      return NextResponse.json({ error: `Error al crear colegio: ${errorText}` }, { status: 500 })
     }
 
     const record = await response.json()
@@ -131,8 +155,9 @@ export async function POST(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Error creating school:', error)
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    return NextResponse.json({ error: `Error interno: ${errorMsg}` }, { status: 500 })
   }
 }
 
