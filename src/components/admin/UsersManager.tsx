@@ -16,6 +16,8 @@ interface User {
   role: 'admin' | 'teacher' | 'student'
   courseId: string
   courseName: string
+  schoolId?: string
+  schoolName?: string
   programId: string
   programName: string
   progress: number
@@ -40,11 +42,18 @@ interface Course {
   levelId: string
 }
 
+interface School {
+  id: string
+  name: string
+  code: string
+}
+
 export default function UsersManager() {
   const [users, setUsers] = useState<User[]>([])
   const [levels, setLevels] = useState<Level[]>([])
   const [programs, setPrograms] = useState<Program[]>([])
   const [courses, setCourses] = useState<Course[]>([])
+  const [schools, setSchools] = useState<School[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
@@ -61,6 +70,8 @@ export default function UsersManager() {
     role: 'student' as 'admin' | 'teacher' | 'student',
     courseId: '',
     courseName: '',
+    schoolId: '',
+    schoolName: '',
     programId: '',
     programName: '',
     expiresAt: ''
@@ -74,6 +85,8 @@ export default function UsersManager() {
     programName: '',
     courseId: '',
     courseName: '',
+    schoolId: '',
+    schoolName: '',
     expiresAt: ''
   })
 
@@ -84,17 +97,24 @@ export default function UsersManager() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [usersRes, levelsRes, programsRes, coursesRes] = await Promise.all([
+      const [usersRes, levelsRes, programsRes, coursesRes, schoolsRes] = await Promise.all([
         fetch('/api/admin/users'),
         fetch('/api/levels'),
         fetch('/api/programs'),
-        fetch('/api/admin/courses')
+        fetch('/api/admin/courses'),
+        fetch('/api/schools')
       ])
       
       const usersData = await usersRes.json()
       const levelsData = await levelsRes.json()
       const programsData = await programsRes.json()
       const coursesData = await coursesRes.json()
+      const schoolsData = await schoolsRes.json()
+      
+      // Cargar colegios
+      if (schoolsData.success && schoolsData.schools) {
+        setSchools(schoolsData.schools)
+      }
       
       // Cargar cursos
       console.log('[UsersManager] Courses response:', coursesData)
@@ -228,6 +248,8 @@ export default function UsersManager() {
       role: user.role,
       courseId: user.courseId,
       courseName: user.courseName,
+      schoolId: user.schoolId || '',
+      schoolName: user.schoolName || '',
       programId: user.programId,
       programName: user.programName,
       expiresAt: user.expiresAt || ''
@@ -319,6 +341,8 @@ export default function UsersManager() {
       role: 'student',
       courseId: '',
       courseName: '',
+      schoolId: '',
+      schoolName: '',
       programId: '',
       programName: '',
       expiresAt: ''
@@ -491,6 +515,26 @@ export default function UsersManager() {
                 className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
               />
             </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Colegio</label>
+              <select
+                value={bulkData.schoolId}
+                onChange={(e) => {
+                  const school = schools.find(s => s.id === e.target.value)
+                  setBulkData({ 
+                    ...bulkData, 
+                    schoolId: e.target.value,
+                    schoolName: school?.name || ''
+                  })
+                }}
+                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+              >
+                <option value="">Sin asignar</option>
+                {schools.map(school => (
+                  <option key={school.id} value={school.id}>{school.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="flex justify-end gap-3">
             <button
@@ -589,6 +633,29 @@ export default function UsersManager() {
                 <option value="">Sin asignar</option>
                 {displayCourses.map(course => (
                   <option key={course.id} value={course.id}>{course.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Colegio/Institución</label>
+              <select
+                value={formData.schoolId}
+                onChange={(e) => {
+                  const school = schools.find(s => s.id === e.target.value)
+                  setFormData({ 
+                    ...formData, 
+                    schoolId: e.target.value,
+                    schoolName: school?.name || ''
+                  })
+                }}
+                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+              >
+                <option value="">Sin asignar</option>
+                {schools.map(school => (
+                  <option key={school.id} value={school.id}>{school.name} ({school.code})</option>
                 ))}
               </select>
             </div>
