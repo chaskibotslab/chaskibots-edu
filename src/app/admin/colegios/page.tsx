@@ -86,7 +86,9 @@ export default function ColegiosPage() {
         body: JSON.stringify(formData)
       })
       
-      if (res.ok) {
+      const data = await res.json()
+      
+      if (res.ok && data.success) {
         setShowAddModal(false)
         setFormData({
           name: '',
@@ -101,10 +103,11 @@ export default function ColegiosPage() {
         })
         loadSchools()
       } else {
-        alert('Error al crear colegio')
+        alert(data.error || 'Error al crear colegio')
       }
     } catch (error) {
-      alert('Error al crear colegio')
+      console.error('Error:', error)
+      alert('Error de conexión al crear colegio')
     }
   }
 
