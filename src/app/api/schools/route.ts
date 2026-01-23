@@ -53,8 +53,9 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json()
     
-    const schools: School[] = data.records.map((record: any) => ({
+    const schools = data.records.map((record: any) => ({
       id: record.fields.id || record.id,
+      recordId: record.id, // ID interno de Airtable para DELETE
       name: record.fields.name || '',
       code: record.fields.code || '',
       address: record.fields.address || '',
@@ -111,16 +112,8 @@ export async function POST(request: NextRequest) {
     if (address) fields.address = address
     if (city) fields.city = city
     if (country) fields.country = country
-    // Formatear teléfono para Airtable (agregar código de país si no lo tiene)
-    if (phone) {
-      let formattedPhone = phone.toString().replace(/\D/g, '') // Solo números
-      if (formattedPhone.startsWith('0')) {
-        formattedPhone = '+593' + formattedPhone.substring(1) // Ecuador
-      } else if (!formattedPhone.startsWith('+')) {
-        formattedPhone = '+593' + formattedPhone
-      }
-      fields.phone = formattedPhone
-    }
+    // NO enviar phone si causa problemas - el usuario debe cambiar el tipo de campo en Airtable a "Single line text"
+    // if (phone) fields.phone = phone
     if (email) fields.email = email
     if (maxStudents) fields.maxStudents = Number(maxStudents)
     if (maxTeachers) fields.maxTeachers = Number(maxTeachers)
@@ -186,12 +179,53 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const recordId = searchParams.get('recordId')
+    const schoolId = searchParams.get('id')
 
-    if (!recordId) {
-      return NextResponse.json({ error: 'recordId es requerido' }, { status: 400 })
+    let airtableRecordId = recordId
+
+    // Si no tenemos recordId pero tenemos schoolId, buscar el registro primero
+    if (!airtableRecordId && schoolId) {
+      const searchUrl = `${AIRTABLE_API_URL}?filterByFormula=${encodeURIComponent(`{id}="${schoolId}"`)}`
+      const searchResponse = await fetch(searchUrl, {
+        headers: {
+          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        },
+      })
+      
+      if (searchResponse.ok) {
+        const searchData = await searchResponse.json()
+        if (searchData.records && searchData.records.length > 0) {
+          airtableRecordId = searchData.records[0].id
+        }
+      }
     }
 
-    const response = await fetch(`${AIRTABLE_API_URL}/${recordId}`, {
+    // Si el recordId parece ser un ID de school (empieza con "school-"), buscar el registro
+    if (airtableRecordId && airtableRecordId.startsWith('school-')) {
+      const searchUrl = `${AIRTABLE_API_URL}?filterByFormula=${encodeURIComponent(`{id}="${airtableRecordId}"`)}`
+      const searchResponse = await fetch(searchUrl, {
+        headers: {
+          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        },
+      })
+      
+      if (searchResponse.ok) {
+        const searchData = await searchResponse.json()
+        if (searchData.records && searchData.records.length > 0) {
+          airtableRecordId = searchData.records[0].id
+        } else {
+          return NextResponse.json({ error: 'Colegio no encontrado' }, { status: 404 })
+        }
+      }
+    }
+
+    if (!airtableRecordId) {
+      return NextResponse.json({ error: 'ID de colegio es requerido' }, { status: 400 })
+    }
+
+    console.log('Deleting school with Airtable record ID:', airtableRecordId)
+
+    const response = await fetch(`${AIRTABLE_API_URL}/${airtableRecordId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
@@ -199,12 +233,14 @@ export async function DELETE(request: NextRequest) {
     })
 
     if (!response.ok) {
-      return NextResponse.json({ error: 'Error deleting school' }, { status: 500 })
+      const errorText = await response.text()
+      console.error('Airtable delete error:', errorText)
+      return NextResponse.json({ error: 'Error al eliminar colegio' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }
 }
