@@ -2,26 +2,41 @@
 
 import { useState, useEffect } from 'react'
 import { EDUCATION_LEVELS } from '@/lib/constants'
-import {
-  getStudents,
-  getStudentsByLevel,
-  addStudent,
-  updateStudent,
-  deleteStudent,
-  getGrades,
-  getGradesByStudent,
-  addGrade,
-  updateGrade,
-  deleteGrade,
-  getLevelSummary,
-  getStudentSummary,
-  exportGradesToCSV,
-  exportStudentsToCSV,
-  seedSampleData,
-  Student,
-  Grade,
-  GradeSummary
-} from '@/lib/gradingService'
+
+// Interfaces para datos de Airtable
+interface Student {
+  id: string
+  name: string
+  levelId: string
+  courseId?: string
+  email?: string
+  createdAt: string
+}
+
+interface Grade {
+  id: string
+  studentId: string
+  studentName: string
+  lessonId: string
+  levelId: string
+  courseId?: string
+  score: number
+  feedback?: string
+  taskId?: string
+  submittedAt: string
+  gradedAt?: string
+  gradedBy?: string
+}
+
+interface GradeSummary {
+  studentId: string
+  studentName: string
+  levelId: string
+  totalGrades: number
+  averageScore: number
+  completedLessons: number
+  lastActivity: string
+}
 import {
   Users, Plus, Edit, Trash2, Save, X, Search,
   GraduationCap, Award, FileText, Download, ChevronDown,
@@ -57,7 +72,6 @@ export default function GradingPanel() {
   const [newGradeTaskId, setNewGradeTaskId] = useState('')
 
   useEffect(() => {
-    seedSampleData()
     loadData()
   }, [])
 
@@ -65,109 +79,181 @@ export default function GradingPanel() {
     loadData()
   }, [selectedLevel])
 
-  const loadData = () => {
+  const loadData = async () => {
     setIsLoading(true)
     try {
+      // Cargar calificaciones desde Airtable
+      let gradesUrl = '/api/grades'
       if (selectedLevel) {
-        setStudents(getStudentsByLevel(selectedLevel))
-        setSummaries(getLevelSummary(selectedLevel))
-        const levelGrades = getGrades().filter(g => g.levelId === selectedLevel)
-        setGrades(levelGrades)
+        gradesUrl += `?levelId=${selectedLevel}`
+      }
+      
+      const gradesRes = await fetch(gradesUrl)
+      const gradesData = await gradesRes.json()
+      
+      if (gradesData.success && gradesData.grades) {
+        setGrades(gradesData.grades)
+        
+        // Generar lista de estudiantes únicos desde las calificaciones
+        const uniqueStudents = new Map<string, Student>()
+        gradesData.grades.forEach((g: Grade) => {
+          if (g.studentName && !uniqueStudents.has(g.studentName)) {
+            uniqueStudents.set(g.studentName, {
+              id: g.studentId || g.studentName,
+              name: g.studentName,
+              levelId: g.levelId,
+              courseId: g.courseId,
+              createdAt: g.submittedAt
+            })
+          }
+        })
+        setStudents(Array.from(uniqueStudents.values()))
+        
+        // Generar resúmenes por estudiante
+        const summaryMap = new Map<string, GradeSummary>()
+        gradesData.grades.forEach((g: Grade) => {
+          const key = g.studentName
+          if (!summaryMap.has(key)) {
+            summaryMap.set(key, {
+              studentId: g.studentId || g.studentName,
+              studentName: g.studentName,
+              levelId: g.levelId,
+              totalGrades: 0,
+              averageScore: 0,
+              completedLessons: 0,
+              lastActivity: g.submittedAt
+            })
+          }
+          const summary = summaryMap.get(key)!
+          summary.totalGrades++
+          summary.averageScore = ((summary.averageScore * (summary.totalGrades - 1)) + g.score) / summary.totalGrades
+          summary.completedLessons++
+          if (new Date(g.submittedAt) > new Date(summary.lastActivity)) {
+            summary.lastActivity = g.submittedAt
+          }
+        })
+        setSummaries(Array.from(summaryMap.values()))
       } else {
-        setStudents(getStudents())
-        setGrades(getGrades())
+        setGrades([])
+        setStudents([])
         setSummaries([])
       }
+    } catch (error) {
+      console.error('Error loading data:', error)
+      setGrades([])
+      setStudents([])
+      setSummaries([])
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleAddStudent = () => {
+  const handleAddStudent = async () => {
     if (!newStudentName.trim() || !selectedLevel) return
     
-    addStudent({
-      name: newStudentName.trim(),
-      levelId: selectedLevel,
-      email: newStudentEmail.trim() || undefined
-    })
-    
-    setNewStudentName('')
-    setNewStudentEmail('')
-    setShowAddStudent(false)
-    loadData()
-  }
-
-  const handleUpdateStudent = () => {
-    if (!editingStudent || !newStudentName.trim()) return
-    
-    updateStudent(editingStudent.id, {
-      name: newStudentName.trim(),
-      email: newStudentEmail.trim() || undefined
-    })
-    
-    setEditingStudent(null)
-    setNewStudentName('')
-    setNewStudentEmail('')
-    loadData()
-  }
-
-  const handleDeleteStudent = (id: string) => {
-    if (confirm('¿Estás seguro de eliminar este estudiante? También se eliminarán sus calificaciones.')) {
-      deleteStudent(id)
+    try {
+      await fetch('/api/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newStudentName.trim(),
+          levelId: selectedLevel,
+          email: newStudentEmail.trim() || undefined
+        })
+      })
+      
+      setNewStudentName('')
+      setNewStudentEmail('')
+      setShowAddStudent(false)
       loadData()
+    } catch (error) {
+      alert('Error al agregar estudiante')
     }
   }
 
-  const handleAddGrade = () => {
-    if (!selectedStudent || !newGradeLesson.trim()) return
-    
-    addGrade({
-      studentId: selectedStudent.id,
-      lessonId: newGradeLesson.trim(),
-      levelId: selectedStudent.levelId,
-      score: newGradeScore,
-      feedback: newGradeFeedback.trim() || undefined,
-      taskId: newGradeTaskId.trim() || undefined,
-      submittedAt: new Date().toISOString(),
-      gradedAt: new Date().toISOString()
-    })
-    
-    setNewGradeScore(10)
-    setNewGradeFeedback('')
-    setNewGradeLesson('')
-    setNewGradeTaskId('')
-    setShowAddGrade(false)
-    setSelectedStudent(null)
-    loadData()
+  const handleUpdateStudent = async () => {
+    if (!editingStudent || !newStudentName.trim()) return
+    // Por ahora solo cerrar el modal - la edición se puede implementar después
+    setEditingStudent(null)
+    setNewStudentName('')
+    setNewStudentEmail('')
   }
 
-  const handleUpdateGrade = () => {
+  const handleDeleteStudent = async (id: string) => {
+    if (confirm('¿Estás seguro de eliminar este estudiante?')) {
+      try {
+        await fetch(`/api/students?id=${id}`, { method: 'DELETE' })
+        loadData()
+      } catch (error) {
+        alert('Error al eliminar estudiante')
+      }
+    }
+  }
+
+  const handleAddGrade = async () => {
+    if (!selectedStudent || !newGradeLesson.trim()) return
+    
+    try {
+      await fetch('/api/grades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: selectedStudent.id,
+          studentName: selectedStudent.name,
+          lessonId: newGradeLesson.trim(),
+          levelId: selectedStudent.levelId,
+          score: newGradeScore,
+          feedback: newGradeFeedback.trim() || undefined,
+          taskId: newGradeTaskId.trim() || undefined,
+          submittedAt: new Date().toISOString()
+        })
+      })
+      
+      setNewGradeScore(10)
+      setNewGradeFeedback('')
+      setNewGradeLesson('')
+      setNewGradeTaskId('')
+      setShowAddGrade(false)
+      setSelectedStudent(null)
+      loadData()
+    } catch (error) {
+      alert('Error al agregar calificación')
+    }
+  }
+
+  const handleUpdateGrade = async () => {
     if (!editingGrade) return
-    
-    updateGrade(editingGrade.id, {
-      score: newGradeScore,
-      feedback: newGradeFeedback.trim() || undefined,
-      gradedAt: new Date().toISOString()
-    })
-    
+    // Por ahora solo cerrar el modal
     setEditingGrade(null)
     setNewGradeScore(10)
     setNewGradeFeedback('')
-    loadData()
   }
 
-  const handleDeleteGrade = (id: string) => {
+  const handleDeleteGrade = async (id: string) => {
     if (confirm('¿Estás seguro de eliminar esta calificación?')) {
-      deleteGrade(id)
-      loadData()
+      try {
+        await fetch(`/api/grades?id=${id}`, { method: 'DELETE' })
+        loadData()
+      } catch (error) {
+        alert('Error al eliminar calificación')
+      }
     }
   }
 
   const handleExportCSV = (type: 'students' | 'grades') => {
-    const csv = type === 'students' 
-      ? exportStudentsToCSV(selectedLevel || undefined)
-      : exportGradesToCSV(selectedLevel || undefined)
+    // Generar CSV desde los datos en memoria
+    let csv = ''
+    if (type === 'students') {
+      csv = 'Nombre,Nivel,Email\n'
+      students.forEach(s => {
+        csv += `"${s.name}","${s.levelId}","${s.email || ''}"\n`
+      })
+    } else {
+      csv = 'Estudiante,Tarea,Calificación,Feedback,Fecha\n'
+      grades.forEach(g => {
+        csv += `"${g.studentName}","${g.taskId || g.lessonId}","${g.score}","${g.feedback || ''}","${g.submittedAt}"\n`
+      })
+    }
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
@@ -351,8 +437,8 @@ export default function GradingPanel() {
                 </div>
               ) : (
                 filteredStudents.map(student => {
-                  const summary = getStudentSummary(student.id)
-                  const studentGrades = getGradesByStudent(student.id)
+                  const summary = summaries.find(s => s.studentName === student.name)
+                  const studentGrades = grades.filter(g => g.studentName === student.name)
                   
                   return (
                     <div
