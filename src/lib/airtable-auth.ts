@@ -149,6 +149,8 @@ export interface Course {
   levelId: string
   teacherId: string
   teacherName: string
+  schoolId?: string       // ID del colegio/institución
+  schoolName?: string     // Nombre del colegio
   accessCodes: string[]   // Lista de códigos de acceso del curso
   maxStudents: number
   currentStudents: number
@@ -560,7 +562,9 @@ export async function createCourse(
   teacherId: string,
   teacherName: string,
   description?: string,
-  maxStudents: number = 30
+  maxStudents: number = 30,
+  schoolId?: string,
+  schoolName?: string
 ): Promise<{ success: boolean; course?: Course; error?: string }> {
   try {
     const record = await createRecord(COURSES_TABLE, {
@@ -569,6 +573,8 @@ export async function createCourse(
       levelId,
       teacherId,
       teacherName,
+      schoolId: schoolId || '',
+      schoolName: schoolName || '',
       maxStudents,
       currentStudents: 0,
       isActive: true,
@@ -582,6 +588,8 @@ export async function createCourse(
       levelId,
       teacherId,
       teacherName,
+      schoolId,
+      schoolName,
       accessCodes: [],
       maxStudents,
       currentStudents: 0,
@@ -608,6 +616,8 @@ export async function getAllCourses(): Promise<Course[]> {
       levelId: (record.fields.levelId as string) || '',
       teacherId: (record.fields.teacherId as string) || '',
       teacherName: (record.fields.teacherName as string) || '',
+      schoolId: (record.fields.schoolId as string) || '',
+      schoolName: (record.fields.schoolName as string) || '',
       accessCodes: [],
       maxStudents: (record.fields.maxStudents as number) || 30,
       currentStudents: (record.fields.currentStudents as number) || 0,
@@ -632,6 +642,8 @@ export async function getTeacherCourses(teacherId: string): Promise<Course[]> {
       levelId: (record.fields.levelId as string) || '',
       teacherId: (record.fields.teacherId as string) || '',
       teacherName: (record.fields.teacherName as string) || '',
+      schoolId: (record.fields.schoolId as string) || '',
+      schoolName: (record.fields.schoolName as string) || '',
       accessCodes: [],
       maxStudents: (record.fields.maxStudents as number) || 30,
       currentStudents: (record.fields.currentStudents as number) || 0,
@@ -653,6 +665,8 @@ export async function updateCourse(
     levelId?: string
     teacherId?: string
     teacherName?: string
+    schoolId?: string
+    schoolName?: string
     maxStudents?: number
     isActive?: boolean
   }
@@ -664,6 +678,8 @@ export async function updateCourse(
     if (data.levelId !== undefined) updateData.levelId = data.levelId
     if (data.teacherId !== undefined) updateData.teacherId = data.teacherId
     if (data.teacherName !== undefined) updateData.teacherName = data.teacherName
+    if (data.schoolId !== undefined) updateData.schoolId = data.schoolId
+    if (data.schoolName !== undefined) updateData.schoolName = data.schoolName
     if (data.maxStudents !== undefined) updateData.maxStudents = data.maxStudents
     if (data.isActive !== undefined) updateData.isActive = data.isActive
 

@@ -123,7 +123,7 @@ ES4X8P3Q,,,María García,inicial-2,student,curso-inicial-2,Tecnología Inicial 
 
 ## 2️⃣ Tabla: `courses_catalog` (Catálogo de Cursos)
 
-Esta tabla almacena los cursos disponibles.
+Esta tabla almacena los cursos disponibles. **Los cursos pertenecen a un colegio específico.**
 
 ### Campos:
 
@@ -133,8 +133,10 @@ Esta tabla almacena los cursos disponibles.
 | `name` | Single line text | Nombre del curso | ✅ |
 | `description` | Long text | Descripción del curso | ❌ |
 | `levelId` | Single line text | Nivel educativo del curso | ✅ |
-| `teacherId` | Single line text | ID del profesor asignado | ✅ |
-| `teacherName` | Single line text | Nombre del profesor | ✅ |
+| `teacherId` | Single line text | ID del profesor asignado | ❌ |
+| `teacherName` | Single line text | Nombre del profesor | ❌ |
+| `schoolId` | Single line text | **🏫 ID del colegio** | ❌ |
+| `schoolName` | Single line text | **🏫 Nombre del colegio** | ❌ |
 | `maxStudents` | Number | Máximo de estudiantes | ✅ |
 | `currentStudents` | Number | Estudiantes actuales | ❌ |
 | `startDate` | Date | Fecha de inicio | ❌ |

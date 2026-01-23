@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, levelId, teacherId, teacherName, description, maxStudents } = body
+    const { name, levelId, teacherId, teacherName, description, maxStudents, schoolId, schoolName } = body
 
     if (!name || !levelId) {
       return NextResponse.json(
@@ -44,7 +44,9 @@ export async function POST(request: NextRequest) {
       teacherId || '',
       teacherName || '',
       description,
-      maxStudents
+      maxStudents,
+      schoolId,
+      schoolName
     )
 
     if (!result.success) {
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json()
-    const { courseId, name, description, levelId, teacherId, teacherName, maxStudents, isActive } = body
+    const { courseId, name, description, levelId, teacherId, teacherName, schoolId, schoolName, maxStudents, isActive } = body
 
     if (!courseId) {
       return NextResponse.json(
@@ -88,6 +90,8 @@ export async function PATCH(request: NextRequest) {
       levelId,
       teacherId,
       teacherName,
+      schoolId,
+      schoolName,
       maxStudents,
       isActive
     })
