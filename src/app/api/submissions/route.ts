@@ -13,6 +13,7 @@ export interface Submission {
   studentEmail?: string
   levelId: string
   lessonId?: string
+  courseId?: string
   code: string
   output: string
   submittedAt: string
@@ -32,6 +33,7 @@ export async function GET(request: NextRequest) {
     const levelId = searchParams.get('levelId')
     const status = searchParams.get('status')
     const taskId = searchParams.get('taskId')
+    const courseId = searchParams.get('courseId')
 
     let filterFormula = ''
     const filters: string[] = []
@@ -39,6 +41,7 @@ export async function GET(request: NextRequest) {
     if (levelId) filters.push(`{levelId}="${levelId}"`)
     if (status) filters.push(`{status}="${status}"`)
     if (taskId) filters.push(`{taskId}="${taskId}"`)
+    if (courseId) filters.push(`{courseId}="${courseId}"`)
     
     if (filters.length > 0) {
       filterFormula = filters.length === 1 
@@ -74,6 +77,7 @@ export async function GET(request: NextRequest) {
       studentEmail: record.fields.studentEmail || '',
       levelId: record.fields.levelId || '',
       lessonId: record.fields.lessonId || '',
+      courseId: record.fields.courseId || '',
       code: record.fields.code || '',
       output: record.fields.output || '',
       submittedAt: record.fields.submittedAt || '',
