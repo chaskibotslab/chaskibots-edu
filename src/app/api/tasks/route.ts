@@ -179,22 +179,28 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'taskId es requerido' }, { status: 400 })
     }
 
+    // Solo campos que existen en Airtable
     const fields: Record<string, any> = {}
     
-    if (updates.levelId !== undefined) fields.levelId = updates.levelId
-    if (updates.title !== undefined) fields.title = updates.title
-    if (updates.description !== undefined) fields.description = updates.description
-    if (updates.type !== undefined) fields.type = updates.type
-    if (updates.category !== undefined) fields.category = updates.category
-    if (updates.difficulty !== undefined) fields.difficulty = updates.difficulty
-    if (updates.points !== undefined) fields.points = updates.points
-    if (updates.dueDate !== undefined) fields.dueDate = updates.dueDate
-    if (updates.isActive !== undefined) fields.isActive = updates.isActive
+    if (updates.levelId !== undefined) fields.levelId = String(updates.levelId)
+    if (updates.title !== undefined) fields.title = String(updates.title)
+    if (updates.points !== undefined) fields.points = Number(updates.points) || 10
+    if (updates.dueDate !== undefined) fields.dueDate = String(updates.dueDate)
+    if (updates.isActive !== undefined) fields.isActive = Boolean(updates.isActive)
+    
+    // type, category, difficulty se guardan como prefijo en description
+    if (updates.description !== undefined || updates.type !== undefined || updates.category !== undefined || updates.difficulty !== undefined) {
+      const metaPrefix = `[${updates.type || 'concept'}|${updates.category || 'general'}|${updates.difficulty || 'basico'}]`
+      fields.description = `${metaPrefix} ${updates.description || ''}`
+    }
+    
     if (updates.questions !== undefined) {
       fields.questions = Array.isArray(updates.questions) 
-        ? updates.questions.join('|') 
+        ? updates.questions.filter((q: string) => q && q.trim()).join('|') 
         : updates.questions
     }
+
+    console.log('Updating task:', taskId, 'with fields:', fields)
 
     const response = await fetch(AIRTABLE_API_URL, {
       method: 'PATCH',
@@ -212,8 +218,8 @@ export async function PATCH(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Airtable error:', errorText)
-      return NextResponse.json({ error: 'Error updating task' }, { status: 500 })
+      console.error('Airtable error updating task:', errorText)
+      return NextResponse.json({ error: `Error updating task: ${errorText}` }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, message: 'Tarea actualizada' })
