@@ -1,6 +1,42 @@
-# ⚠️ CORRECCIÓN URGENTE DE TABLAS EN AIRTABLE
+# ⚠️ CONFIGURACIÓN DE TABLAS EN AIRTABLE
 
-## El Problema
+## 🆕 NUEVA TABLA: `teacher_courses`
+
+Esta tabla permite asignar **múltiples cursos** a cada profesor de forma escalable.
+
+### Campos de la tabla `teacher_courses`:
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | Single line text | ID único de la asignación |
+| `teacherId` | Single line text | accessCode del profesor |
+| `teacherName` | Single line text | Nombre del profesor |
+| `courseId` | Single line text | ID del curso asignado |
+| `courseName` | Single line text | Nombre del curso |
+| `levelId` | Single line text | Nivel del curso |
+| `schoolId` | Single line text | ID del colegio |
+| `schoolName` | Single line text | Nombre del colegio |
+| `createdAt` | Single line text | Fecha de asignación |
+
+### Cómo crear la tabla:
+
+1. Ve a tu base de Airtable
+2. Haz clic en **"+ Add or import"** → **"CSV file"**
+3. Selecciona el archivo `airtable/teacher_courses.csv`
+4. Airtable creará la tabla automáticamente
+
+### Ejemplo de asignación:
+
+| teacherId | teacherName | courseId | levelId | schoolId |
+|-----------|-------------|----------|---------|----------|
+| PRB23SLL | Hugo Chicaiza | curso-inicial-2 | inicial-2 | school-uepslm |
+| PRB23SLL | Hugo Chicaiza | curso-robotica-8vo | octavo-egb | school-uepslm |
+
+Con esta tabla, Hugo Chicaiza solo verá los niveles `inicial-2` y `octavo-egb`.
+
+---
+
+## El Problema con campos "Single select"
 
 El error `INVALID_MULTIPLE_CHOICE_OPTIONS` ocurre porque algunos campos en tus tablas de Airtable están configurados como **"Single select"** o **"Multiple select"** en lugar de **"Single line text"**.
 
