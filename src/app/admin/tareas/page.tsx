@@ -74,6 +74,10 @@ export default function AdminTareasPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showInactive, setShowInactive] = useState(false)
   
+  // Usuario logueado
+  const [currentUser, setCurrentUser] = useState<{ role: string; levelId: string; courseId: string } | null>(null)
+  const isAdmin = currentUser?.role === 'admin'
+  
   // Modal states
   const [showModal, setShowModal] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
@@ -91,15 +95,40 @@ export default function AdminTareasPage() {
     attachmentType: 'none' as 'none' | 'drive' | 'link' | 'pdf'
   })
 
+  // Cargar usuario logueado
   useEffect(() => {
-    loadTasks()
-  }, [selectedLevel, showInactive])
+    const userStr = localStorage.getItem('user')
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr)
+        setCurrentUser(user)
+        // Si es profesor, fijar su nivel
+        if (user.role === 'teacher' && user.levelId) {
+          setSelectedLevel(user.levelId)
+        }
+      } catch (e) {
+        console.error('Error parsing user:', e)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (currentUser !== null) {
+      loadTasks()
+    }
+  }, [selectedLevel, showInactive, currentUser])
 
   const loadTasks = async () => {
     setLoading(true)
     try {
       let url = `/api/tasks?activeOnly=${!showInactive}`
-      if (selectedLevel) url += `&levelId=${selectedLevel}`
+      
+      // Si es profesor, filtrar por su nivel
+      if (!isAdmin && currentUser?.levelId) {
+        url += `&levelId=${currentUser.levelId}`
+      } else if (selectedLevel) {
+        url += `&levelId=${selectedLevel}`
+      }
       
       const res = await fetch(url)
       const data = await res.json()
@@ -346,16 +375,23 @@ export default function AdminTareasPage() {
               </div>
             </div>
             
-            <select
-              value={selectedLevel}
-              onChange={(e) => setSelectedLevel(e.target.value)}
-              className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
-            >
-              <option value="">Todos los niveles</option>
-              {EDUCATION_LEVELS.map(level => (
-                <option key={level.id} value={level.id}>{level.name}</option>
-              ))}
-            </select>
+            {/* Solo admin puede cambiar nivel, profesores ven solo su nivel */}
+            {isAdmin ? (
+              <select
+                value={selectedLevel}
+                onChange={(e) => setSelectedLevel(e.target.value)}
+                className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+              >
+                <option value="">Todos los niveles</option>
+                {EDUCATION_LEVELS.map(level => (
+                  <option key={level.id} value={level.id}>{level.name}</option>
+                ))}
+              </select>
+            ) : (
+              <div className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white">
+                {EDUCATION_LEVELS.find(l => l.id === currentUser?.levelId)?.name || 'Mi nivel'}
+              </div>
+            )}
 
             <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
               <input
