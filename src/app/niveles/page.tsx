@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import Header from '@/components/Header'
@@ -9,7 +9,7 @@ import { EDUCATION_LEVELS } from '@/lib/constants'
 import { 
   ArrowRight, Sparkles, Rocket, Brain, Bot, Baby, Backpack, Pencil, 
   BookOpen, FlaskConical, Lightbulb, Zap, Gamepad2, Wrench, Settings, 
-  Laptop, ShieldCheck, GraduationCap, Users, Code
+  Laptop, ShieldCheck, GraduationCap, Users, Code, Lock
 } from 'lucide-react'
 
 const ICON_MAP: Record<string, any> = {
@@ -17,9 +17,90 @@ const ICON_MAP: Record<string, any> = {
   Zap, Gamepad2, Wrench, Settings, Laptop, Brain, ShieldCheck, Rocket
 }
 
+interface UserData {
+  role: string
+  levelId?: string
+  courseId?: string
+  courseIds?: string // Múltiples cursos separados por coma
+  schoolId?: string
+  accessCode?: string // ID único del usuario
+}
+
 export default function NivelesPage() {
   const [scrollY, setScrollY] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null)
+  const [userCourses, setUserCourses] = useState<any[]>([])
+
+  // Cargar usuario y sus cursos
+  useEffect(() => {
+    const userStr = localStorage.getItem('user')
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr)
+        setCurrentUser(user)
+        
+        // Si es profesor o estudiante, cargar sus cursos asignados
+        if (user.role !== 'admin') {
+          loadUserCourses(user)
+        }
+      } catch (e) {
+        console.error('Error parsing user:', e)
+      }
+    }
+  }, [])
+
+  const loadUserCourses = async (user: UserData) => {
+    try {
+      if (user.role === 'teacher') {
+        // Para profesores: usar tabla teacher_courses con accessCode como teacherId
+        const teacherId = user.accessCode || ''
+        const res = await fetch(`/api/teacher-courses?teacherId=${teacherId}`)
+        const data = await res.json()
+        if (data.assignments && data.assignments.length > 0) {
+          setUserCourses(data.assignments)
+        } else {
+          // Fallback: si no hay asignaciones en teacher_courses, usar courseId directo
+          if (user.courseId) {
+            setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
+          }
+        }
+      } else if (user.role === 'student') {
+        // Para estudiantes: solo su curso asignado
+        if (user.courseId) {
+          setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
+        }
+      }
+    } catch (error) {
+      console.error('Error loading courses:', error)
+    }
+  }
+
+  // Determinar qué niveles puede ver el usuario
+  const allowedLevelIds = useMemo(() => {
+    if (!currentUser) return [] // No logueado, no ve nada
+    if (currentUser.role === 'admin') return EDUCATION_LEVELS.map(l => l.id) // Admin ve todo
+    
+    // Profesor/Estudiante: solo niveles de sus cursos
+    const levelIds = new Set<string>()
+    
+    // Agregar nivel directo del usuario
+    if (currentUser.levelId) {
+      levelIds.add(currentUser.levelId)
+    }
+    
+    // Agregar niveles de sus cursos
+    userCourses.forEach(course => {
+      if (course.levelId) {
+        levelIds.add(course.levelId)
+      }
+    })
+    
+    return Array.from(levelIds)
+  }, [currentUser, userCourses])
+
+  const isAdmin = currentUser?.role === 'admin'
+  const canAccessLevel = (levelId: string) => isAdmin || allowedLevelIds.includes(levelId)
 
   useEffect(() => {
     setIsVisible(true)
@@ -120,6 +201,27 @@ export default function NivelesPage() {
               <div className="grid grid-cols-2 gap-4">
                 {EDUCATION_LEVELS.slice(0, 2).map((level) => {
                   const IconComponent = ICON_MAP[level.icon] || Bot
+                  const hasAccess = canAccessLevel(level.id)
+                  
+                  if (!hasAccess && !isAdmin) {
+                    return (
+                      <div
+                        key={level.id}
+                        className="bg-dark-800/50 border border-dark-700 rounded-xl p-6 opacity-50 cursor-not-allowed"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center">
+                            <Lock className="w-6 h-6 text-gray-500" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-500">{level.name}</h3>
+                            <p className="text-gray-600 text-sm">Sin acceso</p>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
+                  
                   return (
                     <Link
                       key={level.id}
@@ -157,6 +259,22 @@ export default function NivelesPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {EDUCATION_LEVELS.slice(2, 6).map((level) => {
                   const IconComponent = ICON_MAP[level.icon] || Bot
+                  const hasAccess = canAccessLevel(level.id)
+                  
+                  if (!hasAccess && !isAdmin) {
+                    return (
+                      <div key={level.id} className="bg-dark-800/50 border border-dark-700 rounded-xl p-5 opacity-50 cursor-not-allowed">
+                        <div className="flex flex-col items-center text-center">
+                          <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center mb-3">
+                            <Lock className="w-6 h-6 text-gray-500" />
+                          </div>
+                          <h3 className="font-semibold text-gray-500 text-sm">{level.name}</h3>
+                          <p className="text-gray-600 text-xs mt-1">Sin acceso</p>
+                        </div>
+                      </div>
+                    )
+                  }
+                  
                   return (
                     <Link
                       key={level.id}
@@ -191,6 +309,24 @@ export default function NivelesPage() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {EDUCATION_LEVELS.slice(6, 12).map((level) => {
                   const IconComponent = ICON_MAP[level.icon] || Bot
+                  const hasAccess = canAccessLevel(level.id)
+                  
+                  if (!hasAccess && !isAdmin) {
+                    return (
+                      <div key={level.id} className="bg-dark-800/50 border border-dark-700 rounded-xl p-5 opacity-50 cursor-not-allowed">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-dark-700 rounded-lg flex items-center justify-center">
+                            <Lock className="w-5 h-5 text-gray-500" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-500 text-sm">{level.name}</h3>
+                            <p className="text-gray-600 text-xs">Sin acceso</p>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
+                  
                   return (
                     <Link
                       key={level.id}
@@ -227,6 +363,24 @@ export default function NivelesPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {EDUCATION_LEVELS.slice(12, 15).map((level) => {
                   const IconComponent = ICON_MAP[level.icon] || Bot
+                  const hasAccess = canAccessLevel(level.id)
+                  
+                  if (!hasAccess && !isAdmin) {
+                    return (
+                      <div key={level.id} className="bg-dark-800/50 border border-dark-700 rounded-xl p-6 opacity-50 cursor-not-allowed">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center">
+                            <Lock className="w-6 h-6 text-gray-500" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-500">{level.name}</h3>
+                            <p className="text-gray-600 text-sm">Sin acceso</p>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
+                  
                   return (
                     <Link
                       key={level.id}

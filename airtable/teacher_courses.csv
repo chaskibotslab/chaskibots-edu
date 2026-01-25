@@ -1,0 +1,3 @@
+id,teacherId,teacherName,courseId,courseName,levelId,schoolId,schoolName,createdAt
+tc-demo-1,PRB23SLL,Hugo Chicaiza,curso-inicial-2,Tecnologia Inicial 2,inicial-2,school-demo,Colegio Demo ChaskiBots,2024-01-01
+tc-demo-2,PRB23SLL,Hugo Chicaiza,curso-robotica-8vo,Robotica 8vo EGB,octavo-egb,school-demo,Colegio Demo ChaskiBots,2024-01-01
