@@ -20,6 +20,28 @@ interface AirtableResponse {
   offset?: string
 }
 
+function normalizeRole(input: unknown): 'admin' | 'teacher' | 'student' {
+  const raw = String(input ?? '').trim().toLowerCase()
+
+  if (!raw) return 'student'
+
+  // Admin variants
+  if (raw === 'admin' || raw === 'administrator' || raw === 'administrador') return 'admin'
+  if (raw.includes('admin')) return 'admin'
+  if (raw.includes('administr')) return 'admin'
+
+  // Teacher variants
+  if (raw === 'teacher' || raw === 'profesor' || raw === 'professora' || raw === 'prof') return 'teacher'
+  if (raw.includes('teacher')) return 'teacher'
+  if (raw.includes('prof')) return 'teacher'
+  if (raw.includes('docente')) return 'teacher'
+
+  // Student variants
+  if (raw === 'student' || raw === 'estudiante' || raw === 'alumno' || raw === 'alumna') return 'student'
+
+  return 'student'
+}
+
 async function fetchTable(tableName: string, filterFormula?: string): Promise<AirtableRecord[]> {
   const url = new URL(`${AIRTABLE_API_URL}/${tableName}`)
   if (filterFormula) {
@@ -202,7 +224,7 @@ export async function validateAccessCode(accessCode: string): Promise<{
       accessCode: (fields.accessCode as string) || '',
       name: (fields.name as string) || 'Usuario',
       email: fields.email as string | undefined,
-      role: (fields.role as 'admin' | 'teacher' | 'student') || 'student',
+      role: normalizeRole(fields.role),
       courseId: (fields.courseId as string) || '',
       courseName: (fields.courseName as string) || '',
       schoolId: (fields.schoolId as string) || '',
@@ -259,7 +281,7 @@ export async function validateEmailPassword(email: string, password: string): Pr
       accessCode: (fields.accessCode as string) || '',
       name: (fields.name as string) || 'Usuario',
       email: fields.email as string | undefined,
-      role: (fields.role as 'admin' | 'teacher' | 'student') || 'student',
+      role: normalizeRole(fields.role),
       courseId: (fields.courseId as string) || '',
       courseName: (fields.courseName as string) || '',
       schoolId: (fields.schoolId as string) || '',
@@ -426,7 +448,7 @@ export async function getAllUsers(): Promise<CourseUser[]> {
       accessCode: (record.fields.accessCode as string) || '',
       name: (record.fields.name as string) || '',
       email: record.fields.email as string | undefined,
-      role: (record.fields.role as 'admin' | 'teacher' | 'student') || 'student',
+      role: normalizeRole(record.fields.role),
       courseId: (record.fields.courseId as string) || '',
       courseName: (record.fields.courseName as string) || '',
       schoolId: (record.fields.schoolId as string) || '',
@@ -455,7 +477,7 @@ export async function getCourseUsers(courseId: string): Promise<CourseUser[]> {
       accessCode: (record.fields.accessCode as string) || '',
       name: (record.fields.name as string) || '',
       email: record.fields.email as string | undefined,
-      role: (record.fields.role as 'admin' | 'teacher' | 'student') || 'student',
+      role: normalizeRole(record.fields.role),
       courseId: (record.fields.courseId as string) || '',
       courseName: (record.fields.courseName as string) || '',
       schoolId: (record.fields.schoolId as string) || '',
