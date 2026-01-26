@@ -63,20 +63,23 @@ export default function NivelesPage() {
     if (!user) return [] // No logueado, no ve nada
     if (user.role === 'admin') return EDUCATION_LEVELS.map(l => l.id) // Admin ve todo
     
-    // Profesor/Estudiante: solo niveles de sus cursos
+    // Profesor/Estudiante: solo niveles permitidos
     const levelIds = new Set<string>()
-    
-    // Agregar nivel directo del usuario
-    if (user.levelId) {
-      levelIds.add(user.levelId)
-    }
-    
-    // Agregar niveles de sus cursos
-    userCourses.forEach(course => {
-      if (course.levelId) {
-        levelIds.add(course.levelId)
+
+    if (user.role === 'teacher') {
+      // Si hay asignaciones en teacher_courses, SOLO esas aplican.
+      if (userCourses.length > 0) {
+        userCourses.forEach(course => {
+          if (course.levelId) levelIds.add(course.levelId)
+        })
+      } else {
+        // Fallback: si no hay asignaciones, usar el nivel del usuario.
+        if (user.levelId) levelIds.add(user.levelId)
       }
-    })
+    } else {
+      // Student
+      if (user.levelId) levelIds.add(user.levelId)
+    }
     
     return Array.from(levelIds)
   }, [user, userCourses])
