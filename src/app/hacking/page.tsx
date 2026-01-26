@@ -1,12 +1,62 @@
 'use client'
 
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import { Shield, Lock, Eye, Key, ArrowRight } from 'lucide-react'
 
 export default function HackingPage() {
+  const { user, isLoading, isAuthenticated } = useAuth()
+  const [userCourses, setUserCourses] = useState<any[]>([])
+
+  const loadUserCourses = async () => {
+    try {
+      if (!user) return
+      if (user.role === 'teacher') {
+        const teacherId = user.accessCode || ''
+        const res = await fetch(`/api/teacher-courses?teacherId=${teacherId}`)
+        const data = await res.json()
+        if (data.assignments && data.assignments.length > 0) {
+          setUserCourses(data.assignments)
+        } else {
+          if (user.courseId) setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
+        }
+      } else if (user.role === 'student') {
+        if (user.courseId) setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
+      } else {
+        setUserCourses([])
+      }
+    } catch (error) {
+      console.error('Error loading courses:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user && user.role !== 'admin') {
+      loadUserCourses()
+    }
+    if (!isLoading && (!isAuthenticated || !user)) {
+      setUserCourses([])
+    }
+  }, [isLoading, isAuthenticated, user])
+
+  const allowedLevelIds = useMemo(() => {
+    if (!user) return []
+    if (user.role === 'admin') return EDUCATION_LEVELS.map(l => l.id)
+    const levelIds = new Set<string>()
+    if (user.levelId) levelIds.add(user.levelId)
+    userCourses.forEach(course => {
+      if (course.levelId) levelIds.add(course.levelId)
+    })
+    return Array.from(levelIds)
+  }, [user, userCourses])
+
+  const isAdmin = user?.role === 'admin'
+  const canAccessLevel = (levelId: string) => isAdmin || allowedLevelIds.includes(levelId)
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -109,20 +159,39 @@ export default function HackingPage() {
             Selecciona tu Nivel
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-12">
-            {EDUCATION_LEVELS.map((level) => (
-              <Link
-                key={level.id}
-                href={`/nivel/${level.id}?area=hacking`}
-                className={`level-card bg-gradient-to-br ${level.color} text-white text-center group`}
-              >
-                <div className="text-2xl mb-1">{level.icon}</div>
-                <h3 className="font-bold text-sm">{level.name}</h3>
-                <p className="text-xs opacity-80">{level.ageRange}</p>
-                <div className="mt-2 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                  Ver <ArrowRight className="w-3 h-3 ml-1" />
-                </div>
-              </Link>
-            ))}
+            {EDUCATION_LEVELS.map((level) => {
+              const hasAccess = canAccessLevel(level.id)
+
+              if (!hasAccess && !isAdmin) {
+                return (
+                  <div
+                    key={level.id}
+                    className="level-card bg-dark-800/60 text-white text-center opacity-50 cursor-not-allowed border border-dark-700"
+                  >
+                    <div className="text-2xl mb-2">
+                      <Lock className="w-6 h-6 mx-auto text-gray-400" />
+                    </div>
+                    <h3 className="font-bold text-sm text-gray-300">{level.name}</h3>
+                    <p className="text-xs text-gray-400">Sin acceso</p>
+                  </div>
+                )
+              }
+
+              return (
+                <Link
+                  key={level.id}
+                  href={`/nivel/${level.id}?area=hacking`}
+                  className={`level-card bg-gradient-to-br ${level.color} text-white text-center group`}
+                >
+                  <div className="text-2xl mb-1">{level.icon}</div>
+                  <h3 className="font-bold text-sm">{level.name}</h3>
+                  <p className="text-xs opacity-80">{level.ageRange}</p>
+                  <div className="mt-2 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                    Ver <ArrowRight className="w-3 h-3 ml-1" />
+                  </div>
+                </Link>
+              )
+            })}
           </div>
 
           {/* Tools */}

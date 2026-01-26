@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 
 export interface User {
   id: string
+  accessCode?: string
   name: string
   email: string
   avatar?: string
@@ -114,6 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       const loggedUser: User = {
         id: data.user.id,
+        accessCode: data.user.accessCode,
         name: data.user.name,
         email: data.user.email || email,
         role: data.user.role,

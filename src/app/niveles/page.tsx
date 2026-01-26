@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import { 
   ArrowRight, Sparkles, Rocket, Brain, Bot, Baby, Backpack, Pencil, 
@@ -17,41 +18,15 @@ const ICON_MAP: Record<string, any> = {
   Zap, Gamepad2, Wrench, Settings, Laptop, Brain, ShieldCheck, Rocket
 }
 
-interface UserData {
-  role: string
-  levelId?: string
-  courseId?: string
-  courseIds?: string // Múltiples cursos separados por coma
-  schoolId?: string
-  accessCode?: string // ID único del usuario
-}
-
 export default function NivelesPage() {
+  const { user, isLoading, isAuthenticated } = useAuth()
   const [scrollY, setScrollY] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
-  const [currentUser, setCurrentUser] = useState<UserData | null>(null)
   const [userCourses, setUserCourses] = useState<any[]>([])
 
-  // Cargar usuario y sus cursos
-  useEffect(() => {
-    const userStr = localStorage.getItem('user')
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr)
-        setCurrentUser(user)
-        
-        // Si es profesor o estudiante, cargar sus cursos asignados
-        if (user.role !== 'admin') {
-          loadUserCourses(user)
-        }
-      } catch (e) {
-        console.error('Error parsing user:', e)
-      }
-    }
-  }, [])
-
-  const loadUserCourses = async (user: UserData) => {
+  const loadUserCourses = async () => {
     try {
+      if (!user) return
       if (user.role === 'teacher') {
         // Para profesores: usar tabla teacher_courses con accessCode como teacherId
         const teacherId = user.accessCode || ''
@@ -61,32 +36,39 @@ export default function NivelesPage() {
           setUserCourses(data.assignments)
         } else {
           // Fallback: si no hay asignaciones en teacher_courses, usar courseId directo
-          if (user.courseId) {
-            setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
-          }
+          if (user.courseId) setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
         }
       } else if (user.role === 'student') {
         // Para estudiantes: solo su curso asignado
-        if (user.courseId) {
-          setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
-        }
+        if (user.courseId) setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
+      } else {
+        setUserCourses([])
       }
     } catch (error) {
       console.error('Error loading courses:', error)
     }
   }
 
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user && user.role !== 'admin') {
+      loadUserCourses()
+    }
+    if (!isLoading && (!isAuthenticated || !user)) {
+      setUserCourses([])
+    }
+  }, [isLoading, isAuthenticated, user])
+
   // Determinar qué niveles puede ver el usuario
   const allowedLevelIds = useMemo(() => {
-    if (!currentUser) return [] // No logueado, no ve nada
-    if (currentUser.role === 'admin') return EDUCATION_LEVELS.map(l => l.id) // Admin ve todo
+    if (!user) return [] // No logueado, no ve nada
+    if (user.role === 'admin') return EDUCATION_LEVELS.map(l => l.id) // Admin ve todo
     
     // Profesor/Estudiante: solo niveles de sus cursos
     const levelIds = new Set<string>()
     
     // Agregar nivel directo del usuario
-    if (currentUser.levelId) {
-      levelIds.add(currentUser.levelId)
+    if (user.levelId) {
+      levelIds.add(user.levelId)
     }
     
     // Agregar niveles de sus cursos
@@ -97,9 +79,9 @@ export default function NivelesPage() {
     })
     
     return Array.from(levelIds)
-  }, [currentUser, userCourses])
+  }, [user, userCourses])
 
-  const isAdmin = currentUser?.role === 'admin'
+  const isAdmin = user?.role === 'admin'
   const canAccessLevel = (levelId: string) => isAdmin || allowedLevelIds.includes(levelId)
 
   useEffect(() => {
