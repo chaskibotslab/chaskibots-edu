@@ -11,6 +11,24 @@ import {
   GripVertical, Eye, X, Check, ExternalLink, Loader2, RefreshCw
 } from 'lucide-react'
 
+// Función para convertir URLs de Google Drive al formato de imagen directa
+function convertGoogleDriveUrl(url: string): string {
+  if (!url) return ''
+  // Si ya está en formato uc?id=, devolverlo tal cual
+  if (url.includes('drive.google.com/uc?id=')) return url
+  // Convertir formato /file/d/ID/view o /file/d/ID/preview
+  const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
+  if (match && match[1]) {
+    return `https://drive.google.com/uc?id=${match[1]}`
+  }
+  // Formato ?id=ID
+  const idMatch = url.match(/[?&]id=([^&]+)/)
+  if (idMatch && idMatch[1]) {
+    return `https://drive.google.com/uc?id=${idMatch[1]}`
+  }
+  return url
+}
+
 interface Lesson {
   id: string
   levelId: string
@@ -619,20 +637,20 @@ export default function ContenidoAdminPage() {
                   value={editFormData.images.join('\n')}
                   onChange={(e) => setEditFormData({ 
                     ...editFormData, 
-                    images: e.target.value.split('\n').map(url => url.trim()).filter(url => url) 
+                    images: e.target.value.split('\n').map(url => convertGoogleDriveUrl(url.trim())).filter(url => url) 
                   })}
-                  placeholder="https://drive.google.com/uc?id=ID_IMAGEN&#10;https://otra-imagen.jpg"
+                  placeholder="https://drive.google.com/file/d/ID/view&#10;https://otra-imagen.jpg"
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none font-mono text-sm"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Agrega múltiples URLs de imágenes, una por línea. Para Google Drive usa: <code className="text-neon-cyan">https://drive.google.com/uc?id=ID</code>
+                  Pega las URLs de Google Drive directamente (se convierten automáticamente)
                 </p>
                 {editFormData.images.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {editFormData.images.map((img, idx) => (
                       <div key={idx} className="relative group">
                         <img 
-                          src={img} 
+                          src={convertGoogleDriveUrl(img)} 
                           alt={`Imagen ${idx + 1}`}
                           className="w-16 h-16 object-cover rounded-lg border border-dark-600"
                           onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png' }}
