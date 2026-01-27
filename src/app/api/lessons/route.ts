@@ -66,22 +66,36 @@ export async function GET(request: Request) {
       const videos: string[] = []
       const images: string[] = []
       
-      allUrls.forEach((url: string) => {
-        // Detectar si es video (YouTube, Drive con /preview, Vimeo) o imagen
-        if (url.includes('youtube.com') || url.includes('youtu.be') || 
-            url.includes('/preview') || url.includes('vimeo.com')) {
+      allUrls.forEach((url: string, index: number) => {
+        // Primera URL siempre es video (para mantener compatibilidad)
+        if (index === 0) {
           videos.push(url)
-        } else if (url.includes('drive.google.com/file/d/')) {
-          // Google Drive file - convertir a formato de imagen directa
+          return
+        }
+        
+        // URLs adicionales: detectar si es imagen o video
+        const isImageExtension = /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?|$)/i.test(url)
+        const isExplicitImage = url.includes('drive.google.com/uc?id=') || isImageExtension
+        
+        if (isExplicitImage) {
+          // Es imagen explícita
+          if (url.includes('drive.google.com/file/d/')) {
+            const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
+            if (match && match[1]) {
+              images.push(`https://drive.google.com/uc?id=${match[1]}`)
+            }
+          } else {
+            images.push(url)
+          }
+        } else if (url.includes('drive.google.com/file/d/') && !url.includes('/preview')) {
+          // Google Drive sin /preview - convertir a imagen
           const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
           if (match && match[1]) {
             images.push(`https://drive.google.com/uc?id=${match[1]}`)
           }
-        } else if (url.includes('drive.google.com/uc?id=')) {
-          images.push(url)
         } else {
-          // Asumir que es imagen si no es video conocido
-          images.push(url)
+          // Es video (YouTube, Vimeo, Drive con /preview)
+          videos.push(url)
         }
       })
       
