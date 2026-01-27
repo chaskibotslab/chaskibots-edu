@@ -31,9 +31,15 @@ interface Submission {
   files?: string
 }
 
+interface TeacherCourseAssignment {
+  courseId: string
+  levelId: string
+  courseName: string
+}
+
 export default function EntregasPage() {
   const router = useRouter()
-  const { user, isAdmin, isLoading } = useAuth()
+  const { user, isAdmin, isTeacher, isLoading } = useAuth()
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedLevel, setSelectedLevel] = useState('')
@@ -43,17 +49,40 @@ export default function EntregasPage() {
   const [gradeInput, setGradeInput] = useState('')
   const [feedbackInput, setFeedbackInput] = useState('')
   const [saving, setSaving] = useState(false)
+  const [teacherCourses, setTeacherCourses] = useState<TeacherCourseAssignment[]>([])
+
+  // Cargar cursos asignados al profesor
+  useEffect(() => {
+    async function loadTeacherCourses() {
+      if (isTeacher && !isAdmin && user?.accessCode) {
+        try {
+          const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
+          const data = await res.json()
+          if (data.assignments && data.assignments.length > 0) {
+            setTeacherCourses(data.assignments)
+          }
+        } catch (error) {
+          console.error('Error loading teacher courses:', error)
+        }
+      }
+    }
+    loadTeacherCourses()
+  }, [isTeacher, isAdmin, user])
 
   useEffect(() => {
     // Permitir acceso a admin y profesores
     if (!isLoading && !user) {
       router.push('/')
     }
-  }, [user, isLoading, router])
+    // Si no es admin ni profesor, redirigir
+    if (!isLoading && user && !isAdmin && !isTeacher) {
+      router.push('/')
+    }
+  }, [user, isLoading, isAdmin, isTeacher, router])
 
   useEffect(() => {
     loadSubmissions()
-  }, [])
+  }, [teacherCourses])
 
   const loadSubmissions = async () => {
     setLoading(true)
@@ -122,7 +151,16 @@ export default function EntregasPage() {
     }
   }
 
+  // Niveles permitidos para el profesor
+  const allowedLevelIds = isAdmin 
+    ? EDUCATION_LEVELS.map(l => l.id) 
+    : teacherCourses.map(tc => tc.levelId)
+
   const filteredSubmissions = submissions.filter(sub => {
+    // Filtrar por cursos del profesor (si no es admin)
+    if (!isAdmin && teacherCourses.length > 0) {
+      if (!allowedLevelIds.includes(sub.levelId)) return false
+    }
     if (selectedLevel && sub.levelId !== selectedLevel) return false
     if (selectedStatus && sub.status !== selectedStatus) return false
     if (searchTerm) {
@@ -169,7 +207,7 @@ export default function EntregasPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
-              href="/admin"
+              href={isAdmin ? "/admin" : "/dashboard"}
               className="p-2 hover:bg-dark-700 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -215,7 +253,7 @@ export default function EntregasPage() {
               className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
             >
               <option value="">Todos los niveles</option>
-              {EDUCATION_LEVELS.map(level => (
+              {(isAdmin ? EDUCATION_LEVELS : EDUCATION_LEVELS.filter(l => allowedLevelIds.includes(l.id))).map(level => (
                 <option key={level.id} value={level.id}>{level.name}</option>
               ))}
             </select>
