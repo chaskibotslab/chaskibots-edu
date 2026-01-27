@@ -284,72 +284,7 @@ export default function NivelPage() {
                 </div>
               </div>
 
-              {/* Mostrar lección seleccionada con video embebido */}
-              {selectedLesson && (
-                <div className="mb-6 card">
-                  {(() => {
-                    const lesson = apiLessons.find(l => l.id === selectedLesson) || 
-                                   courseData.modules.flatMap(m => m.lessons).find(l => l.id === selectedLesson)
-                    if (!lesson) return null
-                    const videoUrl = 'videoEmbedUrl' in lesson ? lesson.videoEmbedUrl : lesson.videoUrl
-                    return (
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-bold text-white">{lesson.title}</h3>
-                          <button 
-                            onClick={() => setSelectedLesson(null)}
-                            className="text-gray-400 hover:text-white"
-                          >
-                            <X className="w-5 h-5" />
-                          </button>
-                        </div>
-                        {videoUrl && (
-                          <div className="aspect-video bg-dark-800 rounded-lg overflow-hidden mb-4">
-                            <iframe
-                              src={videoUrl}
-                              className="w-full h-full"
-                              allow="autoplay; encrypted-media"
-                              allowFullScreen
-                            ></iframe>
-                          </div>
-                        )}
-                        {'images' in lesson && Array.isArray(lesson.images) && lesson.images.length > 0 && (
-                          <div className="mb-4">
-                            <p className="text-sm text-gray-400 mb-2">📷 Galería ({lesson.images.length} {lesson.images.length === 1 ? 'imagen' : 'imágenes'})</p>
-                            <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-dark-600 scrollbar-track-dark-800">
-                              {lesson.images.map((img: string, idx: number) => {
-                                const proxyUrl = img.includes('drive.google.com') 
-                                  ? `/api/image-proxy?url=${encodeURIComponent(img)}`
-                                  : img
-                                return (
-                                  <div 
-                                    key={idx} 
-                                    className="flex-shrink-0 w-48 h-36 bg-dark-700 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-neon-cyan transition-all"
-                                    onClick={() => setZoomImage(proxyUrl)}
-                                  >
-                                    <img 
-                                      src={proxyUrl} 
-                                      alt={`Imagen ${idx + 1}`}
-                                      className="w-full h-full object-cover"
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement
-                                        target.src = '/placeholder.png'
-                                      }}
-                                    />
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          </div>
-                        )}
-                        {'content' in lesson && lesson.content && (
-                          <p className="text-gray-300">{lesson.content}</p>
-                        )}
-                      </div>
-                    )
-                  })()}
-                </div>
-              )}
+              {/* Modal de lección seleccionada */}
 
               {/* Módulos y Lecciones - Usar API si hay datos, sino usar locales */}
               {lessonsLoading ? (
@@ -567,14 +502,105 @@ export default function NivelPage() {
         </main>
       </div>
 
+      {/* Modal de Lección con Video */}
+      {selectedLesson && (() => {
+        const lesson = apiLessons.find(l => l.id === selectedLesson) || 
+                       courseData.modules.flatMap(m => m.lessons).find(l => l.id === selectedLesson)
+        if (!lesson) return null
+        const videoUrl = 'videoEmbedUrl' in lesson ? lesson.videoEmbedUrl : lesson.videoUrl
+        return (
+          <div 
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedLesson(null)}
+          >
+            <div 
+              className="bg-dark-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-dark-600 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="sticky top-0 bg-dark-800 border-b border-dark-600 p-4 flex items-center justify-between z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-neon-cyan/20 rounded-lg flex items-center justify-center">
+                    <Play className="w-5 h-5 text-neon-cyan" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{lesson.title}</h3>
+                    <p className="text-sm text-gray-400">{lesson.duration} • {lesson.type}</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setSelectedLesson(null)}
+                  className="p-2 hover:bg-dark-700 rounded-lg text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              
+              {/* Content */}
+              <div className="p-4 space-y-4">
+                {/* Video */}
+                {videoUrl && (
+                  <div className="aspect-video bg-dark-900 rounded-xl overflow-hidden">
+                    <iframe
+                      src={videoUrl}
+                      className="w-full h-full"
+                      allow="autoplay; encrypted-media; fullscreen"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                )}
+                
+                {/* Galería de imágenes */}
+                {'images' in lesson && Array.isArray(lesson.images) && lesson.images.length > 0 && (
+                  <div>
+                    <p className="text-sm text-gray-400 mb-3">📷 Galería ({lesson.images.length} {lesson.images.length === 1 ? 'imagen' : 'imágenes'})</p>
+                    <div className="flex gap-3 overflow-x-auto pb-2">
+                      {lesson.images.map((img: string, idx: number) => {
+                        const proxyUrl = img.includes('drive.google.com') 
+                          ? `/api/image-proxy?url=${encodeURIComponent(img)}`
+                          : img
+                        return (
+                          <div 
+                            key={idx} 
+                            className="flex-shrink-0 w-40 h-28 bg-dark-700 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-neon-cyan transition-all"
+                            onClick={() => setZoomImage(proxyUrl)}
+                          >
+                            <img 
+                              src={proxyUrl} 
+                              alt={`Imagen ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement
+                                target.src = '/placeholder.png'
+                              }}
+                            />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Descripción */}
+                {'content' in lesson && lesson.content && (
+                  <div className="bg-dark-700/50 rounded-xl p-4">
+                    <p className="text-gray-300 whitespace-pre-line">{lesson.content}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Modal de Zoom para Imágenes */}
       {zoomImage && (
         <div 
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/95 z-[60] flex items-center justify-center p-4"
           onClick={() => setZoomImage(null)}
         >
           <button 
-            className="absolute top-4 right-4 text-white hover:text-neon-cyan p-2"
+            className="absolute top-4 right-4 text-white hover:text-neon-cyan p-2 z-10"
             onClick={() => setZoomImage(null)}
           >
             <X className="w-8 h-8" />
