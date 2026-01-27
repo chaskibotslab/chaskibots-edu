@@ -1,8 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import { useAuth } from '@/components/AuthProvider'
+
+interface TeacherCourseAssignment {
+  courseId: string
+  levelId: string
+  courseName: string
+}
 
 // Interfaces para datos de Airtable
 interface Student {
@@ -57,6 +63,7 @@ export default function GradingPanel() {
   const [summaries, setSummaries] = useState<GradeSummary[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [teacherCourses, setTeacherCourses] = useState<TeacherCourseAssignment[]>([])
   
   // Modal states
   const [showAddStudent, setShowAddStudent] = useState(false)
@@ -72,6 +79,38 @@ export default function GradingPanel() {
   const [newGradeFeedback, setNewGradeFeedback] = useState('')
   const [newGradeLesson, setNewGradeLesson] = useState('')
   const [newGradeTaskId, setNewGradeTaskId] = useState('')
+
+  // Cargar asignaciones de cursos para profesores
+  useEffect(() => {
+    async function loadTeacherCourses() {
+      if (isTeacher && !isAdmin && user?.accessCode) {
+        try {
+          const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
+          const data = await res.json()
+          if (data.assignments && data.assignments.length > 0) {
+            setTeacherCourses(data.assignments)
+          }
+        } catch (error) {
+          console.error('Error loading teacher courses:', error)
+        }
+      }
+    }
+    loadTeacherCourses()
+  }, [isTeacher, isAdmin, user])
+
+  // Niveles permitidos para el usuario
+  const allowedLevels = useMemo(() => {
+    if (isAdmin) return EDUCATION_LEVELS
+    if (isTeacher && teacherCourses.length > 0) {
+      const allowedIds = new Set(teacherCourses.map(tc => tc.levelId))
+      return EDUCATION_LEVELS.filter(l => allowedIds.has(l.id))
+    }
+    // Fallback: usar levelId del usuario
+    if (user?.levelId) {
+      return EDUCATION_LEVELS.filter(l => l.id === user.levelId)
+    }
+    return []
+  }, [isAdmin, isTeacher, teacherCourses, user])
 
   useEffect(() => {
     loadData()
@@ -337,17 +376,19 @@ export default function GradingPanel() {
       <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
         <label className="block text-sm text-gray-400 mb-2">Seleccionar Nivel Académico</label>
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setSelectedLevel('')}
-            className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-              selectedLevel === ''
-                ? 'bg-neon-cyan text-dark-900 font-medium'
-                : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
-            }`}
-          >
-            Todos
-          </button>
-          {EDUCATION_LEVELS.map(level => (
+          {isAdmin && (
+            <button
+              onClick={() => setSelectedLevel('')}
+              className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                selectedLevel === ''
+                  ? 'bg-neon-cyan text-dark-900 font-medium'
+                  : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+              }`}
+            >
+              Todos
+            </button>
+          )}
+          {allowedLevels.map(level => (
             <button
               key={level.id}
               onClick={() => setSelectedLevel(level.id)}

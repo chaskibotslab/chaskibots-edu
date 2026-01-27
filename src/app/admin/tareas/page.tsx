@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import {
   FileText, Plus, Edit, Trash2, Save, X, Search,
@@ -65,18 +66,22 @@ const DIFFICULTIES = [
   { id: 'avanzado', name: 'Avanzado', color: 'bg-red-500/20 text-red-400' },
 ]
 
+interface TeacherCourseAssignment {
+  courseId: string
+  levelId: string
+  courseName: string
+}
+
 export default function AdminTareasPage() {
   const router = useRouter()
+  const { user, isAdmin, isTeacher } = useAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [selectedLevel, setSelectedLevel] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [showInactive, setShowInactive] = useState(false)
-  
-  // Usuario logueado
-  const [currentUser, setCurrentUser] = useState<{ role: string; levelId: string; courseId: string } | null>(null)
-  const isAdmin = currentUser?.role === 'admin'
+  const [teacherCourses, setTeacherCourses] = useState<TeacherCourseAssignment[]>([])
   
   // Modal states
   const [showModal, setShowModal] = useState(false)
@@ -95,37 +100,61 @@ export default function AdminTareasPage() {
     attachmentType: 'none' as 'none' | 'drive' | 'link' | 'pdf'
   })
 
-  // Cargar usuario logueado
+  // Cargar asignaciones de cursos para profesores
   useEffect(() => {
-    const userStr = localStorage.getItem('user')
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr)
-        setCurrentUser(user)
-        // Si es profesor, fijar su nivel
-        if (user.role === 'teacher' && user.levelId) {
-          setSelectedLevel(user.levelId)
+    async function loadTeacherCourses() {
+      if (isTeacher && !isAdmin && user?.accessCode) {
+        try {
+          const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
+          const data = await res.json()
+          if (data.assignments && data.assignments.length > 0) {
+            setTeacherCourses(data.assignments)
+            // Seleccionar el primer nivel asignado por defecto
+            if (!selectedLevel && data.assignments[0]?.levelId) {
+              setSelectedLevel(data.assignments[0].levelId)
+            }
+          }
+        } catch (error) {
+          console.error('Error loading teacher courses:', error)
         }
-      } catch (e) {
-        console.error('Error parsing user:', e)
       }
     }
-  }, [])
+    loadTeacherCourses()
+  }, [isTeacher, isAdmin, user])
+
+  // Niveles permitidos para el usuario
+  const allowedLevels = useMemo(() => {
+    if (isAdmin) return EDUCATION_LEVELS
+    if (isTeacher && teacherCourses.length > 0) {
+      const allowedIds = new Set(teacherCourses.map(tc => tc.levelId))
+      return EDUCATION_LEVELS.filter(l => allowedIds.has(l.id))
+    }
+    // Fallback: usar levelId del usuario
+    if (user?.levelId) {
+      return EDUCATION_LEVELS.filter(l => l.id === user.levelId)
+    }
+    return []
+  }, [isAdmin, isTeacher, teacherCourses, user])
 
   useEffect(() => {
-    if (currentUser !== null) {
+    if (user !== null) {
       loadTasks()
     }
-  }, [selectedLevel, showInactive, currentUser])
+  }, [selectedLevel, showInactive, user, teacherCourses])
 
   const loadTasks = async () => {
     setLoading(true)
     try {
       let url = `/api/tasks?activeOnly=${!showInactive}`
       
-      // Si es profesor, filtrar por su nivel
-      if (!isAdmin && currentUser?.levelId) {
-        url += `&levelId=${currentUser.levelId}`
+      // Si es profesor, filtrar por niveles asignados
+      if (!isAdmin && isTeacher) {
+        if (selectedLevel) {
+          url += `&levelId=${selectedLevel}`
+        } else if (teacherCourses.length > 0) {
+          // Usar el primer nivel asignado si no hay selección
+          url += `&levelId=${teacherCourses[0].levelId}`
+        }
       } else if (selectedLevel) {
         url += `&levelId=${selectedLevel}`
       }
@@ -375,23 +404,17 @@ export default function AdminTareasPage() {
               </div>
             </div>
             
-            {/* Solo admin puede cambiar nivel, profesores ven solo su nivel */}
-            {isAdmin ? (
-              <select
-                value={selectedLevel}
-                onChange={(e) => setSelectedLevel(e.target.value)}
-                className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
-              >
-                <option value="">Todos los niveles</option>
-                {EDUCATION_LEVELS.map(level => (
-                  <option key={level.id} value={level.id}>{level.name}</option>
-                ))}
-              </select>
-            ) : (
-              <div className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white">
-                {EDUCATION_LEVELS.find(l => l.id === currentUser?.levelId)?.name || 'Mi nivel'}
-              </div>
-            )}
+            {/* Selector de nivel basado en permisos */}
+            <select
+              value={selectedLevel}
+              onChange={(e) => setSelectedLevel(e.target.value)}
+              className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+            >
+              {isAdmin && <option value="">Todos los niveles</option>}
+              {allowedLevels.map(level => (
+                <option key={level.id} value={level.id}>{level.name}</option>
+              ))}
+            </select>
 
             <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
               <input
@@ -562,7 +585,7 @@ export default function AdminTareasPage() {
                     className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
                   >
                     <option value="">Seleccionar nivel...</option>
-                    {EDUCATION_LEVELS.map(level => (
+                    {allowedLevels.map(level => (
                       <option key={level.id} value={level.id}>{level.name}</option>
                     ))}
                   </select>
