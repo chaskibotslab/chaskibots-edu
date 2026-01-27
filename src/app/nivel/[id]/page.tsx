@@ -30,6 +30,7 @@ interface APILesson {
   order: number
   videoUrl: string
   videoEmbedUrl: string
+  images: string[]
   content: string
   locked: boolean
 }
@@ -308,6 +309,20 @@ export default function NivelPage() {
                               allow="autoplay; encrypted-media"
                               allowFullScreen
                             ></iframe>
+                          </div>
+                        )}
+                        {'images' in lesson && Array.isArray(lesson.images) && lesson.images.length > 0 && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            {lesson.images.map((img: string, idx: number) => (
+                              <div key={idx} className="relative">
+                                <img 
+                                  src={img} 
+                                  alt={`Imagen ${idx + 1}`}
+                                  className="w-full rounded-lg border border-dark-600 cursor-pointer hover:opacity-90 transition-opacity"
+                                  onClick={() => window.open(img, '_blank')}
+                                />
+                              </div>
+                            ))}
                           </div>
                         )}
                         {'content' in lesson && lesson.content && (
