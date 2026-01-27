@@ -350,12 +350,22 @@ export default function AdminTareasPage() {
     return <Icon className={`w-5 h-5 ${cat.color}`} />
   }
 
-  const filteredTasks = tasks.filter(task => 
-    task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    task.description.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  // Filtrar tareas por nivel seleccionado y búsqueda
+  const filteredTasks = tasks.filter(task => {
+    // Filtro por nivel (si hay nivel seleccionado)
+    if (selectedLevel && task.levelId !== selectedLevel) {
+      return false
+    }
+    // Filtro por búsqueda de texto
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase()
+      return task.title.toLowerCase().includes(search) ||
+             task.description.toLowerCase().includes(search)
+    }
+    return true
+  })
 
-  // Group tasks by level
+  // Group tasks by level (solo para mostrar agrupado)
   const tasksByLevel = filteredTasks.reduce((acc, task) => {
     const level = task.levelId || 'sin-nivel'
     if (!acc[level]) acc[level] = []
