@@ -21,6 +21,7 @@ interface Lesson {
   duration: string
   order: number
   videoUrl: string
+  images: string[]
   content: string
   locked: boolean
 }
@@ -30,6 +31,7 @@ interface EditFormData {
   type: string
   duration: string
   videoUrl: string
+  images: string[]
   content: string
   locked: boolean
 }
@@ -49,6 +51,7 @@ export default function ContenidoAdminPage() {
     type: 'video',
     duration: '5 min',
     videoUrl: '',
+    images: [],
     content: '',
     locked: false
   })
@@ -104,6 +107,7 @@ export default function ContenidoAdminPage() {
       type: lesson.type,
       duration: lesson.duration,
       videoUrl: lesson.videoUrl || '',
+      images: lesson.images || [],
       content: lesson.content || '',
       locked: lesson.locked
     })
@@ -604,6 +608,49 @@ export default function ContenidoAdminPage() {
                 <p className="text-xs text-gray-500 mt-2">
                   Para Google Drive: usa el formato <code className="text-neon-cyan">/preview</code> al final
                 </p>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  🖼️ URLs de Imágenes (una por línea)
+                </label>
+                <textarea
+                  rows={3}
+                  value={editFormData.images.join('\n')}
+                  onChange={(e) => setEditFormData({ 
+                    ...editFormData, 
+                    images: e.target.value.split('\n').map(url => url.trim()).filter(url => url) 
+                  })}
+                  placeholder="https://drive.google.com/uc?id=ID_IMAGEN&#10;https://otra-imagen.jpg"
+                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none font-mono text-sm"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Agrega múltiples URLs de imágenes, una por línea. Para Google Drive usa: <code className="text-neon-cyan">https://drive.google.com/uc?id=ID</code>
+                </p>
+                {editFormData.images.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {editFormData.images.map((img, idx) => (
+                      <div key={idx} className="relative group">
+                        <img 
+                          src={img} 
+                          alt={`Imagen ${idx + 1}`}
+                          className="w-16 h-16 object-cover rounded-lg border border-dark-600"
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setEditFormData({
+                            ...editFormData,
+                            images: editFormData.images.filter((_, i) => i !== idx)
+                          })}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div>

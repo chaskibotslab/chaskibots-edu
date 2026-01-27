@@ -55,6 +55,10 @@ export async function GET(request: Request) {
     const lessons = data.records.map((record: any) => {
       const moduleName = record.fields.moduleName || ''
       const moduleId = moduleName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'sin-modulo'
+      // Parsear imágenes (separadas por | o salto de línea)
+      const imagesStr = record.fields.images || ''
+      const images = imagesStr.split(/[|\n]/).map((url: string) => url.trim()).filter((url: string) => url)
+      
       return {
         id: record.id,
         levelId: record.fields.levelId || '',
@@ -66,6 +70,7 @@ export async function GET(request: Request) {
         order: record.fields.order || 0,
         videoUrl: record.fields.videoUrl || '',
         videoEmbedUrl: getVideoEmbedUrl(record.fields.videoUrl || ''),
+        images,
         content: record.fields.content || '',
         locked: record.fields.locked || false,
       }
@@ -157,6 +162,10 @@ export async function PUT(request: Request) {
     if (body.duration) fields.duration = body.duration
     if (body.order !== undefined) fields.order = body.order
     if (body.videoUrl !== undefined) fields.videoUrl = body.videoUrl
+    if (body.images !== undefined) {
+      // Guardar imágenes como string separado por |
+      fields.images = Array.isArray(body.images) ? body.images.join('|') : body.images
+    }
     if (body.content !== undefined) fields.content = body.content
     if (body.locked !== undefined) fields.locked = body.locked
 
