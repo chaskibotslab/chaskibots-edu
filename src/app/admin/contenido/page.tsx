@@ -39,7 +39,6 @@ interface Lesson {
   duration: string
   order: number
   videoUrl: string
-  images: string[]
   content: string
   locked: boolean
 }
@@ -49,7 +48,6 @@ interface EditFormData {
   type: string
   duration: string
   videoUrl: string
-  images: string[]
   content: string
   locked: boolean
 }
@@ -69,7 +67,6 @@ export default function ContenidoAdminPage() {
     type: 'video',
     duration: '5 min',
     videoUrl: '',
-    images: [],
     content: '',
     locked: false
   })
@@ -125,7 +122,6 @@ export default function ContenidoAdminPage() {
       type: lesson.type,
       duration: lesson.duration,
       videoUrl: lesson.videoUrl || '',
-      images: lesson.images || [],
       content: lesson.content || '',
       locked: lesson.locked
     })
@@ -602,73 +598,19 @@ export default function ContenidoAdminPage() {
               <div>
                 <label className="block text-sm text-gray-400 mb-2">
                   <Video className="w-4 h-4 inline mr-2" />
-                  URL del Video (Google Drive o YouTube)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={editFormData.videoUrl}
-                    onChange={(e) => setEditFormData({ ...editFormData, videoUrl: e.target.value })}
-                    placeholder="https://drive.google.com/file/d/ID/preview"
-                    className="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                  />
-                  {editFormData.videoUrl && (
-                    <a 
-                      href={editFormData.videoUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="px-4 py-3 bg-dark-600 text-gray-300 rounded-lg hover:bg-dark-500"
-                    >
-                      <ExternalLink className="w-5 h-5" />
-                    </a>
-                  )}
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  Para Google Drive: usa el formato <code className="text-neon-cyan">/preview</code> al final
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">
-                  🖼️ URLs de Imágenes (una por línea)
+                  URLs de Videos e Imágenes (una por línea)
                 </label>
                 <textarea
-                  rows={3}
-                  value={editFormData.images.join('\n')}
-                  onChange={(e) => setEditFormData({ 
-                    ...editFormData, 
-                    images: e.target.value.split('\n').map(url => convertGoogleDriveUrl(url.trim())).filter(url => url) 
-                  })}
-                  placeholder="https://drive.google.com/file/d/ID/view&#10;https://otra-imagen.jpg"
+                  rows={4}
+                  value={editFormData.videoUrl}
+                  onChange={(e) => setEditFormData({ ...editFormData, videoUrl: e.target.value })}
+                  placeholder="https://drive.google.com/file/d/ID/preview&#10;https://drive.google.com/file/d/IMAGEN_ID/view"
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none font-mono text-sm"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Pega las URLs de Google Drive directamente (se convierten automáticamente)
+                  <strong>Videos:</strong> usa <code className="text-neon-cyan">/preview</code> al final • 
+                  <strong> Imágenes:</strong> pega el link normal de Google Drive
                 </p>
-                {editFormData.images.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {editFormData.images.map((img, idx) => (
-                      <div key={idx} className="relative group">
-                        <img 
-                          src={convertGoogleDriveUrl(img)} 
-                          alt={`Imagen ${idx + 1}`}
-                          className="w-16 h-16 object-cover rounded-lg border border-dark-600"
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png' }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setEditFormData({
-                            ...editFormData,
-                            images: editFormData.images.filter((_, i) => i !== idx)
-                          })}
-                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <div>

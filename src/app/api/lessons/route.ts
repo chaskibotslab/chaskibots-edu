@@ -55,9 +55,36 @@ export async function GET(request: Request) {
     const lessons = data.records.map((record: any) => {
       const moduleName = record.fields.moduleName || ''
       const moduleId = moduleName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'sin-modulo'
-      // Parsear imágenes (separadas por | o salto de línea)
-      const imagesStr = record.fields.images || ''
-      const images = imagesStr.split(/[|\n]/).map((url: string) => url.trim()).filter((url: string) => url)
+      
+      // Parsear múltiples URLs del campo videoUrl (separadas por | o salto de línea)
+      const videoUrlRaw = record.fields.videoUrl || ''
+      const allUrls = videoUrlRaw.split(/[|\n]/).map((url: string) => url.trim()).filter((url: string) => url)
+      
+      // Separar videos de imágenes
+      const videos: string[] = []
+      const images: string[] = []
+      
+      allUrls.forEach((url: string) => {
+        // Detectar si es video (YouTube, Drive con /preview, Vimeo) o imagen
+        if (url.includes('youtube.com') || url.includes('youtu.be') || 
+            url.includes('/preview') || url.includes('vimeo.com')) {
+          videos.push(url)
+        } else if (url.includes('drive.google.com/file/d/')) {
+          // Google Drive file - convertir a formato de imagen directa
+          const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
+          if (match && match[1]) {
+            images.push(`https://drive.google.com/uc?id=${match[1]}`)
+          }
+        } else if (url.includes('drive.google.com/uc?id=')) {
+          images.push(url)
+        } else {
+          // Asumir que es imagen si no es video conocido
+          images.push(url)
+        }
+      })
+      
+      // El primer video es el principal para embed
+      const mainVideoUrl = videos[0] || ''
       
       return {
         id: record.id,
@@ -68,8 +95,9 @@ export async function GET(request: Request) {
         type: record.fields.type || 'video',
         duration: record.fields.duration || '5 min',
         order: record.fields.order || 0,
-        videoUrl: record.fields.videoUrl || '',
-        videoEmbedUrl: getVideoEmbedUrl(record.fields.videoUrl || ''),
+        videoUrl: mainVideoUrl,
+        videoEmbedUrl: getVideoEmbedUrl(mainVideoUrl),
+        videos,
         images,
         content: record.fields.content || '',
         locked: record.fields.locked || false,
@@ -162,10 +190,6 @@ export async function PUT(request: Request) {
     if (body.duration) fields.duration = body.duration
     if (body.order !== undefined) fields.order = body.order
     if (body.videoUrl !== undefined) fields.videoUrl = body.videoUrl
-    if (body.images !== undefined) {
-      // Guardar imágenes como string separado por |
-      fields.images = Array.isArray(body.images) ? body.images.join('|') : body.images
-    }
     if (body.content !== undefined) fields.content = body.content
     if (body.locked !== undefined) fields.locked = body.locked
 

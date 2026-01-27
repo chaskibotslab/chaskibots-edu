@@ -30,6 +30,7 @@ interface APILesson {
   order: number
   videoUrl: string
   videoEmbedUrl: string
+  videos: string[]
   images: string[]
   content: string
   locked: boolean
