@@ -314,16 +314,27 @@ export default function NivelPage() {
                         )}
                         {'images' in lesson && Array.isArray(lesson.images) && lesson.images.length > 0 && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            {lesson.images.map((img: string, idx: number) => (
-                              <div key={idx} className="relative">
-                                <img 
-                                  src={img} 
-                                  alt={`Imagen ${idx + 1}`}
-                                  className="w-full rounded-lg border border-dark-600 cursor-pointer hover:opacity-90 transition-opacity"
-                                  onClick={() => window.open(img, '_blank')}
-                                />
-                              </div>
-                            ))}
+                            {lesson.images.map((img: string, idx: number) => {
+                              // Usar proxy para imágenes de Google Drive
+                              const proxyUrl = img.includes('drive.google.com') 
+                                ? `/api/image-proxy?url=${encodeURIComponent(img)}`
+                                : img
+                              return (
+                                <div key={idx} className="relative bg-dark-700 rounded-lg overflow-hidden">
+                                  <img 
+                                    src={proxyUrl} 
+                                    alt={`Imagen ${idx + 1}`}
+                                    className="w-full h-auto max-h-96 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                                    onClick={() => window.open(img, '_blank')}
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement
+                                      target.style.display = 'none'
+                                      target.parentElement!.innerHTML = `<div class="p-4 text-center text-gray-400"><a href="${img}" target="_blank" class="text-neon-cyan hover:underline">Ver imagen ${idx + 1}</a></div>`
+                                    }}
+                                  />
+                                </div>
+                              )
+                            })}
                           </div>
                         )}
                         {'content' in lesson && lesson.content && (
