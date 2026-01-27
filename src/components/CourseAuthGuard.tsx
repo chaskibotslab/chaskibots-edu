@@ -14,6 +14,7 @@ interface CourseAuthGuardProps {
 export default function CourseAuthGuard({ levelId, levelName, children }: CourseAuthGuardProps) {
   const { isAuthenticated, user } = useAuth()
   const [isAuthorized, setIsAuthorized] = useState(false)
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true)
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -21,20 +22,62 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
 
   // Verificar si ya está autenticado para este curso
   useEffect(() => {
-    if (isAuthenticated && user) {
-      // Admin y teacher siempre tienen acceso a todos los cursos
-      if (user.role === 'admin' || user.role === 'teacher') {
+    async function checkAccess() {
+      setIsCheckingAccess(true)
+      
+      if (!isAuthenticated || !user) {
+        setIsCheckingAccess(false)
+        return
+      }
+
+      // Admin siempre tiene acceso a todos los cursos
+      if (user.role === 'admin') {
         setIsAuthorized(true)
+        setIsCheckingAccess(false)
+        return
+      }
+
+      // Teacher: verificar en teacher_courses
+      if (user.role === 'teacher') {
+        try {
+          const teacherId = user.accessCode || ''
+          const res = await fetch(`/api/teacher-courses?teacherId=${teacherId}`)
+          const data = await res.json()
+          
+          if (data.assignments && data.assignments.length > 0) {
+            // Verificar si tiene acceso a este nivel
+            const hasAccess = data.assignments.some((a: any) => a.levelId === levelId)
+            if (hasAccess) {
+              setIsAuthorized(true)
+              setIsCheckingAccess(false)
+              return
+            }
+          } else {
+            // Fallback: si no hay asignaciones, usar levelId del usuario
+            if (user.levelId === levelId) {
+              setIsAuthorized(true)
+              setIsCheckingAccess(false)
+              return
+            }
+          }
+        } catch (error) {
+          console.error('Error checking teacher access:', error)
+          // En caso de error, usar fallback
+          if (user.levelId === levelId) {
+            setIsAuthorized(true)
+            setIsCheckingAccess(false)
+            return
+          }
+        }
+        setIsCheckingAccess(false)
         return
       }
       
       // Estudiante: verificar si su levelId coincide con el curso
-      // El levelId del usuario puede ser exacto o puede ser un nivel que incluye este curso
       const userLevel = user.levelId || ''
-      
-      // Dar acceso si el levelId del usuario coincide con el curso
       if (userLevel === levelId) {
         setIsAuthorized(true)
+        setIsCheckingAccess(false)
         return
       }
       
@@ -43,7 +86,11 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
       if (courseAccess === 'granted') {
         setIsAuthorized(true)
       }
+      
+      setIsCheckingAccess(false)
     }
+    
+    checkAccess()
   }, [isAuthenticated, user, levelId])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,6 +119,18 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Mostrar loading mientras se verifica acceso
+  if (isCheckingAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-chaski-dark via-blue-900 to-indigo-900">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 text-white animate-spin mx-auto mb-4" />
+          <p className="text-white/80">Verificando acceso...</p>
+        </div>
+      </div>
+    )
   }
 
   // Si ya está autorizado, mostrar el contenido

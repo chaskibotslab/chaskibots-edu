@@ -14,8 +14,9 @@ import dynamic from 'next/dynamic'
 const LevelsManager = dynamic(() => import('@/components/admin/LevelsManager'), { ssr: false })
 const ProgramsManager = dynamic(() => import('@/components/admin/ProgramsManager'), { ssr: false })
 const UsersManager = dynamic(() => import('@/components/admin/UsersManager'), { ssr: false })
+const TeacherCoursesManager = dynamic(() => import('@/components/admin/TeacherCoursesManager'), { ssr: false })
 
-type GestionTab = 'levels' | 'programs' | 'users'
+type GestionTab = 'levels' | 'programs' | 'users' | 'assignments'
 
 export default function GestionPage() {
   const router = useRouter()
@@ -46,7 +47,8 @@ export default function GestionPage() {
   const tabs = [
     { id: 'levels' as GestionTab, label: 'Niveles', icon: GraduationCap, color: 'neon-cyan' },
     { id: 'programs' as GestionTab, label: 'Programas', icon: FolderOpen, color: 'neon-purple' },
-    { id: 'users' as GestionTab, label: 'Usuarios', icon: Users, color: 'neon-green' }
+    { id: 'users' as GestionTab, label: 'Usuarios', icon: Users, color: 'neon-green' },
+    { id: 'assignments' as GestionTab, label: 'Asignaciones', icon: BookOpen, color: 'neon-orange' }
   ]
 
   return (
@@ -133,11 +135,13 @@ export default function GestionPage() {
               {activeTab === 'levels' && 'Gestión de Niveles Educativos'}
               {activeTab === 'programs' && 'Gestión de Programas'}
               {activeTab === 'users' && 'Gestión de Usuarios y Códigos'}
+              {activeTab === 'assignments' && 'Asignación de Cursos a Profesores'}
             </h2>
             <p className="text-sm text-gray-400">
               {activeTab === 'levels' && 'Crea y administra niveles desde Inicial hasta Universidad'}
               {activeTab === 'programs' && 'Configura programas para cada nivel educativo'}
               {activeTab === 'users' && 'Genera códigos de acceso y administra usuarios'}
+              {activeTab === 'assignments' && 'Asigna múltiples cursos a cada profesor con multi-select'}
             </p>
           </div>
         </header>
@@ -147,6 +151,7 @@ export default function GestionPage() {
           {activeTab === 'levels' && <LevelsManager />}
           {activeTab === 'programs' && <ProgramsManager />}
           {activeTab === 'users' && <UsersManager />}
+          {activeTab === 'assignments' && <TeacherCoursesManager />}
         </div>
       </main>
     </div>
