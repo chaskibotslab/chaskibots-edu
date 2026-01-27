@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { 
   Plus, Edit, Trash2, Save, X, Users, Key, Copy, Check,
-  Loader2, Filter, RefreshCw, Download
+  Loader2, Filter, RefreshCw, Download, Upload, FileSpreadsheet
 } from 'lucide-react'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 
@@ -88,6 +88,17 @@ export default function UsersManager() {
     schoolId: '',
     schoolName: '',
     expiresAt: ''
+  })
+
+  const [showImportForm, setShowImportForm] = useState(false)
+  const [importData, setImportData] = useState({
+    names: '',
+    levelId: '',
+    programId: '',
+    programName: '',
+    courseName: '',
+    schoolId: '',
+    schoolName: ''
   })
 
   useEffect(() => {
@@ -236,6 +247,63 @@ export default function UsersManager() {
       }
     } catch (error) {
       console.error('Error creating bulk users:', error)
+    }
+    setSaving(false)
+  }
+
+  const handleImportCreate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+
+    try {
+      // Parsear nombres (uno por línea)
+      const names = importData.names
+        .split('\n')
+        .map(n => n.trim())
+        .filter(n => n.length > 0)
+
+      if (names.length === 0) {
+        alert('Por favor ingresa al menos un nombre')
+        setSaving(false)
+        return
+      }
+
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'import',
+          names,
+          levelId: importData.levelId,
+          programId: importData.programId,
+          programName: importData.programName,
+          courseName: importData.courseName,
+          schoolId: importData.schoolId,
+          schoolName: importData.schoolName
+        })
+      })
+
+      if (res.ok) {
+        const result = await res.json()
+        await loadData()
+        setShowImportForm(false)
+        setImportData({
+          names: '',
+          levelId: '',
+          programId: '',
+          programName: '',
+          courseName: '',
+          schoolId: '',
+          schoolName: ''
+        })
+        alert(`Se crearon ${result.created || names.length} usuarios exitosamente`)
+      } else {
+        const error = await res.json()
+        alert(`Error: ${error.error || 'No se pudieron crear los usuarios'}`)
+      }
+    } catch (error) {
+      console.error('Error importing users:', error)
+      alert('Error de conexión')
     }
     setSaving(false)
   }
@@ -419,11 +487,18 @@ export default function UsersManager() {
             Exportar
           </button>
           <button
-            onClick={() => setShowBulkForm(!showBulkForm)}
+            onClick={() => { setShowBulkForm(!showBulkForm); setShowImportForm(false) }}
             className="flex items-center gap-2 px-4 py-2 bg-neon-orange/20 text-neon-orange rounded-lg hover:bg-neon-orange/30 transition-colors"
           >
             <Users className="w-4 h-4" />
             Crear en Lote
+          </button>
+          <button
+            onClick={() => { setShowImportForm(!showImportForm); setShowBulkForm(false) }}
+            className="flex items-center gap-2 px-4 py-2 bg-neon-purple/20 text-neon-purple rounded-lg hover:bg-neon-purple/30 transition-colors"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Importar Lista
           </button>
           <button
             onClick={() => setShowForm(!showForm)}
@@ -551,6 +626,124 @@ export default function UsersManager() {
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Users className="w-4 h-4" />}
               Crear {bulkData.count} Usuarios
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Import Form - Lista de nombres */}
+      {showImportForm && (
+        <form onSubmit={handleImportCreate} className="bg-dark-800 rounded-xl p-6 border border-neon-purple/30 space-y-4">
+          <h4 className="text-white font-semibold flex items-center gap-2">
+            <FileSpreadsheet className="w-5 h-5 text-neon-purple" />
+            Importar Lista de Estudiantes
+          </h4>
+          <p className="text-sm text-gray-400">
+            Pega los nombres de los estudiantes (uno por línea). Puedes copiar directamente desde Excel.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-1">
+              <label className="block text-sm text-gray-400 mb-1">Nombres (uno por línea)</label>
+              <textarea
+                value={importData.names}
+                onChange={(e) => setImportData({ ...importData, names: e.target.value })}
+                placeholder="Juan Pérez&#10;María García&#10;Carlos López&#10;Ana Martínez"
+                rows={8}
+                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white font-mono text-sm resize-none"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {importData.names.split('\n').filter(n => n.trim()).length} nombres detectados
+              </p>
+            </div>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Nivel *</label>
+                <select
+                  value={importData.levelId}
+                  onChange={(e) => setImportData({ ...importData, levelId: e.target.value })}
+                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  required
+                >
+                  <option value="">Seleccionar...</option>
+                  {levels.map(level => (
+                    <option key={level.id} value={level.id}>{level.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Programa</label>
+                <select
+                  value={importData.programId}
+                  onChange={(e) => {
+                    const program = programs.find(p => p.id === e.target.value)
+                    setImportData({ 
+                      ...importData, 
+                      programId: e.target.value,
+                      programName: program?.name || ''
+                    })
+                  }}
+                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                >
+                  <option value="">Sin asignar</option>
+                  {programs.map(program => (
+                    <option key={program.id} value={program.id}>{program.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Curso/Clase</label>
+                <input
+                  type="text"
+                  value={importData.courseName}
+                  onChange={(e) => setImportData({ ...importData, courseName: e.target.value })}
+                  placeholder="8vo A Matutino"
+                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Colegio</label>
+                <select
+                  value={importData.schoolId}
+                  onChange={(e) => {
+                    const school = schools.find(s => s.id === e.target.value)
+                    setImportData({ 
+                      ...importData, 
+                      schoolId: e.target.value,
+                      schoolName: school?.name || ''
+                    })
+                  }}
+                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                >
+                  <option value="">Sin asignar</option>
+                  {schools.map(school => (
+                    <option key={school.id} value={school.id}>{school.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => setShowImportForm(false)}
+              className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={saving || !importData.names.trim() || !importData.levelId}
+              className="flex items-center gap-2 px-6 py-2 bg-neon-purple text-white font-semibold rounded-lg hover:bg-neon-purple/90 transition-colors disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              Crear {importData.names.split('\n').filter(n => n.trim()).length} Usuarios
             </button>
           </div>
         </form>

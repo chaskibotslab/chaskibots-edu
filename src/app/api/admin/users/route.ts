@@ -56,9 +56,58 @@ export async function POST(request: NextRequest) {
       programName
     } = body
 
-    // Crear múltiples usuarios
+    // Importar lista de nombres
+    if (action === 'import') {
+      const { names, schoolId, schoolName } = body
+      
+      if (!names || !Array.isArray(names) || names.length === 0 || !levelId) {
+        return NextResponse.json(
+          { success: false, error: 'Se requiere una lista de nombres y nivel' },
+          { status: 400 }
+        )
+      }
+
+      // Crear usuarios uno por uno con sus nombres reales
+      const createdUsers = []
+      const errors = []
+
+      for (const studentName of names) {
+        try {
+          const result = await createCourseUser(
+            studentName,
+            'student',
+            courseId || '',
+            courseName || '',
+            levelId,
+            '', // email
+            '', // expiresAt
+            programId || '',
+            programName || '',
+            schoolId || '',
+            schoolName || ''
+          )
+          if (result.success) {
+            createdUsers.push(result.user)
+          } else {
+            errors.push({ name: studentName, error: result.error })
+          }
+        } catch (err) {
+          errors.push({ name: studentName, error: 'Error de conexión' })
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        created: createdUsers.length,
+        users: createdUsers,
+        errors: errors.length > 0 ? errors : undefined,
+        message: `${createdUsers.length} de ${names.length} usuarios creados`
+      })
+    }
+
+    // Crear múltiples usuarios con prefijo
     if (action === 'bulk') {
-      if (!courseId || !courseName || !levelId || !count) {
+      if (!levelId || !count) {
         return NextResponse.json(
           { success: false, error: 'Faltan campos requeridos para creación en lote' },
           { status: 400 }
@@ -66,8 +115,8 @@ export async function POST(request: NextRequest) {
       }
 
       const result = await createBulkUsers(
-        courseId,
-        courseName,
+        courseId || '',
+        courseName || '',
         levelId,
         count,
         namePrefix || 'Estudiante',
