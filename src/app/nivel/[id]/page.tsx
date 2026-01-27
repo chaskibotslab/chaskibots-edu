@@ -48,6 +48,7 @@ export default function NivelPage() {
   const [lessonsLoading, setLessonsLoading] = useState(true)
   const [yearPlan, setYearPlan] = useState<{month: string, topic: string, project: string}[]>([])
   const [yearPlanLoading, setYearPlanLoading] = useState(true)
+  const [zoomImage, setZoomImage] = useState<string | null>(null)
 
   const level = EDUCATION_LEVELS.find(l => l.id === levelId)
   const content = LEVEL_CONTENT[levelId]
@@ -313,28 +314,32 @@ export default function NivelPage() {
                           </div>
                         )}
                         {'images' in lesson && Array.isArray(lesson.images) && lesson.images.length > 0 && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            {lesson.images.map((img: string, idx: number) => {
-                              // Usar proxy para imágenes de Google Drive
-                              const proxyUrl = img.includes('drive.google.com') 
-                                ? `/api/image-proxy?url=${encodeURIComponent(img)}`
-                                : img
-                              return (
-                                <div key={idx} className="relative bg-dark-700 rounded-lg overflow-hidden">
-                                  <img 
-                                    src={proxyUrl} 
-                                    alt={`Imagen ${idx + 1}`}
-                                    className="w-full h-auto max-h-96 object-contain cursor-pointer hover:opacity-90 transition-opacity"
-                                    onClick={() => window.open(img, '_blank')}
-                                    onError={(e) => {
-                                      const target = e.target as HTMLImageElement
-                                      target.style.display = 'none'
-                                      target.parentElement!.innerHTML = `<div class="p-4 text-center text-gray-400"><a href="${img}" target="_blank" class="text-neon-cyan hover:underline">Ver imagen ${idx + 1}</a></div>`
-                                    }}
-                                  />
-                                </div>
-                              )
-                            })}
+                          <div className="mb-4">
+                            <p className="text-sm text-gray-400 mb-2">📷 Galería ({lesson.images.length} {lesson.images.length === 1 ? 'imagen' : 'imágenes'})</p>
+                            <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-dark-600 scrollbar-track-dark-800">
+                              {lesson.images.map((img: string, idx: number) => {
+                                const proxyUrl = img.includes('drive.google.com') 
+                                  ? `/api/image-proxy?url=${encodeURIComponent(img)}`
+                                  : img
+                                return (
+                                  <div 
+                                    key={idx} 
+                                    className="flex-shrink-0 w-48 h-36 bg-dark-700 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-neon-cyan transition-all"
+                                    onClick={() => setZoomImage(proxyUrl)}
+                                  >
+                                    <img 
+                                      src={proxyUrl} 
+                                      alt={`Imagen ${idx + 1}`}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement
+                                        target.src = '/placeholder.png'
+                                      }}
+                                    />
+                                  </div>
+                                )
+                              })}
+                            </div>
                           </div>
                         )}
                         {'content' in lesson && lesson.content && (
@@ -561,6 +566,27 @@ export default function NivelPage() {
         </div>
         </main>
       </div>
+
+      {/* Modal de Zoom para Imágenes */}
+      {zoomImage && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setZoomImage(null)}
+        >
+          <button 
+            className="absolute top-4 right-4 text-white hover:text-neon-cyan p-2"
+            onClick={() => setZoomImage(null)}
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <img 
+            src={zoomImage} 
+            alt="Imagen ampliada"
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </CourseAuthGuard>
   )
 }
