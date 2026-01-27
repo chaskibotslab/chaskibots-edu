@@ -56,11 +56,13 @@ export async function GET(request: Request) {
       const moduleName = record.fields.moduleName || ''
       const moduleId = moduleName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'sin-modulo'
       
-      // Parsear múltiples URLs del campo videoUrl (separadas por | o salto de línea)
+      // Obtener videoUrl original para edición
       const videoUrlRaw = record.fields.videoUrl || ''
+      
+      // Parsear múltiples URLs (separadas por | o salto de línea) para visualización
       const allUrls = videoUrlRaw.split(/[|\n]/).map((url: string) => url.trim()).filter((url: string) => url)
       
-      // Separar videos de imágenes
+      // Separar videos de imágenes para mostrar al estudiante
       const videos: string[] = []
       const images: string[] = []
       
@@ -95,7 +97,7 @@ export async function GET(request: Request) {
         type: record.fields.type || 'video',
         duration: record.fields.duration || '5 min',
         order: record.fields.order || 0,
-        videoUrl: mainVideoUrl,
+        videoUrl: videoUrlRaw,
         videoEmbedUrl: getVideoEmbedUrl(mainVideoUrl),
         videos,
         images,
