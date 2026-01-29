@@ -124,21 +124,28 @@ export async function POST(request: NextRequest) {
     // Preparar información de adjuntos
     let attachments: string[] = []
     
-    // Guardar dibujo como base64 en el campo drawing
+    // Guardar dibujo como base64 en el campo drawing (con límite de tamaño)
     let drawingData = ''
     if (drawing) {
-      drawingData = drawing // Guardar el base64 completo
+      // Limitar tamaño del dibujo a 100KB para evitar errores de Airtable
+      const maxDrawingSize = 100000
+      if (drawing.length <= maxDrawingSize) {
+        drawingData = drawing
+      } else {
+        console.log('Drawing too large, truncating:', drawing.length, 'chars')
+        drawingData = '[Dibujo muy grande - no guardado]'
+      }
       attachments.push('🎨 Dibujo incluido')
     }
     
-    // Guardar nombres de archivos
+    // Guardar solo nombres de archivos (NO los datos base64, son muy grandes para Airtable)
     let filesData = ''
     if (files && files.length > 0) {
-      // Guardar info de archivos como JSON
+      // Solo guardar metadata, NO los datos base64
       filesData = JSON.stringify(files.map((f: any) => ({
         name: f.name,
-        type: f.type,
-        data: f.data // base64
+        type: f.type
+        // NO incluir f.data - es muy grande para Airtable
       })))
       attachments.push(`📎 ${files.length} archivo(s): ${files.map((f: any) => f.name).join(', ')}`)
     }
