@@ -27,6 +27,8 @@ interface Task {
   points: number
   allowDrawing?: boolean
   allowFiles?: boolean
+  attachmentUrl?: string
+  attachmentType?: 'none' | 'drive' | 'link' | 'pdf'
 }
 
 interface TaskQuestion {
@@ -623,6 +625,25 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
             {expandedTask === task.id && !isAlreadySubmitted && (
               <div className="px-4 pb-4 border-t border-dark-600">
                 <div className="pt-4 space-y-4">
+                  {/* Archivo adjunto del docente */}
+                  {task.attachmentUrl && (
+                    <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                      <p className="text-sm text-blue-300 mb-2 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        📎 Material adjunto del profesor:
+                      </p>
+                      <a
+                        href={task.attachmentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-colors"
+                      >
+                        <Upload className="w-4 h-4" />
+                        Ver archivo adjunto →
+                      </a>
+                    </div>
+                  )}
+                  
                   {task.questions?.map((question, idx) => (
                     <div key={question.id} className="space-y-2">
                       <label className="block text-sm text-white">

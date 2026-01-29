@@ -93,6 +93,8 @@ export async function GET(request: NextRequest) {
         isActive: record.fields.isActive !== false,
         questions,
         createdAt: record.fields.createdAt || new Date().toISOString(),
+        attachmentUrl: record.fields.attachmentUrl || '',
+        attachmentType: record.fields.attachmentType || 'none',
       }
     })
 
@@ -137,6 +139,8 @@ export async function POST(request: NextRequest) {
     if (points) fields.points = Number(points) || 10
     if (dueDate) fields.dueDate = String(dueDate)
     if (questionsStr) fields.questions = questionsStr
+    if (attachmentUrl) fields.attachmentUrl = String(attachmentUrl)
+    if (attachmentType && attachmentType !== 'none') fields.attachmentType = String(attachmentType)
 
     console.log('Creating task with fields:', fields)
 
@@ -199,6 +203,8 @@ export async function PATCH(request: NextRequest) {
         ? updates.questions.filter((q: string) => q && q.trim()).join('|') 
         : updates.questions
     }
+    if (updates.attachmentUrl !== undefined) fields.attachmentUrl = String(updates.attachmentUrl)
+    if (updates.attachmentType !== undefined) fields.attachmentType = String(updates.attachmentType)
 
     console.log('Updating task:', taskId, 'with fields:', fields)
 
