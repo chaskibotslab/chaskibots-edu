@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// API Submissions - v2 (2026-01-29)
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
 const AIRTABLE_SUBMISSIONS_TABLE = 'submissions'
