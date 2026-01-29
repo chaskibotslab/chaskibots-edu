@@ -138,14 +138,14 @@ export async function POST(request: NextRequest) {
       attachments.push('🎨 Dibujo incluido')
     }
     
-    // Guardar solo nombres de archivos (NO los datos base64, son muy grandes para Airtable)
+    // Guardar archivos - pueden ser URLs de Google Drive o solo metadata
     let filesData = ''
     if (files && files.length > 0) {
-      // Solo guardar metadata, NO los datos base64
+      // Guardar metadata con URLs si están disponibles
       filesData = JSON.stringify(files.map((f: any) => ({
         name: f.name,
-        type: f.type
-        // NO incluir f.data - es muy grande para Airtable
+        type: f.type,
+        url: f.url || '' // URL de Google Drive si existe
       })))
       attachments.push(`📎 ${files.length} archivo(s): ${files.map((f: any) => f.name).join(', ')}`)
     }

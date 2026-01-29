@@ -366,6 +366,39 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
     setUploadedFiles(prev => ({ ...prev, [taskId]: files }))
   }
 
+  // Función para subir archivo a Google Drive
+  const uploadFileToGoogleDrive = async (file: UploadedFile): Promise<{ name: string, url: string } | null> => {
+    try {
+      // Convertir base64 a Blob
+      const base64Data = file.base64?.split(',')[1] || ''
+      const byteCharacters = atob(base64Data)
+      const byteNumbers = new Array(byteCharacters.length)
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i)
+      }
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: file.type })
+      
+      // Crear FormData
+      const formData = new FormData()
+      formData.append('file', blob, file.name)
+      
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      })
+      
+      if (res.ok) {
+        const data = await res.json()
+        return { name: file.name, url: data.url || data.thumbnailUrl }
+      }
+      return null
+    } catch (error) {
+      console.error('Error uploading file to Google Drive:', error)
+      return null
+    }
+  }
+
   const handleSubmit = async (task: Task) => {
     if (!studentName || !studentName.trim()) {
       alert('Debes iniciar sesión para enviar tareas')
@@ -393,12 +426,26 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
         `${q.question}\nRespuesta: ${taskAnswers[q.id] || ''}`
       ).join('\n\n') || ''
 
+      // Subir archivos a Google Drive primero
+      let uploadedUrls: { name: string, url: string }[] = []
+      if (taskFiles.length > 0) {
+        for (const file of taskFiles) {
+          const uploaded = await uploadFileToGoogleDrive(file)
+          if (uploaded) {
+            uploadedUrls.push(uploaded)
+          }
+        }
+      }
+
       // Agregar info de dibujo y archivos
       let attachmentsInfo = ''
       if (taskDrawing) {
-        attachmentsInfo += '\n\n📎 DIBUJO ADJUNTO: [imagen base64 incluida]'
+        attachmentsInfo += '\n\n📎 DIBUJO ADJUNTO: [imagen incluida]'
       }
-      if (taskFiles.length > 0) {
+      if (uploadedUrls.length > 0) {
+        attachmentsInfo += `\n\n📎 ARCHIVOS EN GOOGLE DRIVE (${uploadedUrls.length}):\n`
+        attachmentsInfo += uploadedUrls.map(f => `- ${f.name}: ${f.url}`).join('\n')
+      } else if (taskFiles.length > 0) {
         attachmentsInfo += `\n\n📎 ARCHIVOS ADJUNTOS (${taskFiles.length}):\n`
         attachmentsInfo += taskFiles.map(f => `- ${f.name} (${(f.size / 1024).toFixed(1)} KB)`).join('\n')
       }
@@ -421,12 +468,12 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
         submissionData.drawing = taskDrawing
       }
 
-      // Si hay archivos, agregar sus base64
-      if (taskFiles.length > 0) {
-        submissionData.files = taskFiles.map(f => ({
+      // Si hay archivos subidos a Google Drive, guardar URLs
+      if (uploadedUrls.length > 0) {
+        submissionData.files = uploadedUrls.map(f => ({
           name: f.name,
-          type: f.type,
-          data: f.base64
+          type: 'url',
+          url: f.url
         }))
       }
 

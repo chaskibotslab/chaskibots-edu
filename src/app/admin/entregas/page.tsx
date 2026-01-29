@@ -457,6 +457,9 @@ export default function EntregasPage() {
                   {selectedSubmission.files && (() => {
                     try {
                       const filesArray = JSON.parse(selectedSubmission.files)
+                      // Verificar si los archivos tienen URLs de Google Drive
+                      const hasDownloadableUrl = filesArray.some((f: any) => f.url)
+                      
                       return (
                         <div className="space-y-2">
                           <p className="text-sm text-blue-300 flex items-center gap-2">
@@ -464,17 +467,34 @@ export default function EntregasPage() {
                             📎 Archivos adjuntos ({filesArray.length}):
                           </p>
                           {filesArray.map((file: any, idx: number) => (
-                            <a
-                              key={idx}
-                              href={file.data}
-                              download={file.name}
-                              className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/30"
-                            >
-                              <Download className="w-5 h-5 text-blue-400" />
-                              <span className="text-sm text-blue-300 flex-1">{file.name}</span>
-                              <span className="text-xs text-gray-400">Descargar →</span>
-                            </a>
+                            file.url ? (
+                              <a
+                                key={idx}
+                                href={file.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/30"
+                              >
+                                <Download className="w-5 h-5 text-blue-400" />
+                                <span className="text-sm text-blue-300 flex-1">{file.name}</span>
+                                <span className="text-xs text-gray-400">Ver en Google Drive →</span>
+                              </a>
+                            ) : (
+                              <div
+                                key={idx}
+                                className="flex items-center gap-2 p-3 bg-gray-500/10 rounded-lg border border-gray-500/30"
+                              >
+                                <FileText className="w-5 h-5 text-gray-400" />
+                                <span className="text-sm text-gray-300 flex-1">{file.name}</span>
+                                <span className="text-xs text-gray-500">({file.type || 'archivo'})</span>
+                              </div>
+                            )
                           ))}
+                          {!hasDownloadableUrl && (
+                            <p className="text-xs text-gray-500 mt-2">
+                              ⚠️ Los archivos fueron registrados pero no se subieron a Google Drive.
+                            </p>
+                          )}
                         </div>
                       )
                     } catch {
