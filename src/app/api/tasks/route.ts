@@ -133,24 +133,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Si hay archivo adjunto con datos base64, subirlo a Google Drive
+    // Si hay archivo adjunto con datos base64, intentar subirlo a Google Drive
+    // Si falla, guardar como data URL directamente
     let finalAttachmentUrl = attachmentUrl || ''
-    if (attachmentData && attachmentName && isDriveConfigured()) {
-      try {
-        console.log(`Uploading teacher file to Drive: ${attachmentName}`)
-        const driveResult = await uploadFileToDrive(
-          attachmentData,
-          attachmentName,
-          attachmentMimeType || 'application/octet-stream',
-          'Tareas-Docente',
-          'docente',
-          levelId
-        )
-        finalAttachmentUrl = driveResult.webViewLink
-        console.log(`Teacher file uploaded to Drive: ${finalAttachmentUrl}`)
-      } catch (driveError) {
-        console.error('Error uploading teacher file to Drive:', driveError)
-        // Continuar sin el archivo si falla
+    if (attachmentData && attachmentName) {
+      if (isDriveConfigured()) {
+        try {
+          console.log(`Uploading teacher file to Drive: ${attachmentName}`)
+          const driveResult = await uploadFileToDrive(
+            attachmentData,
+            attachmentName,
+            attachmentMimeType || 'application/octet-stream',
+            'Tareas-Docente',
+            'docente',
+            levelId
+          )
+          finalAttachmentUrl = driveResult.webViewLink
+          console.log(`Teacher file uploaded to Drive: ${finalAttachmentUrl}`)
+        } catch (driveError) {
+          console.error('Error uploading teacher file to Drive:', driveError)
+          // Si Drive falla, guardar como data URL (base64)
+          console.log('Falling back to base64 storage')
+          finalAttachmentUrl = attachmentData // El attachmentData ya es un data URL
+        }
+      } else {
+        // Sin Drive configurado, guardar como data URL
+        console.log('Drive not configured, using base64 storage')
+        finalAttachmentUrl = attachmentData
       }
     }
 
@@ -219,23 +228,33 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'taskId es requerido' }, { status: 400 })
     }
 
-    // Si hay archivo adjunto con datos base64, subirlo a Google Drive
+    // Si hay archivo adjunto con datos base64, intentar subirlo a Google Drive
+    // Si falla, guardar como data URL directamente
     let finalAttachmentUrl = updates.attachmentUrl || ''
-    if (updates.attachmentData && updates.attachmentName && isDriveConfigured()) {
-      try {
-        console.log(`Uploading teacher file to Drive: ${updates.attachmentName}`)
-        const driveResult = await uploadFileToDrive(
-          updates.attachmentData,
-          updates.attachmentName,
-          updates.attachmentMimeType || 'application/octet-stream',
-          'Tareas-Docente',
-          'docente',
-          updates.levelId || 'general'
-        )
-        finalAttachmentUrl = driveResult.webViewLink
-        console.log(`Teacher file uploaded to Drive: ${finalAttachmentUrl}`)
-      } catch (driveError) {
-        console.error('Error uploading teacher file to Drive:', driveError)
+    if (updates.attachmentData && updates.attachmentName) {
+      if (isDriveConfigured()) {
+        try {
+          console.log(`Uploading teacher file to Drive: ${updates.attachmentName}`)
+          const driveResult = await uploadFileToDrive(
+            updates.attachmentData,
+            updates.attachmentName,
+            updates.attachmentMimeType || 'application/octet-stream',
+            'Tareas-Docente',
+            'docente',
+            updates.levelId || 'general'
+          )
+          finalAttachmentUrl = driveResult.webViewLink
+          console.log(`Teacher file uploaded to Drive: ${finalAttachmentUrl}`)
+        } catch (driveError) {
+          console.error('Error uploading teacher file to Drive:', driveError)
+          // Si Drive falla, guardar como data URL (base64)
+          console.log('Falling back to base64 storage')
+          finalAttachmentUrl = updates.attachmentData
+        }
+      } else {
+        // Sin Drive configurado, guardar como data URL
+        console.log('Drive not configured, using base64 storage')
+        finalAttachmentUrl = updates.attachmentData
       }
     }
 
