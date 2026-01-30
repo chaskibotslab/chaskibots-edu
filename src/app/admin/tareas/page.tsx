@@ -721,19 +721,61 @@ function AdminTareasContent() {
               </div>
 
               {/* Attachment / Document */}
-              <div className="p-3 bg-dark-700/50 rounded-lg border border-dark-600">
-                <label className="block text-sm text-gray-400 mb-2">📎 Material de Apoyo (opcional)</label>
-                <div className="grid md:grid-cols-2 gap-3">
-                  <select
-                    value={formData.attachmentType}
-                    onChange={(e) => setFormData(prev => ({ ...prev, attachmentType: e.target.value as any }))}
-                    className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+              <div className="p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-xl border border-blue-500/30">
+                <label className="block text-sm text-white font-medium mb-3">📎 Material de Apoyo (opcional)</label>
+                
+                {/* Botones de selección de tipo */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'none', attachmentUrl: '', attachmentData: '', attachmentName: '' }))}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      formData.attachmentType === 'none' 
+                        ? 'bg-gray-600 text-white' 
+                        : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                    }`}
                   >
-                    <option value="none">Sin adjunto</option>
-                    <option value="upload">Subir archivo</option>
-                    <option value="drive">Google Drive (enlace)</option>
-                    <option value="link">Enlace externo</option>
-                  </select>
+                    Sin adjunto
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'drive', attachmentData: '', attachmentName: '' }))}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                      formData.attachmentType === 'drive' 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    Google Drive (Recomendado)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'upload', attachmentUrl: '' }))}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      formData.attachmentType === 'upload' 
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                    }`}
+                  >
+                    Archivo pequeño (&lt;100KB)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'link', attachmentData: '', attachmentName: '' }))}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      formData.attachmentType === 'link' 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                    }`}
+                  >
+                    Otro enlace
+                  </button>
+                </div>
+
+                <div className="space-y-3">
                   {formData.attachmentType === 'upload' && (
                     <div className="col-span-2">
                       <div 
@@ -807,26 +849,43 @@ function AdminTareasContent() {
                       </div>
                     </div>
                   )}
-                  {(formData.attachmentType === 'drive' || formData.attachmentType === 'link') && (
-                    <input
-                      type="url"
-                      value={formData.attachmentUrl}
-                      onChange={(e) => setFormData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
-                      placeholder={
-                        formData.attachmentType === 'drive' 
-                          ? 'https://drive.google.com/...' 
-                          : 'https://...'
-                      }
-                      className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
-                    />
+                  {formData.attachmentType === 'drive' && (
+                    <div className="bg-blue-900/30 border border-blue-500/40 rounded-lg p-4">
+                      <p className="text-sm text-blue-200 mb-3 font-medium">📋 Pasos para compartir desde Google Drive:</p>
+                      <ol className="text-xs text-blue-300 space-y-1 mb-4 list-decimal list-inside">
+                        <li>Sube tu archivo a Google Drive</li>
+                        <li>Clic derecho → <strong>Compartir</strong></li>
+                        <li>Cambia a <strong>"Cualquier persona con el enlace"</strong></li>
+                        <li>Copia el enlace y pégalo aquí abajo</li>
+                      </ol>
+                      <input
+                        type="url"
+                        value={formData.attachmentUrl}
+                        onChange={(e) => setFormData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
+                        placeholder="Pega aquí el enlace de Google Drive..."
+                        className="w-full px-4 py-3 bg-dark-700 border border-blue-500/50 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+                      />
+                      {formData.attachmentUrl && (
+                        <p className="text-xs text-neon-green mt-2 flex items-center gap-1">✓ Enlace guardado correctamente</p>
+                      )}
+                    </div>
+                  )}
+                  {formData.attachmentType === 'link' && (
+                    <div className="bg-purple-900/30 border border-purple-500/40 rounded-lg p-4">
+                      <p className="text-sm text-purple-200 mb-3">🔗 Pega cualquier enlace externo:</p>
+                      <input
+                        type="url"
+                        value={formData.attachmentUrl}
+                        onChange={(e) => setFormData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
+                        placeholder="https://..."
+                        className="w-full px-4 py-3 bg-dark-700 border border-purple-500/50 rounded-lg text-white placeholder-gray-500 focus:border-purple-400 focus:outline-none"
+                      />
+                      {formData.attachmentUrl && (
+                        <p className="text-xs text-neon-green mt-2">✓ Enlace guardado</p>
+                      )}
+                    </div>
                   )}
                 </div>
-                {formData.attachmentUrl && formData.attachmentType !== 'upload' && (
-                  <p className="text-xs text-neon-green mt-2">✓ Enlace guardado</p>
-                )}
-                <p className="text-xs text-gray-500 mt-2">
-                  Sube un archivo (máx. 100KB) o pega un enlace de Google Drive para archivos más grandes.
-                </p>
               </div>
 
               {/* Questions */}
