@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { EDUCATION_LEVELS } from '@/lib/constants'
+import { useAuth } from '@/components/AuthProvider'
 import {
   FileCode, Clock, CheckCircle, AlertCircle, Eye, X,
   Award, Send, Filter, RefreshCw, Trash2, ChevronDown
@@ -12,6 +13,7 @@ interface Submission {
   taskId: string
   studentName: string
   levelId: string
+  courseId?: string
   code: string
   output: string
   submittedAt: string
@@ -21,7 +23,16 @@ interface Submission {
   gradedAt?: string
 }
 
+interface TeacherCourseAssignment {
+  courseId: string
+  levelId: string
+  courseName: string
+}
+
 export default function SubmissionsPanel() {
+  const { user, isAdmin, isTeacher } = useAuth()
+  const [teacherCourses, setTeacherCourses] = useState<TeacherCourseAssignment[]>([])
+  const [selectedCourse, setSelectedCourse] = useState<string>('')
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedLevel, setSelectedLevel] = useState('')
@@ -30,10 +41,39 @@ export default function SubmissionsPanel() {
   const [gradeInput, setGradeInput] = useState<number>(10)
   const [feedbackInput, setFeedbackInput] = useState('')
   const [saving, setSaving] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+
+  // Cargar cursos asignados al profesor
+  useEffect(() => {
+    async function loadTeacherCourses() {
+      if (isTeacher && !isAdmin && user?.accessCode) {
+        try {
+          const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
+          const data = await res.json()
+          if (data.assignments && data.assignments.length > 0) {
+            setTeacherCourses(data.assignments)
+          }
+        } catch (error) {
+          console.error('Error loading teacher courses:', error)
+        }
+      }
+    }
+    loadTeacherCourses()
+  }, [isTeacher, isAdmin, user])
+
+  // Niveles permitidos
+  const allowedLevels = useMemo(() => {
+    if (isAdmin) return EDUCATION_LEVELS
+    if (isTeacher && teacherCourses.length > 0) {
+      const allowedIds = new Set(teacherCourses.map(tc => tc.levelId))
+      return EDUCATION_LEVELS.filter(l => allowedIds.has(l.id))
+    }
+    return EDUCATION_LEVELS
+  }, [isAdmin, isTeacher, teacherCourses])
 
   useEffect(() => {
     loadSubmissions()
-  }, [selectedLevel, statusFilter])
+  }, [selectedLevel, statusFilter, selectedCourse, teacherCourses])
 
   const loadSubmissions = async () => {
     setLoading(true)
@@ -45,7 +85,27 @@ export default function SubmissionsPanel() {
       const res = await fetch(url)
       const data = await res.json()
       if (data.submissions) {
-        setSubmissions(data.submissions)
+        let filteredSubmissions = data.submissions
+        
+        // Si es profesor, filtrar por sus cursos asignados
+        if (isTeacher && !isAdmin && teacherCourses.length > 0) {
+          const allowedLevelIds = new Set(teacherCourses.map(tc => tc.levelId))
+          filteredSubmissions = data.submissions.filter((s: Submission) => 
+            allowedLevelIds.has(s.levelId)
+          )
+          
+          // Si hay curso seleccionado, filtrar más
+          if (selectedCourse) {
+            const courseLevel = teacherCourses.find(tc => tc.courseId === selectedCourse)?.levelId
+            if (courseLevel) {
+              filteredSubmissions = filteredSubmissions.filter((s: Submission) => 
+                s.levelId === courseLevel
+              )
+            }
+          }
+        }
+        
+        setSubmissions(filteredSubmissions)
       }
     } catch (error) {
       console.error('Error loading submissions:', error)
@@ -64,7 +124,7 @@ export default function SubmissionsPanel() {
           submissionId: selectedSubmission.id,
           grade: gradeInput,
           feedback: feedbackInput,
-          gradedBy: 'admin'
+          gradedBy: user?.email || 'admin'
         })
       })
       if (res.ok) {
@@ -85,7 +145,6 @@ export default function SubmissionsPanel() {
   // Sincronizar calificación con Airtable (tabla grades)
   const syncGradeToAirtable = async (submission: Submission, grade: number, feedback: string) => {
     try {
-      // Crear calificación en Airtable
       const response = await fetch('/api/grades', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -97,7 +156,7 @@ export default function SubmissionsPanel() {
           feedback: feedback,
           taskId: submission.taskId,
           submittedAt: submission.submittedAt || new Date().toISOString(),
-          gradedBy: 'admin'
+          gradedBy: user?.email || 'admin'
         })
       })
       
@@ -149,7 +208,6 @@ export default function SubmissionsPanel() {
 
   const pendingCount = submissions.filter(s => s.status === 'pending').length
   const gradedCount = submissions.filter(s => s.status === 'graded').length
-  const [syncing, setSyncing] = useState(false)
   
   // Sincronizar TODAS las entregas calificadas al sistema local
   const syncAllGradedSubmissions = async () => {
@@ -165,7 +223,7 @@ export default function SubmissionsPanel() {
     
     for (const submission of gradedSubmissions) {
       try {
-        syncGradeToAirtable(submission, submission.grade!, submission.feedback || '')
+        await syncGradeToAirtable(submission, submission.grade!, submission.feedback || '')
         synced++
       } catch (error) {
         console.error('Error syncing submission:', submission.id, error)
@@ -186,7 +244,7 @@ export default function SubmissionsPanel() {
             Entregas de Estudiantes
           </h2>
           <p className="text-gray-400 text-sm mt-1">
-            Tareas enviadas desde los simuladores
+            {isTeacher && !isAdmin ? 'Entregas de tus cursos asignados' : 'Tareas enviadas desde los simuladores'}
           </p>
         </div>
         
@@ -222,13 +280,31 @@ export default function SubmissionsPanel() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
+        {/* Selector de curso para profesores */}
+        {isTeacher && !isAdmin && teacherCourses.length > 0 && (
+          <select
+            value={selectedCourse}
+            onChange={(e) => {
+              setSelectedCourse(e.target.value)
+              const course = teacherCourses.find(tc => tc.courseId === e.target.value)
+              if (course) setSelectedLevel(course.levelId)
+            }}
+            className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+          >
+            <option value="">Todos mis cursos</option>
+            {teacherCourses.map(tc => (
+              <option key={tc.courseId} value={tc.courseId}>{tc.courseName}</option>
+            ))}
+          </select>
+        )}
+        
         <select
           value={selectedLevel}
           onChange={(e) => setSelectedLevel(e.target.value)}
           className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
         >
           <option value="">Todos los niveles</option>
-          {EDUCATION_LEVELS.map(level => (
+          {allowedLevels.map(level => (
             <option key={level.id} value={level.id}>{level.name}</option>
           ))}
         </select>
@@ -254,7 +330,9 @@ export default function SubmissionsPanel() {
           <Send className="w-12 h-12 text-gray-600 mx-auto mb-3" />
           <p className="text-gray-400">No hay entregas aún</p>
           <p className="text-gray-500 text-sm mt-1">
-            Los estudiantes pueden enviar tareas desde los simuladores
+            {isTeacher && !isAdmin && teacherCourses.length === 0 
+              ? 'No tienes cursos asignados. Contacta al administrador.'
+              : 'Los estudiantes pueden enviar tareas desde los simuladores'}
           </p>
         </div>
       ) : (
