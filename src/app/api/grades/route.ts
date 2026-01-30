@@ -104,6 +104,57 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'studentName y score son requeridos' }, { status: 400 })
     }
 
+    // Verificar si ya existe una calificación para este estudiante + tarea
+    if (studentName && taskId) {
+      const checkFilter = `AND({studentName}="${studentName}",{taskId}="${taskId}")`
+      const checkUrl = `${AIRTABLE_API_URL}?filterByFormula=${encodeURIComponent(checkFilter)}`
+      
+      try {
+        const checkRes = await fetch(checkUrl, {
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-store',
+        })
+        
+        if (checkRes.ok) {
+          const checkData = await checkRes.json()
+          if (checkData.records && checkData.records.length > 0) {
+            // Ya existe, actualizar en lugar de crear
+            const existingId = checkData.records[0].id
+            const updateRes = await fetch(`${AIRTABLE_API_URL}/${existingId}`, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                fields: {
+                  score: Number(score),
+                  feedback: feedback || '',
+                  gradedAt: new Date().toISOString(),
+                  gradedBy: gradedBy || 'admin'
+                }
+              })
+            })
+            
+            if (updateRes.ok) {
+              const updateData = await updateRes.json()
+              return NextResponse.json({ 
+                success: true, 
+                grade: updateData,
+                updated: true,
+                message: 'Calificación actualizada (ya existía)'
+              })
+            }
+          }
+        }
+      } catch (e) {
+        console.log('Error checking for existing grade, will create new:', e)
+      }
+    }
+
     // Solo incluir campos que no estén vacíos para evitar errores de Airtable
     const fields: Record<string, any> = {
       studentName,

@@ -317,39 +317,43 @@ export default function GradingPanel({ initialLevelId = '' }: GradingPanelProps)
   }
 
   const handleExportCSV = (type: 'students' | 'grades' | 'summary') => {
-    // Generar CSV desde los datos en memoria
-    let csv = ''
+    // Generar archivo Excel-compatible (TSV con extensión .xls)
+    // Usamos tabulador como separador que Excel interpreta correctamente
+    let content = ''
     let filename = ''
     const levelName = EDUCATION_LEVELS.find(l => l.id === selectedLevel)?.name || 'Todos'
     const dateStr = new Date().toISOString().slice(0, 10)
+    const SEP = '\t' // Tabulador para Excel
     
     if (type === 'students') {
-      csv = 'Nombre,Nivel,Email,Promedio,Total Calificaciones\n'
+      content = `Nombre${SEP}Nivel${SEP}Email${SEP}Promedio${SEP}Total Calificaciones\n`
       students.forEach(s => {
         const summary = summaries.find(sum => sum.studentName === s.name)
-        csv += `"${s.name}","${EDUCATION_LEVELS.find(l => l.id === s.levelId)?.name || s.levelId}","${s.email || ''}","${summary?.averageScore.toFixed(1) || 'N/A'}","${summary?.totalGrades || 0}"\n`
+        const lvlName = EDUCATION_LEVELS.find(l => l.id === s.levelId)?.name || s.levelId
+        content += `${s.name}${SEP}${lvlName}${SEP}${s.email || ''}${SEP}${summary?.averageScore.toFixed(1) || 'N/A'}${SEP}${summary?.totalGrades || 0}\n`
       })
-      filename = `estudiantes_${levelName}_${dateStr}.csv`
+      filename = `estudiantes_${levelName}_${dateStr}.xls`
     } else if (type === 'grades') {
-      csv = 'Estudiante,Nivel,Tarea ID,Calificación,Feedback,Fecha Entrega,Fecha Calificación,Calificado Por\n'
+      content = `Estudiante${SEP}Nivel${SEP}Tarea ID${SEP}Calificación${SEP}Feedback${SEP}Fecha Entrega${SEP}Fecha Calificación${SEP}Calificado Por\n`
       grades.forEach(g => {
         const levelNameG = EDUCATION_LEVELS.find(l => l.id === g.levelId)?.name || g.levelId
-        csv += `"${g.studentName}","${levelNameG}","${g.taskId || g.lessonId}","${g.score}","${(g.feedback || '').replace(/"/g, '""')}","${g.submittedAt}","${g.gradedAt || ''}","${g.gradedBy || ''}"\n`
+        const feedback = (g.feedback || '').replace(/\t/g, ' ').replace(/\n/g, ' ')
+        content += `${g.studentName}${SEP}${levelNameG}${SEP}${g.taskId || g.lessonId}${SEP}${g.score}${SEP}${feedback}${SEP}${g.submittedAt}${SEP}${g.gradedAt || ''}${SEP}${g.gradedBy || ''}\n`
       })
-      filename = `calificaciones_${levelName}_${dateStr}.csv`
+      filename = `calificaciones_${levelName}_${dateStr}.xls`
     } else if (type === 'summary') {
-      csv = 'Posición,Estudiante,Nivel,Promedio,Total Calificaciones,Lecciones Completadas,Última Actividad\n'
+      content = `Posición${SEP}Estudiante${SEP}Nivel${SEP}Promedio${SEP}Total Calificaciones${SEP}Lecciones Completadas${SEP}Última Actividad\n`
       const sortedSummaries = [...summaries].sort((a, b) => b.averageScore - a.averageScore)
       sortedSummaries.forEach((s, idx) => {
         const levelNameS = EDUCATION_LEVELS.find(l => l.id === s.levelId)?.name || s.levelId
-        csv += `"${idx + 1}","${s.studentName}","${levelNameS}","${s.averageScore.toFixed(1)}","${s.totalGrades}","${s.completedLessons}","${s.lastActivity}"\n`
+        content += `${idx + 1}${SEP}${s.studentName}${SEP}${levelNameS}${SEP}${s.averageScore.toFixed(1)}${SEP}${s.totalGrades}${SEP}${s.completedLessons}${SEP}${s.lastActivity}\n`
       })
-      filename = `resumen_ranking_${levelName}_${dateStr}.csv`
+      filename = `resumen_ranking_${levelName}_${dateStr}.xls`
     }
     
-    // Agregar BOM para Excel
+    // Agregar BOM para Excel y usar tipo application/vnd.ms-excel
     const BOM = '\uFEFF'
-    const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8' })
+    const blob = new Blob([BOM + content], { type: 'application/vnd.ms-excel;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -658,10 +662,10 @@ export default function GradingPanel({ initialLevelId = '' }: GradingPanelProps)
                     </tr>
                   ) : (
                     grades.map(grade => {
-                      const student = students.find(s => s.id === grade.studentId)
+                      const student = students.find(s => s.id === grade.studentId || s.name === grade.studentName)
                       return (
                         <tr key={grade.id} className="hover:bg-dark-700/50">
-                          <td className="px-4 py-3 text-white">{student?.name || 'Desconocido'}</td>
+                          <td className="px-4 py-3 text-white">{grade.studentName || student?.name || 'Desconocido'}</td>
                           <td className="px-4 py-3 text-gray-400">{grade.lessonId}</td>
                           <td className="px-4 py-3 text-center">
                             <span className={`px-3 py-1 rounded-full font-bold ${getScoreBg(grade.score)} ${getScoreColor(grade.score)}`}>
