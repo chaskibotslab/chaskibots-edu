@@ -101,7 +101,8 @@ function AdminTareasContent() {
     attachmentUrl: '',
     attachmentType: 'none' as 'none' | 'drive' | 'link' | 'upload',
     attachmentData: '',
-    attachmentName: ''
+    attachmentName: '',
+    attachmentMimeType: ''
   })
 
   // Sincronizar selectedLevel con urlLevelId cuando cambie
@@ -211,7 +212,8 @@ function AdminTareasContent() {
       attachmentUrl: '',
       attachmentType: 'none',
       attachmentData: '',
-      attachmentName: ''
+      attachmentName: '',
+      attachmentMimeType: ''
     })
     setShowModal(true)
   }
@@ -249,7 +251,8 @@ function AdminTareasContent() {
       attachmentUrl: (task as any).attachmentUrl || '',
       attachmentType: (task as any).attachmentType || 'none',
       attachmentData: '',
-      attachmentName: ''
+      attachmentName: '',
+      attachmentMimeType: ''
     })
     setShowModal(true)
   }
@@ -748,7 +751,8 @@ function AdminTareasContent() {
                                 ...prev, 
                                 attachmentData: base64,
                                 attachmentName: file.name,
-                                attachmentType: 'upload'
+                                attachmentType: 'upload',
+                                attachmentMimeType: file.type || 'application/octet-stream'
                               }));
                             };
                             reader.readAsDataURL(file);
@@ -767,7 +771,8 @@ function AdminTareasContent() {
                                   ...prev, 
                                   attachmentData: base64,
                                   attachmentName: file.name,
-                                  attachmentType: 'upload'
+                                  attachmentType: 'upload',
+                                  attachmentMimeType: file.type || 'application/octet-stream'
                                 }));
                               };
                               reader.readAsDataURL(file);

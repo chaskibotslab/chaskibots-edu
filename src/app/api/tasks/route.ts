@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { levelId, title, description, type, category, difficulty, points, dueDate, questions, attachmentUrl, attachmentType, attachmentData, attachmentName } = body
+    const { levelId, title, description, type, category, difficulty, points, dueDate, questions, attachmentUrl, attachmentType, attachmentData, attachmentName, attachmentMimeType } = body
 
     if (!levelId || !title) {
       return NextResponse.json(
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
         const driveResult = await uploadFileToDrive(
           attachmentData,
           attachmentName,
-          attachmentType || 'application/octet-stream',
+          attachmentMimeType || 'application/octet-stream',
           'Tareas-Docente',
           'docente',
           levelId
@@ -227,7 +227,7 @@ export async function PATCH(request: NextRequest) {
         const driveResult = await uploadFileToDrive(
           updates.attachmentData,
           updates.attachmentName,
-          updates.attachmentType || 'application/octet-stream',
+          updates.attachmentMimeType || 'application/octet-stream',
           'Tareas-Docente',
           'docente',
           updates.levelId || 'general'
