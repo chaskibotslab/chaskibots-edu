@@ -589,18 +589,20 @@ export async function createCourse(
   schoolName?: string
 ): Promise<{ success: boolean; course?: Course; error?: string }> {
   try {
+    // Nota: courses_catalog NO tiene campo teacherId, solo teacherName
+    const courseId = `curso-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`
     const record = await createRecord(COURSES_TABLE, {
+      id: courseId,
       name,
       description: description || '',
       levelId,
-      teacherId,
-      teacherName,
+      teacherName: teacherName || '',
       schoolId: schoolId || '',
       schoolName: schoolName || '',
       maxStudents,
       currentStudents: 0,
       isActive: true,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString().split('T')[0]
     })
 
     const course: Course = {

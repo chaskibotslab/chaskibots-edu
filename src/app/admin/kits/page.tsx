@@ -443,7 +443,7 @@ export default function KitsAdminPage() {
               </button>
               <button
                 onClick={handleSave}
-                disabled={saving || !formData.levelId || !formData.name}
+                disabled={saving || (isCreating && (!formData.levelId || !formData.name))}
                 className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? (
