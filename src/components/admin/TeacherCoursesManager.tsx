@@ -285,9 +285,11 @@ export default function TeacherCoursesManager() {
           className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
         >
           <option value="all">Todos los profesores</option>
-          {teachers.map(teacher => (
-            <option key={teacher.accessCode} value={teacher.accessCode}>{teacher.name}</option>
-          ))}
+          {teachers
+            .filter(t => filterSchool === 'all' || t.schoolId === filterSchool)
+            .map(teacher => (
+              <option key={teacher.accessCode} value={teacher.accessCode}>{teacher.name}</option>
+            ))}
         </select>
       </div>
 
@@ -308,11 +310,13 @@ export default function TeacherCoursesManager() {
               className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
             >
               <option value="">-- Seleccionar profesor --</option>
-              {teachers.map(teacher => (
-                <option key={teacher.accessCode} value={teacher.accessCode}>
-                  {teacher.name} {teacher.schoolName ? `(${teacher.schoolName})` : ''}
-                </option>
-              ))}
+              {teachers
+                .filter(t => filterSchool === 'all' || t.schoolId === filterSchool)
+                .map(teacher => (
+                  <option key={teacher.accessCode} value={teacher.accessCode}>
+                    {teacher.name} {teacher.schoolName ? `(${teacher.schoolName})` : ''}
+                  </option>
+                ))}
             </select>
           </div>
 

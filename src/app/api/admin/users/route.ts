@@ -149,6 +149,9 @@ export async function POST(request: NextRequest) {
     const finalCourseId = courseId || ''
     const finalCourseName = courseName || ''
 
+    // Obtener schoolId y schoolName del body
+    const { schoolId, schoolName } = body
+
     const result = await createCourseUser(
       name,
       role,
@@ -158,7 +161,9 @@ export async function POST(request: NextRequest) {
       email,
       expiresAt,
       programId || '',
-      programName || ''
+      programName || '',
+      schoolId || '',
+      schoolName || ''
     )
 
     if (!result.success) {
@@ -166,6 +171,42 @@ export async function POST(request: NextRequest) {
         { success: false, error: result.error },
         { status: 400 }
       )
+    }
+
+    // Si es profesor y tiene curso asignado, crear entrada en teacher_courses
+    if (role === 'teacher' && finalCourseId && result.user?.accessCode) {
+      try {
+        const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
+        const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
+        const TEACHER_COURSES_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/teacher_courses`
+        
+        const assignmentId = `tc-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`
+        
+        const assignmentFields = {
+          id: assignmentId,
+          teacherId: result.user.accessCode,
+          teacherName: name,
+          courseId: finalCourseId,
+          courseName: finalCourseName,
+          levelId: levelId,
+          schoolId: schoolId || '',
+          schoolName: schoolName || '',
+          createdAt: new Date().toISOString().split('T')[0]
+        }
+        
+        await fetch(TEACHER_COURSES_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ records: [{ fields: assignmentFields }] }),
+        })
+        console.log('[API Users] Created teacher_courses assignment for new teacher')
+      } catch (assignError) {
+        console.error('[API Users] Error creating teacher_courses assignment:', assignError)
+        // No fallar la creación del usuario por esto
+      }
     }
 
     return NextResponse.json({
