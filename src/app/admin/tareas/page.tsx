@@ -102,6 +102,13 @@ function AdminTareasContent() {
     attachmentType: 'none' as 'none' | 'drive' | 'link' | 'pdf'
   })
 
+  // Sincronizar selectedLevel con urlLevelId cuando cambie
+  useEffect(() => {
+    if (urlLevelId && urlLevelId !== selectedLevel) {
+      setSelectedLevel(urlLevelId)
+    }
+  }, [urlLevelId])
+
   // Cargar asignaciones de cursos para profesores
   useEffect(() => {
     async function loadTeacherCourses() {
@@ -137,12 +144,16 @@ function AdminTareasContent() {
       const allowedIds = new Set(teacherCourses.map(tc => tc.levelId))
       return EDUCATION_LEVELS.filter(l => allowedIds.has(l.id))
     }
+    // Fallback: si viene levelId de la URL, mostrar ese nivel
+    if (urlLevelId) {
+      return EDUCATION_LEVELS.filter(l => l.id === urlLevelId)
+    }
     // Fallback: usar levelId del usuario
     if (user?.levelId) {
       return EDUCATION_LEVELS.filter(l => l.id === user.levelId)
     }
     return []
-  }, [isAdmin, isTeacher, teacherCourses, user])
+  }, [isAdmin, isTeacher, teacherCourses, user, urlLevelId])
 
   useEffect(() => {
     if (user !== null) {
@@ -183,8 +194,10 @@ function AdminTareasContent() {
 
   const openCreateModal = () => {
     setEditingTask(null)
+    // Usar el nivel seleccionado, o el de la URL, o el primero permitido
+    const defaultLevel = selectedLevel || urlLevelId || (allowedLevels.length > 0 ? allowedLevels[0].id : '')
     setFormData({
-      levelId: selectedLevel || '',
+      levelId: defaultLevel,
       title: '',
       description: '',
       type: 'concept',
