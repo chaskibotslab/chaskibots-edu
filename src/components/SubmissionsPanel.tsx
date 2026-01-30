@@ -21,6 +21,8 @@ interface Submission {
   grade?: number
   feedback?: string
   gradedAt?: string
+  drawing?: string
+  files?: string
 }
 
 interface TeacherCourseAssignment {
