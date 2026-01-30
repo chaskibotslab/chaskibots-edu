@@ -7,6 +7,12 @@ const SCOPES = ['https://www.googleapis.com/auth/drive.file']
 // ID de la carpeta principal de ChaskiBots en Drive (ChaskiBots-EDU compartida)
 const MAIN_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || '1kX397yuC2Nbvys9tYCHpvpI04iJ3OxO8'
 
+// Carpeta específica para archivos del docente
+const TEACHER_FOLDER_ID = process.env.GOOGLE_DRIVE_TEACHER_FOLDER_ID || '1HLKy4aNlrzKMccj0X81ViS0Kfa8h2Z1N'
+
+// Carpeta específica para archivos de estudiantes
+const STUDENT_FOLDER_ID = process.env.GOOGLE_DRIVE_STUDENT_FOLDER_ID || '1PbkQEuf4cPR74nmQ8vFhm2u_Tsu9Aysc'
+
 // Función para formatear la clave privada correctamente
 function formatPrivateKey(key: string): string {
   if (!key) return ''
@@ -43,7 +49,13 @@ const credentials = {
 
 // Verificar si Drive está configurado correctamente
 export function isDriveConfigured(): boolean {
-  return !!(process.env.GOOGLE_PRIVATE_KEY && process.env.GOOGLE_CLIENT_EMAIL)
+  const hasPrivateKey = !!process.env.GOOGLE_PRIVATE_KEY
+  const hasClientEmail = !!process.env.GOOGLE_CLIENT_EMAIL
+  console.log(`[Drive] Config check - Private Key: ${hasPrivateKey}, Client Email: ${hasClientEmail}`)
+  if (hasClientEmail) {
+    console.log(`[Drive] Client Email: ${process.env.GOOGLE_CLIENT_EMAIL}`)
+  }
+  return hasPrivateKey && hasClientEmail
 }
 
 // Crear cliente de autenticación
@@ -97,22 +109,29 @@ export async function uploadFileToDrive(
   studentName: string,
   taskId: string
 ): Promise<{ fileId: string; webViewLink: string; webContentLink: string }> {
+  console.log(`[Drive] uploadFileToDrive called with:`)
+  console.log(`[Drive]   fileName: ${fileName}`)
+  console.log(`[Drive]   mimeType: ${mimeType}`)
+  console.log(`[Drive]   levelId: ${levelId}`)
+  console.log(`[Drive]   studentName: ${studentName}`)
+  console.log(`[Drive]   taskId: ${taskId}`)
+  console.log(`[Drive]   fileContent length: ${typeof fileContent === 'string' ? fileContent.length : 'buffer'}`)
+  
   try {
     const drive = getDriveClient()
+    console.log(`[Drive] Drive client created successfully`)
 
     let targetFolderId: string
 
-    // Si es archivo del docente, usar carpeta diferente
+    // Si es archivo del docente, usar carpeta del docente directamente
     if (studentName === 'docente') {
-      // Estructura para docentes: Tareas-Docente > Nivel
-      const docenteFolderId = await getOrCreateFolder(drive, 'Tareas-Docente', MAIN_FOLDER_ID)
-      targetFolderId = await getOrCreateFolder(drive, levelId, docenteFolderId)
+      // Subir directamente a la carpeta del docente (sin subcarpetas)
+      console.log(`[Drive] Uploading teacher file to folder: ${TEACHER_FOLDER_ID}`)
+      targetFolderId = TEACHER_FOLDER_ID
     } else {
-      // Estructura para estudiantes: Entregas-Estudiantes > Nivel > Tarea > Estudiante
-      const entregasFolderId = await getOrCreateFolder(drive, 'Entregas-Estudiantes', MAIN_FOLDER_ID)
-      const levelFolderId = await getOrCreateFolder(drive, levelId, entregasFolderId)
-      const taskFolderId = await getOrCreateFolder(drive, taskId, levelFolderId)
-      targetFolderId = await getOrCreateFolder(drive, studentName.replace(/[^a-zA-Z0-9]/g, '_'), taskFolderId)
+      // Subir directamente a la carpeta de estudiantes (sin subcarpetas)
+      console.log(`[Drive] Uploading student file to folder: ${STUDENT_FOLDER_ID}`)
+      targetFolderId = STUDENT_FOLDER_ID
     }
 
     // Preparar el contenido del archivo
@@ -145,6 +164,8 @@ export async function uploadFileToDrive(
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
     const finalFileName = `${timestamp}_${fileName}`
 
+    console.log(`[Drive] Creating file: ${finalFileName} in folder: ${targetFolderId}`)
+    
     const file = await drive.files.create({
       requestBody: {
         name: finalFileName,
@@ -153,6 +174,8 @@ export async function uploadFileToDrive(
       media,
       fields: 'id, webViewLink, webContentLink',
     })
+
+    console.log(`[Drive] File created with ID: ${file.data.id}`)
 
     const fileId = file.data.id as string
 
@@ -165,13 +188,16 @@ export async function uploadFileToDrive(
       },
     })
 
+    console.log(`[Drive] Permissions set. WebViewLink: ${file.data.webViewLink}`)
+
     return {
       fileId: fileId,
       webViewLink: file.data.webViewLink || `https://drive.google.com/file/d/${fileId}/view`,
       webContentLink: file.data.webContentLink || `https://drive.google.com/uc?export=download&id=${fileId}`,
     }
-  } catch (error) {
-    console.error('Error uploading to Drive:', error)
+  } catch (error: any) {
+    console.error('[Drive] Error uploading to Drive:', error?.message || error)
+    console.error('[Drive] Error details:', JSON.stringify(error?.response?.data || error, null, 2))
     throw error
   }
 }
