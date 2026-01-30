@@ -99,7 +99,9 @@ function AdminTareasContent() {
     dueDate: '',
     questions: [{ text: '', type: 'text' as Question['type'], options: [] as string[] }],
     attachmentUrl: '',
-    attachmentType: 'none' as 'none' | 'drive' | 'link' | 'pdf'
+    attachmentType: 'none' as 'none' | 'drive' | 'link' | 'upload',
+    attachmentData: '',
+    attachmentName: ''
   })
 
   // Sincronizar selectedLevel con urlLevelId cuando cambie
@@ -207,7 +209,9 @@ function AdminTareasContent() {
       dueDate: '',
       questions: [{ text: '', type: 'text', options: [] }],
       attachmentUrl: '',
-      attachmentType: 'none'
+      attachmentType: 'none',
+      attachmentData: '',
+      attachmentName: ''
     })
     setShowModal(true)
   }
@@ -243,7 +247,9 @@ function AdminTareasContent() {
       dueDate: task.dueDate || '',
       questions: parseQuestions(task.questions),
       attachmentUrl: (task as any).attachmentUrl || '',
-      attachmentType: (task as any).attachmentType || 'none'
+      attachmentType: (task as any).attachmentType || 'none',
+      attachmentData: '',
+      attachmentName: ''
     })
     setShowModal(true)
   }
@@ -721,11 +727,72 @@ function AdminTareasContent() {
                     className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
                   >
                     <option value="none">Sin adjunto</option>
-                    <option value="drive">Google Drive</option>
+                    <option value="upload">Subir archivo</option>
+                    <option value="drive">Google Drive (enlace)</option>
                     <option value="link">Enlace externo</option>
-                    <option value="pdf">PDF / Documento</option>
                   </select>
-                  {formData.attachmentType !== 'none' && (
+                  {formData.attachmentType === 'upload' && (
+                    <div className="col-span-2">
+                      <div 
+                        className="border-2 border-dashed border-dark-500 rounded-lg p-4 text-center hover:border-neon-cyan/50 transition-colors cursor-pointer"
+                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onDrop={async (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const file = e.dataTransfer.files[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              const base64 = reader.result as string;
+                              setFormData(prev => ({ 
+                                ...prev, 
+                                attachmentData: base64,
+                                attachmentName: file.name,
+                                attachmentType: 'upload'
+                              }));
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.onchange = (e) => {
+                            const file = (e.target as HTMLInputElement).files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = () => {
+                                const base64 = reader.result as string;
+                                setFormData(prev => ({ 
+                                  ...prev, 
+                                  attachmentData: base64,
+                                  attachmentName: file.name,
+                                  attachmentType: 'upload'
+                                }));
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          };
+                          input.click();
+                        }}
+                      >
+                        {(formData as any).attachmentName ? (
+                          <div className="text-neon-green">
+                            <Upload className="w-6 h-6 mx-auto mb-2" />
+                            <p className="text-sm">{(formData as any).attachmentName}</p>
+                            <p className="text-xs text-gray-400 mt-1">Clic para cambiar</p>
+                          </div>
+                        ) : (
+                          <div className="text-gray-400">
+                            <Upload className="w-6 h-6 mx-auto mb-2" />
+                            <p className="text-sm">Arrastra un archivo aquí o haz clic para seleccionar</p>
+                            <p className="text-xs mt-1">PDF, Word, imagen, etc.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {(formData.attachmentType === 'drive' || formData.attachmentType === 'link') && (
                     <input
                       type="url"
                       value={formData.attachmentUrl}
@@ -733,16 +800,17 @@ function AdminTareasContent() {
                       placeholder={
                         formData.attachmentType === 'drive' 
                           ? 'https://drive.google.com/...' 
-                          : formData.attachmentType === 'pdf'
-                          ? 'URL del PDF o documento'
                           : 'https://...'
                       }
                       className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
                     />
                   )}
                 </div>
+                {formData.attachmentUrl && formData.attachmentType !== 'upload' && (
+                  <p className="text-xs text-neon-green mt-2">✓ Enlace guardado</p>
+                )}
                 <p className="text-xs text-gray-500 mt-2">
-                  Puedes adjuntar un enlace a Google Drive, un PDF o cualquier recurso externo para los estudiantes.
+                  Sube un archivo o pega un enlace. Los archivos se guardan automáticamente en Google Drive.
                 </p>
               </div>
 
