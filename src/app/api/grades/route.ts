@@ -136,13 +136,23 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Airtable grades error:', errorText)
+      console.error('Airtable grades POST error:', response.status, errorText)
       // Si la tabla no existe, dar mensaje claro
       if (errorText.includes('NOT_FOUND') || errorText.includes('TABLE_NOT_FOUND')) {
         return NextResponse.json({ 
           error: 'Tabla grades no existe en Airtable', 
           message: 'Crea una tabla llamada "grades" con los campos: studentName, score, gradedAt, studentId, lessonId, levelId, courseId, schoolId, submittedAt, feedback, taskId, gradedBy' 
-        }, { status: 500 })
+        }, { status: 404 })
+      }
+      // Si hay error de campo desconocido
+      if (errorText.includes('UNKNOWN_FIELD_NAME')) {
+        const match = errorText.match(/Unknown field name: \\"([^"]+)\\"/)
+        const fieldName = match ? match[1] : 'desconocido'
+        return NextResponse.json({ 
+          error: `Campo "${fieldName}" no existe en la tabla grades de Airtable`,
+          message: `Agrega el campo "${fieldName}" a tu tabla grades en Airtable, o verifica que el nombre sea correcto.`,
+          details: errorText
+        }, { status: 422 })
       }
       return NextResponse.json({ error: 'Error creating grade', details: errorText }, { status: 500 })
     }
