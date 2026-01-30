@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { uploadFileToDrive, isDriveConfigured } from '@/lib/googleDrive'
+
+// Carpeta del docente en Google Drive
+const DOCENTE_FOLDER_ID = '1HLKy4aNlrzKMccj0X81ViS0Kfa8h2Z1N'
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
@@ -120,13 +124,34 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { levelId, title, description, type, category, difficulty, points, dueDate, questions, attachmentUrl, attachmentType } = body
+    const { levelId, title, description, type, category, difficulty, points, dueDate, questions, attachmentUrl, attachmentType, attachmentData, attachmentName } = body
 
     if (!levelId || !title) {
       return NextResponse.json(
         { error: 'levelId y title son requeridos' },
         { status: 400 }
       )
+    }
+
+    // Si hay archivo adjunto con datos base64, subirlo a Google Drive
+    let finalAttachmentUrl = attachmentUrl || ''
+    if (attachmentData && attachmentName && isDriveConfigured()) {
+      try {
+        console.log(`Uploading teacher file to Drive: ${attachmentName}`)
+        const driveResult = await uploadFileToDrive(
+          attachmentData,
+          attachmentName,
+          attachmentType || 'application/octet-stream',
+          'Tareas-Docente',
+          'docente',
+          levelId
+        )
+        finalAttachmentUrl = driveResult.webViewLink
+        console.log(`Teacher file uploaded to Drive: ${finalAttachmentUrl}`)
+      } catch (driveError) {
+        console.error('Error uploading teacher file to Drive:', driveError)
+        // Continuar sin el archivo si falla
+      }
     }
 
     // Convertir array de preguntas a string separado por |
@@ -137,7 +162,7 @@ export async function POST(request: NextRequest) {
     // Construir campos - solo incluir los que existen en Airtable
     // NOTA: type, category, difficulty y attachmentUrl se guardan como prefijo en description
     // Formato: [type|category|difficulty|attachmentUrl] descripcion
-    const metaPrefix = `[${type || 'concept'}|${category || 'general'}|${difficulty || 'basico'}|${attachmentUrl || ''}]`
+    const metaPrefix = `[${type || 'concept'}|${category || 'general'}|${difficulty || 'basico'}|${finalAttachmentUrl}]`
     const fullDescription = `${metaPrefix} ${description || ''}`
     
     const fields: Record<string, any> = {
@@ -194,6 +219,26 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'taskId es requerido' }, { status: 400 })
     }
 
+    // Si hay archivo adjunto con datos base64, subirlo a Google Drive
+    let finalAttachmentUrl = updates.attachmentUrl || ''
+    if (updates.attachmentData && updates.attachmentName && isDriveConfigured()) {
+      try {
+        console.log(`Uploading teacher file to Drive: ${updates.attachmentName}`)
+        const driveResult = await uploadFileToDrive(
+          updates.attachmentData,
+          updates.attachmentName,
+          updates.attachmentType || 'application/octet-stream',
+          'Tareas-Docente',
+          'docente',
+          updates.levelId || 'general'
+        )
+        finalAttachmentUrl = driveResult.webViewLink
+        console.log(`Teacher file uploaded to Drive: ${finalAttachmentUrl}`)
+      } catch (driveError) {
+        console.error('Error uploading teacher file to Drive:', driveError)
+      }
+    }
+
     // Solo campos que existen en Airtable
     const fields: Record<string, any> = {}
     
@@ -205,8 +250,8 @@ export async function PATCH(request: NextRequest) {
     
     // type, category, difficulty y attachmentUrl se guardan como prefijo en description
     // Formato: [type|category|difficulty|attachmentUrl] descripcion
-    if (updates.description !== undefined || updates.type !== undefined || updates.category !== undefined || updates.difficulty !== undefined || updates.attachmentUrl !== undefined) {
-      const metaPrefix = `[${updates.type || 'concept'}|${updates.category || 'general'}|${updates.difficulty || 'basico'}|${updates.attachmentUrl || ''}]`
+    if (updates.description !== undefined || updates.type !== undefined || updates.category !== undefined || updates.difficulty !== undefined || finalAttachmentUrl) {
+      const metaPrefix = `[${updates.type || 'concept'}|${updates.category || 'general'}|${updates.difficulty || 'basico'}|${finalAttachmentUrl}]`
       fields.description = `${metaPrefix} ${updates.description || ''}`
     }
     
