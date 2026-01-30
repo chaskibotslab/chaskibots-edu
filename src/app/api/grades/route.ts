@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
     // Solo incluir campos que no estén vacíos para evitar errores de Airtable
     const fields: Record<string, any> = {
       studentName,
-      score: String(score),
+      score: Number(score),
       gradedAt: new Date().toISOString(),
     }
     
