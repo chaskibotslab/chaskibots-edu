@@ -744,6 +744,11 @@ function AdminTareasContent() {
                           e.stopPropagation();
                           const file = e.dataTransfer.files[0];
                           if (file) {
+                            // Validar tamaño máximo: 500KB
+                            if (file.size > 500 * 1024) {
+                              alert('⚠️ El archivo es muy grande. Máximo permitido: 500KB.\n\nPara archivos más grandes, sube el archivo a Google Drive manualmente y pega el enlace.');
+                              return;
+                            }
                             const reader = new FileReader();
                             reader.onload = () => {
                               const base64 = reader.result as string;
@@ -764,6 +769,11 @@ function AdminTareasContent() {
                           input.onchange = (e) => {
                             const file = (e.target as HTMLInputElement).files?.[0];
                             if (file) {
+                              // Validar tamaño máximo: 500KB
+                              if (file.size > 500 * 1024) {
+                                alert('⚠️ El archivo es muy grande. Máximo permitido: 500KB.\n\nPara archivos más grandes, sube el archivo a Google Drive manualmente y pega el enlace.');
+                                return;
+                              }
                               const reader = new FileReader();
                               reader.onload = () => {
                                 const base64 = reader.result as string;
@@ -791,7 +801,7 @@ function AdminTareasContent() {
                           <div className="text-gray-400">
                             <Upload className="w-6 h-6 mx-auto mb-2" />
                             <p className="text-sm">Arrastra un archivo aquí o haz clic para seleccionar</p>
-                            <p className="text-xs mt-1">PDF, Word, imagen, etc.</p>
+                            <p className="text-xs mt-1">PDF, Word, imagen, etc. <span className="text-yellow-400">(máx. 500KB)</span></p>
                           </div>
                         )}
                       </div>
@@ -815,7 +825,7 @@ function AdminTareasContent() {
                   <p className="text-xs text-neon-green mt-2">✓ Enlace guardado</p>
                 )}
                 <p className="text-xs text-gray-500 mt-2">
-                  Sube un archivo o pega un enlace. Los archivos se guardan automáticamente en Google Drive.
+                  Sube un archivo (máx. 500KB) o pega un enlace de Google Drive para archivos más grandes.
                 </p>
               </div>
 
