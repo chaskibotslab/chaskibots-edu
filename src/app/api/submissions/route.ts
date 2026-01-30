@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { uploadFileToDrive, isDriveConfigured } from '@/lib/googleDrive'
 
-// API Submissions - v3 (2026-01-30) - Fixed file attachments
+// API Submissions - v4 (2026-01-30) - Upload files to Google Drive
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
 const AIRTABLE_SUBMISSIONS_TABLE = 'submissions'
@@ -138,32 +139,74 @@ export async function POST(request: NextRequest) {
       attachments.push('🎨 Dibujo incluido')
     }
     
-    // Guardar archivos - pueden ser URLs de Google Drive o datos base64
+    // Guardar archivos - subir a Google Drive si está configurado
     let filesData = ''
     if (files && files.length > 0) {
-      // Guardar metadata con URLs o datos base64
-      // Limitar tamaño total de archivos a 90KB para evitar errores de Airtable
-      const maxFilesSize = 90000
-      const filesWithData = files.map((f: any) => ({
-        name: f.name,
-        type: f.type,
-        url: f.url || '',
-        data: f.data || '' // Incluir datos base64 si existen
-      }))
+      const processedFiles = []
       
-      const filesJson = JSON.stringify(filesWithData)
-      if (filesJson.length <= maxFilesSize) {
-        filesData = filesJson
-      } else {
-        // Si es muy grande, guardar solo metadata sin datos
-        console.log('Files data too large, saving without base64:', filesJson.length, 'chars')
-        filesData = JSON.stringify(files.map((f: any) => ({
-          name: f.name,
-          type: f.type,
-          url: f.url || '',
-          data: '' // Sin datos por tamaño
-        })))
+      for (const f of files) {
+        // Si ya tiene URL de Drive, usarla directamente
+        if (f.url) {
+          processedFiles.push({
+            name: f.name,
+            type: f.type,
+            url: f.url,
+            data: ''
+          })
+        } 
+        // Si tiene datos base64 y Drive está configurado, subir a Drive
+        else if (f.data && isDriveConfigured()) {
+          try {
+            console.log(`Uploading file to Drive: ${f.name}`)
+            const driveResult = await uploadFileToDrive(
+              f.data,
+              f.name,
+              f.type || 'application/octet-stream',
+              levelId || 'sin-nivel',
+              studentName,
+              taskId
+            )
+            processedFiles.push({
+              name: f.name,
+              type: f.type,
+              url: driveResult.webViewLink,
+              data: '' // No guardar base64, solo el enlace de Drive
+            })
+            console.log(`File uploaded to Drive: ${driveResult.webViewLink}`)
+          } catch (driveError) {
+            console.error('Error uploading to Drive:', driveError)
+            // Si falla Drive, guardar base64 si es pequeño
+            const maxSize = 90000
+            if (f.data.length <= maxSize) {
+              processedFiles.push({
+                name: f.name,
+                type: f.type,
+                url: '',
+                data: f.data
+              })
+            } else {
+              processedFiles.push({
+                name: f.name,
+                type: f.type,
+                url: '',
+                data: '' // Muy grande y Drive falló
+              })
+            }
+          }
+        }
+        // Sin Drive configurado, guardar base64 si es pequeño
+        else if (f.data) {
+          const maxSize = 90000
+          processedFiles.push({
+            name: f.name,
+            type: f.type,
+            url: '',
+            data: f.data.length <= maxSize ? f.data : ''
+          })
+        }
       }
+      
+      filesData = JSON.stringify(processedFiles)
       attachments.push(`📎 ${files.length} archivo(s): ${files.map((f: any) => f.name).join(', ')}`)
     }
 
