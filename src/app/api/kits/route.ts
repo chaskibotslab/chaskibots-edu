@@ -72,7 +72,7 @@ export async function GET(request: Request) {
       return {
         id: record.id,
         levelId: record.fields.levelId || '',
-        name: record.fields.Name || '',
+        name: record.fields.name || record.fields.Name || '',
         description: record.fields.description || '',
         components: record.fields.components ? record.fields.components.split(',').map((c: string) => c.trim()) : [],
         skills: record.fields.skills ? record.fields.skills.split(',').map((s: string) => s.trim()) : [],
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         records: [{
           fields: {
-            Name: body.name,
+            name: body.name,
             levelId: body.levelId,
             description: body.description,
             price: body.price,
@@ -146,15 +146,15 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'ID is required', message: 'ID is required' }, { status: 400 })
     }
 
-    // Campos que existen en Airtable según la tabla del usuario:
-    // Name, levelId, description, components, skills, image_urls, price, videoUrl, tutorialUrl
+    // Campos que existen en Airtable según el CSV:
+    // id, levelId, name, description, components, skills, images, videoUrl, tutorialUrl
     const fields: Record<string, any> = {}
-    if (body.name) fields.Name = body.name
+    if (body.name) fields.name = body.name
     if (body.levelId) fields.levelId = body.levelId
     if (body.description) fields.description = body.description
     if (body.components) fields.components = body.components
     if (body.skills) fields.skills = body.skills
-    if (body.image_urls !== undefined) fields.image_urls = body.image_urls
+    if (body.image_urls !== undefined) fields.images = body.image_urls
     if (body.price !== undefined) fields.price = Number(body.price) || 0
     if (body.videoUrl !== undefined) fields.videoUrl = body.videoUrl
     if (body.tutorialUrl !== undefined) fields.tutorialUrl = body.tutorialUrl

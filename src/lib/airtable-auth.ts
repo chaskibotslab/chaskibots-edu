@@ -590,20 +590,25 @@ export async function createCourse(
 ): Promise<{ success: boolean; course?: Course; error?: string }> {
   try {
     // Nota: courses_catalog NO tiene campo teacherId, solo teacherName
+    // Solo enviar campos con valores para evitar error INVALID_MULTIPLE_CHOICE_OPTIONS
     const courseId = `curso-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`
-    const record = await createRecord(COURSES_TABLE, {
+    const fields: Record<string, unknown> = {
       id: courseId,
       name,
-      description: description || '',
       levelId,
-      teacherName: teacherName || '',
-      schoolId: schoolId || '',
-      schoolName: schoolName || '',
       maxStudents,
       currentStudents: 0,
       isActive: true,
       createdAt: new Date().toISOString().split('T')[0]
-    })
+    }
+    
+    // Solo agregar campos opcionales si tienen valor
+    if (description && description.trim() !== '') fields.description = description
+    if (teacherName && teacherName.trim() !== '') fields.teacherName = teacherName
+    if (schoolId && schoolId.trim() !== '') fields.schoolId = schoolId
+    if (schoolName && schoolName.trim() !== '') fields.schoolName = schoolName
+    
+    const record = await createRecord(COURSES_TABLE, fields)
 
     const course: Course = {
       id: record.id,
