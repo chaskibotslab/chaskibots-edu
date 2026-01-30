@@ -100,11 +100,20 @@ export async function uploadFileToDrive(
   try {
     const drive = getDriveClient()
 
-    // Crear estructura de carpetas: Entregas > Nivel > Tarea > Estudiante
-    const entregasFolderId = await getOrCreateFolder(drive, 'Entregas-Estudiantes', MAIN_FOLDER_ID)
-    const levelFolderId = await getOrCreateFolder(drive, levelId, entregasFolderId)
-    const taskFolderId = await getOrCreateFolder(drive, taskId, levelFolderId)
-    const studentFolderId = await getOrCreateFolder(drive, studentName.replace(/[^a-zA-Z0-9]/g, '_'), taskFolderId)
+    let targetFolderId: string
+
+    // Si es archivo del docente, usar carpeta diferente
+    if (studentName === 'docente') {
+      // Estructura para docentes: Tareas-Docente > Nivel
+      const docenteFolderId = await getOrCreateFolder(drive, 'Tareas-Docente', MAIN_FOLDER_ID)
+      targetFolderId = await getOrCreateFolder(drive, levelId, docenteFolderId)
+    } else {
+      // Estructura para estudiantes: Entregas-Estudiantes > Nivel > Tarea > Estudiante
+      const entregasFolderId = await getOrCreateFolder(drive, 'Entregas-Estudiantes', MAIN_FOLDER_ID)
+      const levelFolderId = await getOrCreateFolder(drive, levelId, entregasFolderId)
+      const taskFolderId = await getOrCreateFolder(drive, taskId, levelFolderId)
+      targetFolderId = await getOrCreateFolder(drive, studentName.replace(/[^a-zA-Z0-9]/g, '_'), taskFolderId)
+    }
 
     // Preparar el contenido del archivo
     let media: { mimeType: string; body: Readable }
@@ -139,7 +148,7 @@ export async function uploadFileToDrive(
     const file = await drive.files.create({
       requestBody: {
         name: finalFileName,
-        parents: [studentFolderId],
+        parents: [targetFolderId],
       },
       media,
       fields: 'id, webViewLink, webContentLink',
