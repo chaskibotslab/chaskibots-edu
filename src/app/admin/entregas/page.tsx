@@ -470,8 +470,6 @@ function EntregasContent() {
                   {selectedSubmission.files && (() => {
                     try {
                       const filesArray = JSON.parse(selectedSubmission.files)
-                      // Verificar si los archivos tienen URLs de Google Drive
-                      const hasDownloadableUrl = filesArray.some((f: any) => f.url)
                       
                       return (
                         <div className="space-y-2">
@@ -479,20 +477,43 @@ function EntregasContent() {
                             <FileText className="w-4 h-4" />
                             📎 Archivos adjuntos ({filesArray.length}):
                           </p>
-                          {filesArray.map((file: any, idx: number) => (
-                            file.url ? (
-                              <a
-                                key={idx}
-                                href={file.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/30"
-                              >
-                                <Download className="w-5 h-5 text-blue-400" />
-                                <span className="text-sm text-blue-300 flex-1">{file.name}</span>
-                                <span className="text-xs text-gray-400">Ver en Google Drive →</span>
-                              </a>
-                            ) : (
+                          {filesArray.map((file: any, idx: number) => {
+                            // Si tiene URL de Google Drive
+                            if (file.url) {
+                              return (
+                                <a
+                                  key={idx}
+                                  href={file.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/30"
+                                >
+                                  <Download className="w-5 h-5 text-blue-400" />
+                                  <span className="text-sm text-blue-300 flex-1">{file.name}</span>
+                                  <span className="text-xs text-gray-400">Ver en Google Drive →</span>
+                                </a>
+                              )
+                            }
+                            // Si tiene datos base64
+                            if (file.data) {
+                              const dataUrl = file.data.startsWith('data:') 
+                                ? file.data 
+                                : `data:${file.type || 'application/octet-stream'};base64,${file.data}`
+                              return (
+                                <a
+                                  key={idx}
+                                  href={dataUrl}
+                                  download={file.name}
+                                  className="flex items-center gap-2 p-3 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-colors border border-green-500/30"
+                                >
+                                  <Download className="w-5 h-5 text-green-400" />
+                                  <span className="text-sm text-green-300 flex-1">{file.name}</span>
+                                  <span className="text-xs text-gray-400">Descargar archivo</span>
+                                </a>
+                              )
+                            }
+                            // Sin URL ni datos
+                            return (
                               <div
                                 key={idx}
                                 className="flex items-center gap-2 p-3 bg-gray-500/10 rounded-lg border border-gray-500/30"
@@ -502,12 +523,7 @@ function EntregasContent() {
                                 <span className="text-xs text-gray-500">({file.type || 'archivo'})</span>
                               </div>
                             )
-                          ))}
-                          {!hasDownloadableUrl && (
-                            <p className="text-xs text-gray-500 mt-2">
-                              ⚠️ Los archivos fueron registrados pero no se subieron a Google Drive.
-                            </p>
-                          )}
+                          })}
                         </div>
                       )
                     } catch {
