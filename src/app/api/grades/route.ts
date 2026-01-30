@@ -103,21 +103,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'studentName y score son requeridos' }, { status: 400 })
     }
 
+    // Solo incluir campos que no estén vacíos para evitar errores de Airtable
     const fields: Record<string, any> = {
-      studentId: studentId || '',
       studentName,
-      lessonId: lessonId || '',
-      levelId: levelId || '',
-      courseId: courseId || '',
-      schoolId: schoolId || '',
       score: String(score),
-      submittedAt: submittedAt || new Date().toISOString(),
       gradedAt: new Date().toISOString(),
     }
     
+    // Agregar campos opcionales solo si tienen valor
+    if (studentId) fields.studentId = studentId
+    if (lessonId) fields.lessonId = lessonId
+    if (levelId) fields.levelId = levelId
+    if (courseId) fields.courseId = courseId
+    if (schoolId) fields.schoolId = schoolId
+    if (submittedAt) fields.submittedAt = submittedAt
     if (feedback) fields.feedback = feedback
     if (taskId) fields.taskId = taskId
     if (gradedBy) fields.gradedBy = gradedBy
+
+    console.log('Creating grade with fields:', fields)
 
     const response = await fetch(AIRTABLE_API_URL, {
       method: 'POST',
@@ -132,8 +136,15 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Airtable error:', errorText)
-      return NextResponse.json({ error: 'Error creating grade', message: errorText }, { status: 500 })
+      console.error('Airtable grades error:', errorText)
+      // Si la tabla no existe, dar mensaje claro
+      if (errorText.includes('NOT_FOUND') || errorText.includes('TABLE_NOT_FOUND')) {
+        return NextResponse.json({ 
+          error: 'Tabla grades no existe en Airtable', 
+          message: 'Crea una tabla llamada "grades" con los campos: studentName, score, gradedAt, studentId, lessonId, levelId, courseId, schoolId, submittedAt, feedback, taskId, gradedBy' 
+        }, { status: 500 })
+      }
+      return NextResponse.json({ error: 'Error creating grade', details: errorText }, { status: 500 })
     }
 
     const data = await response.json()

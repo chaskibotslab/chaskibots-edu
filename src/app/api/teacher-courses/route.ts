@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ fields }),
+      body: JSON.stringify({ records: [{ fields }] }),
     })
 
     if (!response.ok) {
@@ -139,7 +139,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Error al asignar curso: ${errorText}` }, { status: 500 })
     }
 
-    const record = await response.json()
+    const data = await response.json()
+    const record = data.records?.[0]
     
     return NextResponse.json({ 
       success: true, 
