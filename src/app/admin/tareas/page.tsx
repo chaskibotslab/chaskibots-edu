@@ -744,9 +744,9 @@ function AdminTareasContent() {
                           e.stopPropagation();
                           const file = e.dataTransfer.files[0];
                           if (file) {
-                            // Validar tamaño máximo: 500KB
-                            if (file.size > 500 * 1024) {
-                              alert('⚠️ El archivo es muy grande. Máximo permitido: 500KB.\n\nPara archivos más grandes, sube el archivo a Google Drive manualmente y pega el enlace.');
+                            // Validar tamaño máximo: 100KB (límite de Airtable)
+                            if (file.size > 100 * 1024) {
+                              alert('⚠️ El archivo es muy grande. Máximo permitido: 100KB.\n\nPara archivos más grandes:\n1. Sube el archivo a Google Drive manualmente\n2. Selecciona "Enlace de Google Drive"\n3. Pega el enlace compartido');
                               return;
                             }
                             const reader = new FileReader();
@@ -769,9 +769,9 @@ function AdminTareasContent() {
                           input.onchange = (e) => {
                             const file = (e.target as HTMLInputElement).files?.[0];
                             if (file) {
-                              // Validar tamaño máximo: 500KB
-                              if (file.size > 500 * 1024) {
-                                alert('⚠️ El archivo es muy grande. Máximo permitido: 500KB.\n\nPara archivos más grandes, sube el archivo a Google Drive manualmente y pega el enlace.');
+                              // Validar tamaño máximo: 100KB (límite de Airtable)
+                              if (file.size > 100 * 1024) {
+                                alert('⚠️ El archivo es muy grande. Máximo permitido: 100KB.\n\nPara archivos más grandes:\n1. Sube el archivo a Google Drive manualmente\n2. Selecciona "Enlace de Google Drive"\n3. Pega el enlace compartido');
                                 return;
                               }
                               const reader = new FileReader();
@@ -801,7 +801,7 @@ function AdminTareasContent() {
                           <div className="text-gray-400">
                             <Upload className="w-6 h-6 mx-auto mb-2" />
                             <p className="text-sm">Arrastra un archivo aquí o haz clic para seleccionar</p>
-                            <p className="text-xs mt-1">PDF, Word, imagen, etc. <span className="text-yellow-400">(máx. 500KB)</span></p>
+                            <p className="text-xs mt-1">PDF, Word, imagen, etc. <span className="text-yellow-400">(máx. 100KB)</span></p>
                           </div>
                         )}
                       </div>
@@ -825,7 +825,7 @@ function AdminTareasContent() {
                   <p className="text-xs text-neon-green mt-2">✓ Enlace guardado</p>
                 )}
                 <p className="text-xs text-gray-500 mt-2">
-                  Sube un archivo (máx. 500KB) o pega un enlace de Google Drive para archivos más grandes.
+                  Sube un archivo (máx. 100KB) o pega un enlace de Google Drive para archivos más grandes.
                 </p>
               </div>
 
