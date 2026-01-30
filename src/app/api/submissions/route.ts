@@ -138,15 +138,32 @@ export async function POST(request: NextRequest) {
       attachments.push('🎨 Dibujo incluido')
     }
     
-    // Guardar archivos - pueden ser URLs de Google Drive o solo metadata
+    // Guardar archivos - pueden ser URLs de Google Drive o datos base64
     let filesData = ''
     if (files && files.length > 0) {
-      // Guardar metadata con URLs si están disponibles
-      filesData = JSON.stringify(files.map((f: any) => ({
+      // Guardar metadata con URLs o datos base64
+      // Limitar tamaño total de archivos a 90KB para evitar errores de Airtable
+      const maxFilesSize = 90000
+      const filesWithData = files.map((f: any) => ({
         name: f.name,
         type: f.type,
-        url: f.url || '' // URL de Google Drive si existe
-      })))
+        url: f.url || '',
+        data: f.data || '' // Incluir datos base64 si existen
+      }))
+      
+      const filesJson = JSON.stringify(filesWithData)
+      if (filesJson.length <= maxFilesSize) {
+        filesData = filesJson
+      } else {
+        // Si es muy grande, guardar solo metadata sin datos
+        console.log('Files data too large, saving without base64:', filesJson.length, 'chars')
+        filesData = JSON.stringify(files.map((f: any) => ({
+          name: f.name,
+          type: f.type,
+          url: f.url || '',
+          data: '' // Sin datos por tamaño
+        })))
+      }
       attachments.push(`📎 ${files.length} archivo(s): ${files.map((f: any) => f.name).join(', ')}`)
     }
 
