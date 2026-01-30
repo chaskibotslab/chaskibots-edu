@@ -110,13 +110,12 @@ export async function POST(request: Request) {
           fields: {
             name: body.name,
             levelId: body.levelId,
-            description: body.description,
-            price: body.price,
-            components: body.components,
-            skills: body.skills,
-            images: body.image_urls,
-            videoUrl: body.videoUrl,
-            tutorialUrl: body.tutorialUrl,
+            description: body.description || '',
+            components: body.components || '',
+            skills: body.skills || '',
+            images: body.image_urls || '',
+            videoUrl: body.videoUrl || '',
+            tutorialUrl: body.tutorialUrl || '',
           }
         }]
       })
@@ -148,6 +147,7 @@ export async function PUT(request: Request) {
 
     // Campos que existen en Airtable según el CSV:
     // id, levelId, name, description, components, skills, images, videoUrl, tutorialUrl
+    // NOTA: price NO existe en la tabla kits de Airtable
     const fields: Record<string, any> = {}
     if (body.name) fields.name = body.name
     if (body.levelId) fields.levelId = body.levelId
@@ -155,7 +155,7 @@ export async function PUT(request: Request) {
     if (body.components) fields.components = body.components
     if (body.skills) fields.skills = body.skills
     if (body.image_urls !== undefined) fields.images = body.image_urls
-    if (body.price !== undefined) fields.price = Number(body.price) || 0
+    // price no existe en Airtable, no enviarlo
     if (body.videoUrl !== undefined) fields.videoUrl = body.videoUrl
     if (body.tutorialUrl !== undefined) fields.tutorialUrl = body.tutorialUrl
 

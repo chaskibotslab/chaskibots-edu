@@ -105,13 +105,19 @@ export default function AdminTareasPage() {
     async function loadTeacherCourses() {
       if (isTeacher && !isAdmin && user?.accessCode) {
         try {
+          console.log('[Tareas] Loading teacher courses for:', user.accessCode)
           const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
           const data = await res.json()
+          console.log('[Tareas] Teacher courses loaded:', data.assignments?.length || 0)
           if (data.assignments && data.assignments.length > 0) {
             setTeacherCourses(data.assignments)
-            // Seleccionar el primer nivel asignado por defecto
-            if (!selectedLevel && data.assignments[0]?.levelId) {
-              setSelectedLevel(data.assignments[0].levelId)
+            // Seleccionar el primer nivel asignado por defecto si no hay selección
+            if (!selectedLevel) {
+              const firstLevel = data.assignments[0]?.levelId
+              if (firstLevel) {
+                console.log('[Tareas] Setting default level:', firstLevel)
+                setSelectedLevel(firstLevel)
+              }
             }
           }
         } catch (error) {
@@ -147,22 +153,25 @@ export default function AdminTareasPage() {
     try {
       let url = `/api/tasks?activeOnly=${!showInactive}`
       
-      // Si es profesor, filtrar por niveles asignados
-      if (!isAdmin && isTeacher) {
-        if (selectedLevel) {
-          url += `&levelId=${selectedLevel}`
-        } else if (teacherCourses.length > 0) {
-          // Usar el primer nivel asignado si no hay selección
-          url += `&levelId=${teacherCourses[0].levelId}`
-        }
-      } else if (selectedLevel) {
+      // Siempre filtrar por nivel seleccionado si hay uno
+      if (selectedLevel) {
         url += `&levelId=${selectedLevel}`
+      } else if (!isAdmin && isTeacher && teacherCourses.length > 0) {
+        // Profesor sin nivel seleccionado: usar el primer nivel asignado
+        url += `&levelId=${teacherCourses[0].levelId}`
       }
+      // Admin sin nivel seleccionado: obtiene todas las tareas
       
       const res = await fetch(url)
       const data = await res.json()
       if (data.tasks) {
-        setTasks(data.tasks)
+        // Para profesores, filtrar adicionalmente por niveles permitidos
+        if (!isAdmin && isTeacher && teacherCourses.length > 0) {
+          const allowedLevelIds = new Set(teacherCourses.map(tc => tc.levelId))
+          setTasks(data.tasks.filter((t: Task) => allowedLevelIds.has(t.levelId)))
+        } else {
+          setTasks(data.tasks)
+        }
       }
     } catch (error) {
       console.error('Error loading tasks:', error)
