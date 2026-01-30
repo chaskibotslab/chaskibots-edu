@@ -297,26 +297,44 @@ export default function GradingPanel() {
     }
   }
 
-  const handleExportCSV = (type: 'students' | 'grades') => {
+  const handleExportCSV = (type: 'students' | 'grades' | 'summary') => {
     // Generar CSV desde los datos en memoria
     let csv = ''
+    let filename = ''
+    const levelName = EDUCATION_LEVELS.find(l => l.id === selectedLevel)?.name || 'Todos'
+    const dateStr = new Date().toISOString().slice(0, 10)
+    
     if (type === 'students') {
-      csv = 'Nombre,Nivel,Email\n'
+      csv = 'Nombre,Nivel,Email,Promedio,Total Calificaciones\n'
       students.forEach(s => {
-        csv += `"${s.name}","${s.levelId}","${s.email || ''}"\n`
+        const summary = summaries.find(sum => sum.studentName === s.name)
+        csv += `"${s.name}","${EDUCATION_LEVELS.find(l => l.id === s.levelId)?.name || s.levelId}","${s.email || ''}","${summary?.averageScore.toFixed(1) || 'N/A'}","${summary?.totalGrades || 0}"\n`
       })
-    } else {
-      csv = 'Estudiante,Tarea,Calificación,Feedback,Fecha\n'
+      filename = `estudiantes_${levelName}_${dateStr}.csv`
+    } else if (type === 'grades') {
+      csv = 'Estudiante,Nivel,Tarea ID,Calificación,Feedback,Fecha Entrega,Fecha Calificación,Calificado Por\n'
       grades.forEach(g => {
-        csv += `"${g.studentName}","${g.taskId || g.lessonId}","${g.score}","${g.feedback || ''}","${g.submittedAt}"\n`
+        const levelNameG = EDUCATION_LEVELS.find(l => l.id === g.levelId)?.name || g.levelId
+        csv += `"${g.studentName}","${levelNameG}","${g.taskId || g.lessonId}","${g.score}","${(g.feedback || '').replace(/"/g, '""')}","${g.submittedAt}","${g.gradedAt || ''}","${g.gradedBy || ''}"\n`
       })
+      filename = `calificaciones_${levelName}_${dateStr}.csv`
+    } else if (type === 'summary') {
+      csv = 'Posición,Estudiante,Nivel,Promedio,Total Calificaciones,Lecciones Completadas,Última Actividad\n'
+      const sortedSummaries = [...summaries].sort((a, b) => b.averageScore - a.averageScore)
+      sortedSummaries.forEach((s, idx) => {
+        const levelNameS = EDUCATION_LEVELS.find(l => l.id === s.levelId)?.name || s.levelId
+        csv += `"${idx + 1}","${s.studentName}","${levelNameS}","${s.averageScore.toFixed(1)}","${s.totalGrades}","${s.completedLessons}","${s.lastActivity}"\n`
+      })
+      filename = `resumen_ranking_${levelName}_${dateStr}.csv`
     }
     
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    // Agregar BOM para Excel
+    const BOM = '\uFEFF'
+    const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `${type}_${selectedLevel || 'todos'}_${new Date().toISOString().slice(0, 10)}.csv`
+    link.download = filename
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -354,20 +372,27 @@ export default function GradingPanel() {
           </p>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => handleExportCSV('students')}
             className="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm flex items-center gap-2 transition-colors"
           >
             <Download className="w-4 h-4" />
-            Exportar Estudiantes
+            Estudiantes
           </button>
           <button
             onClick={() => handleExportCSV('grades')}
             className="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm flex items-center gap-2 transition-colors"
           >
             <Download className="w-4 h-4" />
-            Exportar Calificaciones
+            Calificaciones
+          </button>
+          <button
+            onClick={() => handleExportCSV('summary')}
+            className="px-3 py-2 bg-neon-purple/20 hover:bg-neon-purple/30 text-neon-purple rounded-lg text-sm flex items-center gap-2 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Ranking
           </button>
         </div>
       </div>
