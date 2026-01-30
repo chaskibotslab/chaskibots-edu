@@ -236,7 +236,7 @@ export default function NivelPage() {
                   <span>Calificaciones</span>
                 </Link>
                 <Link
-                  href="/admin/tareas"
+                  href={`/admin/tareas?levelId=${levelId}`}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all text-gray-400 hover:bg-dark-700 mt-1"
                 >
                   <Settings className="w-5 h-5" />

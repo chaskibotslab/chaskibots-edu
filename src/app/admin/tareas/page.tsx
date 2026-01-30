@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useMemo, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
@@ -72,13 +72,15 @@ interface TeacherCourseAssignment {
   courseName: string
 }
 
-export default function AdminTareasPage() {
+function AdminTareasContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const urlLevelId = searchParams.get('levelId') || ''
   const { user, isAdmin, isTeacher } = useAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [selectedLevel, setSelectedLevel] = useState('')
+  const [selectedLevel, setSelectedLevel] = useState(urlLevelId)
   const [searchTerm, setSearchTerm] = useState('')
   const [showInactive, setShowInactive] = useState(false)
   const [teacherCourses, setTeacherCourses] = useState<TeacherCourseAssignment[]>([])
@@ -111,8 +113,8 @@ export default function AdminTareasPage() {
           console.log('[Tareas] Teacher courses loaded:', data.assignments?.length || 0)
           if (data.assignments && data.assignments.length > 0) {
             setTeacherCourses(data.assignments)
-            // Seleccionar el primer nivel asignado por defecto si no hay selección
-            if (!selectedLevel) {
+            // Solo establecer nivel por defecto si NO viene de la URL y no hay selección
+            if (!selectedLevel && !urlLevelId) {
               const firstLevel = data.assignments[0]?.levelId
               if (firstLevel) {
                 console.log('[Tareas] Setting default level:', firstLevel)
@@ -126,7 +128,7 @@ export default function AdminTareasPage() {
       }
     }
     loadTeacherCourses()
-  }, [isTeacher, isAdmin, user])
+  }, [isTeacher, isAdmin, user, urlLevelId])
 
   // Niveles permitidos para el usuario
   const allowedLevels = useMemo(() => {
@@ -869,5 +871,18 @@ export default function AdminTareasPage() {
         </div>
       )}
     </div>
+  )
+}
+
+// Wrapper con Suspense para useSearchParams
+export default function AdminTareasPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+      </div>
+    }>
+      <AdminTareasContent />
+    </Suspense>
   )
 }
