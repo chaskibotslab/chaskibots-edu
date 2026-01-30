@@ -5,7 +5,7 @@ import {
   Send, CheckCircle, Clock, FileText, Code, Cpu, Zap, 
   BookOpen, Loader2, ChevronDown, ChevronUp, Award,
   Lightbulb, Wrench, CircuitBoard, Bot, Calendar, AlertCircle,
-  Pencil, Upload, Image, Star, ClipboardList
+  Pencil, Upload, Image, Star, ClipboardList, Download
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import DrawingCanvas from './DrawingCanvas'
@@ -627,19 +627,19 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                 <div className="pt-4 space-y-4">
                   {/* Archivo adjunto del docente */}
                   {task.attachmentUrl && (
-                    <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                      <p className="text-sm text-blue-300 mb-2 flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        📎 Material adjunto del profesor:
+                    <div className="p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/40 rounded-xl">
+                      <p className="text-sm text-blue-200 mb-3 flex items-center gap-2 font-medium">
+                        <FileText className="w-5 h-5" />
+                        📎 Material adjunto del profesor
                       </p>
                       <a
                         href={task.attachmentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-colors"
+                        className="inline-flex items-center gap-3 px-5 py-3 bg-blue-500 hover:bg-blue-400 text-white font-medium rounded-lg transition-colors shadow-lg"
                       >
-                        <Upload className="w-4 h-4" />
-                        Ver archivo adjunto →
+                        <Download className="w-5 h-5" />
+                        Descargar archivo adjunto
                       </a>
                     </div>
                   )}
