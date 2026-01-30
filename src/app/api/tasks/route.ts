@@ -66,18 +66,29 @@ export async function GET(request: NextRequest) {
       const questionsStr = record.fields.questions || ''
       const questions = questionsStr.split('|').filter((q: string) => q.trim())
       
-      // Parsear metadatos desde prefijo en description: [type|category|difficulty] descripcion
+      // Parsear metadatos desde prefijo en description: [type|category|difficulty|attachmentUrl] descripcion
       let taskType = 'concept'
       let category = 'general'
       let difficulty = 'basico'
+      let attachmentUrl = ''
       let description = record.fields.description || ''
       
-      const metaMatch = description.match(/^\[([^|]+)\|([^|]+)\|([^\]]+)\]\s*(.*)$/)
-      if (metaMatch) {
-        taskType = metaMatch[1] || 'concept'
-        category = metaMatch[2] || 'general'
-        difficulty = metaMatch[3] || 'basico'
-        description = metaMatch[4] || ''
+      // Nuevo formato con 4 campos: [type|category|difficulty|attachmentUrl]
+      const metaMatch4 = description.match(/^\[([^|]*)\|([^|]*)\|([^|]*)\|([^\]]*)\]\s*(.*)$/)
+      // Formato antiguo con 3 campos: [type|category|difficulty]
+      const metaMatch3 = description.match(/^\[([^|]+)\|([^|]+)\|([^\]]+)\]\s*(.*)$/)
+      
+      if (metaMatch4) {
+        taskType = metaMatch4[1] || 'concept'
+        category = metaMatch4[2] || 'general'
+        difficulty = metaMatch4[3] || 'basico'
+        attachmentUrl = metaMatch4[4] || ''
+        description = metaMatch4[5] || ''
+      } else if (metaMatch3) {
+        taskType = metaMatch3[1] || 'concept'
+        category = metaMatch3[2] || 'general'
+        difficulty = metaMatch3[3] || 'basico'
+        description = metaMatch3[4] || ''
       }
       
       return {
@@ -93,8 +104,8 @@ export async function GET(request: NextRequest) {
         isActive: record.fields.isActive !== false,
         questions,
         createdAt: record.fields.createdAt || new Date().toISOString(),
-        attachmentUrl: record.fields.attachmentUrl || '',
-        attachmentType: record.fields.attachmentType || 'none',
+        attachmentUrl: attachmentUrl,
+        attachmentType: attachmentUrl ? 'drive' : 'none',
       }
     })
 
@@ -124,8 +135,9 @@ export async function POST(request: NextRequest) {
       : (questions || '')
 
     // Construir campos - solo incluir los que existen en Airtable
-    // NOTA: type, category, difficulty se guardan como prefijo en description
-    const metaPrefix = `[${type || 'concept'}|${category || 'general'}|${difficulty || 'basico'}]`
+    // NOTA: type, category, difficulty y attachmentUrl se guardan como prefijo en description
+    // Formato: [type|category|difficulty|attachmentUrl] descripcion
+    const metaPrefix = `[${type || 'concept'}|${category || 'general'}|${difficulty || 'basico'}|${attachmentUrl || ''}]`
     const fullDescription = `${metaPrefix} ${description || ''}`
     
     const fields: Record<string, any> = {
@@ -139,8 +151,7 @@ export async function POST(request: NextRequest) {
     if (points) fields.points = Number(points) || 10
     if (dueDate) fields.dueDate = String(dueDate)
     if (questionsStr) fields.questions = questionsStr
-    if (attachmentUrl) fields.attachmentUrl = String(attachmentUrl)
-    if (attachmentType && attachmentType !== 'none') fields.attachmentType = String(attachmentType)
+    // NO enviar attachmentUrl ni attachmentType - se guardan en description
 
     console.log('Creating task with fields:', fields)
 

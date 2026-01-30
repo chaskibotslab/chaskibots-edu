@@ -145,9 +145,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'ID is required', message: 'ID is required' }, { status: 400 })
     }
 
-    // Campos que existen en Airtable según el CSV:
-    // id, levelId, name, description, components, skills, images, videoUrl, tutorialUrl
-    // NOTA: price NO existe en la tabla kits de Airtable
+    // Campos que existen en Airtable
     const fields: Record<string, any> = {}
     if (body.name) fields.name = body.name
     if (body.levelId) fields.levelId = body.levelId
@@ -155,7 +153,7 @@ export async function PUT(request: Request) {
     if (body.components) fields.components = body.components
     if (body.skills) fields.skills = body.skills
     if (body.image_urls !== undefined) fields.images = body.image_urls
-    // price no existe en Airtable, no enviarlo
+    if (body.price !== undefined) fields.price = Number(body.price) || 0
     if (body.videoUrl !== undefined) fields.videoUrl = body.videoUrl
     if (body.tutorialUrl !== undefined) fields.tutorialUrl = body.tutorialUrl
 
