@@ -29,7 +29,8 @@
     "react-dom": "^18.3.1",
     "sharp": "^0.34.5",
     "tailwindcss": "^3.4.3",
-    "three": "^0.160.0"
+    "three": "^0.160.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",

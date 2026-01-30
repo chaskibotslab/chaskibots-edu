@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import { useAuth } from '@/components/AuthProvider'
+import * as XLSX from 'xlsx'
 
 interface TeacherCourseAssignment {
   courseId: string
@@ -316,50 +317,86 @@ export default function GradingPanel({ initialLevelId = '' }: GradingPanelProps)
     }
   }
 
-  const handleExportCSV = (type: 'students' | 'grades' | 'summary') => {
-    // Generar archivo Excel-compatible (TSV con extensión .xls)
-    // Usamos tabulador como separador que Excel interpreta correctamente
-    let content = ''
-    let filename = ''
+  const handleExportExcel = (type: 'students' | 'grades' | 'summary' | 'all') => {
     const levelName = EDUCATION_LEVELS.find(l => l.id === selectedLevel)?.name || 'Todos'
     const dateStr = new Date().toISOString().slice(0, 10)
-    const SEP = '\t' // Tabulador para Excel
     
-    if (type === 'students') {
-      content = `Nombre${SEP}Nivel${SEP}Email${SEP}Promedio${SEP}Total Calificaciones\n`
-      students.forEach(s => {
+    // Crear workbook
+    const wb = XLSX.utils.book_new()
+    
+    // Función para agregar hoja de estudiantes
+    const addStudentsSheet = () => {
+      const data = students.map(s => {
         const summary = summaries.find(sum => sum.studentName === s.name)
-        const lvlName = EDUCATION_LEVELS.find(l => l.id === s.levelId)?.name || s.levelId
-        content += `${s.name}${SEP}${lvlName}${SEP}${s.email || ''}${SEP}${summary?.averageScore.toFixed(1) || 'N/A'}${SEP}${summary?.totalGrades || 0}\n`
+        return {
+          'Nombre': s.name,
+          'Nivel': EDUCATION_LEVELS.find(l => l.id === s.levelId)?.name || s.levelId,
+          'Email': s.email || '',
+          'Promedio': summary?.averageScore ? Number(summary.averageScore.toFixed(1)) : 0,
+          'Total Calificaciones': summary?.totalGrades || 0
+        }
       })
-      filename = `estudiantes_${levelName}_${dateStr}.xls`
-    } else if (type === 'grades') {
-      content = `Estudiante${SEP}Nivel${SEP}Tarea ID${SEP}Calificación${SEP}Feedback${SEP}Fecha Entrega${SEP}Fecha Calificación${SEP}Calificado Por\n`
-      grades.forEach(g => {
-        const levelNameG = EDUCATION_LEVELS.find(l => l.id === g.levelId)?.name || g.levelId
-        const feedback = (g.feedback || '').replace(/\t/g, ' ').replace(/\n/g, ' ')
-        content += `${g.studentName}${SEP}${levelNameG}${SEP}${g.taskId || g.lessonId}${SEP}${g.score}${SEP}${feedback}${SEP}${g.submittedAt}${SEP}${g.gradedAt || ''}${SEP}${g.gradedBy || ''}\n`
-      })
-      filename = `calificaciones_${levelName}_${dateStr}.xls`
-    } else if (type === 'summary') {
-      content = `Posición${SEP}Estudiante${SEP}Nivel${SEP}Promedio${SEP}Total Calificaciones${SEP}Lecciones Completadas${SEP}Última Actividad\n`
-      const sortedSummaries = [...summaries].sort((a, b) => b.averageScore - a.averageScore)
-      sortedSummaries.forEach((s, idx) => {
-        const levelNameS = EDUCATION_LEVELS.find(l => l.id === s.levelId)?.name || s.levelId
-        content += `${idx + 1}${SEP}${s.studentName}${SEP}${levelNameS}${SEP}${s.averageScore.toFixed(1)}${SEP}${s.totalGrades}${SEP}${s.completedLessons}${SEP}${s.lastActivity}\n`
-      })
-      filename = `resumen_ranking_${levelName}_${dateStr}.xls`
+      const ws = XLSX.utils.json_to_sheet(data)
+      // Ajustar ancho de columnas
+      ws['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 30 }, { wch: 10 }, { wch: 18 }]
+      XLSX.utils.book_append_sheet(wb, ws, 'Estudiantes')
     }
     
-    // Agregar BOM para Excel y usar tipo application/vnd.ms-excel
-    const BOM = '\uFEFF'
-    const blob = new Blob([BOM + content], { type: 'application/vnd.ms-excel;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    link.click()
-    URL.revokeObjectURL(url)
+    // Función para agregar hoja de calificaciones
+    const addGradesSheet = () => {
+      const data = grades.map(g => ({
+        'Estudiante': g.studentName,
+        'Nivel': EDUCATION_LEVELS.find(l => l.id === g.levelId)?.name || g.levelId,
+        'Tarea ID': g.taskId || g.lessonId,
+        'Calificación': g.score,
+        'Feedback': g.feedback || '',
+        'Fecha Entrega': g.submittedAt ? new Date(g.submittedAt).toLocaleDateString('es-EC') : '',
+        'Fecha Calificación': g.gradedAt ? new Date(g.gradedAt).toLocaleDateString('es-EC') : '',
+        'Calificado Por': g.gradedBy || ''
+      }))
+      const ws = XLSX.utils.json_to_sheet(data)
+      ws['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 18 }, { wch: 12 }, { wch: 30 }, { wch: 15 }, { wch: 18 }, { wch: 15 }]
+      XLSX.utils.book_append_sheet(wb, ws, 'Calificaciones')
+    }
+    
+    // Función para agregar hoja de resumen/ranking
+    const addSummarySheet = () => {
+      const sortedSummaries = [...summaries].sort((a, b) => b.averageScore - a.averageScore)
+      const data = sortedSummaries.map((s, idx) => ({
+        'Posición': idx + 1,
+        'Estudiante': s.studentName,
+        'Nivel': EDUCATION_LEVELS.find(l => l.id === s.levelId)?.name || s.levelId,
+        'Promedio': Number(s.averageScore.toFixed(1)),
+        'Total Calificaciones': s.totalGrades,
+        'Lecciones Completadas': s.completedLessons,
+        'Última Actividad': s.lastActivity ? new Date(s.lastActivity).toLocaleDateString('es-EC') : ''
+      }))
+      const ws = XLSX.utils.json_to_sheet(data)
+      ws['!cols'] = [{ wch: 10 }, { wch: 25 }, { wch: 15 }, { wch: 10 }, { wch: 18 }, { wch: 20 }, { wch: 15 }]
+      XLSX.utils.book_append_sheet(wb, ws, 'Ranking')
+    }
+    
+    let filename = ''
+    
+    if (type === 'all') {
+      // Exportar todo en un solo archivo con múltiples hojas
+      addStudentsSheet()
+      addGradesSheet()
+      addSummarySheet()
+      filename = `reporte_completo_${levelName}_${dateStr}.xlsx`
+    } else if (type === 'students') {
+      addStudentsSheet()
+      filename = `estudiantes_${levelName}_${dateStr}.xlsx`
+    } else if (type === 'grades') {
+      addGradesSheet()
+      filename = `calificaciones_${levelName}_${dateStr}.xlsx`
+    } else if (type === 'summary') {
+      addSummarySheet()
+      filename = `ranking_${levelName}_${dateStr}.xlsx`
+    }
+    
+    // Generar y descargar archivo
+    XLSX.writeFile(wb, filename)
   }
 
   const filteredStudents = students.filter(s => 
@@ -397,21 +434,28 @@ export default function GradingPanel({ initialLevelId = '' }: GradingPanelProps)
         
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => handleExportCSV('students')}
+            onClick={() => handleExportExcel('all')}
+            className="px-3 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm flex items-center gap-2 transition-colors font-medium"
+          >
+            <Download className="w-4 h-4" />
+            Exportar Todo (.xlsx)
+          </button>
+          <button
+            onClick={() => handleExportExcel('students')}
             className="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm flex items-center gap-2 transition-colors"
           >
             <Download className="w-4 h-4" />
             Estudiantes
           </button>
           <button
-            onClick={() => handleExportCSV('grades')}
+            onClick={() => handleExportExcel('grades')}
             className="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm flex items-center gap-2 transition-colors"
           >
             <Download className="w-4 h-4" />
             Calificaciones
           </button>
           <button
-            onClick={() => handleExportCSV('summary')}
+            onClick={() => handleExportExcel('summary')}
             className="px-3 py-2 bg-neon-purple/20 hover:bg-neon-purple/30 text-neon-purple rounded-lg text-sm flex items-center gap-2 transition-colors"
           >
             <Download className="w-4 h-4" />
