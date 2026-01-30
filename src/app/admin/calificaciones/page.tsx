@@ -1,14 +1,16 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import GradingPanel from '@/components/GradingPanel'
 import { ArrowLeft, Shield, GraduationCap } from 'lucide-react'
 
-export default function CalificacionesPage() {
+function CalificacionesContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const urlLevelId = searchParams.get('levelId') || ''
   const { isAdmin, isTeacher, isAuthenticated, isLoading, user } = useAuth()
 
   // Permitir acceso a admins Y profesores
@@ -71,8 +73,21 @@ export default function CalificacionesPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <GradingPanel />
+        <GradingPanel initialLevelId={urlLevelId} />
       </main>
     </div>
+  )
+}
+
+// Wrapper con Suspense para useSearchParams
+export default function CalificacionesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
+      </div>
+    }>
+      <CalificacionesContent />
+    </Suspense>
   )
 }

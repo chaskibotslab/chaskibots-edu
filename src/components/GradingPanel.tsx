@@ -54,9 +54,13 @@ import SubmissionsPanel from './SubmissionsPanel'
 
 type ViewMode = 'students' | 'grades' | 'summary' | 'submissions'
 
-export default function GradingPanel() {
+interface GradingPanelProps {
+  initialLevelId?: string
+}
+
+export default function GradingPanel({ initialLevelId = '' }: GradingPanelProps) {
   const { user, isAdmin, isTeacher } = useAuth()
-  const [selectedLevel, setSelectedLevel] = useState<string>('')
+  const [selectedLevel, setSelectedLevel] = useState<string>(initialLevelId)
   const [viewMode, setViewMode] = useState<ViewMode>('students')
   const [students, setStudents] = useState<Student[]>([])
   const [grades, setGrades] = useState<Grade[]>([])
@@ -80,6 +84,13 @@ export default function GradingPanel() {
   const [newGradeLesson, setNewGradeLesson] = useState('')
   const [newGradeTaskId, setNewGradeTaskId] = useState('')
 
+  // Sincronizar selectedLevel con initialLevelId cuando cambie
+  useEffect(() => {
+    if (initialLevelId && initialLevelId !== selectedLevel) {
+      setSelectedLevel(initialLevelId)
+    }
+  }, [initialLevelId])
+
   // Cargar asignaciones de cursos para profesores
   useEffect(() => {
     async function loadTeacherCourses() {
@@ -89,6 +100,10 @@ export default function GradingPanel() {
           const data = await res.json()
           if (data.assignments && data.assignments.length > 0) {
             setTeacherCourses(data.assignments)
+            // Si no hay nivel seleccionado y no viene de URL, usar el primero asignado
+            if (!selectedLevel && !initialLevelId && data.assignments[0]?.levelId) {
+              setSelectedLevel(data.assignments[0].levelId)
+            }
           }
         } catch (error) {
           console.error('Error loading teacher courses:', error)
@@ -96,7 +111,7 @@ export default function GradingPanel() {
       }
     }
     loadTeacherCourses()
-  }, [isTeacher, isAdmin, user])
+  }, [isTeacher, isAdmin, user, initialLevelId])
 
   // Niveles permitidos para el usuario
   const allowedLevels = useMemo(() => {
@@ -105,12 +120,16 @@ export default function GradingPanel() {
       const allowedIds = new Set(teacherCourses.map(tc => tc.levelId))
       return EDUCATION_LEVELS.filter(l => allowedIds.has(l.id))
     }
+    // Fallback: si viene levelId de la URL, mostrar ese nivel
+    if (initialLevelId) {
+      return EDUCATION_LEVELS.filter(l => l.id === initialLevelId)
+    }
     // Fallback: usar levelId del usuario
     if (user?.levelId) {
       return EDUCATION_LEVELS.filter(l => l.id === user.levelId)
     }
     return []
-  }, [isAdmin, isTeacher, teacherCourses, user])
+  }, [isAdmin, isTeacher, teacherCourses, user, initialLevelId])
 
   useEffect(() => {
     loadData()

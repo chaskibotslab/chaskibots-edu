@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
@@ -37,12 +37,14 @@ interface TeacherCourseAssignment {
   courseName: string
 }
 
-export default function EntregasPage() {
+function EntregasContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const urlLevelId = searchParams.get('levelId') || ''
   const { user, isAdmin, isTeacher, isLoading } = useAuth()
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedLevel, setSelectedLevel] = useState('')
+  const [selectedLevel, setSelectedLevel] = useState(urlLevelId)
   const [selectedStatus, setSelectedStatus] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
@@ -50,6 +52,13 @@ export default function EntregasPage() {
   const [feedbackInput, setFeedbackInput] = useState('')
   const [saving, setSaving] = useState(false)
   const [teacherCourses, setTeacherCourses] = useState<TeacherCourseAssignment[]>([])
+
+  // Sincronizar selectedLevel con urlLevelId cuando cambie
+  useEffect(() => {
+    if (urlLevelId && urlLevelId !== selectedLevel) {
+      setSelectedLevel(urlLevelId)
+    }
+  }, [urlLevelId])
 
   // Cargar cursos asignados al profesor
   useEffect(() => {
@@ -60,6 +69,10 @@ export default function EntregasPage() {
           const data = await res.json()
           if (data.assignments && data.assignments.length > 0) {
             setTeacherCourses(data.assignments)
+            // Si no hay nivel seleccionado y no viene de URL, usar el primero asignado
+            if (!selectedLevel && !urlLevelId && data.assignments[0]?.levelId) {
+              setSelectedLevel(data.assignments[0].levelId)
+            }
           }
         } catch (error) {
           console.error('Error loading teacher courses:', error)
@@ -67,7 +80,7 @@ export default function EntregasPage() {
       }
     }
     loadTeacherCourses()
-  }, [isTeacher, isAdmin, user])
+  }, [isTeacher, isAdmin, user, urlLevelId])
 
   useEffect(() => {
     // Permitir acceso a admin y profesores
@@ -568,5 +581,18 @@ export default function EntregasPage() {
         </div>
       )}
     </div>
+  )
+}
+
+// Wrapper con Suspense para useSearchParams
+export default function EntregasPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+      </div>
+    }>
+      <EntregasContent />
+    </Suspense>
   )
 }
