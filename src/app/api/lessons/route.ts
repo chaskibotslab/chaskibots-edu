@@ -157,13 +157,18 @@ export async function POST(request: Request) {
       })
     })
 
-    // Si falla, intentar con el campo type
+    // Si falla, manejar el error
     if (!response.ok) {
       const errorText = await response.text()
+      console.error('Airtable error creating lesson:', errorText)
       
-      // Si el error NO es por type, reintentar con type
-      if (!errorText.includes('INVALID_MULTIPLE_CHOICE') && body.type) {
-        fields.type = body.type
+      // Si es error de INVALID_MULTIPLE_CHOICE, el campo moduleName o type tiene un valor no permitido
+      if (errorText.includes('INVALID_MULTIPLE_CHOICE')) {
+        // Intentar sin moduleName (usar un valor genérico o vacío)
+        const retryFields = { ...fields }
+        delete retryFields.moduleName
+        if (body.type) delete retryFields.type
+        
         response = await fetch(AIRTABLE_API_URL, {
           method: 'POST',
           headers: {
@@ -171,13 +176,20 @@ export async function POST(request: Request) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            records: [{ fields }]
+            records: [{ fields: retryFields }]
           })
         })
-      }
-      
-      if (!response.ok) {
-        console.error('Airtable error:', errorText)
+        
+        if (!response.ok) {
+          const retryError = await response.text()
+          console.error('Airtable retry error:', retryError)
+          return NextResponse.json({ 
+            error: 'Error creating lesson', 
+            message: 'El nombre del módulo no es válido. Verifica que el módulo exista en Airtable o usa un nombre existente.',
+            details: errorText 
+          }, { status: 500 })
+        }
+      } else {
         return NextResponse.json({ error: 'Error creating lesson', message: errorText }, { status: 500 })
       }
     }
