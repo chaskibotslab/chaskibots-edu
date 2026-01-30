@@ -5,7 +5,7 @@ import { EDUCATION_LEVELS } from '@/lib/constants'
 import { useAuth } from '@/components/AuthProvider'
 import {
   FileCode, Clock, CheckCircle, AlertCircle, Eye, X,
-  Award, Send, Filter, RefreshCw, Trash2, ChevronDown
+  Award, Send, Filter, RefreshCw, Trash2, ChevronDown, Download, FileText
 } from 'lucide-react'
 
 interface Submission {
