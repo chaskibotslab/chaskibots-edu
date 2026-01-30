@@ -203,9 +203,10 @@ export async function PATCH(request: NextRequest) {
     if (updates.dueDate !== undefined) fields.dueDate = String(updates.dueDate)
     if (updates.isActive !== undefined) fields.isActive = Boolean(updates.isActive)
     
-    // type, category, difficulty se guardan como prefijo en description
-    if (updates.description !== undefined || updates.type !== undefined || updates.category !== undefined || updates.difficulty !== undefined) {
-      const metaPrefix = `[${updates.type || 'concept'}|${updates.category || 'general'}|${updates.difficulty || 'basico'}]`
+    // type, category, difficulty y attachmentUrl se guardan como prefijo en description
+    // Formato: [type|category|difficulty|attachmentUrl] descripcion
+    if (updates.description !== undefined || updates.type !== undefined || updates.category !== undefined || updates.difficulty !== undefined || updates.attachmentUrl !== undefined) {
+      const metaPrefix = `[${updates.type || 'concept'}|${updates.category || 'general'}|${updates.difficulty || 'basico'}|${updates.attachmentUrl || ''}]`
       fields.description = `${metaPrefix} ${updates.description || ''}`
     }
     
@@ -214,8 +215,7 @@ export async function PATCH(request: NextRequest) {
         ? updates.questions.filter((q: string) => q && q.trim()).join('|') 
         : updates.questions
     }
-    if (updates.attachmentUrl !== undefined) fields.attachmentUrl = String(updates.attachmentUrl)
-    if (updates.attachmentType !== undefined) fields.attachmentType = String(updates.attachmentType)
+    // NO enviar attachmentUrl ni attachmentType como campos separados - se guardan en description
 
     console.log('Updating task:', taskId, 'with fields:', fields)
 
