@@ -428,13 +428,16 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
         `${q.question}\nRespuesta: ${taskAnswers[q.id] || ''}`
       ).join('\n\n') || ''
 
-      // Subir archivos a Google Drive primero
-      let uploadedUrls: { name: string, url: string }[] = []
+      // Subir archivos a Google Drive primero, si falla usar base64
+      let processedFiles: { name: string, type: string, url?: string, data?: string }[] = []
       if (taskFiles.length > 0) {
         for (const file of taskFiles) {
           const uploaded = await uploadFileToGoogleDrive(file)
           if (uploaded) {
-            uploadedUrls.push(uploaded)
+            processedFiles.push({ name: file.name, type: file.type, url: uploaded.url })
+          } else {
+            // Si Drive falla, guardar como base64
+            processedFiles.push({ name: file.name, type: file.type, data: file.base64 || '' })
           }
         }
       }
@@ -444,12 +447,9 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
       if (taskDrawing) {
         attachmentsInfo += '\n\n📎 DIBUJO ADJUNTO: [imagen incluida]'
       }
-      if (uploadedUrls.length > 0) {
-        attachmentsInfo += `\n\n📎 ARCHIVOS EN GOOGLE DRIVE (${uploadedUrls.length}):\n`
-        attachmentsInfo += uploadedUrls.map(f => `- ${f.name}: ${f.url}`).join('\n')
-      } else if (taskFiles.length > 0) {
-        attachmentsInfo += `\n\n📎 ARCHIVOS ADJUNTOS (${taskFiles.length}):\n`
-        attachmentsInfo += taskFiles.map(f => `- ${f.name} (${(f.size / 1024).toFixed(1)} KB)`).join('\n')
+      if (processedFiles.length > 0) {
+        attachmentsInfo += `\n\n📎 ARCHIVOS ADJUNTOS (${processedFiles.length}):\n`
+        attachmentsInfo += processedFiles.map(f => `- ${f.name}`).join('\n')
       }
 
       const taskId = `TASK-${Date.now().toString(36).toUpperCase()}`
@@ -470,13 +470,9 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
         submissionData.drawing = taskDrawing
       }
 
-      // Si hay archivos subidos a Google Drive, guardar URLs
-      if (uploadedUrls.length > 0) {
-        submissionData.files = uploadedUrls.map(f => ({
-          name: f.name,
-          type: 'url',
-          url: f.url
-        }))
+      // Si hay archivos, enviarlos (con URL de Drive o base64)
+      if (processedFiles.length > 0) {
+        submissionData.files = processedFiles
       }
 
       const res = await fetch('/api/submissions', {

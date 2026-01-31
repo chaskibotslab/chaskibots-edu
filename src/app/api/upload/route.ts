@@ -34,10 +34,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Validar tipo de archivo
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Only images allowed.' }, { status: 400 })
+    // Validar tipo de archivo - permitir imágenes, PDFs, documentos
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+      'application/pdf',
+      'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/plain', 'text/csv'
+    ]
+    if (!allowedTypes.includes(file.type) && !file.type.startsWith('image/')) {
+      return NextResponse.json({ error: 'Tipo de archivo no permitido. Usa imágenes, PDF, Word o Excel.' }, { status: 400 })
     }
 
     // Validar tamaño (máximo 10MB)
