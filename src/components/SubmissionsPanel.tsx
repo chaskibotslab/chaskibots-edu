@@ -436,23 +436,48 @@ export default function SubmissionsPanel() {
               </div>
             </div>
 
-            {/* Archivos Adjuntos del Estudiante */}
-            {(selectedSubmission.drawing || selectedSubmission.files) && (
-              <div className="p-4 border-t border-dark-600">
-                <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-blue-400" /> Archivos Adjuntos
-                </h4>
-                <div className="space-y-2">
-                  {selectedSubmission.drawing && selectedSubmission.drawing !== '[Dibujo muy grande - no guardado]' && (
-                    <a href={selectedSubmission.drawing} download className="flex items-center gap-2 p-3 bg-purple-500/10 hover:bg-purple-500/20 rounded-lg border border-purple-500/30">
-                      <Download className="w-5 h-5 text-purple-400" />
-                      <span className="text-sm text-purple-300">Descargar dibujo</span>
+            {/* Archivos del Estudiante */}
+            <div className="p-4 border-t border-dark-600 bg-gradient-to-r from-blue-900/20 to-purple-900/20">
+              <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-400" /> Archivos del Estudiante
+              </h4>
+              <div className="space-y-3">
+                {selectedSubmission.drawing && selectedSubmission.drawing !== '[Dibujo muy grande - no guardado]' && (
+                  <div className="bg-purple-900/30 border border-purple-500/40 rounded-lg p-3">
+                    <p className="text-xs text-purple-300 mb-2">Dibujo:</p>
+                    <img src={selectedSubmission.drawing} alt="Dibujo" className="max-w-full max-h-48 rounded border border-purple-500/30 mb-2" />
+                    <a href={selectedSubmission.drawing} download className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium">
+                      <Download className="w-4 h-4" /> Descargar dibujo
                     </a>
-                  )}
-                  {selectedSubmission.files && (() => { try { return JSON.parse(selectedSubmission.files).map((f: {name: string, url?: string}, i: number) => f.url ? <a key={i} href={f.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg border border-blue-500/30"><Download className="w-5 h-5 text-blue-400" /><span className="text-sm text-blue-300">{f.name}</span></a> : null) } catch { return null } })()}
-                </div>
+                  </div>
+                )}
+                {selectedSubmission.files && (() => {
+                  try {
+                    const files = JSON.parse(selectedSubmission.files)
+                    if (!files.length) return null
+                    return (
+                      <div className="bg-blue-900/30 border border-blue-500/40 rounded-lg p-3">
+                        <p className="text-xs text-blue-300 mb-2">Archivos ({files.length}):</p>
+                        <div className="space-y-2">
+                          {files.map((f: {name: string, url?: string, data?: string}, i: number) => {
+                            const url = f.url || f.data || ''
+                            if (!url) return <div key={i} className="text-gray-400 text-sm">{f.name} (no disponible)</div>
+                            return (
+                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium">
+                                <Download className="w-4 h-4" /> {f.name}
+                              </a>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  } catch { return null }
+                })()}
+                {!selectedSubmission.drawing && !selectedSubmission.files && (
+                  <p className="text-sm text-gray-500 italic">Sin archivos adjuntos</p>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Grading Section */}
             <div className="p-4 border-t border-dark-600 bg-dark-900/50">
