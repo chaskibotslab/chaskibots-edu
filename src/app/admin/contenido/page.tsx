@@ -42,6 +42,7 @@ interface Lesson {
   videoUrl: string
   content: string
   locked: boolean
+  pdfUrl?: string
 }
 
 interface Document {
@@ -64,6 +65,7 @@ interface EditFormData {
   videoUrl: string
   content: string
   locked: boolean
+  pdfUrl: string
 }
 
 export default function ContenidoAdminPage() {
@@ -82,7 +84,8 @@ export default function ContenidoAdminPage() {
     duration: '5 min',
     videoUrl: '',
     content: '',
-    locked: false
+    locked: false,
+    pdfUrl: ''
   })
   const [showNewLessonModal, setShowNewLessonModal] = useState(false)
   const [showNewModuleModal, setShowNewModuleModal] = useState(false)
@@ -255,7 +258,8 @@ export default function ContenidoAdminPage() {
       duration: lesson.duration,
       videoUrl: lesson.videoUrl || '',
       content: lesson.content || '',
-      locked: lesson.locked
+      locked: lesson.locked,
+      pdfUrl: lesson.pdfUrl || ''
     })
     setMessage(null)
   }
@@ -643,6 +647,11 @@ export default function ContenidoAdminPage() {
                                   ) : (
                                     <span className="text-yellow-400">Sin video</span>
                                   )}
+                                  {lesson.pdfUrl && (
+                                    <span className="text-blue-400 flex items-center gap-1">
+                                      <Download className="w-3 h-3" /> PDF
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                               <div className="flex items-center gap-1">
@@ -871,6 +880,33 @@ export default function ContenidoAdminPage() {
                   placeholder="Describe el contenido de esta lección..."
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none"
                 />
+              </div>
+
+              <div className="p-4 bg-gradient-to-r from-green-900/20 to-blue-900/20 rounded-xl border border-green-500/30">
+                <label className="block text-sm text-white font-medium mb-2">
+                  <Download className="w-4 h-4 inline mr-2" />
+                  📄 Documento PDF (opcional)
+                </label>
+                <input
+                  type="url"
+                  value={editFormData.pdfUrl}
+                  onChange={(e) => setEditFormData({ ...editFormData, pdfUrl: e.target.value })}
+                  placeholder="https://drive.google.com/file/d/..."
+                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-green focus:outline-none"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Sube el PDF a Google Drive → Compartir → Cualquier persona con el enlace → Pega el enlace aquí
+                </p>
+                {editFormData.pdfUrl && (
+                  <a 
+                    href={editFormData.pdfUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg"
+                  >
+                    <Download className="w-4 h-4" /> Ver PDF
+                  </a>
+                )}
               </div>
 
               <div className="flex items-center gap-6">

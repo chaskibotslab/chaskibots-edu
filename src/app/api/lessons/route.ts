@@ -117,6 +117,7 @@ export async function GET(request: Request) {
         images,
         content: record.fields.content || '',
         locked: record.fields.locked || false,
+        pdfUrl: record.fields.pdfUrl || '',
       }
     })
 
@@ -144,6 +145,7 @@ export async function POST(request: Request) {
     if (body.videoUrl) fields.videoUrl = body.videoUrl
     if (body.content) fields.content = body.content
     if (body.locked !== undefined) fields.locked = body.locked
+    if (body.pdfUrl) fields.pdfUrl = body.pdfUrl
     
     // Intentar primero sin el campo 'type' que puede causar problemas
     let response = await fetch(AIRTABLE_API_URL, {
@@ -220,6 +222,7 @@ export async function PUT(request: Request) {
     if (body.videoUrl !== undefined) fields.videoUrl = body.videoUrl
     if (body.content !== undefined) fields.content = body.content
     if (body.locked !== undefined) fields.locked = body.locked
+    if (body.pdfUrl !== undefined) fields.pdfUrl = body.pdfUrl
 
     const response = await fetch(AIRTABLE_API_URL, {
       method: 'PATCH',
