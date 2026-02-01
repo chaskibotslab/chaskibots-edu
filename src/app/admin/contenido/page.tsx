@@ -100,20 +100,6 @@ export default function ContenidoAdminPage() {
     moduleId: '',
     moduleName: ''
   })
-  
-  // Estados para documentos
-  const [documents, setDocuments] = useState<Document[]>([])
-  const [loadingDocs, setLoadingDocs] = useState(false)
-  const [showDocModal, setShowDocModal] = useState(false)
-  const [editingDoc, setEditingDoc] = useState<Document | null>(null)
-  const [activeTab, setActiveTab] = useState<'lessons' | 'documents'>('lessons')
-  const [docFormData, setDocFormData] = useState({
-    title: '',
-    description: '',
-    driveUrl: '',
-    category: 'codigo' as 'codigo' | 'tutorial' | 'ejercicio' | 'referencia' | 'otro',
-    tags: ''
-  })
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -126,7 +112,6 @@ export default function ContenidoAdminPage() {
 
   useEffect(() => {
     loadLessons()
-    loadDocuments()
   }, [selectedLevel])
 
   const loadLessons = async () => {
@@ -145,109 +130,6 @@ export default function ContenidoAdminPage() {
       console.error('Error loading lessons:', error)
     }
     setLoadingLessons(false)
-  }
-
-  const loadDocuments = async () => {
-    setLoadingDocs(true)
-    try {
-      let url = '/api/documents'
-      if (selectedLevel) {
-        url += `?levelId=${selectedLevel}`
-      }
-      const response = await fetch(url)
-      if (response.ok) {
-        const data = await response.json()
-        setDocuments(data.documents || [])
-      }
-    } catch (error) {
-      console.error('Error loading documents:', error)
-    }
-    setLoadingDocs(false)
-  }
-
-  const handleSaveDocument = async () => {
-    setSaving(true)
-    try {
-      const payload = {
-        ...docFormData,
-        levelId: selectedLevel,
-        tags: docFormData.tags.split(',').map(t => t.trim()).filter(Boolean)
-      }
-
-      if (editingDoc) {
-        const response = await fetch('/api/documents', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: editingDoc.id, ...payload })
-        })
-        if (response.ok) {
-          loadDocuments()
-          setShowDocModal(false)
-          setEditingDoc(null)
-        }
-      } else {
-        const response = await fetch('/api/documents', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        })
-        if (response.ok) {
-          loadDocuments()
-          setShowDocModal(false)
-        }
-      }
-    } catch (error) {
-      alert('Error al guardar documento')
-    }
-    setSaving(false)
-  }
-
-  const handleDeleteDocument = async (id: string) => {
-    if (!confirm('¿Eliminar este documento?')) return
-    try {
-      const response = await fetch(`/api/documents?id=${id}`, { method: 'DELETE' })
-      if (response.ok) loadDocuments()
-    } catch (error) {
-      alert('Error al eliminar')
-    }
-  }
-
-  const openDocModal = (doc?: Document) => {
-    if (doc) {
-      setEditingDoc(doc)
-      setDocFormData({
-        title: doc.title,
-        description: doc.description,
-        driveUrl: doc.driveUrl,
-        category: doc.category,
-        tags: doc.tags.join(', ')
-      })
-    } else {
-      setEditingDoc(null)
-      setDocFormData({ title: '', description: '', driveUrl: '', category: 'codigo', tags: '' })
-    }
-    setShowDocModal(true)
-  }
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'codigo': return <Code className="w-4 h-4 text-green-400" />
-      case 'tutorial': return <BookOpen className="w-4 h-4 text-blue-400" />
-      case 'ejercicio': return <FileCode className="w-4 h-4 text-orange-400" />
-      case 'referencia': return <FileText className="w-4 h-4 text-purple-400" />
-      default: return <FileText className="w-4 h-4 text-gray-400" />
-    }
-  }
-
-  const getCategoryLabel = (category: string) => {
-    const labels: Record<string, string> = {
-      codigo: 'Código',
-      tutorial: 'Tutorial',
-      ejercicio: 'Ejercicio',
-      referencia: 'Referencia',
-      otro: 'Otro'
-    }
-    return labels[category] || category
   }
 
   const openEditModal = (lesson: Lesson) => {
@@ -530,39 +412,11 @@ export default function ContenidoAdminPage() {
                     <div className="flex gap-4 mt-4 text-sm">
                       <span className="text-gray-400">{modules.length} módulos</span>
                       <span className="text-gray-400">{lessons.length} lecciones</span>
-                      <span className="text-gray-400">{documents.length} documentos</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Tabs */}
-              <div className="flex gap-2 border-b border-dark-600 pb-2">
-                <button
-                  onClick={() => setActiveTab('lessons')}
-                  className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${
-                    activeTab === 'lessons'
-                      ? 'bg-dark-700 text-neon-cyan border-b-2 border-neon-cyan'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  <Video className="w-4 h-4 inline mr-2" />
-                  Lecciones
-                </button>
-                <button
-                  onClick={() => setActiveTab('documents')}
-                  className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${
-                    activeTab === 'documents'
-                      ? 'bg-dark-700 text-neon-green border-b-2 border-neon-green'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  <FileCode className="w-4 h-4 inline mr-2" />
-                  Documentos PDF
-                </button>
-              </div>
-
-              {activeTab === 'lessons' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-white">Módulos y Lecciones</h3>
@@ -702,92 +556,6 @@ export default function ContenidoAdminPage() {
                   ))
                 )}
               </div>
-              )}
-
-              {/* Documents Tab */}
-              {activeTab === 'documents' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-white">Documentos y Códigos</h3>
-                  <button 
-                    onClick={() => openDocModal()}
-                    className="flex items-center gap-2 px-3 py-2 bg-neon-green text-dark-900 rounded-lg hover:bg-neon-green/90 font-medium"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Agregar Documento
-                  </button>
-                </div>
-
-                <div className="bg-dark-800/50 rounded-xl border border-dark-600 p-4">
-                  <p className="text-sm text-gray-400 mb-2">
-                    📁 Sube tus archivos PDF a Google Drive, luego pega el enlace aquí para que los estudiantes puedan descargarlos.
-                  </p>
-                </div>
-
-                {loadingDocs ? (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-8 h-8 animate-spin text-neon-green" />
-                  </div>
-                ) : documents.length === 0 ? (
-                  <div className="bg-dark-800 rounded-xl border border-dark-600 p-12 text-center">
-                    <FileCode className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                    <p className="text-gray-400 mb-2">No hay documentos para este nivel</p>
-                    <p className="text-sm text-gray-500">Agrega códigos, tutoriales y ejercicios en PDF</p>
-                  </div>
-                ) : (
-                  <div className="grid gap-3">
-                    {documents.map((doc) => (
-                      <div key={doc.id} className="bg-dark-800 rounded-xl border border-dark-600 p-4 hover:border-dark-500 transition-colors">
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 bg-dark-700 rounded-lg flex items-center justify-center">
-                            {getCategoryIcon(doc.category)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-white font-medium">{doc.title}</h4>
-                            <p className="text-sm text-gray-400 line-clamp-2">{doc.description}</p>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              <span className="px-2 py-0.5 bg-dark-700 text-xs text-gray-300 rounded">
-                                {getCategoryLabel(doc.category)}
-                              </span>
-                              {doc.tags.map((tag, i) => (
-                                <span key={i} className="px-2 py-0.5 bg-dark-600 text-xs text-gray-400 rounded">
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <a
-                              href={doc.driveUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 text-neon-green hover:bg-neon-green/20 rounded-lg"
-                              title="Descargar"
-                            >
-                              <Download className="w-5 h-5" />
-                            </a>
-                            <button
-                              onClick={() => openDocModal(doc)}
-                              className="p-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-600 rounded-lg"
-                              title="Editar"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteDocument(doc.id)}
-                              className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-600 rounded-lg"
-                              title="Eliminar"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              )}
             </div>
           )}
         </main>
@@ -1056,93 +824,6 @@ export default function ContenidoAdminPage() {
         </div>
       )}
 
-      {/* Modal Documento */}
-      {showDocModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-xl border border-dark-600 w-full max-w-lg">
-            <div className="flex items-center justify-between p-4 border-b border-dark-600">
-              <h3 className="text-xl font-semibold text-white">
-                {editingDoc ? 'Editar Documento' : 'Nuevo Documento'}
-              </h3>
-              <button onClick={() => { setShowDocModal(false); setEditingDoc(null); }} className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Título del Documento *</label>
-                <input
-                  type="text"
-                  value={docFormData.title}
-                  onChange={(e) => setDocFormData({ ...docFormData, title: e.target.value })}
-                  placeholder="Ej: Código Arduino - LED Blink"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-green focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Enlace de Google Drive *</label>
-                <input
-                  type="url"
-                  value={docFormData.driveUrl}
-                  onChange={(e) => setDocFormData({ ...docFormData, driveUrl: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/..."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-green focus:outline-none"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Sube el PDF a tu Drive, haz clic derecho → Compartir → Cualquier persona con el enlace → Copiar enlace
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Categoría</label>
-                <select
-                  value={docFormData.category}
-                  onChange={(e) => setDocFormData({ ...docFormData, category: e.target.value as any })}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-green focus:outline-none"
-                >
-                  <option value="codigo">📝 Código</option>
-                  <option value="tutorial">📖 Tutorial</option>
-                  <option value="ejercicio">✏️ Ejercicio</option>
-                  <option value="referencia">📚 Referencia</option>
-                  <option value="otro">📄 Otro</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Descripción (opcional)</label>
-                <textarea
-                  rows={2}
-                  value={docFormData.description}
-                  onChange={(e) => setDocFormData({ ...docFormData, description: e.target.value })}
-                  placeholder="Breve descripción del contenido..."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-green focus:outline-none resize-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Etiquetas (separadas por coma)</label>
-                <input
-                  type="text"
-                  value={docFormData.tags}
-                  onChange={(e) => setDocFormData({ ...docFormData, tags: e.target.value })}
-                  placeholder="arduino, led, básico"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-green focus:outline-none"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 p-4 border-t border-dark-600">
-              <button onClick={() => { setShowDocModal(false); setEditingDoc(null); }} className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600">
-                Cancelar
-              </button>
-              <button 
-                onClick={handleSaveDocument} 
-                disabled={saving || !docFormData.title.trim() || !docFormData.driveUrl.trim()} 
-                className="flex items-center gap-2 px-4 py-2 bg-neon-green text-dark-900 rounded-lg font-medium hover:bg-neon-green/90 disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                {editingDoc ? 'Guardar Cambios' : 'Crear Documento'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
