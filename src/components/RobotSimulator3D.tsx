@@ -42,6 +42,14 @@ interface RobotSimulator3DProps {
 }
 
 // Definición de laberintos/desafíos
+interface Collectible {
+  id: string
+  x: number
+  z: number
+  type: 'star' | 'gem' | 'coin' | 'key'
+  collected?: boolean
+}
+
 interface Challenge {
   id: string
   name: string
@@ -50,6 +58,8 @@ interface Challenge {
   start: { x: number, z: number, angle: number }
   goal: { x: number, z: number, radius: number }
   difficulty: 'easy' | 'medium' | 'hard'
+  collectibles?: Collectible[]
+  requireAllCollectibles?: boolean
 }
 
 // Área de juego: 400x400 unidades (centrado en 200,200)
@@ -229,6 +239,125 @@ const CHALLENGES: Challenge[] = [
     ],
     start: { x: 90, z: 320, angle: -90 },
     goal: { x: 340, z: 80, radius: 35 }
+  },
+  // === NIVELES CON COLECCIONABLES (Tipo Picto Blocks) ===
+  {
+    id: 'collect-stars',
+    name: 'Recolecta Estrellas',
+    description: 'Recoge las 3 estrellas y llega a la meta',
+    difficulty: 'easy',
+    obstacles: [],
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 340, z: 200, radius: 35 },
+    collectibles: [
+      { id: 's1', x: 150, z: 200, type: 'star' },
+      { id: 's2', x: 230, z: 200, type: 'star' },
+      { id: 's3', x: 310, z: 200, type: 'star' },
+    ],
+    requireAllCollectibles: true
+  },
+  {
+    id: 'treasure-hunt',
+    name: 'Caza del Tesoro',
+    description: 'Recoge las gemas evitando obstáculos',
+    difficulty: 'medium',
+    obstacles: [
+      { x: 150, z: 100, w: 20, h: 80 },
+      { x: 150, z: 220, w: 20, h: 80 },
+      { x: 250, z: 140, w: 20, h: 120 },
+    ],
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 340, z: 200, radius: 35 },
+    collectibles: [
+      { id: 'g1', x: 120, z: 120, type: 'gem' },
+      { id: 'g2', x: 120, z: 280, type: 'gem' },
+      { id: 'g3', x: 200, z: 200, type: 'gem' },
+      { id: 'g4', x: 300, z: 120, type: 'gem' },
+      { id: 'g5', x: 300, z: 280, type: 'gem' },
+    ],
+    requireAllCollectibles: true
+  },
+  {
+    id: 'coin-path',
+    name: 'Camino de Monedas',
+    description: 'Sigue el rastro de monedas',
+    difficulty: 'easy',
+    obstacles: [
+      { x: 60, z: 100, w: 280, h: 15 },
+      { x: 60, z: 285, w: 280, h: 15 },
+    ],
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 330, z: 200, radius: 35 },
+    collectibles: [
+      { id: 'c1', x: 120, z: 200, type: 'coin' },
+      { id: 'c2', x: 170, z: 200, type: 'coin' },
+      { id: 'c3', x: 220, z: 200, type: 'coin' },
+      { id: 'c4', x: 270, z: 200, type: 'coin' },
+    ],
+    requireAllCollectibles: false
+  },
+  {
+    id: 'key-door',
+    name: 'Llave y Puerta',
+    description: 'Recoge la llave para abrir la meta',
+    difficulty: 'medium',
+    obstacles: [
+      { x: 180, z: 60, w: 15, h: 130 },
+      { x: 180, z: 230, w: 15, h: 130 },
+    ],
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 330, z: 200, radius: 35 },
+    collectibles: [
+      { id: 'k1', x: 120, z: 320, type: 'key' },
+    ],
+    requireAllCollectibles: true
+  },
+  {
+    id: 'star-maze',
+    name: 'Laberinto Estelar',
+    description: 'Navega el laberinto recogiendo estrellas',
+    difficulty: 'hard',
+    obstacles: [
+      { x: 100, z: 60, w: 15, h: 120 },
+      { x: 100, z: 230, w: 15, h: 110 },
+      { x: 180, z: 120, w: 15, h: 160 },
+      { x: 260, z: 60, w: 15, h: 120 },
+      { x: 260, z: 230, w: 15, h: 110 },
+    ],
+    start: { x: 60, z: 200, angle: 0 },
+    goal: { x: 340, z: 200, radius: 35 },
+    collectibles: [
+      { id: 'sm1', x: 140, z: 100, type: 'star' },
+      { id: 'sm2', x: 140, z: 300, type: 'star' },
+      { id: 'sm3', x: 220, z: 200, type: 'star' },
+      { id: 'sm4', x: 300, z: 100, type: 'star' },
+      { id: 'sm5', x: 300, z: 300, type: 'star' },
+    ],
+    requireAllCollectibles: true
+  },
+  {
+    id: 'gem-collector',
+    name: 'Colector de Gemas',
+    description: 'Recoge todas las gemas en orden',
+    difficulty: 'hard',
+    obstacles: [
+      { x: 120, z: 60, w: 25, h: 60 },
+      { x: 120, z: 280, w: 25, h: 60 },
+      { x: 200, z: 140, w: 25, h: 120 },
+      { x: 280, z: 60, w: 25, h: 60 },
+      { x: 280, z: 280, w: 25, h: 60 },
+    ],
+    start: { x: 60, z: 200, angle: 0 },
+    goal: { x: 340, z: 200, radius: 35 },
+    collectibles: [
+      { id: 'gc1', x: 100, z: 100, type: 'gem' },
+      { id: 'gc2', x: 100, z: 300, type: 'gem' },
+      { id: 'gc3', x: 170, z: 200, type: 'gem' },
+      { id: 'gc4', x: 240, z: 100, type: 'gem' },
+      { id: 'gc5', x: 240, z: 300, type: 'gem' },
+      { id: 'gc6', x: 310, z: 200, type: 'gem' },
+    ],
+    requireAllCollectibles: true
   }
 ]
 
@@ -526,6 +655,100 @@ function GoalPoint({ position, reached }: { position: [number, number, number], 
   )
 }
 
+// Componente de Coleccionable 3D
+function CollectibleItem({ 
+  position, 
+  type, 
+  collected 
+}: { 
+  position: [number, number, number], 
+  type: 'star' | 'gem' | 'coin' | 'key',
+  collected: boolean 
+}) {
+  const meshRef = useRef<THREE.Mesh>(null)
+  
+  useFrame((state) => {
+    if (meshRef.current && !collected) {
+      meshRef.current.rotation.y = state.clock.elapsedTime * 2
+      meshRef.current.position.y = 0.3 + Math.sin(state.clock.elapsedTime * 3) * 0.1
+    }
+  })
+  
+  if (collected) return null
+  
+  const colors = {
+    star: { main: '#fbbf24', emissive: '#f59e0b' },
+    gem: { main: '#a855f7', emissive: '#9333ea' },
+    coin: { main: '#fcd34d', emissive: '#eab308' },
+    key: { main: '#ef4444', emissive: '#dc2626' }
+  }
+  
+  const color = colors[type]
+  
+  return (
+    <group position={position}>
+      <mesh ref={meshRef} position={[0, 0.3, 0]}>
+        {type === 'star' && (
+          <>
+            <octahedronGeometry args={[0.25, 0]} />
+            <meshStandardMaterial 
+              color={color.main}
+              emissive={color.emissive}
+              emissiveIntensity={0.8}
+              metalness={0.8}
+              roughness={0.2}
+            />
+          </>
+        )}
+        {type === 'gem' && (
+          <>
+            <octahedronGeometry args={[0.2, 2]} />
+            <meshStandardMaterial 
+              color={color.main}
+              emissive={color.emissive}
+              emissiveIntensity={0.6}
+              metalness={0.9}
+              roughness={0.1}
+              transparent
+              opacity={0.9}
+            />
+          </>
+        )}
+        {type === 'coin' && (
+          <>
+            <cylinderGeometry args={[0.2, 0.2, 0.05, 32]} />
+            <meshStandardMaterial 
+              color={color.main}
+              emissive={color.emissive}
+              emissiveIntensity={0.5}
+              metalness={1}
+              roughness={0.2}
+            />
+          </>
+        )}
+        {type === 'key' && (
+          <>
+            <boxGeometry args={[0.15, 0.35, 0.08]} />
+            <meshStandardMaterial 
+              color={color.main}
+              emissive={color.emissive}
+              emissiveIntensity={0.6}
+              metalness={0.7}
+              roughness={0.3}
+            />
+          </>
+        )}
+      </mesh>
+      <pointLight 
+        position={[0, 0.5, 0]} 
+        intensity={1.5} 
+        color={color.main} 
+        distance={2}
+      />
+    </group>
+  )
+}
+
 // Componente del Grid manual
 function CustomGrid() {
   const gridRef = useRef<THREE.Group>(null)
@@ -617,12 +840,14 @@ function Scene({
   robotState, 
   obstacles, 
   challenge,
-  goalReached 
+  goalReached,
+  collectedItems
 }: { 
   robotState: RobotState, 
   obstacles: Array<{x: number, z: number, w: number, h: number}>,
   challenge: Challenge,
-  goalReached: boolean
+  goalReached: boolean,
+  collectedItems: Set<string>
 }) {
   // Convertir obstáculos 2D a posiciones 3D
   const scale = 0.025
@@ -687,6 +912,16 @@ function Scene({
         <Obstacle key={i} position={obs.position} size={obs.size} />
       ))}
 
+      {/* Coleccionables */}
+      {challenge.collectibles?.map((item) => (
+        <CollectibleItem
+          key={item.id}
+          position={[(item.x - 200) * scale, 0, (item.z - 200) * scale]}
+          type={item.type}
+          collected={collectedItems.has(item.id)}
+        />
+      ))}
+
       <Robot state={robotState} obstacles={obstacles} />
     </>
   )
@@ -700,6 +935,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0)
   const [goalReached, setGoalReached] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [collectedItems, setCollectedItems] = useState<Set<string>>(new Set())
   
   const currentChallenge = CHALLENGES[currentChallengeIndex]
   
@@ -721,17 +957,47 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
   // Obstáculos del desafío actual
   const obstacles = currentChallenge.obstacles
   
+  // Verificar colección de items
+  useEffect(() => {
+    if (!currentChallenge.collectibles) return
+    
+    currentChallenge.collectibles.forEach(item => {
+      if (collectedItems.has(item.id)) return
+      
+      const dx = robotState.x - item.x
+      const dz = robotState.z - item.z
+      const distance = Math.sqrt(dx * dx + dz * dz)
+      
+      if (distance < 40) {
+        setCollectedItems(prev => {
+          const newSet = new Set(Array.from(prev))
+          newSet.add(item.id)
+          return newSet
+        })
+      }
+    })
+  }, [robotState.x, robotState.z, currentChallenge.collectibles, collectedItems])
+  
   // Verificar si llegó a la meta
   useEffect(() => {
     const dx = robotState.x - currentChallenge.goal.x
     const dz = robotState.z - currentChallenge.goal.z
     const distance = Math.sqrt(dx * dx + dz * dz)
     
-    if (distance < currentChallenge.goal.radius && !goalReached) {
+    // Verificar si se requieren todos los coleccionables
+    const allCollected = !currentChallenge.requireAllCollectibles || 
+      !currentChallenge.collectibles ||
+      currentChallenge.collectibles.every(item => collectedItems.has(item.id))
+    
+    if (distance < currentChallenge.goal.radius && !goalReached && allCollected) {
       setGoalReached(true)
       setIsRunning(false)
     }
-  }, [robotState.x, robotState.z, currentChallenge.goal, goalReached])
+  }, [robotState.x, robotState.z, currentChallenge.goal, goalReached, collectedItems, currentChallenge.requireAllCollectibles, currentChallenge.collectibles])
+  
+  // Contar coleccionables
+  const totalCollectibles = currentChallenge.collectibles?.length || 0
+  const collectedCount = currentChallenge.collectibles?.filter(item => collectedItems.has(item.id)).length || 0
   
   // Cambiar desafío
   const changeChallenge = (direction: 'prev' | 'next') => {
@@ -741,6 +1007,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
     
     setCurrentChallengeIndex(newIndex)
     setGoalReached(false)
+    setCollectedItems(new Set())
     const newChallenge = CHALLENGES[newIndex]
     setRobotState({
       x: newChallenge.start.x,
@@ -965,6 +1232,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
   const resetRobot = () => {
     setIsRunning(false)
     setGoalReached(false)
+    setCollectedItems(new Set())
     setRobotState({
       x: currentChallenge.start.x,
       z: currentChallenge.start.z,
@@ -1126,6 +1394,36 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
         </div>
       </div>
 
+      {/* Contador de coleccionables */}
+      {totalCollectibles > 0 && (
+        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-purple-500/30 p-2 flex-shrink-0">
+          <div className="flex items-center justify-center gap-3">
+            <span className="text-xs text-gray-400">Coleccionables:</span>
+            <div className="flex items-center gap-1">
+              {currentChallenge.collectibles?.map((item) => (
+                <div 
+                  key={item.id}
+                  className={`w-5 h-5 rounded-full flex items-center justify-center text-xs transition-all ${
+                    collectedItems.has(item.id)
+                      ? item.type === 'star' ? 'bg-yellow-500 text-yellow-900'
+                        : item.type === 'gem' ? 'bg-purple-500 text-purple-900'
+                        : item.type === 'coin' ? 'bg-amber-400 text-amber-900'
+                        : 'bg-red-500 text-red-900'
+                      : 'bg-dark-600 text-gray-500'
+                  }`}
+                >
+                  {item.type === 'star' ? '★' : item.type === 'gem' ? '◆' : item.type === 'coin' ? '●' : '🔑'}
+                </div>
+              ))}
+            </div>
+            <span className="text-xs font-bold text-purple-300">{collectedCount}/{totalCollectibles}</span>
+            {currentChallenge.requireAllCollectibles && collectedCount < totalCollectibles && (
+              <span className="text-xs text-orange-400">(Requeridos)</span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Mensaje de victoria */}
       {goalReached && (
         <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-b border-yellow-500/30 p-3 flex-shrink-0">
@@ -1146,6 +1444,7 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
               obstacles={obstacles} 
               challenge={currentChallenge}
               goalReached={goalReached}
+              collectedItems={collectedItems}
             />
           </Canvas>
         </div>
