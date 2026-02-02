@@ -751,15 +751,23 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
           break
           
         case 'turn_left':
-          newState.angle -= 3
+          // Usar el ángulo del parámetro, dividido por los pasos de la duración
+          const turnLeftAngle = cmd.params.angle || 90
+          const turnLeftSteps = Math.ceil((cmd.duration || 500) / 50)
+          newState.angle -= turnLeftAngle / turnLeftSteps
           newState.leftMotor = 0
           newState.rightMotor = 150
+          newState.isMoving = true
           break
           
         case 'turn_right':
-          newState.angle += 3
+          // Usar el ángulo del parámetro, dividido por los pasos de la duración
+          const turnRightAngle = cmd.params.angle || 90
+          const turnRightSteps = Math.ceil((cmd.duration || 500) / 50)
+          newState.angle += turnRightAngle / turnRightSteps
           newState.leftMotor = 150
           newState.rightMotor = 0
+          newState.isMoving = true
           break
           
         case 'stop':

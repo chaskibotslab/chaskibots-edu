@@ -584,17 +584,19 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
           })
           break
         case 'robot_turn_left':
+          const leftAngle = block.getFieldValue('ANGLE') || 90
           commands.push({
             type: 'turn_left',
-            params: { angle: block.getFieldValue('ANGLE') || 90 },
-            duration: 500
+            params: { angle: leftAngle },
+            duration: Math.max(300, leftAngle * 8) // Duración proporcional al ángulo
           })
           break
         case 'robot_turn_right':
+          const rightAngle = block.getFieldValue('ANGLE') || 90
           commands.push({
             type: 'turn_right',
-            params: { angle: block.getFieldValue('ANGLE') || 90 },
-            duration: 500
+            params: { angle: rightAngle },
+            duration: Math.max(300, rightAngle * 8) // Duración proporcional al ángulo
           })
           break
         case 'robot_stop':
