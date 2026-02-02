@@ -8,7 +8,7 @@ import * as THREE from 'three'
 import { 
   RotateCcw, ArrowUp, ArrowDown, Play, Pause,
   ArrowLeft, ArrowRight, Square, Map, Trophy, ChevronLeft, ChevronRight,
-  Maximize2, Minimize2, Lightbulb, Eye, Gauge
+  Maximize2, Minimize2, Lightbulb, Eye, Gauge, Send
 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -62,6 +62,7 @@ interface Challenge {
   id: string
   name: string
   description: string
+  category: 'laberinto' | 'coleccionables' | 'minisumo'
   obstacles: Array<{x: number, z: number, w: number, h: number}>
   start: { x: number, z: number, angle: number }
   goal: { x: number, z: number, radius: number }
@@ -73,6 +74,14 @@ interface Challenge {
   winCondition?: 'reach_goal' | 'push_all_out'
 }
 
+type ChallengeCategory = 'laberinto' | 'coleccionables' | 'minisumo'
+
+const CATEGORY_INFO: Record<ChallengeCategory, { name: string, icon: string, color: string }> = {
+  laberinto: { name: 'Laberintos', icon: '🧩', color: 'from-blue-500/20 to-cyan-500/20' },
+  coleccionables: { name: 'Coleccionables', icon: '⭐', color: 'from-purple-500/20 to-pink-500/20' },
+  minisumo: { name: 'Mini Sumo', icon: '🥋', color: 'from-red-500/20 to-orange-500/20' }
+}
+
 // Área de juego: 400x400 unidades (centrado en 200,200)
 // El círculo 3D tiene radio 5, que equivale a 200 unidades desde el centro
 // Todos los obstáculos deben estar entre 40 y 360 para quedar dentro del círculo
@@ -81,11 +90,12 @@ const ARENA_CENTER = 200
 const ARENA_MARGIN = 50 // Margen desde el borde
 
 const CHALLENGES: Challenge[] = [
-  // === NIVEL FÁCIL === (pasillos anchos ~100 unidades)
+  // === LABERINTOS - NIVEL FÁCIL === (pasillos anchos ~100 unidades)
   {
     id: 'basic',
     name: 'Camino Recto',
     description: 'Llega a la meta en línea recta',
+    category: 'laberinto',
     difficulty: 'easy',
     obstacles: [
       { x: 60, z: 100, w: 280, h: 15 },
@@ -98,6 +108,7 @@ const CHALLENGES: Challenge[] = [
     id: 'turn-right',
     name: 'Giro Derecha',
     description: 'Avanza y gira 90° a la derecha',
+    category: 'laberinto',
     difficulty: 'easy',
     obstacles: [
       { x: 60, z: 100, w: 180, h: 15 },
@@ -112,6 +123,7 @@ const CHALLENGES: Challenge[] = [
     id: 'turn-left',
     name: 'Giro Izquierda',
     description: 'Avanza y gira 90° a la izquierda',
+    category: 'laberinto',
     difficulty: 'easy',
     obstacles: [
       { x: 60, z: 115, w: 15, h: 15 },
@@ -122,11 +134,12 @@ const CHALLENGES: Challenge[] = [
     start: { x: 70, z: 200, angle: 0 },
     goal: { x: 290, z: 70, radius: 35 }
   },
-  // === NIVEL MEDIO === (pasillos ~90 unidades)
+  // === LABERINTOS - NIVEL MEDIO === (pasillos ~90 unidades)
   {
     id: 'zigzag',
     name: 'Zigzag',
     description: 'Navega en zigzag entre obstáculos',
+    category: 'laberinto',
     difficulty: 'medium',
     obstacles: [
       { x: 120, z: 60, w: 20, h: 100 },
@@ -142,6 +155,7 @@ const CHALLENGES: Challenge[] = [
     id: 'slalom',
     name: 'Slalom',
     description: 'Zigzaguea entre los postes',
+    category: 'laberinto',
     difficulty: 'medium',
     obstacles: [
       { x: 130, z: 60, w: 30, h: 60 },
@@ -157,6 +171,7 @@ const CHALLENGES: Challenge[] = [
     id: 'u-turn',
     name: 'Media Vuelta',
     description: 'Da la vuelta y llega al otro lado',
+    category: 'laberinto',
     difficulty: 'medium',
     obstacles: [
       { x: 60, z: 60, w: 220, h: 15 },
@@ -172,6 +187,7 @@ const CHALLENGES: Challenge[] = [
     id: 'corridor',
     name: 'Corredor L',
     description: 'Navega por el pasillo en L',
+    category: 'laberinto',
     difficulty: 'medium',
     obstacles: [
       { x: 60, z: 60, w: 15, h: 180 },
@@ -184,11 +200,12 @@ const CHALLENGES: Challenge[] = [
     start: { x: 105, z: 105, angle: 90 },
     goal: { x: 275, z: 270, radius: 35 }
   },
-  // === NIVEL DIFÍCIL === (pasillos ~80 unidades)
+  // === LABERINTOS - NIVEL DIFÍCIL === (pasillos ~80 unidades)
   {
     id: 'spiral',
     name: 'Espiral',
     description: 'Navega por el camino en espiral',
+    category: 'laberinto',
     difficulty: 'hard',
     obstacles: [
       { x: 50, z: 50, w: 300, h: 15 },
@@ -207,6 +224,7 @@ const CHALLENGES: Challenge[] = [
     id: 'maze',
     name: 'Laberinto',
     description: 'Encuentra el camino correcto',
+    category: 'laberinto',
     difficulty: 'hard',
     obstacles: [
       { x: 120, z: 50, w: 15, h: 130 },
@@ -224,6 +242,7 @@ const CHALLENGES: Challenge[] = [
     id: 'obstacle-course',
     name: 'Carrera Obstáculos',
     description: 'Evita todos los obstáculos',
+    category: 'laberinto',
     difficulty: 'hard',
     obstacles: [
       { x: 120, z: 80, w: 35, h: 35 },
@@ -239,6 +258,7 @@ const CHALLENGES: Challenge[] = [
     id: 'snake',
     name: 'Serpiente',
     description: 'Sigue el camino serpenteante',
+    category: 'laberinto',
     difficulty: 'hard',
     obstacles: [
       { x: 50, z: 50, w: 15, h: 130 },
@@ -251,11 +271,12 @@ const CHALLENGES: Challenge[] = [
     start: { x: 90, z: 320, angle: -90 },
     goal: { x: 340, z: 80, radius: 35 }
   },
-  // === NIVELES CON COLECCIONABLES (Tipo Picto Blocks) ===
+  // === COLECCIONABLES (Tipo Picto Blocks) ===
   {
     id: 'collect-stars',
     name: 'Recolecta Estrellas',
     description: 'Recoge las 3 estrellas y llega a la meta',
+    category: 'coleccionables',
     difficulty: 'easy',
     obstacles: [],
     start: { x: 70, z: 200, angle: 0 },
@@ -271,6 +292,7 @@ const CHALLENGES: Challenge[] = [
     id: 'treasure-hunt',
     name: 'Caza del Tesoro',
     description: 'Recoge las gemas evitando obstáculos',
+    category: 'coleccionables',
     difficulty: 'medium',
     obstacles: [
       { x: 150, z: 100, w: 20, h: 80 },
@@ -292,6 +314,7 @@ const CHALLENGES: Challenge[] = [
     id: 'coin-path',
     name: 'Camino de Monedas',
     description: 'Sigue el rastro de monedas',
+    category: 'coleccionables',
     difficulty: 'easy',
     obstacles: [
       { x: 60, z: 100, w: 280, h: 15 },
@@ -311,6 +334,7 @@ const CHALLENGES: Challenge[] = [
     id: 'key-door',
     name: 'Llave y Puerta',
     description: 'Recoge la llave para abrir la meta',
+    category: 'coleccionables',
     difficulty: 'medium',
     obstacles: [
       { x: 180, z: 60, w: 15, h: 130 },
@@ -327,6 +351,7 @@ const CHALLENGES: Challenge[] = [
     id: 'star-maze',
     name: 'Laberinto Estelar',
     description: 'Navega el laberinto recogiendo estrellas',
+    category: 'coleccionables',
     difficulty: 'hard',
     obstacles: [
       { x: 100, z: 60, w: 15, h: 120 },
@@ -350,6 +375,7 @@ const CHALLENGES: Challenge[] = [
     id: 'gem-collector',
     name: 'Colector de Gemas',
     description: 'Recoge todas las gemas en orden',
+    category: 'coleccionables',
     difficulty: 'hard',
     obstacles: [
       { x: 120, z: 60, w: 25, h: 60 },
@@ -370,11 +396,12 @@ const CHALLENGES: Challenge[] = [
     ],
     requireAllCollectibles: true
   },
-  // === NIVELES MINI SUMO (empujar objetos fuera del dohyo) ===
+  // === MINI SUMO (empujar objetos fuera del dohyo) ===
   {
     id: 'sumo-basic',
     name: 'Mini Sumo Básico',
     description: 'Empuja el vaso fuera del dohyo',
+    category: 'minisumo',
     difficulty: 'easy',
     obstacles: [],
     start: { x: 200, z: 280, angle: -90 },
@@ -389,6 +416,7 @@ const CHALLENGES: Challenge[] = [
     id: 'sumo-duo',
     name: 'Sumo Doble',
     description: 'Empuja los 2 vasos fuera del ring',
+    category: 'minisumo',
     difficulty: 'medium',
     obstacles: [],
     start: { x: 200, z: 300, angle: -90 },
@@ -404,6 +432,7 @@ const CHALLENGES: Challenge[] = [
     id: 'sumo-trio',
     name: 'Sumo Triple',
     description: 'Saca los 3 objetos del dohyo',
+    category: 'minisumo',
     difficulty: 'medium',
     obstacles: [],
     start: { x: 200, z: 310, angle: -90 },
@@ -420,6 +449,7 @@ const CHALLENGES: Challenge[] = [
     id: 'sumo-boxes',
     name: 'Cajas Rebeldes',
     description: 'Empuja todas las cajas fuera del área',
+    category: 'minisumo',
     difficulty: 'hard',
     obstacles: [],
     start: { x: 200, z: 320, angle: -90 },
@@ -437,6 +467,7 @@ const CHALLENGES: Challenge[] = [
     id: 'sumo-challenge',
     name: 'Desafío Sumo',
     description: 'Limpia el dohyo de todos los objetos',
+    category: 'minisumo',
     difficulty: 'hard',
     obstacles: [],
     start: { x: 200, z: 330, angle: -90 },
@@ -1166,7 +1197,13 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
   const [collectedItems, setCollectedItems] = useState<Set<string>>(new Set())
   const [pushablePositions, setPushablePositions] = useState<{[key: string]: {x: number, z: number}}>({})
   const [objectsOutOfDohyo, setObjectsOutOfDohyo] = useState<Set<string>>(new Set())
+  const [selectedCategory, setSelectedCategory] = useState<ChallengeCategory>('laberinto')
+  const [showSubmitModal, setShowSubmitModal] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   
+  // Filtrar desafíos por categoría
+  const filteredChallenges = CHALLENGES.filter(c => c.category === selectedCategory)
+  const currentChallengeInCategory = filteredChallenges.findIndex(c => c.id === CHALLENGES[currentChallengeIndex]?.id)
   const currentChallenge = CHALLENGES[currentChallengeIndex]
   
   const [robotState, setRobotState] = useState<RobotState>({
@@ -1289,18 +1326,27 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
     }
   }, [objectsOutOfDohyo, currentChallenge.winCondition, currentChallenge.pushableObjects, goalReached])
   
-  // Cambiar desafío
+  // Cambiar desafío dentro de la categoría actual
   const changeChallenge = (direction: 'prev' | 'next') => {
-    const newIndex = direction === 'next' 
-      ? (currentChallengeIndex + 1) % CHALLENGES.length
-      : (currentChallengeIndex - 1 + CHALLENGES.length) % CHALLENGES.length
+    const currentIndexInFiltered = filteredChallenges.findIndex(c => c.id === currentChallenge?.id)
+    let newFilteredIndex: number
     
-    setCurrentChallengeIndex(newIndex)
+    if (currentIndexInFiltered === -1) {
+      newFilteredIndex = 0
+    } else {
+      newFilteredIndex = direction === 'next' 
+        ? (currentIndexInFiltered + 1) % filteredChallenges.length
+        : (currentIndexInFiltered - 1 + filteredChallenges.length) % filteredChallenges.length
+    }
+    
+    const newChallenge = filteredChallenges[newFilteredIndex]
+    const globalIndex = CHALLENGES.findIndex(c => c.id === newChallenge.id)
+    
+    setCurrentChallengeIndex(globalIndex)
     setGoalReached(false)
     setCollectedItems(new Set())
     setPushablePositions({})
     setObjectsOutOfDohyo(new Set())
-    const newChallenge = CHALLENGES[newIndex]
     setRobotState({
       x: newChallenge.start.x,
       z: newChallenge.start.z,
@@ -1315,6 +1361,51 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
       servoAngle: 90,
       isMoving: false
     })
+  }
+  
+  // Cambiar categoría
+  const changeCategory = (category: ChallengeCategory) => {
+    setSelectedCategory(category)
+    const firstChallengeInCategory = CHALLENGES.find(c => c.category === category)
+    if (firstChallengeInCategory) {
+      const globalIndex = CHALLENGES.findIndex(c => c.id === firstChallengeInCategory.id)
+      setCurrentChallengeIndex(globalIndex)
+      setGoalReached(false)
+      setCollectedItems(new Set())
+      setPushablePositions({})
+      setObjectsOutOfDohyo(new Set())
+      setRobotState({
+        x: firstChallengeInCategory.start.x,
+        z: firstChallengeInCategory.start.z,
+        angle: firstChallengeInCategory.start.angle,
+        speed: 0,
+        leftMotor: 0,
+        rightMotor: 0,
+        leds: { 13: false, 12: false, 11: false, 10: false },
+        buzzerFreq: 0,
+        ultrasonicDistance: 100,
+        irSensor: false,
+        servoAngle: 90,
+        isMoving: false
+      })
+    }
+  }
+  
+  // Enviar reto completado
+  const submitChallenge = async () => {
+    if (!goalReached) return
+    
+    setSubmitting(true)
+    try {
+      // Simular envío - aquí se conectaría con el API real
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      alert(`¡Reto "${currentChallenge.name}" enviado exitosamente! 🎉`)
+      setShowSubmitModal(false)
+    } catch (error) {
+      alert('Error al enviar el reto. Intenta de nuevo.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   // Función para detectar colisión
@@ -1641,19 +1732,42 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
         </div>
       </div>
 
-      {/* Selector de desafío */}
+      {/* Selector de categoría */}
       <div className="bg-dark-900/50 border-b border-dark-600 p-2 flex-shrink-0">
+        <div className="flex items-center justify-center gap-2">
+          {(Object.keys(CATEGORY_INFO) as ChallengeCategory[]).map((cat) => (
+            <button
+              key={cat}
+              onClick={() => changeCategory(cat)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                selectedCategory === cat
+                  ? `bg-gradient-to-r ${CATEGORY_INFO[cat].color} border border-white/20 text-white`
+                  : 'bg-dark-700 hover:bg-dark-600 text-gray-400'
+              }`}
+            >
+              <span>{CATEGORY_INFO[cat].icon}</span>
+              <span>{CATEGORY_INFO[cat].name}</span>
+              <span className="text-[10px] opacity-60">
+                ({CHALLENGES.filter(c => c.category === cat).length})
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Selector de desafío dentro de la categoría */}
+      <div className={`bg-gradient-to-r ${CATEGORY_INFO[selectedCategory].color} border-b border-dark-600 p-2 flex-shrink-0`}>
         <div className="flex items-center justify-between">
           <button
             onClick={() => changeChallenge('prev')}
-            className="p-1.5 bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors"
+            className="p-1.5 bg-dark-700/50 hover:bg-dark-600 rounded-lg transition-colors"
           >
-            <ChevronLeft className="w-4 h-4 text-gray-400" />
+            <ChevronLeft className="w-4 h-4 text-gray-300" />
           </button>
           
           <div className="flex-1 text-center">
             <div className="flex items-center justify-center gap-2">
-              <Map className="w-4 h-4 text-purple-400" />
+              <span className="text-lg">{CATEGORY_INFO[selectedCategory].icon}</span>
               <span className="text-sm font-medium text-white">{currentChallenge.name}</span>
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                 currentChallenge.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
@@ -1664,24 +1778,24 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
                  currentChallenge.difficulty === 'medium' ? 'Medio' : 'Difícil'}
               </span>
             </div>
-            <p className="text-[10px] text-gray-500">{currentChallenge.description}</p>
+            <p className="text-[10px] text-gray-300">{currentChallenge.description}</p>
           </div>
           
           <button
             onClick={() => changeChallenge('next')}
-            className="p-1.5 bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors"
+            className="p-1.5 bg-dark-700/50 hover:bg-dark-600 rounded-lg transition-colors"
           >
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <ChevronRight className="w-4 h-4 text-gray-300" />
           </button>
         </div>
         
-        {/* Indicadores de desafíos */}
+        {/* Indicadores de desafíos en la categoría */}
         <div className="flex justify-center gap-1 mt-2">
-          {CHALLENGES.map((_, i) => (
+          {filteredChallenges.map((challenge, i) => (
             <div 
-              key={i}
+              key={challenge.id}
               className={`w-2 h-2 rounded-full transition-colors ${
-                i === currentChallengeIndex ? 'bg-purple-400' : 'bg-dark-600'
+                challenge.id === currentChallenge.id ? 'bg-white' : 'bg-white/30'
               }`}
             />
           ))}
@@ -1744,13 +1858,77 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
         </div>
       )}
 
-      {/* Mensaje de victoria */}
+      {/* Mensaje de victoria con botón de enviar */}
       {goalReached && (
         <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-b border-yellow-500/30 p-3 flex-shrink-0">
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-3">
             <Trophy className="w-5 h-5 text-yellow-400" />
-            <span className="text-sm font-bold text-yellow-300">¡Felicidades! Llegaste a la meta</span>
-            <Trophy className="w-5 h-5 text-yellow-400" />
+            <span className="text-sm font-bold text-yellow-300">¡Reto completado!</span>
+            <button
+              onClick={() => setShowSubmitModal(true)}
+              className="flex items-center gap-1 px-3 py-1 bg-green-500/30 hover:bg-green-500/50 text-green-300 rounded-lg text-xs font-medium transition-colors border border-green-500/30"
+            >
+              <Send className="w-3 h-3" />
+              Enviar Reto
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de envío de reto */}
+      {showSubmitModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100]">
+          <div className="bg-dark-800 rounded-xl border border-dark-600 p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-yellow-400" />
+              Enviar Reto Completado
+            </h3>
+            <div className="bg-dark-700 rounded-lg p-4 mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">{CATEGORY_INFO[selectedCategory].icon}</span>
+                <span className="text-white font-medium">{currentChallenge.name}</span>
+              </div>
+              <p className="text-sm text-gray-400">{currentChallenge.description}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                  currentChallenge.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
+                  currentChallenge.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                  'bg-red-500/20 text-red-400'
+                }`}>
+                  {currentChallenge.difficulty === 'easy' ? 'Fácil' : 
+                   currentChallenge.difficulty === 'medium' ? 'Medio' : 'Difícil'}
+                </span>
+                <span className="text-xs text-gray-500">Categoría: {CATEGORY_INFO[selectedCategory].name}</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-400 mb-4">
+              ¿Deseas enviar este reto como completado a tu docente?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSubmitModal(false)}
+                className="flex-1 px-4 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={submitChallenge}
+                disabled={submitting}
+                className="flex-1 px-4 py-2 bg-green-500/30 hover:bg-green-500/50 text-green-300 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {submitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-green-300/30 border-t-green-300 rounded-full animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Enviar
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
