@@ -50,6 +50,14 @@ interface Collectible {
   collected?: boolean
 }
 
+interface PushableObject {
+  id: string
+  x: number
+  z: number
+  type: 'cup' | 'box' | 'cylinder'
+  radius: number
+}
+
 interface Challenge {
   id: string
   name: string
@@ -60,6 +68,9 @@ interface Challenge {
   difficulty: 'easy' | 'medium' | 'hard'
   collectibles?: Collectible[]
   requireAllCollectibles?: boolean
+  pushableObjects?: PushableObject[]
+  dohyo?: { x: number, z: number, radius: number }
+  winCondition?: 'reach_goal' | 'push_all_out'
 }
 
 // Área de juego: 400x400 unidades (centrado en 200,200)
@@ -358,6 +369,87 @@ const CHALLENGES: Challenge[] = [
       { id: 'gc6', x: 310, z: 200, type: 'gem' },
     ],
     requireAllCollectibles: true
+  },
+  // === NIVELES MINI SUMO (empujar objetos fuera del dohyo) ===
+  {
+    id: 'sumo-basic',
+    name: 'Mini Sumo Básico',
+    description: 'Empuja el vaso fuera del dohyo',
+    difficulty: 'easy',
+    obstacles: [],
+    start: { x: 200, z: 280, angle: -90 },
+    goal: { x: 200, z: 200, radius: 20 },
+    dohyo: { x: 200, z: 200, radius: 150 },
+    pushableObjects: [
+      { id: 'cup1', x: 200, z: 150, type: 'cup', radius: 20 }
+    ],
+    winCondition: 'push_all_out'
+  },
+  {
+    id: 'sumo-duo',
+    name: 'Sumo Doble',
+    description: 'Empuja los 2 vasos fuera del ring',
+    difficulty: 'medium',
+    obstacles: [],
+    start: { x: 200, z: 300, angle: -90 },
+    goal: { x: 200, z: 200, radius: 20 },
+    dohyo: { x: 200, z: 200, radius: 150 },
+    pushableObjects: [
+      { id: 'cup1', x: 150, z: 150, type: 'cup', radius: 20 },
+      { id: 'cup2', x: 250, z: 150, type: 'cup', radius: 20 }
+    ],
+    winCondition: 'push_all_out'
+  },
+  {
+    id: 'sumo-trio',
+    name: 'Sumo Triple',
+    description: 'Saca los 3 objetos del dohyo',
+    difficulty: 'medium',
+    obstacles: [],
+    start: { x: 200, z: 310, angle: -90 },
+    goal: { x: 200, z: 200, radius: 20 },
+    dohyo: { x: 200, z: 200, radius: 150 },
+    pushableObjects: [
+      { id: 'obj1', x: 150, z: 130, type: 'cylinder', radius: 18 },
+      { id: 'obj2', x: 200, z: 100, type: 'cup', radius: 20 },
+      { id: 'obj3', x: 250, z: 130, type: 'cylinder', radius: 18 }
+    ],
+    winCondition: 'push_all_out'
+  },
+  {
+    id: 'sumo-boxes',
+    name: 'Cajas Rebeldes',
+    description: 'Empuja todas las cajas fuera del área',
+    difficulty: 'hard',
+    obstacles: [],
+    start: { x: 200, z: 320, angle: -90 },
+    goal: { x: 200, z: 200, radius: 20 },
+    dohyo: { x: 200, z: 200, radius: 160 },
+    pushableObjects: [
+      { id: 'box1', x: 140, z: 140, type: 'box', radius: 22 },
+      { id: 'box2', x: 260, z: 140, type: 'box', radius: 22 },
+      { id: 'box3', x: 200, z: 100, type: 'box', radius: 22 },
+      { id: 'box4', x: 170, z: 180, type: 'box', radius: 18 }
+    ],
+    winCondition: 'push_all_out'
+  },
+  {
+    id: 'sumo-challenge',
+    name: 'Desafío Sumo',
+    description: 'Limpia el dohyo de todos los objetos',
+    difficulty: 'hard',
+    obstacles: [],
+    start: { x: 200, z: 330, angle: -90 },
+    goal: { x: 200, z: 200, radius: 20 },
+    dohyo: { x: 200, z: 200, radius: 160 },
+    pushableObjects: [
+      { id: 'c1', x: 130, z: 130, type: 'cup', radius: 18 },
+      { id: 'c2', x: 200, z: 90, type: 'cylinder', radius: 20 },
+      { id: 'c3', x: 270, z: 130, type: 'cup', radius: 18 },
+      { id: 'b1', x: 150, z: 200, type: 'box', radius: 16 },
+      { id: 'b2', x: 250, z: 200, type: 'box', radius: 16 }
+    ],
+    winCondition: 'push_all_out'
   }
 ]
 
@@ -749,6 +841,117 @@ function CollectibleItem({
   )
 }
 
+// Componente de Objeto Empujable 3D (para Mini Sumo)
+function PushableItem({ 
+  position, 
+  type,
+  isOut
+}: { 
+  position: [number, number, number], 
+  type: 'cup' | 'box' | 'cylinder',
+  isOut: boolean
+}) {
+  const meshRef = useRef<THREE.Mesh>(null)
+  
+  const colors = {
+    cup: { main: '#ef4444', emissive: '#dc2626' },
+    box: { main: '#3b82f6', emissive: '#2563eb' },
+    cylinder: { main: '#22c55e', emissive: '#16a34a' }
+  }
+  
+  const color = colors[type]
+  
+  return (
+    <group position={position}>
+      <mesh ref={meshRef} position={[0, type === 'cup' ? 0.25 : 0.2, 0]} castShadow>
+        {type === 'cup' && (
+          <>
+            <cylinderGeometry args={[0.35, 0.25, 0.5, 16]} />
+            <meshStandardMaterial 
+              color={isOut ? '#666666' : color.main}
+              emissive={isOut ? '#333333' : color.emissive}
+              emissiveIntensity={isOut ? 0.1 : 0.4}
+              metalness={0.3}
+              roughness={0.7}
+            />
+          </>
+        )}
+        {type === 'box' && (
+          <>
+            <boxGeometry args={[0.5, 0.4, 0.5]} />
+            <meshStandardMaterial 
+              color={isOut ? '#666666' : color.main}
+              emissive={isOut ? '#333333' : color.emissive}
+              emissiveIntensity={isOut ? 0.1 : 0.4}
+              metalness={0.2}
+              roughness={0.8}
+            />
+          </>
+        )}
+        {type === 'cylinder' && (
+          <>
+            <cylinderGeometry args={[0.3, 0.3, 0.45, 20]} />
+            <meshStandardMaterial 
+              color={isOut ? '#666666' : color.main}
+              emissive={isOut ? '#333333' : color.emissive}
+              emissiveIntensity={isOut ? 0.1 : 0.4}
+              metalness={0.4}
+              roughness={0.6}
+            />
+          </>
+        )}
+      </mesh>
+      {!isOut && (
+        <pointLight 
+          position={[0, 0.6, 0]} 
+          intensity={1} 
+          color={color.main} 
+          distance={1.5}
+        />
+      )}
+    </group>
+  )
+}
+
+// Componente del Dohyo (ring de sumo)
+function Dohyo({ position, radius }: { position: [number, number, number], radius: number }) {
+  const scale = 0.025
+  const r = radius * scale
+  
+  return (
+    <group position={position}>
+      {/* Base del dohyo - círculo negro */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+        <circleGeometry args={[r, 64]} />
+        <meshStandardMaterial 
+          color="#1a1a1a"
+          roughness={0.9}
+          metalness={0.1}
+        />
+      </mesh>
+      {/* Borde blanco del dohyo */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+        <ringGeometry args={[r - 0.15, r, 64]} />
+        <meshStandardMaterial 
+          color="#ffffff"
+          emissive="#ffffff"
+          emissiveIntensity={0.3}
+          roughness={0.5}
+        />
+      </mesh>
+      {/* Líneas de inicio */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-0.3, 0.025, 0]}>
+        <planeGeometry args={[0.08, 0.6]} />
+        <meshStandardMaterial color="#8b4513" />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0.3, 0.025, 0]}>
+        <planeGeometry args={[0.08, 0.6]} />
+        <meshStandardMaterial color="#8b4513" />
+      </mesh>
+    </group>
+  )
+}
+
 // Componente del Grid manual
 function CustomGrid() {
   const gridRef = useRef<THREE.Group>(null)
@@ -841,13 +1044,17 @@ function Scene({
   obstacles, 
   challenge,
   goalReached,
-  collectedItems
+  collectedItems,
+  pushablePositions,
+  objectsOutOfDohyo
 }: { 
   robotState: RobotState, 
   obstacles: Array<{x: number, z: number, w: number, h: number}>,
   challenge: Challenge,
   goalReached: boolean,
-  collectedItems: Set<string>
+  collectedItems: Set<string>,
+  pushablePositions: {[key: string]: {x: number, z: number}},
+  objectsOutOfDohyo: Set<string>
 }) {
   // Convertir obstáculos 2D a posiciones 3D
   const scale = 0.025
@@ -922,6 +1129,27 @@ function Scene({
         />
       ))}
 
+      {/* Dohyo para niveles Mini Sumo */}
+      {challenge.dohyo && (
+        <Dohyo 
+          position={[(challenge.dohyo.x - 200) * scale, 0, (challenge.dohyo.z - 200) * scale]}
+          radius={challenge.dohyo.radius}
+        />
+      )}
+
+      {/* Objetos empujables */}
+      {challenge.pushableObjects?.map((obj) => {
+        const pos = pushablePositions[obj.id] || { x: obj.x, z: obj.z }
+        return (
+          <PushableItem
+            key={obj.id}
+            position={[(pos.x - 200) * scale, 0, (pos.z - 200) * scale]}
+            type={obj.type}
+            isOut={objectsOutOfDohyo.has(obj.id)}
+          />
+        )
+      })}
+
       <Robot state={robotState} obstacles={obstacles} />
     </>
   )
@@ -936,6 +1164,8 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
   const [goalReached, setGoalReached] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [collectedItems, setCollectedItems] = useState<Set<string>>(new Set())
+  const [pushablePositions, setPushablePositions] = useState<{[key: string]: {x: number, z: number}}>({})
+  const [objectsOutOfDohyo, setObjectsOutOfDohyo] = useState<Set<string>>(new Set())
   
   const currentChallenge = CHALLENGES[currentChallengeIndex]
   
@@ -999,6 +1229,66 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
   const totalCollectibles = currentChallenge.collectibles?.length || 0
   const collectedCount = currentChallenge.collectibles?.filter(item => collectedItems.has(item.id)).length || 0
   
+  // Contar objetos fuera del dohyo (Mini Sumo)
+  const totalPushables = currentChallenge.pushableObjects?.length || 0
+  const pushedOutCount = objectsOutOfDohyo.size
+  
+  // Lógica de empujar objetos
+  useEffect(() => {
+    if (!currentChallenge.pushableObjects || !currentChallenge.dohyo) return
+    
+    const robotRadius = 35
+    const dohyo = currentChallenge.dohyo
+    
+    currentChallenge.pushableObjects.forEach(obj => {
+      if (objectsOutOfDohyo.has(obj.id)) return
+      
+      const currentPos = pushablePositions[obj.id] || { x: obj.x, z: obj.z }
+      const dx = robotState.x - currentPos.x
+      const dz = robotState.z - currentPos.z
+      const distance = Math.sqrt(dx * dx + dz * dz)
+      
+      // Si el robot está cerca del objeto, empujarlo
+      if (distance < robotRadius + obj.radius) {
+        const pushForce = 8
+        const angle = Math.atan2(dz, dx)
+        const newX = currentPos.x - Math.cos(angle) * pushForce
+        const newZ = currentPos.z - Math.sin(angle) * pushForce
+        
+        setPushablePositions(prev => ({
+          ...prev,
+          [obj.id]: { x: newX, z: newZ }
+        }))
+        
+        // Verificar si salió del dohyo
+        const distFromCenter = Math.sqrt(
+          Math.pow(newX - dohyo.x, 2) + Math.pow(newZ - dohyo.z, 2)
+        )
+        
+        if (distFromCenter > dohyo.radius) {
+          setObjectsOutOfDohyo(prev => {
+            const newSet = new Set(Array.from(prev))
+            newSet.add(obj.id)
+            return newSet
+          })
+        }
+      }
+    })
+  }, [robotState.x, robotState.z, currentChallenge.pushableObjects, currentChallenge.dohyo, pushablePositions, objectsOutOfDohyo])
+  
+  // Verificar condición de victoria para Mini Sumo
+  useEffect(() => {
+    if (currentChallenge.winCondition !== 'push_all_out') return
+    if (!currentChallenge.pushableObjects) return
+    
+    const allOut = currentChallenge.pushableObjects.every(obj => objectsOutOfDohyo.has(obj.id))
+    
+    if (allOut && !goalReached) {
+      setGoalReached(true)
+      setIsRunning(false)
+    }
+  }, [objectsOutOfDohyo, currentChallenge.winCondition, currentChallenge.pushableObjects, goalReached])
+  
   // Cambiar desafío
   const changeChallenge = (direction: 'prev' | 'next') => {
     const newIndex = direction === 'next' 
@@ -1008,6 +1298,8 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
     setCurrentChallengeIndex(newIndex)
     setGoalReached(false)
     setCollectedItems(new Set())
+    setPushablePositions({})
+    setObjectsOutOfDohyo(new Set())
     const newChallenge = CHALLENGES[newIndex]
     setRobotState({
       x: newChallenge.start.x,
@@ -1233,6 +1525,8 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
     setIsRunning(false)
     setGoalReached(false)
     setCollectedItems(new Set())
+    setPushablePositions({})
+    setObjectsOutOfDohyo(new Set())
     setRobotState({
       x: currentChallenge.start.x,
       z: currentChallenge.start.z,
@@ -1424,6 +1718,32 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
         </div>
       )}
 
+      {/* Contador de objetos Mini Sumo */}
+      {totalPushables > 0 && (
+        <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-b border-red-500/30 p-2 flex-shrink-0">
+          <div className="flex items-center justify-center gap-3">
+            <span className="text-xs text-gray-400">🥋 Mini Sumo:</span>
+            <div className="flex items-center gap-1">
+              {currentChallenge.pushableObjects?.map((obj) => (
+                <div 
+                  key={obj.id}
+                  className={`w-5 h-5 rounded flex items-center justify-center text-xs transition-all ${
+                    objectsOutOfDohyo.has(obj.id)
+                      ? 'bg-green-500 text-green-900'
+                      : obj.type === 'cup' ? 'bg-red-500/50 text-red-200'
+                        : obj.type === 'box' ? 'bg-blue-500/50 text-blue-200'
+                        : 'bg-green-500/50 text-green-200'
+                  }`}
+                >
+                  {obj.type === 'cup' ? '🥤' : obj.type === 'box' ? '📦' : '🛢️'}
+                </div>
+              ))}
+            </div>
+            <span className="text-xs font-bold text-orange-300">{pushedOutCount}/{totalPushables} fuera</span>
+          </div>
+        </div>
+      )}
+
       {/* Mensaje de victoria */}
       {goalReached && (
         <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-b border-yellow-500/30 p-3 flex-shrink-0">
@@ -1445,6 +1765,8 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
               challenge={currentChallenge}
               goalReached={goalReached}
               collectedItems={collectedItems}
+              pushablePositions={pushablePositions}
+              objectsOutOfDohyo={objectsOutOfDohyo}
             />
           </Canvas>
         </div>
