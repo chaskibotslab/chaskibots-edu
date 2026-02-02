@@ -1345,9 +1345,9 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden" style={{ minHeight: '600px' }}>
+      <div className="flex flex-1 overflow-hidden" style={{ minHeight: isFullscreen ? 'calc(100vh - 70px)' : '700px' }}>
         {/* Blockly Workspace */}
-        <div className="flex-1 relative min-h-full">
+        <div className="flex-1 relative min-h-full" style={{ minWidth: '50%' }}>
           {/* Logo de fondo del workspace */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
             <Image 
@@ -1382,8 +1382,8 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
 
         {/* Right Panel - Tabs */}
         <div className={`bg-dark-800 border-l border-dark-600 flex flex-col ${
-          isFullscreen ? 'w-[500px]' : 'w-[400px]'
-        }`}>
+          isFullscreen ? 'w-[550px]' : 'w-[450px]'
+        }`} style={{ minWidth: isFullscreen ? '550px' : '450px' }}>
           {/* Tabs */}
           <div className="flex border-b border-dark-600">
             <button
@@ -1439,7 +1439,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                 </button>
               </div>
               {/* Simulador - Mantener ambos montados para evitar problemas de renderizado */}
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" style={{ minHeight: '500px' }}>
                 <div className={`absolute inset-0 ${simulatorMode === '2d' ? 'block' : 'hidden'}`}>
                   <RobotSimulator />
                 </div>

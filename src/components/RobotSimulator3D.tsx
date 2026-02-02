@@ -135,7 +135,7 @@ const CHALLENGES: Challenge[] = [
   {
     id: 'u-turn',
     name: 'Media Vuelta',
-    description: 'Gira 180° y regresa',
+    description: 'Da la vuelta y llega al otro lado',
     difficulty: 'medium',
     obstacles: [
       { x: 60, z: 60, w: 220, h: 15 },
@@ -144,8 +144,8 @@ const CHALLENGES: Challenge[] = [
       { x: 140, z: 140, w: 80, h: 15 },
       { x: 140, z: 245, w: 80, h: 15 },
     ],
-    start: { x: 100, z: 200, angle: 0 },
-    goal: { x: 100, z: 200, radius: 35 }
+    start: { x: 100, z: 120, angle: 0 },
+    goal: { x: 100, z: 280, radius: 35 }
   },
   {
     id: 'corridor',
