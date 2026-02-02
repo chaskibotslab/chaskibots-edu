@@ -60,13 +60,13 @@ const ARENA_CENTER = 200
 const ARENA_MARGIN = 50 // Margen desde el borde
 
 const CHALLENGES: Challenge[] = [
+  // === NIVEL FÁCIL ===
   {
     id: 'basic',
     name: 'Camino Recto',
     description: 'Llega a la meta en línea recta',
     difficulty: 'easy',
     obstacles: [
-      // Paredes laterales para guiar - dentro del área
       { x: 80, z: 120, w: 240, h: 15 },
       { x: 80, z: 265, w: 240, h: 15 },
     ],
@@ -74,18 +74,48 @@ const CHALLENGES: Challenge[] = [
     goal: { x: 330, z: 200, radius: 30 }
   },
   {
-    id: 'obstacles',
-    name: 'Obstáculos',
-    description: 'Esquiva los bloques para llegar a la meta',
+    id: 'turn-right',
+    name: 'Giro Derecha',
+    description: 'Avanza y gira 90° a la derecha',
     difficulty: 'easy',
     obstacles: [
-      { x: 130, z: 130, w: 50, h: 50 },
-      { x: 200, z: 220, w: 50, h: 50 },
-      { x: 130, z: 250, w: 50, h: 50 },
-      { x: 250, z: 150, w: 50, h: 50 },
+      { x: 80, z: 120, w: 150, h: 15 },
+      { x: 80, z: 265, w: 15, h: 15 },
+      { x: 215, z: 120, w: 15, h: 160 },
+      { x: 215, z: 265, w: 120, h: 15 },
     ],
     start: { x: 70, z: 200, angle: 0 },
-    goal: { x: 330, z: 200, radius: 30 }
+    goal: { x: 280, z: 320, radius: 30 }
+  },
+  {
+    id: 'turn-left',
+    name: 'Giro Izquierda',
+    description: 'Avanza y gira 90° a la izquierda',
+    difficulty: 'easy',
+    obstacles: [
+      { x: 80, z: 135, w: 15, h: 15 },
+      { x: 80, z: 265, w: 150, h: 15 },
+      { x: 215, z: 135, w: 120, h: 15 },
+      { x: 215, z: 135, w: 15, h: 145 },
+    ],
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 280, z: 80, radius: 30 }
+  },
+  // === NIVEL MEDIO ===
+  {
+    id: 'zigzag',
+    name: 'Zigzag',
+    description: 'Navega en zigzag entre obstáculos',
+    difficulty: 'medium',
+    obstacles: [
+      { x: 100, z: 80, w: 15, h: 100 },
+      { x: 100, z: 220, w: 15, h: 100 },
+      { x: 180, z: 120, w: 15, h: 160 },
+      { x: 260, z: 80, w: 15, h: 100 },
+      { x: 260, z: 220, w: 15, h: 100 },
+    ],
+    start: { x: 60, z: 180, angle: 0 },
+    goal: { x: 340, z: 200, radius: 30 }
   },
   {
     id: 'slalom',
@@ -93,7 +123,6 @@ const CHALLENGES: Challenge[] = [
     description: 'Zigzaguea entre los postes',
     difficulty: 'medium',
     obstacles: [
-      // Postes verticales espaciados - todos dentro del área
       { x: 120, z: 100, w: 25, h: 80 },
       { x: 120, z: 220, w: 25, h: 80 },
       { x: 185, z: 150, w: 25, h: 100 },
@@ -104,12 +133,26 @@ const CHALLENGES: Challenge[] = [
     goal: { x: 330, z: 200, radius: 30 }
   },
   {
+    id: 'u-turn',
+    name: 'Media Vuelta',
+    description: 'Gira 180° y regresa',
+    difficulty: 'medium',
+    obstacles: [
+      { x: 70, z: 100, w: 200, h: 15 },
+      { x: 70, z: 285, w: 200, h: 15 },
+      { x: 255, z: 100, w: 15, h: 200 },
+      { x: 130, z: 160, w: 100, h: 15 },
+      { x: 130, z: 225, w: 100, h: 15 },
+    ],
+    start: { x: 90, z: 200, angle: 0 },
+    goal: { x: 90, z: 200, radius: 30 }
+  },
+  {
     id: 'corridor',
-    name: 'Corredor',
+    name: 'Corredor L',
     description: 'Navega por el pasillo en L',
     difficulty: 'medium',
     obstacles: [
-      // Paredes del corredor en L - dentro del área
       { x: 70, z: 70, w: 15, h: 180 },
       { x: 130, z: 130, w: 15, h: 120 },
       { x: 70, z: 235, w: 150, h: 15 },
@@ -120,13 +163,32 @@ const CHALLENGES: Challenge[] = [
     start: { x: 100, z: 100, angle: 90 },
     goal: { x: 290, z: 280, radius: 30 }
   },
+  // === NIVEL DIFÍCIL ===
+  {
+    id: 'spiral',
+    name: 'Espiral',
+    description: 'Navega por el camino en espiral',
+    difficulty: 'hard',
+    obstacles: [
+      { x: 60, z: 60, w: 280, h: 15 },
+      { x: 60, z: 60, w: 15, h: 280 },
+      { x: 60, z: 325, w: 280, h: 15 },
+      { x: 325, z: 120, w: 15, h: 220 },
+      { x: 120, z: 120, w: 220, h: 15 },
+      { x: 120, z: 120, w: 15, h: 150 },
+      { x: 120, z: 255, w: 150, h: 15 },
+      { x: 255, z: 180, w: 15, h: 90 },
+      { x: 180, z: 180, w: 90, h: 15 },
+    ],
+    start: { x: 90, z: 290, angle: -90 },
+    goal: { x: 200, z: 220, radius: 25 }
+  },
   {
     id: 'maze',
     name: 'Laberinto',
-    description: 'Encuentra el camino',
+    description: 'Encuentra el camino correcto',
     difficulty: 'hard',
     obstacles: [
-      // Laberinto compacto dentro del área
       { x: 100, z: 80, w: 15, h: 120 },
       { x: 100, z: 230, w: 15, h: 90 },
       { x: 170, z: 130, w: 15, h: 140 },
@@ -138,6 +200,42 @@ const CHALLENGES: Challenge[] = [
     ],
     start: { x: 70, z: 300, angle: -90 },
     goal: { x: 330, z: 100, radius: 30 }
+  },
+  {
+    id: 'obstacle-course',
+    name: 'Carrera Obstáculos',
+    description: 'Evita todos los obstáculos',
+    difficulty: 'hard',
+    obstacles: [
+      { x: 100, z: 100, w: 40, h: 40 },
+      { x: 100, z: 260, w: 40, h: 40 },
+      { x: 160, z: 180, w: 40, h: 40 },
+      { x: 220, z: 100, w: 40, h: 40 },
+      { x: 220, z: 260, w: 40, h: 40 },
+      { x: 280, z: 180, w: 40, h: 40 },
+      { x: 160, z: 100, w: 40, h: 40 },
+      { x: 160, z: 260, w: 40, h: 40 },
+      { x: 280, z: 100, w: 40, h: 40 },
+      { x: 280, z: 260, w: 40, h: 40 },
+    ],
+    start: { x: 60, z: 200, angle: 0 },
+    goal: { x: 340, z: 200, radius: 30 }
+  },
+  {
+    id: 'precision',
+    name: 'Precisión',
+    description: 'Pasa por pasillos estrechos',
+    difficulty: 'hard',
+    obstacles: [
+      { x: 100, z: 80, w: 15, h: 100 },
+      { x: 100, z: 220, w: 15, h: 100 },
+      { x: 180, z: 80, w: 15, h: 80 },
+      { x: 180, z: 240, w: 15, h: 80 },
+      { x: 260, z: 80, w: 15, h: 100 },
+      { x: 260, z: 220, w: 15, h: 100 },
+    ],
+    start: { x: 60, z: 200, angle: 0 },
+    goal: { x: 340, z: 200, radius: 25 }
   }
 ]
 

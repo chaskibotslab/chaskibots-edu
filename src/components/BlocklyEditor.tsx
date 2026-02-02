@@ -241,6 +241,130 @@ Blockly.Blocks['buzzer_tone'] = {
     this.setTooltip("Reproduce un tono en el buzzer");
   }
 };
+
+// Nuevos bloques avanzados
+Blockly.Blocks['robot_curve_left'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("↰ Curva izquierda")
+        .appendField(new Blockly.FieldNumber(50, 0, 100), "RADIUS")
+        .appendField("% radio");
+    this.appendDummyInput()
+        .appendField("por")
+        .appendField(new Blockly.FieldNumber(1000, 0, 10000), "TIME")
+        .appendField("ms");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(160);
+    this.setTooltip("Hace una curva hacia la izquierda");
+  }
+};
+
+Blockly.Blocks['robot_curve_right'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("↱ Curva derecha")
+        .appendField(new Blockly.FieldNumber(50, 0, 100), "RADIUS")
+        .appendField("% radio");
+    this.appendDummyInput()
+        .appendField("por")
+        .appendField(new Blockly.FieldNumber(1000, 0, 10000), "TIME")
+        .appendField("ms");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(160);
+    this.setTooltip("Hace una curva hacia la derecha");
+  }
+};
+
+Blockly.Blocks['robot_spin'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("🔄 Girar sobre sí mismo")
+        .appendField(new Blockly.FieldDropdown([["izquierda","LEFT"], ["derecha","RIGHT"]]), "DIR");
+    this.appendDummyInput()
+        .appendField("por")
+        .appendField(new Blockly.FieldNumber(1000, 0, 10000), "TIME")
+        .appendField("ms");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(160);
+    this.setTooltip("Gira el robot sobre su propio eje");
+  }
+};
+
+Blockly.Blocks['wait_until_distance'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("⏳ Esperar hasta distancia")
+        .appendField(new Blockly.FieldDropdown([["menor que","LT"], ["mayor que","GT"]]), "OP")
+        .appendField(new Blockly.FieldNumber(20, 0, 400), "DIST")
+        .appendField("cm");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(210);
+    this.setTooltip("Espera hasta que el sensor detecte la distancia indicada");
+  }
+};
+
+Blockly.Blocks['if_obstacle'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("🚧 Si hay obstáculo a menos de")
+        .appendField(new Blockly.FieldNumber(20, 0, 400), "DIST")
+        .appendField("cm");
+    this.appendStatementInput("DO")
+        .setCheck(null)
+        .appendField("hacer");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(210);
+    this.setTooltip("Ejecuta acciones si detecta un obstáculo cercano");
+  }
+};
+
+Blockly.Blocks['repeat_forever'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("🔁 Repetir siempre");
+    this.appendStatementInput("DO")
+        .setCheck(null);
+    this.setPreviousStatement(true, null);
+    this.setColour(120);
+    this.setTooltip("Repite las acciones indefinidamente");
+  }
+};
+
+Blockly.Blocks['led_rgb'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("🌈 LED RGB color")
+        .appendField(new Blockly.FieldDropdown([
+          ["rojo","RED"], ["verde","GREEN"], ["azul","BLUE"],
+          ["amarillo","YELLOW"], ["cian","CYAN"], ["magenta","MAGENTA"],
+          ["blanco","WHITE"], ["apagado","OFF"]
+        ]), "COLOR");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(60);
+    this.setTooltip("Cambia el color del LED RGB");
+  }
+};
+
+Blockly.Blocks['play_melody'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("🎵 Reproducir melodía")
+        .appendField(new Blockly.FieldDropdown([
+          ["victoria","VICTORY"], ["error","ERROR"], ["inicio","START"],
+          ["beep","BEEP"], ["alarma","ALARM"]
+        ]), "MELODY");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(330);
+    this.setTooltip("Reproduce una melodía predefinida");
+  }
+};
 `
 
 // Generadores de código Arduino
@@ -471,20 +595,28 @@ Blockly.Arduino['math_arithmetic'] = function(block) {
 const TOOLBOX_XML = `
 <xml id="toolbox" style="display: none">
   <category name="🤖 Robot" colour="160">
+    <label text="Movimiento Básico"></label>
     <block type="robot_move_forward"></block>
     <block type="robot_move_backward"></block>
     <block type="robot_turn_left"></block>
     <block type="robot_turn_right"></block>
     <block type="robot_stop"></block>
+    <label text="Movimiento Avanzado"></label>
+    <block type="robot_curve_left"></block>
+    <block type="robot_curve_right"></block>
+    <block type="robot_spin"></block>
   </category>
   <category name="💡 LEDs" colour="60">
     <block type="led_on"></block>
     <block type="led_off"></block>
     <block type="led_blink"></block>
+    <block type="led_rgb"></block>
   </category>
   <category name="📡 Sensores" colour="210">
     <block type="sensor_ultrasonic"></block>
     <block type="sensor_ir"></block>
+    <block type="wait_until_distance"></block>
+    <block type="if_obstacle"></block>
   </category>
   <category name="⚙️ Motores" colour="290">
     <block type="servo_move"></block>
@@ -492,9 +624,11 @@ const TOOLBOX_XML = `
   </category>
   <category name="🔊 Sonido" colour="330">
     <block type="buzzer_tone"></block>
+    <block type="play_melody"></block>
   </category>
   <category name="⏱️ Control" colour="120">
     <block type="delay_ms"></block>
+    <block type="repeat_forever"></block>
     <block type="controls_repeat_ext">
       <value name="TIMES">
         <shadow type="math_number">
@@ -642,6 +776,42 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
               pin: block.getFieldValue('PIN') || 8
             },
             duration: block.getFieldValue('DURATION') || 500
+          })
+          break
+        case 'robot_curve_left':
+          commands.push({
+            type: 'move_forward',
+            params: { speed: block.getFieldValue('RADIUS') || 50, curve: 'left' },
+            duration: block.getFieldValue('TIME') || 1000
+          })
+          break
+        case 'robot_curve_right':
+          commands.push({
+            type: 'move_forward',
+            params: { speed: block.getFieldValue('RADIUS') || 50, curve: 'right' },
+            duration: block.getFieldValue('TIME') || 1000
+          })
+          break
+        case 'robot_spin':
+          const spinDir = block.getFieldValue('DIR') || 'LEFT'
+          commands.push({
+            type: spinDir === 'LEFT' ? 'turn_left' : 'turn_right',
+            params: { angle: 360 },
+            duration: block.getFieldValue('TIME') || 1000
+          })
+          break
+        case 'play_melody':
+          commands.push({
+            type: 'buzzer',
+            params: { melody: block.getFieldValue('MELODY') || 'BEEP' },
+            duration: 1000
+          })
+          break
+        case 'led_rgb':
+          commands.push({
+            type: 'led_on',
+            params: { pin: 13, color: block.getFieldValue('COLOR') || 'WHITE' },
+            duration: 100
           })
           break
       }
