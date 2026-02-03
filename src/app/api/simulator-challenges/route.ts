@@ -25,7 +25,7 @@ export interface SimulatorChallenge {
 }
 
 // GET - Obtener retos completados del simulador
-// Filtra submissions donde type='simulator_challenge'
+// Filtra submissions donde taskId empieza con 'sim-'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
     const schoolId = searchParams.get('schoolId')
     const category = searchParams.get('category')
 
-    // Siempre filtrar por type='simulator_challenge'
-    const filters: string[] = ['{type}="simulator_challenge"']
+    // Filtrar por taskId que empieza con 'sim-' (prefijo para retos de simulador)
+    const filters: string[] = ['FIND("sim-",{taskId})=1']
     
     if (studentName) filters.push(`{studentName}="${studentName}"`)
     if (studentEmail) filters.push(`{studentEmail}="${studentEmail}"`)
@@ -76,10 +76,14 @@ export async function GET(request: NextRequest) {
         challengeInfo = {}
       }
       
+      // Remover prefijo 'sim-' del taskId para obtener el challengeId original
+      const taskId = record.fields.taskId || ''
+      const challengeId = taskId.startsWith('sim-') ? taskId.substring(4) : taskId
+      
       return {
         id: record.id,
-        challengeId: record.fields.taskId || '',
-        challengeName: challengeInfo.challengeName || record.fields.taskId || '',
+        challengeId: challengeId,
+        challengeName: challengeInfo.challengeName || challengeId || '',
         challengeCategory: challengeInfo.challengeCategory || 'laberinto',
         challengeDifficulty: challengeInfo.challengeDifficulty || 'easy',
         studentName: record.fields.studentName || '',
@@ -133,10 +137,9 @@ export async function POST(request: NextRequest) {
       challengeDifficulty: challengeDifficulty || 'easy',
     })
 
-    // Usar formato de submissions con campo type='simulator_challenge'
+    // Usar formato de submissions con prefijo 'sim-' en taskId para identificar retos
     const fields: any = {
-      taskId: challengeId,
-      type: 'simulator_challenge',
+      taskId: `sim-${challengeId}`,
       studentName,
       studentEmail: studentEmail || '',
       levelId: levelId || '',
