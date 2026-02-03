@@ -436,3 +436,54 @@ body {
 .stagger-4 { animation-delay: 0.4s; }
 .stagger-5 { animation-delay: 0.5s; }
 .stagger-6 { animation-delay: 0.6s; }
+
+/* Blockly Workspace - Ocultar scrollbar vertical del centro */
+.blocklySvg {
+  background-color: transparent !important;
+}
+
+.blocklyScrollbarVertical {
+  display: none !important;
+}
+
+.blocklyScrollbarHorizontal {
+  display: none !important;
+}
+
+/* Si se necesita scroll, usar el del contenedor padre */
+.blocklyMainBackground {
+  stroke: none !important;
+}
+
+/* Toolbox de Blockly */
+.blocklyToolboxDiv {
+  background: #1a1a25 !important;
+  border-right: 1px solid #252532 !important;
+}
+
+.blocklyTreeRow {
+  padding: 6px 12px !important;
+}
+
+.blocklyTreeLabel {
+  color: #e0e0e0 !important;
+  font-size: 13px !important;
+}
+
+.blocklyTreeRow:hover {
+  background: rgba(0, 245, 255, 0.1) !important;
+}
+
+.blocklyTreeSelected {
+  background: rgba(0, 245, 255, 0.2) !important;
+}
+
+/* Flyout de Blockly */
+.blocklyFlyoutBackground {
+  fill: #12121a !important;
+  fill-opacity: 0.95 !important;
+}
+
+.blocklyFlyoutScrollbar {
+  display: none !important;
+}
