@@ -59,97 +59,124 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Panel izquierdo - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-chaski-dark via-blue-900 to-indigo-900 p-12 flex-col justify-between relative overflow-hidden">
-        {/* Decoración de fondo */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-chaski-accent rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div>
+      {/* Panel izquierdo - Branding Futurista */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 p-12 flex-col justify-between relative overflow-hidden">
+        {/* Efectos de fondo animados */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-neon-cyan/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-neon-purple/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-neon-pink/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
         </div>
+        {/* Líneas decorativas */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-purple to-transparent opacity-50"></div>
         
         <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center gap-4">
-            <Image 
-              src="/chaski.png" 
-              alt="ChaskiBots Logo" 
-              width={60} 
-              height={60}
-              className="rounded-2xl"
-            />
-            <span className="text-3xl font-bold text-white">ChaskiBots EDU</span>
+          <Link href="/" className="inline-flex items-center gap-4 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-neon-cyan/40 rounded-2xl blur-md group-hover:bg-neon-cyan/60 transition-all"></div>
+              <Image 
+                src="/chaski.png" 
+                alt="ChaskiBots Logo" 
+                width={70} 
+                height={70}
+                className="rounded-2xl relative border-2 border-neon-cyan/50 group-hover:border-neon-cyan transition-all"
+              />
+            </div>
+            <div>
+              <span className="text-3xl font-bold bg-gradient-to-r from-white via-neon-cyan to-white bg-clip-text text-transparent">ChaskiBots</span>
+              <span className="block text-neon-cyan text-sm font-medium tracking-widest">PLATAFORMA EDUCATIVA</span>
+            </div>
           </Link>
         </div>
         
         <div className="relative z-10 space-y-8">
           <h2 className="text-4xl font-bold text-white leading-tight">
-            Aprende robótica, IA y programación de forma divertida
+            Aprende <span className="bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">robótica, IA</span> y programación de forma divertida
           </h2>
-          <p className="text-xl text-blue-200">
+          <p className="text-xl text-gray-400">
             Plataforma educativa interactiva para estudiantes de todas las edades
           </p>
           
           <div className="space-y-4">
-            <div className="flex items-center gap-4 text-white">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <Rocket className="w-6 h-6" />
+            <div className="flex items-center gap-4 text-white group">
+              <div className="w-14 h-14 bg-neon-cyan/20 rounded-xl flex items-center justify-center border border-neon-cyan/30 group-hover:bg-neon-cyan/30 group-hover:border-neon-cyan/50 transition-all">
+                <Rocket className="w-7 h-7 text-neon-cyan" />
               </div>
               <span className="text-lg">Cursos interactivos paso a paso</span>
             </div>
-            <div className="flex items-center gap-4 text-white">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-6 h-6" />
+            <div className="flex items-center gap-4 text-white group">
+              <div className="w-14 h-14 bg-neon-purple/20 rounded-xl flex items-center justify-center border border-neon-purple/30 group-hover:bg-neon-purple/30 group-hover:border-neon-purple/50 transition-all">
+                <Sparkles className="w-7 h-7 text-neon-purple" />
               </div>
               <span className="text-lg">Proyectos prácticos y divertidos</span>
             </div>
-            <div className="flex items-center gap-4 text-white">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <Shield className="w-6 h-6" />
+            <div className="flex items-center gap-4 text-white group">
+              <div className="w-14 h-14 bg-neon-green/20 rounded-xl flex items-center justify-center border border-neon-green/30 group-hover:bg-neon-green/30 group-hover:border-neon-green/50 transition-all">
+                <Shield className="w-7 h-7 text-neon-green" />
               </div>
               <span className="text-lg">Ambiente seguro para aprender</span>
             </div>
           </div>
         </div>
         
-        <div className="relative z-10 text-blue-300 text-sm">
+        <div className="relative z-10 text-neon-cyan/60 text-sm">
           © 2024 ChaskiBots. Todos los derechos reservados.
         </div>
       </div>
 
-      {/* Panel derecho - Formulario */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 px-6 py-12">
-        <div className="w-full max-w-md">
+      {/* Panel derecho - Formulario Futurista */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 px-6 py-12 relative overflow-hidden">
+        {/* Efectos de fondo en móvil */}
+        <div className="absolute inset-0 lg:hidden">
+          <div className="absolute top-10 right-10 w-48 h-48 bg-neon-cyan/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 left-10 w-64 h-64 bg-neon-purple/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        </div>
+        
+        <div className="w-full max-w-md relative z-10">
           {/* Logo móvil */}
           <div className="lg:hidden text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-3">
-              <Image 
-                src="/chaski.png" 
-                alt="ChaskiBots Logo" 
-                width={50} 
-                height={50}
-                className="rounded-xl"
-              />
-              <span className="text-2xl font-bold text-chaski-dark">ChaskiBots EDU</span>
+              <div className="relative">
+                <div className="absolute inset-0 bg-neon-cyan/40 rounded-xl blur-md"></div>
+                <Image 
+                  src="/chaski.png" 
+                  alt="ChaskiBots Logo" 
+                  width={50} 
+                  height={50}
+                  className="rounded-xl relative border-2 border-neon-cyan/50"
+                />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-white to-neon-cyan bg-clip-text text-transparent">ChaskiBots</span>
             </Link>
           </div>
 
-          {/* Login Card */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-          <h1 className="text-2xl font-bold text-chaski-dark text-center mb-2">
-            ¡Bienvenido de vuelta!
-          </h1>
-          <p className="text-gray-600 text-center mb-6">
-            Ingresa tus credenciales para continuar
-          </p>
+          {/* Login Card - Futurista */}
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/20 via-neon-purple/20 to-neon-pink/20 rounded-3xl blur-xl"></div>
+            <div className="relative bg-dark-800/90 backdrop-blur-xl rounded-3xl p-8 border border-neon-cyan/20">
+              {/* Línea decorativa superior */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent rounded-full"></div>
+              
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <Sparkles className="w-6 h-6 text-neon-cyan animate-pulse" />
+                <h1 className="text-2xl font-bold text-white text-center">
+                  ¡Bienvenido de vuelta!
+                </h1>
+              </div>
+              <p className="text-gray-400 text-center mb-6">
+                Ingresa tus credenciales para continuar
+              </p>
 
-          {/* Tabs para cambiar modo de login */}
-          <div className="flex mb-6 bg-gray-100 rounded-xl p-1">
+          {/* Tabs para cambiar modo de login - Futurista */}
+          <div className="flex mb-6 bg-dark-700/50 rounded-xl p-1 border border-dark-600">
             <button
               type="button"
               onClick={() => setLoginMode('email')}
-              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+              className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${
                 loginMode === 'email' 
-                  ? 'bg-white text-chaski-dark shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-gradient-to-r from-neon-cyan/20 to-neon-cyan/10 text-neon-cyan border border-neon-cyan/30 shadow-lg shadow-neon-cyan/10' 
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               <Mail className="w-4 h-4 inline mr-2" />
@@ -158,10 +185,10 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setLoginMode('code')}
-              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+              className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${
                 loginMode === 'code' 
-                  ? 'bg-white text-chaski-dark shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-gradient-to-r from-neon-purple/20 to-neon-purple/10 text-neon-purple border border-neon-purple/30 shadow-lg shadow-neon-purple/10' 
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               <Key className="w-4 h-4 inline mr-2" />
@@ -171,7 +198,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+              <div className="bg-red-500/20 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
@@ -179,16 +206,16 @@ export default function LoginPage() {
             {loginMode === 'code' ? (
               /* Login con código de acceso */
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Código de Acceso
                 </label>
                 <div className="relative">
-                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neon-purple" />
                   <input
                     type="text"
                     value={accessCode}
                     onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-chaski-accent focus:border-transparent transition-all placeholder:text-gray-400 font-mono text-lg tracking-wider"
+                    className="w-full pl-10 pr-4 py-3 bg-dark-700/50 border border-neon-purple/30 rounded-xl focus:ring-2 focus:ring-neon-purple/50 focus:border-neon-purple/50 transition-all placeholder:text-gray-500 font-mono text-lg tracking-wider text-white"
                     placeholder="Ej: ES7A1V6W"
                     maxLength={10}
                     required
@@ -202,40 +229,40 @@ export default function LoginPage() {
               /* Login con email/password */
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Correo electrónico
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neon-cyan" />
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-chaski-accent focus:border-transparent transition-all placeholder:text-gray-300"
-                      placeholder=""
+                      className="w-full pl-10 pr-4 py-3 bg-dark-700/50 border border-dark-600 rounded-xl focus:ring-2 focus:ring-neon-cyan/50 focus:border-neon-cyan/50 transition-all placeholder:text-gray-500 text-white"
+                      placeholder="tu@email.com"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Contraseña
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neon-cyan" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-chaski-accent focus:border-transparent transition-all placeholder:text-gray-300"
-                      placeholder=""
+                      className="w-full pl-10 pr-12 py-3 bg-dark-700/50 border border-dark-600 rounded-xl focus:ring-2 focus:ring-neon-cyan/50 focus:border-neon-cyan/50 transition-all placeholder:text-gray-500 text-white"
+                      placeholder="••••••••"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-neon-cyan transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -243,11 +270,11 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="rounded border-gray-300" />
-                    <span className="text-gray-600">Recordarme</span>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" className="rounded border-dark-600 bg-dark-700 text-neon-cyan focus:ring-neon-cyan/50" />
+                    <span className="text-gray-400">Recordarme</span>
                   </label>
-                  <a href="#" className="text-chaski-blue hover:underline">
+                  <a href="#" className="text-neon-cyan hover:text-white transition-colors">
                     ¿Olvidaste tu contraseña?
                   </a>
                 </div>
@@ -257,7 +284,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full btn-primary py-3 flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-gradient-to-r from-neon-cyan to-neon-purple text-white font-bold rounded-xl hover:opacity-90 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-neon-cyan/20"
             >
               {isLoading ? (
                 <>
@@ -270,43 +297,44 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
-            <p className="text-gray-700 font-medium mb-2">
+          <div className="mt-6 text-center bg-gradient-to-r from-neon-cyan/10 to-neon-purple/10 border border-neon-cyan/20 rounded-xl p-4">
+            <p className="text-white font-medium mb-2">
               ¿No tienes cuenta?
             </p>
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-gray-400 mb-3">
               Para registrarte, contáctanos:
             </p>
-            <div className="flex items-center justify-center gap-2 text-chaski-dark font-bold">
+            <div className="flex items-center justify-center gap-2 text-neon-cyan font-bold">
               <span className="text-xl">📞</span>
-              <a href="tel:+593968653593" className="text-lg hover:text-chaski-blue">0968653593</a>
+              <a href="tel:+593968653593" className="text-lg hover:text-white transition-colors">0968653593</a>
             </div>
             <p className="text-xs text-gray-500 mt-2">
               📍 Machachi - Ecuador
             </p>
             <div className="mt-3 flex items-center justify-center gap-2">
               <Image src="/chaski.png" alt="ChaskiBots" width={24} height={24} className="rounded" />
-              <span className="text-sm font-semibold text-chaski-dark">ChaskiBots</span>
+              <span className="text-sm font-semibold text-white">ChaskiBots</span>
             </div>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-gray-100">
+          <div className="mt-6 pt-6 border-t border-dark-600">
             <p className="text-xs text-gray-500 text-center">
               Al iniciar sesión, aceptas nuestros{' '}
-              <a href="#" className="text-chaski-blue hover:underline">Términos de Servicio</a>
+              <a href="#" className="text-neon-cyan hover:text-white transition-colors">Términos de Servicio</a>
               {' '}y{' '}
-              <a href="#" className="text-chaski-blue hover:underline">Política de Privacidad</a>
+              <a href="#" className="text-neon-cyan hover:text-white transition-colors">Política de Privacidad</a>
             </p>
           </div>
-        </div>
+            </div>
+          </div>
 
-        {/* Info de acceso */}
-        <div className="mt-6 bg-gradient-to-r from-chaski-dark to-blue-900 rounded-xl p-4 text-white text-sm">
-          <p className="font-semibold mb-2 text-center">🔐 Acceso a la plataforma</p>
-          <p className="text-xs text-center opacity-90">
-            Ingresa con tu correo y contraseña proporcionados por tu institución.
-          </p>
-        </div>
+          {/* Info de acceso */}
+          <div className="mt-6 bg-gradient-to-r from-dark-700/80 to-dark-600/80 backdrop-blur-xl rounded-xl p-4 border border-neon-cyan/20">
+            <p className="font-semibold mb-2 text-center text-neon-cyan">🔐 Acceso a la plataforma</p>
+            <p className="text-xs text-center text-gray-400">
+              Ingresa con tu correo y contraseña proporcionados por tu institución.
+            </p>
+          </div>
         </div>
       </div>
     </div>
