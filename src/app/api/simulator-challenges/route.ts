@@ -25,7 +25,7 @@ export interface SimulatorChallenge {
 }
 
 // GET - Obtener retos completados del simulador
-// Filtra submissions donde taskId empieza con 'simulator-challenge-'
+// Filtra submissions donde type='simulator_challenge'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
     const schoolId = searchParams.get('schoolId')
     const category = searchParams.get('category')
 
-    // Siempre filtrar por taskId que empiece con 'simulator-challenge-'
-    const filters: string[] = ['FIND("simulator-challenge-",{taskId})>0']
+    // Siempre filtrar por type='simulator_challenge'
+    const filters: string[] = ['{type}="simulator_challenge"']
     
     if (studentName) filters.push(`{studentName}="${studentName}"`)
     if (studentEmail) filters.push(`{studentEmail}="${studentEmail}"`)
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       
       return {
         id: record.id,
-        challengeId: record.fields.taskId?.replace('simulator-challenge-', '') || '',
+        challengeId: record.fields.taskId || '',
         challengeName: challengeInfo.challengeName || record.fields.taskId || '',
         challengeCategory: challengeInfo.challengeCategory || 'laberinto',
         challengeDifficulty: challengeInfo.challengeDifficulty || 'easy',
@@ -133,9 +133,10 @@ export async function POST(request: NextRequest) {
       challengeDifficulty: challengeDifficulty || 'easy',
     })
 
-    // Usar formato de submissions con taskId especial
+    // Usar formato de submissions con campo type='simulator_challenge'
     const fields: any = {
-      taskId: `simulator-challenge-${challengeId}`,
+      taskId: challengeId,
+      type: 'simulator_challenge',
       studentName,
       studentEmail: studentEmail || '',
       levelId: levelId || '',
