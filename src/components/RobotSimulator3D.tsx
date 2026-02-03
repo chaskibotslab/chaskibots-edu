@@ -66,7 +66,7 @@ interface Challenge {
   id: string
   name: string
   description: string
-  category: 'laberinto' | 'coleccionables' | 'minisumo'
+  category: 'laberinto' | 'coleccionables' | 'minisumo' | 'seguidor' | 'ia'
   obstacles: Array<{x: number, z: number, w: number, h: number}>
   start: { x: number, z: number, angle: number }
   goal: { x: number, z: number, radius: number }
@@ -76,14 +76,20 @@ interface Challenge {
   pushableObjects?: PushableObject[]
   dohyo?: { x: number, z: number, radius: number }
   winCondition?: 'reach_goal' | 'push_all_out'
+  // Para seguidor de línea
+  linePath?: Array<{x: number, z: number}>
+  // Para retos de IA
+  aiType?: 'color_detection' | 'object_avoidance' | 'pattern_recognition'
 }
 
-type ChallengeCategory = 'laberinto' | 'coleccionables' | 'minisumo'
+type ChallengeCategory = 'laberinto' | 'coleccionables' | 'minisumo' | 'seguidor' | 'ia'
 
 const CATEGORY_INFO: Record<ChallengeCategory, { name: string, icon: string, color: string }> = {
   laberinto: { name: 'Laberintos', icon: '🧩', color: 'from-blue-500/20 to-cyan-500/20' },
   coleccionables: { name: 'Coleccionables', icon: '⭐', color: 'from-purple-500/20 to-pink-500/20' },
-  minisumo: { name: 'Mini Sumo', icon: '🥋', color: 'from-red-500/20 to-orange-500/20' }
+  minisumo: { name: 'Mini Sumo', icon: '🥋', color: 'from-red-500/20 to-orange-500/20' },
+  seguidor: { name: 'Seguidor de Línea', icon: '➰', color: 'from-green-500/20 to-emerald-500/20' },
+  ia: { name: 'Inteligencia Artificial', icon: '🤖', color: 'from-violet-500/20 to-fuchsia-500/20' }
 }
 
 // Área de juego: 400x400 unidades (centrado en 200,200)
@@ -485,6 +491,190 @@ const CHALLENGES: Challenge[] = [
       { id: 'b2', x: 250, z: 200, type: 'box', radius: 16 }
     ],
     winCondition: 'push_all_out'
+  },
+  // === SEGUIDOR DE LÍNEA ===
+  {
+    id: 'line-straight',
+    name: 'Línea Recta',
+    description: 'Sigue la línea recta hasta la meta',
+    category: 'seguidor',
+    difficulty: 'easy',
+    obstacles: [],
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 330, z: 200, radius: 35 },
+    linePath: [
+      { x: 70, z: 200 }, { x: 150, z: 200 }, { x: 230, z: 200 }, { x: 330, z: 200 }
+    ]
+  },
+  {
+    id: 'line-curve',
+    name: 'Curva Suave',
+    description: 'Sigue la línea con una curva',
+    category: 'seguidor',
+    difficulty: 'easy',
+    obstacles: [],
+    start: { x: 70, z: 280, angle: 0 },
+    goal: { x: 330, z: 120, radius: 35 },
+    linePath: [
+      { x: 70, z: 280 }, { x: 130, z: 270 }, { x: 180, z: 240 }, 
+      { x: 220, z: 200 }, { x: 260, z: 160 }, { x: 300, z: 130 }, { x: 330, z: 120 }
+    ]
+  },
+  {
+    id: 'line-zigzag',
+    name: 'Zigzag',
+    description: 'Sigue el patrón en zigzag',
+    category: 'seguidor',
+    difficulty: 'medium',
+    obstacles: [],
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 330, z: 200, radius: 35 },
+    linePath: [
+      { x: 70, z: 200 }, { x: 120, z: 120 }, { x: 170, z: 280 }, 
+      { x: 220, z: 120 }, { x: 270, z: 280 }, { x: 330, z: 200 }
+    ]
+  },
+  {
+    id: 'line-loop',
+    name: 'Circuito Cerrado',
+    description: 'Completa el circuito circular',
+    category: 'seguidor',
+    difficulty: 'medium',
+    obstacles: [],
+    start: { x: 200, z: 320, angle: 180 },
+    goal: { x: 200, z: 320, radius: 35 },
+    linePath: [
+      { x: 200, z: 320 }, { x: 120, z: 280 }, { x: 80, z: 200 }, 
+      { x: 120, z: 120 }, { x: 200, z: 80 }, { x: 280, z: 120 },
+      { x: 320, z: 200 }, { x: 280, z: 280 }, { x: 200, z: 320 }
+    ]
+  },
+  {
+    id: 'line-complex',
+    name: 'Pista Compleja',
+    description: 'Sigue la pista con múltiples curvas',
+    category: 'seguidor',
+    difficulty: 'hard',
+    obstacles: [],
+    start: { x: 70, z: 320, angle: 0 },
+    goal: { x: 330, z: 80, radius: 35 },
+    linePath: [
+      { x: 70, z: 320 }, { x: 120, z: 300 }, { x: 150, z: 250 },
+      { x: 130, z: 200 }, { x: 150, z: 150 }, { x: 200, z: 130 },
+      { x: 250, z: 150 }, { x: 270, z: 200 }, { x: 250, z: 250 },
+      { x: 280, z: 280 }, { x: 320, z: 250 }, { x: 340, z: 180 },
+      { x: 330, z: 120 }, { x: 330, z: 80 }
+    ]
+  },
+  {
+    id: 'line-8',
+    name: 'Figura 8',
+    description: 'Sigue el patrón en forma de 8',
+    category: 'seguidor',
+    difficulty: 'hard',
+    obstacles: [],
+    start: { x: 200, z: 200, angle: -90 },
+    goal: { x: 200, z: 200, radius: 30 },
+    linePath: [
+      { x: 200, z: 200 }, { x: 150, z: 150 }, { x: 100, z: 120 },
+      { x: 80, z: 150 }, { x: 100, z: 200 }, { x: 150, z: 250 },
+      { x: 200, z: 200 }, { x: 250, z: 150 }, { x: 300, z: 120 },
+      { x: 320, z: 150 }, { x: 300, z: 200 }, { x: 250, z: 250 },
+      { x: 200, z: 200 }
+    ]
+  },
+  // === INTELIGENCIA ARTIFICIAL ===
+  {
+    id: 'ia-color-basic',
+    name: 'Detecta Colores',
+    description: 'Encuentra y llega a la zona del color indicado',
+    category: 'ia',
+    difficulty: 'easy',
+    obstacles: [],
+    start: { x: 200, z: 320, angle: -90 },
+    goal: { x: 200, z: 100, radius: 50 },
+    aiType: 'color_detection',
+    collectibles: [
+      { id: 'red', x: 100, z: 100, type: 'gem' },
+      { id: 'green', x: 200, z: 100, type: 'star' },
+      { id: 'blue', x: 300, z: 100, type: 'coin' }
+    ]
+  },
+  {
+    id: 'ia-avoid',
+    name: 'Evita Obstáculos',
+    description: 'Usa sensores para evitar obstáculos móviles',
+    category: 'ia',
+    difficulty: 'medium',
+    obstacles: [
+      { x: 150, z: 150, w: 30, h: 30 },
+      { x: 250, z: 150, w: 30, h: 30 },
+      { x: 200, z: 220, w: 30, h: 30 }
+    ],
+    start: { x: 200, z: 320, angle: -90 },
+    goal: { x: 200, z: 80, radius: 40 },
+    aiType: 'object_avoidance'
+  },
+  {
+    id: 'ia-pattern',
+    name: 'Reconoce Patrones',
+    description: 'Identifica y sigue el patrón correcto',
+    category: 'ia',
+    difficulty: 'medium',
+    obstacles: [],
+    start: { x: 70, z: 200, angle: 0 },
+    goal: { x: 330, z: 200, radius: 40 },
+    aiType: 'pattern_recognition',
+    collectibles: [
+      { id: 'p1', x: 120, z: 150, type: 'star' },
+      { id: 'p2', x: 170, z: 250, type: 'gem' },
+      { id: 'p3', x: 220, z: 150, type: 'star' },
+      { id: 'p4', x: 270, z: 250, type: 'gem' }
+    ],
+    requireAllCollectibles: true
+  },
+  {
+    id: 'ia-maze-smart',
+    name: 'Laberinto Inteligente',
+    description: 'Usa IA para encontrar el camino más corto',
+    category: 'ia',
+    difficulty: 'hard',
+    obstacles: [
+      { x: 120, z: 80, w: 15, h: 120 },
+      { x: 120, z: 250, w: 15, h: 100 },
+      { x: 200, z: 150, w: 15, h: 100 },
+      { x: 200, z: 300, w: 15, h: 50 },
+      { x: 280, z: 80, w: 15, h: 120 },
+      { x: 280, z: 250, w: 15, h: 100 }
+    ],
+    start: { x: 60, z: 200, angle: 0 },
+    goal: { x: 340, z: 200, radius: 35 },
+    aiType: 'object_avoidance'
+  },
+  {
+    id: 'ia-hunt',
+    name: 'Caza Inteligente',
+    description: 'Encuentra todos los objetivos usando visión',
+    category: 'ia',
+    difficulty: 'hard',
+    obstacles: [
+      { x: 100, z: 100, w: 25, h: 25 },
+      { x: 300, z: 100, w: 25, h: 25 },
+      { x: 100, z: 300, w: 25, h: 25 },
+      { x: 300, z: 300, w: 25, h: 25 }
+    ],
+    start: { x: 200, z: 200, angle: 0 },
+    goal: { x: 200, z: 200, radius: 30 },
+    aiType: 'color_detection',
+    collectibles: [
+      { id: 'h1', x: 80, z: 200, type: 'star' },
+      { id: 'h2', x: 320, z: 200, type: 'star' },
+      { id: 'h3', x: 200, z: 80, type: 'gem' },
+      { id: 'h4', x: 200, z: 320, type: 'gem' },
+      { id: 'h5', x: 150, z: 150, type: 'coin' },
+      { id: 'h6', x: 250, z: 250, type: 'coin' }
+    ],
+    requireAllCollectibles: true
   }
 ]
 
@@ -521,8 +711,11 @@ function Robot({ state, obstacles }: { state: RobotState, obstacles: Array<{x: n
     }
   })
 
+  // Escala del robot reducida al 55% para pasar por pasillos
+  const robotScale = 0.55
+  
   return (
-    <group ref={robotRef} position={[0, 0.3, 0]}>
+    <group ref={robotRef} position={[0, 0.2, 0]} scale={[robotScale, robotScale, robotScale]}>
       {/* Cuerpo principal del robot */}
       <mesh position={[0, 0.15, 0]} castShadow>
         <boxGeometry args={[0.8, 0.3, 1]} />
@@ -948,7 +1141,7 @@ function PushableItem({
   )
 }
 
-// Componente del Dohyo (ring de sumo)
+// Componente del Dohyo (ring de sumo) con objetos decorativos
 function Dohyo({ position, radius }: { position: [number, number, number], radius: number }) {
   const scale = 0.025
   const r = radius * scale
@@ -983,6 +1176,109 @@ function Dohyo({ position, radius }: { position: [number, number, number], radiu
         <planeGeometry args={[0.08, 0.6]} />
         <meshStandardMaterial color="#8b4513" />
       </mesh>
+      
+      {/* Objetos decorativos alrededor del dohyo */}
+      {/* Postes de esquina */}
+      {[0, 90, 180, 270].map((angle, i) => {
+        const rad = (angle * Math.PI) / 180
+        const x = Math.cos(rad) * (r + 0.4)
+        const z = Math.sin(rad) * (r + 0.4)
+        return (
+          <group key={i} position={[x, 0, z]}>
+            {/* Poste */}
+            <mesh position={[0, 0.4, 0]} castShadow>
+              <cylinderGeometry args={[0.08, 0.1, 0.8, 8]} />
+              <meshStandardMaterial color="#8b4513" roughness={0.8} />
+            </mesh>
+            {/* Bandera/decoración superior */}
+            <mesh position={[0.1, 0.75, 0]}>
+              <boxGeometry args={[0.15, 0.1, 0.02]} />
+              <meshStandardMaterial 
+                color={i % 2 === 0 ? '#ef4444' : '#3b82f6'} 
+                emissive={i % 2 === 0 ? '#ef4444' : '#3b82f6'}
+                emissiveIntensity={0.3}
+              />
+            </mesh>
+          </group>
+        )
+      })}
+      
+      {/* Luces decorativas en el borde */}
+      {[45, 135, 225, 315].map((angle, i) => {
+        const rad = (angle * Math.PI) / 180
+        const x = Math.cos(rad) * (r + 0.2)
+        const z = Math.sin(rad) * (r + 0.2)
+        return (
+          <pointLight 
+            key={`light-${i}`}
+            position={[x, 0.3, z]} 
+            intensity={0.5} 
+            color={['#ef4444', '#22c55e', '#3b82f6', '#eab308'][i]} 
+            distance={1.5}
+          />
+        )
+      })}
+    </group>
+  )
+}
+
+// Componente para renderizar la línea del seguidor de línea
+function LinePath({ points }: { points: Array<{x: number, z: number}> }) {
+  const scale = 0.025
+  const lineRef = useRef<THREE.Group>(null)
+  
+  if (!points || points.length < 2) return null
+  
+  // Convertir puntos 2D a 3D
+  const points3D = points.map(p => ({
+    x: (p.x - 200) * scale,
+    z: (p.z - 200) * scale
+  }))
+  
+  return (
+    <group ref={lineRef}>
+      {/* Línea principal negra */}
+      {points3D.map((point, i) => {
+        if (i === points3D.length - 1) return null
+        const next = points3D[i + 1]
+        const dx = next.x - point.x
+        const dz = next.z - point.z
+        const length = Math.sqrt(dx * dx + dz * dz)
+        const angle = Math.atan2(dx, dz)
+        const midX = (point.x + next.x) / 2
+        const midZ = (point.z + next.z) / 2
+        
+        return (
+          <mesh 
+            key={i} 
+            position={[midX, 0.015, midZ]} 
+            rotation={[-Math.PI / 2, 0, angle]}
+          >
+            <planeGeometry args={[0.12, length + 0.05]} />
+            <meshStandardMaterial 
+              color="#1a1a1a"
+              emissive="#000000"
+              roughness={0.9}
+            />
+          </mesh>
+        )
+      })}
+      
+      {/* Puntos de referencia en la línea */}
+      {points3D.map((point, i) => (
+        <mesh 
+          key={`dot-${i}`} 
+          position={[point.x, 0.02, point.z]} 
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <circleGeometry args={[0.08, 16]} />
+          <meshStandardMaterial 
+            color={i === 0 ? '#22c55e' : i === points3D.length - 1 ? '#ef4444' : '#1a1a1a'}
+            emissive={i === 0 ? '#22c55e' : i === points3D.length - 1 ? '#ef4444' : '#000000'}
+            emissiveIntensity={i === 0 || i === points3D.length - 1 ? 0.5 : 0}
+          />
+        </mesh>
+      ))}
     </group>
   )
 }
@@ -1170,6 +1466,11 @@ function Scene({
           position={[(challenge.dohyo.x - 200) * scale, 0, (challenge.dohyo.z - 200) * scale]}
           radius={challenge.dohyo.radius}
         />
+      )}
+
+      {/* Línea para seguidor de línea */}
+      {challenge.linePath && (
+        <LinePath points={challenge.linePath} />
       )}
 
       {/* Objetos empujables */}
