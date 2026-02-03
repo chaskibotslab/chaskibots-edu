@@ -9,8 +9,9 @@ import {
   ArrowLeft, FileText, Search, Filter, Check, X, Clock,
   Eye, Trash2, Download, ChevronDown, Loader2, Code,
   Calendar, User, GraduationCap, Star, MessageSquare,
-  Image, Paperclip, Edit3, RotateCcw
+  Image, Paperclip, Edit3, RotateCcw, Gamepad2
 } from 'lucide-react'
+import SimulatorChallengesPanel from '@/components/SimulatorChallengesPanel'
 
 interface Submission {
   id: string
@@ -41,6 +42,7 @@ function EntregasContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const urlLevelId = searchParams.get('levelId') || ''
+  const urlTab = searchParams.get('tab') || 'tareas'
   const { user, isAdmin, isTeacher, isLoading } = useAuth()
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
@@ -52,6 +54,7 @@ function EntregasContent() {
   const [feedbackInput, setFeedbackInput] = useState('')
   const [saving, setSaving] = useState(false)
   const [teacherCourses, setTeacherCourses] = useState<TeacherCourseAssignment[]>([])
+  const [activeTab, setActiveTab] = useState<'tareas' | 'simulador'>(urlTab as 'tareas' | 'simulador')
 
   // Sincronizar selectedLevel con urlLevelId cuando cambie
   useEffect(() => {
@@ -235,155 +238,195 @@ function EntregasContent() {
               </p>
             </div>
           </div>
-          <button
-            onClick={loadSubmissions}
-            className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-white rounded-lg transition-colors"
-          >
-            Actualizar
-          </button>
+          {activeTab === 'tareas' && (
+            <button
+              onClick={loadSubmissions}
+              className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-white rounded-lg transition-colors"
+            >
+              Actualizar
+            </button>
+          )}
+        </div>
+        
+        {/* Tabs */}
+        <div className="max-w-7xl mx-auto mt-4">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab('tareas')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                activeTab === 'tareas'
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              Tareas y Lecciones
+            </button>
+            <button
+              onClick={() => setActiveTab('simulador')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                activeTab === 'simulador'
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+              }`}
+            >
+              <Gamepad2 className="w-4 h-4" />
+              Retos Simulador 3D
+            </button>
+          </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto p-6">
-        {/* Filters */}
-        <div className="bg-dark-800 border border-dark-600 rounded-xl p-4 mb-6">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Buscar por nombre, código..."
-                  className="w-full pl-10 pr-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
-                />
-              </div>
-            </div>
-            <select
-              value={selectedLevel}
-              onChange={(e) => setSelectedLevel(e.target.value)}
-              className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
-            >
-              <option value="">Todos los niveles</option>
-              {(isAdmin ? EDUCATION_LEVELS : EDUCATION_LEVELS.filter(l => allowedLevelIds.includes(l.id))).map(level => (
-                <option key={level.id} value={level.id}>{level.name}</option>
-              ))}
-            </select>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
-            >
-              <option value="">Todos los estados</option>
-              <option value="pending">Pendientes</option>
-              <option value="graded">Calificados</option>
-              <option value="returned">Devueltos</option>
-            </select>
-          </div>
-        </div>
+        {/* Tab: Simulador 3D */}
+        {activeTab === 'simulador' && (
+          <SimulatorChallengesPanel />
+        )}
 
-        {/* Submissions List */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
-          </div>
-        ) : filteredSubmissions.length === 0 ? (
-          <div className="bg-dark-800 border border-dark-600 rounded-xl p-12 text-center">
-            <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">No hay entregas</h3>
-            <p className="text-gray-400">
-              {searchTerm || selectedLevel || selectedStatus
-                ? 'No se encontraron entregas con los filtros seleccionados'
-                : 'Aún no hay entregas de estudiantes'}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredSubmissions.map(submission => (
-              <div
-                key={submission.id}
-                className="bg-dark-800 border border-dark-600 rounded-xl overflow-hidden hover:border-purple-500/30 transition-colors"
-              >
-                <div className="p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-purple-400" />
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-white">{submission.studentName}</h3>
-                          <p className="text-sm text-gray-400">{submission.taskId}</p>
-                        </div>
-                        {getStatusBadge(submission.status)}
-                      </div>
-                      
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-3">
-                        <span className="flex items-center gap-1">
-                          <GraduationCap className="w-4 h-4" />
-                          {getLevelName(submission.levelId)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {new Date(submission.submittedAt).toLocaleDateString('es-ES', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                        {submission.grade !== undefined && (
-                          <span className="flex items-center gap-1 text-green-400">
-                            <Star className="w-4 h-4" />
-                            {submission.grade}/10
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Code Preview */}
-                      <div className="bg-dark-900 rounded-lg p-3 max-h-32 overflow-hidden">
-                        <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
-                          {submission.code.slice(0, 300)}
-                          {submission.code.length > 300 && '...'}
-                        </pre>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <button
-                        onClick={() => {
-                          setSelectedSubmission(submission)
-                          setGradeInput(submission.grade?.toString() || '')
-                          setFeedbackInput(submission.feedback || '')
-                        }}
-                        className={`p-2 rounded-lg transition-colors ${
-                          submission.status === 'graded'
-                            ? 'bg-green-500/20 hover:bg-green-500/30 text-green-400'
-                            : 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-400'
-                        }`}
-                        title={submission.status === 'graded' ? 'Editar calificación' : 'Calificar'}
-                      >
-                        {submission.status === 'graded' ? (
-                          <Edit3 className="w-5 h-5" />
-                        ) : (
-                          <Eye className="w-5 h-5" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(submission.id)}
-                        className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
-                        title="Eliminar"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
+        {/* Tab: Tareas */}
+        {activeTab === 'tareas' && (
+          <>
+            {/* Filters */}
+            <div className="bg-dark-800 border border-dark-600 rounded-xl p-4 mb-6">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex-1 min-w-[200px]">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Buscar por nombre, código..."
+                      className="w-full pl-10 pr-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                    />
                   </div>
                 </div>
+                <select
+                  value={selectedLevel}
+                  onChange={(e) => setSelectedLevel(e.target.value)}
+                  className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                >
+                  <option value="">Todos los niveles</option>
+                  {(isAdmin ? EDUCATION_LEVELS : EDUCATION_LEVELS.filter(l => allowedLevelIds.includes(l.id))).map(level => (
+                    <option key={level.id} value={level.id}>{level.name}</option>
+                  ))}
+                </select>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                >
+                  <option value="">Todos los estados</option>
+                  <option value="pending">Pendientes</option>
+                  <option value="graded">Calificados</option>
+                  <option value="returned">Devueltos</option>
+                </select>
               </div>
-            ))}
-          </div>
+            </div>
+
+            {/* Submissions List */}
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+              </div>
+            ) : filteredSubmissions.length === 0 ? (
+              <div className="bg-dark-800 border border-dark-600 rounded-xl p-12 text-center">
+                <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">No hay entregas</h3>
+                <p className="text-gray-400">
+                  {searchTerm || selectedLevel || selectedStatus
+                    ? 'No se encontraron entregas con los filtros seleccionados'
+                    : 'Aún no hay entregas de estudiantes'}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredSubmissions.map(submission => (
+                  <div
+                    key={submission.id}
+                    className="bg-dark-800 border border-dark-600 rounded-xl overflow-hidden hover:border-purple-500/30 transition-colors"
+                  >
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-purple-400" />
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-white">{submission.studentName}</h3>
+                              <p className="text-sm text-gray-400">{submission.taskId}</p>
+                            </div>
+                            {getStatusBadge(submission.status)}
+                          </div>
+                          
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-3">
+                            <span className="flex items-center gap-1">
+                              <GraduationCap className="w-4 h-4" />
+                              {getLevelName(submission.levelId)}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-4 h-4" />
+                              {new Date(submission.submittedAt).toLocaleDateString('es-ES', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                            {submission.grade !== undefined && (
+                              <span className="flex items-center gap-1 text-green-400">
+                                <Star className="w-4 h-4" />
+                                {submission.grade}/10
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Code Preview */}
+                          <div className="bg-dark-900 rounded-lg p-3 max-h-32 overflow-hidden">
+                            <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
+                              {submission.code.slice(0, 300)}
+                              {submission.code.length > 300 && '...'}
+                            </pre>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedSubmission(submission)
+                              setGradeInput(submission.grade?.toString() || '')
+                              setFeedbackInput(submission.feedback || '')
+                            }}
+                            className={`p-2 rounded-lg transition-colors ${
+                              submission.status === 'graded'
+                                ? 'bg-green-500/20 hover:bg-green-500/30 text-green-400'
+                                : 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-400'
+                            }`}
+                            title={submission.status === 'graded' ? 'Editar calificación' : 'Calificar'}
+                          >
+                            {submission.status === 'graded' ? (
+                              <Edit3 className="w-5 h-5" />
+                            ) : (
+                              <Eye className="w-5 h-5" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(submission.id)}
+                            className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+                            title="Eliminar"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 

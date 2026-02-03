@@ -39,6 +39,10 @@ interface RobotSimulator3DProps {
   commands?: SimulatorCommand[]
   onStateChange?: (state: RobotState) => void
   onRequestCommands?: () => SimulatorCommand[]
+  studentName?: string
+  studentEmail?: string
+  courseId?: string
+  schoolId?: string
 }
 
 // Definición de laberintos/desafíos
@@ -1187,7 +1191,15 @@ function Scene({
 }
 
 // Componente principal
-export default function RobotSimulator3D({ commands = [], onStateChange, onRequestCommands }: RobotSimulator3DProps) {
+export default function RobotSimulator3D({ 
+  commands = [], 
+  onStateChange, 
+  onRequestCommands,
+  studentName = '',
+  studentEmail = '',
+  courseId = '',
+  schoolId = ''
+}: RobotSimulator3DProps) {
   const [isRunning, setIsRunning] = useState(false)
   const [programCommands, setProgramCommands] = useState<SimulatorCommand[]>([])
   const runningRef = useRef(false)
@@ -1395,13 +1407,50 @@ export default function RobotSimulator3D({ commands = [], onStateChange, onReque
   const submitChallenge = async () => {
     if (!goalReached) return
     
+    // Verificar que hay nombre de estudiante
+    const finalStudentName = studentName || localStorage.getItem('studentName') || ''
+    const finalStudentEmail = studentEmail || localStorage.getItem('studentEmail') || ''
+    const finalCourseId = courseId || localStorage.getItem('courseId') || ''
+    const finalSchoolId = schoolId || localStorage.getItem('schoolId') || ''
+    
+    if (!finalStudentName) {
+      const name = prompt('Por favor ingresa tu nombre para registrar el reto:')
+      if (!name) {
+        alert('Necesitas ingresar tu nombre para enviar el reto.')
+        return
+      }
+      localStorage.setItem('studentName', name)
+    }
+    
     setSubmitting(true)
     try {
-      // Simular envío - aquí se conectaría con el API real
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      alert(`¡Reto "${currentChallenge.name}" enviado exitosamente! 🎉`)
-      setShowSubmitModal(false)
+      const response = await fetch('/api/simulator-challenges', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          challengeId: currentChallenge.id,
+          challengeName: currentChallenge.name,
+          challengeCategory: currentChallenge.category,
+          challengeDifficulty: currentChallenge.difficulty,
+          studentName: finalStudentName || localStorage.getItem('studentName'),
+          studentEmail: finalStudentEmail,
+          courseId: finalCourseId,
+          schoolId: finalSchoolId
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        alert(`¡Reto "${currentChallenge.name}" enviado exitosamente! 🎉\nTu docente podrá ver tu progreso.`)
+        setShowSubmitModal(false)
+      } else {
+        throw new Error(data.error || 'Error al enviar')
+      }
     } catch (error) {
+      console.error('Error submitting challenge:', error)
       alert('Error al enviar el reto. Intenta de nuevo.')
     } finally {
       setSubmitting(false)
