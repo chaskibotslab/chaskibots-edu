@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import { ALL_COURSES } from '@/data/courses'
@@ -73,17 +74,34 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-900 flex">
+    <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 flex relative overflow-hidden">
+      {/* Fondo futurista con efectos */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-neon-cyan/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neon-purple/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-neon-pink/3 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+      
       {/* Sidebar */}
-      <aside className="w-64 bg-dark-800 border-r border-dark-600 flex flex-col">
-        <div className="p-4 border-b border-dark-600">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
+      <aside className="w-64 bg-dark-800/80 backdrop-blur-xl border-r border-neon-cyan/10 flex flex-col relative z-10">
+        {/* Logo Header con efecto glow */}
+        <div className="p-4 border-b border-neon-cyan/20 bg-gradient-to-r from-neon-cyan/5 to-neon-purple/5">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-neon-cyan/30 rounded-xl blur-md group-hover:bg-neon-cyan/50 transition-all"></div>
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-neon-cyan/50 group-hover:border-neon-cyan transition-all">
+                <Image 
+                  src="/chaski.png" 
+                  alt="ChaskiBots" 
+                  width={48} 
+                  height={48}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
             <div>
-              <h1 className="text-white font-bold">ChaskiBots</h1>
-              <p className="text-xs text-neon-cyan">Panel Admin</p>
+              <h1 className="text-white font-bold text-lg tracking-wide">ChaskiBots</h1>
+              <p className="text-xs text-neon-cyan font-medium tracking-widest uppercase">Panel Admin</p>
             </div>
           </Link>
         </div>
@@ -91,52 +109,52 @@ export default function AdminPage() {
         <nav className="flex-1 p-4 space-y-2">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
               activeTab === 'dashboard'
-                ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/30'
-                : 'text-gray-400 hover:bg-dark-700 hover:text-white'
+                ? 'bg-gradient-to-r from-neon-cyan/20 to-neon-cyan/10 text-neon-cyan border border-neon-cyan/40 shadow-lg shadow-neon-cyan/20'
+                : 'text-gray-400 hover:bg-dark-700/50 hover:text-white hover:border-white/10 border border-transparent'
             }`}
           >
             <BarChart3 className="w-5 h-5" />
-            <span>Dashboard</span>
+            <span className="font-medium">Dashboard</span>
           </button>
 
           <button
             onClick={() => setActiveTab('courses')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
               activeTab === 'courses'
-                ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/30'
-                : 'text-gray-400 hover:bg-dark-700 hover:text-white'
+                ? 'bg-gradient-to-r from-neon-purple/20 to-neon-purple/10 text-neon-purple border border-neon-purple/40 shadow-lg shadow-neon-purple/20'
+                : 'text-gray-400 hover:bg-dark-700/50 hover:text-white hover:border-white/10 border border-transparent'
             }`}
           >
             <BookOpen className="w-5 h-5" />
-            <span>Cursos</span>
+            <span className="font-medium">Cursos</span>
           </button>
 
           <button
             onClick={() => setActiveTab('users')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
               activeTab === 'users'
-                ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/30'
-                : 'text-gray-400 hover:bg-dark-700 hover:text-white'
+                ? 'bg-gradient-to-r from-neon-pink/20 to-neon-pink/10 text-neon-pink border border-neon-pink/40 shadow-lg shadow-neon-pink/20'
+                : 'text-gray-400 hover:bg-dark-700/50 hover:text-white hover:border-white/10 border border-transparent'
             }`}
           >
             <Users className="w-5 h-5" />
-            <span>Usuarios</span>
+            <span className="font-medium">Usuarios</span>
           </button>
 
           <button
             onClick={() => setActiveTab('logs')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
               activeTab === 'logs'
-                ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/30'
-                : 'text-gray-400 hover:bg-dark-700 hover:text-white'
+                ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/10 text-neon-green border border-neon-green/40 shadow-lg shadow-neon-green/20'
+                : 'text-gray-400 hover:bg-dark-700/50 hover:text-white hover:border-white/10 border border-transparent'
             }`}
           >
             <Activity className="w-5 h-5" />
-            <span>Actividad</span>
+            <span className="font-medium">Actividad</span>
             {accessLogs.length > 0 && (
-              <span className="ml-auto bg-neon-purple/30 text-neon-purple text-xs px-2 py-0.5 rounded-full">
+              <span className="ml-auto bg-neon-green/30 text-neon-green text-xs px-2 py-0.5 rounded-full font-bold animate-pulse">
                 {accessLogs.length}
               </span>
             )}
@@ -144,65 +162,69 @@ export default function AdminPage() {
 
           <button
             onClick={() => setActiveTab('settings')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
               activeTab === 'settings'
-                ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/30'
-                : 'text-gray-400 hover:bg-dark-700 hover:text-white'
+                ? 'bg-gradient-to-r from-orange-500/20 to-orange-500/10 text-orange-400 border border-orange-500/40 shadow-lg shadow-orange-500/20'
+                : 'text-gray-400 hover:bg-dark-700/50 hover:text-white hover:border-white/10 border border-transparent'
             }`}
           >
             <Settings className="w-5 h-5" />
-            <span>Configuración</span>
+            <span className="font-medium">Configuración</span>
           </button>
 
-          <div className="mt-4 pt-4 border-t border-dark-600">
-            <p className="text-xs text-gray-500 mb-2 px-4">Herramientas</p>
+          <div className="mt-4 pt-4 border-t border-neon-cyan/10">
+            <p className="text-xs text-neon-cyan/60 mb-3 px-4 font-semibold tracking-wider uppercase">Herramientas</p>
             <Link
               href="/admin/colegios"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-blue-500/30"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-blue-500/10 hover:text-blue-400 transition-all duration-300 border border-transparent hover:border-blue-500/30 group"
             >
-              <Shield className="w-5 h-5 text-blue-400" />
-              <span>Colegios</span>
+              <Shield className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
+              <span className="font-medium">Colegios</span>
               <span className="ml-auto text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">Nuevo</span>
             </Link>
             <Link
               href="/admin/calificaciones"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-neon-green/30"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-neon-green/10 hover:text-neon-green transition-all duration-300 border border-transparent hover:border-neon-green/30 group"
             >
-              <GraduationCap className="w-5 h-5 text-neon-green" />
-              <span>Calificaciones</span>
+              <GraduationCap className="w-5 h-5 text-neon-green group-hover:scale-110 transition-transform" />
+              <span className="font-medium">Calificaciones</span>
             </Link>
             <Link
               href="/admin/entregas"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-purple-500/30"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 border border-transparent hover:border-purple-500/30 group"
             >
-              <FileText className="w-5 h-5 text-purple-400" />
-              <span>Entregas de Estudiantes</span>
+              <FileText className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
+              <span className="font-medium">Entregas</span>
             </Link>
             <Link
               href="/admin/tareas"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-yellow-500/30"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-yellow-500/10 hover:text-yellow-400 transition-all duration-300 border border-transparent hover:border-yellow-500/30 group"
             >
-              <BookOpen className="w-5 h-5 text-yellow-400" />
-              <span>Gestión de Tareas</span>
+              <BookOpen className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform" />
+              <span className="font-medium">Gestión de Tareas</span>
             </Link>
             <Link
               href="/admin/contenido"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-dark-700 hover:text-white transition-all border border-transparent hover:border-neon-cyan/30"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-neon-cyan/10 hover:text-neon-cyan transition-all duration-300 border border-transparent hover:border-neon-cyan/30 group"
             >
-              <Brain className="w-5 h-5 text-neon-cyan" />
-              <span>Contenido</span>
+              <Brain className="w-5 h-5 text-neon-cyan group-hover:scale-110 transition-transform" />
+              <span className="font-medium">Contenido</span>
             </Link>
           </div>
         </nav>
 
-        <div className="p-4 border-t border-dark-600">
+        {/* Footer del sidebar con usuario y logo pequeño */}
+        <div className="p-4 border-t border-neon-cyan/10 bg-gradient-to-r from-dark-800/50 to-dark-700/50">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-neon-purple to-neon-pink rounded-full flex items-center justify-center">
-              <span className="text-white font-bold">{user?.name?.charAt(0) || 'A'}</span>
+            <div className="relative">
+              <div className="absolute inset-0 bg-neon-purple/30 rounded-full blur-sm"></div>
+              <div className="relative w-10 h-10 bg-gradient-to-br from-neon-purple to-neon-pink rounded-full flex items-center justify-center border border-neon-purple/50">
+                <span className="text-white font-bold">{user?.name?.charAt(0) || 'A'}</span>
+              </div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-medium truncate">{user?.name}</p>
-              <p className="text-gray-400 text-xs truncate">{user?.email}</p>
+              <p className="text-white text-sm font-semibold truncate">{user?.name}</p>
+              <p className="text-neon-cyan/60 text-xs truncate">{user?.email}</p>
             </div>
           </div>
           <button
@@ -210,7 +232,7 @@ export default function AdminPage() {
               logout()
               router.push('/')
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500/20 to-red-600/20 text-red-400 rounded-xl hover:from-red-500/30 hover:to-red-600/30 transition-all duration-300 border border-red-500/30 hover:border-red-500/50 font-medium"
           >
             <LogOut className="w-4 h-4" />
             <span>Cerrar Sesión</span>
@@ -219,22 +241,29 @@ export default function AdminPage() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        {/* Header */}
-        <header className="h-16 bg-dark-800/50 backdrop-blur border-b border-dark-600 flex items-center justify-between px-6">
-          <div>
-            <h2 className="text-xl font-bold text-white">
-              {activeTab === 'dashboard' && 'Dashboard'}
-              {activeTab === 'courses' && 'Gestión de Cursos'}
-              {activeTab === 'users' && 'Gestión de Usuarios'}
-              {activeTab === 'logs' && 'Registro de Actividad'}
-              {activeTab === 'settings' && 'Configuración'}
-            </h2>
+      <main className="flex-1 overflow-auto relative z-10">
+        {/* Header futurista */}
+        <header className="h-20 bg-dark-800/60 backdrop-blur-xl border-b border-neon-cyan/10 flex items-center justify-between px-8">
+          <div className="flex items-center gap-4">
+            {/* Logo pequeño en header */}
+            <div className="w-10 h-10 rounded-lg overflow-hidden border border-neon-cyan/30 hidden lg:block">
+              <Image src="/chaski.png" alt="ChaskiBots" width={40} height={40} className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white tracking-wide">
+                {activeTab === 'dashboard' && 'Dashboard'}
+                {activeTab === 'courses' && 'Gestión de Cursos'}
+                {activeTab === 'users' && 'Gestión de Usuarios'}
+                {activeTab === 'logs' && 'Registro de Actividad'}
+                {activeTab === 'settings' && 'Configuración'}
+              </h2>
+              <p className="text-neon-cyan/60 text-sm">Panel de Administración ChaskiBots</p>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-neon-cyan/10 to-neon-purple/10 text-neon-cyan hover:text-white transition-all duration-300 rounded-xl border border-neon-cyan/30 hover:border-neon-cyan/60 font-medium"
             >
               <Home className="w-4 h-4" />
               <span>Ver Sitio</span>
@@ -246,59 +275,84 @@ export default function AdminPage() {
         <div className="p-6">
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-6">
-              {/* Stats Cards */}
+            <div className="space-y-8">
+              {/* Stats Cards con efectos futuristas */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-dark-800 rounded-xl p-6 border border-dark-600">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 bg-neon-cyan/20 rounded-lg flex items-center justify-center">
-                      <Users className="w-6 h-6 text-neon-cyan" />
+                {/* Card Usuarios */}
+                <div className="group relative bg-gradient-to-br from-dark-800/80 to-dark-700/50 rounded-2xl p-6 border border-neon-cyan/20 hover:border-neon-cyan/50 transition-all duration-500 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-cyan/10 rounded-full blur-2xl group-hover:bg-neon-cyan/20 transition-all duration-500"></div>
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-neon-cyan/30 to-neon-cyan/10 rounded-xl flex items-center justify-center border border-neon-cyan/30 shadow-lg shadow-neon-cyan/20">
+                        <Users className="w-7 h-7 text-neon-cyan" />
+                      </div>
+                      <span className="text-neon-green text-sm font-bold bg-neon-green/20 px-2 py-1 rounded-lg">+12%</span>
                     </div>
-                    <span className="text-green-400 text-sm">+12%</span>
+                    <h3 className="text-4xl font-bold text-white mb-1">{stats.totalUsers}</h3>
+                    <p className="text-neon-cyan/70 font-medium">Usuarios Totales</p>
                   </div>
-                  <h3 className="text-3xl font-bold text-white">{stats.totalUsers}</h3>
-                  <p className="text-gray-400">Usuarios Totales</p>
                 </div>
 
-                <div className="bg-dark-800 rounded-xl p-6 border border-dark-600">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 bg-neon-purple/20 rounded-lg flex items-center justify-center">
-                      <BookOpen className="w-6 h-6 text-neon-purple" />
+                {/* Card Cursos */}
+                <div className="group relative bg-gradient-to-br from-dark-800/80 to-dark-700/50 rounded-2xl p-6 border border-neon-purple/20 hover:border-neon-purple/50 transition-all duration-500 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-purple/10 rounded-full blur-2xl group-hover:bg-neon-purple/20 transition-all duration-500"></div>
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-neon-purple/30 to-neon-purple/10 rounded-xl flex items-center justify-center border border-neon-purple/30 shadow-lg shadow-neon-purple/20">
+                        <BookOpen className="w-7 h-7 text-neon-purple" />
+                      </div>
+                      <span className="text-neon-green text-sm font-bold bg-neon-green/20 px-2 py-1 rounded-lg">+2</span>
                     </div>
-                    <span className="text-green-400 text-sm">+2</span>
+                    <h3 className="text-4xl font-bold text-white mb-1">{stats.totalCourses}</h3>
+                    <p className="text-neon-purple/70 font-medium">Cursos Activos</p>
                   </div>
-                  <h3 className="text-3xl font-bold text-white">{stats.totalCourses}</h3>
-                  <p className="text-gray-400">Cursos Activos</p>
                 </div>
 
-                <div className="bg-dark-800 rounded-xl p-6 border border-dark-600">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 bg-neon-pink/20 rounded-lg flex items-center justify-center">
-                      <GraduationCap className="w-6 h-6 text-neon-pink" />
+                {/* Card Niveles */}
+                <div className="group relative bg-gradient-to-br from-dark-800/80 to-dark-700/50 rounded-2xl p-6 border border-neon-pink/20 hover:border-neon-pink/50 transition-all duration-500 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-neon-pink/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-pink/10 rounded-full blur-2xl group-hover:bg-neon-pink/20 transition-all duration-500"></div>
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-neon-pink/30 to-neon-pink/10 rounded-xl flex items-center justify-center border border-neon-pink/30 shadow-lg shadow-neon-pink/20">
+                        <GraduationCap className="w-7 h-7 text-neon-pink" />
+                      </div>
                     </div>
+                    <h3 className="text-4xl font-bold text-white mb-1">{stats.totalLevels}</h3>
+                    <p className="text-neon-pink/70 font-medium">Niveles Educativos</p>
                   </div>
-                  <h3 className="text-3xl font-bold text-white">{stats.totalLevels}</h3>
-                  <p className="text-gray-400">Niveles Educativos</p>
                 </div>
 
-                <div className="bg-dark-800 rounded-xl p-6 border border-dark-600">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
-                      <Activity className="w-6 h-6 text-green-400" />
+                {/* Card Accesos */}
+                <div className="group relative bg-gradient-to-br from-dark-800/80 to-dark-700/50 rounded-2xl p-6 border border-neon-green/20 hover:border-neon-green/50 transition-all duration-500 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-neon-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-green/10 rounded-full blur-2xl group-hover:bg-neon-green/20 transition-all duration-500"></div>
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-neon-green/30 to-neon-green/10 rounded-xl flex items-center justify-center border border-neon-green/30 shadow-lg shadow-neon-green/20">
+                        <Activity className="w-7 h-7 text-neon-green" />
+                      </div>
                     </div>
+                    <h3 className="text-4xl font-bold text-white mb-1">{stats.recentLogins}</h3>
+                    <p className="text-neon-green/70 font-medium">Accesos Recientes</p>
                   </div>
-                  <h3 className="text-3xl font-bold text-white">{stats.recentLogins}</h3>
-                  <p className="text-gray-400">Accesos Recientes</p>
                 </div>
               </div>
 
-              {/* Recent Activity */}
-              <div className="bg-dark-800 rounded-xl border border-dark-600">
-                <div className="p-4 border-b border-dark-600 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-white">Actividad Reciente</h3>
+              {/* Recent Activity con estilo futurista */}
+              <div className="bg-gradient-to-br from-dark-800/80 to-dark-700/50 rounded-2xl border border-neon-cyan/10 overflow-hidden">
+                <div className="p-5 border-b border-neon-cyan/10 flex items-center justify-between bg-gradient-to-r from-neon-cyan/5 to-transparent">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-neon-cyan/20 rounded-xl flex items-center justify-center">
+                      <Activity className="w-5 h-5 text-neon-cyan" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white">Actividad Reciente</h3>
+                  </div>
                   <button
                     onClick={() => setActiveTab('logs')}
-                    className="text-neon-cyan text-sm hover:underline"
+                    className="text-neon-cyan text-sm font-medium hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-neon-cyan/10"
                   >
                     Ver todo
                   </button>
