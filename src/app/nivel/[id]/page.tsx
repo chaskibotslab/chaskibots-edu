@@ -34,6 +34,7 @@ interface APILesson {
   images: string[]
   content: string
   locked: boolean
+  pdfUrl?: string
 }
 
 export default function NivelPage() {
@@ -585,6 +586,28 @@ export default function NivelPage() {
                 {'content' in lesson && lesson.content && (
                   <div className="bg-dark-700/50 rounded-xl p-4">
                     <p className="text-gray-300 whitespace-pre-line">{lesson.content}</p>
+                  </div>
+                )}
+                
+                {/* Botón de PDF */}
+                {'pdfUrl' in lesson && lesson.pdfUrl && (
+                  <div className="flex items-center gap-3 p-4 bg-dark-700/50 rounded-xl">
+                    <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-red-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium">Documento PDF</p>
+                      <p className="text-sm text-gray-400">Material de apoyo para esta lección</p>
+                    </div>
+                    <a
+                      href={lesson.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg flex items-center gap-2 transition-colors"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Ver PDF
+                    </a>
                   </div>
                 )}
               </div>
