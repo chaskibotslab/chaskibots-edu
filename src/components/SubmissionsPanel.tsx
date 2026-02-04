@@ -39,6 +39,8 @@ export default function SubmissionsPanel() {
   const [loading, setLoading] = useState(true)
   const [selectedLevel, setSelectedLevel] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('')
+  const [studentFilter, setStudentFilter] = useState<string>('')
+  const [taskFilter, setTaskFilter] = useState<string>('')
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
   const [gradeInput, setGradeInput] = useState<number>(10)
   const [feedbackInput, setFeedbackInput] = useState('')
@@ -319,6 +321,30 @@ export default function SubmissionsPanel() {
           <option value="">Todos los estados</option>
           <option value="pending">Pendientes</option>
           <option value="graded">Calificados</option>
+        </select>
+
+        {/* Filtro por estudiante */}
+        <select
+          value={studentFilter}
+          onChange={(e) => setStudentFilter(e.target.value)}
+          className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+        >
+          <option value="">Todos los estudiantes</option>
+          {Array.from(new Set(submissions.map(s => s.studentName))).filter(Boolean).sort().map(name => (
+            <option key={name} value={name}>{name}</option>
+          ))}
+        </select>
+
+        {/* Filtro por tarea */}
+        <select
+          value={taskFilter}
+          onChange={(e) => setTaskFilter(e.target.value)}
+          className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+        >
+          <option value="">Todas las tareas</option>
+          {Array.from(new Set(submissions.map(s => s.taskId))).filter(Boolean).sort().map(task => (
+            <option key={task} value={task}>{task}</option>
+          ))}
         </select>
       </div>
 
