@@ -219,7 +219,6 @@ export async function POST(request: NextRequest) {
     // Guardar en Airtable (campos: drawing y files para los datos)
     const fields: any = {
       taskId,
-      type: 'task',
       studentName,
       studentEmail: studentEmail || '',
       levelId: levelId || '',
