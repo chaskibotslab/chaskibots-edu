@@ -284,45 +284,6 @@ export default function SubmissionsPanel() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        {/* Selector de curso para profesores */}
-        {isTeacher && !isAdmin && teacherCourses.length > 0 && (
-          <select
-            value={selectedCourse}
-            onChange={(e) => {
-              setSelectedCourse(e.target.value)
-              const course = teacherCourses.find(tc => tc.courseId === e.target.value)
-              if (course) setSelectedLevel(course.levelId)
-            }}
-            className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
-          >
-            <option value="">Todos mis cursos</option>
-            {teacherCourses.map(tc => (
-              <option key={tc.courseId} value={tc.courseId}>{tc.courseName}</option>
-            ))}
-          </select>
-        )}
-        
-        <select
-          value={selectedLevel}
-          onChange={(e) => setSelectedLevel(e.target.value)}
-          className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
-        >
-          <option value="">Todos los niveles</option>
-          {allowedLevels.map(level => (
-            <option key={level.id} value={level.id}>{level.name}</option>
-          ))}
-        </select>
-        
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
-        >
-          <option value="">Todos los estados</option>
-          <option value="pending">Pendientes</option>
-          <option value="graded">Calificados</option>
-        </select>
-
         {/* Filtro por estudiante */}
         <select
           value={studentFilter}
