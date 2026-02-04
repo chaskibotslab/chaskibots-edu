@@ -152,7 +152,7 @@ export async function PUT(request: Request) {
     if (body.description) fields.description = body.description
     if (body.components) fields.components = body.components
     if (body.skills) fields.skills = body.skills
-    if (body.image_urls !== undefined) fields.images = body.image_urls
+    if (body.image_urls !== undefined) fields.image_urls = body.image_urls
     if (body.price !== undefined) fields.price = Number(body.price) || 0
     if (body.videoUrl !== undefined) fields.videoUrl = body.videoUrl
     if (body.tutorialUrl !== undefined) fields.tutorialUrl = body.tutorialUrl
