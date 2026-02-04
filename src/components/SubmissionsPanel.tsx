@@ -1,4 +1,5 @@
 'use client'
+// v2.1
 
 import { useState, useEffect, useMemo } from 'react'
 import { EDUCATION_LEVELS } from '@/lib/constants'
