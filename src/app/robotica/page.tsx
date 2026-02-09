@@ -5,12 +5,31 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
-import { EDUCATION_LEVELS } from '@/lib/constants'
-import { Bot, Cpu, Wrench, Lightbulb, ArrowRight, Lock } from 'lucide-react'
+import { Bot, Cpu, Wrench, Lightbulb } from 'lucide-react'
+
+interface Level {
+  id: string
+  name: string
+  ageRange?: string
+}
 
 export default function RoboticaPage() {
   const { user, isLoading, isAuthenticated } = useAuth()
   const [userCourses, setUserCourses] = useState<any[]>([])
+  const [allLevels, setAllLevels] = useState<Level[]>([])
+
+  // Cargar niveles desde Airtable
+  const loadLevels = async () => {
+    try {
+      const res = await fetch('/api/admin/levels')
+      const data = await res.json()
+      if (data.levels) {
+        setAllLevels(data.levels)
+      }
+    } catch (error) {
+      console.error('Error loading levels:', error)
+    }
+  }
 
   const loadUserCourses = async () => {
     try {
@@ -47,6 +66,10 @@ export default function RoboticaPage() {
   }
 
   useEffect(() => {
+    loadLevels()
+  }, [])
+
+  useEffect(() => {
     if (!isLoading && isAuthenticated && user && user.role !== 'admin') {
       loadUserCourses()
     }
@@ -57,7 +80,7 @@ export default function RoboticaPage() {
 
   const allowedLevelIds = useMemo(() => {
     if (!user) return []
-    if (user.role === 'admin') return EDUCATION_LEVELS.map(l => l.id)
+    if (user.role === 'admin') return allLevels.map(l => l.id)
     const levelIds = new Set<string>()
 
     // SIEMPRE usar el levelId del usuario si existe (prioridad máxima)
@@ -73,10 +96,15 @@ export default function RoboticaPage() {
     }
 
     return Array.from(levelIds)
-  }, [user, userCourses])
+  }, [user, userCourses, allLevels])
 
   const isAdmin = user?.role === 'admin'
-  const canAccessLevel = (levelId: string) => isAdmin || allowedLevelIds.includes(levelId)
+  
+  // Filtrar niveles que el usuario puede ver
+  const visibleLevels = useMemo(() => {
+    if (isAdmin) return allLevels
+    return allLevels.filter(level => allowedLevelIds.includes(level.id))
+  }, [allLevels, allowedLevelIds, isAdmin])
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-900">
@@ -125,24 +153,16 @@ export default function RoboticaPage() {
           <div>
             <h2 className="text-lg font-semibold text-white mb-4">Selecciona tu Nivel</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {EDUCATION_LEVELS.map((level) => {
-                const hasAccess = canAccessLevel(level.id)
-
-                if (!hasAccess && !isAdmin) {
-                  return null
-                }
-
-                return (
-                  <Link
-                    key={level.id}
-                    href={`/nivel/${level.id}?area=robotica`}
-                    className="group bg-dark-800/80 backdrop-blur rounded-xl p-4 border border-dark-600 hover:border-neon-blue/50 transition-all"
-                  >
-                    <h3 className="font-semibold text-white text-sm mb-1">{level.name}</h3>
-                    <p className="text-gray-500 text-xs">{level.ageRange}</p>
-                  </Link>
-                )
-              })}
+              {visibleLevels.map((level) => (
+                <Link
+                  key={level.id}
+                  href={`/nivel/${level.id}?area=robotica`}
+                  className="group bg-dark-800/80 backdrop-blur rounded-xl p-4 border border-dark-600 hover:border-neon-blue/50 transition-all"
+                >
+                  <h3 className="font-semibold text-white text-sm mb-1">{level.name}</h3>
+                  <p className="text-gray-500 text-xs">{level.ageRange}</p>
+                </Link>
+              ))}
             </div>
           </div>
 
