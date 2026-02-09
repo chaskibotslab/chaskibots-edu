@@ -62,10 +62,10 @@ export default function LevelsManager() {
   const loadLevels = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/levels')
+      const res = await fetch('/api/admin/levels')
       const data = await res.json()
-      if (Array.isArray(data)) {
-        setLevels(data)
+      if (data.levels) {
+        setLevels(data.levels)
       }
     } catch (error) {
       console.error('Error loading levels:', error)

@@ -59,14 +59,14 @@ export default function ProgramsManager() {
     try {
       const [programsRes, levelsRes] = await Promise.all([
         fetch('/api/programs'),
-        fetch('/api/levels')
+        fetch('/api/admin/levels')
       ])
       
       const programsData = await programsRes.json()
       const levelsData = await levelsRes.json()
       
       if (programsData.programs) setPrograms(programsData.programs)
-      if (Array.isArray(levelsData)) setLevels(levelsData)
+      if (levelsData.levels) setLevels(levelsData.levels)
     } catch (error) {
       console.error('Error loading data:', error)
     }
