@@ -3,19 +3,47 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from './AuthProvider'
-import { Menu, X, User, LogOut, BookOpen, Bot, Brain, Shield, Zap, Settings } from 'lucide-react'
+import { Menu, X, User, LogOut, BookOpen, Bot, Brain, Shield, Zap, Settings, ChevronLeft, Home } from 'lucide-react'
 
 export default function Header() {
   const { user, logout, isAuthenticated, isAdmin } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const isHomePage = pathname === '/' || pathname === '/dashboard'
+  const isLoginPage = pathname === '/login'
+
+  const handleBack = () => {
+    // Intentar ir atrás en el historial, si no hay historial ir al dashboard
+    if (window.history.length > 2) {
+      router.back()
+    } else {
+      router.push(isAuthenticated ? '/dashboard' : '/')
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-md border-b border-neon-cyan/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
+          {/* Back Button + Logo */}
+          <div className="flex items-center gap-2">
+            {/* Botón de retroceso - visible en todas las páginas excepto home/dashboard/login */}
+            {!isHomePage && !isLoginPage && (
+              <button
+                onClick={handleBack}
+                className="p-2 rounded-lg bg-dark-800 border border-dark-600 hover:border-neon-cyan/50 hover:bg-dark-700 transition-all duration-200 group"
+                title="Volver"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-400 group-hover:text-neon-cyan transition-colors" />
+              </button>
+            )}
+            
+            {/* Logo */}
+            <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-3 group">
             <Image 
               src="/chaski.png" 
               alt="ChaskiBots Logo" 
@@ -28,6 +56,7 @@ export default function Header() {
               <span className="text-[10px] text-neon-cyan tracking-widest">EDUCATION PLATFORM</span>
             </div>
           </Link>
+          </div>
 
           {/* Desktop Navigation - Oculto por solicitud del usuario */}
 
