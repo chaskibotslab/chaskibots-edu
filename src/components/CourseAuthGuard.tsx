@@ -37,38 +37,34 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
         return
       }
 
-      // Teacher: verificar en teacher_courses
+      // Teacher: verificar acceso
       if (user.role === 'teacher') {
-        try {
-          const teacherId = user.accessCode || ''
-          const res = await fetch(`/api/teacher-courses?teacherId=${teacherId}`)
-          const data = await res.json()
-          
-          if (data.assignments && data.assignments.length > 0) {
-            // Verificar si tiene acceso a este nivel
-            const hasAccess = data.assignments.some((a: any) => a.levelId === levelId)
-            if (hasAccess) {
-              setIsAuthorized(true)
-              setIsCheckingAccess(false)
-              return
+        // Primero verificar si el levelId del usuario coincide
+        if (user.levelId === levelId) {
+          setIsAuthorized(true)
+          setIsCheckingAccess(false)
+          return
+        }
+        
+        // Solo buscar asignaciones si tiene accessCode
+        if (user.accessCode) {
+          try {
+            const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
+            const data = await res.json()
+            
+            if (data.assignments && data.assignments.length > 0) {
+              const hasAccess = data.assignments.some((a: any) => a.levelId === levelId)
+              if (hasAccess) {
+                setIsAuthorized(true)
+                setIsCheckingAccess(false)
+                return
+              }
             }
-          } else {
-            // Fallback: si no hay asignaciones, usar levelId del usuario
-            if (user.levelId === levelId) {
-              setIsAuthorized(true)
-              setIsCheckingAccess(false)
-              return
-            }
-          }
-        } catch (error) {
-          console.error('Error checking teacher access:', error)
-          // En caso de error, usar fallback
-          if (user.levelId === levelId) {
-            setIsAuthorized(true)
-            setIsCheckingAccess(false)
-            return
+          } catch (error) {
+            console.error('Error checking teacher access:', error)
           }
         }
+        
         setIsCheckingAccess(false)
         return
       }

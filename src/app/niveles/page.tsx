@@ -77,24 +77,25 @@ export default function NivelesPage() {
       console.log('[Niveles] Usuario:', user.name, 'Role:', user.role, 'LevelId:', user.levelId, 'AccessCode:', user.accessCode)
       
       if (user.role === 'teacher') {
-        // Para profesores: usar tabla teacher_courses con accessCode como teacherId
-        const teacherId = user.accessCode || ''
-        console.log('[Niveles] Buscando asignaciones para teacherId:', teacherId)
-        const res = await fetch(`/api/teacher-courses?teacherId=${teacherId}`)
-        const data = await res.json()
-        console.log('[Niveles] Asignaciones encontradas:', data.assignments?.length || 0, data.assignments)
-        
-        if (data.assignments && data.assignments.length > 0) {
-          setUserCourses(data.assignments)
-        } else {
-          // Fallback: si no hay asignaciones en teacher_courses, usar levelId directo del usuario
-          console.log('[Niveles] Sin asignaciones, usando levelId del usuario:', user.levelId)
-          if (user.levelId) {
-            setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
-          } else {
-            // Si no hay levelId, el profesor no tiene acceso a ningún nivel
-            setUserCourses([])
+        // Si el profesor tiene accessCode, buscar asignaciones en teacher_courses
+        if (user.accessCode) {
+          console.log('[Niveles] Buscando asignaciones para teacherId:', user.accessCode)
+          const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
+          const data = await res.json()
+          console.log('[Niveles] Asignaciones encontradas:', data.assignments?.length || 0)
+          
+          if (data.assignments && data.assignments.length > 0) {
+            setUserCourses(data.assignments)
+            return
           }
+        }
+        
+        // Sin accessCode o sin asignaciones: usar SOLO el levelId del usuario
+        console.log('[Niveles] Usando levelId del usuario:', user.levelId)
+        if (user.levelId) {
+          setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
+        } else {
+          setUserCourses([])
         }
       } else if (user.role === 'student') {
         // Para estudiantes: solo su curso asignado
