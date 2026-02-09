@@ -92,19 +92,24 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, ...updateData } = body
+    const { originalId, ...updateData } = body
 
-    if (!id) {
+    // Usar originalId para buscar, o id si no hay originalId
+    const searchId = originalId || updateData.id
+
+    if (!searchId) {
       return NextResponse.json(
         { success: false, error: 'ID es requerido' },
         { status: 400 }
       )
     }
 
-    // Buscar el registro por el campo 'id'
+    console.log('Updating level, searching by:', searchId, 'new data:', updateData)
+
+    // Buscar el registro por el campo 'id' original
     const records = await base(TABLE_NAME)
       .select({
-        filterByFormula: `{id} = '${id}'`,
+        filterByFormula: `{id} = '${searchId}'`,
         maxRecords: 1
       })
       .firstPage()
@@ -116,6 +121,7 @@ export async function PUT(request: NextRequest) {
       )
     }
 
+    // Actualizar incluyendo el nuevo id si cambió
     await base(TABLE_NAME).update(records[0].id, updateData)
 
     return NextResponse.json({
