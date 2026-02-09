@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/components/AuthProvider'
-import { Mail, Lock, Eye, EyeOff, Loader2, Sparkles, Shield, Rocket, Key } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Loader2, Sparkles, Shield, Rocket, Key, ArrowRight } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -17,6 +17,11 @@ export default function LoginPage() {
   const [loginMode, setLoginMode] = useState<'email' | 'code'>('email')
   const { login } = useAuth()
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,7 +63,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className={`min-h-screen flex transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
       {/* Panel izquierdo - Branding Futurista */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 p-12 flex-col justify-between relative overflow-hidden">
         {/* Efectos de fondo animados */}
@@ -284,15 +289,19 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 bg-gradient-to-r from-neon-cyan to-neon-purple text-white font-bold rounded-xl hover:opacity-90 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-neon-cyan/20"
+              className="w-full py-4 bg-gradient-to-r from-neon-cyan via-neon-blue to-neon-purple text-white font-bold rounded-xl hover:scale-[1.02] hover:shadow-xl hover:shadow-neon-cyan/30 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden"
             >
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   Ingresando...
                 </>
               ) : (
-                'Iniciar Sesión'
+                <>
+                  Iniciar Sesión
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
               )}
             </button>
           </form>
