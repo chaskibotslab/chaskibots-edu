@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const teacherId = searchParams.get('teacherId')
+    const teacherName = searchParams.get('teacherName')
     const schoolId = searchParams.get('schoolId')
     const courseId = searchParams.get('courseId')
 
@@ -31,6 +32,7 @@ export async function GET(request: NextRequest) {
     const filters: string[] = []
     
     if (teacherId) filters.push(`{teacherId}="${teacherId}"`)
+    if (teacherName) filters.push(`{teacherName}="${teacherName}"`)
     if (schoolId) filters.push(`{schoolId}="${schoolId}"`)
     if (courseId) filters.push(`{courseId}="${courseId}"`)
     

@@ -46,23 +46,32 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
           return
         }
         
-        // Solo buscar asignaciones si tiene accessCode
-        if (user.accessCode) {
-          try {
+        // Buscar asignaciones por accessCode o por nombre
+        try {
+          let assignments: any[] = []
+          
+          if (user.accessCode) {
             const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
             const data = await res.json()
-            
-            if (data.assignments && data.assignments.length > 0) {
-              const hasAccess = data.assignments.some((a: any) => a.levelId === levelId)
-              if (hasAccess) {
-                setIsAuthorized(true)
-                setIsCheckingAccess(false)
-                return
-              }
-            }
-          } catch (error) {
-            console.error('Error checking teacher access:', error)
+            if (data.assignments?.length > 0) assignments = data.assignments
           }
+          
+          if (assignments.length === 0 && user.name) {
+            const res = await fetch(`/api/teacher-courses?teacherName=${encodeURIComponent(user.name)}`)
+            const data = await res.json()
+            if (data.assignments?.length > 0) assignments = data.assignments
+          }
+          
+          if (assignments.length > 0) {
+            const hasAccess = assignments.some((a: any) => a.levelId === levelId)
+            if (hasAccess) {
+              setIsAuthorized(true)
+              setIsCheckingAccess(false)
+              return
+            }
+          }
+        } catch (error) {
+          console.error('Error checking teacher access:', error)
         }
         
         setIsCheckingAccess(false)

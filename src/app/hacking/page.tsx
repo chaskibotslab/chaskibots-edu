@@ -16,17 +16,24 @@ export default function HackingPage() {
     try {
       if (!user) return
       if (user.role === 'teacher') {
-        // Solo buscar asignaciones si tiene accessCode
+        let assignments: any[] = []
+        
+        // Buscar por accessCode
         if (user.accessCode) {
           const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
           const data = await res.json()
-          if (data.assignments && data.assignments.length > 0) {
-            setUserCourses(data.assignments)
-            return
-          }
+          if (data.assignments?.length > 0) assignments = data.assignments
         }
-        // Sin accessCode o sin asignaciones: usar levelId del usuario
-        if (user.levelId) setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
+        
+        // Si no hay, buscar por nombre
+        if (assignments.length === 0 && user.name) {
+          const res = await fetch(`/api/teacher-courses?teacherName=${encodeURIComponent(user.name)}`)
+          const data = await res.json()
+          if (data.assignments?.length > 0) assignments = data.assignments
+        }
+        
+        if (assignments.length > 0) setUserCourses(assignments)
+        else if (user.levelId) setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
         else setUserCourses([])
       } else if (user.role === 'student') {
         if (user.levelId) setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
