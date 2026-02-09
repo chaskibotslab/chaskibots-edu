@@ -22,10 +22,18 @@ interface Kit {
   tutorialUrl: string
 }
 
+interface Level {
+  id: string
+  name: string
+  fullName?: string
+  ageRange?: string
+}
+
 export default function KitsAdminPage() {
   const router = useRouter()
   const { isAdmin, isAuthenticated, isLoading } = useAuth()
   const [kits, setKits] = useState<Kit[]>([])
+  const [levels, setLevels] = useState<Level[]>([])
   const [loadingKits, setLoadingKits] = useState(true)
   const [editingKit, setEditingKit] = useState<Kit | null>(null)
   const [isCreating, setIsCreating] = useState(false)
@@ -56,6 +64,7 @@ export default function KitsAdminPage() {
 
   useEffect(() => {
     loadKits()
+    loadLevels()
   }, [])
 
   const loadKits = async () => {
@@ -70,6 +79,31 @@ export default function KitsAdminPage() {
       console.error('Error loading kits:', error)
     }
     setLoadingKits(false)
+  }
+
+  const loadLevels = async () => {
+    try {
+      const response = await fetch('/api/admin/levels')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.levels) {
+          setLevels(data.levels)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading levels:', error)
+    }
+  }
+
+  // Obtener niveles que no tienen kit asignado
+  const levelsWithoutKit = levels.filter(level => 
+    !kits.some(kit => kit.levelId === level.id)
+  )
+
+  // Obtener nombre del nivel por ID
+  const getLevelName = (levelId: string) => {
+    const level = levels.find(l => l.id === levelId)
+    return level ? `${level.name} (${level.ageRange || ''})` : levelId
   }
 
   const openEditModal = (kit: Kit) => {
@@ -234,7 +268,7 @@ export default function KitsAdminPage() {
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h3 className="text-white font-semibold">{kit.name}</h3>
-                      <p className="text-sm text-neon-cyan">{kit.levelId}</p>
+                      <p className="text-sm text-neon-cyan">{getLevelName(kit.levelId)}</p>
                     </div>
                     <span className="text-lg font-bold text-neon-cyan">${kit.price}</span>
                   </div>
@@ -289,14 +323,51 @@ export default function KitsAdminPage() {
 
               {/* Level ID */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">ID del Nivel *</label>
-                <input
-                  type="text"
+                <label className="block text-sm text-gray-400 mb-2">Nivel Educativo *</label>
+                <select
                   value={formData.levelId}
-                  onChange={(e) => setFormData({ ...formData, levelId: e.target.value })}
-                  placeholder="ej: inicial-1, primero-egb, etc."
+                  onChange={(e) => {
+                    const selectedLevel = levels.find(l => l.id === e.target.value)
+                    setFormData({ 
+                      ...formData, 
+                      levelId: e.target.value,
+                      // Auto-completar nombre si está vacío
+                      name: formData.name || (selectedLevel ? `Kit ${selectedLevel.name}` : '')
+                    })
+                  }}
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                />
+                >
+                  <option value="">-- Seleccionar nivel --</option>
+                  {isCreating ? (
+                    // Al crear, mostrar solo niveles sin kit
+                    levelsWithoutKit.length > 0 ? (
+                      levelsWithoutKit.map(level => (
+                        <option key={level.id} value={level.id}>
+                          {level.name} - {level.fullName || ''} ({level.ageRange || ''})
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>Todos los niveles ya tienen kit</option>
+                    )
+                  ) : (
+                    // Al editar, mostrar todos los niveles
+                    levels.map(level => (
+                      <option key={level.id} value={level.id}>
+                        {level.name} - {level.fullName || ''} ({level.ageRange || ''})
+                      </option>
+                    ))
+                  )}
+                </select>
+                {isCreating && levelsWithoutKit.length === 0 && (
+                  <p className="text-xs text-yellow-400 mt-2">
+                    ⚠️ Todos los niveles ya tienen un kit asignado
+                  </p>
+                )}
+                {isCreating && levelsWithoutKit.length > 0 && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    {levelsWithoutKit.length} nivel(es) sin kit asignado
+                  </p>
+                )}
               </div>
 
               {/* Nombre */}
