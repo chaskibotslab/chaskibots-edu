@@ -47,12 +47,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessLogs, setAccessLogs] = useState<AccessLog[]>([])
 
   // Función para refrescar datos del usuario desde Airtable
-  const refreshUserData = async (accessCode: string) => {
+  const refreshUserData = async (identifier: { accessCode?: string; email?: string }) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const body = identifier.accessCode 
+        ? { accessCode: identifier.accessCode }
+        : { email: identifier.email, password: '' } // Usamos API de refresh
+      
+      // Usar endpoint de refresh si existe, o login con accessCode
+      const endpoint = identifier.accessCode ? '/api/auth/login' : '/api/auth/refresh'
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessCode })
+        body: JSON.stringify(identifier.accessCode ? { accessCode: identifier.accessCode } : { email: identifier.email })
       })
       const data = await response.json()
       if (data.success && data.user) {
@@ -71,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         setUser(refreshedUser)
         localStorage.setItem('chaskibots_user', JSON.stringify(refreshedUser))
-        console.log('[Auth] Usuario refrescado desde Airtable:', refreshedUser.name, 'levelId:', refreshedUser.levelId)
+        console.log('[Auth] Usuario refrescado desde Airtable:', refreshedUser.name, 'levelId:', refreshedUser.levelId, 'accessCode:', refreshedUser.accessCode)
       }
     } catch (error) {
       console.error('[Auth] Error refrescando usuario:', error)
@@ -91,9 +97,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const sessionData = btoa(JSON.stringify({ id: parsedUser.id, role: parsedUser.role, email: parsedUser.email }))
         document.cookie = `chaskibots_session=${sessionData}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
         
-        // Refrescar datos del usuario desde Airtable si tiene accessCode
+        // Refrescar datos del usuario desde Airtable
         if (parsedUser.accessCode) {
-          refreshUserData(parsedUser.accessCode)
+          refreshUserData({ accessCode: parsedUser.accessCode })
+        } else if (parsedUser.email) {
+          refreshUserData({ email: parsedUser.email })
         }
       } catch {
         localStorage.removeItem('chaskibots_user')
