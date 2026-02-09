@@ -161,15 +161,16 @@ export default function LevelsManager() {
         <form onSubmit={handleSubmit} className="bg-dark-800 rounded-xl p-6 border border-dark-600 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">ID (único)</label>
+              <label className="block text-sm text-gray-400 mb-1">ID (único) {editingId && <span className="text-xs text-gray-500">(no editable)</span>}</label>
               <input
                 type="text"
                 value={formData.id || ''}
                 onChange={(e) => setFormData({ ...formData, id: e.target.value.toLowerCase().replace(/\s/g, '-') })}
                 placeholder="ej: cuarto-bach"
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className={`w-full px-3 py-2 border rounded-lg ${editingId ? 'bg-dark-800 border-dark-700 text-gray-500 cursor-not-allowed' : 'bg-dark-700 border-dark-600 text-white'}`}
                 required
                 disabled={!!editingId}
+                readOnly={!!editingId}
               />
             </div>
             <div>
