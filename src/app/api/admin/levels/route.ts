@@ -92,7 +92,8 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { originalId, ...updateData } = body
+    // Excluir originalId y recordId de los datos a enviar a Airtable
+    const { originalId, recordId, ...updateData } = body
 
     // Usar originalId para buscar, o id si no hay originalId
     const searchId = originalId || updateData.id
@@ -104,7 +105,7 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    console.log('Updating level, searching by:', searchId, 'new data:', updateData)
+    console.log('Updating level, searching by:', searchId)
 
     // Buscar el registro por el campo 'id' original
     const records = await base(TABLE_NAME)
