@@ -147,6 +147,20 @@ export const EDUCATION_LEVELS: EducationLevel[] = [
     hasAdvancedIA: true
   },
   { 
+    id: 'sexto-slm', 
+    name: '6° SLM', 
+    fullName: 'Sexto - Colegio SLM',
+    category: 'media',
+    ageRange: '10-11 años', 
+    gradeNumber: 6,
+    color: 'from-emerald-500 to-teal-600', 
+    neonColor: '#26a69a',
+    icon: 'Zap',
+    kitPrice: 70,
+    hasHacking: false,
+    hasAdvancedIA: true
+  },
+  { 
     id: 'septimo-egb', 
     name: '7° EGB', 
     fullName: 'Séptimo de EGB - Media',
