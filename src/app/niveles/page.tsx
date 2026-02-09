@@ -179,82 +179,25 @@ export default function NivelesPage() {
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col bg-dark-900 overflow-x-hidden">
+    <div className={`min-h-screen flex flex-col bg-dark-900 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       <Header />
       
-      <main className="flex-1">
-        {/* Hero Section con Parallax y Logo */}
-        <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-          {/* Background con efecto zoom */}
-          <div 
-            className="absolute inset-0 bg-gradient-to-br from-dark-900 via-blue-900/50 to-purple-900/50"
-            style={{ transform: `scale(${1 + scrollY * 0.0003})` }}
-          >
-            <div className="absolute inset-0 bg-cyber-grid opacity-20"></div>
-          </div>
+      <main className="flex-1 py-6 px-4">
+        <div className="max-w-5xl mx-auto space-y-8">
           
-          {/* Efectos de luz animados */}
-          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-neon-cyan/20 rounded-full blur-[150px] animate-pulse"></div>
-          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-neon-purple/20 rounded-full blur-[120px] animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-blue/10 rounded-full blur-[180px] animate-parallax"></div>
-          
-          {/* Contenido */}
-          <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-            {/* Logo animado */}
-            <div className={`mb-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <div className="relative inline-block">
-                <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/40 via-neon-purple/40 to-neon-pink/40 rounded-full blur-2xl animate-pulse scale-125"></div>
-                <Image 
-                  src="/chaski.png" 
-                  alt="ChaskiBots Logo" 
-                  width={150} 
-                  height={150}
-                  className="relative rounded-3xl shadow-2xl animate-float"
-                  priority
-                />
-              </div>
+          {/* Header Section */}
+          <div className="text-center py-8">
+            <div className="inline-flex items-center gap-2 bg-dark-800 rounded-full px-4 py-2 mb-4 border border-dark-600">
+              <Sparkles className="w-4 h-4 text-neon-cyan" />
+              <span className="text-sm text-gray-400">Plataforma Educativa</span>
             </div>
-            
-            <h1 className={`text-5xl md:text-6xl lg:text-7xl font-bold mb-6 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <span className="text-white">Niveles </span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink animate-gradient">Educativos</span>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              Niveles Educativos
             </h1>
-            
-            <p className={`text-xl text-gray-300 max-w-2xl mx-auto mb-8 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              Selecciona tu nivel y accede a contenido exclusivo de 
-              <span className="text-neon-cyan font-semibold"> Robótica</span>, 
-              <span className="text-neon-purple font-semibold"> IA</span> y 
-              <span className="text-neon-green font-semibold"> Hacking Ético</span>
+            <p className="text-gray-500 max-w-xl mx-auto">
+              Selecciona tu nivel para acceder a contenido de Robótica, IA y Hacking Ético
             </p>
-
-            {/* Badges animados */}
-            <div className={`flex flex-wrap justify-center gap-4 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <div className="glass-dark px-4 py-2 rounded-full flex items-center gap-2">
-                <Bot className="w-5 h-5 text-neon-cyan" />
-                <span className="text-white text-sm">14 Kits de Robótica</span>
-              </div>
-              <div className="glass-dark px-4 py-2 rounded-full flex items-center gap-2">
-                <Brain className="w-5 h-5 text-neon-purple" />
-                <span className="text-white text-sm">IA en el Navegador</span>
-              </div>
-              <div className="glass-dark px-4 py-2 rounded-full flex items-center gap-2">
-                <Rocket className="w-5 h-5 text-neon-green" />
-                <span className="text-white text-sm">+30 Simuladores</span>
-              </div>
-            </div>
           </div>
-
-          {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-            <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
-              <div className="w-1.5 h-3 bg-neon-cyan rounded-full animate-pulse"></div>
-            </div>
-          </div>
-        </section>
-
-        {/* Secciones de Niveles con diseño profesional */}
-        <div className="relative py-12">
-          <div className="max-w-6xl mx-auto px-4">
             {/* Educación Inicial */}
             <div className="mb-16">
               <div className="flex items-center gap-4 mb-8">
@@ -426,7 +369,7 @@ export default function NivelesPage() {
                 })}
               </div>
             </div>
-          </div>
+
         </div>
       </main>
 
