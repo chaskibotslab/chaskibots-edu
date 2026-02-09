@@ -46,6 +46,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [accessLogs, setAccessLogs] = useState<AccessLog[]>([])
 
+  // Función para refrescar datos del usuario desde Airtable
+  const refreshUserData = async (accessCode: string) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessCode })
+      })
+      const data = await response.json()
+      if (data.success && data.user) {
+        const refreshedUser: User = {
+          id: data.user.id,
+          accessCode: data.user.accessCode,
+          name: data.user.name,
+          email: data.user.email || '',
+          role: data.user.role,
+          levelId: data.user.levelId,
+          courseId: data.user.courseId,
+          schoolId: data.user.schoolId,
+          progress: 0,
+          createdAt: data.user.createdAt || new Date().toISOString(),
+          lastLogin: new Date().toISOString()
+        }
+        setUser(refreshedUser)
+        localStorage.setItem('chaskibots_user', JSON.stringify(refreshedUser))
+        console.log('[Auth] Usuario refrescado desde Airtable:', refreshedUser.name, 'levelId:', refreshedUser.levelId)
+      }
+    } catch (error) {
+      console.error('[Auth] Error refrescando usuario:', error)
+    }
+  }
+
   useEffect(() => {
     const savedUser = localStorage.getItem('chaskibots_user')
     const savedLogs = localStorage.getItem('chaskibots_access_logs')
@@ -58,6 +90,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Sincronizar cookie de sesión para el middleware (protección server-side)
         const sessionData = btoa(JSON.stringify({ id: parsedUser.id, role: parsedUser.role, email: parsedUser.email }))
         document.cookie = `chaskibots_session=${sessionData}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
+        
+        // Refrescar datos del usuario desde Airtable si tiene accessCode
+        if (parsedUser.accessCode) {
+          refreshUserData(parsedUser.accessCode)
+        }
       } catch {
         localStorage.removeItem('chaskibots_user')
         document.cookie = 'chaskibots_session=; path=/; max-age=0'
