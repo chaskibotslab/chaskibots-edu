@@ -18,12 +18,58 @@ const ICON_MAP: Record<string, any> = {
   Zap, Gamepad2, Wrench, Settings, Laptop, Brain, ShieldCheck, Rocket
 }
 
+interface DynamicLevel {
+  id: string
+  name: string
+  fullName: string
+  category: string
+  ageRange: string
+  gradeNumber: number
+  color: string
+  neonColor: string
+  icon: string
+  kitPrice: number
+  hasHacking: boolean
+  hasAdvancedIA: boolean
+}
+
 export default function NivelesPage() {
   const { user, isLoading, isAuthenticated } = useAuth()
   const [scrollY, setScrollY] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [userCourses, setUserCourses] = useState<any[]>([])
   const [coursesLoading, setCoursesLoading] = useState(true)
+  const [dynamicLevels, setDynamicLevels] = useState<DynamicLevel[]>([])
+  const [levelsLoading, setLevelsLoading] = useState(true)
+
+  // Cargar niveles desde Airtable
+  useEffect(() => {
+    const loadLevels = async () => {
+      try {
+        const res = await fetch('/api/admin/levels')
+        const data = await res.json()
+        if (data.levels && data.levels.length > 0) {
+          setDynamicLevels(data.levels)
+        }
+      } catch (error) {
+        console.error('Error loading levels from Airtable:', error)
+      }
+      setLevelsLoading(false)
+    }
+    loadLevels()
+  }, [])
+
+  // Combinar niveles: Airtable tiene prioridad, luego fallback a constantes locales
+  const allLevels = useMemo(() => {
+    if (dynamicLevels.length > 0) {
+      // Crear un mapa de niveles de Airtable
+      const airtableLevelIds = new Set(dynamicLevels.map(l => l.id))
+      // Agregar niveles locales que no estén en Airtable
+      const localOnlyLevels = EDUCATION_LEVELS.filter(l => !airtableLevelIds.has(l.id))
+      return [...dynamicLevels, ...localOnlyLevels]
+    }
+    return EDUCATION_LEVELS
+  }, [dynamicLevels])
 
   const loadUserCourses = async () => {
     try {
@@ -85,8 +131,8 @@ export default function NivelesPage() {
   // Determinar qué niveles puede ver el usuario
   const allowedLevelIds = useMemo(() => {
     if (!user) return [] // No logueado, no ve nada
-    if (user.role === 'admin') return EDUCATION_LEVELS.map(l => l.id) // Admin ve todo
-    if (coursesLoading) return [] // Mientras carga, no mostrar nada
+    if (user.role === 'admin') return allLevels.map(l => l.id) // Admin ve todo
+    if (coursesLoading || levelsLoading) return [] // Mientras carga, no mostrar nada
     
     // Profesor/Estudiante: solo niveles permitidos
     const levelIds = new Set<string>()
@@ -107,7 +153,7 @@ export default function NivelesPage() {
     }
     
     return Array.from(levelIds)
-  }, [user, userCourses, coursesLoading])
+  }, [user, userCourses, coursesLoading, levelsLoading, allLevels])
 
   const isAdmin = user?.role === 'admin'
   const canAccessLevel = (levelId: string) => isAdmin || allowedLevelIds.includes(levelId)
@@ -209,7 +255,7 @@ export default function NivelesPage() {
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                {EDUCATION_LEVELS.slice(0, 2).map((level) => {
+                {allLevels.filter(l => l.category === 'inicial').map((level) => {
                   const IconComponent = ICON_MAP[level.icon] || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
@@ -253,7 +299,7 @@ export default function NivelesPage() {
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {EDUCATION_LEVELS.slice(2, 6).map((level) => {
+                {allLevels.filter(l => l.category === 'elemental').map((level) => {
                   const IconComponent = ICON_MAP[level.icon] || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
@@ -294,7 +340,7 @@ export default function NivelesPage() {
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {EDUCATION_LEVELS.slice(6, 12).map((level) => {
+                {allLevels.filter(l => l.category === 'media' || l.category === 'superior').map((level) => {
                   const IconComponent = ICON_MAP[level.icon] || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
@@ -337,7 +383,7 @@ export default function NivelesPage() {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {EDUCATION_LEVELS.slice(12, 15).map((level) => {
+                {allLevels.filter(l => l.category === 'bachillerato').map((level) => {
                   const IconComponent = ICON_MAP[level.icon] || Bot
                   const hasAccess = canAccessLevel(level.id)
                   

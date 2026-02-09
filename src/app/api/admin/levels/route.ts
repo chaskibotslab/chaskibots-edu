@@ -7,6 +7,41 @@ const base = new Airtable({
 
 const TABLE_NAME = 'levels'
 
+// GET - Obtener todos los niveles desde Airtable
+export async function GET() {
+  try {
+    const records = await base(TABLE_NAME)
+      .select({
+        sort: [{ field: 'gradeNumber', direction: 'asc' }]
+      })
+      .all()
+
+    const levels = records.map((record: any) => ({
+      id: record.fields.id || record.id,
+      recordId: record.id,
+      name: record.fields.name || '',
+      fullName: record.fields.fullName || record.fields.name || '',
+      category: record.fields.category || 'elemental',
+      ageRange: record.fields.ageRange || '',
+      gradeNumber: record.fields.gradeNumber || 0,
+      color: record.fields.color || 'from-blue-500 to-cyan-600',
+      neonColor: record.fields.neonColor || '#00d4ff',
+      icon: record.fields.icon || 'BookOpen',
+      kitPrice: record.fields.kitPrice || 50,
+      hasHacking: record.fields.hasHacking || false,
+      hasAdvancedIA: record.fields.hasAdvancedIA || false,
+    }))
+
+    return NextResponse.json({ success: true, levels })
+  } catch (error) {
+    console.error('Error fetching levels:', error)
+    return NextResponse.json(
+      { success: false, error: 'Error al obtener niveles', levels: [] },
+      { status: 500 }
+    )
+  }
+}
+
 // POST - Crear nivel
 export async function POST(request: NextRequest) {
   try {
