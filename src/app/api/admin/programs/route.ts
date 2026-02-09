@@ -11,40 +11,45 @@ const TABLE_NAME = 'programs'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, name, description, levelId, levelName, type, duration, price } = body
+    const { name, description, levelId, levelName, type, duration, price } = body
 
-    if (!name || !levelId || !type) {
+    console.log('Creating program with body:', body)
+
+    if (!name || !levelId) {
       return NextResponse.json(
-        { success: false, error: 'Nombre, nivel y tipo son requeridos' },
+        { success: false, error: 'Nombre y nivel son requeridos' },
         { status: 400 }
       )
     }
 
-    const programId = id || `prog-${levelId}-${type}-${Date.now()}`
-
-    // Solo enviar campos que existen en Airtable
+    // Solo enviar campos que existen en Airtable - campos básicos
     const fields: Record<string, any> = {
       name,
       levelId,
-      type,
     }
     
-    // Campos opcionales
+    // Campos opcionales - solo agregar si tienen valor
     if (description) fields.description = description
     if (levelName) fields.levelName = levelName
+    if (type) fields.type = type
     if (duration) fields.duration = duration
-    if (price !== undefined) fields.price = Number(price) || 50
+    if (price !== undefined && price !== '') fields.price = Number(price) || 0
 
-    await base(TABLE_NAME).create(fields)
+    console.log('Sending fields to Airtable:', fields)
+
+    const result = await base(TABLE_NAME).create(fields)
+    console.log('Program created:', result.id)
 
     return NextResponse.json({
       success: true,
-      message: 'Programa creado exitosamente'
+      message: 'Programa creado exitosamente',
+      id: result.id
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating program:', error)
+    const errorMessage = error?.message || error?.error?.message || 'Error al crear programa'
     return NextResponse.json(
-      { success: false, error: 'Error al crear programa' },
+      { success: false, error: errorMessage, details: String(error) },
       { status: 500 }
     )
   }
