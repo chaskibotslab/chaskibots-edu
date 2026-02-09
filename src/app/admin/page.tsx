@@ -656,6 +656,7 @@ export default function AdminPage() {
 // Componente para gestionar cursos desde Airtable
 function CoursesManager() {
   const [courses, setCourses] = useState<any[]>([])
+  const [teachers, setTeachers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingCourse, setEditingCourse] = useState<any>(null)
@@ -671,7 +672,24 @@ function CoursesManager() {
 
   useEffect(() => {
     loadCourses()
+    loadTeachers()
   }, [])
+
+  const loadTeachers = async () => {
+    try {
+      const res = await fetch('/api/admin/users')
+      const data = await res.json()
+      if (data.users) {
+        // Filtrar solo profesores
+        const teachersList = data.users.filter((u: any) => 
+          u.role === 'teacher' || u.role === 'profesor' || u.role === 'prof'
+        )
+        setTeachers(teachersList)
+      }
+    } catch (error) {
+      console.error('Error loading teachers:', error)
+    }
+  }
 
   const loadCourses = async () => {
     setLoading(true)
@@ -829,12 +847,18 @@ function CoursesManager() {
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-1">Profesor</label>
-              <input
-                type="text"
+              <select
                 value={formData.teacherName}
                 onChange={(e) => setFormData({...formData, teacherName: e.target.value})}
                 className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
-              />
+              >
+                <option value="">Seleccionar profesor...</option>
+                {teachers.map((teacher) => (
+                  <option key={teacher.id} value={teacher.name}>
+                    {teacher.name} {teacher.email ? `(${teacher.email})` : ''}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-1">Máx. Estudiantes</label>
