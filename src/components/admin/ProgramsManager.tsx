@@ -58,7 +58,7 @@ export default function ProgramsManager() {
     setLoading(true)
     try {
       const [programsRes, levelsRes] = await Promise.all([
-        fetch('/api/programs'),
+        fetch('/api/admin/programs'),
         fetch('/api/admin/levels')
       ])
       

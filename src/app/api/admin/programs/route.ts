@@ -7,6 +7,38 @@ const base = new Airtable({
 
 const TABLE_NAME = 'programs'
 
+// GET - Obtener todos los programas
+export async function GET() {
+  try {
+    const records = await base(TABLE_NAME)
+      .select({
+        sort: [{ field: 'name', direction: 'asc' }]
+      })
+      .all()
+
+    const programs = records.map((record: any) => ({
+      id: record.fields.id || record.id,
+      recordId: record.id,
+      name: record.fields.name || '',
+      description: record.fields.description || '',
+      levelId: record.fields.levelId || '',
+      levelName: record.fields.levelName || '',
+      type: record.fields.type || 'robotica',
+      duration: record.fields.duration || '',
+      price: record.fields.price || 0,
+      isActive: record.fields.isActive !== false
+    }))
+
+    return NextResponse.json({ success: true, programs })
+  } catch (error) {
+    console.error('Error fetching programs:', error)
+    return NextResponse.json(
+      { success: false, error: 'Error al obtener programas', programs: [] },
+      { status: 500 }
+    )
+  }
+}
+
 // POST - Crear programa
 export async function POST(request: NextRequest) {
   try {
