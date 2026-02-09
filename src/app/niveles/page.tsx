@@ -23,38 +23,62 @@ export default function NivelesPage() {
   const [scrollY, setScrollY] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [userCourses, setUserCourses] = useState<any[]>([])
+  const [coursesLoading, setCoursesLoading] = useState(true)
 
   const loadUserCourses = async () => {
     try {
       if (!user) return
+      console.log('[Niveles] Usuario:', user.name, 'Role:', user.role, 'LevelId:', user.levelId, 'AccessCode:', user.accessCode)
+      
       if (user.role === 'teacher') {
         // Para profesores: usar tabla teacher_courses con accessCode como teacherId
         const teacherId = user.accessCode || ''
+        console.log('[Niveles] Buscando asignaciones para teacherId:', teacherId)
         const res = await fetch(`/api/teacher-courses?teacherId=${teacherId}`)
         const data = await res.json()
+        console.log('[Niveles] Asignaciones encontradas:', data.assignments?.length || 0, data.assignments)
+        
         if (data.assignments && data.assignments.length > 0) {
           setUserCourses(data.assignments)
         } else {
-          // Fallback: si no hay asignaciones en teacher_courses, usar courseId directo
-          if (user.courseId) setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
+          // Fallback: si no hay asignaciones en teacher_courses, usar levelId directo del usuario
+          console.log('[Niveles] Sin asignaciones, usando levelId del usuario:', user.levelId)
+          if (user.levelId) {
+            setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
+          } else {
+            // Si no hay levelId, el profesor no tiene acceso a ningún nivel
+            setUserCourses([])
+          }
         }
       } else if (user.role === 'student') {
         // Para estudiantes: solo su curso asignado
-        if (user.courseId) setUserCourses([{ courseId: user.courseId, levelId: user.levelId }])
+        if (user.levelId) {
+          setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
+        } else {
+          setUserCourses([])
+        }
       } else {
         setUserCourses([])
       }
     } catch (error) {
       console.error('Error loading courses:', error)
+    } finally {
+      setCoursesLoading(false)
     }
   }
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user && user.role !== 'admin') {
+      setCoursesLoading(true)
       loadUserCourses()
     }
     if (!isLoading && (!isAuthenticated || !user)) {
       setUserCourses([])
+      setCoursesLoading(false)
+    }
+    // Admin no necesita cargar cursos
+    if (!isLoading && user?.role === 'admin') {
+      setCoursesLoading(false)
     }
   }, [isLoading, isAuthenticated, user])
 
@@ -62,6 +86,7 @@ export default function NivelesPage() {
   const allowedLevelIds = useMemo(() => {
     if (!user) return [] // No logueado, no ve nada
     if (user.role === 'admin') return EDUCATION_LEVELS.map(l => l.id) // Admin ve todo
+    if (coursesLoading) return [] // Mientras carga, no mostrar nada
     
     // Profesor/Estudiante: solo niveles permitidos
     const levelIds = new Set<string>()
@@ -82,7 +107,7 @@ export default function NivelesPage() {
     }
     
     return Array.from(levelIds)
-  }, [user, userCourses])
+  }, [user, userCourses, coursesLoading])
 
   const isAdmin = user?.role === 'admin'
   const canAccessLevel = (levelId: string) => isAdmin || allowedLevelIds.includes(levelId)
