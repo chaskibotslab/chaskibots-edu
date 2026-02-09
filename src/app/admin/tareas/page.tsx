@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
+import { useDynamicLevels } from '@/hooks/useDynamicLevels'
 import {
   FileText, Plus, Edit, Trash2, Save, X, Search,
   ArrowLeft, Calendar, Award, CheckCircle, Clock,
@@ -77,6 +78,7 @@ function AdminTareasContent() {
   const searchParams = useSearchParams()
   const urlLevelId = searchParams.get('levelId') || ''
   const { user, isAdmin, isTeacher } = useAuth()
+  const { levels: dynamicLevels, loading: levelsLoading } = useDynamicLevels()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -142,21 +144,22 @@ function AdminTareasContent() {
 
   // Niveles permitidos para el usuario
   const allowedLevels = useMemo(() => {
-    if (isAdmin) return EDUCATION_LEVELS
+    const levels = dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS
+    if (isAdmin) return levels
     if (isTeacher && teacherCourses.length > 0) {
       const allowedIds = new Set(teacherCourses.map(tc => tc.levelId))
-      return EDUCATION_LEVELS.filter(l => allowedIds.has(l.id))
+      return levels.filter(l => allowedIds.has(l.id))
     }
     // Fallback: si viene levelId de la URL, mostrar ese nivel
     if (urlLevelId) {
-      return EDUCATION_LEVELS.filter(l => l.id === urlLevelId)
+      return levels.filter(l => l.id === urlLevelId)
     }
     // Fallback: usar levelId del usuario
     if (user?.levelId) {
-      return EDUCATION_LEVELS.filter(l => l.id === user.levelId)
+      return levels.filter(l => l.id === user.levelId)
     }
     return []
-  }, [isAdmin, isTeacher, teacherCourses, user, urlLevelId])
+  }, [isAdmin, isTeacher, teacherCourses, user, urlLevelId, dynamicLevels])
 
   useEffect(() => {
     if (user !== null) {
@@ -511,7 +514,7 @@ function AdminTareasContent() {
         ) : (
           <div className="space-y-6">
             {Object.entries(tasksByLevel).map(([levelId, levelTasks]) => {
-              const level = EDUCATION_LEVELS.find(l => l.id === levelId)
+              const level = (dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS).find(l => l.id === levelId)
               return (
                 <div key={levelId} className="bg-dark-800 border border-dark-600 rounded-xl overflow-hidden">
                   <div className="bg-dark-700 px-4 py-3 border-b border-dark-600 flex items-center justify-between">

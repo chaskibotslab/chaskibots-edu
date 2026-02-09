@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
+import { useDynamicLevels } from '@/hooks/useDynamicLevels'
 import {
   ArrowLeft, FileText, Search, Filter, Check, X, Clock,
   Eye, Trash2, Download, ChevronDown, Loader2, Code,
@@ -44,6 +45,7 @@ function EntregasContent() {
   const urlLevelId = searchParams.get('levelId') || ''
   const urlTab = searchParams.get('tab') || 'tareas'
   const { user, isAdmin, isTeacher, isLoading } = useAuth()
+  const { levels: dynamicLevels } = useDynamicLevels()
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedLevel, setSelectedLevel] = useState(urlLevelId)
@@ -168,8 +170,9 @@ function EntregasContent() {
   }
 
   // Niveles permitidos para el profesor
+  const levels = dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS
   const allowedLevelIds = isAdmin 
-    ? EDUCATION_LEVELS.map(l => l.id) 
+    ? levels.map(l => l.id) 
     : teacherCourses.map(tc => tc.levelId)
 
   const filteredSubmissions = submissions.filter(sub => {
@@ -191,7 +194,7 @@ function EntregasContent() {
   })
 
   const getLevelName = (levelId: string) => {
-    const level = EDUCATION_LEVELS.find(l => l.id === levelId)
+    const level = levels.find(l => l.id === levelId)
     return level?.name || levelId
   }
 
@@ -307,7 +310,7 @@ function EntregasContent() {
                   className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
                 >
                   <option value="">Todos los niveles</option>
-                  {(isAdmin ? EDUCATION_LEVELS : EDUCATION_LEVELS.filter(l => allowedLevelIds.includes(l.id))).map(level => (
+                  {(isAdmin ? levels : levels.filter(l => allowedLevelIds.includes(l.id))).map(level => (
                     <option key={level.id} value={level.id}>{level.name}</option>
                   ))}
                 </select>

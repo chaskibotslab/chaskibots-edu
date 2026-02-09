@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
+import { useDynamicLevels } from '@/hooks/useDynamicLevels'
 import { ALL_COURSES } from '@/data/courses'
 import UsersManagerComponent from '@/components/admin/UsersManager'
 import {
@@ -655,6 +656,7 @@ export default function AdminPage() {
 
 // Componente para gestionar cursos desde Airtable
 function CoursesManager() {
+  const { levels: dynamicLevels } = useDynamicLevels()
   const [courses, setCourses] = useState<any[]>([])
   const [teachers, setTeachers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -831,7 +833,7 @@ function CoursesManager() {
                 required
               >
                 <option value="">Seleccionar...</option>
-                {EDUCATION_LEVELS.map(level => (
+                {(dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS).map(level => (
                   <option key={level.id} value={level.id}>{level.name}</option>
                 ))}
               </select>

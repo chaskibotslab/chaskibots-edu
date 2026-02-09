@@ -10,6 +10,7 @@ import {
   Clock, GripVertical, ChevronDown
 } from 'lucide-react'
 import { EDUCATION_LEVELS } from '@/lib/constants'
+import { useDynamicLevels } from '@/hooks/useDynamicLevels'
 
 interface Lesson {
   id: string
@@ -37,6 +38,7 @@ export default function AdminLeccionesContent() {
   const { user, isLoading } = useAuth()
   const router = useRouter()
   const isAdmin = user?.role === 'admin'
+  const { levels: dynamicLevels } = useDynamicLevels()
 
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [loading, setLoading] = useState(true)
@@ -228,9 +230,9 @@ export default function AdminLeccionesContent() {
             className="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
           >
             <option value="">Todos los niveles</option>
-            {EDUCATION_LEVELS.map(level => (
+            {(dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS).map(level => (
               <option key={level.id} value={level.id}>
-                {level.icon} {level.name}
+                {level.icon || '📚'} {level.name}
               </option>
             ))}
           </select>
@@ -324,9 +326,9 @@ export default function AdminLeccionesContent() {
                     className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
                   >
                     <option value="">Seleccionar nivel</option>
-                    {EDUCATION_LEVELS.map(level => (
+                    {(dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS).map(level => (
                       <option key={level.id} value={level.id}>
-                        {level.icon} {level.name}
+                        {level.icon || '📚'} {level.name}
                       </option>
                     ))}
                   </select>

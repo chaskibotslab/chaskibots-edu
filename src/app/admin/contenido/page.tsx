@@ -12,6 +12,18 @@ import {
   Download, Code, BookOpen, FileCode
 } from 'lucide-react'
 
+interface DynamicLevel {
+  id: string
+  name: string
+  fullName: string
+  category: string
+  ageRange: string
+  gradeNumber: number
+  icon?: string
+  color?: string
+  neonColor?: string
+}
+
 // Función para convertir URLs de Google Drive al formato de imagen directa
 function convertGoogleDriveUrl(url: string): string {
   if (!url) return ''
@@ -71,13 +83,15 @@ interface EditFormData {
 export default function ContenidoAdminPage() {
   const router = useRouter()
   const { isAdmin, isAuthenticated, isLoading } = useAuth()
-  const [selectedLevel, setSelectedLevel] = useState<string>('inicial-1')
+  const [selectedLevel, setSelectedLevel] = useState<string>('')
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [loadingLessons, setLoadingLessons] = useState(true)
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [dynamicLevels, setDynamicLevels] = useState<DynamicLevel[]>([])
+  const [levelsLoading, setLevelsLoading] = useState(true)
   const [editFormData, setEditFormData] = useState<EditFormData>({
     title: '',
     type: 'video',
@@ -100,6 +114,52 @@ export default function ContenidoAdminPage() {
     moduleId: '',
     moduleName: ''
   })
+
+  // Cargar niveles dinámicamente desde Airtable
+  useEffect(() => {
+    const loadLevels = async () => {
+      try {
+        const res = await fetch('/api/admin/levels')
+        const data = await res.json()
+        if (data.levels && data.levels.length > 0) {
+          setDynamicLevels(data.levels)
+          // Seleccionar el primer nivel por defecto
+          if (!selectedLevel && data.levels.length > 0) {
+            setSelectedLevel(data.levels[0].id)
+          }
+        } else {
+          // Fallback a niveles locales si no hay en Airtable
+          setDynamicLevels(EDUCATION_LEVELS.map(l => ({
+            id: l.id,
+            name: l.name,
+            fullName: l.fullName,
+            category: l.category,
+            ageRange: l.ageRange,
+            gradeNumber: l.gradeNumber
+          })))
+          if (!selectedLevel) {
+            setSelectedLevel(EDUCATION_LEVELS[0].id)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading levels:', error)
+        // Fallback a niveles locales
+        setDynamicLevels(EDUCATION_LEVELS.map(l => ({
+          id: l.id,
+          name: l.name,
+          fullName: l.fullName,
+          category: l.category,
+          ageRange: l.ageRange,
+          gradeNumber: l.gradeNumber
+        })))
+        if (!selectedLevel) {
+          setSelectedLevel(EDUCATION_LEVELS[0].id)
+        }
+      }
+      setLevelsLoading(false)
+    }
+    loadLevels()
+  }, [])
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -326,7 +386,7 @@ export default function ContenidoAdminPage() {
     )
   }
 
-  const levels = EDUCATION_LEVELS
+  const levels = dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS
   const currentLevel = levels.find(l => l.id === selectedLevel)
 
   const toggleModule = (moduleId: string) => {
