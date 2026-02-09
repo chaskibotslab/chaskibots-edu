@@ -13,27 +13,32 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { id, name, fullName, category, ageRange, gradeNumber, kitPrice, hasHacking, hasAdvancedIA, color, neonColor, icon } = body
 
-    if (!id || !name) {
+    if (!name) {
       return NextResponse.json(
-        { success: false, error: 'ID y nombre son requeridos' },
+        { success: false, error: 'Nombre es requerido' },
         { status: 400 }
       )
     }
 
-    await base(TABLE_NAME).create({
-      id,
+    // Solo enviar campos que existen en Airtable
+    const fields: Record<string, any> = {
       name,
-      fullName: fullName || name,
-      category: category || 'elemental',
-      ageRange: ageRange || '',
-      gradeNumber: gradeNumber || 1,
-      kitPrice: kitPrice || 50,
-      hasHacking: hasHacking || false,
-      hasAdvancedIA: hasAdvancedIA || false,
-      color: color || 'from-blue-500 to-cyan-600',
-      neonColor: neonColor || '#00d4ff',
-      icon: icon || '📚'
-    })
+    }
+    
+    // Campos opcionales - solo agregar si tienen valor
+    if (id) fields.id = id
+    if (fullName) fields.fullName = fullName
+    if (category) fields.category = category
+    if (ageRange) fields.ageRange = ageRange
+    if (gradeNumber !== undefined) fields.gradeNumber = Number(gradeNumber) || 1
+    if (kitPrice !== undefined) fields.kitPrice = Number(kitPrice) || 50
+    if (hasHacking !== undefined) fields.hasHacking = hasHacking
+    if (hasAdvancedIA !== undefined) fields.hasAdvancedIA = hasAdvancedIA
+    if (color) fields.color = color
+    if (neonColor) fields.neonColor = neonColor
+    if (icon) fields.icon = icon
+
+    await base(TABLE_NAME).create(fields)
 
     return NextResponse.json({
       success: true,

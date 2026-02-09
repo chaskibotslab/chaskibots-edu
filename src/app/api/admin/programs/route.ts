@@ -22,18 +22,20 @@ export async function POST(request: NextRequest) {
 
     const programId = id || `prog-${levelId}-${type}-${Date.now()}`
 
-    await base(TABLE_NAME).create({
-      id: programId,
+    // Solo enviar campos que existen en Airtable
+    const fields: Record<string, any> = {
       name,
-      description: description || '',
       levelId,
-      levelName: levelName || '',
       type,
-      duration: duration || '6 meses',
-      price: price || 50,
-      isActive: true,
-      createdAt: new Date().toISOString()
-    })
+    }
+    
+    // Campos opcionales
+    if (description) fields.description = description
+    if (levelName) fields.levelName = levelName
+    if (duration) fields.duration = duration
+    if (price !== undefined) fields.price = Number(price) || 50
+
+    await base(TABLE_NAME).create(fields)
 
     return NextResponse.json({
       success: true,

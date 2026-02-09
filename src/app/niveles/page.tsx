@@ -188,23 +188,9 @@ export default function NivelesPage() {
                   const IconComponent = ICON_MAP[level.icon] || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
+                  // Para docentes: no mostrar niveles sin acceso
                   if (!hasAccess && !isAdmin) {
-                    return (
-                      <div
-                        key={level.id}
-                        className="bg-dark-800/50 border border-dark-700 rounded-xl p-6 opacity-50 cursor-not-allowed"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center">
-                            <Lock className="w-6 h-6 text-gray-500" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-500">{level.name}</h3>
-                            <p className="text-gray-600 text-sm">Sin acceso</p>
-                          </div>
-                        </div>
-                      </div>
-                    )
+                    return null
                   }
                   
                   return (
@@ -246,18 +232,9 @@ export default function NivelesPage() {
                   const IconComponent = ICON_MAP[level.icon] || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
+                  // Para docentes: no mostrar niveles sin acceso
                   if (!hasAccess && !isAdmin) {
-                    return (
-                      <div key={level.id} className="bg-dark-800/50 border border-dark-700 rounded-xl p-5 opacity-50 cursor-not-allowed">
-                        <div className="flex flex-col items-center text-center">
-                          <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center mb-3">
-                            <Lock className="w-6 h-6 text-gray-500" />
-                          </div>
-                          <h3 className="font-semibold text-gray-500 text-sm">{level.name}</h3>
-                          <p className="text-gray-600 text-xs mt-1">Sin acceso</p>
-                        </div>
-                      </div>
-                    )
+                    return null
                   }
                   
                   return (
@@ -296,20 +273,9 @@ export default function NivelesPage() {
                   const IconComponent = ICON_MAP[level.icon] || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
+                  // Para docentes: no mostrar niveles sin acceso
                   if (!hasAccess && !isAdmin) {
-                    return (
-                      <div key={level.id} className="bg-dark-800/50 border border-dark-700 rounded-xl p-5 opacity-50 cursor-not-allowed">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-dark-700 rounded-lg flex items-center justify-center">
-                            <Lock className="w-5 h-5 text-gray-500" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-500 text-sm">{level.name}</h3>
-                            <p className="text-gray-600 text-xs">Sin acceso</p>
-                          </div>
-                        </div>
-                      </div>
-                    )
+                    return null
                   }
                   
                   return (
@@ -350,20 +316,9 @@ export default function NivelesPage() {
                   const IconComponent = ICON_MAP[level.icon] || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
+                  // Para docentes: no mostrar niveles sin acceso
                   if (!hasAccess && !isAdmin) {
-                    return (
-                      <div key={level.id} className="bg-dark-800/50 border border-dark-700 rounded-xl p-6 opacity-50 cursor-not-allowed">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center">
-                            <Lock className="w-6 h-6 text-gray-500" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-500">{level.name}</h3>
-                            <p className="text-gray-600 text-sm">Sin acceso</p>
-                          </div>
-                        </div>
-                      </div>
-                    )
+                    return null
                   }
                   
                   return (
