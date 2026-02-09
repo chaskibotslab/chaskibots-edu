@@ -54,17 +54,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Solo enviar campos de texto simple - evitar Single Select de Airtable
+    // Enviar campos a Airtable (todos como texto)
     const fields: Record<string, any> = {
-      name,
-      levelId: String(levelId), // Asegurar que sea texto
+      name: String(name),
+      levelId: String(levelId),
     }
     
-    // Campos opcionales - solo texto simple y números
+    // Campos opcionales
     if (description) fields.description = String(description)
+    if (levelName) fields.levelName = String(levelName)
+    if (type) fields.type = String(type)
     if (duration) fields.duration = String(duration)
     if (price !== undefined && price !== '') fields.price = Number(price) || 0
-    // NO enviar levelName ni type si son Single Select en Airtable
 
     console.log('Sending fields to Airtable:', fields)
 
