@@ -50,12 +50,55 @@ export default function NivelPage() {
   const [yearPlan, setYearPlan] = useState<{month: string, topic: string, project: string}[]>([])
   const [yearPlanLoading, setYearPlanLoading] = useState(true)
   const [zoomImage, setZoomImage] = useState<string | null>(null)
+  const [dynamicLevel, setDynamicLevel] = useState<any>(null)
+  const [levelLoading, setLevelLoading] = useState(true)
 
-  const level = EDUCATION_LEVELS.find(l => l.id === levelId)
+  // Buscar primero en constantes, luego en Airtable
+  const staticLevel = EDUCATION_LEVELS.find(l => l.id === levelId)
+  const level = staticLevel || dynamicLevel
   const content = LEVEL_CONTENT[levelId]
   const availableSimulators = SIMULATORS.filter(s => s.levels.includes(levelId))
   const courseData = ALL_COURSES[levelId] || ALL_COURSES['inicial-1']
   const progress = calculateProgress(courseData.modules)
+
+  // Cargar nivel desde Airtable si no existe en constantes
+  useEffect(() => {
+    async function loadLevel() {
+      if (staticLevel) {
+        setLevelLoading(false)
+        return
+      }
+      setLevelLoading(true)
+      try {
+        const response = await fetch('/api/admin/levels')
+        if (response.ok) {
+          const data = await response.json()
+          if (data.levels) {
+            const found = data.levels.find((l: any) => l.id === levelId)
+            if (found) {
+              setDynamicLevel({
+                id: found.id,
+                name: found.name,
+                fullName: found.fullName || found.name,
+                ageRange: found.ageRange || '',
+                icon: found.icon || '📚',
+                category: found.category || 'elemental',
+                color: found.color || 'from-blue-500 to-cyan-600',
+                neonColor: found.neonColor || '#00d4ff',
+                kitPrice: found.kitPrice || 50,
+                hasHacking: found.hasHacking || false,
+                hasAdvancedIA: found.hasAdvancedIA || false
+              })
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading level:', error)
+      }
+      setLevelLoading(false)
+    }
+    loadLevel()
+  }, [levelId, staticLevel])
 
   // Cargar lecciones desde API
   useEffect(() => {
@@ -110,6 +153,17 @@ export default function NivelPage() {
     acc[key].push(lesson)
     return acc
   }, {} as Record<string, APILesson[]>)
+
+  if (levelLoading) {
+    return (
+      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400">Cargando nivel...</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!level) {
     return (
