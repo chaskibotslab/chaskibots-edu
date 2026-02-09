@@ -64,15 +64,17 @@ export default function TeacherCoursesManager() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [usersRes, coursesRes, schoolsRes, assignmentsRes] = await Promise.all([
+      const [usersRes, coursesRes, programsRes, schoolsRes, assignmentsRes] = await Promise.all([
         fetch('/api/admin/users'),
         fetch('/api/admin/courses'),
+        fetch('/api/admin/programs'),
         fetch('/api/schools'),
         fetch('/api/teacher-courses')
       ])
       
       const usersData = await usersRes.json()
       const coursesData = await coursesRes.json()
+      const programsData = await programsRes.json()
       const schoolsData = await schoolsRes.json()
       const assignmentsData = await assignmentsRes.json()
       
@@ -82,9 +84,34 @@ export default function TeacherCoursesManager() {
         setTeachers(teachersList)
       }
       
+      // Combinar cursos y programas
+      const allCourses: Course[] = []
+      
       if (coursesData.courses) {
-        setCourses(coursesData.courses)
+        coursesData.courses.forEach((c: any) => {
+          allCourses.push({
+            id: c.id,
+            name: c.name,
+            levelId: c.levelId || ''
+          })
+        })
       }
+      
+      // Agregar programas como cursos asignables
+      if (programsData.programs) {
+        programsData.programs.forEach((p: any) => {
+          // Evitar duplicados por ID
+          if (!allCourses.find(c => c.id === p.id)) {
+            allCourses.push({
+              id: p.id,
+              name: p.name,
+              levelId: p.levelId || ''
+            })
+          }
+        })
+      }
+      
+      setCourses(allCourses)
       
       if (schoolsData.success && schoolsData.schools) {
         setSchools(schoolsData.schools)
