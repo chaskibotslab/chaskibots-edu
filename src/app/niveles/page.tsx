@@ -137,20 +137,19 @@ export default function NivelesPage() {
     // Profesor/Estudiante: solo niveles permitidos
     const levelIds = new Set<string>()
 
-    if (user.role === 'teacher') {
-      // Si hay asignaciones en teacher_courses, SOLO esas aplican.
-      if (userCourses.length > 0) {
-        userCourses.forEach(course => {
-          if (course.levelId) levelIds.add(course.levelId)
-        })
-      } else {
-        // Fallback: si no hay asignaciones, usar el nivel del usuario.
-        if (user.levelId) levelIds.add(user.levelId)
-      }
-    } else {
-      // Student
-      if (user.levelId) levelIds.add(user.levelId)
+    // SIEMPRE usar el levelId del usuario si existe (prioridad máxima)
+    if (user.levelId) {
+      levelIds.add(user.levelId)
     }
+
+    // Para profesores: también agregar niveles de asignaciones
+    if (user.role === 'teacher' && userCourses.length > 0) {
+      userCourses.forEach(course => {
+        if (course.levelId) levelIds.add(course.levelId)
+      })
+    }
+    
+    console.log('[Niveles] Usuario:', user.name, 'Role:', user.role, 'LevelId:', user.levelId, 'Allowed:', Array.from(levelIds))
     
     return Array.from(levelIds)
   }, [user, userCourses, coursesLoading, levelsLoading, allLevels])

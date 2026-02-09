@@ -1,11 +1,35 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import AIModule from '@/components/AIModule'
-import { Brain, Camera, Upload, Mic, Lightbulb } from 'lucide-react'
+import { useAuth } from '@/components/AuthProvider'
+import { Brain, Camera, Upload, Mic, Lightbulb, Loader2 } from 'lucide-react'
 
 export default function IAPage() {
+  const { user, isLoading, isAuthenticated } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login?redirect=/ia')
+    }
+  }, [isLoading, isAuthenticated, router])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-neon-purple animate-spin" />
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return null
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />

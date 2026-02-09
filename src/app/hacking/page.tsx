@@ -48,16 +48,16 @@ export default function HackingPage() {
     if (user.role === 'admin') return EDUCATION_LEVELS.map(l => l.id)
     const levelIds = new Set<string>()
 
-    if (user.role === 'teacher') {
-      if (userCourses.length > 0) {
-        userCourses.forEach(course => {
-          if (course.levelId) levelIds.add(course.levelId)
-        })
-      } else {
-        if (user.levelId) levelIds.add(user.levelId)
-      }
-    } else {
-      if (user.levelId) levelIds.add(user.levelId)
+    // SIEMPRE usar el levelId del usuario si existe (prioridad máxima)
+    if (user.levelId) {
+      levelIds.add(user.levelId)
+    }
+
+    // Para profesores: también agregar niveles de asignaciones
+    if (user.role === 'teacher' && userCourses.length > 0) {
+      userCourses.forEach(course => {
+        if (course.levelId) levelIds.add(course.levelId)
+      })
     }
 
     return Array.from(levelIds)
