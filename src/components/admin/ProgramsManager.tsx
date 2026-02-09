@@ -8,6 +8,7 @@ import {
 
 interface Program {
   id: string
+  recordId?: string
   name: string
   description: string
   levelId: string
@@ -39,7 +40,8 @@ export default function ProgramsManager() {
     type: 'robotica',
     duration: '6 meses',
     price: 50,
-    isActive: true
+    isActive: true,
+    recordId: undefined
   })
 
   const programTypes = [
@@ -77,7 +79,7 @@ export default function ProgramsManager() {
     e.preventDefault()
     setSaving(true)
 
-    // Generate ID if new
+    // Generate ID if new, include recordId for updates
     const dataToSend = {
       ...formData,
       id: editingId || `prog-${formData.levelId}-${formData.type}-${Date.now()}`
@@ -91,9 +93,13 @@ export default function ProgramsManager() {
         body: JSON.stringify(dataToSend)
       })
 
-      if (res.ok) {
+      const result = await res.json()
+      if (res.ok && result.success) {
         await loadData()
         resetForm()
+      } else {
+        console.error('Error from API:', result.error)
+        alert(result.error || 'Error al guardar programa')
       }
     } catch (error) {
       console.error('Error saving program:', error)
@@ -102,7 +108,8 @@ export default function ProgramsManager() {
   }
 
   const handleEdit = (program: Program) => {
-    setFormData(program)
+    // Incluir recordId en formData para la actualización
+    setFormData({ ...program, recordId: program.recordId })
     setEditingId(program.id)
     setShowForm(true)
   }
@@ -136,7 +143,8 @@ export default function ProgramsManager() {
       type: 'robotica',
       duration: '6 meses',
       price: 50,
-      isActive: true
+      isActive: true,
+      recordId: undefined
     })
     setEditingId(null)
     setShowForm(false)

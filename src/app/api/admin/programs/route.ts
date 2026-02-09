@@ -43,7 +43,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, description, levelId, levelName, type, duration, price } = body
+    const { id, name, description, levelId, levelName, type, duration, price } = body
 
     console.log('Creating program with body:', body)
 
@@ -54,8 +54,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Generar ID si no viene
+    const programId = id || `prog-${levelId}-${type || 'robotica'}-${Date.now()}`
+
     // Enviar campos a Airtable (todos como texto)
     const fields: Record<string, any> = {
+      id: programId,
       name: String(name),
       levelId: String(levelId),
     }
@@ -75,7 +79,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Programa creado exitosamente',
-      id: result.id
+      id: programId,
+      recordId: result.id
     })
   } catch (error: any) {
     console.error('Error creating program:', error)
@@ -91,39 +96,68 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, ...updateData } = body
+    const { id, recordId, ...updateData } = body
 
-    if (!id) {
+    console.log('Updating program:', { id, recordId, updateData })
+
+    if (!id && !recordId) {
       return NextResponse.json(
         { success: false, error: 'ID es requerido' },
         { status: 400 }
       )
     }
 
-    const records = await base(TABLE_NAME)
-      .select({
-        filterByFormula: `{id} = '${id}'`,
-        maxRecords: 1
-      })
-      .firstPage()
+    let airtableRecordId = recordId
 
-    if (records.length === 0) {
+    // Si no tenemos recordId, buscar por el campo id
+    if (!airtableRecordId && id) {
+      const records = await base(TABLE_NAME)
+        .select({
+          filterByFormula: `{id} = '${id}'`,
+          maxRecords: 1
+        })
+        .firstPage()
+
+      if (records.length > 0) {
+        airtableRecordId = records[0].id
+      }
+    }
+
+    // Si aún no encontramos, intentar usar id como recordId directo (formato rec...)
+    if (!airtableRecordId && id && id.startsWith('rec')) {
+      airtableRecordId = id
+    }
+
+    if (!airtableRecordId) {
       return NextResponse.json(
         { success: false, error: 'Programa no encontrado' },
         { status: 404 }
       )
     }
 
-    await base(TABLE_NAME).update(records[0].id, updateData)
+    // Preparar campos para actualizar
+    const fields: Record<string, any> = {}
+    if (updateData.name) fields.name = String(updateData.name)
+    if (updateData.description !== undefined) fields.description = String(updateData.description || '')
+    if (updateData.levelId) fields.levelId = String(updateData.levelId)
+    if (updateData.levelName) fields.levelName = String(updateData.levelName)
+    if (updateData.type) fields.type = String(updateData.type)
+    if (updateData.duration) fields.duration = String(updateData.duration)
+    if (updateData.price !== undefined) fields.price = Number(updateData.price) || 0
+    if (updateData.isActive !== undefined) fields.isActive = Boolean(updateData.isActive)
+
+    console.log('Updating Airtable record:', airtableRecordId, 'with fields:', fields)
+
+    await base(TABLE_NAME).update(airtableRecordId, fields)
 
     return NextResponse.json({
       success: true,
       message: 'Programa actualizado exitosamente'
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating program:', error)
     return NextResponse.json(
-      { success: false, error: 'Error al actualizar programa' },
+      { success: false, error: error?.message || 'Error al actualizar programa' },
       { status: 500 }
     )
   }
