@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/AuthProvider'
+import AnimatedBackground from '@/components/AnimatedBackground'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -32,7 +33,10 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <AuthProvider>
-          {children}
+          <AnimatedBackground />
+          <div className="relative z-10">
+            {children}
+          </div>
         </AuthProvider>
       </body>
     </html>
