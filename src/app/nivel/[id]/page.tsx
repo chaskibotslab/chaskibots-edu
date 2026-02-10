@@ -40,8 +40,13 @@ interface APILesson {
 export default function NivelPage() {
   const params = useParams()
   const levelId = params.id as string
-  const { user } = useAuth()
-  const isTeacher = user?.role === 'admin' || user?.role === 'teacher'
+  const { user, isTeacher, isAdmin } = useAuth()
+  
+  // Debug: mostrar info del usuario en consola
+  useEffect(() => {
+    console.log('[Nivel] Usuario:', user?.name, 'Role:', user?.role, 'isTeacher:', isTeacher, 'isAdmin:', isAdmin)
+  }, [user, isTeacher, isAdmin])
+  
   const [activeTab, setActiveTab] = useState<'lessons' | 'kit' | 'calendar' | 'ai' | 'simulators' | 'tasks'>('lessons')
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
