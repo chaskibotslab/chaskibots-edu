@@ -66,7 +66,7 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col bg-dark-900">
+    <div className="min-h-screen flex flex-col bg-transparent">
       <Header />
       
       <main className="flex-1">
@@ -169,7 +169,7 @@ export default function HomePage() {
         </section>
 
         {/* Experiencias ChaskiBots */}
-        <section className="py-20 px-4 bg-dark-900">
+        <section className="py-20 px-4 bg-transparent">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center text-white mb-4">
               Nuestras <span className="text-neon-orange">Experiencias</span>
@@ -395,7 +395,7 @@ export default function HomePage() {
         </section>
 
         {/* Features - Futurista */}
-        <section className="py-20 px-4 bg-dark-900">
+        <section className="py-20 px-4 bg-transparent">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center text-white mb-12">
               ¿Por qué <span className="text-neon-cyan">ChaskiBots</span> EDU?

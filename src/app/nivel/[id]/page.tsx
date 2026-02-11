@@ -161,7 +161,7 @@ export default function NivelPage() {
 
   if (levelLoading) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-400">Cargando nivel...</p>
@@ -172,7 +172,7 @@ export default function NivelPage() {
 
   if (!level) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Nivel no encontrado</h1>
           <Link href="/niveles" className="btn-primary">
@@ -196,9 +196,9 @@ export default function NivelPage() {
 
   return (
     <CourseAuthGuard levelId={levelId} levelName={level.name}>
-      <div className="min-h-screen bg-dark-900 flex">
+      <div className="min-h-screen bg-transparent flex">
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-dark-800 border-r border-dark-600 transition-all duration-300 overflow-hidden flex-shrink-0`}>
+      <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-dark-800/90 backdrop-blur-sm border-r border-dark-600 transition-all duration-300 overflow-hidden flex-shrink-0`}>
         <div className="h-full flex flex-col">
           {/* Header del Sidebar */}
           <div className="p-4 border-b border-dark-600">

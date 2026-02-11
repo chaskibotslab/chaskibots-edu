@@ -30,7 +30,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
       </div>
     )
@@ -43,7 +43,7 @@ export default function DashboardPage() {
   const currentLevel = EDUCATION_LEVELS.find(l => l.id === user?.levelId) || EDUCATION_LEVELS[0]
 
   return (
-    <div className={`min-h-screen flex flex-col bg-dark-900 transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen flex flex-col bg-transparent transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
       <Header />
       
       <main className="flex-1 py-6 px-4">

@@ -179,7 +179,7 @@ export default function NivelesPage() {
   }, [])
 
   return (
-    <div className={`min-h-screen flex flex-col bg-dark-900 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen flex flex-col bg-transparent transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       <Header />
       
       <main className="flex-1 py-6 px-4">
