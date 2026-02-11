@@ -68,9 +68,12 @@ function EntregasContent() {
   // Cargar cursos asignados al profesor
   useEffect(() => {
     async function loadTeacherCourses() {
-      if (isTeacher && !isAdmin && user?.accessCode) {
+      if (isTeacher && !isAdmin && (user?.accessCode || user?.name)) {
         try {
-          const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
+          const params = new URLSearchParams()
+          if (user.accessCode) params.append('teacherId', user.accessCode)
+          if (user.name) params.append('teacherName', user.name)
+          const res = await fetch(`/api/teacher-courses?${params.toString()}`)
           const data = await res.json()
           if (data.assignments && data.assignments.length > 0) {
             setTeacherCourses(data.assignments)

@@ -37,19 +37,14 @@ export default function RoboticaPage() {
       if (user.role === 'teacher') {
         let assignments: any[] = []
         
-        // Buscar por accessCode
-        if (user.accessCode) {
-          const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
-          const data = await res.json()
-          if (data.assignments?.length > 0) assignments = data.assignments
-        }
+        // Buscar por accessCode Y nombre (OR en API)
+        const params = new URLSearchParams()
+        if (user.accessCode) params.append('teacherId', user.accessCode)
+        if (user.name) params.append('teacherName', user.name)
         
-        // Si no hay, buscar por nombre
-        if (assignments.length === 0 && user.name) {
-          const res = await fetch(`/api/teacher-courses?teacherName=${encodeURIComponent(user.name)}`)
-          const data = await res.json()
-          if (data.assignments?.length > 0) assignments = data.assignments
-        }
+        const res = await fetch(`/api/teacher-courses?${params.toString()}`)
+        const data = await res.json()
+        if (data.assignments?.length > 0) assignments = data.assignments
         
         if (assignments.length > 0) setUserCourses(assignments)
         else if (user.levelId) setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])

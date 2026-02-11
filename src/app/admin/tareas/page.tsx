@@ -117,10 +117,13 @@ function AdminTareasContent() {
   // Cargar asignaciones de cursos para profesores
   useEffect(() => {
     async function loadTeacherCourses() {
-      if (isTeacher && !isAdmin && user?.accessCode) {
+      if (isTeacher && !isAdmin && (user?.accessCode || user?.name)) {
         try {
-          console.log('[Tareas] Loading teacher courses for:', user.accessCode)
-          const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
+          const params = new URLSearchParams()
+          if (user.accessCode) params.append('teacherId', user.accessCode)
+          if (user.name) params.append('teacherName', user.name)
+          console.log('[Tareas] Loading teacher courses for:', params.toString())
+          const res = await fetch(`/api/teacher-courses?${params.toString()}`)
           const data = await res.json()
           console.log('[Tareas] Teacher courses loaded:', data.assignments?.length || 0)
           if (data.assignments && data.assignments.length > 0) {

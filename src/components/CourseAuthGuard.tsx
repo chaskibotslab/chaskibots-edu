@@ -46,21 +46,16 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
           return
         }
         
-        // Buscar asignaciones por accessCode o por nombre
+        // Buscar asignaciones por accessCode Y nombre (OR en API)
         try {
           let assignments: any[] = []
+          const params = new URLSearchParams()
+          if (user.accessCode) params.append('teacherId', user.accessCode)
+          if (user.name) params.append('teacherName', user.name)
           
-          if (user.accessCode) {
-            const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
-            const data = await res.json()
-            if (data.assignments?.length > 0) assignments = data.assignments
-          }
-          
-          if (assignments.length === 0 && user.name) {
-            const res = await fetch(`/api/teacher-courses?teacherName=${encodeURIComponent(user.name)}`)
-            const data = await res.json()
-            if (data.assignments?.length > 0) assignments = data.assignments
-          }
+          const res = await fetch(`/api/teacher-courses?${params.toString()}`)
+          const data = await res.json()
+          if (data.assignments?.length > 0) assignments = data.assignments
           
           if (assignments.length > 0) {
             const hasAccess = assignments.some((a: any) => a.levelId === levelId)

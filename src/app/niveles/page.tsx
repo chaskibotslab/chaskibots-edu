@@ -80,23 +80,16 @@ export default function NivelesPage() {
         // Buscar asignaciones: primero por accessCode, luego por nombre
         let assignments: any[] = []
         
-        if (user.accessCode) {
-          console.log('[Niveles] Buscando asignaciones por teacherId:', user.accessCode)
-          const res = await fetch(`/api/teacher-courses?teacherId=${user.accessCode}`)
-          const data = await res.json()
-          if (data.assignments && data.assignments.length > 0) {
-            assignments = data.assignments
-          }
-        }
+        // Buscar por accessCode Y nombre para mayor flexibilidad
+        const params = new URLSearchParams()
+        if (user.accessCode) params.append('teacherId', user.accessCode)
+        if (user.name) params.append('teacherName', user.name)
         
-        // Si no hay asignaciones por accessCode, buscar por nombre
-        if (assignments.length === 0 && user.name) {
-          console.log('[Niveles] Buscando asignaciones por teacherName:', user.name)
-          const res = await fetch(`/api/teacher-courses?teacherName=${encodeURIComponent(user.name)}`)
-          const data = await res.json()
-          if (data.assignments && data.assignments.length > 0) {
-            assignments = data.assignments
-          }
+        console.log('[Niveles] Buscando asignaciones:', params.toString())
+        const res = await fetch(`/api/teacher-courses?${params.toString()}`)
+        const data = await res.json()
+        if (data.assignments && data.assignments.length > 0) {
+          assignments = data.assignments
         }
         
         console.log('[Niveles] Asignaciones encontradas:', assignments.length)

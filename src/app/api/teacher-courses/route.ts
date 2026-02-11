@@ -28,11 +28,23 @@ export async function GET(request: NextRequest) {
     const schoolId = searchParams.get('schoolId')
     const courseId = searchParams.get('courseId')
 
+    console.log('[TeacherCourses API] GET request - teacherId:', teacherId, 'teacherName:', teacherName)
+
     let filterFormula = ''
     const filters: string[] = []
     
-    if (teacherId) filters.push(`{teacherId}="${teacherId}"`)
-    if (teacherName) filters.push(`{teacherName}="${teacherName}"`)
+    // Si se busca por teacherId, buscar por teacherId O por teacherName
+    // Esto maneja casos donde el teacherId guardado sea diferente al accessCode actual
+    if (teacherId && teacherName) {
+      // Si vienen ambos, buscar por cualquiera de los dos
+      filters.push(`OR({teacherId}="${teacherId}",{teacherName}="${teacherName}")`)
+    } else if (teacherId) {
+      // Solo teacherId - buscar exacto
+      filters.push(`{teacherId}="${teacherId}"`)
+    } else if (teacherName) {
+      // Solo teacherName - buscar exacto
+      filters.push(`{teacherName}="${teacherName}"`)
+    }
     if (schoolId) filters.push(`{schoolId}="${schoolId}"`)
     if (courseId) filters.push(`{courseId}="${courseId}"`)
     
@@ -41,6 +53,8 @@ export async function GET(request: NextRequest) {
         ? filters[0] 
         : `AND(${filters.join(',')})`
     }
+
+    console.log('[TeacherCourses API] Filter formula:', filterFormula)
 
     let url = AIRTABLE_API_URL + '?sort[0][field]=teacherName&sort[0][direction]=asc'
     if (filterFormula) {
@@ -79,6 +93,11 @@ export async function GET(request: NextRequest) {
       schoolName: record.fields.schoolName || '',
       createdAt: record.fields.createdAt || '',
     }))
+
+    console.log('[TeacherCourses API] Found', assignments.length, 'assignments')
+    if (assignments.length > 0) {
+      console.log('[TeacherCourses API] First assignment teacherId:', assignments[0].teacherId, 'teacherName:', assignments[0].teacherName)
+    }
 
     return NextResponse.json({ success: true, assignments })
   } catch (error) {
