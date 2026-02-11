@@ -5,6 +5,7 @@ import { Play, Copy, RotateCcw, Save, Code, Bot, Cpu, Lightbulb, Gauge, Monitor,
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import RobotSimulator from './RobotSimulator'
+import { useAuth } from '@/components/AuthProvider'
 
 // Importar simulador 3D dinámicamente para evitar errores de SSR
 const RobotSimulator3D = dynamic(() => import('./RobotSimulator3D'), { 
@@ -667,6 +668,7 @@ interface SimulatorCommand {
 }
 
 export default function BlocklyEditor({ onCodeChange, userId, userName }: BlocklyEditorProps) {
+  const { user } = useAuth()
   const blocklyDiv = useRef<HTMLDivElement>(null)
   const workspaceRef = useRef<any>(null)
   const [generatedCode, setGeneratedCode] = useState('')
@@ -1444,7 +1446,13 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                   <RobotSimulator />
                 </div>
                 <div className={`absolute inset-0 ${simulatorMode === '3d' ? 'block' : 'hidden'}`}>
-                  <RobotSimulator3D onRequestCommands={getBlocklyCommands} />
+                  <RobotSimulator3D 
+                    onRequestCommands={getBlocklyCommands}
+                    studentName={user?.name || userName || ''}
+                    studentEmail={user?.email || ''}
+                    courseId={user?.courseId || ''}
+                    schoolId={user?.schoolId || ''}
+                  />
                 </div>
               </div>
             </div>

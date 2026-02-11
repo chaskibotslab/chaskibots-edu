@@ -5,6 +5,7 @@ import {
   Play, RotateCcw, Copy, Check, ChevronRight, ChevronDown,
   BookOpen, Code, Terminal, Lightbulb, Zap, Send, Loader2
 } from 'lucide-react'
+import { useAuth } from '@/components/AuthProvider'
 
 interface PythonSimulatorProps {
   levelId: string
@@ -347,6 +348,7 @@ interface Task {
 }
 
 export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
+  const { user } = useAuth()
   const [code, setCode] = useState('# Escribe tu código Python aquí\nprint("¡Hola Mundo!")')
   const [output, setOutput] = useState<string[]>([])
   const [isRunning, setIsRunning] = useState(false)
@@ -359,6 +361,13 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
   const [isSending, setIsSending] = useState(false)
   const [sendSuccess, setSendSuccess] = useState(false)
   const outputRef = useRef<HTMLDivElement>(null)
+
+  // Pre-llenar nombre del estudiante si está autenticado
+  useEffect(() => {
+    if (user?.name && !studentName) {
+      setStudentName(user.name)
+    }
+  }, [user])
 
   // Cargar tareas del nivel
   useEffect(() => {
@@ -655,8 +664,11 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
         body: JSON.stringify({
           taskId,
           studentName,
+          studentEmail: user?.email || '',
           levelId,
           lessonId: selectedTask,
+          courseId: user?.courseId || '',
+          schoolId: user?.schoolId || '',
           code,
           output: `Tarea: ${taskTitle}\n\n${output.join('\n')}`
         })
