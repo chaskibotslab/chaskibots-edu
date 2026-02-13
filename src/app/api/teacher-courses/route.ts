@@ -98,7 +98,9 @@ export async function GET(request: NextRequest) {
 
     console.log('[TeacherCourses API] Found', assignments.length, 'assignments')
     if (assignments.length > 0) {
-      console.log('[TeacherCourses API] All assignments:', assignments.map(a => ({ courseName: a.courseName, levelId: a.levelId, teacherName: a.teacherName })))
+      console.log('[TeacherCourses API] All assignments:', JSON.stringify(assignments.map(a => ({ courseName: a.courseName, levelId: a.levelId, teacherId: a.teacherId, teacherName: a.teacherName }))))
+    } else {
+      console.log('[TeacherCourses API] No assignments found for filter:', filterFormula)
     }
 
     return NextResponse.json({ success: true, assignments })
