@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
 
     console.log('[TeacherCourses API] Found', assignments.length, 'assignments')
     if (assignments.length > 0) {
-      console.log('[TeacherCourses API] First assignment teacherId:', assignments[0].teacherId, 'teacherName:', assignments[0].teacherName)
+      console.log('[TeacherCourses API] All assignments:', assignments.map(a => ({ courseName: a.courseName, levelId: a.levelId, teacherName: a.teacherName })))
     }
 
     return NextResponse.json({ success: true, assignments })
