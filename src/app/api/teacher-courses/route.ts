@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const schoolId = searchParams.get('schoolId')
     const courseId = searchParams.get('courseId')
 
-    console.log('[TeacherCourses API] GET request - teacherId:', teacherId, 'teacherName:', teacherName)
+    console.log('[TeacherCourses API] GET request - teacherId:', JSON.stringify(teacherId), 'teacherName:', JSON.stringify(teacherName))
 
     let filterFormula = ''
     const filters: string[] = []
