@@ -47,6 +47,7 @@ export default function TeacherCoursesManager() {
   const [assignments, setAssignments] = useState<TeacherCourse[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [syncing, setSyncing] = useState(false)
   
   // Estado para el formulario de asignación
   const [selectedTeacher, setSelectedTeacher] = useState<string>('')
@@ -209,6 +210,30 @@ export default function TeacherCoursesManager() {
     setSaving(false)
   }
 
+  // Sincronizar levelId de todas las asignaciones
+  const handleSyncLevelIds = async () => {
+    if (!confirm('¿Sincronizar todos los levelId de las asignaciones con los datos de programas/cursos?')) {
+      return
+    }
+    
+    setSyncing(true)
+    try {
+      const res = await fetch('/api/admin/sync-teacher-courses', { method: 'POST' })
+      const data = await res.json()
+      
+      if (data.success) {
+        alert(`✅ Sincronización completada:\n- ${data.stats.corrected} corregidos\n- ${data.stats.errors} errores`)
+        await loadData()
+      } else {
+        alert(`❌ Error: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Error syncing:', error)
+      alert('Error al sincronizar')
+    }
+    setSyncing(false)
+  }
+
   // Eliminar una asignación individual
   const handleDeleteAssignment = async (assignment: TeacherCourse) => {
     if (!confirm(`¿Eliminar asignación de "${assignment.courseName}" para ${assignment.teacherName}?`)) {
@@ -271,6 +296,15 @@ export default function TeacherCoursesManager() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={handleSyncLevelIds}
+            disabled={syncing}
+            className="flex items-center gap-2 px-3 py-2 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-colors disabled:opacity-50"
+            title="Sincronizar levelId de asignaciones con programas/cursos"
+          >
+            {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            Sincronizar
+          </button>
           <button
             onClick={loadData}
             className="flex items-center gap-2 px-3 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600 transition-colors"
