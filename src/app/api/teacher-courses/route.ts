@@ -34,16 +34,18 @@ export async function GET(request: NextRequest) {
     const filters: string[] = []
     
     // Si se busca por teacherId, buscar por teacherId O por teacherName
-    // Usar FIND para búsqueda parcial y también igualdad exacta
+    // Usar LOWER() para búsqueda case-insensitive
     if (teacherId && teacherName) {
-      // Si vienen ambos, buscar por cualquiera de los dos (exacto o parcial)
-      filters.push(`OR({teacherId}="${teacherId}",{teacherName}="${teacherName}",FIND("${teacherName}",{teacherName})>0)`)
+      // Si vienen ambos, buscar por cualquiera de los dos (case-insensitive)
+      const lowerName = teacherName.toLowerCase()
+      filters.push(`OR({teacherId}="${teacherId}",LOWER({teacherName})="${lowerName}")`)
     } else if (teacherId) {
       // Solo teacherId - buscar exacto
       filters.push(`{teacherId}="${teacherId}"`)
     } else if (teacherName) {
-      // Solo teacherName - buscar exacto o parcial
-      filters.push(`OR({teacherName}="${teacherName}",FIND("${teacherName}",{teacherName})>0)`)
+      // Solo teacherName - buscar case-insensitive
+      const lowerName = teacherName.toLowerCase()
+      filters.push(`LOWER({teacherName})="${lowerName}"`)
     }
     if (schoolId) filters.push(`{schoolId}="${schoolId}"`)
     if (courseId) filters.push(`{courseId}="${courseId}"`)
