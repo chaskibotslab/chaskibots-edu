@@ -157,6 +157,13 @@ export default function NivelesPage() {
     }
     
     console.log('[Niveles] Usuario:', user.name, 'Role:', user.role, 'LevelId:', user.levelId, 'Allowed:', Array.from(levelIds))
+    console.log('[Niveles] AllLevels IDs:', allLevels.map(l => l.id))
+    
+    // Verificar qué levelIds no existen en allLevels
+    const missingLevels = Array.from(levelIds).filter(id => !allLevels.find(l => l.id === id))
+    if (missingLevels.length > 0) {
+      console.warn('[Niveles] ADVERTENCIA: Estos levelIds no existen en allLevels:', missingLevels)
+    }
     
     return Array.from(levelIds)
   }, [user, userCourses, coursesLoading, levelsLoading, allLevels])
