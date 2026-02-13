@@ -56,7 +56,7 @@ export async function GET() {
         levelId: r.fields.levelId
       })) || [],
       totalAssignments: allAssignmentsData.records?.length || 0,
-      allTeacherNames: [...new Set(allAssignmentsData.records?.map((r: any) => r.fields.teacherName) || [])]
+      allTeacherNames: Array.from(new Set(allAssignmentsData.records?.map((r: any) => r.fields.teacherName) || []))
     })
   } catch (error) {
     console.error('Debug error:', error)
