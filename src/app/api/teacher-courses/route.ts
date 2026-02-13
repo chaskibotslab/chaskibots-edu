@@ -34,16 +34,16 @@ export async function GET(request: NextRequest) {
     const filters: string[] = []
     
     // Si se busca por teacherId, buscar por teacherId O por teacherName
-    // Esto maneja casos donde el teacherId guardado sea diferente al accessCode actual
+    // Usar FIND para búsqueda parcial y también igualdad exacta
     if (teacherId && teacherName) {
-      // Si vienen ambos, buscar por cualquiera de los dos
-      filters.push(`OR({teacherId}="${teacherId}",{teacherName}="${teacherName}")`)
+      // Si vienen ambos, buscar por cualquiera de los dos (exacto o parcial)
+      filters.push(`OR({teacherId}="${teacherId}",{teacherName}="${teacherName}",FIND("${teacherName}",{teacherName})>0)`)
     } else if (teacherId) {
       // Solo teacherId - buscar exacto
       filters.push(`{teacherId}="${teacherId}"`)
     } else if (teacherName) {
-      // Solo teacherName - buscar exacto
-      filters.push(`{teacherName}="${teacherName}"`)
+      // Solo teacherName - buscar exacto o parcial
+      filters.push(`OR({teacherName}="${teacherName}",FIND("${teacherName}",{teacherName})>0)`)
     }
     if (schoolId) filters.push(`{schoolId}="${schoolId}"`)
     if (courseId) filters.push(`{courseId}="${courseId}"`)

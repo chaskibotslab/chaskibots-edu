@@ -92,7 +92,7 @@ export default function NivelesPage() {
           assignments = data.assignments
         }
         
-        console.log('[Niveles] Asignaciones encontradas:', assignments.length)
+        console.log('[Niveles] Asignaciones encontradas:', assignments.length, assignments.map((a: any) => ({ courseId: a.courseId, levelId: a.levelId, courseName: a.courseName })))
         
         if (assignments.length > 0) {
           setUserCourses(assignments)
