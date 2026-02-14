@@ -119,7 +119,25 @@ export default function TeacherCoursesManager() {
       }
       
       if (assignmentsData.success && assignmentsData.assignments) {
-        setAssignments(assignmentsData.assignments)
+        // Filtrar asignaciones de profesores que ya no existen
+        const teacherIds = new Set(usersData.users?.filter((u: any) => u.role === 'teacher').map((t: any) => t.accessCode) || [])
+        const validAssignments = assignmentsData.assignments.filter((a: TeacherCourse) => teacherIds.has(a.teacherId))
+        
+        // Si hay asignaciones huérfanas, eliminarlas automáticamente
+        const orphanAssignments = assignmentsData.assignments.filter((a: TeacherCourse) => !teacherIds.has(a.teacherId))
+        if (orphanAssignments.length > 0) {
+          console.log(`[TeacherCoursesManager] Eliminando ${orphanAssignments.length} asignaciones huérfanas`)
+          // Eliminar asignaciones huérfanas en segundo plano
+          orphanAssignments.forEach(async (a: TeacherCourse) => {
+            try {
+              await fetch(`/api/teacher-courses?recordId=${a.recordId}`, { method: 'DELETE' })
+            } catch (err) {
+              console.error('Error eliminando asignación huérfana:', err)
+            }
+          })
+        }
+        
+        setAssignments(validAssignments)
       }
     } catch (error) {
       console.error('Error loading data:', error)
