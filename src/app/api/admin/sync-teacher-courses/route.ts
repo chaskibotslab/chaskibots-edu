@@ -61,11 +61,24 @@ export async function POST() {
   try {
     console.log('[Sync] Iniciando sincronización de teacher_courses...')
 
-    // 1. Obtener todos los programas/cursos para crear un mapa de courseId -> levelId
-    const [programs, courses] = await Promise.all([
-      fetchAllRecords('programs'),
-      fetchAllRecords('courses')
-    ])
+    // 1. Obtener todos los programas para crear un mapa de courseId -> levelId
+    // Nota: La tabla principal es 'programs', courses puede no existir
+    let programs: AirtableRecord[] = []
+    let courses: AirtableRecord[] = []
+    
+    try {
+      programs = await fetchAllRecords('programs')
+      console.log('[Sync] Programs obtenidos:', programs.length)
+    } catch (error) {
+      console.error('[Sync] Error obteniendo programs:', error)
+    }
+    
+    try {
+      courses = await fetchAllRecords('courses')
+      console.log('[Sync] Courses obtenidos:', courses.length)
+    } catch (error) {
+      console.log('[Sync] Tabla courses no disponible, usando solo programs')
+    }
 
     // Crear mapa de courseId/programId -> levelId correcto
     const levelIdMap: Record<string, string> = {}
@@ -151,11 +164,21 @@ export async function POST() {
 // GET - Ver estado actual sin hacer cambios
 export async function GET() {
   try {
-    // 1. Obtener todos los programas/cursos
-    const [programs, courses] = await Promise.all([
-      fetchAllRecords('programs'),
-      fetchAllRecords('courses')
-    ])
+    // 1. Obtener todos los programas para crear un mapa de courseId -> levelId
+    let programs: AirtableRecord[] = []
+    let courses: AirtableRecord[] = []
+    
+    try {
+      programs = await fetchAllRecords('programs')
+    } catch (error) {
+      console.error('[Sync GET] Error obteniendo programs:', error)
+    }
+    
+    try {
+      courses = await fetchAllRecords('courses')
+    } catch (error) {
+      console.log('[Sync GET] Tabla courses no disponible')
+    }
 
     // Crear mapa de courseId -> levelId
     const levelIdMap: Record<string, string> = {}
