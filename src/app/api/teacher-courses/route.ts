@@ -116,8 +116,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { teacherId, teacherName, courseId, courseName, levelId, schoolId, schoolName } = body
 
-    if (!teacherId || !courseId || !schoolId) {
-      return NextResponse.json({ error: 'teacherId, courseId y schoolId son requeridos' }, { status: 400 })
+    if (!teacherId || !courseId) {
+      return NextResponse.json({ error: 'teacherId y courseId son requeridos' }, { status: 400 })
     }
 
     // Verificar si ya existe esta asignación
