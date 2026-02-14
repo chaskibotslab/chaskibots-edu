@@ -162,7 +162,7 @@ export default function NivelesPage() {
     // Verificar qué levelIds no existen en allLevels
     const missingLevels = Array.from(levelIds).filter(id => !allLevels.find(l => l.id === id))
     if (missingLevels.length > 0) {
-      console.warn('[Niveles] ⚠️ ADVERTENCIA: Estos levelIds de cursos asignados NO existen como niveles en Airtable:', missingLevels)
+      console.warn('[Niveles] ⚠️ ADVERTENCIA: Estos levelIds de cursos asignados NO existen como niveles en Airtable:', JSON.stringify(missingLevels))
       console.warn('[Niveles] 👉 Solución: Crear estos niveles en Airtable o corregir el levelId de los cursos')
     }
     
