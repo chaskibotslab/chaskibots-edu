@@ -1,97 +1,19 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
+import { useLevels, useUserCourses } from '@/hooks'
 import { Bot, Cpu, Wrench, Lightbulb } from 'lucide-react'
 
-interface Level {
-  id: string
-  name: string
-  ageRange?: string
-}
-
 export default function RoboticaPage() {
-  const { user, isLoading, isAuthenticated } = useAuth()
-  const [userCourses, setUserCourses] = useState<any[]>([])
-  const [allLevels, setAllLevels] = useState<Level[]>([])
-
-  // Cargar niveles desde Airtable
-  const loadLevels = async () => {
-    try {
-      const res = await fetch('/api/admin/levels')
-      const data = await res.json()
-      if (data.levels) {
-        setAllLevels(data.levels)
-      }
-    } catch (error) {
-      console.error('Error loading levels:', error)
-    }
-  }
-
-  const loadUserCourses = async () => {
-    try {
-      if (!user) return
-      if (user.role === 'teacher') {
-        let assignments: any[] = []
-        
-        // Buscar por accessCode Y nombre (OR en API)
-        const params = new URLSearchParams()
-        if (user.accessCode) params.append('teacherId', user.accessCode)
-        if (user.name) params.append('teacherName', user.name)
-        
-        const res = await fetch(`/api/teacher-courses?${params.toString()}`)
-        const data = await res.json()
-        if (data.assignments?.length > 0) assignments = data.assignments
-        
-        if (assignments.length > 0) setUserCourses(assignments)
-        else if (user.levelId) setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
-        else setUserCourses([])
-      } else if (user.role === 'student') {
-        if (user.levelId) setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
-        else setUserCourses([])
-      } else {
-        setUserCourses([])
-      }
-    } catch (error) {
-      console.error('Error loading courses:', error)
-    }
-  }
-
-  useEffect(() => {
-    loadLevels()
-  }, [])
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && user && user.role !== 'admin') {
-      loadUserCourses()
-    }
-    if (!isLoading && (!isAuthenticated || !user)) {
-      setUserCourses([])
-    }
-  }, [isLoading, isAuthenticated, user])
-
-  const allowedLevelIds = useMemo(() => {
-    if (!user) return []
-    if (user.role === 'admin') return allLevels.map(l => l.id)
-    const levelIds = new Set<string>()
-
-    // SIEMPRE usar el levelId del usuario si existe (prioridad máxima)
-    if (user.levelId) {
-      levelIds.add(user.levelId)
-    }
-
-    // Para profesores: también agregar niveles de asignaciones
-    if (user.role === 'teacher' && userCourses.length > 0) {
-      userCourses.forEach(course => {
-        if (course.levelId) levelIds.add(course.levelId)
-      })
-    }
-
-    return Array.from(levelIds)
-  }, [user, userCourses, allLevels])
+  const { user } = useAuth()
+  
+  // Usar hooks modulares
+  const { levels: allLevels } = useLevels()
+  const { allowedLevelIds } = useUserCourses(allLevels)
 
   const isAdmin = user?.role === 'admin'
   

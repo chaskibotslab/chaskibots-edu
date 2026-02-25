@@ -1,4 +1,8 @@
 import { NextResponse } from 'next/server'
+import { cache, cacheKeys } from '@/lib/cache'
+import { getUserFriendlyError } from '@/lib/airtable-errors'
+
+export const dynamic = 'force-dynamic'
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
@@ -27,7 +31,18 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const levelId = searchParams.get('levelId')
 
+  // Caché de lecciones - 15 minutos
+  const CACHE_KEY = cacheKeys.lessons(levelId || 'all')
+
   try {
+    // Intentar obtener del caché primero
+    const cached = cache.get<any[]>(CACHE_KEY)
+    if (cached) {
+      console.log('[Lessons API] Usando caché para:', levelId || 'todos')
+      return NextResponse.json({ lessons: cached })
+    }
+
+    console.log('[Lessons API] Consultando Airtable para:', levelId || 'todos')
     let url = AIRTABLE_API_URL
     
     if (levelId) {
@@ -47,6 +62,15 @@ export async function GET(request: Request) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Airtable lessons error:', errorText)
+      
+      // Mensaje amigable para límite de API
+      if (response.status === 429) {
+        return NextResponse.json(
+          { error: getUserFriendlyError(429, errorText) },
+          { status: 429 }
+        )
+      }
+      
       return NextResponse.json({ error: 'Error fetching lessons' }, { status: 500 })
     }
 
@@ -121,9 +145,22 @@ export async function GET(request: Request) {
       }
     })
 
+    // Guardar en caché
+    cache.set(CACHE_KEY, lessons)
+
     return NextResponse.json(lessons)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error:', error)
+    
+    // Mensaje amigable para límite de API
+    const errorMessage = error?.message || ''
+    if (errorMessage.includes('429') || errorMessage.includes('BILLING_LIMIT')) {
+      return NextResponse.json(
+        { error: getUserFriendlyError(429, errorMessage) },
+        { status: 429 }
+      )
+    }
+    
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

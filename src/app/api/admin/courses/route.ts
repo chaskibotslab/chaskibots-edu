@@ -1,11 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createCourse, getAllCourses, getTeacherCourses, updateCourse, deleteCourse } from '@/lib/airtable-auth'
+import { cache } from '@/lib/cache'
+import { getUserFriendlyError } from '@/lib/airtable-errors'
+
+export const dynamic = 'force-dynamic'
 
 // GET - Obtener cursos
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const teacherId = searchParams.get('teacherId')
+  
+  // Caché de cursos - 10 minutos
+  const CACHE_KEY = `courses:${teacherId || 'all'}`
+
   try {
-    const { searchParams } = new URL(request.url)
-    const teacherId = searchParams.get('teacherId')
+    // Intentar obtener del caché primero
+    const cached = cache.get<any[]>(CACHE_KEY)
+    if (cached) {
+      console.log('[Courses API] Usando caché para:', teacherId || 'todos')
+      return NextResponse.json({ success: true, courses: cached })
+    }
+
+    console.log('[Courses API] Consultando Airtable para:', teacherId || 'todos')
 
     let courses
     if (teacherId) {
@@ -14,10 +30,22 @@ export async function GET(request: NextRequest) {
       courses = await getAllCourses()
     }
 
+    // Guardar en caché
+    cache.set(CACHE_KEY, courses, 10 * 60 * 1000)
+
     return NextResponse.json({ success: true, courses })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error getting courses:', error)
+    
+    const errorMessage = error?.message || ''
+    if (errorMessage.includes('429') || errorMessage.includes('BILLING_LIMIT')) {
+      return NextResponse.json(
+        { success: false, error: getUserFriendlyError(429, errorMessage), courses: [] },
+        { status: 429 }
+      )
+    }
+    
     return NextResponse.json(
       { success: false, error: 'Error al obtener cursos' },
       { status: 500 }

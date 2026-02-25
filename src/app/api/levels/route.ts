@@ -1,12 +1,27 @@
 import { NextResponse } from 'next/server'
 import Airtable from 'airtable'
+import { cache, cacheKeys } from '@/lib/cache'
+import { getUserFriendlyError } from '@/lib/airtable-errors'
+
+export const dynamic = 'force-dynamic'
 
 const base = new Airtable({ 
   apiKey: process.env.AIRTABLE_API_KEY 
 }).base(process.env.AIRTABLE_BASE_ID || '')
 
+// Caché de niveles - 30 minutos (los niveles casi nunca cambian)
+const CACHE_KEY = cacheKeys.levels()
+
 export async function GET() {
   try {
+    // Intentar obtener del caché primero
+    const cached = cache.get<any[]>(CACHE_KEY)
+    if (cached) {
+      console.log('[Levels API] Usando caché')
+      return NextResponse.json(cached)
+    }
+
+    console.log('[Levels API] Consultando Airtable...')
     const records = await base('levels')
       .select({
         sort: [{ field: 'gradeNumber', direction: 'asc' }]
@@ -28,9 +43,22 @@ export async function GET() {
       hasAdvancedIA: record.fields.hasAdvancedIA as boolean || false
     }))
 
+    // Guardar en caché
+    cache.set(CACHE_KEY, levels)
+    
     return NextResponse.json(levels)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching levels from Airtable:', error)
+    
+    // Verificar si es error de límite de API
+    const errorMessage = error?.message || ''
+    if (errorMessage.includes('429') || errorMessage.includes('BILLING_LIMIT')) {
+      return NextResponse.json(
+        { error: getUserFriendlyError(429, errorMessage) },
+        { status: 429 }
+      )
+    }
+    
     // Fallback: devolver array vacío si falla
     return NextResponse.json([])
   }

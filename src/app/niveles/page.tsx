@@ -2,15 +2,14 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
-import { EDUCATION_LEVELS } from '@/lib/constants'
+import { useLevels, useUserCourses } from '@/hooks'
 import { 
-  ArrowRight, Sparkles, Rocket, Brain, Bot, Baby, Backpack, Pencil, 
+  ArrowRight, Sparkles, Bot, Baby, Backpack, Pencil, 
   BookOpen, FlaskConical, Lightbulb, Zap, Gamepad2, Wrench, Settings, 
-  Laptop, ShieldCheck, GraduationCap, Users, Code, Lock
+  Laptop, Brain, ShieldCheck, Rocket, GraduationCap, Code
 } from 'lucide-react'
 
 const ICON_MAP: Record<string, any> = {
@@ -18,156 +17,14 @@ const ICON_MAP: Record<string, any> = {
   Zap, Gamepad2, Wrench, Settings, Laptop, Brain, ShieldCheck, Rocket
 }
 
-interface DynamicLevel {
-  id: string
-  name: string
-  fullName: string
-  category: string
-  ageRange: string
-  gradeNumber: number
-  color: string
-  neonColor: string
-  icon: string
-  kitPrice: number
-  hasHacking: boolean
-  hasAdvancedIA: boolean
-}
-
 export default function NivelesPage() {
-  const { user, isLoading, isAuthenticated } = useAuth()
+  const { user } = useAuth()
   const [scrollY, setScrollY] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
-  const [userCourses, setUserCourses] = useState<any[]>([])
-  const [coursesLoading, setCoursesLoading] = useState(true)
-  const [dynamicLevels, setDynamicLevels] = useState<DynamicLevel[]>([])
-  const [levelsLoading, setLevelsLoading] = useState(true)
-
-  // Cargar niveles desde Airtable
-  useEffect(() => {
-    const loadLevels = async () => {
-      try {
-        const res = await fetch('/api/admin/levels')
-        const data = await res.json()
-        if (data.levels && data.levels.length > 0) {
-          setDynamicLevels(data.levels)
-        }
-      } catch (error) {
-        console.error('Error loading levels from Airtable:', error)
-      }
-      setLevelsLoading(false)
-    }
-    loadLevels()
-  }, [])
-
-  // Combinar niveles: Airtable tiene prioridad, luego fallback a constantes locales
-  const allLevels = useMemo(() => {
-    if (dynamicLevels.length > 0) {
-      // Crear un mapa de niveles de Airtable
-      const airtableLevelIds = new Set(dynamicLevels.map(l => l.id))
-      // Agregar niveles locales que no estén en Airtable
-      const localOnlyLevels = EDUCATION_LEVELS.filter(l => !airtableLevelIds.has(l.id))
-      return [...dynamicLevels, ...localOnlyLevels]
-    }
-    return EDUCATION_LEVELS
-  }, [dynamicLevels])
-
-  const loadUserCourses = async () => {
-    try {
-      if (!user) return
-      console.log('[Niveles] Usuario:', user.name, 'Role:', user.role, 'LevelId:', user.levelId, 'AccessCode:', user.accessCode)
-      
-      if (user.role === 'teacher') {
-        // Buscar asignaciones: primero por accessCode, luego por nombre
-        let assignments: any[] = []
-        
-        // Buscar por accessCode Y nombre para mayor flexibilidad
-        const params = new URLSearchParams()
-        if (user.accessCode) params.append('teacherId', user.accessCode)
-        if (user.name) params.append('teacherName', user.name)
-        
-        console.log('[Niveles] Buscando asignaciones:', params.toString())
-        const res = await fetch(`/api/teacher-courses?${params.toString()}`)
-        const data = await res.json()
-        if (data.assignments && data.assignments.length > 0) {
-          assignments = data.assignments
-        }
-        
-        console.log('[Niveles] Asignaciones encontradas:', assignments.length, assignments.map((a: any) => ({ courseId: a.courseId, levelId: a.levelId, courseName: a.courseName })))
-        
-        if (assignments.length > 0) {
-          setUserCourses(assignments)
-        } else if (user.levelId) {
-          // Fallback: usar levelId del usuario
-          console.log('[Niveles] Usando levelId del usuario:', user.levelId)
-          setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
-        } else {
-          setUserCourses([])
-        }
-      } else if (user.role === 'student') {
-        // Para estudiantes: solo su curso asignado
-        if (user.levelId) {
-          setUserCourses([{ courseId: user.courseId || '', levelId: user.levelId }])
-        } else {
-          setUserCourses([])
-        }
-      } else {
-        setUserCourses([])
-      }
-    } catch (error) {
-      console.error('Error loading courses:', error)
-    } finally {
-      setCoursesLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && user && user.role !== 'admin') {
-      setCoursesLoading(true)
-      loadUserCourses()
-    }
-    if (!isLoading && (!isAuthenticated || !user)) {
-      setUserCourses([])
-      setCoursesLoading(false)
-    }
-    // Admin no necesita cargar cursos
-    if (!isLoading && user?.role === 'admin') {
-      setCoursesLoading(false)
-    }
-  }, [isLoading, isAuthenticated, user])
-
-  // Determinar qué niveles puede ver el usuario
-  const allowedLevelIds = useMemo(() => {
-    if (!user) return [] // No logueado, no ve nada
-    if (user.role === 'admin') return allLevels.map(l => l.id) // Admin ve todo
-    if (coursesLoading || levelsLoading) return [] // Mientras carga, no mostrar nada
-    
-    // Profesor/Estudiante: solo niveles permitidos
-    const levelIds = new Set<string>()
-
-    // SIEMPRE usar el levelId del usuario si existe (prioridad máxima)
-    if (user.levelId) {
-      levelIds.add(user.levelId)
-    }
-
-    // Para profesores: también agregar niveles de asignaciones
-    if (user.role === 'teacher' && userCourses.length > 0) {
-      userCourses.forEach(course => {
-        if (course.levelId) levelIds.add(course.levelId)
-      })
-    }
-    
-    console.log('[Niveles] Usuario:', user.name, 'Role:', user.role, 'LevelId:', user.levelId, 'Allowed:', Array.from(levelIds))
-    console.log('[Niveles] AllLevels IDs:', allLevels.map(l => l.id))
-    
-    // Verificar qué levelIds no existen en allLevels
-    const missingLevels = Array.from(levelIds).filter(id => !allLevels.find(l => l.id === id))
-    if (missingLevels.length > 0) {
-      console.warn('[Niveles] ⚠️ ADVERTENCIA: Estos levelIds de cursos asignados NO existen como niveles en Airtable:', JSON.stringify(missingLevels))
-      console.warn('[Niveles] 👉 Solución: Crear estos niveles en Airtable o corregir el levelId de los cursos')
-    }
-    
-    return Array.from(levelIds)
-  }, [user, userCourses, coursesLoading, levelsLoading, allLevels])
+  
+  // Usar hooks modulares
+  const { levels: allLevels, loading: levelsLoading } = useLevels()
+  const { allowedLevelIds, loading: coursesLoading } = useUserCourses(allLevels)
 
   const isAdmin = user?.role === 'admin'
   const canAccessLevel = (levelId: string) => isAdmin || allowedLevelIds.includes(levelId)
@@ -213,7 +70,7 @@ export default function NivelesPage() {
               
               <div className="grid grid-cols-2 gap-4">
                 {allLevels.filter(l => l.category === 'inicial').map((level) => {
-                  const IconComponent = ICON_MAP[level.icon] || Bot
+                  const IconComponent = (level.icon && ICON_MAP[level.icon]) || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
                   // Para docentes: no mostrar niveles sin acceso
@@ -257,7 +114,7 @@ export default function NivelesPage() {
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {allLevels.filter(l => l.category === 'elemental').map((level) => {
-                  const IconComponent = ICON_MAP[level.icon] || Bot
+                  const IconComponent = (level.icon && ICON_MAP[level.icon]) || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
                   // Para docentes: no mostrar niveles sin acceso
@@ -298,7 +155,7 @@ export default function NivelesPage() {
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {allLevels.filter(l => l.category === 'media' || l.category === 'superior').map((level) => {
-                  const IconComponent = ICON_MAP[level.icon] || Bot
+                  const IconComponent = (level.icon && ICON_MAP[level.icon]) || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
                   // Para docentes: no mostrar niveles sin acceso
@@ -341,7 +198,7 @@ export default function NivelesPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {allLevels.filter(l => l.category === 'bachillerato').map((level) => {
-                  const IconComponent = ICON_MAP[level.icon] || Bot
+                  const IconComponent = (level.icon && ICON_MAP[level.icon]) || Bot
                   const hasAccess = canAccessLevel(level.id)
                   
                   // Para docentes: no mostrar niveles sin acceso

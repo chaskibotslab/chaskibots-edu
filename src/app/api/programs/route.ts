@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Airtable from 'airtable'
+import { cache } from '@/lib/cache'
+import { getUserFriendlyError } from '@/lib/airtable-errors'
+
+export const dynamic = 'force-dynamic'
 
 const base = new Airtable({ 
   apiKey: process.env.AIRTABLE_API_KEY 
@@ -7,9 +11,21 @@ const base = new Airtable({
 
 // GET - Obtener programas (todos o filtrados por nivel)
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const levelId = searchParams.get('levelId')
+  
+  // Caché de programas - 30 minutos
+  const CACHE_KEY = `programs:${levelId || 'all'}`
+
   try {
-    const { searchParams } = new URL(request.url)
-    const levelId = searchParams.get('levelId')
+    // Intentar obtener del caché primero
+    const cached = cache.get<any>(CACHE_KEY)
+    if (cached) {
+      console.log('[Programs API] Usando caché para:', levelId || 'todos')
+      return NextResponse.json({ success: true, programs: cached })
+    }
+
+    console.log('[Programs API] Consultando Airtable para:', levelId || 'todos')
 
     let filterFormula = '{isActive} = TRUE()'
     if (levelId) {
@@ -35,9 +51,22 @@ export async function GET(request: NextRequest) {
       isActive: record.fields.isActive as boolean
     }))
 
+    // Guardar en caché
+    cache.set(CACHE_KEY, programs)
+
     return NextResponse.json({ success: true, programs })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching programs:', error)
+    
+    // Mensaje amigable para límite de API
+    const errorMessage = error?.message || ''
+    if (errorMessage.includes('429') || errorMessage.includes('BILLING_LIMIT')) {
+      return NextResponse.json(
+        { success: false, error: getUserFriendlyError(429, errorMessage), programs: [] },
+        { status: 429 }
+      )
+    }
+    
     return NextResponse.json({ success: false, programs: [] })
   }
 }

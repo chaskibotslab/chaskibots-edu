@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cache } from '@/lib/cache'
+import { getUserFriendlyError } from '@/lib/airtable-errors'
+
+export const dynamic = 'force-dynamic'
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
@@ -21,14 +25,25 @@ export interface TeacherCourse {
 
 // GET - Obtener asignaciones de cursos a profesores
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const teacherId = searchParams.get('teacherId')
-    const teacherName = searchParams.get('teacherName')
-    const schoolId = searchParams.get('schoolId')
-    const courseId = searchParams.get('courseId')
+  const { searchParams } = new URL(request.url)
+  const teacherId = searchParams.get('teacherId')
+  const teacherName = searchParams.get('teacherName')
+  const schoolId = searchParams.get('schoolId')
+  const courseId = searchParams.get('courseId')
 
-    console.log('[TeacherCourses API] GET request - teacherId:', JSON.stringify(teacherId), 'teacherName:', JSON.stringify(teacherName))
+  // Caché de asignaciones de profesor - 10 minutos
+  const cacheKeyParts = ['teacher-courses', teacherId || '', teacherName || '', schoolId || '', courseId || '']
+  const CACHE_KEY = cacheKeyParts.join(':')
+
+  try {
+    // Intentar obtener del caché primero
+    const cached = cache.get<any>(CACHE_KEY)
+    if (cached) {
+      console.log('[TeacherCourses API] Usando caché para:', teacherName || teacherId || 'todos')
+      return NextResponse.json(cached)
+    }
+
+    console.log('[TeacherCourses API] Consultando Airtable - teacherId:', JSON.stringify(teacherId), 'teacherName:', JSON.stringify(teacherName))
 
     let filterFormula = ''
     const filters: string[] = []
@@ -97,15 +112,23 @@ export async function GET(request: NextRequest) {
     }))
 
     console.log('[TeacherCourses API] Found', assignments.length, 'assignments')
-    if (assignments.length > 0) {
-      console.log('[TeacherCourses API] All assignments:', JSON.stringify(assignments.map(a => ({ courseName: a.courseName, levelId: a.levelId, teacherId: a.teacherId, teacherName: a.teacherName }))))
-    } else {
-      console.log('[TeacherCourses API] No assignments found for filter:', filterFormula)
-    }
 
-    return NextResponse.json({ success: true, assignments })
-  } catch (error) {
+    // Guardar en caché - 10 minutos
+    const result = { success: true, assignments }
+    cache.set(CACHE_KEY, result, 10 * 60 * 1000)
+
+    return NextResponse.json(result)
+  } catch (error: any) {
     console.error('Error:', error)
+    
+    const errorMessage = error?.message || ''
+    if (errorMessage.includes('429') || errorMessage.includes('BILLING_LIMIT')) {
+      return NextResponse.json(
+        { success: false, error: getUserFriendlyError(429, errorMessage), assignments: [] },
+        { status: 429 }
+      )
+    }
+    
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

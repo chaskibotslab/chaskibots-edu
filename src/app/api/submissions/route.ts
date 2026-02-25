@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { uploadFileToDrive, isDriveConfigured } from '@/lib/googleDrive'
 
+export const dynamic = 'force-dynamic'
+
 // API Submissions - v4 (2026-01-30) - Upload files to Google Drive
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
@@ -300,7 +302,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PATCH - Calificar entrega
+// PATCH - Calificar entrega (y sincronizar con grades)
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json()
@@ -349,10 +351,129 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Error updating submission', details: errorText }, { status: 500 })
     }
 
+    // Si se está calificando (tiene grade), sincronizar con tabla grades
+    if (grade !== undefined && grade !== null && grade !== '') {
+      try {
+        // Primero obtener los datos de la submission para tener toda la info
+        const submissionRes = await fetch(`${AIRTABLE_API_URL}/${recordId}`, {
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        })
+        
+        if (submissionRes.ok) {
+          const submissionData = await submissionRes.json()
+          const sub = submissionData.fields
+          
+          // Sincronizar con tabla grades
+          await syncToGrades({
+            studentName: sub.studentName || '',
+            taskId: sub.taskId || '',
+            levelId: sub.levelId || '',
+            courseId: sub.courseId || '',
+            schoolId: sub.schoolId || '',
+            score: parseFloat(String(grade)),
+            feedback: feedback || '',
+            submittedAt: sub.submittedAt || new Date().toISOString(),
+            gradedAt: new Date().toISOString(),
+            gradedBy: gradedBy || ''
+          })
+        }
+      } catch (syncError) {
+        console.error('Error syncing to grades (non-blocking):', syncError)
+        // No fallar si la sincronización falla, la calificación ya se guardó
+      }
+    }
+
     return NextResponse.json({ success: true, message: 'Calificación guardada' })
   } catch (error) {
     console.error('PATCH Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+// Función auxiliar para sincronizar con tabla grades
+async function syncToGrades(data: {
+  studentName: string
+  taskId: string
+  levelId: string
+  courseId?: string
+  schoolId?: string
+  score: number
+  feedback?: string
+  submittedAt: string
+  gradedAt: string
+  gradedBy?: string
+}) {
+  const GRADES_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/grades`
+  
+  // Buscar si ya existe un registro para este estudiante y tarea
+  const searchUrl = `${GRADES_URL}?filterByFormula=AND({studentName}="${data.studentName}",{taskId}="${data.taskId}")`
+  
+  const searchRes = await fetch(searchUrl, {
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+  })
+  
+  if (!searchRes.ok) {
+    console.error('Error searching grades:', await searchRes.text())
+    return
+  }
+  
+  const searchData = await searchRes.json()
+  
+  const gradeFields: Record<string, any> = {
+    studentName: data.studentName,
+    lessonId: data.taskId,
+    taskId: data.taskId,
+    levelId: data.levelId,
+    score: data.score,
+    submittedAt: data.submittedAt,
+    gradedAt: data.gradedAt,
+  }
+  
+  if (data.courseId) gradeFields.courseId = data.courseId
+  if (data.schoolId) gradeFields.schoolId = data.schoolId
+  if (data.feedback) gradeFields.feedback = data.feedback
+  if (data.gradedBy) gradeFields.gradedBy = data.gradedBy
+  
+  if (searchData.records && searchData.records.length > 0) {
+    // Actualizar registro existente
+    const existingId = searchData.records[0].id
+    console.log('Updating existing grade:', existingId)
+    
+    await fetch(GRADES_URL, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        records: [{
+          id: existingId,
+          fields: gradeFields
+        }]
+      })
+    })
+  } else {
+    // Crear nuevo registro
+    console.log('Creating new grade for:', data.studentName, data.taskId)
+    
+    await fetch(GRADES_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        records: [{
+          fields: gradeFields
+        }]
+      })
+    })
   }
 }
 

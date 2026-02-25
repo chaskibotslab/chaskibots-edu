@@ -7,29 +7,54 @@ import {
   updateUser,
   regenerateAccessCode 
 } from '@/lib/airtable-auth'
+import { cache } from '@/lib/cache'
+import { getUserFriendlyError } from '@/lib/airtable-errors'
+
+export const dynamic = 'force-dynamic'
 
 // GET - Obtener usuarios (todos o filtrados)
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const courseId = searchParams.get('courseId')
+  const { searchParams } = new URL(request.url)
+  const courseId = searchParams.get('courseId')
+  
+  // Caché de usuarios - 5 minutos (los usuarios pueden cambiar más frecuentemente)
+  const CACHE_KEY = `users:${courseId || 'all'}`
 
-    console.log('[API Users] Fetching users, courseId:', courseId)
+  try {
+    // Intentar obtener del caché primero
+    const cached = cache.get<any[]>(CACHE_KEY)
+    if (cached) {
+      console.log('[API Users] Usando caché para:', courseId || 'todos')
+      return NextResponse.json({ success: true, users: cached })
+    }
+
+    console.log('[API Users] Consultando Airtable, courseId:', courseId)
 
     // Si hay courseId, filtrar por curso
     if (courseId) {
       const users = await getCourseUsers(courseId)
       console.log('[API Users] Got', users.length, 'users for course')
+      cache.set(CACHE_KEY, users, 5 * 60 * 1000) // 5 minutos
       return NextResponse.json({ success: true, users })
     }
 
     // Si no hay courseId, obtener todos los usuarios
     const users = await getAllUsers()
     console.log('[API Users] Got', users.length, 'total users from Airtable')
+    cache.set(CACHE_KEY, users, 5 * 60 * 1000) // 5 minutos
     return NextResponse.json({ success: true, users })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('[API Users] Error getting users:', error)
+    
+    const errorMessage = error?.message || ''
+    if (errorMessage.includes('429') || errorMessage.includes('BILLING_LIMIT')) {
+      return NextResponse.json(
+        { success: false, error: getUserFriendlyError(429, errorMessage), users: [] },
+        { status: 429 }
+      )
+    }
+    
     return NextResponse.json(
       { success: false, error: 'Error al obtener usuarios', users: [] },
       { status: 500 }

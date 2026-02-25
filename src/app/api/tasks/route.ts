@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { uploadFileToDrive, isDriveConfigured } from '@/lib/googleDrive'
 
+export const dynamic = 'force-dynamic'
+
 // Carpeta del docente en Google Drive
 const DOCENTE_FOLDER_ID = '1HLKy4aNlrzKMccj0X81ViS0Kfa8h2Z1N'
 

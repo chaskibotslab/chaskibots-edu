@@ -59,7 +59,14 @@ async function fetchTable(tableName: string, filterFormula?: string): Promise<Ai
   
   if (!response.ok) {
     const errorText = await response.text()
-    throw new Error(`Airtable API error: ${response.status} - ${errorText}`)
+    // Mensaje amigable para límite de API
+    if (response.status === 429) {
+      if (errorText.includes('PUBLIC_API_BILLING_LIMIT_EXCEEDED')) {
+        throw new Error('⚠️ Se ha alcanzado el límite mensual de solicitudes. Por favor, espera a que se reinicie o contacta al administrador.')
+      }
+      throw new Error('⏳ Demasiadas solicitudes. Espera unos segundos e intenta de nuevo.')
+    }
+    throw new Error(`Error de conexión: ${response.status}`)
   }
   
   const data: AirtableResponse = await response.json()

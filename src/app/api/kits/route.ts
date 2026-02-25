@@ -1,4 +1,8 @@
 import { NextResponse } from 'next/server'
+import { cache, cacheKeys } from '@/lib/cache'
+import { getUserFriendlyError } from '@/lib/airtable-errors'
+
+export const dynamic = 'force-dynamic'
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
@@ -22,7 +26,18 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const levelId = searchParams.get('levelId')
 
+  // Caché de kits - 1 hora (los kits casi nunca cambian)
+  const CACHE_KEY = cacheKeys.kits(levelId || undefined)
+
   try {
+    // Intentar obtener del caché primero
+    const cached = cache.get<any>(CACHE_KEY)
+    if (cached) {
+      console.log('[Kits API] Usando caché para:', levelId || 'todos')
+      return NextResponse.json(cached)
+    }
+
+    console.log('[Kits API] Consultando Airtable para:', levelId || 'todos')
     let url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_KITS_TABLE_ID}`
     
     if (levelId) {
@@ -40,6 +55,15 @@ export async function GET(request: Request) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Airtable error:', errorText)
+      
+      // Mensaje amigable para límite de API
+      if (response.status === 429) {
+        return NextResponse.json(
+          { error: getUserFriendlyError(429, errorText) },
+          { status: 429 }
+        )
+      }
+      
       return NextResponse.json({ error: 'Error fetching from Airtable', details: errorText }, { status: 500 })
     }
 
@@ -83,13 +107,27 @@ export async function GET(request: Request) {
       }
     })
 
+    // Guardar en caché
+    const result = levelId && kits.length > 0 ? kits[0] : kits
+    cache.set(CACHE_KEY, result)
+
     if (levelId && kits.length > 0) {
       return NextResponse.json(kits[0])
     }
 
     return NextResponse.json(kits)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error:', error)
+    
+    // Verificar si es error de límite de API
+    const errorMessage = error?.message || ''
+    if (errorMessage.includes('429') || errorMessage.includes('BILLING_LIMIT')) {
+      return NextResponse.json(
+        { error: getUserFriendlyError(429, errorMessage) },
+        { status: 429 }
+      )
+    }
+    
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

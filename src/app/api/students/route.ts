@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
 const AIRTABLE_STUDENTS_TABLE = 'students'
@@ -11,22 +13,28 @@ export interface Student {
   name: string
   levelId: string
   courseId?: string
+  schoolId?: string
   email?: string
+  accessCode?: string
   createdAt: string
 }
 
-// GET - Obtener estudiantes
+// GET - Obtener estudiantes con filtros por nivel, curso y colegio
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const levelId = searchParams.get('levelId')
     const courseId = searchParams.get('courseId')
+    const schoolId = searchParams.get('schoolId')
+    const search = searchParams.get('search') // Búsqueda por nombre
 
     let filterFormula = ''
     const filters: string[] = []
     
     if (levelId) filters.push(`{levelId}="${levelId}"`)
     if (courseId) filters.push(`{courseId}="${courseId}"`)
+    if (schoolId) filters.push(`{schoolId}="${schoolId}"`)
+    if (search) filters.push(`FIND(LOWER("${search}"), LOWER({name}))`)
     
     if (filters.length > 0) {
       filterFormula = filters.length === 1 
@@ -64,7 +72,9 @@ export async function GET(request: NextRequest) {
       name: record.fields.name || '',
       levelId: record.fields.levelId || '',
       courseId: record.fields.courseId || '',
+      schoolId: record.fields.schoolId || '',
       email: record.fields.email || '',
+      accessCode: record.fields.accessCode || '',
       createdAt: record.fields.createdAt || record.createdTime,
     }))
 
@@ -79,7 +89,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, levelId, courseId, email } = body
+    const { name, levelId, courseId, schoolId, email, accessCode } = body
 
     if (!name) {
       return NextResponse.json({ error: 'name es requerido' }, { status: 400 })
@@ -89,10 +99,12 @@ export async function POST(request: NextRequest) {
       name,
       levelId: levelId || '',
       courseId: courseId || '',
+      schoolId: schoolId || '',
       createdAt: new Date().toISOString(),
     }
     
     if (email) fields.email = email
+    if (accessCode) fields.accessCode = accessCode
 
     const response = await fetch(AIRTABLE_API_URL, {
       method: 'POST',
@@ -121,7 +133,9 @@ export async function POST(request: NextRequest) {
         name: record.fields.name,
         levelId: record.fields.levelId,
         courseId: record.fields.courseId,
+        schoolId: record.fields.schoolId,
         email: record.fields.email,
+        accessCode: record.fields.accessCode,
         createdAt: record.fields.createdAt,
       }
     })

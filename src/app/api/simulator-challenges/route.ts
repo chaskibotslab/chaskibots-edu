@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 // API para registrar retos completados del simulador 3D
 // Usa la tabla 'submissions' con taskId que empieza con 'simulator-challenge-'
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
