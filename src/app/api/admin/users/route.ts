@@ -121,6 +121,9 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      // Invalidar caché de usuarios
+      cache.invalidateByPrefix('users:')
+
       return NextResponse.json({
         success: true,
         created: createdUsers.length,
@@ -154,6 +157,9 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
+
+      // Invalidar caché de usuarios
+      cache.invalidateByPrefix('users:')
 
       return NextResponse.json({
         success: true,
@@ -234,6 +240,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Invalidar caché de usuarios
+    cache.invalidateByPrefix('users:')
+
     return NextResponse.json({
       success: true,
       user: result.user,
@@ -270,6 +279,9 @@ export async function PATCH(request: NextRequest) {
           { status: 400 }
         )
       }
+      // Invalidar caché de usuarios
+      cache.invalidateByPrefix('users:')
+
       return NextResponse.json({
         success: true,
         newCode: result.newCode,
@@ -285,6 +297,9 @@ export async function PATCH(request: NextRequest) {
           { status: 400 }
         )
       }
+      // Invalidar caché de usuarios
+      cache.invalidateByPrefix('users:')
+
       return NextResponse.json({
         success: true,
         message: 'Usuario desactivado exitosamente'
@@ -299,6 +314,9 @@ export async function PATCH(request: NextRequest) {
           { status: 400 }
         )
       }
+      // Invalidar caché de usuarios
+      cache.invalidateByPrefix('users:')
+
       return NextResponse.json({
         success: true,
         message: 'Usuario activado exitosamente'
@@ -324,6 +342,9 @@ export async function PATCH(request: NextRequest) {
           { status: 400 }
         )
       }
+      // Invalidar caché de usuarios
+      cache.invalidateByPrefix('users:')
+
       return NextResponse.json({
         success: true,
         message: 'Usuario actualizado exitosamente'
@@ -379,6 +400,9 @@ export async function DELETE(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Invalidar caché de usuarios
+    cache.invalidateByPrefix('users:')
 
     return NextResponse.json({
       success: true,
