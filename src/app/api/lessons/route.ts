@@ -6,9 +6,20 @@ export const dynamic = 'force-dynamic'
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
-const AIRTABLE_LESSONS_TABLE = 'lessons'
 
-const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_LESSONS_TABLE}`
+// Tablas de lecciones por programa
+const LESSONS_TABLES: Record<string, string> = {
+  robotica: 'lessons',
+  ia: 'lessons_ia',
+  hacking: 'lessons_hacking'
+}
+
+function getAirtableUrl(programId: string = 'robotica'): string {
+  const table = LESSONS_TABLES[programId] || 'lessons'
+  return `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${table}`
+}
+
+const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/lessons`
 
 function getVideoEmbedUrl(url: string): string {
   if (!url) return ''
@@ -30,20 +41,21 @@ function getVideoEmbedUrl(url: string): string {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const levelId = searchParams.get('levelId')
+  const programId = searchParams.get('programId') || 'robotica'
 
-  // Caché de lecciones - 15 minutos
-  const CACHE_KEY = cacheKeys.lessons(levelId || 'all')
+  // Caché de lecciones - 15 minutos (incluye programa en la clave)
+  const CACHE_KEY = `lessons_${programId}_${levelId || 'all'}`
 
   try {
     // Intentar obtener del caché primero
     const cached = cache.get<any[]>(CACHE_KEY)
     if (cached) {
-      console.log('[Lessons API] Usando caché para:', levelId || 'todos')
-      return NextResponse.json({ lessons: cached })
+      console.log('[Lessons API] Usando caché para:', programId, levelId || 'todos')
+      return NextResponse.json(cached)
     }
 
-    console.log('[Lessons API] Consultando Airtable para:', levelId || 'todos')
-    let url = AIRTABLE_API_URL
+    console.log('[Lessons API] Consultando Airtable para:', programId, levelId || 'todos')
+    let url = getAirtableUrl(programId)
     
     if (levelId) {
       url += `?filterByFormula={levelId}="${levelId}"&sort[0][field]=order&sort[0][direction]=asc`

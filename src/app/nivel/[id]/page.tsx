@@ -57,6 +57,7 @@ export default function NivelPage() {
   const [zoomImage, setZoomImage] = useState<string | null>(null)
   const [dynamicLevel, setDynamicLevel] = useState<any>(null)
   const [levelLoading, setLevelLoading] = useState(true)
+  const [selectedProgram, setSelectedProgram] = useState<'robotica' | 'ia' | 'hacking'>('robotica')
 
   // Buscar primero en constantes, luego en Airtable
   const staticLevel = EDUCATION_LEVELS.find(l => l.id === levelId)
@@ -105,12 +106,13 @@ export default function NivelPage() {
     loadLevel()
   }, [levelId, staticLevel])
 
-  // Cargar lecciones desde API
+  // Cargar lecciones desde API según programa seleccionado
   useEffect(() => {
     async function loadLessons() {
       setLessonsLoading(true)
+      setApiLessons([]) // Limpiar lecciones anteriores
       try {
-        const response = await fetch(`/api/lessons?levelId=${levelId}`)
+        const response = await fetch(`/api/lessons?levelId=${levelId}&programId=${selectedProgram}`)
         if (response.ok) {
           const data = await response.json()
           if (Array.isArray(data) && data.length > 0) {
@@ -123,7 +125,7 @@ export default function NivelPage() {
       setLessonsLoading(false)
     }
     loadLessons()
-  }, [levelId])
+  }, [levelId, selectedProgram])
 
   // Cargar plan del año desde API
   useEffect(() => {
@@ -344,7 +346,42 @@ export default function NivelPage() {
                 </div>
               </div>
 
-              {/* Modal de lección seleccionada */}
+              {/* Selector de Programa */}
+              <div className="flex gap-2 mb-6">
+                <button
+                  onClick={() => setSelectedProgram('robotica')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                    selectedProgram === 'robotica'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                  }`}
+                >
+                  <Bot className="w-4 h-4" />
+                  Robótica
+                </button>
+                <button
+                  onClick={() => setSelectedProgram('ia')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                    selectedProgram === 'ia'
+                      ? 'bg-purple-500 text-white'
+                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                  }`}
+                >
+                  <Brain className="w-4 h-4" />
+                  IA
+                </button>
+                <button
+                  onClick={() => setSelectedProgram('hacking')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                    selectedProgram === 'hacking'
+                      ? 'bg-red-500 text-white'
+                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                  }`}
+                >
+                  <Shield className="w-4 h-4" />
+                  Hacking
+                </button>
+              </div>
 
               {/* Módulos y Lecciones - Usar API si hay datos, sino usar locales */}
               {lessonsLoading ? (
