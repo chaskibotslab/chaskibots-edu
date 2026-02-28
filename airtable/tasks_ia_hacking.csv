@@ -1,0 +1,101 @@
+levelId,moduleName,taskTitle,taskType,description,dueWeek,points,category
+inicial-1,IA: Robots que Aprenden,Dibujar robot inteligente,dibujo,Dibuja un robot que pueda reconocer a tu familia. Incluye ojos cámara y una sonrisa.,2,10,ia
+inicial-1,IA: Robots que Escuchan,Lista de comandos,actividad,Escribe 5 comandos que le darías a un robot asistente en tu casa.,4,10,ia
+inicial-1,IA: Robots que Ven,Clasificar objetos por color,actividad,Trae 6 objetos de casa y clasifícalos por color como lo haría un robot.,6,10,ia
+inicial-1,IA: Mi Robot Amigo,Presentación Mi Robot,proyecto,Presenta tu dibujo de robot explicando qué puede hacer y por qué es especial.,8,20,ia
+inicial-2,IA: Decisiones Simples,Tarjetas Si-Entonces,actividad,Crea 4 tarjetas con situaciones y decisiones: Si llueve entonces...,2,10,ia
+inicial-2,IA: Patrones,Completar patrones,actividad,Completa 5 secuencias de patrones con colores y formas.,4,10,ia
+inicial-2,IA: Clasificación,Clasificar en grupos,actividad,Clasifica 10 objetos del aula en 3 grupos diferentes y explica por qué.,6,10,ia
+inicial-2,IA: Robot Clasificador,Robot clasificador de cartón,proyecto,Construye un robot de cartón con cajas para clasificar objetos.,8,20,ia
+primero-egb,IA: Secuencias,Ordenar mi rutina,actividad,Dibuja los 6 pasos de tu rutina matutina en orden correcto.,3,15,ia
+primero-egb,IA: Algoritmos,Instrucciones para robot,actividad,Escribe instrucciones paso a paso para que un robot haga un sándwich.,6,15,ia
+primero-egb,IA: Scratch Jr,Mi primer programa,práctica,Crea un programa en Scratch Jr donde el gato camine y diga hola.,9,20,ia
+primero-egb,IA: Proyecto Final,Juego en Scratch Jr,proyecto,Crea un juego simple donde un personaje recoge 3 objetos.,12,30,ia
+segundo-egb,IA: Condicionales,Tarjetas condicionales,actividad,Crea 5 tarjetas con condiciones: Si el semáforo está rojo entonces...,3,15,ia
+segundo-egb,IA: Bucles,Dibujo con bucles,actividad,Dibuja un patrón usando la instrucción repetir 4 veces.,6,15,ia
+segundo-egb,IA: Combinando,Juego interactivo,práctica,Crea un juego en Scratch Jr con condicionales y bucles.,9,20,ia
+segundo-egb,IA: Proyecto Final,App con múltiples pantallas,proyecto,Crea una aplicación con 3 pantallas diferentes en Scratch Jr.,12,30,ia
+tercero-egb,IA: ¿Qué es ML?,Árbol de decisión animal,actividad,Crea un árbol de decisión para adivinar 8 animales con preguntas sí/no.,3,15,ia
+tercero-egb,IA: Clasificación,Clasificador Teachable Machine,práctica,Entrena un clasificador de 3 objetos en Teachable Machine.,6,25,ia
+tercero-egb,IA: Reconocimiento,Detector de sonidos,práctica,Crea un detector que reconozca 3 sonidos diferentes.,9,25,ia
+tercero-egb,IA: Proyecto Final,Proyecto ML útil,proyecto,Crea un clasificador que resuelva un problema real de tu vida diaria.,12,35,ia
+cuarto-egb,IA: Scratch Avanzado,Proyecto con Video Sensing,práctica,Crea un proyecto que detecte movimiento con la cámara.,3,20,ia
+cuarto-egb,IA: Reconocimiento,Juego controlado por voz,práctica,Crea un juego que responda a 4 comandos de voz diferentes.,6,25,ia
+cuarto-egb,IA: Chatbots,Chatbot personalizado,práctica,Crea un chatbot que responda 10 preguntas sobre un tema que te guste.,9,25,ia
+cuarto-egb,IA: Proyecto Final,Asistente virtual,proyecto,Crea un asistente virtual que responda preguntas y ejecute acciones.,12,35,ia
+cuarto-egb,Hacking: Internet Seguro,Póster reglas seguridad,actividad,Crea un póster con las 10 reglas de seguridad en internet.,3,15,hacking
+cuarto-egb,Hacking: Contraseñas,Crear 3 contraseñas seguras,actividad,Crea 3 contraseñas seguras usando la técnica de frases y explica por qué son seguras.,6,15,hacking
+cuarto-egb,Hacking: Privacidad,Auditoría de privacidad,actividad,Revisa la configuración de privacidad de 2 apps que uses y reporta qué encontraste.,9,20,hacking
+cuarto-egb,Hacking: Proyecto,Campaña de seguridad,proyecto,Crea una campaña con póster y presentación para enseñar seguridad a otros niños.,12,30,hacking
+quinto-egb,IA: ML Conceptos,Recolectar dataset,actividad,Recolecta 30 imágenes para entrenar un clasificador de 3 categorías.,3,20,ia
+quinto-egb,IA: Texto,Detector de emociones,práctica,Entrena un clasificador de texto que detecte si un mensaje es feliz triste o enojado.,6,25,ia
+quinto-egb,IA: Números,Modelo de predicción,práctica,Crea un modelo que prediga algo basado en datos numéricos.,9,25,ia
+quinto-egb,IA: Proyecto Final,Solución ML a problema real,proyecto,Desarrolla una solución completa usando ML para un problema que identifiques.,12,40,ia
+quinto-egb,Hacking: Fake News,Análisis de 5 noticias,actividad,Analiza 5 noticias y determina cuáles son falsas. Explica cómo lo descubriste.,3,15,hacking
+quinto-egb,Hacking: Phishing,Identificar 5 correos,actividad,Analiza 5 correos de ejemplo e identifica cuáles son phishing.,6,20,hacking
+quinto-egb,Hacking: Malware,Plan de protección,actividad,Crea un plan de 10 pasos para proteger tu computadora de malware.,9,20,hacking
+quinto-egb,Hacking: Proyecto,Manual de seguridad ilustrado,proyecto,Crea un manual ilustrado de seguridad digital para niños de 4to grado.,12,30,hacking
+sexto-egb,IA: IA en Robots,Mapa sensores-sentidos,actividad,Crea un diagrama que mapee 5 sensores de robot a sentidos humanos.,3,15,ia
+sexto-egb,IA: Visión,Robot sigue color,práctica,Programa un robot que siga un objeto de color específico.,6,30,ia
+sexto-egb,IA: Voz,Robot con comandos de voz,práctica,Agrega control por voz a tu robot con al menos 4 comandos.,9,30,ia
+sexto-egb,IA: Proyecto Final,Robot inteligente completo,proyecto,Construye un robot con visión voz y toma de decisiones integradas.,12,40,ia
+sexto-egb,Hacking: Redes,Investigar mi IP,actividad,Encuentra tu IP pública y privada. Investiga qué información revela cada una.,3,15,hacking
+sexto-egb,Hacking: Encriptación,Mensaje cifrado César,actividad,Cifra un mensaje de 20 palabras con cifrado César y envíalo a un compañero para descifrar.,6,20,hacking
+sexto-egb,Hacking: Autenticación,Configurar 2FA,práctica,Activa 2FA en al menos 2 cuentas y documenta el proceso.,9,20,hacking
+sexto-egb,Hacking: Proyecto,Auditoría personal de seguridad,proyecto,Realiza una auditoría completa de seguridad de tus cuentas y dispositivos.,12,30,hacking
+septimo-egb,IA: Python Básico,Ejercicios Python,práctica,Completa 10 ejercicios de Python: variables condicionales y bucles.,3,20,ia
+septimo-egb,IA: Listas y Funciones,Juego de adivinanzas,práctica,Programa un juego de adivinar el número en Python.,6,25,ia
+septimo-egb,IA: Librerías IA,Análisis con gráficos,práctica,Analiza un dataset y crea 3 gráficos diferentes con Matplotlib.,9,25,ia
+septimo-egb,IA: Proyecto Final,Proyecto análisis de datos,proyecto,Proyecto completo de análisis de datos con visualizaciones.,12,40,ia
+septimo-egb,Hacking: Hacking Ético,Investigación hacker famoso,investigación,Investiga un hacker ético famoso y presenta su historia y contribuciones.,3,15,hacking
+septimo-egb,Hacking: Reconocimiento,Perfil OSINT,práctica,Crea un perfil de información pública de un objetivo autorizado.,6,25,hacking
+septimo-egb,Hacking: Vulnerabilidades,Análisis de CVE,actividad,Analiza 3 CVEs recientes y explica qué vulnerabilidad describen.,9,20,hacking
+septimo-egb,Hacking: Proyecto,CTF 5 retos,proyecto,Resuelve 5 retos de CTF nivel principiante y documenta las soluciones.,12,35,hacking
+octavo-egb,IA: Repaso Python,Limpieza de dataset,práctica,Limpia un dataset con valores nulos y tipos incorrectos usando Pandas.,3,20,ia
+octavo-egb,IA: Scikit-learn,Clasificador KNN,práctica,Entrena un clasificador KNN y evalúa su precisión.,6,30,ia
+octavo-egb,IA: Más Modelos,Comparar 3 modelos,práctica,Compara KNN árbol de decisión y regresión en el mismo dataset.,9,30,ia
+octavo-egb,IA: Proyecto Final,Pipeline ML completo,proyecto,Crea un pipeline completo: datos limpieza modelo evaluación.,12,45,ia
+octavo-egb,Hacking: Linux Básico,Comandos Linux,práctica,Completa 15 ejercicios de comandos Linux en terminal.,3,20,hacking
+octavo-egb,Hacking: Comandos,Script bash,práctica,Crea un script bash que automatice una tarea de administración.,6,25,hacking
+octavo-egb,Hacking: Herramientas,Escaneo con Nmap,práctica,Realiza un escaneo completo de tu red local y documenta los resultados.,9,25,hacking
+octavo-egb,Hacking: Proyecto,OverTheWire Bandit 1-10,proyecto,Completa los niveles 1-10 de OverTheWire Bandit y documenta cada solución.,12,40,hacking
+noveno-egb,IA: Redes Neuronales,Perceptrón desde cero,práctica,Implementa un perceptrón simple en Python sin librerías.,3,25,ia
+noveno-egb,IA: TensorFlow/Keras,Clasificador MNIST,práctica,Entrena una red neuronal para clasificar dígitos MNIST con >95% accuracy.,6,30,ia
+noveno-egb,IA: Imágenes,CNN para imágenes,práctica,Entrena una CNN para clasificar imágenes de CIFAR-10.,9,35,ia
+noveno-egb,IA: Proyecto Final,Clasificador de imágenes propio,proyecto,Entrena un modelo CNN con tu propio dataset de imágenes.,12,50,ia
+noveno-egb,Hacking: Web Basics,Análisis de página web,práctica,Analiza una página web con DevTools y documenta su estructura.,3,20,hacking
+noveno-egb,Hacking: OWASP Top 10,Laboratorio XSS,práctica,Completa 5 retos de XSS en laboratorio controlado.,6,30,hacking
+noveno-egb,Hacking: SQL Injection,Laboratorio SQLi,práctica,Completa 5 retos de SQL injection en laboratorio.,9,30,hacking
+noveno-egb,Hacking: Proyecto,DVWA completo,proyecto,Completa todos los retos de DVWA en nivel medio y escribe reporte.,12,45,hacking
+decimo-egb,IA: NLP Básico,Análisis de sentimientos,práctica,Crea un clasificador de sentimientos para reviews de productos.,3,30,ia
+decimo-egb,IA: Chatbots,Chatbot con ML,práctica,Crea un chatbot que aprenda de conversaciones usando ML.,6,35,ia
+decimo-egb,IA: Visión,Sistema reconocimiento facial,práctica,Implementa un sistema de reconocimiento facial con OpenCV.,9,35,ia
+decimo-egb,IA: Proyecto Final,Proyecto IA aplicada,proyecto,Desarrolla una solución completa de IA para un problema real.,12,50,ia
+decimo-egb,Hacking: Metodología,Documentación de pentest,práctica,Documenta un proceso de pentesting completo con plantilla profesional.,3,25,hacking
+decimo-egb,Hacking: Reconocimiento,Reconocimiento completo,práctica,Realiza reconocimiento completo de objetivo de práctica autorizado.,6,30,hacking
+decimo-egb,Hacking: Explotación,Exploit con Metasploit,práctica,Explota una vulnerabilidad conocida en máquina de práctica.,9,35,hacking
+decimo-egb,Hacking: Proyecto,Máquina HTB/THM,proyecto,Resuelve una máquina de HackTheBox o TryHackMe y escribe writeup.,12,50,hacking
+primero-bach,IA: Deep Learning,Predicción con LSTM,práctica,Implementa predicción de series temporales con LSTM.,3,35,ia
+primero-bach,IA: GANs,GAN para generar imágenes,práctica,Implementa una GAN básica para generar dígitos.,6,40,ia
+primero-bach,IA: Deployment,API de modelo ML,práctica,Crea una API REST con Flask para servir tu modelo.,9,35,ia
+primero-bach,IA: Proyecto Final,Proyecto end-to-end,proyecto,Modelo + API + Frontend desplegado en la nube.,12,60,ia
+primero-bach,Hacking: Redes,Ataque MITM en lab,práctica,Realiza ataque MITM en laboratorio y documenta el proceso.,3,35,hacking
+primero-bach,Hacking: Wireless,Crackear WiFi en lab,práctica,Captura handshake y crackea contraseña WiFi en laboratorio.,6,40,hacking
+primero-bach,Hacking: Passwords,Cracking de hashes,práctica,Crackea 10 hashes diferentes usando John y Hashcat.,9,35,hacking
+primero-bach,Hacking: Proyecto,Máquina media HTB,proyecto,Resuelve máquina de dificultad media y escribe writeup técnico completo.,12,55,hacking
+segundo-bach,IA: Ética en IA,Análisis de sesgo,investigación,Analiza un dataset real por sesgo y escribe reporte con recomendaciones.,3,30,ia
+segundo-bach,IA: Reinforcement,Agente Q-Learning,práctica,Implementa agente Q-Learning para juego simple.,6,40,ia
+segundo-bach,IA: LLMs,Aplicación con LLM,práctica,Crea una aplicación útil usando API de LLM.,9,40,ia
+segundo-bach,IA: Proyecto Final,Paper de investigación,proyecto,Escribe paper técnico sobre tema de IA con investigación original.,12,60,ia
+segundo-bach,Hacking: Social Engineering,Campaña de phishing simulada,práctica,Diseña campaña de phishing educativa en laboratorio.,3,35,hacking
+segundo-bach,Hacking: Privilege Escalation,Privesc en 3 máquinas,práctica,Escala privilegios en 3 máquinas diferentes Linux y Windows.,6,45,hacking
+segundo-bach,Hacking: Active Directory,Ataque a AD en lab,práctica,Realiza ataque completo a Active Directory en laboratorio.,9,45,hacking
+segundo-bach,Hacking: Proyecto,Ejercicio Red Team,proyecto,Ejercicio completo de red team con reporte ejecutivo.,12,60,hacking
+tercero-bach,IA: Estado del Arte,Replicar paper,práctica,Implementa algoritmo de paper científico reciente.,3,45,ia
+tercero-bach,IA: MLOps,Pipeline automatizado,práctica,Crea pipeline de ML con CI/CD y monitoreo.,6,45,ia
+tercero-bach,IA: Especialización,Proyecto especializado,práctica,Proyecto avanzado en área de especialización elegida.,9,50,ia
+tercero-bach,IA: Capstone,Proyecto de graduación,proyecto,Proyecto completo publicable en portafolio profesional.,12,70,ia
+tercero-bach,Hacking: Blue Team,Análisis de logs SIEM,práctica,Analiza logs de incidente simulado en SIEM.,3,40,hacking
+tercero-bach,Hacking: Forensics,Análisis forense completo,práctica,Realiza análisis forense de disco y memoria de incidente.,6,50,hacking
+tercero-bach,Hacking: Malware,Análisis de malware,práctica,Analiza muestra de malware con técnicas estáticas y dinámicas.,9,50,hacking
+tercero-bach,Hacking: Capstone,Investigación de incidente,proyecto,Investigación completa de incidente con reporte forense profesional.,12,70,hacking

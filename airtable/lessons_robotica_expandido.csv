@@ -1,0 +1,91 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked,programId
+octavo-egb,Kit Extra: Componentes Básicos,Conociendo el Kit Extra,video,15 min,1,,Presentación de componentes: LEDs resistencias pulsadores potenciómetro buzzer transistor 2N2222A. Identificar cada componente.,false,robotica
+octavo-egb,Kit Extra: Componentes Básicos,Práctica 1: LED con Resistencia,activity,25 min,2,,Conectar LED con resistencia 220Ω. Entender polaridad (pata larga = ánodo +). Calcular resistencia necesaria con Ley de Ohm.,false,robotica
+octavo-egb,Kit Extra: Componentes Básicos,Práctica 2: LED con Pulsador,activity,30 min,3,,Agregar pulsador al circuito. Pulsador cierra/abre circuito. Concepto de interruptor momentáneo vs permanente.,false,robotica
+octavo-egb,Kit Extra: Componentes Básicos,Práctica 3: Potenciómetro,activity,30 min,4,,Potenciómetro como divisor de voltaje. Controlar brillo del LED girando la perilla. Medir voltaje con multímetro.,false,robotica
+octavo-egb,Kit Extra: Componentes Básicos,Práctica 4: Buzzer Pasivo,activity,25 min,5,,Conectar buzzer con transistor 2N2222A como amplificador. Diferentes frecuencias = diferentes tonos. Base Colector Emisor.,false,robotica
+octavo-egb,Kit Extra: Componentes Básicos,Práctica 5: Circuito Integrado,activity,35 min,6,,Proyecto integrador: Pulsador activa buzzer + LED. Usar transistor como switch electrónico. Circuito completo.,false,robotica
+octavo-egb,Arduino IDE: Configuración,Instalación Arduino IDE,tutorial,30 min,7,,Descargar e instalar Arduino IDE. Configurar para ESP32. Instalar drivers USB CP2102/CH340.,false,robotica
+octavo-egb,Arduino IDE: Configuración,Conociendo el ESP32,video,20 min,8,,Pines del ESP32: GPIO digitales analógicos PWM. Diferencia con Arduino. WiFi y Bluetooth integrados.,false,robotica
+octavo-egb,Arduino IDE: Configuración,Primer Programa: Blink,tutorial,25 min,9,,Código Blink: pinMode() digitalWrite() delay(). Subir código al ESP32. LED interno parpadea.,false,robotica
+octavo-egb,Arduino IDE: Configuración,Variables y Constantes,tutorial,30 min,10,,Declarar variables int float. Constantes con #define. Usar variables para tiempos de delay.,false,robotica
+octavo-egb,PCB DRAGON RC V2.0: LEDs,Identificar LEDs de la PCB,video,15 min,11,,LEDs D1 a D6 en la PCB DRAGON RC V2.0. Pines GPIO correspondientes. Esquemático de conexiones.,false,robotica
+octavo-egb,PCB DRAGON RC V2.0: LEDs,Encender LEDs con Código,tutorial,30 min,12,,Código para encender cada LED. Usar constantes para pines. Función setup() y loop().,false,robotica
+octavo-egb,PCB DRAGON RC V2.0: LEDs,Secuencia de LEDs,activity,35 min,13,,Crear secuencia tipo Knight Rider. LEDs se encienden en orden. Usar arrays para los pines.,false,robotica
+octavo-egb,PCB DRAGON RC V2.0: LEDs,Semáforo con LEDs,project,40 min,14,,Proyecto: Semáforo con tiempos reales. Verde 5s → Amarillo 2s → Rojo 5s. Funciones para cada estado.,false,robotica
+octavo-egb,PCB DRAGON RC V2.0: Botones,Leer Botones de la PCB,tutorial,25 min,15,,Botones BOTON1 y BOTON2 en la PCB. digitalRead() para leer estado. INPUT_PULLUP explicado.,false,robotica
+octavo-egb,PCB DRAGON RC V2.0: Botones,Botón Enciende LED,activity,30 min,16,,Presionar botón → LED enciende. Soltar → LED apaga. Lógica invertida con PULLUP.,false,robotica
+octavo-egb,PCB DRAGON RC V2.0: Botones,Toggle con Botón,activity,35 min,17,,Presionar una vez → LED ON. Presionar otra vez → LED OFF. Variable de estado boolean.,false,robotica
+octavo-egb,PCB DRAGON RC V2.0: Botones,Contador con Display Serial,activity,30 min,18,,Cada presión incrementa contador. Mostrar en Serial Monitor. Debounce básico con delay.,false,robotica
+octavo-egb,TB6612FNG: Control de Motores,Conociendo el TB6612FNG,video,20 min,19,,Driver de motores TB6612FNG. Pines: AIN1 AIN2 PWMA BIN1 BIN2 PWMB STBY. Capacidad 1.2A por canal.,false,robotica
+octavo-egb,TB6612FNG: Control de Motores,Conexiones en PCB DRAGON,tutorial,25 min,20,,Pines en PCB: AIN1=14 AIN2=12 PWMA=27 BIN1=26 BIN2=25 PWMB=33 STBY=5. Verificar con multímetro.,false,robotica
+octavo-egb,TB6612FNG: Control de Motores,Control de UN Motor,tutorial,40 min,21,,⚡PRÁCTICA CRÍTICA: ledcSetup() ledcAttachPin() ledcWrite() en ESP32. Canal PWM frecuencia resolución.,false,robotica
+octavo-egb,TB6612FNG: Control de Motores,Funciones de Movimiento,tutorial,35 min,22,,Crear funciones: motorA_adelante() motorA_atras() motorA_stop(). Parámetro de velocidad 0-255.,false,robotica
+octavo-egb,TB6612FNG: Control de Motores,Control de DOS Motores,activity,40 min,23,,Motor B: BIN1=26 BIN2=25 PWMB=33. Funciones para ambos motores. STBY=5 debe estar HIGH.,false,robotica
+octavo-egb,TB6612FNG: Control de Motores,Movimientos del Robot,activity,45 min,24,,Funciones: adelante() atras() girarIzquierda() girarDerecha() detener(). Coordinar ambos motores.,false,robotica
+octavo-egb,Bluetooth: Control Inalámbrico,Bluetooth Serial en ESP32,tutorial,30 min,25,,Librería BluetoothSerial.h. Inicializar Bluetooth. Nombre del dispositivo. Emparejar con celular.,false,robotica
+octavo-egb,Bluetooth: Control Inalámbrico,Recibir Comandos,tutorial,35 min,26,,SerialBT.available() SerialBT.read(). Comandos: F=adelante B=atrás L=izquierda R=derecha S=stop.,false,robotica
+octavo-egb,Bluetooth: Control Inalámbrico,App Serial Bluetooth Terminal,tutorial,25 min,27,,Descargar app en celular. Conectar al ESP32. Enviar comandos. Probar respuesta del robot.,false,robotica
+octavo-egb,Bluetooth: Control Inalámbrico,Control de Velocidad,activity,35 min,28,,Comandos 0-9 para velocidad. Mapear 0-9 a 0-255. Velocidad variable con Bluetooth.,false,robotica
+octavo-egb,Proyecto RC: Ensamblaje,Ensamblaje del Chasis,project,45 min,29,,Montar motores en chasis. Instalar ruedas 65mm. Fijar PCB DRAGON RC V2.0. Organizar cables.,false,robotica
+octavo-egb,Proyecto RC: Ensamblaje,Conexión de Baterías,tutorial,30 min,30,,Portapilas 3xAA o batería LiPo. Conexión a VIN y GND. Verificar voltaje con multímetro.,false,robotica
+octavo-egb,Proyecto RC: Ensamblaje,Código Completo RC,tutorial,40 min,31,,Integrar todo: Bluetooth + Motores + LEDs + Buzzer. Código final del robot RC.,false,robotica
+octavo-egb,Proyecto RC: Ensamblaje,Pruebas y Ajustes,activity,35 min,32,,Probar todos los movimientos. Ajustar velocidades si ruedas desbalanceadas. Debugging.,false,robotica
+octavo-egb,Proyecto RC: Competencia,Pista de Obstáculos,activity,40 min,33,,Crear pista con conos y obstáculos. Practicar control del robot. Mejorar habilidad.,false,robotica
+octavo-egb,Proyecto RC: Competencia,Competencia Final RC,project,60 min,34,,Carrera de obstáculos. Slalom. Estacionamiento en reversa. Premiación y certificados.,true,robotica
+noveno-egb,Kit Extra: Repaso Rápido,Repaso Componentes,activity,30 min,1,,Repaso rápido del Kit Extra. Énfasis en sensores IR y lectura de valores digitales.,false,robotica
+noveno-egb,Kit Extra: Repaso Rápido,Circuitos en Protoboard,activity,35 min,2,,Armar circuitos más complejos en protoboard. Múltiples LEDs y sensores.,false,robotica
+noveno-egb,ESP32 Super Mini: Introducción,Conociendo ESP32 Super Mini,video,20 min,3,,ESP32 Super Mini: más pequeño mismo poder. Pines disponibles. Diferencias con ESP32 normal.,false,robotica
+noveno-egb,ESP32 Super Mini: Introducción,Configurar en Arduino IDE,tutorial,25 min,4,,Seleccionar placa ESP32 Dev Module. Configurar velocidad de subida. Primer Blink.,false,robotica
+noveno-egb,ESP32 Super Mini: Introducción,Pines del Super Mini,tutorial,30 min,5,,Mapeo de pines GPIO. Pines seguros para usar. Pines con funciones especiales.,false,robotica
+noveno-egb,Sensores IR: Fundamentos,¿Cómo funciona sensor IR?,video,20 min,6,,Sensor TCRT5000: LED infrarrojo + fototransistor. Reflexión de luz. Blanco vs Negro.,false,robotica
+noveno-egb,Sensores IR: Fundamentos,Conectar UN Sensor IR,tutorial,30 min,7,,Sensor IR a GPIO18. VCC GND OUT. digitalRead() para leer. Línea negra=0 Blanco=1.,false,robotica
+noveno-egb,Sensores IR: Fundamentos,LED Indicador de Sensor,activity,25 min,8,,LED que indica estado del sensor. Sensor detecta línea → LED enciende.,false,robotica
+noveno-egb,Sensores IR: Fundamentos,Conectar DOS Sensores,tutorial,35 min,9,,Sensor izquierdo GPIO18. Sensor derecho GPIO19. Leer ambos en loop. Serial Monitor.,false,robotica
+noveno-egb,Sensores IR: Fundamentos,Tabla de Estados,activity,30 min,10,,Documentar: 00=ambos en línea 10=izq fuera 01=der fuera 11=ambos fuera. Entender lógica.,false,robotica
+noveno-egb,Lógica Seguidor: Programación,Pseudocódigo del Seguidor,tutorial,25 min,11,,Escribir lógica en papel: SI ambos en línea ENTONCES adelante. SI izq fuera ENTONCES gira derecha.,false,robotica
+noveno-egb,Lógica Seguidor: Programación,Implementar con if-else,tutorial,40 min,12,,Código: int izq=digitalRead(18); int der=digitalRead(19); if(izq==0 && der==0) adelante();,false,robotica
+noveno-egb,Lógica Seguidor: Programación,Funciones de Movimiento,activity,35 min,13,,Crear funciones adelante() girarIzquierda() girarDerecha() detener() con driver L298N o TB6612.,false,robotica
+noveno-egb,Lógica Seguidor: Programación,Integrar Sensores + Motores,activity,45 min,14,,Código completo: leer sensores → decidir → mover motores. Loop continuo.,false,robotica
+noveno-egb,PCB RC DRAGON V2: Seguidor,Conociendo PCB RC DRAGON V2,video,20 min,15,,PCB compacta con ESP32 Super Mini y TB6612FNG integrado. Conexiones de sensores IR.,false,robotica
+noveno-egb,PCB RC DRAGON V2: Seguidor,Conexiones de Sensores,tutorial,30 min,16,,Conectar sensores IR a pines designados. Verificar alimentación 3.3V o 5V.,false,robotica
+noveno-egb,PCB RC DRAGON V2: Seguidor,Pines de Motores en PCB,tutorial,25 min,17,,Identificar pines del TB6612 en la PCB. Conexión de motores. Verificar polaridad.,false,robotica
+noveno-egb,Proyecto Seguidor: Ensamblaje,Montar Sensores en Chasis,project,40 min,18,,Sensores IR en parte delantera. Separación 3cm entre sensores. Altura 5mm sobre piso.,false,robotica
+noveno-egb,Proyecto Seguidor: Ensamblaje,Instalar PCB y Motores,activity,35 min,19,,Fijar PCB RC DRAGON V2. Conectar motores. Organizar cables con amarras.,false,robotica
+noveno-egb,Proyecto Seguidor: Ensamblaje,Código Final Seguidor,tutorial,40 min,20,,Cargar código completo. Ajustar pines según PCB. Verificar dirección de motores.,false,robotica
+noveno-egb,Calibración: Ajustes Finos,Calibrar Altura de Sensores,tutorial,30 min,21,,Ajustar altura para mejor detección. Probar con diferentes superficies.,false,robotica
+noveno-egb,Calibración: Ajustes Finos,Ajustar Velocidades,activity,35 min,22,,Velocidad muy alta → se sale. Muy baja → lento. Encontrar balance óptimo.,false,robotica
+noveno-egb,Calibración: Ajustes Finos,Curvas Cerradas,activity,30 min,23,,Ajustar tiempos de giro para curvas de 90°. Probar en pista con curvas.,false,robotica
+noveno-egb,Pista: Diseño y Pruebas,Crear Pista de Práctica,activity,40 min,24,,Cinta aislante negra sobre superficie blanca. Curvas suaves y cerradas. Intersecciones.,false,robotica
+noveno-egb,Pista: Diseño y Pruebas,Pruebas Continuas,activity,35 min,25,,Probar robot en pista completa. Identificar puntos problemáticos. Ajustar código.,false,robotica
+noveno-egb,Pista: Diseño y Pruebas,Optimización de Código,tutorial,40 min,26,,Mejorar respuesta. Usar PWM variable según error. PID básico opcional.,false,robotica
+noveno-egb,Competencia: Seguidor de Línea,Reglas de Competencia,video,15 min,27,,Reglas oficiales: tiempo máximo salidas permitidas penalizaciones. Formato de carrera.,false,robotica
+noveno-egb,Competencia: Seguidor de Línea,Práctica Cronometrada,activity,40 min,28,,Practicar con cronómetro. Registrar tiempos. Mejorar récord personal.,false,robotica
+noveno-egb,Competencia: Seguidor de Línea,Competencia Final Seguidor,project,60 min,29,,Carrera oficial. El más rápido sin salirse gana. Premiación y certificados.,true,robotica
+decimo-egb,Kit Extra: Aplicaciones,Repaso Kit Extra Avanzado,activity,30 min,1,,Repaso rápido. Énfasis en sensores y toma de decisiones autónomas.,false,robotica
+decimo-egb,Kit Extra: Aplicaciones,Sensor de Distancia Concepto,video,20 min,2,,Ultrasonido: envía pulso mide tiempo de retorno. Velocidad del sonido. Cálculo de distancia.,false,robotica
+decimo-egb,Sensor Ultrasónico: HC-SR04,Conociendo el HC-SR04,video,20 min,3,,Pines: VCC GND TRIGGER ECHO. Rango 2cm-400cm. Ángulo de detección 15°.,false,robotica
+decimo-egb,Sensor Ultrasónico: HC-SR04,Conexiones del Sensor,tutorial,25 min,4,,TRIGGER a GPIO13. ECHO a GPIO15. VCC a 5V. GND a GND. Verificar conexiones.,false,robotica
+decimo-egb,Sensor Ultrasónico: HC-SR04,Código para Medir Distancia,tutorial,40 min,5,,digitalWrite(TRIGGER HIGH) delayMicroseconds(10) pulseIn(ECHO HIGH) distancia=duracion*0.034/2,false,robotica
+decimo-egb,Sensor Ultrasónico: HC-SR04,Mostrar en Serial Monitor,activity,30 min,6,,Imprimir distancia cada 100ms. Probar con objetos a diferentes distancias. Verificar precisión.,false,robotica
+decimo-egb,Sensor Ultrasónico: HC-SR04,LED según Distancia,activity,35 min,7,,LED verde si >30cm. LED amarillo si 15-30cm. LED rojo si <15cm. Semáforo de proximidad.,false,robotica
+decimo-egb,Sensor Ultrasónico: HC-SR04,Buzzer de Alerta,activity,30 min,8,,Buzzer suena más rápido mientras más cerca. Efecto tipo sensor de estacionamiento.,false,robotica
+decimo-egb,Algoritmo Evasión: Lógica,Diseñar el Algoritmo,tutorial,30 min,9,,Pseudocódigo: SI distancia>20cm ENTONCES adelante. SI distancia<20cm ENTONCES detener girar.,false,robotica
+decimo-egb,Algoritmo Evasión: Lógica,Implementar Decisiones,tutorial,40 min,10,,if(distancia>20) adelante(); else { detener(); delay(300); atras(); delay(500); girarDerecha(); },false,robotica
+decimo-egb,Algoritmo Evasión: Lógica,Mejorar el Algoritmo,activity,35 min,11,,Agregar búsqueda de espacio libre. Girar y medir. Elegir dirección con más espacio.,false,robotica
+decimo-egb,Algoritmo Evasión: Lógica,Evitar Esquinas,activity,40 min,12,,Problema: robot se queda atrapado en esquinas. Solución: retroceder más girar más.,false,robotica
+decimo-egb,PCB DRAGON RC: Integración,Conexiones en PCB DRAGON RC,tutorial,30 min,13,,Conectar HC-SR04 a pines de la PCB. Verificar alimentación 5V del regulador 7805.,false,robotica
+decimo-egb,PCB DRAGON RC: Integración,Verificar Regulador 7805,tutorial,25 min,14,,Medir voltaje de salida del 7805. Debe ser 5V estables. Verificar soldadura.,false,robotica
+decimo-egb,PCB DRAGON RC: Integración,Integrar Sensor + Motores,activity,45 min,15,,Código completo: medir distancia → decidir → mover motores. Loop continuo.,false,robotica
+decimo-egb,Proyecto Evita Obstáculos: Ensamblaje,Montar Sensor en Robot,project,40 min,16,,Sensor ultrasónico en parte delantera. Ángulo recto hacia adelante. Fijar con soporte.,false,robotica
+decimo-egb,Proyecto Evita Obstáculos: Ensamblaje,Ensamblaje Completo,activity,45 min,17,,Robot terminado con sensor montado. Verificar todas las conexiones. Probar alimentación.,false,robotica
+decimo-egb,Proyecto Evita Obstáculos: Ensamblaje,Cargar Código Final,tutorial,35 min,18,,Código final con todas las funciones. Ajustar distancia de detección. Velocidades.,false,robotica
+decimo-egb,Optimización: Ajustes,Ajustar Distancia de Detección,activity,30 min,19,,Probar diferentes umbrales: 15cm 20cm 30cm. Encontrar el óptimo para tu robot.,false,robotica
+decimo-egb,Optimización: Ajustes,Mejorar Giros,activity,35 min,20,,Ajustar tiempos de giro. Giros de 90° precisos. Alternar izquierda/derecha.,false,robotica
+decimo-egb,Optimización: Ajustes,Agregar Aleatoriedad,tutorial,30 min,21,,random() para elegir dirección. Evita patrones predecibles. Robot más inteligente.,false,robotica
+decimo-egb,Laberinto: Diseño,Construir Laberinto Simple,activity,45 min,22,,Paredes de cartón o madera. Pasillos de 20cm ancho. Entrada y salida clara.,false,robotica
+decimo-egb,Laberinto: Diseño,Pruebas en Laberinto,activity,40 min,23,,Probar robot en laberinto. Identificar problemas. Ajustar algoritmo.,false,robotica
+decimo-egb,Laberinto: Diseño,Optimización Final,activity,35 min,24,,Últimos ajustes para mejor rendimiento. Velocidad vs precisión.,false,robotica
+decimo-egb,Competencia: Evita Obstáculos,Reglas de Competencia,video,15 min,25,,Reglas: tiempo máximo toques permitidos. Laberinto oficial. Formato de competencia.,false,robotica
+decimo-egb,Competencia: Evita Obstáculos,Práctica Final,activity,40 min,26,,Últimas pruebas antes de competencia. Verificar batería. Código estable.,false,robotica
+decimo-egb,Competencia: Evita Obstáculos,Competencia Final Laberinto,project,60 min,27,,Competencia oficial. Robot debe salir del laberinto sin tocar paredes. Premiación.,true,robotica

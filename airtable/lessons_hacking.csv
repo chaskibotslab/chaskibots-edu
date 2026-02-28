@@ -1,0 +1,121 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked
+cuarto-egb,Hacking: Internet Seguro,¿Qué es internet?,video,15 min,1,,Red de computadoras conectadas en todo el mundo. Cómo viaja la información.,false
+cuarto-egb,Hacking: Internet Seguro,Peligros en línea,video,20 min,2,,Extraños en internet información falsa y virus informáticos.,false
+cuarto-egb,Hacking: Internet Seguro,Reglas de seguridad,activity,25 min,3,,Crear póster con las 10 reglas de seguridad en internet.,false
+cuarto-egb,Hacking: Contraseñas,Contraseñas fuertes,video,15 min,4,,Por qué necesitamos contraseñas. Ejemplos de contraseñas malas vs buenas.,false
+cuarto-egb,Hacking: Contraseñas,Crear contraseña segura,activity,25 min,5,,Técnica de frase: MiGatoTiene4Patas! Crear contraseñas memorables y seguras.,false
+cuarto-egb,Hacking: Contraseñas,Juego de contraseñas,activity,20 min,6,,Adivinar si una contraseña es fuerte o débil. Competencia por equipos.,false
+cuarto-egb,Hacking: Privacidad,Información personal,video,20 min,7,,Qué NO compartir en internet: dirección teléfono escuela fotos.,false
+cuarto-egb,Hacking: Privacidad,Huella digital,activity,25 min,8,,Todo lo que publicas queda para siempre. Analizar huella digital propia.,false
+cuarto-egb,Hacking: Privacidad,Configurar privacidad,tutorial,30 min,9,,Configurar privacidad en juegos y apps que usan los estudiantes.,false
+cuarto-egb,Hacking: Proyecto,Campaña de seguridad,project,40 min,10,,Crear campaña para enseñar seguridad a otros niños.,false
+cuarto-egb,Hacking: Proyecto,Presentación,activity,30 min,11,,Presentar campaña de seguridad a la clase.,true
+cuarto-egb,Hacking: Proyecto,Certificado Ciudadano Digital,activity,15 min,12,,Entrega de Certificado de Ciudadano Digital Seguro.,true
+quinto-egb,Hacking: Fake News,¿Qué son noticias falsas?,video,20 min,1,,Por qué existen las fake news y cómo se propagan en redes.,false
+quinto-egb,Hacking: Fake News,Verificar información,tutorial,30 min,2,,Técnicas: buscar fuente original fecha y otras fuentes que confirmen.,false
+quinto-egb,Hacking: Fake News,Detective de noticias,activity,25 min,3,,Identificar noticias falsas vs verdaderas en ejercicio práctico.,false
+quinto-egb,Hacking: Phishing,¿Qué es phishing?,video,20 min,4,,Correos y mensajes falsos que intentan robar datos personales.,false
+quinto-egb,Hacking: Phishing,Identificar phishing,tutorial,30 min,5,,Señales de alerta: errores ortográficos urgencia links sospechosos.,false
+quinto-egb,Hacking: Phishing,Juego anti-phishing,activity,25 min,6,,Identificar correos reales vs intentos de phishing.,false
+quinto-egb,Hacking: Malware,Virus y malware,video,20 min,7,,Tipos de malware: virus troyanos ransomware spyware.,false
+quinto-egb,Hacking: Malware,Proteger mi computadora,tutorial,30 min,8,,Antivirus actualizaciones y no descargar archivos sospechosos.,false
+quinto-egb,Hacking: Malware,Simulación de ataque,activity,25 min,9,,Juego de rol: qué hacer si detectamos un virus en la computadora.,false
+quinto-egb,Hacking: Proyecto,Manual de seguridad,project,45 min,10,,Crear manual ilustrado de seguridad digital para niños.,false
+quinto-egb,Hacking: Proyecto,Presentación,activity,30 min,11,,Enseñar el manual a compañeros de grados menores.,true
+quinto-egb,Hacking: Proyecto,Certificado Detective Digital,activity,15 min,12,,Entrega de Certificado de Detective Digital.,true
+sexto-egb,Hacking: Redes,¿Cómo funciona internet?,video,25 min,1,,Direcciones IP DNS servidores y clientes explicados.,false
+sexto-egb,Hacking: Redes,Mi dirección IP,tutorial,30 min,2,,Encontrar nuestra IP y entender qué información revela.,false
+sexto-egb,Hacking: Redes,Redes WiFi seguras,activity,25 min,3,,WPA2 contraseñas de router y peligros de redes públicas.,false
+sexto-egb,Hacking: Encriptación,¿Qué es encriptar?,video,20 min,4,,Mensajes secretos códigos y cifrado de información.,false
+sexto-egb,Hacking: Encriptación,Cifrado César,tutorial,35 min,5,,Implementar cifrado César en papel. Encriptar y desencriptar mensajes.,false
+sexto-egb,Hacking: Encriptación,Mensajes secretos,activity,30 min,6,,Enviar mensajes cifrados entre compañeros y descifrarlos.,false
+sexto-egb,Hacking: Autenticación,Más que contraseñas,video,20 min,7,,Autenticación de dos factores biometría y tokens de seguridad.,false
+sexto-egb,Hacking: Autenticación,Configurar 2FA,tutorial,35 min,8,,Activar autenticación de dos factores en cuentas reales.,false
+sexto-egb,Hacking: Autenticación,Gestores de contraseñas,tutorial,30 min,9,,Usar un gestor de contraseñas para mayor seguridad.,false
+sexto-egb,Hacking: Proyecto,Auditoría de seguridad,project,45 min,10,,Revisar la seguridad de sus propias cuentas y dispositivos.,false
+sexto-egb,Hacking: Proyecto,Plan de mejora,activity,30 min,11,,Crear plan personal para mejorar seguridad digital.,true
+sexto-egb,Hacking: Proyecto,Certificado Fundamentos,activity,15 min,12,,Entrega de Certificado Fundamentos de Seguridad.,true
+septimo-egb,Hacking: Hacking Ético,¿Qué es hacking ético?,video,25 min,1,,Diferencia entre hacker y cracker. Los sombreros del hacking.,false
+septimo-egb,Hacking: Hacking Ético,Legalidad y ética,video,20 min,2,,Leyes de ciberseguridad permisos y responsabilidad legal.,false
+septimo-egb,Hacking: Hacking Ético,Casos famosos,activity,30 min,3,,Analizar casos de hackers éticos famosos y sus contribuciones.,false
+septimo-egb,Hacking: Reconocimiento,OSINT básico,video,25 min,4,,Open Source Intelligence: información pública disponible.,false
+septimo-egb,Hacking: Reconocimiento,Buscar información,tutorial,35 min,5,,Google dorking básico y búsqueda en redes sociales.,false
+septimo-egb,Hacking: Reconocimiento,Perfil de objetivo,activity,30 min,6,,Crear perfil con información pública de objetivo autorizado.,false
+septimo-egb,Hacking: Vulnerabilidades,¿Qué es una vulnerabilidad?,video,25 min,7,,Errores en software que pueden ser explotados por atacantes.,false
+septimo-egb,Hacking: Vulnerabilidades,CVE y exploits,tutorial,35 min,8,,Base de datos CVE y cómo entender reportes de vulnerabilidades.,false
+septimo-egb,Hacking: Vulnerabilidades,Reportar vulnerabilidades,activity,30 min,9,,Cómo reportar bugs de forma responsable a empresas.,false
+septimo-egb,Hacking: Proyecto,CTF para principiantes,project,50 min,10,,Resolver retos de Capture The Flag nivel básico.,false
+septimo-egb,Hacking: Proyecto,Competencia CTF,activity,45 min,11,,Mini competencia CTF en clase por equipos.,true
+septimo-egb,Hacking: Proyecto,Certificado Hacker Ético Jr,activity,15 min,12,,Entrega de Certificado Hacker Ético Junior.,true
+octavo-egb,Hacking: Linux Básico,¿Por qué Linux?,video,20 min,1,,Linux en servidores y herramientas de seguridad. Distribuciones.,false
+octavo-egb,Hacking: Linux Básico,Instalación VM,tutorial,40 min,2,,VirtualBox + Ubuntu o Kali Linux. Configuración inicial.,false
+octavo-egb,Hacking: Linux Básico,Navegación terminal,tutorial,35 min,3,,Comandos: cd ls pwd mkdir rm cp mv cat. Navegación básica.,false
+octavo-egb,Hacking: Comandos,Permisos y usuarios,tutorial,40 min,4,,chmod chown sudo y gestión de usuarios en Linux.,false
+octavo-egb,Hacking: Comandos,Procesos y red,tutorial,35 min,5,,ps top netstat ifconfig ping. Monitoreo del sistema.,false
+octavo-egb,Hacking: Comandos,Scripting bash,tutorial,40 min,6,,Scripts básicos en bash para automatizar tareas.,false
+octavo-egb,Hacking: Herramientas,Nmap introducción,tutorial,45 min,7,,Escaneo de puertos y descubrimiento de servicios con Nmap.,false
+octavo-egb,Hacking: Herramientas,Wireshark básico,tutorial,45 min,8,,Capturar y analizar tráfico de red con Wireshark.,false
+octavo-egb,Hacking: Herramientas,Práctica de escaneo,activity,40 min,9,,Escanear red local con permiso y documentar hallazgos.,false
+octavo-egb,Hacking: Proyecto,Laboratorio virtual,project,50 min,10,,Configurar laboratorio de práctica con máquinas virtuales.,false
+octavo-egb,Hacking: Proyecto,Retos de terminal,activity,45 min,11,,OverTheWire Bandit niveles 1-10. Retos de línea de comandos.,true
+octavo-egb,Hacking: Proyecto,Certificado Linux Security,activity,15 min,12,,Entrega de Certificado Linux Security.,true
+noveno-egb,Hacking: Web Basics,Cómo funciona la web,video,25 min,1,,HTTP HTML CSS JavaScript servidores y navegadores.,false
+noveno-egb,Hacking: Web Basics,Herramientas del navegador,tutorial,35 min,2,,DevTools: inspeccionar elementos network console.,false
+noveno-egb,Hacking: Web Basics,Modificar páginas,activity,30 min,3,,Editar HTML y CSS en el navegador para entender estructura.,false
+noveno-egb,Hacking: OWASP Top 10,Vulnerabilidades comunes,video,30 min,4,,OWASP Top 10 y por qué es importante conocerlas.,false
+noveno-egb,Hacking: OWASP Top 10,XSS Cross-Site Scripting,tutorial,45 min,5,,Qué es XSS cómo funciona y cómo prevenirlo.,false
+noveno-egb,Hacking: OWASP Top 10,Práctica XSS,activity,40 min,6,,Laboratorio XSS en entorno controlado y seguro.,false
+noveno-egb,Hacking: SQL Injection,¿Qué es SQLi?,video,25 min,7,,Bases de datos consultas SQL e inyección de código.,false
+noveno-egb,Hacking: SQL Injection,Práctica SQLi,tutorial,50 min,8,,Laboratorio de SQL injection en entorno de práctica.,false
+noveno-egb,Hacking: SQL Injection,Prevención,tutorial,35 min,9,,Prepared statements y sanitización de inputs.,false
+noveno-egb,Hacking: Proyecto,DVWA,project,55 min,10,,Damn Vulnerable Web App: resolver retos de seguridad web.,false
+noveno-egb,Hacking: Proyecto,Reporte de seguridad,activity,40 min,11,,Escribir reporte profesional de vulnerabilidades encontradas.,true
+noveno-egb,Hacking: Proyecto,Certificado Web Security,activity,15 min,12,,Entrega de Certificado Web Security.,true
+decimo-egb,Hacking: Metodología,Fases del pentesting,video,30 min,1,,Reconocimiento escaneo explotación y reporte profesional.,false
+decimo-egb,Hacking: Metodología,Alcance y reglas,video,25 min,2,,Definir scope obtener permisos y reglas de engagement.,false
+decimo-egb,Hacking: Metodología,Documentación,tutorial,35 min,3,,Tomar notas evidencias y screenshots durante pentesting.,false
+decimo-egb,Hacking: Reconocimiento,OSINT avanzado,tutorial,45 min,4,,Maltego theHarvester y Shodan para reconocimiento.,false
+decimo-egb,Hacking: Reconocimiento,Enumeración,tutorial,45 min,5,,Nmap avanzado enum4linux dirb y gobuster.,false
+decimo-egb,Hacking: Reconocimiento,Práctica recon,activity,40 min,6,,Reconocimiento completo de objetivo de práctica autorizado.,false
+decimo-egb,Hacking: Explotación,Metasploit intro,tutorial,50 min,7,,Arquitectura de Metasploit módulos y payloads.,false
+decimo-egb,Hacking: Explotación,Exploit básico,tutorial,50 min,8,,Explotar vulnerabilidad conocida en máquina de práctica.,false
+decimo-egb,Hacking: Explotación,Post-explotación,tutorial,45 min,9,,Qué hacer después de obtener acceso. Persistencia y pivoting.,false
+decimo-egb,Hacking: Proyecto,CTF intermedio,project,60 min,10,,Resolver máquina de HackTheBox o TryHackMe nivel fácil.,false
+decimo-egb,Hacking: Proyecto,Reporte profesional,activity,45 min,11,,Escribir reporte de pentesting con formato profesional.,true
+decimo-egb,Hacking: Proyecto,Certificado Pentester Jr,activity,15 min,12,,Entrega de Certificado Pentester Junior.,true
+primero-bach,Hacking: Redes,Ataques de red,video,30 min,1,,ARP spoofing MITM y DNS poisoning explicados.,false
+primero-bach,Hacking: Redes,Práctica MITM,tutorial,55 min,2,,Ettercap y Bettercap en laboratorio controlado.,false
+primero-bach,Hacking: Redes,Defensa de red,tutorial,45 min,3,,Detectar y prevenir ataques de red. IDS e IPS.,false
+primero-bach,Hacking: Wireless,WiFi hacking,video,30 min,4,,WEP WPA WPA2 y captura de handshakes.,false
+primero-bach,Hacking: Wireless,Aircrack-ng,tutorial,55 min,5,,Capturar handshake y crackear contraseña WiFi en lab.,false
+primero-bach,Hacking: Wireless,Seguridad WiFi,tutorial,45 min,6,,Configurar WiFi seguro y detectar redes maliciosas.,false
+primero-bach,Hacking: Passwords,Cracking de contraseñas,video,25 min,7,,Hashes rainbow tables y wordlists para cracking.,false
+primero-bach,Hacking: Passwords,John the Ripper,tutorial,50 min,8,,Crackear hashes comunes con John the Ripper.,false
+primero-bach,Hacking: Passwords,Hashcat,tutorial,50 min,9,,GPU cracking y reglas avanzadas con Hashcat.,false
+primero-bach,Hacking: Proyecto,Máquina completa,project,70 min,10,,Resolver máquina de dificultad media en HackTheBox.,false
+primero-bach,Hacking: Proyecto,Writeup técnico,activity,50 min,11,,Documentar proceso completo de resolución.,true
+primero-bach,Hacking: Proyecto,Certificado Ethical Hacker,activity,15 min,12,,Entrega de Certificado Ethical Hacker.,true
+segundo-bach,Hacking: Social Engineering,Ingeniería social,video,30 min,1,,Phishing pretexting baiting y técnicas de manipulación.,false
+segundo-bach,Hacking: Social Engineering,Crear phishing,tutorial,55 min,2,,GoPhish y páginas falsas en laboratorio controlado.,false
+segundo-bach,Hacking: Social Engineering,Defensa SE,activity,45 min,3,,Entrenar a detectar y resistir ataques de ingeniería social.,false
+segundo-bach,Hacking: Privilege Escalation,Linux privesc,tutorial,55 min,4,,Técnicas de escalación de privilegios en Linux.,false
+segundo-bach,Hacking: Privilege Escalation,Windows privesc,tutorial,55 min,5,,Técnicas de escalación de privilegios en Windows.,false
+segundo-bach,Hacking: Privilege Escalation,Práctica privesc,activity,50 min,6,,Máquinas de práctica para escalación de privilegios.,false
+segundo-bach,Hacking: Active Directory,AD fundamentals,video,30 min,7,,Dominios usuarios grupos y GPOs en Active Directory.,false
+segundo-bach,Hacking: Active Directory,AD attacks,tutorial,60 min,8,,Kerberoasting Pass-the-Hash y ataques a AD.,false
+segundo-bach,Hacking: Active Directory,AD defense,tutorial,50 min,9,,Hardening y defensa de Active Directory.,false
+segundo-bach,Hacking: Proyecto,Red Team exercise,project,75 min,10,,Ejercicio completo de red team en entorno simulado.,false
+segundo-bach,Hacking: Proyecto,Presentación ejecutiva,activity,50 min,11,,Presentar hallazgos a directivos simulados.,true
+segundo-bach,Hacking: Proyecto,Certificado Red Team,activity,15 min,12,,Entrega de Certificado Red Team Operator.,true
+tercero-bach,Hacking: Blue Team,SOC operations,video,30 min,1,,Security Operations Center roles y responsabilidades.,false
+tercero-bach,Hacking: Blue Team,SIEM basics,tutorial,55 min,2,,Splunk o ELK para análisis de logs y alertas.,false
+tercero-bach,Hacking: Blue Team,Incident response,tutorial,50 min,3,,Proceso de respuesta a incidentes de seguridad.,false
+tercero-bach,Hacking: Forensics,Digital forensics,video,30 min,4,,Evidencia digital cadena de custodia y análisis forense.,false
+tercero-bach,Hacking: Forensics,Análisis de disco,tutorial,55 min,5,,Autopsy para análisis de discos y recuperar archivos.,false
+tercero-bach,Hacking: Forensics,Análisis de memoria,tutorial,55 min,6,,Volatility para análisis de memoria RAM.,false
+tercero-bach,Hacking: Malware,Análisis de malware,video,30 min,7,,Tipos de malware comportamiento y técnicas de análisis.,false
+tercero-bach,Hacking: Malware,Análisis estático,tutorial,55 min,8,,Strings PE headers imports y análisis sin ejecutar.,false
+tercero-bach,Hacking: Malware,Análisis dinámico,tutorial,55 min,9,,Sandbox y análisis de comportamiento en VM aislada.,false
+tercero-bach,Hacking: Capstone,Proyecto final,project,80 min,10,,Investigación completa de incidente de seguridad simulado.,false
+tercero-bach,Hacking: Capstone,Reporte forense,activity,55 min,11,,Documentación profesional de investigación forense.,true
+tercero-bach,Hacking: Capstone,Certificación Cybersecurity,activity,20 min,12,,Entrega de Certificado Cybersecurity Professional.,true

@@ -1,0 +1,87 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked,programId
+cuarto-egb,Kit Extra: Introducción,Conociendo el Kit Extra,video,15 min,1,,Presentación de componentes: LEDs resistencias pulsadores potenciómetro buzzer cables jumper cinta de cobre pila CR2032.,false,robotica
+cuarto-egb,Kit Extra: Introducción,Seguridad con Electricidad,video,10 min,2,,Reglas de seguridad: no tocar cables pelados no conectar mal las pilas. Voltajes seguros.,false,robotica
+cuarto-egb,Kit Extra: Introducción,Identificar Componentes,activity,20 min,3,,Actividad: identificar cada componente del kit. Nombrarlos y conocer su función básica.,false,robotica
+cuarto-egb,Kit Extra: LED Básico,¿Qué es un LED?,video,15 min,4,,LED = Diodo Emisor de Luz. Tiene polaridad: pata larga (+) pata corta (-). Colores disponibles.,false,robotica
+cuarto-egb,Kit Extra: LED Básico,Práctica 1: Encender LED,activity,25 min,5,,Conectar LED con pila CR2032. Observar polaridad. LED enciende si está bien conectado.,false,robotica
+cuarto-egb,Kit Extra: LED Básico,¿Por qué usar Resistencia?,video,12 min,6,,Sin resistencia el LED se quema. Resistencia limita la corriente. 220Ω es valor común.,false,robotica
+cuarto-egb,Kit Extra: LED Básico,Práctica 2: LED con Resistencia,activity,30 min,7,,Circuito: Pila → Resistencia 220Ω → LED → Pila. Verificar que enciende correctamente.,false,robotica
+cuarto-egb,Kit Extra: Pulsador,¿Qué es un Pulsador?,video,12 min,8,,Pulsador = interruptor momentáneo. Presionar cierra circuito. Soltar abre circuito.,false,robotica
+cuarto-egb,Kit Extra: Pulsador,Práctica 3: LED con Pulsador,activity,30 min,9,,Agregar pulsador al circuito. Presionar → LED enciende. Soltar → LED apaga.,false,robotica
+cuarto-egb,Kit Extra: Pulsador,Circuito con 2 LEDs,activity,35 min,10,,Dos LEDs en paralelo. Un pulsador enciende ambos. Practicar conexiones.,false,robotica
+cuarto-egb,Kit Extra: Potenciómetro,¿Qué es un Potenciómetro?,video,12 min,11,,Potenciómetro = resistencia variable. Girar cambia resistencia. Controla voltaje.,false,robotica
+cuarto-egb,Kit Extra: Potenciómetro,Práctica 4: Controlar Brillo,activity,35 min,12,,Potenciómetro controla brillo del LED. Girar → más/menos brillante. Divisor de voltaje.,false,robotica
+cuarto-egb,Kit Extra: Buzzer,¿Qué es un Buzzer?,video,10 min,13,,Buzzer = componente que hace sonido. Buzzer activo vs pasivo. Frecuencia = tono.,false,robotica
+cuarto-egb,Kit Extra: Buzzer,Práctica 5: Hacer Sonido,activity,30 min,14,,Conectar buzzer con pila. Escuchar el sonido. Probar con pulsador para activar.,false,robotica
+cuarto-egb,Kit Extra: Buzzer,Alarma Simple,activity,35 min,15,,Circuito: Pulsador activa buzzer + LED. Sistema de alarma básico.,false,robotica
+cuarto-egb,Kit Extra: Proyecto,Proyecto: Tarjeta Musical,project,45 min,16,,Crear tarjeta que al abrirla enciende LED y suena buzzer. Decorar con dibujos.,false,robotica
+cuarto-egb,Robot Pintor: Introducción,¿Qué es un Robot Pintor?,video,15 min,17,,Robot que dibuja usando vibración. Motor con leva excéntrica genera movimiento.,false,robotica
+cuarto-egb,Robot Pintor: Introducción,Componentes del Robot,video,12 min,18,,Base acrílica ruedas motor DC portapilas interruptor marcadores. Identificar cada parte.,false,robotica
+cuarto-egb,Robot Pintor: Ensamblaje,Ensamblar Base y Ruedas,activity,30 min,19,,Fijar ruedas traseras con tornillos. Porta-marcador como tercera pata. Base estable.,false,robotica
+cuarto-egb,Robot Pintor: Ensamblaje,Instalar Motor y Leva,activity,35 min,20,,Fijar motor en centro. Instalar leva descentrada en eje. Girar a mano → vibración.,false,robotica
+cuarto-egb,Robot Pintor: Ensamblaje,Conectar Circuito,tutorial,40 min,21,,Conectar: portapilas → interruptor → motor. Verificar que motor gira al encender.,false,robotica
+cuarto-egb,Robot Pintor: Pruebas,Primeras Pruebas,activity,30 min,22,,Colocar marcador. Encender robot. Observar patrones que dibuja. Ajustar si necesario.,false,robotica
+cuarto-egb,Robot Pintor: Pruebas,Diferentes Superficies,activity,25 min,23,,Probar en papel blanco cartulina. Diferentes marcadores = diferentes colores.,false,robotica
+cuarto-egb,Robot Pintor: Competencia,Competencia de Arte,project,45 min,24,,Competencia: patrón más creativo. Votar por el mejor dibujo. Premios.,true,robotica
+quinto-egb,Kit Extra: Repaso,Repaso Rápido Kit Extra,activity,25 min,1,,Repaso de componentes: LED resistencia pulsador potenciómetro buzzer. Armar circuito completo.,false,robotica
+quinto-egb,Kit Extra: Repaso,Circuitos Más Complejos,activity,35 min,2,,Múltiples LEDs en serie y paralelo. Entender diferencias. Practicar conexiones.,false,robotica
+quinto-egb,Kit Extra: Transistor,¿Qué es un Transistor?,video,15 min,3,,Transistor 2N2222A como switch electrónico. Base Colector Emisor. Amplifica señales.,false,robotica
+quinto-egb,Kit Extra: Transistor,Práctica: Transistor como Switch,activity,40 min,4,,Usar transistor para encender LED con señal pequeña. Amplificación de corriente.,false,robotica
+quinto-egb,Kit Extra: Avanzado,Circuito Integrado Completo,activity,45 min,5,,Proyecto: Pulsador → Transistor → Buzzer + LED. Sistema de alarma mejorado.,false,robotica
+quinto-egb,Kit Extra: Avanzado,Semáforo con LEDs,project,50 min,6,,3 LEDs (rojo amarillo verde). Simular semáforo con tiempos. Usar pulsador para cambiar.,false,robotica
+quinto-egb,Carro Jet: Introducción,Concepto de Propulsión,video,20 min,7,,Acción-reacción: empujar aire hacia atrás = avanzar. Hélices y ventiladores.,false,robotica
+quinto-egb,Carro Jet: Introducción,Componentes del Carro Jet,video,15 min,8,,Chasis 4 ruedas motor DC hélice portapilas interruptor. Identificar cada parte.,false,robotica
+quinto-egb,Carro Jet: Ensamblaje,Ensamblar Chasis,activity,30 min,9,,Fijar 4 ruedas al chasis. Verificar que giran libremente. Base estable.,false,robotica
+quinto-egb,Carro Jet: Ensamblaje,Instalar Motor y Hélice,activity,35 min,10,,Fijar motor en parte trasera. Instalar hélice bien ajustada. ⚠️No tocar hélice girando.,false,robotica
+quinto-egb,Carro Jet: Ensamblaje,Conectar Circuito,tutorial,35 min,11,,Conectar: portapilas → interruptor → motor. Verificar dirección de la hélice.,false,robotica
+quinto-egb,Carro Jet: Pruebas,Pruebas de Propulsión,activity,30 min,12,,Encender motor. Sentir el viento de la hélice. Probar en superficie lisa.,false,robotica
+quinto-egb,Carro Jet: Pruebas,Ajustar Dirección,activity,25 min,13,,Si el carro no va recto ajustar ruedas. Verificar balance de peso.,false,robotica
+quinto-egb,Carro Jet: Competencia,Carrera de Velocidad,project,45 min,14,,Pista de 3 metros. Competencia de velocidad. El más rápido gana. Premios.,true,robotica
+quinto-egb,Robot Perro: Introducción,Biomimética,video,20 min,15,,Bio(vida)+Mímesis(imitar). Robots que imitan animales. Cómo caminan los perros.,false,robotica
+quinto-egb,Robot Perro: Introducción,Componentes del Robot Perro,video,15 min,16,,Cuerpo 4 patas articuladas motor central levas desfasadas. Mecanismo de caminata.,false,robotica
+quinto-egb,Robot Perro: Ensamblaje,Ensamblar Cuerpo,activity,35 min,17,,Armar estructura del cuerpo. Fijar motor central. Preparar articulaciones.,false,robotica
+quinto-egb,Robot Perro: Ensamblaje,Instalar Patas,activity,40 min,18,,4 levas desfasadas 90°. Conectar a patas. Girar a mano → patas se mueven alternadas.,false,robotica
+quinto-egb,Robot Perro: Ensamblaje,Conectar Circuito,tutorial,35 min,19,,Conectar: portapilas → interruptor → motor. Verificar movimiento de patas.,false,robotica
+quinto-egb,Robot Perro: Decoración,Decorar el Robot,activity,30 min,20,,Agregar ojos cola nariz de cartulina. Personalizar con colores y stickers.,false,robotica
+quinto-egb,Robot Perro: Pruebas,Pruebas de Caminata,activity,35 min,21,,Probar en superficie plana. Ajustar si alguna pata no toca el piso.,false,robotica
+quinto-egb,Robot Perro: Competencia,Exposición de Robots,project,45 min,22,,Presentar los 3 robots del año a padres. Explicar funcionamiento. Certificados.,true,robotica
+sexto-egb,Kit Extra: Aplicaciones,Mini-Proyectos con Kit Extra,activity,40 min,1,,Semáforo automático. Sistema de seguridad con buzzer. Indicador de nivel con LEDs.,false,robotica
+sexto-egb,Kit Extra: Aplicaciones,Proyectos Personalizados,activity,45 min,2,,Crear proyecto propio usando componentes del kit. Creatividad y aplicación.,false,robotica
+sexto-egb,Carro Solar: Introducción,Energía Fotovoltaica,video,25 min,3,,¿Cómo funcionan celdas solares? Luz → electricidad. Energía renovable limpia.,false,robotica
+sexto-egb,Carro Solar: Introducción,Componentes del Carro Solar,video,15 min,4,,Panel solar 6V chasis ligero 2 motores pequeños 4 ruedas. Identificar partes.,false,robotica
+sexto-egb,Carro Solar: Ensamblaje,Ensamblar Chasis,activity,35 min,5,,Chasis ligero plástico o cartón. Instalar 4 ruedas eficientes. Base estable.,false,robotica
+sexto-egb,Carro Solar: Ensamblaje,Instalar Panel Solar,activity,30 min,6,,Panel solar en techo del carro. Ángulo óptimo hacia el sol. Fijar con pegamento.,false,robotica
+sexto-egb,Carro Solar: Ensamblaje,Conectar Motores,tutorial,40 min,7,,Conectar panel solar a motores. Sin baterías: funciona solo con luz solar.,false,robotica
+sexto-egb,Carro Solar: Pruebas,Pruebas con Sol,activity,35 min,8,,Probar exterior con sol directo. Interior con lámpara potente. Medir rendimiento.,false,robotica
+sexto-egb,Carro Solar: Pruebas,Optimizar Rendimiento,activity,30 min,9,,Ajustar ángulo del panel. Reducir peso. Mejorar eficiencia de ruedas.,false,robotica
+sexto-egb,Carro Solar: Competencia,Competencia Solar,project,45 min,10,,Competencia: ¿cuánto tiempo funciona después de 1 hora de carga? Premios.,false,robotica
+sexto-egb,Robot 4 en 1: Introducción,Robot Multifunción,video,20 min,11,,Robot con 4 modos diferentes. Sensores como sentidos del robot. Autonomía.,false,robotica
+sexto-egb,Robot 4 en 1: Introducción,Componentes del Robot,video,15 min,12,,Chasis robusto 2 motores driver L293D sensores varios portapilas central.,false,robotica
+sexto-egb,Robot 4 en 1: Construcción,Ensamblar Base,project,45 min,13,,Construir chasis robusto. Espacio para 4 sistemas de sensores. Motores instalados.,false,robotica
+sexto-egb,Robot 4 en 1: Modo 1,Control por Sonido,activity,40 min,14,,Micrófono electret detecta sonido. 1 palmada=avanza 2=gira 3=detiene. Circuito amplificador.,false,robotica
+sexto-egb,Robot 4 en 1: Modo 2,Control Infrarrojo,activity,45 min,15,,Receptor IR y control remoto. Comandos: adelante atrás izquierda derecha stop.,false,robotica
+sexto-egb,Robot 4 en 1: Modo 3,Seguidor de Línea,activity,50 min,16,,2 sensores IR parte inferior. Detectan línea negra sobre blanco. Lógica de seguimiento.,false,robotica
+sexto-egb,Robot 4 en 1: Modo 4,Evita Obstáculos Táctil,activity,45 min,17,,2 bumpers (switches) adelante. Toca obstáculo → retrocede → gira 90° → continúa.,false,robotica
+sexto-egb,Robot 4 en 1: Competencias,Comparación de Modos,activity,40 min,18,,Carrera con cada modo. ¿Cuál más preciso? ¿Más rápido? ¿Más autónomo?,false,robotica
+sexto-egb,Robot 4 en 1: Competencias,Competencia Final,project,60 min,19,,Competencia usando los 4 modos. Premiación por categorías. Certificados.,true,robotica
+septimo-egb,Kit Extra: Experto,Kit Extra Rápido,activity,30 min,1,,Las 6 prácticas en una semana. Ya dominan componentes. Mayor velocidad y autonomía.,false,robotica
+septimo-egb,Kit Extra: Experto,Proyectos Creativos,activity,40 min,2,,Crear proyecto propio innovador. Combinar múltiples componentes. Presentar idea.,false,robotica
+septimo-egb,Programación Visual: Intro,Scratch/Blockly Introducción,tutorial,40 min,3,,Programación sin código. Bloques tipo puzzle. Conceptos: secuencias bucles condicionales.,false,robotica
+septimo-egb,Programación Visual: Intro,Programa 1: Secuencia,activity,35 min,4,,Crear secuencia simple de movimientos. Entender orden de ejecución.,false,robotica
+septimo-egb,Programación Visual: Intro,Programa 2: Bucles,activity,40 min,5,,Usar bloque repetir. Animaciones que se repiten. Eficiencia en código.,false,robotica
+septimo-egb,Programación Visual: Intro,Programa 3: Condicionales,activity,45 min,6,,Bloque si-entonces. Reaccionar a eventos. Interactividad.,false,robotica
+septimo-egb,Programación Visual: Intro,Programa 4: Variables,activity,40 min,7,,Crear variables. Contador de puntos. Guardar información.,false,robotica
+septimo-egb,Carro Robot: Planificación,Robot Multi-Sensor,video,25 min,8,,Robot con 3 sensores: ultrasónico IR bumpers. Todo integrado. Planificación.,false,robotica
+septimo-egb,Carro Robot: Construcción,Construcción del Chasis,project,50 min,9,,Chasis grande para sensores. Driver L298N. Conexiones organizadas. Cable management.,false,robotica
+septimo-egb,Carro Robot: Construcción,Instalar Sensores,activity,45 min,10,,Montar sensores en posiciones correctas. Verificar conexiones. Probar individualmente.,false,robotica
+septimo-egb,Carro Robot: Lógica,Pseudocódigo del Robot,tutorial,35 min,11,,Escribir lógica en papel: SI obstáculo a 20cm ENTONCES detener y girar.,false,robotica
+septimo-egb,Carro Robot: Lógica,Diseñar Comportamiento,activity,40 min,12,,Usar bloques de simulador para diseñar comportamiento. Ajustar sensibilidad.,false,robotica
+septimo-egb,Carro Robot: Pruebas,Probar Cada Sensor,activity,40 min,13,,Probar ultrasónico solo. Luego IR. Luego bumpers. Verificar funcionamiento.,false,robotica
+septimo-egb,Carro Robot: Pruebas,Combinar Sensores,activity,45 min,14,,Todos los sensores juntos. Pista con línea + obstáculos. Ajustar tiempos.,false,robotica
+septimo-egb,Robot 4en1 Mejorado: Construcción,Versión Mejorada,project,50 min,15,,Mismos 4 modos que 6° pero mejorados. Sensores más sensibles. Mejor control.,false,robotica
+septimo-egb,Robot 4en1 Mejorado: Personalización,Personalizar con Bloques,activity,45 min,16,,Usar bloques para diseñar comportamiento personalizado. Velocidades variables.,false,robotica
+septimo-egb,Robot 4en1 Mejorado: Secuencias,Secuencias Complejas,activity,50 min,17,,Programar: avanza → detecta línea → sigue 1m → busca obstáculo → empuja.,false,robotica
+septimo-egb,Preparación 8°: Microcontroladores,Introducción a Microcontroladores,video,30 min,18,,¿Qué es microcontrolador? Arduino vs ESP32. Pines digitales vs analógicos.,false,robotica
+septimo-egb,Preparación 8°: Microcontroladores,Primer Contacto con Código,tutorial,40 min,19,,Ver código Arduino IDE sin programar. Estructura: setup() loop(). Leer código Blink.,false,robotica
+septimo-egb,Preparación 8°: Microcontroladores,Comparar Bloques vs Código,activity,35 min,20,,Mismo programa en Scratch y en Arduino. Entender la equivalencia.,false,robotica
+septimo-egb,Competencia: Final,Competencia Multi-Robot,project,60 min,21,,Competencia con robots del año. Diferentes categorías. Premiación final.,true,robotica

@@ -11,6 +11,7 @@ const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRT
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const levelId = searchParams.get('levelId')
+  const programId = searchParams.get('programId')
 
   try {
     let url = AIRTABLE_API_URL + '?sort[0][field]=name&sort[0][direction]=asc'
@@ -33,17 +34,24 @@ export async function GET(request: Request) {
     
     let simulators = data.records.map((record: any) => ({
       id: record.fields.id || record.id,
+      recordId: record.id,
       name: record.fields.name || '',
       description: record.fields.description || '',
       icon: record.fields.icon || 'code',
       url: record.fields.url || '',
       levels: record.fields.levels ? record.fields.levels.split(',').map((l: string) => l.trim()) : [],
+      programs: record.fields.programs ? record.fields.programs.split(',').map((p: string) => p.trim()) : ['robotica', 'ia', 'hacking'],
       enabled: record.fields.enabled !== false,
     }))
 
     // Filtrar por nivel si se especifica
     if (levelId) {
       simulators = simulators.filter((sim: any) => sim.levels.includes(levelId) && sim.enabled)
+    }
+
+    // Filtrar por programa si se especifica
+    if (programId) {
+      simulators = simulators.filter((sim: any) => sim.programs.includes(programId) && sim.enabled)
     }
 
     return NextResponse.json(simulators)
@@ -72,6 +80,7 @@ export async function POST(request: Request) {
             icon: body.icon,
             url: body.url,
             levels: Array.isArray(body.levels) ? body.levels.join(',') : body.levels,
+            programs: Array.isArray(body.programs) ? body.programs.join(',') : (body.programs || 'robotica,ia,hacking'),
             enabled: body.enabled !== false,
           }
         }]
@@ -107,6 +116,7 @@ export async function PUT(request: Request) {
     if (body.icon) fields.icon = body.icon
     if (body.url) fields.url = body.url
     if (body.levels !== undefined) fields.levels = Array.isArray(body.levels) ? body.levels.join(',') : body.levels
+    if (body.programs !== undefined) fields.programs = Array.isArray(body.programs) ? body.programs.join(',') : body.programs
     if (body.enabled !== undefined) fields.enabled = body.enabled
 
     const response = await fetch(AIRTABLE_API_URL, {

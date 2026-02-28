@@ -1,0 +1,173 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked
+inicial-1,IA: Robots que Aprenden,¿Qué es un robot inteligente?,video,10 min,1,,Diferencia entre robot normal y robot que piensa. Videos de robots mascotas que reconocen a sus dueños.,false
+inicial-1,IA: Robots que Aprenden,Robots que reconocen caras,activity,15 min,2,,Juego: mostrar fotos de familia y el robot (títere) reconoce quién es cada persona.,false
+inicial-1,IA: Robots que Escuchan,Robots que entienden palabras,video,10 min,3,,Asistentes de voz como Alexa y Google. El robot escucha y responde a lo que decimos.,false
+inicial-1,IA: Robots que Escuchan,Dar órdenes al robot,activity,20 min,4,,Juego de roles: un niño es el robot y otros dan comandos simples como caminar o saltar.,false
+inicial-1,IA: Robots que Ven,Robots con ojos,video,10 min,5,,Las cámaras son los ojos del robot. Robots que siguen objetos de colores.,false
+inicial-1,IA: Robots que Ven,Clasificar colores,activity,15 min,6,,Actividad: clasificar objetos por color como lo haría un robot inteligente.,false
+inicial-1,IA: Mi Robot Amigo,Dibujar mi robot inteligente,project,25 min,7,,Proyecto final: dibujar un robot que pueda hacer algo especial como ayudar en casa.,true
+inicial-1,IA: Mi Robot Amigo,Presentación de robots,activity,20 min,8,,Cada niño presenta su robot dibujado y explica qué puede hacer.,true
+inicial-2,IA: Decisiones Simples,Si llueve uso paraguas,video,12 min,1,,Concepto de si...entonces. Decisiones que tomamos cada día sin pensar.,false
+inicial-2,IA: Decisiones Simples,El robot que decide,activity,20 min,2,,Juego con tarjetas: situaciones donde el robot debe elegir qué hacer.,false
+inicial-2,IA: Patrones,Encontrar patrones,video,10 min,3,,Secuencias de colores y formas. Los robots buscan patrones para aprender.,false
+inicial-2,IA: Patrones,Completar secuencias,activity,25 min,4,,Actividad con bloques: completar patrones de colores formas y tamaños.,false
+inicial-2,IA: Clasificación,Agrupar objetos,video,12 min,5,,Robots que clasifican: frutas juguetes colores. Cómo aprenden a agrupar.,false
+inicial-2,IA: Clasificación,Juego de clasificación,activity,25 min,6,,Clasificar objetos del aula en grupos por tamaño color o uso.,false
+inicial-2,IA: Robot Clasificador,Construir clasificador,project,30 min,7,,Proyecto: crear un robot de cartón que clasifica objetos en cajas.,true
+inicial-2,IA: Robot Clasificador,Feria de robots,activity,25 min,8,,Presentación a padres de los robots clasificadores creados.,true
+primero-egb,IA: Secuencias,¿Qué es una secuencia?,video,15 min,1,,Pasos para lavarse las manos vestirse o hacer un sándwich. Todo tiene orden.,false
+primero-egb,IA: Secuencias,Ordenar pasos,activity,25 min,2,,Tarjetas con pasos desordenados que deben ordenarse correctamente.,false
+primero-egb,IA: Secuencias,Mi rutina diaria,project,30 min,3,,Dibujar los pasos de la rutina matutina en orden correcto.,false
+primero-egb,IA: Algoritmos,Instrucciones para robots,video,15 min,4,,Un algoritmo es como una receta. Instrucciones paso a paso claras.,false
+primero-egb,IA: Algoritmos,Robot humano,activity,30 min,5,,Un niño es robot y otros dan instrucciones para llegar a un punto del aula.,false
+primero-egb,IA: Algoritmos,Laberinto en papel,activity,25 min,6,,Escribir instrucciones con flechas para salir del laberinto.,false
+primero-egb,IA: Scratch Jr,Conociendo Scratch Jr,tutorial,20 min,7,,Interfaz de Scratch Jr. Bloques básicos de movimiento y sonido.,false
+primero-egb,IA: Scratch Jr,Mi primer programa,activity,30 min,8,,Hacer que el gato camine de un lado a otro de la pantalla.,false
+primero-egb,IA: Scratch Jr,Historia animada,project,35 min,9,,Crear una historia simple con 2 personajes que interactúan.,false
+primero-egb,IA: Proyecto Final,Planificar mi juego,video,15 min,10,,Ideas para crear un juego simple en Scratch Jr.,false
+primero-egb,IA: Proyecto Final,Crear mi juego,project,40 min,11,,Juego simple donde un personaje recoge objetos.,true
+primero-egb,IA: Proyecto Final,Presentación,activity,30 min,12,,Mostrar los juegos creados a toda la clase.,true
+segundo-egb,IA: Condicionales,Si...entonces,video,15 min,1,,Decisiones en la vida: si tengo hambre entonces como.,false
+segundo-egb,IA: Condicionales,Juego de decisiones,activity,25 min,2,,Tarjetas: Si el semáforo está rojo entonces... completar la acción.,false
+segundo-egb,IA: Condicionales,Scratch Jr condicionales,tutorial,30 min,3,,Bloque al tocar en Scratch Jr para crear interacciones.,false
+segundo-egb,IA: Bucles,Repetir acciones,video,15 min,4,,Cosas que repetimos: caminar respirar parpadear. Los bucles en programación.,false
+segundo-egb,IA: Bucles,Dibujar con bucles,activity,30 min,5,,Dibujar patrones usando repetir 4 veces: línea giro.,false
+segundo-egb,IA: Bucles,Bucles en Scratch Jr,tutorial,30 min,6,,Bloque repetir para crear animaciones que se repiten.,false
+segundo-egb,IA: Combinando,Condicionales + Bucles,video,15 min,7,,Combinar decisiones con repeticiones para programas más complejos.,false
+segundo-egb,IA: Combinando,Juego interactivo,project,40 min,8,,Crear juego donde el personaje reacciona al tocarlo.,false
+segundo-egb,IA: Combinando,Mejorando mi juego,activity,35 min,9,,Agregar sonidos y más interacciones al juego.,false
+segundo-egb,IA: Proyecto Final,Diseñar mi app,video,15 min,10,,Planificar una aplicación simple con varias pantallas.,false
+segundo-egb,IA: Proyecto Final,Crear mi app,project,45 min,11,,Aplicación con múltiples pantallas e interacciones.,true
+segundo-egb,IA: Proyecto Final,Feria de apps,activity,30 min,12,,Presentar aplicaciones a compañeros y recibir feedback.,true
+tercero-egb,IA: ¿Qué es ML?,Máquinas que aprenden,video,20 min,1,,Diferencia entre programar reglas vs aprender de ejemplos.,false
+tercero-egb,IA: ¿Qué es ML?,Juego de adivinanzas,activity,25 min,2,,Juego: adivinar animal con preguntas sí/no como árbol de decisión.,false
+tercero-egb,IA: ¿Qué es ML?,Teachable Machine intro,tutorial,30 min,3,,Conocer Teachable Machine de Google y sus posibilidades.,false
+tercero-egb,IA: Clasificación,Clasificar imágenes,video,15 min,4,,Cómo la IA reconoce gatos vs perros usando ejemplos.,false
+tercero-egb,IA: Clasificación,Entrenar clasificador,tutorial,35 min,5,,Crear clasificador de 3 objetos en Teachable Machine.,false
+tercero-egb,IA: Clasificación,Mi clasificador,project,40 min,6,,Clasificador personalizado de útiles escolares frutas u otros objetos.,false
+tercero-egb,IA: Reconocimiento,Reconocer sonidos,video,15 min,7,,IA que reconoce sonidos: aplausos silbidos palabras específicas.,false
+tercero-egb,IA: Reconocimiento,Entrenar con sonidos,tutorial,35 min,8,,Clasificador de sonidos en Teachable Machine con micrófono.,false
+tercero-egb,IA: Reconocimiento,Proyecto de sonidos,project,40 min,9,,Crear detector de sonidos personalizado para uso práctico.,false
+tercero-egb,IA: Proyecto Final,Planificar proyecto IA,video,15 min,10,,Ideas para proyecto final con Teachable Machine.,false
+tercero-egb,IA: Proyecto Final,Desarrollar proyecto,project,50 min,11,,Proyecto libre: clasificador útil para la vida diaria.,true
+tercero-egb,IA: Proyecto Final,Exposición,activity,30 min,12,,Presentar proyectos y explicar cómo aprende la IA.,true
+cuarto-egb,IA: Scratch Avanzado,Repaso Scratch,tutorial,25 min,1,,Variables listas y bloques personalizados en Scratch.,false
+cuarto-egb,IA: Scratch Avanzado,Extensiones de IA,video,20 min,2,,Extensiones de Scratch: reconocimiento de voz y video sensing.,false
+cuarto-egb,IA: Scratch Avanzado,Video Sensing,tutorial,35 min,3,,Detectar movimiento con la cámara en proyectos de Scratch.,false
+cuarto-egb,IA: Reconocimiento,Reconocimiento de voz,tutorial,30 min,4,,Extensión de voz en Scratch. Crear comandos por voz.,false
+cuarto-egb,IA: Reconocimiento,Juego controlado por voz,project,45 min,5,,Crear juego que responde a comandos de voz del jugador.,false
+cuarto-egb,IA: Reconocimiento,Mejoras y ajustes,activity,35 min,6,,Mejorar precisión del reconocimiento y agregar más comandos.,false
+cuarto-egb,IA: Chatbots,¿Qué es un chatbot?,video,20 min,7,,Asistentes virtuales y bots de atención al cliente.,false
+cuarto-egb,IA: Chatbots,Crear chatbot simple,tutorial,40 min,8,,Chatbot en Scratch con respuestas predefinidas a preguntas.,false
+cuarto-egb,IA: Chatbots,Chatbot inteligente,project,45 min,9,,Agregar más respuestas y personalidad al chatbot.,false
+cuarto-egb,IA: Proyecto Final,Diseñar asistente,video,15 min,10,,Planificar asistente virtual personalizado con múltiples funciones.,false
+cuarto-egb,IA: Proyecto Final,Desarrollar asistente,project,50 min,11,,Asistente que responde preguntas y ejecuta acciones.,true
+cuarto-egb,IA: Proyecto Final,Demo Day,activity,35 min,12,,Presentación de asistentes virtuales creados.,true
+quinto-egb,IA: ML Conceptos,Datos de entrenamiento,video,20 min,1,,Importancia de buenos datos. Qué es el sesgo en datos.,false
+quinto-egb,IA: ML Conceptos,Recolectar datos,activity,30 min,2,,Crear dataset propio con imágenes o texto para entrenar modelo.,false
+quinto-egb,IA: ML Conceptos,Machine Learning for Kids,tutorial,35 min,3,,Plataforma ML for Kids. Crear cuenta y primer proyecto.,false
+quinto-egb,IA: Texto,Clasificar texto,video,20 min,4,,Análisis de sentimientos y clasificación spam vs no spam.,false
+quinto-egb,IA: Texto,Entrenar con texto,tutorial,40 min,5,,Clasificador de texto en ML for Kids con ejemplos propios.,false
+quinto-egb,IA: Texto,Detector de emociones,project,45 min,6,,Clasificar texto como feliz triste o enojado automáticamente.,false
+quinto-egb,IA: Números,Predicciones numéricas,video,20 min,7,,Predecir valores: temperatura precios notas usando datos.,false
+quinto-egb,IA: Números,Modelo de predicción,tutorial,40 min,8,,Crear modelo que predice basado en números históricos.,false
+quinto-egb,IA: Números,Proyecto de predicción,project,45 min,9,,Predecir algo útil: clima notas o tendencias.,false
+quinto-egb,IA: Proyecto Final,Problema real,video,15 min,10,,Identificar problema real que ML puede ayudar a resolver.,false
+quinto-egb,IA: Proyecto Final,Solución con ML,project,55 min,11,,Desarrollar solución completa usando Machine Learning.,true
+quinto-egb,IA: Proyecto Final,Pitch de proyecto,activity,35 min,12,,Presentar proyecto como si fuera a inversionistas.,true
+sexto-egb,IA: IA en Robots,Robots inteligentes,video,20 min,1,,Robots que usan IA: aspiradoras drones carros autónomos.,false
+sexto-egb,IA: IA en Robots,Sensores como sentidos,activity,30 min,2,,Mapear sensores del robot a sentidos humanos: vista oído tacto.,false
+sexto-egb,IA: IA en Robots,Comportamiento reactivo,tutorial,35 min,3,,Programar robot que reacciona a estímulos del ambiente.,false
+sexto-egb,IA: Visión,Visión artificial básica,video,20 min,4,,Cómo los robots ven con cámaras y procesan imágenes.,false
+sexto-egb,IA: Visión,Detectar colores,tutorial,40 min,5,,Usar cámara para detectar y seguir colores específicos.,false
+sexto-egb,IA: Visión,Robot sigue color,project,50 min,6,,Robot que sigue objeto de color específico automáticamente.,false
+sexto-egb,IA: Voz,Control por voz,video,20 min,7,,Robots que obedecen comandos de voz del usuario.,false
+sexto-egb,IA: Voz,Integrar reconocimiento,tutorial,45 min,8,,Agregar control de voz al robot usando micrófono.,false
+sexto-egb,IA: Voz,Robot asistente,project,50 min,9,,Robot que responde a comandos de voz y ejecuta acciones.,false
+sexto-egb,IA: Proyecto Final,Robot inteligente,video,15 min,10,,Planificar robot con múltiples capacidades de IA integradas.,false
+sexto-egb,IA: Proyecto Final,Construcción,project,60 min,11,,Desarrollar robot con IA integrada: visión voz y decisiones.,true
+sexto-egb,IA: Proyecto Final,Competencia,activity,45 min,12,,Competencia de robots inteligentes con diferentes retos.,true
+septimo-egb,IA: Python Básico,¿Por qué Python?,video,15 min,1,,Python es el lenguaje de la IA. Instalación y configuración.,false
+septimo-egb,IA: Python Básico,Variables y tipos,tutorial,35 min,2,,int float string bool. Funciones print() e input().,false
+septimo-egb,IA: Python Básico,Condicionales y bucles,tutorial,40 min,3,,if/else for while. Ejercicios básicos de programación.,false
+septimo-egb,IA: Listas y Funciones,Listas en Python,tutorial,35 min,4,,Crear modificar y recorrer listas de datos.,false
+septimo-egb,IA: Listas y Funciones,Funciones,tutorial,40 min,5,,Definir funciones con parámetros y return.,false
+septimo-egb,IA: Listas y Funciones,Mini-proyecto,project,45 min,6,,Juego de adivinanzas programado en Python.,false
+septimo-egb,IA: Librerías IA,NumPy básico,tutorial,40 min,7,,Arrays y operaciones matemáticas con NumPy.,false
+septimo-egb,IA: Librerías IA,Matplotlib,tutorial,35 min,8,,Crear gráficos simples para visualizar datos.,false
+septimo-egb,IA: Librerías IA,Análisis de datos,project,50 min,9,,Analizar dataset simple con gráficos y estadísticas.,false
+septimo-egb,IA: Proyecto Final,Planificar proyecto,video,15 min,10,,Ideas de proyectos con Python para resolver problemas.,false
+septimo-egb,IA: Proyecto Final,Desarrollar,project,55 min,11,,Proyecto de análisis de datos con visualizaciones.,true
+septimo-egb,IA: Proyecto Final,Presentación,activity,35 min,12,,Mostrar resultados código y conclusiones del proyecto.,true
+octavo-egb,IA: Repaso Python,Repaso estructuras,tutorial,30 min,1,,Repaso rápido de Python básico: variables funciones bucles.,false
+octavo-egb,IA: Repaso Python,Pandas intro,tutorial,40 min,2,,DataFrames leer CSV y explorar datos con Pandas.,false
+octavo-egb,IA: Repaso Python,Limpieza de datos,tutorial,40 min,3,,Valores nulos tipos de datos y normalización de datasets.,false
+octavo-egb,IA: Scikit-learn,Introducción sklearn,video,20 min,4,,Qué es scikit-learn instalación y estructura básica.,false
+octavo-egb,IA: Scikit-learn,Clasificación KNN,tutorial,45 min,5,,K-Nearest Neighbors. Entrenar modelo y hacer predicciones.,false
+octavo-egb,IA: Scikit-learn,Clasificador Iris,project,50 min,6,,Clasificar flores con el famoso dataset Iris.,false
+octavo-egb,IA: Más Modelos,Árboles de decisión,tutorial,45 min,7,,Decision Trees. Entrenar y visualizar el árbol de decisiones.,false
+octavo-egb,IA: Más Modelos,Regresión lineal,tutorial,40 min,8,,Predecir valores continuos con regresión lineal.,false
+octavo-egb,IA: Más Modelos,Proyecto predicción,project,50 min,9,,Predecir precios de casas con dataset simple.,false
+octavo-egb,IA: Proyecto Final,Dataset propio,video,15 min,10,,Encontrar o crear dataset interesante para proyecto.,false
+octavo-egb,IA: Proyecto Final,Modelo completo,project,60 min,11,,Pipeline completo: datos modelo predicción evaluación.,true
+octavo-egb,IA: Proyecto Final,Presentación técnica,activity,40 min,12,,Explicar modelo métricas y resultados obtenidos.,true
+noveno-egb,IA: Redes Neuronales,¿Qué es una neurona?,video,25 min,1,,Neurona biológica vs artificial. Pesos bias y activación.,false
+noveno-egb,IA: Redes Neuronales,Perceptrón simple,tutorial,45 min,2,,Implementar perceptrón desde cero en Python.,false
+noveno-egb,IA: Redes Neuronales,Red multicapa,video,20 min,3,,Capas ocultas y funciones de activación en redes profundas.,false
+noveno-egb,IA: TensorFlow/Keras,Instalación TF,tutorial,30 min,4,,Instalar TensorFlow y Keras. Verificar instalación.,false
+noveno-egb,IA: TensorFlow/Keras,Primera red,tutorial,50 min,5,,Red simple para clasificar dígitos escritos a mano MNIST.,false
+noveno-egb,IA: TensorFlow/Keras,Entrenar y evaluar,tutorial,45 min,6,,Epochs batch size accuracy y loss. Interpretar métricas.,false
+noveno-egb,IA: Imágenes,CNNs introducción,video,25 min,7,,Convolutional Neural Networks para clasificar imágenes.,false
+noveno-egb,IA: Imágenes,Clasificador imágenes,tutorial,55 min,8,,CNN para clasificar imágenes del dataset CIFAR-10.,false
+noveno-egb,IA: Imágenes,Transfer Learning,tutorial,45 min,9,,Usar modelos pre-entrenados para nuevas tareas.,false
+noveno-egb,IA: Proyecto Final,Definir problema,video,15 min,10,,Elegir problema de clasificación de imágenes propio.,false
+noveno-egb,IA: Proyecto Final,Desarrollar CNN,project,65 min,11,,Entrenar modelo CNN con dataset propio o personalizado.,true
+noveno-egb,IA: Proyecto Final,Demo y análisis,activity,45 min,12,,Demostrar modelo funcionando y analizar errores.,true
+decimo-egb,IA: NLP Básico,Procesamiento de texto,video,25 min,1,,Tokenización stemming y lemmatization de texto.,false
+decimo-egb,IA: NLP Básico,NLTK introducción,tutorial,45 min,2,,Librería NLTK para procesar texto en Python.,false
+decimo-egb,IA: NLP Básico,Análisis sentimientos,project,50 min,3,,Clasificar reviews como positivas o negativas automáticamente.,false
+decimo-egb,IA: Chatbots,Chatbots con Python,video,20 min,4,,Arquitectura de chatbots y cómo funcionan internamente.,false
+decimo-egb,IA: Chatbots,Chatbot rule-based,tutorial,50 min,5,,Chatbot con reglas y patrones de respuesta.,false
+decimo-egb,IA: Chatbots,Chatbot con ML,project,55 min,6,,Chatbot que aprende de conversaciones anteriores.,false
+decimo-egb,IA: Visión,OpenCV introducción,tutorial,45 min,7,,Leer imágenes aplicar filtros y detectar bordes.,false
+decimo-egb,IA: Visión,Detección de rostros,tutorial,50 min,8,,Haar cascades para detectar caras en imágenes y video.,false
+decimo-egb,IA: Visión,Proyecto visión,project,55 min,9,,Sistema de reconocimiento facial simple funcional.,false
+decimo-egb,IA: Proyecto Final,Propuesta proyecto,video,15 min,10,,Definir proyecto de IA aplicada a problema real.,false
+decimo-egb,IA: Proyecto Final,Desarrollo,project,70 min,11,,Implementar solución completa de IA aplicada.,true
+decimo-egb,IA: Proyecto Final,Presentación,activity,45 min,12,,Demo código y documentación del proyecto.,true
+primero-bach,IA: Deep Learning,RNNs y LSTMs,video,30 min,1,,Redes recurrentes para procesar secuencias de datos.,false
+primero-bach,IA: Deep Learning,Predicción series,tutorial,55 min,2,,Predecir valores futuros con LSTM en series temporales.,false
+primero-bach,IA: Deep Learning,Generación texto,project,60 min,3,,Generar texto automáticamente con red neuronal recurrente.,false
+primero-bach,IA: GANs,Redes generativas,video,25 min,4,,Generative Adversarial Networks y cómo funcionan.,false
+primero-bach,IA: GANs,GAN simple,tutorial,60 min,5,,Implementar GAN básica para generar datos sintéticos.,false
+primero-bach,IA: GANs,Generar imágenes,project,65 min,6,,GAN para generar imágenes simples como dígitos.,false
+primero-bach,IA: Deployment,APIs con Flask,tutorial,50 min,7,,Crear API REST para servir modelo de Machine Learning.,false
+primero-bach,IA: Deployment,Frontend simple,tutorial,45 min,8,,Interfaz web para consumir API del modelo.,false
+primero-bach,IA: Deployment,Deploy en cloud,tutorial,50 min,9,,Subir modelo a Heroku Railway o servicio similar.,false
+primero-bach,IA: Proyecto Final,Proyecto completo,video,15 min,10,,Planificar proyecto end-to-end con todas las fases.,false
+primero-bach,IA: Proyecto Final,Desarrollo full,project,75 min,11,,Modelo + API + Frontend funcionando en producción.,true
+primero-bach,IA: Proyecto Final,Presentación,activity,50 min,12,,Demo en vivo y documentación técnica completa.,true
+segundo-bach,IA: Ética en IA,Sesgo en algoritmos,video,30 min,1,,Casos de sesgo racial y de género en sistemas de IA.,false
+segundo-bach,IA: Ética en IA,Detectar sesgo,tutorial,50 min,2,,Analizar datasets para identificar sesgos problemáticos.,false
+segundo-bach,IA: Ética en IA,IA responsable,activity,45 min,3,,Debate: ¿debe la IA tomar decisiones importantes sobre personas?,false
+segundo-bach,IA: Reinforcement,RL introducción,video,30 min,4,,Agentes entornos recompensas y aprendizaje por refuerzo.,false
+segundo-bach,IA: Reinforcement,Q-Learning,tutorial,55 min,5,,Implementar algoritmo Q-Learning para agente simple.,false
+segundo-bach,IA: Reinforcement,Juego con RL,project,60 min,6,,Entrenar agente para jugar juego simple automáticamente.,false
+segundo-bach,IA: LLMs,Large Language Models,video,30 min,7,,GPT BERT y arquitectura de transformers explicada.,false
+segundo-bach,IA: LLMs,APIs de LLMs,tutorial,50 min,8,,Usar API de OpenAI o alternativas para crear aplicaciones.,false
+segundo-bach,IA: LLMs,Aplicación con LLM,project,60 min,9,,Crear aplicación útil usando Large Language Model.,false
+segundo-bach,IA: Proyecto Final,Investigación,video,20 min,10,,Elegir tema de investigación actual en IA.,false
+segundo-bach,IA: Proyecto Final,Paper técnico,project,70 min,11,,Escribir documento técnico de investigación en IA.,true
+segundo-bach,IA: Proyecto Final,Defensa,activity,50 min,12,,Presentar y defender investigación ante evaluadores.,true
+tercero-bach,IA: Estado del Arte,Tendencias IA 2024+,video,30 min,1,,AGI modelos multimodales y edge AI. El futuro de la IA.,false
+tercero-bach,IA: Estado del Arte,Papers científicos,tutorial,50 min,2,,Cómo leer y entender papers de ML e IA de conferencias.,false
+tercero-bach,IA: Estado del Arte,Replicar paper,project,60 min,3,,Implementar algoritmo descrito en paper científico.,false
+tercero-bach,IA: MLOps,Pipelines de ML,video,25 min,4,,MLflow experimentos y versionado de modelos.,false
+tercero-bach,IA: MLOps,Automatización,tutorial,55 min,5,,Pipeline automatizado de entrenamiento y evaluación.,false
+tercero-bach,IA: MLOps,CI/CD para ML,tutorial,50 min,6,,Tests automáticos y deployment continuo de modelos.,false
+tercero-bach,IA: Especialización,Computer Vision avanzado,tutorial,55 min,7,,Segmentación semántica y detección de objetos avanzada.,false
+tercero-bach,IA: Especialización,NLP avanzado,tutorial,55 min,8,,Transformers fine-tuning y modelos de lenguaje.,false
+tercero-bach,IA: Especialización,Proyecto especializado,project,65 min,9,,Proyecto en área de especialización elegida.,false
+tercero-bach,IA: Capstone,Definir capstone,video,20 min,10,,Proyecto final de graduación: definir alcance y objetivos.,false
+tercero-bach,IA: Capstone,Desarrollo capstone,project,80 min,11,,Proyecto completo publicable en portafolio profesional.,true
+tercero-bach,IA: Capstone,Presentación final,activity,60 min,12,,Defensa del proyecto ante jurado externo.,true

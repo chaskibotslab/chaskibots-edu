@@ -13,7 +13,7 @@ import {
   Users, BookOpen, Settings, LogOut, Home, Bell,
   Plus, Edit, Trash2, Eye, Lock, Unlock, Search,
   ChevronRight, Clock, Shield, GraduationCap,
-  BarChart3, Activity, Key, Mail, Save, X, Package, Brain, FileText
+  BarChart3, Activity, Key, Mail, Save, X, Package, Brain, FileText, Monitor
 } from 'lucide-react'
 
 type AdminTab = 'dashboard' | 'courses' | 'users' | 'logs' | 'settings'
@@ -421,6 +421,21 @@ export default function AdminPage() {
                     <div>
                       <h4 className="text-white font-semibold">Gestionar Kits</h4>
                       <p className="text-gray-400 text-sm">Kits, imágenes, precios</p>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/admin/simuladores"
+                  className="bg-dark-800 rounded-xl p-6 border border-dark-600 hover:border-green-500/50 transition-all group text-left"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                      <Monitor className="w-6 h-6 text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold">Simuladores</h4>
+                      <p className="text-gray-400 text-sm">Por nivel y programa</p>
                     </div>
                   </div>
                 </Link>

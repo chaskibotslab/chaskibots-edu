@@ -1,0 +1,35 @@
+levelId,moduleName,taskTitle,taskType,description,dueWeek,points,category
+cuarto-egb,Kit Extra: LED Básico,Dibujo de circuito LED,dibujo,Dibuja el circuito de LED con resistencia y pila. Etiqueta cada componente.,2,10,robotica
+cuarto-egb,Kit Extra: Pulsador,Circuito con 2 LEDs,práctica,Arma circuito con pulsador que encienda 2 LEDs al mismo tiempo. Toma foto.,4,15,robotica
+cuarto-egb,Kit Extra: Proyecto,Tarjeta Musical,proyecto,Crea tarjeta que al abrirla enciende LED y suena buzzer. Decora creativamente.,6,25,robotica
+cuarto-egb,Robot Pintor: Competencia,Arte con Robot Pintor,proyecto,Crea 3 obras de arte diferentes con tu robot pintor. Presenta la mejor.,8,30,robotica
+quinto-egb,Kit Extra: Transistor,Circuito con Transistor,práctica,Arma circuito donde transistor amplifica señal para encender LED brillante.,2,15,robotica
+quinto-egb,Kit Extra: Avanzado,Semáforo Funcional,proyecto,Construye semáforo con 3 LEDs que cambie con pulsador. Video funcionando.,4,25,robotica
+quinto-egb,Carro Jet: Competencia,Carrera de Velocidad,proyecto,Participa en carrera de 3 metros. Registra tu mejor tiempo.,6,20,robotica
+quinto-egb,Robot Perro: Competencia,Exposición Robot Perro,proyecto,Presenta tu robot perro decorado. Explica cómo funciona el mecanismo de patas.,8,30,robotica
+sexto-egb,Kit Extra: Aplicaciones,Proyecto Personalizado,proyecto,Crea proyecto propio usando mínimo 4 componentes del kit. Presenta funcionamiento.,2,25,robotica
+sexto-egb,Carro Solar: Competencia,Competencia Solar,proyecto,Carga tu carro 1 hora al sol. Mide cuánto tiempo funciona. Registra datos.,4,20,robotica
+sexto-egb,Robot 4 en 1: Modo 3,Seguidor de Línea,práctica,Graba video de tu robot siguiendo línea de 1 metro sin salirse.,6,25,robotica
+sexto-egb,Robot 4 en 1: Competencias,Competencia 4 Modos,proyecto,Participa en competencia usando los 4 modos. Documenta resultados.,8,35,robotica
+septimo-egb,Programación Visual: Intro,Programa con Bucles,práctica,Crea programa en Scratch con mínimo 3 bucles diferentes. Comparte enlace.,3,20,robotica
+septimo-egb,Programación Visual: Intro,Juego Interactivo,proyecto,Crea juego en Scratch con condicionales y variables. Mínimo 100 puntos posibles.,5,30,robotica
+septimo-egb,Carro Robot: Lógica,Pseudocódigo Robot,actividad,Escribe pseudocódigo completo para robot que evita obstáculos y sigue línea.,7,20,robotica
+septimo-egb,Competencia: Final,Competencia Multi-Robot,proyecto,Participa en competencia final. Documenta preparación y resultados.,9,40,robotica
+octavo-egb,Kit Extra: Componentes Básicos,6 Prácticas Documentadas,práctica,Documenta las 6 prácticas del Kit Extra con fotos y explicaciones.,2,25,robotica
+octavo-egb,PCB DRAGON RC V2.0: LEDs,Secuencia Knight Rider,práctica,Programa secuencia de LEDs tipo Knight Rider. Video funcionando.,4,20,robotica
+octavo-egb,PCB DRAGON RC V2.0: Botones,Toggle con Estado,práctica,Programa toggle de LED con botón. Código comentado y video.,5,20,robotica
+octavo-egb,TB6612FNG: Control de Motores,Funciones de Movimiento,práctica,Crea librería con funciones: adelante() atras() girarIzq() girarDer() detener(). Código documentado.,7,30,robotica
+octavo-egb,Bluetooth: Control Inalámbrico,Control desde Celular,práctica,Controla robot desde celular con app Bluetooth. Video demostrando todos los comandos.,9,25,robotica
+octavo-egb,Proyecto RC: Ensamblaje,Robot RC Completo,proyecto,Robot RC ensamblado y funcionando. Video de 1 minuto mostrando todas las funciones.,11,40,robotica
+octavo-egb,Proyecto RC: Competencia,Competencia Final RC,proyecto,Participa en competencia de obstáculos. Documenta tu mejor tiempo y estrategia.,12,50,robotica
+noveno-egb,Sensores IR: Fundamentos,Tabla de Estados IR,actividad,Documenta los 4 estados posibles de 2 sensores IR con diagramas y explicación.,3,15,robotica
+noveno-egb,Lógica Seguidor: Programación,Código Seguidor Comentado,práctica,Código completo del seguidor de línea con comentarios explicando cada sección.,5,25,robotica
+noveno-egb,PCB RC DRAGON V2: Seguidor,Robot Seguidor Ensamblado,proyecto,Robot seguidor ensamblado con sensores calibrados. Video siguiendo línea de 2 metros.,7,35,robotica
+noveno-egb,Calibración: Ajustes Finos,Documentación de Calibración,actividad,Documenta proceso de calibración: altura de sensores velocidades tiempos de giro.,9,20,robotica
+noveno-egb,Competencia: Seguidor de Línea,Competencia Final Seguidor,proyecto,Participa en competencia. Registra tu mejor tiempo. Análisis de mejoras posibles.,11,50,robotica
+decimo-egb,Sensor Ultrasónico: HC-SR04,Código Medidor de Distancia,práctica,Código que mide distancia y muestra en Serial Monitor. Pruebas a 10cm 30cm 50cm.,3,20,robotica
+decimo-egb,Sensor Ultrasónico: HC-SR04,Semáforo de Proximidad,práctica,Sistema con 3 LEDs que indica distancia. Video demostrando los 3 estados.,5,25,robotica
+decimo-egb,Algoritmo Evasión: Lógica,Algoritmo Documentado,actividad,Pseudocódigo y diagrama de flujo del algoritmo de evasión de obstáculos.,7,20,robotica
+decimo-egb,Proyecto Evita Obstáculos: Ensamblaje,Robot Evita Obstáculos,proyecto,Robot ensamblado con sensor ultrasónico. Video navegando sin chocar por 30 segundos.,9,40,robotica
+decimo-egb,Laberinto: Diseño,Laberinto Construido,proyecto,Construye laberinto de mínimo 1m x 1m. Documenta con fotos y medidas.,10,25,robotica
+decimo-egb,Competencia: Evita Obstáculos,Competencia Final Laberinto,proyecto,Participa en competencia de laberinto. Documenta estrategia y resultado.,12,50,robotica
