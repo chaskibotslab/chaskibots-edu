@@ -19,6 +19,7 @@ import CourseAuthGuard from '@/components/CourseAuthGuard'
 import TasksPanel from '@/components/TasksPanel'
 import { useAuth } from '@/components/AuthProvider'
 import ModuleAccordion from '@/components/ModuleAccordion'
+import LessonViewer from '@/components/LessonViewer'
 
 interface APILesson {
   id: string
@@ -161,6 +162,22 @@ export default function NivelPage() {
     acc[key].push(lesson)
     return acc
   }, {} as Record<string, APILesson[]>)
+
+  // Encontrar la lección seleccionada
+  const currentLesson = apiLessons.find(l => l.id === selectedLesson)
+  
+  // Navegación entre lecciones
+  const currentLessonIndex = apiLessons.findIndex(l => l.id === selectedLesson)
+  const handleNextLesson = () => {
+    if (currentLessonIndex < apiLessons.length - 1) {
+      setSelectedLesson(apiLessons[currentLessonIndex + 1].id)
+    }
+  }
+  const handlePrevLesson = () => {
+    if (currentLessonIndex > 0) {
+      setSelectedLesson(apiLessons[currentLessonIndex - 1].id)
+    }
+  }
 
   if (levelLoading) {
     return (
@@ -732,6 +749,26 @@ export default function NivelPage() {
           </div>
         )
       })()}
+
+      {/* Modal de Lección Detallada */}
+      {currentLesson && selectedLesson && (
+        <LessonViewer
+          lesson={{
+            id: currentLesson.id,
+            title: currentLesson.title,
+            moduleName: currentLesson.moduleName,
+            type: currentLesson.type,
+            duration: currentLesson.duration,
+            content: currentLesson.content,
+            videoUrl: currentLesson.videoUrl,
+            images: currentLesson.images
+          }}
+          programId={selectedProgram}
+          onClose={() => setSelectedLesson(null)}
+          onNext={handleNextLesson}
+          onPrev={handlePrevLesson}
+        />
+      )}
 
       {/* Modal de Zoom para Imágenes */}
       {zoomImage && (
