@@ -7,18 +7,7 @@ export const dynamic = 'force-dynamic'
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
 
-// Tablas de lecciones por programa
-const LESSONS_TABLES: Record<string, string> = {
-  robotica: 'lessons',
-  ia: 'lessons_ia',
-  hacking: 'lessons_hacking'
-}
-
-function getAirtableUrl(programId: string = 'robotica'): string {
-  const table = LESSONS_TABLES[programId] || 'lessons'
-  return `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${table}`
-}
-
+// URL base de Airtable - usa una sola tabla 'lessons' con filtro por programId
 const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/lessons`
 
 function getVideoEmbedUrl(url: string): string {
@@ -55,10 +44,22 @@ export async function GET(request: Request) {
     }
 
     console.log('[Lessons API] Consultando Airtable para:', programId, levelId || 'todos')
-    let url = getAirtableUrl(programId)
+    let url = AIRTABLE_API_URL
     
+    // Construir filtro combinando levelId y programId
+    const filters: string[] = []
     if (levelId) {
-      url += `?filterByFormula={levelId}="${levelId}"&sort[0][field]=order&sort[0][direction]=asc`
+      filters.push(`{levelId}="${levelId}"`)
+    }
+    if (programId) {
+      filters.push(`{programId}="${programId}"`)
+    }
+    
+    if (filters.length > 0) {
+      const formula = filters.length === 1 
+        ? filters[0] 
+        : `AND(${filters.join(',')})`
+      url += `?filterByFormula=${encodeURIComponent(formula)}&sort[0][field]=order&sort[0][direction]=asc`
     } else {
       url += `?sort[0][field]=order&sort[0][direction]=asc`
     }

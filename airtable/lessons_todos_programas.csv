@@ -1,0 +1,715 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked,programId,simulatorId
+inicial-1,Bienvenida al Mundo Tech,¡Hola! Bienvenidos al curso,video,5 min,1,,Introducción al mundo de la tecnología para los más pequeños,false,robotica,scratch
+inicial-1,Bienvenida al Mundo Tech,¿Qué es un robot?,video,8 min,2,,Conociendo qué son los robots y dónde los encontramos,false,robotica,scratch
+inicial-1,Bienvenida al Mundo Tech,Robots en nuestra vida,activity,15 min,3,,Actividad: Identificar robots en casa y la escuela,false,robotica,scratch
+inicial-1,Bienvenida al Mundo Tech,Colores de la tecnología,activity,10 min,4,,Aprendemos los colores de los LEDs y componentes,false,robotica,scratch
+inicial-1,Conociendo Mi Kit,Mi caja de herramientas,video,10 min,5,,Exploramos los componentes del kit inicial,false,robotica,scratch
+inicial-1,Conociendo Mi Kit,LEDs mágicos,activity,15 min,6,,Encendemos nuestro primer LED,false,robotica,scratch
+inicial-1,Conociendo Mi Kit,Circuito con stickers,project,20 min,7,,Proyecto: Crear un circuito decorativo con stickers conductores,false,robotica,scratch
+inicial-1,Conociendo Mi Kit,Mi primer robot de papel,project,25 min,8,,Construir un robot simple con materiales reciclados,true,robotica,scratch
+inicial-2,Electricidad Básica,¿Qué necesita electricidad?,video,15 min,1,,Clasificar objetos que usan electricidad. Circuito abierto vs cerrado.,false,robotica,scratch
+inicial-2,Electricidad Básica,Primer Circuito con LED,activity,25 min,2,,Pegar cinta de cobre en plantilla. Colocar pila CR2032 y LED.,false,robotica,scratch
+inicial-2,Circuitos Creativos,Circuito en Paralelo,activity,30 min,3,,Crear circuito con 2 LEDs. Si un LED falla el otro funciona.,false,robotica,scratch
+inicial-2,Circuitos Creativos,Proyecto Arte Eléctrico,project,35 min,4,,Decorar circuito con dibujos. Agregar más LEDs de colores.,false,robotica,scratch
+inicial-2,Generador Eólico,Energía Renovable,video,15 min,5,,¿De dónde viene electricidad? Energía renovable vs no renovable.,false,robotica,scratch
+inicial-2,Generador Eólico,Experimentos con Viento,activity,25 min,6,,Soplar→LED enciende. Viento suave vs fuerte. LED más/menos brillante.,false,robotica,scratch
+inicial-2,Introducción Robots,¿Qué es un Robot?,video,20 min,7,,Videos de robots. Robot = máquina que hace tareas sola.,false,robotica,scratch
+inicial-2,Introducción Robots,Feria de Robótica,project,30 min,8,,Presentar proyectos a padres. Certificado Pequeño Ingeniero.,true,robotica,scratch
+primero-egb,Robot Pintor,Base y Ruedas,activity,30 min,1,,Ensamblar base acrílica. Instalar 2 ruedas traseras con tornillos.,false,robotica,scratch
+primero-egb,Robot Pintor,Motor y Leva Excéntrica,activity,35 min,2,,Fijar motor en centro. Instalar leva descentrada en eje.,false,robotica,scratch
+primero-egb,Robot Pintor,Soldadura Supervisada,tutorial,40 min,3,,Soldadura con cautín supervisión 1:1. Soldar portapilas→interruptor→motor.,false,robotica,scratch
+primero-egb,Robot Pintor,Pruebas y Competencia,project,35 min,4,,Colocar marcador. Robot dibuja patrones al vibrar. Competencia.,false,robotica,scratch
+primero-egb,Carro Jet,Concepto de Propulsión,video,20 min,5,,Acción-reacción. Ensamblar chasis. Instalar 4 ruedas.,false,robotica,scratch
+primero-egb,Carro Jet,Motor y Hélice,activity,35 min,6,,Fijar motor en parte trasera. Instalar hélice bien ajustada.,false,robotica,scratch
+primero-egb,Carro Jet,Circuito Eléctrico Jet,tutorial,40 min,7,,Soldadura del circuito. Motor gira→hélice empuja aire.,false,robotica,scratch
+primero-egb,Carro Jet,Carreras y Conceptos,activity,30 min,8,,Pista de 3 metros. Competencia velocidad. Intro IA.,false,robotica,scratch
+primero-egb,Robot Perro,Biomimética,video,20 min,9,,Bio(vida)+Mímesis(imitar). Cómo caminan perros.,false,robotica,scratch
+primero-egb,Robot Perro,Mecanismo de Caminata,activity,40 min,10,,Motor central con 4 levas desfasadas 90°. Conectar a patas.,false,robotica,scratch
+primero-egb,Robot Perro,Circuito y Decoración,tutorial,35 min,11,,Soldar circuito. Decorar: ojos cola de cartulina nariz.,false,robotica,scratch
+primero-egb,Robot Perro,Exposición Final,project,45 min,12,,Presentar 3 robots a padres. Explicar funcionamiento. Certificados.,true,robotica,scratch
+segundo-egb,Pez Robótico,Movimiento Ondulatorio,video,20 min,1,,Cómo nadan peces (cola se mueve lado a lado).,false,robotica,scratch
+segundo-egb,Pez Robótico,Motor y Mecanismo,activity,35 min,2,,Motor genera oscilación. Barra conecta motor a cola.,false,robotica,scratch
+segundo-egb,Pez Robótico,Impermeabilización,tutorial,40 min,3,,Sellar compartimento motor con silicona. Soldar circuito.,false,robotica,scratch
+segundo-egb,Pez Robótico,Pruebas en Agua,project,35 min,4,,Piscina inflable. ¿Flota? ¿Se mueve? Competencia de natación.,false,robotica,scratch
+segundo-egb,Lámpara Moderna,Diseño y Planificación,video,20 min,5,,Tipos de lámparas. Boceto personal. Ensamblar estructura.,false,robotica,scratch
+segundo-egb,Lámpara Moderna,Circuito 5 LEDs Paralelo,activity,40 min,6,,5 LEDs en paralelo diferentes colores. Calcular resistencias.,false,robotica,scratch
+segundo-egb,Lámpara Moderna,Soldadura Compleja,tutorial,45 min,7,,Supervisión 1:2. Soldar 5 LEDs + resistencias.,false,robotica,scratch
+segundo-egb,Lámpara Moderna,Decoración y Exposición,project,35 min,8,,Pantalla decorativa. Pintar base. Galería de lámparas.,false,robotica,scratch
+segundo-egb,Carro RC,Control Remoto Conceptos,video,20 min,9,,¿Cómo funcionan controles remotos? (ondas radio).,false,robotica,scratch
+segundo-egb,Carro RC,Sistema de Dirección,activity,40 min,10,,Servomotor para volante. Calibrar ángulos.,false,robotica,scratch
+segundo-egb,Carro RC,Circuito RC Completo,tutorial,45 min,11,,Receptor RF + controlador. Soldar conexiones.,false,robotica,scratch
+segundo-egb,Carro RC,Carreras y Competencias,project,40 min,12,,Pista con curvas. Control a distancia. Slalom.,true,robotica,scratch
+tercero-egb,Carrusel Giratorio,Mecanismos Rotacionales,video,20 min,1,,Cómo funcionan carruseles. Base giratoria central.,false,robotica,scratch
+tercero-egb,Carrusel Giratorio,Transmisión Vertical,activity,40 min,2,,Motor horizontal→eje vertical. Engranajes cónicos 90°.,false,robotica,scratch
+tercero-egb,Carrusel Giratorio,Iluminación Decorativa,tutorial,35 min,3,,LEDs en borde giratorio. Contactos rotatorios.,false,robotica,scratch
+tercero-egb,Carrusel Giratorio,Decoración y Música,project,40 min,4,,Pintar carrusel. Buzzer con melodía. Presentación.,false,robotica,scratch
+tercero-egb,Planeador Motorizado,Aerodinámica Básica,video,20 min,5,,Por qué vuelan aviones (sustentación).,false,robotica,scratch
+tercero-egb,Planeador Motorizado,Motor de Propulsión,activity,40 min,6,,Hélice frontal. Balance centro de gravedad.,false,robotica,scratch
+tercero-egb,Planeador Motorizado,Circuito de Vuelo,tutorial,35 min,7,,Batería ligera LiPo 3.7V. Interruptor de seguridad.,false,robotica,scratch
+tercero-egb,Planeador Motorizado,Vuelos de Prueba,project,45 min,8,,Solo exterior. Lanzar y observar. Competencia distancia.,false,robotica,scratch
+tercero-egb,Carro Eólico,Energía del Viento,video,20 min,9,,Molinos históricos. Diseñar aspas grandes.,false,robotica,scratch
+tercero-egb,Carro Eólico,Transmisión Eólica,activity,40 min,10,,Viento→aspas→eje→ruedas. Sistema de engranajes.,false,robotica,scratch
+tercero-egb,Carro Eólico,Optimización,activity,35 min,11,,Diferentes tamaños aspas. Medir eficiencia.,false,robotica,scratch
+tercero-egb,Carro Eólico,Carreras Eólicas,project,45 min,12,,Pista con ventiladores. Energía renovable en transporte.,true,robotica,scratch
+cuarto-egb,Kit Extra Introducción,Conociendo los Componentes,video,20 min,1,,LEDs resistencias pulsadores potenciómetro buzzer transistor,false,robotica,scratch
+cuarto-egb,Kit Extra Introducción,Seguridad Eléctrica,video,15 min,2,,Reglas básicas de seguridad con electricidad,false,robotica,scratch
+cuarto-egb,Kit Extra LED,Polaridad del LED,video,15 min,3,,Ánodo y cátodo. Pata larga = positivo,false,robotica,scratch
+cuarto-egb,Kit Extra LED,¿Por qué usar resistencia?,video,15 min,4,,Protección del LED. Cálculo básico 220Ω,false,robotica,scratch
+cuarto-egb,Kit Extra LED,Circuito LED completo,activity,30 min,5,,LED con resistencia 220Ω. Conexión correcta,false,robotica,scratch
+cuarto-egb,Kit Extra LED,LEDs de diferentes colores,activity,25 min,6,,Experimentar con rojo verde amarillo azul,false,robotica,scratch
+cuarto-egb,Kit Extra Pulsador,¿Qué es un pulsador?,video,15 min,7,,Interruptores momentáneos. Circuito abierto/cerrado,false,robotica,scratch
+cuarto-egb,Kit Extra Pulsador,Circuito con pulsador,activity,30 min,8,,Control de encendido. Pulsador cierra circuito,false,robotica,scratch
+cuarto-egb,Kit Extra Pulsador,Pulsador + LED,activity,30 min,9,,Circuito interactivo. Presionar = encender,false,robotica,scratch
+cuarto-egb,Kit Extra Pulsador,Múltiples pulsadores,activity,35 min,10,,Control de varios LEDs con diferentes pulsadores,false,robotica,scratch
+cuarto-egb,Kit Extra Potenciómetro,¿Qué es un potenciómetro?,video,15 min,11,,Resistencia variable. 10kΩ,false,robotica,scratch
+cuarto-egb,Kit Extra Potenciómetro,Control de brillo,activity,30 min,12,,Dimmer para LED. Girar = cambiar brillo,false,robotica,scratch
+cuarto-egb,Kit Extra Buzzer,¿Qué es un buzzer?,video,15 min,13,,Generador de sonido. Activo vs pasivo,false,robotica,scratch
+cuarto-egb,Kit Extra Buzzer,Circuito con buzzer,activity,30 min,14,,Alarma simple. Buzzer con transistor 2N2222A,false,robotica,scratch
+cuarto-egb,Kit Extra Buzzer,Melodías simples,activity,35 min,15,,Diferentes frecuencias = tonos diferentes,false,robotica,scratch
+cuarto-egb,Proyecto Tarjeta Musical,Diseño de la tarjeta,video,20 min,16,,Planificación del proyecto integrado,false,robotica,scratch
+cuarto-egb,Proyecto Tarjeta Musical,Construcción,activity,45 min,17,,Ensamblaje: pulsador + buzzer + LEDs,false,robotica,scratch
+cuarto-egb,Proyecto Tarjeta Musical,Pruebas y Presentación,project,40 min,18,,Verificar funcionamiento. Demostración,false,robotica,scratch
+cuarto-egb,Robot Pintor Avanzado,Introducción al proyecto,video,20 min,19,,Robot pintor mejorado con más componentes,false,robotica,scratch
+cuarto-egb,Robot Pintor Avanzado,Ensamblaje del chasis,activity,40 min,20,,Base motor de vibración marcadores,false,robotica,scratch
+cuarto-egb,Robot Pintor Avanzado,Circuito con LEDs,activity,45 min,21,,Agregar LEDs decorativos al robot,false,robotica,scratch
+cuarto-egb,Robot Pintor Avanzado,Competencia de Arte,project,45 min,22,,Exhibición de creaciones artísticas,true,robotica,scratch
+quinto-egb,Repaso Circuitos,Circuitos en serie,video,20 min,1,,LEDs en serie. Voltaje se divide,false,robotica,scratch
+quinto-egb,Repaso Circuitos,Circuitos en paralelo,video,20 min,2,,LEDs en paralelo. Corriente se divide,false,robotica,scratch
+quinto-egb,Repaso Circuitos,Combinando circuitos,activity,35 min,3,,Serie y paralelo juntos,false,robotica,scratch
+quinto-egb,Repaso Circuitos,Práctica de medición,activity,30 min,4,,Usar multímetro básico,false,robotica,makecode
+quinto-egb,Transistor,¿Qué es un transistor?,video,20 min,5,,Switch electrónico. Base Colector Emisor,false,robotica,makecode
+quinto-egb,Transistor,Transistor como interruptor,activity,35 min,6,,Control de corriente con señal pequeña,false,robotica,makecode
+quinto-egb,Transistor,Circuito amplificador,activity,40 min,7,,Amplificación simple con 2N2222A,false,robotica,makecode
+quinto-egb,Semáforo,Diseño del semáforo,video,20 min,8,,Planificación 3 LEDs rojo amarillo verde,false,robotica,makecode
+quinto-egb,Semáforo,Circuito del semáforo,activity,40 min,9,,Conexión de 3 LEDs con resistencias,false,robotica,makecode
+quinto-egb,Semáforo,Temporización manual,activity,35 min,10,,Secuencia de luces con interruptores,false,robotica,makecode
+quinto-egb,Semáforo,Proyecto completo,project,45 min,11,,Semáforo funcional con caja decorada,false,robotica,makecode
+quinto-egb,Carro Jet Mejorado,Propulsión por aire,video,20 min,12,,Repaso de acción-reacción,false,robotica,makecode
+quinto-egb,Carro Jet Mejorado,Ensamblaje del chasis,activity,40 min,13,,Motor hélice ruedas,false,robotica,makecode
+quinto-egb,Carro Jet Mejorado,Circuito con interruptor,activity,35 min,14,,Control de encendido seguro,false,robotica,makecode
+quinto-egb,Carro Jet Mejorado,Carrera de velocidad,project,40 min,15,,Competencia en pista,false,robotica,makecode
+quinto-egb,Robot Perro Mejorado,Biomimética avanzada,video,20 min,16,,Análisis de movimiento animal,false,robotica,makecode
+quinto-egb,Robot Perro Mejorado,Mecanismo de 4 patas,activity,45 min,17,,Levas desfasadas 90°,false,robotica,makecode
+quinto-egb,Robot Perro Mejorado,Ensamblaje completo,activity,50 min,18,,Cuerpo patas motor,false,robotica,makecode
+quinto-egb,Robot Perro Mejorado,Decoración y exhibición,project,45 min,19,,Personalización y presentación,true,robotica,makecode
+sexto-egb,Aplicaciones Creativas,Repaso general,video,20 min,1,,Componentes y circuitos de años anteriores,false,robotica,makecode
+sexto-egb,Aplicaciones Creativas,Luz nocturna automática,activity,40 min,2,,LDR + LED. Enciende cuando oscurece,false,robotica,makecode
+sexto-egb,Aplicaciones Creativas,Alarma de puerta,activity,40 min,3,,Reed switch + buzzer,false,robotica,makecode
+sexto-egb,Aplicaciones Creativas,Presentación proyectos,project,35 min,4,,Exhibición de mini-proyectos,false,robotica,makecode
+sexto-egb,Carro Solar,Energía solar,video,25 min,5,,¿Cómo funciona un panel solar?,false,robotica,makecode
+sexto-egb,Carro Solar,Panel y motor,activity,40 min,6,,Conexión directa panel→motor,false,robotica,makecode
+sexto-egb,Carro Solar,Ensamblaje del chasis,activity,45 min,7,,Ruedas ejes estructura,false,robotica,makecode
+sexto-egb,Carro Solar,Pruebas al sol,activity,35 min,8,,Funcionamiento y optimización,false,robotica,makecode
+sexto-egb,Carro Solar,Carrera solar,project,40 min,9,,Competencia de carros solares,false,robotica,makecode
+sexto-egb,Robot 4 en 1,Introducción,video,25 min,10,,4 modos de operación del robot,false,robotica,makecode
+sexto-egb,Robot 4 en 1,Componentes del kit,activity,30 min,11,,Inventario y organización,false,robotica,makecode
+sexto-egb,Robot 4 en 1,Ensamblaje base,activity,45 min,12,,Chasis y motores,false,robotica,makecode
+sexto-egb,Robot 4 en 1 Sonido,Sensor de sonido,video,20 min,13,,Micrófono y detección de palmadas,false,robotica,makecode
+sexto-egb,Robot 4 en 1 Sonido,Programación por palmadas,activity,40 min,14,,Lógica de control por sonido,false,robotica,makecode
+sexto-egb,Robot 4 en 1 Sonido,Pruebas de sonido,activity,35 min,15,,Calibración de sensibilidad,false,robotica,makecode
+sexto-egb,Robot 4 en 1 IR,Receptor IR,video,20 min,16,,¿Cómo funciona el infrarrojo?,false,robotica,makecode
+sexto-egb,Robot 4 en 1 IR,Control remoto,activity,40 min,17,,Programación de botones,false,robotica,makecode
+sexto-egb,Robot 4 en 1 IR,Pruebas IR,activity,35 min,18,,Control direccional,false,robotica,makecode
+sexto-egb,Robot 4 en 1 Línea,Sensores IR,video,20 min,19,,Detección de línea blanco/negro,false,robotica,makecode
+sexto-egb,Robot 4 en 1 Línea,Lógica de seguimiento,activity,40 min,20,,Algoritmo básico,false,robotica,makecode
+sexto-egb,Robot 4 en 1 Línea,Pista de pruebas,activity,35 min,21,,Calibración en pista,false,robotica,makecode
+sexto-egb,Robot 4 en 1 Obstáculos,Bumpers táctiles,video,20 min,22,,Sensores de contacto,false,robotica,makecode
+sexto-egb,Robot 4 en 1 Obstáculos,Lógica de evasión,activity,40 min,23,,Retroceder y girar,false,robotica,makecode
+sexto-egb,Robot 4 en 1 Obstáculos,Competencia final,project,45 min,24,,Demostración de todos los modos,true,robotica,makecode
+septimo-egb,Prácticas Rápidas,LED intermitente manual,activity,30 min,1,,Circuito con condensador,false,robotica,makecode
+septimo-egb,Prácticas Rápidas,Control de motor DC,activity,35 min,2,,Transistor como driver,false,robotica,makecode
+septimo-egb,Prácticas Rápidas,Sensor de luz,activity,35 min,3,,LDR y divisor de voltaje,false,robotica,makecode
+septimo-egb,Prácticas Rápidas,Combinación sensores,activity,40 min,4,,Múltiples entradas,false,robotica,makecode
+septimo-egb,Programación Visual,¿Qué es Scratch?,video,20 min,5,,Introducción a bloques visuales,false,robotica,scratch
+septimo-egb,Programación Visual,Interfaz de Scratch,tutorial,30 min,6,,Conociendo el entorno,false,robotica,scratch
+septimo-egb,Programación Visual,Mi primer programa,activity,35 min,7,,Mover un sprite,false,robotica,scratch
+septimo-egb,Programación Visual,Secuencias,tutorial,30 min,8,,Pasos en orden,false,robotica,scratch
+septimo-egb,Programación Visual,Bucles,tutorial,35 min,9,,Repetir acciones,false,robotica,scratch
+septimo-egb,Programación Visual,Condicionales,tutorial,35 min,10,,Si-entonces-sino,false,robotica,scratch
+septimo-egb,Programación Visual,Variables,tutorial,35 min,11,,Guardar información,false,robotica,scratch
+septimo-egb,Programación Visual,Eventos,tutorial,30 min,12,,Responder a acciones,false,robotica,scratch
+septimo-egb,Programación Visual,Proyecto animación,project,45 min,13,,Historia interactiva,false,robotica,scratch
+septimo-egb,Programación Visual,Proyecto juego,project,50 min,14,,Juego simple en Scratch,false,robotica,scratch
+septimo-egb,Carro Multi-Sensor,Introducción proyecto,video,25 min,15,,Objetivos del robot,false,robotica,makecode
+septimo-egb,Carro Multi-Sensor,Componentes necesarios,activity,30 min,16,,Lista de materiales,false,robotica,makecode
+septimo-egb,Carro Multi-Sensor,Ensamblaje chasis,activity,45 min,17,,Construcción base,false,robotica,makecode
+septimo-egb,Carro Multi-Sensor,Instalación motores,activity,40 min,18,,Conexiones eléctricas,false,robotica,makecode
+septimo-egb,Carro Multi-Sensor,Sensores múltiples,activity,45 min,19,,IR ultrasonido luz,false,robotica,makecode
+septimo-egb,Carro Multi-Sensor,Lógica en Blockly,tutorial,50 min,20,,Diseño del programa,false,robotica,makecode
+septimo-egb,Carro Multi-Sensor,Pruebas de sensores,activity,40 min,21,,Calibración,false,robotica,makecode
+septimo-egb,Carro Multi-Sensor,Integración completa,activity,50 min,22,,Sistema funcionando,false,robotica,makecode
+septimo-egb,Carro Multi-Sensor,Competencia,project,45 min,23,,Demostración final,false,robotica,makecode
+septimo-egb,Preparación ESP32,¿Qué es un microcontrolador?,video,25 min,24,,Introducción a MCUs,false,robotica,tinkercad
+septimo-egb,Preparación ESP32,ESP32 vs Arduino,video,25 min,25,,Comparación de plataformas,false,robotica,tinkercad
+septimo-egb,Preparación ESP32,Conceptos de código,tutorial,35 min,26,,Variables funciones estructuras,true,robotica,tinkercad
+octavo-egb,Kit Extra Componentes,LED con resistencia,activity,35 min,1,,Circuito básico LED 220Ω polaridad,false,robotica,tinkercad
+octavo-egb,Kit Extra Componentes,LED con pulsador,activity,40 min,2,,Control manual de encendido,false,robotica,tinkercad
+octavo-egb,Kit Extra Componentes,Potenciómetro,activity,35 min,3,,Resistencia variable control de brillo,false,robotica,tinkercad
+octavo-egb,Kit Extra Componentes,Buzzer con transistor,activity,40 min,4,,Amplificación con 2N2222A,false,robotica,tinkercad
+octavo-egb,Kit Extra Componentes,Circuito integrado,activity,45 min,5,,Combinación de componentes,false,robotica,tinkercad
+octavo-egb,Kit Extra Componentes,Repaso general,activity,30 min,6,,Preparación para programación,false,robotica,tinkercad
+octavo-egb,Arduino IDE,Instalación Arduino IDE,tutorial,40 min,7,,Descargar e instalar IDE,false,robotica,wokwi
+octavo-egb,Arduino IDE,Configurar ESP32,tutorial,45 min,8,,Drivers board manager puerto COM,false,robotica,wokwi
+octavo-egb,Arduino IDE,Estructura del código,video,30 min,9,,setup() y loop() explicados,false,robotica,wokwi
+octavo-egb,Arduino IDE,Primer programa Blink,tutorial,40 min,10,,LED intermitente en GPIO2,false,robotica,wokwi
+octavo-egb,Arduino IDE,Variables en C++,tutorial,35 min,11,,int float bool String,false,robotica,wokwi
+octavo-egb,Arduino IDE,Funciones,tutorial,40 min,12,,Crear y llamar funciones,false,robotica,wokwi
+octavo-egb,Arduino IDE,Serial Monitor,tutorial,35 min,13,,Depuración con Serial.println,false,robotica,wokwi
+octavo-egb,Arduino IDE,Práctica integrada,activity,45 min,14,,Ejercicios de código,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC LEDs,Conociendo la PCB,video,30 min,15,,Componentes de la PCB DRAGON RC V2.0,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC LEDs,Pines de los LEDs,tutorial,35 min,16,,D1-D6 en GPIO2 4 16 17 18 19,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC LEDs,Encender un LED,tutorial,40 min,17,,digitalWrite HIGH LOW,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC LEDs,Secuencia de LEDs,activity,45 min,18,,Animación con delay,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC LEDs,Knight Rider,activity,50 min,19,,Efecto de barrido ida y vuelta,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC LEDs,Semáforo programado,activity,45 min,20,,Temporización automática,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC LEDs,PWM para brillo,tutorial,40 min,21,,analogWrite valores 0-255,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC LEDs,Efectos de fade,activity,45 min,22,,Transiciones suaves,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC Botones,Pines de los botones,tutorial,35 min,23,,BOTON1 GPIO32 BOTON2 GPIO33,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC Botones,Leer estado del botón,tutorial,40 min,24,,digitalRead INPUT_PULLUP,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC Botones,Debounce,tutorial,45 min,25,,Eliminar rebotes con delay o millis,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC Botones,Toggle con estado,activity,45 min,26,,Variable para encender/apagar,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC Botones,Contador con botón,activity,40 min,27,,Incrementar variable al presionar,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC Botones,Dos botones,activity,45 min,28,,Control múltiple,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC Botones,LED + Botón,activity,40 min,29,,Interacción completa,false,robotica,wokwi
+octavo-egb,PCB DRAGON RC Botones,Práctica integrada,activity,45 min,30,,Ejercicios combinados,false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,Driver TB6612FNG,video,35 min,31,,¿Cómo funciona el driver de motores?,false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,Pines del driver,tutorial,40 min,32,,AIN1 AIN2 PWMA BIN1 BIN2 PWMB STBY,false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,Control de UN motor,tutorial,45 min,33,,Adelante atrás parar,false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,PWM para velocidad,tutorial,45 min,34,,Control de potencia 0-255,false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,Control de DOS motores,activity,50 min,35,,Sincronización de motores,false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,Funciones de movimiento,activity,50 min,36,,adelante() atras() girarIzq() girarDer() parar(),false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,Giros suaves,activity,45 min,37,,Diferencial de velocidad,false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,Coreografía de movimientos,activity,50 min,38,,Secuencia programada,false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,Optimización,activity,40 min,39,,Ajustes finos de velocidad,false,robotica,wokwi
+octavo-egb,TB6612FNG Motores,Integración LEDs+Botones+Motores,activity,55 min,40,,Sistema completo,false,robotica,wokwi
+octavo-egb,Bluetooth,Bluetooth en ESP32,video,30 min,41,,Capacidades BLE y Classic,false,robotica,wokwi
+octavo-egb,Bluetooth,BluetoothSerial librería,tutorial,40 min,42,,Incluir y configurar,false,robotica,wokwi
+octavo-egb,Bluetooth,Configurar Bluetooth,tutorial,45 min,43,,Nombre del dispositivo,false,robotica,wokwi
+octavo-egb,Bluetooth,Recibir comandos,tutorial,45 min,44,,Serial.read() y procesamiento,false,robotica,wokwi
+octavo-egb,Bluetooth,Procesar comandos,activity,50 min,45,,switch/case para F B L R S,false,robotica,wokwi
+octavo-egb,Bluetooth,App de control,tutorial,40 min,46,,Configurar app en celular Android,false,robotica,wokwi
+octavo-egb,Bluetooth,Control de velocidad,activity,45 min,47,,Comandos 0-9 para velocidad,false,robotica,wokwi
+octavo-egb,Bluetooth,Práctica de control,activity,50 min,48,,Pruebas de manejo,false,robotica,wokwi
+octavo-egb,Proyecto Robot RC,Planificación,video,30 min,49,,Diseño del robot final,false,robotica,wokwi
+octavo-egb,Proyecto Robot RC,Ensamblaje chasis,activity,50 min,50,,Construcción de la base,false,robotica,wokwi
+octavo-egb,Proyecto Robot RC,Instalación motores,activity,45 min,51,,Conexiones al driver,false,robotica,wokwi
+octavo-egb,Proyecto Robot RC,Montaje PCB,activity,45 min,52,,Integración de componentes,false,robotica,wokwi
+octavo-egb,Proyecto Robot RC,Programación final,activity,55 min,53,,Código completo del robot,false,robotica,wokwi
+octavo-egb,Proyecto Robot RC,Pruebas funcionamiento,activity,45 min,54,,Depuración y ajustes,false,robotica,wokwi
+octavo-egb,Proyecto Robot RC,Decoración,activity,40 min,55,,Personalización del robot,false,robotica,wokwi
+octavo-egb,Proyecto Robot RC,Práctica de manejo,activity,45 min,56,,Entrenamiento de control,false,robotica,wokwi
+octavo-egb,Proyecto Robot RC,Competencia de robots,project,60 min,57,,Carrera final y exhibición,true,robotica,wokwi
+noveno-egb,Repaso Sensores,Repaso de componentes,video,25 min,1,,Revisión de 8° grado,false,robotica,wokwi
+noveno-egb,Repaso Sensores,Sensores IR principio,video,30 min,2,,Reflexión de luz infrarroja,false,robotica,wokwi
+noveno-egb,Repaso Sensores,Blanco vs negro,activity,35 min,3,,Cómo detecta la línea,false,robotica,wokwi
+noveno-egb,Repaso Sensores,Práctica con sensores,activity,40 min,4,,Lectura básica de IR,false,robotica,wokwi
+noveno-egb,ESP32 Super Mini,Conociendo ESP32 Super Mini,video,30 min,5,,Características y ventajas,false,robotica,wokwi
+noveno-egb,ESP32 Super Mini,Diferencias con DevKit,video,25 min,6,,Tamaño pines alimentación,false,robotica,wokwi
+noveno-egb,ESP32 Super Mini,Configuración Arduino IDE,tutorial,40 min,7,,Board y puerto COM,false,robotica,wokwi
+noveno-egb,ESP32 Super Mini,Pines disponibles,tutorial,35 min,8,,GPIO mapping del Super Mini,false,robotica,wokwi
+noveno-egb,ESP32 Super Mini,Blink en Super Mini,tutorial,40 min,9,,Primer programa,false,robotica,wokwi
+noveno-egb,ESP32 Super Mini,Práctica de pines,activity,45 min,10,,Entradas y salidas,false,robotica,wokwi
+noveno-egb,Sensores IR,Sensor TCRT5000,video,30 min,11,,Componentes del sensor,false,robotica,wokwi
+noveno-egb,Sensores IR,Conexión UN sensor,tutorial,40 min,12,,VCC GND OUT,false,robotica,wokwi
+noveno-egb,Sensores IR,Lectura digital,tutorial,40 min,13,,HIGH cuando negro LOW cuando blanco,false,robotica,wokwi
+noveno-egb,Sensores IR,LED indicador,activity,35 min,14,,Visualización de estado del sensor,false,robotica,wokwi
+noveno-egb,Sensores IR,Conexión DOS sensores,tutorial,45 min,15,,Izquierdo y derecho,false,robotica,wokwi
+noveno-egb,Sensores IR,Tabla de estados,activity,40 min,16,,00 01 10 11 combinaciones,false,robotica,wokwi
+noveno-egb,Sensores IR,Lectura analógica,tutorial,45 min,17,,Valores continuos 0-4095,false,robotica,wokwi
+noveno-egb,Sensores IR,Calibración,activity,45 min,18,,Ajuste de sensibilidad con potenciómetro,false,robotica,wokwi
+noveno-egb,Sensores IR,Práctica con línea,activity,50 min,19,,Pruebas en pista real,false,robotica,wokwi
+noveno-egb,Sensores IR,Código completo sensores,activity,45 min,20,,Integración de lecturas,false,robotica,wokwi
+noveno-egb,Lógica Seguidor,Algoritmo de seguimiento,video,30 min,21,,Diseño de la lógica,false,robotica,wokwi
+noveno-egb,Lógica Seguidor,Pseudocódigo,tutorial,40 min,22,,Planificación antes de código,false,robotica,wokwi
+noveno-egb,Lógica Seguidor,Implementar if-else,tutorial,45 min,23,,Decisiones en código,false,robotica,wokwi
+noveno-egb,Lógica Seguidor,Casos de borde,activity,45 min,24,,¿Qué hacer si pierde la línea?,false,robotica,wokwi
+noveno-egb,Lógica Seguidor,Funciones de movimiento,activity,45 min,25,,Reutilización de código,false,robotica,wokwi
+noveno-egb,Lógica Seguidor,Integrar sensores+motores,activity,55 min,26,,Sistema completo funcionando,false,robotica,wokwi
+noveno-egb,Lógica Seguidor,Pruebas de lógica,activity,50 min,27,,Depuración en pista,false,robotica,wokwi
+noveno-egb,Lógica Seguidor,Optimización velocidad,activity,45 min,28,,Mejoras de rendimiento,false,robotica,wokwi
+noveno-egb,PCB RC DRAGON V2,Conociendo la PCB,video,30 min,29,,Componentes de la PCB compacta,false,robotica,wokwi
+noveno-egb,PCB RC DRAGON V2,Pines de sensores,tutorial,40 min,30,,Conexiones para IR,false,robotica,wokwi
+noveno-egb,PCB RC DRAGON V2,Pines de motores,tutorial,40 min,31,,Driver TB6612 integrado,false,robotica,wokwi
+noveno-egb,PCB RC DRAGON V2,Ensamblaje PCB,activity,50 min,32,,Soldadura de componentes,false,robotica,wokwi
+noveno-egb,PCB RC DRAGON V2,Pruebas de PCB,activity,45 min,33,,Verificación de funcionamiento,false,robotica,wokwi
+noveno-egb,PCB RC DRAGON V2,Adaptación código,activity,45 min,34,,Ajustar pines en el programa,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Planificación,video,25 min,35,,Diseño del robot seguidor,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Ensamblaje chasis,activity,50 min,36,,Construcción de la base,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Montaje sensores,activity,45 min,37,,Posicionamiento correcto,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Instalación motores,activity,45 min,38,,Conexiones al driver,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Montaje PCB,activity,45 min,39,,Integración final,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Programación final,activity,55 min,40,,Código completo optimizado,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Calibración sensores,activity,50 min,41,,Ajustes para la pista,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Pruebas en pista,activity,50 min,42,,Depuración y mejoras,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Optimización velocidad,activity,45 min,43,,Máximo rendimiento,false,robotica,wokwi
+noveno-egb,Proyecto Seguidor,Ajustes finales,activity,40 min,44,,Preparación competencia,false,robotica,wokwi
+noveno-egb,Competencia,Diseño de pista,video,25 min,45,,Especificaciones oficiales,false,robotica,wokwi
+noveno-egb,Competencia,Construcción pista,activity,50 min,46,,Materiales y técnicas,false,robotica,wokwi
+noveno-egb,Competencia,Práctica en pista,activity,55 min,47,,Entrenamiento intensivo,false,robotica,wokwi
+noveno-egb,Competencia,Ajustes último momento,activity,40 min,48,,Optimización final,false,robotica,wokwi
+noveno-egb,Competencia,Clasificatoria,project,60 min,49,,Registro de tiempos,false,robotica,wokwi
+noveno-egb,Competencia,Final competencia,project,60 min,50,,Carrera definitiva y premios,true,robotica,wokwi
+decimo-egb,Aplicaciones Sensores,Repaso sensores,video,25 min,1,,IR luz sonido revisión,false,robotica,wokwi
+decimo-egb,Aplicaciones Sensores,Sensores de distancia,video,30 min,2,,Tipos: IR ultrasonido láser,false,robotica,wokwi
+decimo-egb,Aplicaciones Sensores,Ultrasonido principio,video,30 min,3,,Eco y tiempo de vuelo,false,robotica,wokwi
+decimo-egb,Aplicaciones Sensores,Aplicaciones reales,video,25 min,4,,Robots comerciales con ultrasonido,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Conociendo HC-SR04,video,30 min,5,,Componentes del sensor,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Principio ultrasonido,video,30 min,6,,40kHz emisor receptor,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Conexiones sensor,tutorial,40 min,7,,VCC GND Trigger Echo,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Código medir distancia,tutorial,45 min,8,,pulseIn() y cálculo,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Serial Monitor,tutorial,40 min,9,,Visualizar mediciones en tiempo real,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Conversión centímetros,tutorial,40 min,10,,Fórmula: tiempo/58,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,LED según distancia,activity,45 min,11,,Indicador visual de proximidad,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Múltiples LEDs,activity,50 min,12,,Semáforo de distancia verde amarillo rojo,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Buzzer de alerta,activity,45 min,13,,Alarma de proximidad,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Frecuencia variable,activity,50 min,14,,Pitido más rápido cuando más cerca,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Práctica integrada,activity,55 min,15,,Sensor + LEDs + Buzzer,false,robotica,wokwi
+decimo-egb,Sensor HC-SR04,Filtrado de ruido,activity,45 min,16,,Promedio de lecturas,false,robotica,wokwi
+decimo-egb,Algoritmo Evasión,Diseño algoritmo,video,30 min,17,,Lógica de decisión,false,robotica,wokwi
+decimo-egb,Algoritmo Evasión,Pseudocódigo,tutorial,40 min,18,,Planificación del algoritmo,false,robotica,wokwi
+decimo-egb,Algoritmo Evasión,Implementar decisiones,tutorial,45 min,19,,if distancia < umbral,false,robotica,wokwi
+decimo-egb,Algoritmo Evasión,Distancia de seguridad,activity,40 min,20,,Calibrar umbral óptimo,false,robotica,wokwi
+decimo-egb,Algoritmo Evasión,Acción de evasión,activity,50 min,21,,Retroceder girar avanzar,false,robotica,wokwi
+decimo-egb,Algoritmo Evasión,Mejorar algoritmo,activity,50 min,22,,Casos especiales esquinas,false,robotica,wokwi
+decimo-egb,Algoritmo Evasión,Detección lateral,activity,55 min,23,,Segundo sensor opcional,false,robotica,wokwi
+decimo-egb,Algoritmo Evasión,Práctica evasión,activity,50 min,24,,Pruebas con obstáculos,false,robotica,wokwi
+decimo-egb,Integración PCB,Conexión sensor PCB,tutorial,45 min,25,,Cableado al DRAGON RC,false,robotica,wokwi
+decimo-egb,Integración PCB,Integración motores,activity,50 min,26,,Control combinado,false,robotica,wokwi
+decimo-egb,Integración PCB,Código integrado,activity,55 min,27,,Sensor + Motores + LEDs,false,robotica,wokwi
+decimo-egb,Integración PCB,Pruebas integración,activity,50 min,28,,Depuración del sistema,false,robotica,wokwi
+decimo-egb,Integración PCB,Ajustes velocidad,activity,45 min,29,,Optimización de respuesta,false,robotica,wokwi
+decimo-egb,Integración PCB,Práctica completa,activity,55 min,30,,Sistema funcionando,false,robotica,wokwi
+decimo-egb,Proyecto Ensamblaje,Planificación montaje,video,25 min,31,,Diseño del robot evita obstáculos,false,robotica,wokwi
+decimo-egb,Proyecto Ensamblaje,Ensamblaje chasis,activity,50 min,32,,Construcción de la base,false,robotica,wokwi
+decimo-egb,Proyecto Ensamblaje,Montaje sensor,activity,45 min,33,,Posicionamiento frontal,false,robotica,wokwi
+decimo-egb,Proyecto Ensamblaje,Instalación motores,activity,45 min,34,,Conexiones al driver,false,robotica,wokwi
+decimo-egb,Proyecto Ensamblaje,Montaje PCB,activity,45 min,35,,Integración de componentes,false,robotica,wokwi
+decimo-egb,Proyecto Ensamblaje,Código final,activity,55 min,36,,Programación completa,false,robotica,wokwi
+decimo-egb,Optimización,Ajustes sensibilidad,activity,45 min,37,,Calibración fina,false,robotica,wokwi
+decimo-egb,Optimización,Giros optimizados,activity,50 min,38,,Ángulos precisos 90° 180°,false,robotica,wokwi
+decimo-egb,Optimización,Aleatoriedad giros,activity,45 min,39,,random() para evitar patrones,false,robotica,wokwi
+decimo-egb,Optimización,Velocidad adaptativa,activity,50 min,40,,Más lento cuando más cerca,false,robotica,wokwi
+decimo-egb,Optimización,Pruebas exhaustivas,activity,55 min,41,,Diferentes escenarios,false,robotica,wokwi
+decimo-egb,Optimización,Mejoras finales,activity,45 min,42,,Preparación competencia,false,robotica,wokwi
+decimo-egb,Competencia Laberinto,Diseño laberinto,video,30 min,43,,Especificaciones y reglas,false,robotica,wokwi
+decimo-egb,Competencia Laberinto,Construcción laberinto,activity,55 min,44,,Materiales cartón MDF,false,robotica,wokwi
+decimo-egb,Competencia Laberinto,Práctica laberinto,activity,60 min,45,,Entrenamiento intensivo,false,robotica,wokwi
+decimo-egb,Competencia Laberinto,Estrategias navegación,video,30 min,46,,Técnicas de resolución,false,robotica,wokwi
+decimo-egb,Competencia Laberinto,Ajustes último momento,activity,45 min,47,,Optimización final,false,robotica,wokwi
+decimo-egb,Competencia Laberinto,Clasificatoria,project,60 min,48,,Registro de tiempos,false,robotica,wokwi
+decimo-egb,Competencia Laberinto,Final competencia,project,60 min,49,,Carrera definitiva y premios,true,robotica,wokwi
+sexto-slm,Introducción Robótica,Bienvenida al curso,video,20 min,1,,Presentación del programa ChaskiBots,false,robotica,makecode
+sexto-slm,Introducción Robótica,¿Qué es un robot?,video,25 min,2,,Definición y ejemplos de robots,false,robotica,makecode
+sexto-slm,Introducción Robótica,Tipos de robots,video,25 min,3,,Industriales domésticos educativos,false,robotica,makecode
+sexto-slm,Introducción Robótica,Componentes básicos,tutorial,30 min,4,,Sensores actuadores controladores,false,robotica,makecode
+sexto-slm,MakeCode Arcade,Introducción MakeCode,video,25 min,5,,Plataforma de programación visual,false,robotica,makecode
+sexto-slm,MakeCode Arcade,Interfaz del editor,tutorial,30 min,6,,Bloques simulador código,false,robotica,makecode
+sexto-slm,MakeCode Arcade,Primer programa,tutorial,35 min,7,,Sprite y movimiento básico,false,robotica,makecode
+sexto-slm,MakeCode Arcade,Eventos y controles,tutorial,35 min,8,,Teclado y botones,false,robotica,makecode
+sexto-slm,MakeCode Arcade,Variables y puntuación,tutorial,40 min,9,,Contador de puntos,false,robotica,makecode
+sexto-slm,MakeCode Arcade,Colisiones,activity,40 min,10,,Detectar contacto entre sprites,false,robotica,makecode
+sexto-slm,MakeCode Arcade,Mini juego,activity,45 min,11,,Crear un juego simple,false,robotica,makecode
+sexto-slm,MakeCode Arcade,Proyecto juego,project,50 min,12,,Juego completo con puntuación,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Conociendo el kit,video,25 min,13,,Componentes del robot 4 en 1,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Ensamblaje base,activity,45 min,14,,Construcción del chasis,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Motores y ruedas,activity,40 min,15,,Instalación de motores,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Conexiones eléctricas,tutorial,40 min,16,,Cableado correcto,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Programación básica,tutorial,45 min,17,,Control de motores en MakeCode,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Movimientos básicos,activity,40 min,18,,Adelante atrás giros,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Sensores del robot,tutorial,40 min,19,,IR ultrasonido luz,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Seguidor de línea simple,activity,45 min,20,,Algoritmo básico,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Evita obstáculos simple,activity,45 min,21,,Detección y giro,false,robotica,makecode
+sexto-slm,Robot 4 en 1,Proyecto final,project,50 min,22,,Robot autónomo funcionando,false,robotica,makecode
+sexto-slm,Competencia,Preparación competencia,activity,40 min,23,,Ajustes y práctica,false,robotica,makecode
+sexto-slm,Competencia,Competencia final,project,60 min,24,,Demostración y premios,true,robotica,makecode
+primero-bach,Fundamentos Avanzados,Repaso ESP32,video,30 min,1,,Revisión de conceptos de 10° EGB,false,robotica,wokwi
+primero-bach,Fundamentos Avanzados,Arquitectura ESP32,video,35 min,2,,Dual core WiFi Bluetooth memoria,false,robotica,wokwi
+primero-bach,Fundamentos Avanzados,GPIO avanzado,tutorial,40 min,3,,Modos de pines interrupciones,false,robotica,wokwi
+primero-bach,Fundamentos Avanzados,ADC y DAC,tutorial,45 min,4,,Conversión analógica digital,false,robotica,wokwi
+primero-bach,Fundamentos Avanzados,PWM avanzado,tutorial,45 min,5,,Frecuencia resolución canales,false,robotica,wokwi
+primero-bach,Fundamentos Avanzados,Interrupciones,tutorial,50 min,6,,ISR y manejo de eventos,false,robotica,wokwi
+primero-bach,Comunicación Serial,UART principios,video,30 min,7,,Comunicación serial asíncrona,false,robotica,wokwi
+primero-bach,Comunicación Serial,Serial hardware,tutorial,45 min,8,,Serial1 Serial2 configuración,false,robotica,wokwi
+primero-bach,Comunicación Serial,Protocolo I2C,video,35 min,9,,Bus de comunicación maestro esclavo,false,robotica,wokwi
+primero-bach,Comunicación Serial,Sensores I2C,tutorial,50 min,10,,Conectar múltiples sensores,false,robotica,wokwi
+primero-bach,Comunicación Serial,Protocolo SPI,video,35 min,11,,Comunicación de alta velocidad,false,robotica,wokwi
+primero-bach,Comunicación Serial,Dispositivos SPI,tutorial,50 min,12,,Pantallas SD cards,false,robotica,wokwi
+primero-bach,Comunicación Serial,Práctica protocolos,activity,55 min,13,,Integración I2C y SPI,false,robotica,wokwi
+primero-bach,WiFi ESP32,WiFi introducción,video,30 min,14,,Capacidades WiFi del ESP32,false,robotica,wokwi
+primero-bach,WiFi ESP32,Modo Station,tutorial,45 min,15,,Conectar a red WiFi,false,robotica,wokwi
+primero-bach,WiFi ESP32,Modo Access Point,tutorial,45 min,16,,Crear red WiFi propia,false,robotica,wokwi
+primero-bach,WiFi ESP32,Web Server básico,tutorial,50 min,17,,Servidor HTTP en ESP32,false,robotica,wokwi
+primero-bach,WiFi ESP32,HTML y CSS,tutorial,45 min,18,,Interfaz web básica,false,robotica,wokwi
+primero-bach,WiFi ESP32,Control por web,activity,55 min,19,,Encender LEDs desde navegador,false,robotica,wokwi
+primero-bach,WiFi ESP32,Lectura de sensores web,activity,55 min,20,,Dashboard de sensores,false,robotica,wokwi
+primero-bach,WiFi ESP32,WebSocket,tutorial,50 min,21,,Comunicación en tiempo real,false,robotica,wokwi
+primero-bach,WiFi ESP32,Control robot WiFi,activity,60 min,22,,Robot controlado por web,false,robotica,wokwi
+primero-bach,Sensores Avanzados,Sensor DHT22,tutorial,45 min,23,,Temperatura y humedad,false,robotica,wokwi
+primero-bach,Sensores Avanzados,Sensor BMP280,tutorial,45 min,24,,Presión atmosférica altitud,false,robotica,wokwi
+primero-bach,Sensores Avanzados,Sensor MPU6050,tutorial,50 min,25,,Acelerómetro giroscopio,false,robotica,wokwi
+primero-bach,Sensores Avanzados,GPS NEO-6M,tutorial,55 min,26,,Ubicación coordenadas,false,robotica,wokwi
+primero-bach,Sensores Avanzados,Sensor de gas MQ,tutorial,45 min,27,,Detección de gases,false,robotica,wokwi
+primero-bach,Sensores Avanzados,Integración sensores,activity,60 min,28,,Estación meteorológica,false,robotica,wokwi
+primero-bach,Proyecto IoT,Diseño del proyecto,video,30 min,29,,Planificación de sistema IoT,false,robotica,wokwi
+primero-bach,Proyecto IoT,Selección de sensores,activity,40 min,30,,Elegir componentes,false,robotica,wokwi
+primero-bach,Proyecto IoT,Ensamblaje hardware,activity,55 min,31,,Construcción del sistema,false,robotica,wokwi
+primero-bach,Proyecto IoT,Programación backend,activity,60 min,32,,Código del ESP32,false,robotica,wokwi
+primero-bach,Proyecto IoT,Interfaz web,activity,55 min,33,,Dashboard de control,false,robotica,wokwi
+primero-bach,Proyecto IoT,Pruebas y depuración,activity,50 min,34,,Verificación del sistema,false,robotica,wokwi
+primero-bach,Proyecto IoT,Documentación,activity,40 min,35,,Manual del proyecto,false,robotica,wokwi
+primero-bach,Proyecto IoT,Presentación final,project,60 min,36,,Exhibición del proyecto IoT,true,robotica,wokwi
+segundo-bach,Programación Avanzada,C++ avanzado,video,35 min,1,,Clases objetos herencia,false,robotica,wokwi
+segundo-bach,Programación Avanzada,POO en Arduino,tutorial,50 min,2,,Programación orientada a objetos,false,robotica,wokwi
+segundo-bach,Programación Avanzada,Librerías propias,tutorial,55 min,3,,Crear librerías .h .cpp,false,robotica,wokwi
+segundo-bach,Programación Avanzada,Máquinas de estado,tutorial,50 min,4,,FSM para robots,false,robotica,wokwi
+segundo-bach,Programación Avanzada,Multitarea,tutorial,55 min,5,,FreeRTOS básico,false,robotica,wokwi
+segundo-bach,Programación Avanzada,Tasks y semáforos,tutorial,55 min,6,,Sincronización de tareas,false,robotica,wokwi
+segundo-bach,Programación Avanzada,Práctica multitarea,activity,60 min,7,,Robot con múltiples tareas,false,robotica,wokwi
+segundo-bach,Control PID,Teoría de control,video,40 min,8,,Sistemas de control automático,false,robotica,wokwi
+segundo-bach,Control PID,Controlador P,tutorial,50 min,9,,Control proporcional,false,robotica,wokwi
+segundo-bach,Control PID,Controlador PI,tutorial,50 min,10,,Agregar integral,false,robotica,wokwi
+segundo-bach,Control PID,Controlador PID,tutorial,55 min,11,,Control completo,false,robotica,wokwi
+segundo-bach,Control PID,Sintonización PID,activity,55 min,12,,Ajuste de parámetros Kp Ki Kd,false,robotica,wokwi
+segundo-bach,Control PID,Seguidor PID,activity,60 min,13,,Seguidor de línea con PID,false,robotica,wokwi
+segundo-bach,Control PID,Balanceo PID,activity,60 min,14,,Robot balanceador,false,robotica,wokwi
+segundo-bach,Visión Artificial,Introducción visión,video,35 min,15,,Cámaras y procesamiento,false,robotica,wokwi
+segundo-bach,Visión Artificial,ESP32-CAM,tutorial,50 min,16,,Módulo de cámara,false,robotica,wokwi
+segundo-bach,Visión Artificial,Streaming video,tutorial,55 min,17,,Transmisión en vivo,false,robotica,wokwi
+segundo-bach,Visión Artificial,Detección de color,activity,55 min,18,,Seguir objetos por color,false,robotica,wokwi
+segundo-bach,Visión Artificial,QR codes,activity,50 min,19,,Lectura de códigos QR,false,robotica,wokwi
+segundo-bach,Visión Artificial,Reconocimiento facial,activity,60 min,20,,Detección de rostros,false,robotica,wokwi
+segundo-bach,Robótica Móvil,Cinemática diferencial,video,40 min,21,,Matemáticas del movimiento,false,robotica,wokwi
+segundo-bach,Robótica Móvil,Odometría,tutorial,55 min,22,,Encoders y posición,false,robotica,wokwi
+segundo-bach,Robótica Móvil,Navegación autónoma,tutorial,60 min,23,,Algoritmos de navegación,false,robotica,wokwi
+segundo-bach,Robótica Móvil,Mapeo simple,activity,60 min,24,,Crear mapa del entorno,false,robotica,wokwi
+segundo-bach,Robótica Móvil,Planificación de rutas,activity,55 min,25,,Algoritmo A*,false,robotica,wokwi
+segundo-bach,Robótica Móvil,Robot navegador,activity,65 min,26,,Integración completa,false,robotica,wokwi
+segundo-bach,Proyecto Avanzado,Diseño del proyecto,video,35 min,27,,Planificación de robot avanzado,false,robotica,wokwi
+segundo-bach,Proyecto Avanzado,Selección de tecnologías,activity,45 min,28,,Elegir sensores y actuadores,false,robotica,wokwi
+segundo-bach,Proyecto Avanzado,Diseño mecánico,activity,55 min,29,,CAD y estructura,false,robotica,wokwi
+segundo-bach,Proyecto Avanzado,Ensamblaje,activity,60 min,30,,Construcción del robot,false,robotica,wokwi
+segundo-bach,Proyecto Avanzado,Programación,activity,65 min,31,,Código completo,false,robotica,wokwi
+segundo-bach,Proyecto Avanzado,Pruebas,activity,55 min,32,,Depuración y ajustes,false,robotica,wokwi
+segundo-bach,Proyecto Avanzado,Documentación técnica,activity,45 min,33,,Manual y especificaciones,false,robotica,wokwi
+segundo-bach,Proyecto Avanzado,Presentación,project,60 min,34,,Exhibición del proyecto,true,robotica,wokwi
+tercero-bach,Robótica Industrial,Introducción industrial,video,40 min,1,,Robots en la industria,false,robotica,wokwi
+tercero-bach,Robótica Industrial,Brazos robóticos,video,35 min,2,,Tipos y aplicaciones,false,robotica,wokwi
+tercero-bach,Robótica Industrial,Cinemática directa,tutorial,55 min,3,,Posición del efector,false,robotica,wokwi
+tercero-bach,Robótica Industrial,Cinemática inversa,tutorial,60 min,4,,Calcular ángulos de juntas,false,robotica,wokwi
+tercero-bach,Robótica Industrial,Servomotores,tutorial,50 min,5,,Control de posición angular,false,robotica,wokwi
+tercero-bach,Robótica Industrial,Brazo 3 DOF,activity,65 min,6,,Construir brazo robótico,false,robotica,wokwi
+tercero-bach,Robótica Industrial,Programación brazo,activity,60 min,7,,Control de movimientos,false,robotica,wokwi
+tercero-bach,Robótica Industrial,Gripper,activity,55 min,8,,Pinza robótica,false,robotica,wokwi
+tercero-bach,IA en Robots,Machine Learning intro,video,40 min,9,,Conceptos de ML,false,robotica,wokwi
+tercero-bach,IA en Robots,TensorFlow Lite,tutorial,55 min,10,,ML en microcontroladores,false,robotica,wokwi
+tercero-bach,IA en Robots,Clasificación imágenes,activity,60 min,11,,Reconocimiento de objetos,false,robotica,wokwi
+tercero-bach,IA en Robots,Comandos de voz,activity,55 min,12,,Reconocimiento de voz,false,robotica,wokwi
+tercero-bach,IA en Robots,Robot inteligente,activity,65 min,13,,Integración de IA,false,robotica,wokwi
+tercero-bach,Drones,Introducción drones,video,35 min,14,,Tipos y aplicaciones,false,robotica,wokwi
+tercero-bach,Drones,Física del vuelo,video,40 min,15,,Sustentación y control,false,robotica,wokwi
+tercero-bach,Drones,Controladora de vuelo,tutorial,50 min,16,,Flight controller,false,robotica,wokwi
+tercero-bach,Drones,ESC y motores,tutorial,50 min,17,,Control de velocidad,false,robotica,wokwi
+tercero-bach,Drones,Ensamblaje drone,activity,70 min,18,,Construcción de cuadricóptero,false,robotica,wokwi
+tercero-bach,Drones,Calibración,activity,55 min,19,,Ajustes de vuelo,false,robotica,wokwi
+tercero-bach,Drones,Vuelo básico,activity,60 min,20,,Práctica de pilotaje,false,robotica,wokwi
+tercero-bach,Drones,Programación autónoma,activity,65 min,21,,Vuelo programado,false,robotica,wokwi
+tercero-bach,Proyecto Capstone,Definición proyecto,video,35 min,22,,Elegir tema de tesis,false,robotica,wokwi
+tercero-bach,Proyecto Capstone,Investigación,activity,50 min,23,,Estado del arte,false,robotica,wokwi
+tercero-bach,Proyecto Capstone,Diseño solución,activity,55 min,24,,Arquitectura del sistema,false,robotica,wokwi
+tercero-bach,Proyecto Capstone,Prototipado,activity,65 min,25,,Construcción inicial,false,robotica,wokwi
+tercero-bach,Proyecto Capstone,Desarrollo,activity,70 min,26,,Implementación completa,false,robotica,wokwi
+tercero-bach,Proyecto Capstone,Pruebas y validación,activity,60 min,27,,Verificación de requisitos,false,robotica,wokwi
+tercero-bach,Proyecto Capstone,Documentación final,activity,50 min,28,,Informe técnico,false,robotica,wokwi
+tercero-bach,Proyecto Capstone,Defensa de proyecto,project,60 min,29,,Presentación ante tribunal,true,robotica,wokwi
+inicial-1,Robots que Aprenden,¿Qué es un robot inteligente?,video,10 min,1,,Diferencia entre robot normal y robot que piensa. Videos de robots mascotas.,false,ia,scratch
+inicial-1,Robots que Aprenden,Robots que reconocen caras,activity,15 min,2,,Juego: mostrar fotos de familia el robot (títere) reconoce quién es.,false,ia,scratch
+inicial-1,Robots que Escuchan,Robots que entienden palabras,video,10 min,3,,Asistentes de voz (Alexa Google). El robot escucha y responde.,false,ia,scratch
+inicial-1,Robots que Escuchan,Dar órdenes al robot,activity,20 min,4,,Juego de roles: un niño es el robot otros dan comandos simples.,false,ia,scratch
+inicial-1,Robots que Ven,Robots con ojos,video,10 min,5,,Cámaras como ojos del robot. Robots que siguen objetos.,false,ia,scratch
+inicial-1,Robots que Ven,Clasificar colores,activity,15 min,6,,Actividad: clasificar objetos por color (como haría un robot).,false,ia,scratch
+inicial-1,Mi Robot Amigo,Dibujar mi robot inteligente,project,25 min,7,,Proyecto final: dibujar un robot que pueda hacer algo especial.,false,ia,scratch
+inicial-1,Mi Robot Amigo,Presentación,activity,20 min,8,,Cada niño presenta su robot y qué puede hacer.,true,ia,scratch
+inicial-2,Decisiones Simples,Si llueve uso paraguas,video,12 min,1,,Concepto de si...entonces. Decisiones que tomamos cada día.,false,ia,scratch
+inicial-2,Decisiones Simples,El robot que decide,activity,20 min,2,,Tarjetas con situaciones elegir qué haría el robot.,false,ia,scratch
+inicial-2,Patrones,Encontrar patrones,video,10 min,3,,Secuencias de colores formas. Los robots buscan patrones.,false,ia,scratch
+inicial-2,Patrones,Completar secuencias,activity,25 min,4,,Actividad con bloques: completar patrones de colores y formas.,false,ia,scratch
+inicial-2,Clasificación,Agrupar objetos,video,12 min,5,,Robots que clasifican: frutas juguetes colores.,false,ia,scratch
+inicial-2,Clasificación,Juego de clasificación,activity,25 min,6,,Clasificar objetos del aula en grupos (por tamaño color uso).,false,ia,scratch
+inicial-2,Robot Clasificador,Construir clasificador,project,30 min,7,,Proyecto: crear un robot de cartón que clasifica objetos.,false,ia,scratch
+inicial-2,Robot Clasificador,Feria de robots,activity,25 min,8,,Presentación a padres de los robots clasificadores.,true,ia,scratch
+primero-egb,Secuencias,¿Qué es una secuencia?,video,15 min,1,,Pasos para lavarse las manos vestirse. Todo tiene orden.,false,ia,scratch
+primero-egb,Secuencias,Ordenar pasos,activity,25 min,2,,Tarjetas con pasos desordenados ordenar correctamente.,false,ia,scratch
+primero-egb,Secuencias,Mi rutina diaria,project,30 min,3,,Dibujar los pasos de su rutina matutina en orden.,false,ia,scratch
+primero-egb,Algoritmos,Instrucciones para robots,video,15 min,4,,Un algoritmo es una receta. Instrucciones paso a paso.,false,ia,scratch
+primero-egb,Algoritmos,Robot humano,activity,30 min,5,,Un niño es robot otros dan instrucciones para llegar a un punto.,false,ia,scratch
+primero-egb,Algoritmos,Laberinto en papel,activity,25 min,6,,Escribir instrucciones (↑↓←→) para salir del laberinto.,false,ia,scratch
+primero-egb,Scratch Jr,Conociendo Scratch Jr,tutorial,20 min,7,,Interfaz de Scratch Jr. Bloques básicos de movimiento.,false,ia,scratch
+primero-egb,Scratch Jr,Mi primer programa,activity,30 min,8,,Hacer que el gato camine de un lado a otro.,false,ia,scratch
+primero-egb,Scratch Jr,Historia animada,project,35 min,9,,Crear una historia simple con 2 personajes.,false,ia,scratch
+primero-egb,Proyecto Final,Planificar mi juego,video,15 min,10,,Ideas para un juego simple en Scratch Jr.,false,ia,scratch
+primero-egb,Proyecto Final,Crear mi juego,project,40 min,11,,Juego simple: personaje recoge objetos.,false,ia,scratch
+primero-egb,Proyecto Final,Presentación,activity,30 min,12,,Mostrar juegos a la clase.,true,ia,scratch
+segundo-egb,Condicionales,Si...entonces,video,15 min,1,,Decisiones en la vida: si tengo hambre como.,false,ia,scratch
+segundo-egb,Condicionales,Juego de decisiones,activity,25 min,2,,Tarjetas: Si el semáforo está rojo entonces...,false,ia,scratch
+segundo-egb,Condicionales,Scratch Jr condicionales,tutorial,30 min,3,,Bloque al tocar en Scratch Jr.,false,ia,scratch
+segundo-egb,Bucles,Repetir acciones,video,15 min,4,,Cosas que repetimos: caminar respirar parpadear.,false,ia,scratch
+segundo-egb,Bucles,Dibujar con bucles,activity,30 min,5,,Dibujar patrones usando repetir 4 veces: línea giro.,false,ia,scratch
+segundo-egb,Bucles,Bucles en Scratch Jr,tutorial,30 min,6,,Bloque repetir para animaciones.,false,ia,scratch
+segundo-egb,Combinando,Condicionales + Bucles,video,15 min,7,,Combinar decisiones con repeticiones.,false,ia,scratch
+segundo-egb,Combinando,Juego interactivo,project,40 min,8,,Crear juego donde personaje reacciona al tocarlo.,false,ia,scratch
+segundo-egb,Combinando,Mejorando mi juego,activity,35 min,9,,Agregar sonidos y más interacciones.,false,ia,scratch
+segundo-egb,Proyecto Final,Diseñar mi app,video,15 min,10,,Planificar una aplicación simple.,false,ia,scratch
+segundo-egb,Proyecto Final,Crear mi app,project,45 min,11,,Aplicación con múltiples pantallas.,false,ia,scratch
+segundo-egb,Proyecto Final,Feria de apps,activity,30 min,12,,Presentar aplicaciones a compañeros.,true,ia,scratch
+tercero-egb,¿Qué es ML?,Máquinas que aprenden,video,20 min,1,,Diferencia entre programar reglas vs aprender de ejemplos.,false,ia,teachable
+tercero-egb,¿Qué es ML?,Juego de adivinanzas,activity,25 min,2,,Juego: adivinar animal con preguntas sí/no (árbol de decisión).,false,ia,teachable
+tercero-egb,¿Qué es ML?,Teachable Machine intro,tutorial,30 min,3,,Conocer Teachable Machine de Google.,false,ia,teachable
+tercero-egb,Clasificación,Clasificar imágenes,video,15 min,4,,Cómo la IA reconoce gatos vs perros.,false,ia,teachable
+tercero-egb,Clasificación,Entrenar clasificador,tutorial,35 min,5,,Crear clasificador de 3 objetos en Teachable Machine.,false,ia,teachable
+tercero-egb,Clasificación,Mi clasificador,project,40 min,6,,Clasificador personalizado (útiles escolares frutas etc.).,false,ia,teachable
+tercero-egb,Reconocimiento,Reconocer sonidos,video,15 min,7,,IA que reconoce sonidos: aplausos silbidos palabras.,false,ia,teachable
+tercero-egb,Reconocimiento,Entrenar con sonidos,tutorial,35 min,8,,Clasificador de sonidos en Teachable Machine.,false,ia,teachable
+tercero-egb,Reconocimiento,Proyecto de sonidos,project,40 min,9,,Crear detector de sonidos personalizado.,false,ia,teachable
+tercero-egb,Proyecto Final,Planificar proyecto IA,video,15 min,10,,Ideas para proyecto final con Teachable Machine.,false,ia,teachable
+tercero-egb,Proyecto Final,Desarrollar proyecto,project,50 min,11,,Proyecto libre: clasificador útil para la vida diaria.,false,ia,teachable
+tercero-egb,Proyecto Final,Exposición,activity,30 min,12,,Presentar proyectos y explicar cómo aprende la IA.,true,ia,teachable
+cuarto-egb,Scratch Avanzado,Repaso Scratch,tutorial,25 min,1,,Variables listas bloques personalizados.,false,ia,scratch
+cuarto-egb,Scratch Avanzado,Extensiones de IA,video,20 min,2,,Extensiones: reconocimiento de voz video sensing.,false,ia,scratch
+cuarto-egb,Scratch Avanzado,Video Sensing,tutorial,35 min,3,,Detectar movimiento con cámara en Scratch.,false,ia,scratch
+cuarto-egb,Reconocimiento,Reconocimiento de voz,tutorial,30 min,4,,Extensión de voz en Scratch. Comandos por voz.,false,ia,scratch
+cuarto-egb,Reconocimiento,Juego controlado por voz,project,45 min,5,,Crear juego que responde a comandos de voz.,false,ia,scratch
+cuarto-egb,Reconocimiento,Mejoras y ajustes,activity,35 min,6,,Mejorar precisión agregar más comandos.,false,ia,scratch
+cuarto-egb,Chatbots,¿Qué es un chatbot?,video,20 min,7,,Asistentes virtuales bots de atención al cliente.,false,ia,scratch
+cuarto-egb,Chatbots,Crear chatbot simple,tutorial,40 min,8,,Chatbot en Scratch con respuestas predefinidas.,false,ia,scratch
+cuarto-egb,Chatbots,Chatbot inteligente,project,45 min,9,,Agregar más respuestas y personalidad al bot.,false,ia,scratch
+cuarto-egb,Proyecto Final,Diseñar asistente,video,15 min,10,,Planificar asistente virtual personalizado.,false,ia,teachable
+cuarto-egb,Proyecto Final,Desarrollar asistente,project,50 min,11,,Asistente que responde preguntas y ejecuta acciones.,false,ia,teachable
+cuarto-egb,Proyecto Final,Demo Day,activity,35 min,12,,Presentación de asistentes virtuales.,true,ia,teachable
+quinto-egb,ML Conceptos,Datos de entrenamiento,video,20 min,1,,Importancia de buenos datos. Sesgo en datos.,false,ia,teachable
+quinto-egb,ML Conceptos,Recolectar datos,activity,30 min,2,,Crear dataset propio con imágenes o texto.,false,ia,teachable
+quinto-egb,ML Conceptos,Machine Learning for Kids,tutorial,35 min,3,,Plataforma ML for Kids. Crear proyecto.,false,ia,teachable
+quinto-egb,Texto,Clasificar texto,video,20 min,4,,Análisis de sentimientos spam vs no spam.,false,ia,teachable
+quinto-egb,Texto,Entrenar con texto,tutorial,40 min,5,,Clasificador de texto en ML for Kids.,false,ia,teachable
+quinto-egb,Texto,Detector de emociones,project,45 min,6,,Clasificar texto como feliz triste enojado.,false,ia,teachable
+quinto-egb,Números,Predicciones numéricas,video,20 min,7,,Predecir valores: temperatura precios.,false,ia,teachable
+quinto-egb,Números,Modelo de predicción,tutorial,40 min,8,,Crear modelo que predice basado en números.,false,ia,teachable
+quinto-egb,Números,Proyecto de predicción,project,45 min,9,,Predecir algo útil: clima notas etc.,false,ia,teachable
+quinto-egb,Proyecto Final,Problema real,video,15 min,10,,Identificar problema que ML puede resolver.,false,ia,teachable
+quinto-egb,Proyecto Final,Solución con ML,project,55 min,11,,Desarrollar solución completa.,false,ia,teachable
+quinto-egb,Proyecto Final,Pitch de proyecto,activity,35 min,12,,Presentar como si fuera a inversionistas.,true,ia,teachable
+sexto-egb,IA en Robots,Robots inteligentes,video,20 min,1,,Robots que usan IA: aspiradoras drones carros.,false,ia,teachable
+sexto-egb,IA en Robots,Sensores como sentidos,activity,30 min,2,,Mapear sensores del robot a sentidos humanos.,false,ia,tinkercad
+sexto-egb,IA en Robots,Comportamiento reactivo,tutorial,35 min,3,,Programar robot que reacciona a estímulos.,false,ia,tinkercad
+sexto-egb,Visión,Visión artificial básica,video,20 min,4,,Cómo los robots ven con cámaras.,false,ia,teachable
+sexto-egb,Visión,Detectar colores,tutorial,40 min,5,,Usar cámara para detectar colores específicos.,false,ia,teachable
+sexto-egb,Visión,Robot sigue color,project,50 min,6,,Robot que sigue objeto de color específico.,false,ia,tinkercad
+sexto-egb,Voz,Control por voz,video,20 min,7,,Robots que obedecen comandos de voz.,false,ia,teachable
+sexto-egb,Voz,Integrar reconocimiento,tutorial,45 min,8,,Agregar control de voz al robot.,false,ia,tinkercad
+sexto-egb,Voz,Robot asistente,project,50 min,9,,Robot que responde a comandos de voz.,false,ia,tinkercad
+sexto-egb,Proyecto Final,Robot inteligente,video,15 min,10,,Planificar robot con múltiples capacidades IA.,false,ia,teachable
+sexto-egb,Proyecto Final,Construcción,project,60 min,11,,Desarrollar robot con IA integrada.,false,ia,tinkercad
+sexto-egb,Proyecto Final,Competencia,activity,45 min,12,,Competencia de robots inteligentes.,true,ia,tinkercad
+septimo-egb,Python Básico,¿Por qué Python?,video,15 min,1,,Python es el lenguaje de la IA. Instalación.,false,ia,python
+septimo-egb,Python Básico,Variables y tipos,tutorial,35 min,2,,int float string bool. print() input().,false,ia,python
+septimo-egb,Python Básico,Condicionales y bucles,tutorial,40 min,3,,if/else for while. Ejercicios básicos.,false,ia,python
+septimo-egb,Listas y Funciones,Listas en Python,tutorial,35 min,4,,Crear modificar recorrer listas.,false,ia,python
+septimo-egb,Listas y Funciones,Funciones,tutorial,40 min,5,,Definir funciones parámetros return.,false,ia,python
+septimo-egb,Listas y Funciones,Mini-proyecto,project,45 min,6,,Juego de adivinanzas en Python.,false,ia,python
+septimo-egb,Librerías IA,NumPy básico,tutorial,40 min,7,,Arrays operaciones matemáticas.,false,ia,colab
+septimo-egb,Librerías IA,Matplotlib,tutorial,35 min,8,,Crear gráficos simples.,false,ia,colab
+septimo-egb,Librerías IA,Análisis de datos,project,50 min,9,,Analizar dataset simple con gráficos.,false,ia,colab
+septimo-egb,Proyecto Final,Planificar proyecto,video,15 min,10,,Ideas de proyectos con Python.,false,ia,python
+septimo-egb,Proyecto Final,Desarrollar,project,55 min,11,,Proyecto de análisis de datos.,false,ia,colab
+septimo-egb,Proyecto Final,Presentación,activity,35 min,12,,Mostrar resultados y código.,true,ia,colab
+octavo-egb,Repaso Python,Repaso estructuras,tutorial,30 min,1,,Repaso rápido de Python básico.,false,ia,python
+octavo-egb,Repaso Python,Pandas intro,tutorial,40 min,2,,DataFrames leer CSV explorar datos.,false,ia,colab
+octavo-egb,Repaso Python,Limpieza de datos,tutorial,40 min,3,,Valores nulos tipos de datos normalización.,false,ia,colab
+octavo-egb,Scikit-learn,Introducción sklearn,video,20 min,4,,Qué es scikit-learn instalación.,false,ia,colab
+octavo-egb,Scikit-learn,Clasificación KNN,tutorial,45 min,5,,K-Nearest Neighbors. Entrenar y predecir.,false,ia,colab
+octavo-egb,Scikit-learn,Clasificador Iris,project,50 min,6,,Clasificar flores con dataset Iris.,false,ia,colab
+octavo-egb,Más Modelos,Árboles de decisión,tutorial,45 min,7,,Decision Trees. Visualizar árbol.,false,ia,colab
+octavo-egb,Más Modelos,Regresión lineal,tutorial,40 min,8,,Predecir valores continuos.,false,ia,colab
+octavo-egb,Más Modelos,Proyecto predicción,project,50 min,9,,Predecir precios de casas (dataset simple).,false,ia,colab
+octavo-egb,Proyecto Final,Dataset propio,video,15 min,10,,Encontrar o crear dataset interesante.,false,ia,colab
+octavo-egb,Proyecto Final,Modelo completo,project,60 min,11,,Pipeline completo: datos→modelo→predicción.,false,ia,colab
+octavo-egb,Proyecto Final,Presentación técnica,activity,40 min,12,,Explicar modelo métricas resultados.,true,ia,colab
+noveno-egb,Redes Neuronales,¿Qué es una neurona?,video,25 min,1,,Neurona biológica vs artificial. Pesos y bias.,false,ia,colab
+noveno-egb,Redes Neuronales,Perceptrón simple,tutorial,45 min,2,,Implementar perceptrón desde cero.,false,ia,colab
+noveno-egb,Redes Neuronales,Red multicapa,video,20 min,3,,Capas ocultas funciones de activación.,false,ia,colab
+noveno-egb,TensorFlow/Keras,Instalación TF,tutorial,30 min,4,,Instalar TensorFlow y Keras.,false,ia,colab
+noveno-egb,TensorFlow/Keras,Primera red,tutorial,50 min,5,,Red simple para clasificar dígitos MNIST.,false,ia,colab
+noveno-egb,TensorFlow/Keras,Entrenar y evaluar,tutorial,45 min,6,,Epochs batch size accuracy loss.,false,ia,colab
+noveno-egb,Imágenes,CNNs introducción,video,25 min,7,,Convolutional Neural Networks para imágenes.,false,ia,colab
+noveno-egb,Imágenes,Clasificador imágenes,tutorial,55 min,8,,CNN para clasificar imágenes CIFAR-10.,false,ia,colab
+noveno-egb,Imágenes,Transfer Learning,tutorial,45 min,9,,Usar modelos pre-entrenados.,false,ia,colab
+noveno-egb,Proyecto Final,Definir problema,video,15 min,10,,Elegir problema de clasificación de imágenes.,false,ia,colab
+noveno-egb,Proyecto Final,Desarrollar CNN,project,65 min,11,,Entrenar modelo con dataset propio.,false,ia,colab
+noveno-egb,Proyecto Final,Demo y análisis,activity,45 min,12,,Demostrar modelo analizar errores.,true,ia,colab
+decimo-egb,NLP Básico,Procesamiento de texto,video,25 min,1,,Tokenización stemming lemmatization.,false,ia,colab
+decimo-egb,NLP Básico,NLTK introducción,tutorial,45 min,2,,Librería NLTK procesar texto.,false,ia,colab
+decimo-egb,NLP Básico,Análisis sentimientos,project,50 min,3,,Clasificar reviews como positivas/negativas.,false,ia,colab
+decimo-egb,Chatbots,Chatbots con Python,video,20 min,4,,Arquitectura de chatbots.,false,ia,colab
+decimo-egb,Chatbots,Chatbot rule-based,tutorial,50 min,5,,Chatbot con reglas y patrones.,false,ia,colab
+decimo-egb,Chatbots,Chatbot con ML,project,55 min,6,,Chatbot que aprende de conversaciones.,false,ia,colab
+decimo-egb,Visión,OpenCV introducción,tutorial,45 min,7,,Leer imágenes filtros detección bordes.,false,ia,colab
+decimo-egb,Visión,Detección de rostros,tutorial,50 min,8,,Haar cascades detectar caras.,false,ia,colab
+decimo-egb,Visión,Proyecto visión,project,55 min,9,,Sistema de reconocimiento facial simple.,false,ia,colab
+decimo-egb,Proyecto Final,Propuesta proyecto,video,15 min,10,,Definir proyecto de IA aplicada.,false,ia,colab
+decimo-egb,Proyecto Final,Desarrollo,project,70 min,11,,Implementar solución completa.,false,ia,colab
+decimo-egb,Proyecto Final,Presentación,activity,45 min,12,,Demo código documentación.,true,ia,colab
+primero-bach,Deep Learning,RNNs y LSTMs,video,30 min,1,,Redes recurrentes para secuencias.,false,ia,colab
+primero-bach,Deep Learning,Predicción series,tutorial,55 min,2,,Predecir valores futuros con LSTM.,false,ia,colab
+primero-bach,Deep Learning,Generación texto,project,60 min,3,,Generar texto con RNN.,false,ia,colab
+primero-bach,GANs,Redes generativas,video,25 min,4,,Generative Adversarial Networks.,false,ia,colab
+primero-bach,GANs,GAN simple,tutorial,60 min,5,,Implementar GAN básica.,false,ia,colab
+primero-bach,GANs,Generar imágenes,project,65 min,6,,GAN para generar imágenes simples.,false,ia,colab
+primero-bach,Deployment,APIs con Flask,tutorial,50 min,7,,Crear API REST para modelo ML.,false,ia,colab
+primero-bach,Deployment,Frontend simple,tutorial,45 min,8,,Interfaz web para consumir API.,false,ia,colab
+primero-bach,Deployment,Deploy en cloud,tutorial,50 min,9,,Subir modelo a Heroku o similar.,false,ia,colab
+primero-bach,Proyecto Final,Proyecto completo,video,15 min,10,,Planificar proyecto end-to-end.,false,ia,colab
+primero-bach,Proyecto Final,Desarrollo full,project,75 min,11,,Modelo + API + Frontend.,false,ia,colab
+primero-bach,Proyecto Final,Presentación,activity,50 min,12,,Demo en vivo documentación.,true,ia,colab
+segundo-bach,Ética en IA,Sesgo en algoritmos,video,30 min,1,,Casos de sesgo racial género en IA.,false,ia,colab
+segundo-bach,Ética en IA,Detectar sesgo,tutorial,50 min,2,,Analizar datasets por sesgo.,false,ia,colab
+segundo-bach,Ética en IA,IA responsable,activity,45 min,3,,Debate: ¿debe la IA tomar decisiones importantes?,false,ia,colab
+segundo-bach,Reinforcement,RL introducción,video,30 min,4,,Agentes entornos recompensas.,false,ia,colab
+segundo-bach,Reinforcement,Q-Learning,tutorial,55 min,5,,Implementar Q-Learning simple.,false,ia,colab
+segundo-bach,Reinforcement,Juego con RL,project,60 min,6,,Entrenar agente para juego simple.,false,ia,colab
+segundo-bach,LLMs,Large Language Models,video,30 min,7,,GPT BERT transformers.,false,ia,colab
+segundo-bach,LLMs,APIs de LLMs,tutorial,50 min,8,,Usar API de OpenAI o similar.,false,ia,colab
+segundo-bach,LLMs,Aplicación con LLM,project,60 min,9,,Crear aplicación usando LLM.,false,ia,colab
+segundo-bach,Proyecto Final,Investigación,video,20 min,10,,Elegir tema de investigación en IA.,false,ia,colab
+segundo-bach,Proyecto Final,Paper técnico,project,70 min,11,,Escribir documento técnico.,false,ia,colab
+segundo-bach,Proyecto Final,Defensa,activity,50 min,12,,Presentar y defender investigación.,true,ia,colab
+tercero-bach,Estado del Arte,Tendencias IA 2024+,video,30 min,1,,AGI multimodal edge AI.,false,ia,colab
+tercero-bach,Estado del Arte,Papers científicos,tutorial,50 min,2,,Cómo leer papers de ML/IA.,false,ia,colab
+tercero-bach,Estado del Arte,Replicar paper,project,60 min,3,,Implementar algoritmo de paper.,false,ia,colab
+tercero-bach,MLOps,Pipelines de ML,video,25 min,4,,MLflow experimentos versioning.,false,ia,colab
+tercero-bach,MLOps,Automatización,tutorial,55 min,5,,Pipeline automatizado de entrenamiento.,false,ia,colab
+tercero-bach,MLOps,CI/CD para ML,tutorial,50 min,6,,Tests deployment automático.,false,ia,colab
+tercero-bach,Especialización,Computer Vision avanzado,tutorial,55 min,7,,Segmentación detección objetos.,false,ia,colab
+tercero-bach,Especialización,NLP avanzado,tutorial,55 min,8,,Transformers fine-tuning.,false,ia,colab
+tercero-bach,Especialización,Proyecto especializado,project,65 min,9,,Proyecto en área elegida.,false,ia,colab
+tercero-bach,Capstone,Definir capstone,video,20 min,10,,Proyecto final de graduación.,false,ia,colab
+tercero-bach,Capstone,Desarrollo capstone,project,80 min,11,,Proyecto completo publicable.,false,ia,colab
+tercero-bach,Capstone,Presentación final,activity,60 min,12,,Defensa ante jurado externo.,true,ia,colab
+cuarto-egb,Internet Seguro,¿Qué es internet?,video,15 min,1,,Red de computadoras conectadas. Información viaja.,false,hacking,scratch
+cuarto-egb,Internet Seguro,Peligros en línea,video,20 min,2,,Extraños información falsa virus.,false,hacking,scratch
+cuarto-egb,Internet Seguro,Reglas de seguridad,activity,25 min,3,,Crear póster con reglas de seguridad.,false,hacking,scratch
+cuarto-egb,Contraseñas,Contraseñas fuertes,video,15 min,4,,Por qué necesitamos contraseñas. Ejemplos malos vs buenos.,false,hacking,scratch
+cuarto-egb,Contraseñas,Crear contraseña segura,activity,25 min,5,,Técnica de frase: MiGatoTiene4Patas!,false,hacking,scratch
+cuarto-egb,Contraseñas,Juego de contraseñas,activity,20 min,6,,Adivinar si contraseña es fuerte o débil.,false,hacking,scratch
+cuarto-egb,Privacidad,Información personal,video,20 min,7,,Qué NO compartir: dirección teléfono escuela.,false,hacking,scratch
+cuarto-egb,Privacidad,Huella digital,activity,25 min,8,,Todo lo que publicas queda para siempre.,false,hacking,scratch
+cuarto-egb,Privacidad,Configurar privacidad,tutorial,30 min,9,,Configurar privacidad en juegos y apps.,false,hacking,scratch
+cuarto-egb,Proyecto,Campaña de seguridad,project,40 min,10,,Crear campaña para enseñar a otros niños.,false,hacking,scratch
+cuarto-egb,Proyecto,Presentación,activity,30 min,11,,Presentar campaña a la clase.,false,hacking,scratch
+cuarto-egb,Proyecto,Certificado,activity,15 min,12,,Certificado de Ciudadano Digital Seguro.,true,hacking,scratch
+quinto-egb,Fake News,¿Qué son noticias falsas?,video,20 min,1,,Por qué existen cómo se propagan.,false,hacking,scratch
+quinto-egb,Fake News,Verificar información,tutorial,30 min,2,,Técnicas: buscar fuente fecha otras fuentes.,false,hacking,scratch
+quinto-egb,Fake News,Detective de noticias,activity,25 min,3,,Identificar noticias falsas vs verdaderas.,false,hacking,scratch
+quinto-egb,Phishing,¿Qué es phishing?,video,20 min,4,,Correos y mensajes falsos que roban datos.,false,hacking,scratch
+quinto-egb,Phishing,Identificar phishing,tutorial,30 min,5,,Señales: errores urgencia links sospechosos.,false,hacking,scratch
+quinto-egb,Phishing,Juego anti-phishing,activity,25 min,6,,Identificar correos reales vs phishing.,false,hacking,scratch
+quinto-egb,Malware,Virus y malware,video,20 min,7,,Tipos: virus troyanos ransomware.,false,hacking,scratch
+quinto-egb,Malware,Proteger mi computadora,tutorial,30 min,8,,Antivirus actualizaciones no descargar raro.,false,hacking,scratch
+quinto-egb,Malware,Simulación de ataque,activity,25 min,9,,Juego de rol: qué hacer si hay virus.,false,hacking,scratch
+quinto-egb,Proyecto,Manual de seguridad,project,45 min,10,,Crear manual ilustrado de seguridad.,false,hacking,scratch
+quinto-egb,Proyecto,Presentación,activity,30 min,11,,Enseñar a compañeros menores.,false,hacking,scratch
+quinto-egb,Proyecto,Certificado Detective,activity,15 min,12,,Certificado de Detective Digital.,true,hacking,scratch
+sexto-egb,Redes,¿Cómo funciona internet?,video,25 min,1,,IP DNS servidores clientes.,false,hacking,scratch
+sexto-egb,Redes,Mi dirección IP,tutorial,30 min,2,,Encontrar IP qué revela sobre nosotros.,false,hacking,scratch
+sexto-egb,Redes,Redes WiFi seguras,activity,25 min,3,,WPA2 contraseñas de router redes públicas.,false,hacking,scratch
+sexto-egb,Encriptación,¿Qué es encriptar?,video,20 min,4,,Mensajes secretos códigos cifrado.,false,hacking,scratch
+sexto-egb,Encriptación,Cifrado César,tutorial,35 min,5,,Implementar cifrado César en papel.,false,hacking,scratch
+sexto-egb,Encriptación,Mensajes secretos,activity,30 min,6,,Enviar mensajes cifrados entre compañeros.,false,hacking,scratch
+sexto-egb,Autenticación,Más que contraseñas,video,20 min,7,,2FA biometría tokens.,false,hacking,scratch
+sexto-egb,Autenticación,Configurar 2FA,tutorial,35 min,8,,Activar 2FA en cuentas reales.,false,hacking,scratch
+sexto-egb,Autenticación,Gestores de contraseñas,tutorial,30 min,9,,Usar gestor de contraseñas.,false,hacking,scratch
+sexto-egb,Proyecto,Auditoría de seguridad,project,45 min,10,,Revisar seguridad de sus propias cuentas.,false,hacking,scratch
+sexto-egb,Proyecto,Plan de mejora,activity,30 min,11,,Crear plan para mejorar seguridad personal.,false,hacking,scratch
+sexto-egb,Proyecto,Certificado,activity,15 min,12,,Certificado Fundamentos de Seguridad.,true,hacking,scratch
+septimo-egb,Hacking Ético,¿Qué es hacking ético?,video,25 min,1,,Diferencia: hacker vs cracker. Sombreros.,false,hacking,makecode
+septimo-egb,Hacking Ético,Legalidad y ética,video,20 min,2,,Leyes permisos responsabilidad.,false,hacking,makecode
+septimo-egb,Hacking Ético,Casos famosos,activity,30 min,3,,Analizar casos de hackers éticos famosos.,false,hacking,makecode
+septimo-egb,Reconocimiento,OSINT básico,video,25 min,4,,Información pública disponible.,false,hacking,makecode
+septimo-egb,Reconocimiento,Buscar información,tutorial,35 min,5,,Google dorking básico redes sociales.,false,hacking,makecode
+septimo-egb,Reconocimiento,Perfil de objetivo,activity,30 min,6,,Crear perfil con info pública (con permiso).,false,hacking,makecode
+septimo-egb,Vulnerabilidades,¿Qué es una vulnerabilidad?,video,25 min,7,,Errores en software que pueden explotarse.,false,hacking,makecode
+septimo-egb,Vulnerabilidades,CVE y exploits,tutorial,35 min,8,,Base de datos CVE entender reportes.,false,hacking,makecode
+septimo-egb,Vulnerabilidades,Reportar vulnerabilidades,activity,30 min,9,,Cómo reportar bugs responsablemente.,false,hacking,makecode
+septimo-egb,Proyecto,CTF para principiantes,project,50 min,10,,Resolver retos CTF nivel básico.,false,hacking,makecode
+septimo-egb,Proyecto,Competencia CTF,activity,45 min,11,,Mini competencia en clase.,false,hacking,makecode
+septimo-egb,Proyecto,Certificado,activity,15 min,12,,Certificado Hacker Ético Junior.,true,hacking,makecode
+octavo-egb,Linux Básico,¿Por qué Linux?,video,20 min,1,,Linux en servidores herramientas de seguridad.,false,hacking,wokwi
+octavo-egb,Linux Básico,Instalación VM,tutorial,40 min,2,,VirtualBox + Ubuntu/Kali Linux.,false,hacking,wokwi
+octavo-egb,Linux Básico,Navegación terminal,tutorial,35 min,3,,cd ls pwd mkdir rm cp mv.,false,hacking,wokwi
+octavo-egb,Comandos,Permisos y usuarios,tutorial,40 min,4,,chmod chown sudo usuarios.,false,hacking,wokwi
+octavo-egb,Comandos,Procesos y red,tutorial,35 min,5,,ps top netstat ifconfig ping.,false,hacking,wokwi
+octavo-egb,Comandos,Scripting bash,tutorial,40 min,6,,Scripts básicos automatización.,false,hacking,wokwi
+octavo-egb,Herramientas,Nmap introducción,tutorial,45 min,7,,Escaneo de puertos descubrimiento.,false,hacking,wokwi
+octavo-egb,Herramientas,Wireshark básico,tutorial,45 min,8,,Capturar y analizar tráfico.,false,hacking,wokwi
+octavo-egb,Herramientas,Práctica de escaneo,activity,40 min,9,,Escanear red local (con permiso).,false,hacking,wokwi
+octavo-egb,Proyecto,Laboratorio virtual,project,50 min,10,,Configurar lab de práctica.,false,hacking,wokwi
+octavo-egb,Proyecto,Retos de terminal,activity,45 min,11,,OverTheWire Bandit niveles 1-10.,false,hacking,wokwi
+octavo-egb,Proyecto,Certificado,activity,15 min,12,,Certificado Linux Security.,true,hacking,wokwi
+noveno-egb,Web Basics,Cómo funciona la web,video,25 min,1,,HTTP HTML CSS JavaScript servidores.,false,hacking,wokwi
+noveno-egb,Web Basics,Herramientas del navegador,tutorial,35 min,2,,DevTools inspeccionar network console.,false,hacking,wokwi
+noveno-egb,Web Basics,Modificar páginas,activity,30 min,3,,Editar HTML/CSS en navegador.,false,hacking,wokwi
+noveno-egb,OWASP Top 10,Vulnerabilidades comunes,video,30 min,4,,OWASP Top 10 por qué importa.,false,hacking,wokwi
+noveno-egb,OWASP Top 10,XSS (Cross-Site Scripting),tutorial,45 min,5,,Qué es cómo funciona cómo prevenir.,false,hacking,wokwi
+noveno-egb,OWASP Top 10,Práctica XSS,activity,40 min,6,,Laboratorio XSS en entorno controlado.,false,hacking,wokwi
+noveno-egb,SQL Injection,¿Qué es SQLi?,video,25 min,7,,Bases de datos consultas inyección.,false,hacking,wokwi
+noveno-egb,SQL Injection,Práctica SQLi,tutorial,50 min,8,,Laboratorio SQL injection.,false,hacking,wokwi
+noveno-egb,SQL Injection,Prevención,tutorial,35 min,9,,Prepared statements sanitización.,false,hacking,wokwi
+noveno-egb,Proyecto,DVWA,project,55 min,10,,Damn Vulnerable Web App - retos.,false,hacking,wokwi
+noveno-egb,Proyecto,Reporte de seguridad,activity,40 min,11,,Escribir reporte profesional.,false,hacking,wokwi
+noveno-egb,Proyecto,Certificado,activity,15 min,12,,Certificado Web Security.,true,hacking,wokwi
+decimo-egb,Metodología,Fases del pentesting,video,30 min,1,,Reconocimiento escaneo explotación reporte.,false,hacking,wokwi
+decimo-egb,Metodología,Alcance y reglas,video,25 min,2,,Definir scope obtener permisos.,false,hacking,wokwi
+decimo-egb,Metodología,Documentación,tutorial,35 min,3,,Tomar notas evidencias screenshots.,false,hacking,wokwi
+decimo-egb,Reconocimiento,OSINT avanzado,tutorial,45 min,4,,Maltego theHarvester Shodan.,false,hacking,wokwi
+decimo-egb,Reconocimiento,Enumeración,tutorial,45 min,5,,Nmap avanzado enum4linux dirb.,false,hacking,wokwi
+decimo-egb,Reconocimiento,Práctica recon,activity,40 min,6,,Reconocimiento de objetivo de práctica.,false,hacking,wokwi
+decimo-egb,Explotación,Metasploit intro,tutorial,50 min,7,,Arquitectura módulos payloads.,false,hacking,wokwi
+decimo-egb,Explotación,Exploit básico,tutorial,50 min,8,,Explotar vulnerabilidad conocida.,false,hacking,wokwi
+decimo-egb,Explotación,Post-explotación,tutorial,45 min,9,,Qué hacer después de acceso.,false,hacking,wokwi
+decimo-egb,Proyecto,CTF intermedio,project,60 min,10,,Resolver máquina de HackTheBox/TryHackMe.,false,hacking,wokwi
+decimo-egb,Proyecto,Reporte profesional,activity,45 min,11,,Escribir reporte de pentesting.,false,hacking,wokwi
+decimo-egb,Proyecto,Certificado,activity,15 min,12,,Certificado Pentester Junior.,true,hacking,wokwi
+primero-bach,Redes,Ataques de red,video,30 min,1,,ARP spoofing MITM DNS poisoning.,false,hacking,wokwi
+primero-bach,Redes,Práctica MITM,tutorial,55 min,2,,Ettercap Bettercap en lab.,false,hacking,wokwi
+primero-bach,Redes,Defensa de red,tutorial,45 min,3,,Detectar y prevenir ataques.,false,hacking,wokwi
+primero-bach,Wireless,WiFi hacking,video,30 min,4,,WEP WPA WPA2 handshakes.,false,hacking,wokwi
+primero-bach,Wireless,Aircrack-ng,tutorial,55 min,5,,Capturar handshake crackear.,false,hacking,wokwi
+primero-bach,Wireless,Seguridad WiFi,tutorial,45 min,6,,Configurar WiFi seguro.,false,hacking,wokwi
+primero-bach,Passwords,Cracking de contraseñas,video,25 min,7,,Hashes rainbow tables wordlists.,false,hacking,wokwi
+primero-bach,Passwords,John the Ripper,tutorial,50 min,8,,Crackear hashes comunes.,false,hacking,wokwi
+primero-bach,Passwords,Hashcat,tutorial,50 min,9,,GPU cracking reglas.,false,hacking,wokwi
+primero-bach,Proyecto,Máquina completa,project,70 min,10,,Resolver máquina media de HTB.,false,hacking,wokwi
+primero-bach,Proyecto,Writeup técnico,activity,50 min,11,,Documentar proceso completo.,false,hacking,wokwi
+primero-bach,Proyecto,Certificado,activity,15 min,12,,Certificado Ethical Hacker.,true,hacking,wokwi
+segundo-bach,Social Engineering,Ingeniería social,video,30 min,1,,Phishing pretexting baiting.,false,hacking,colab
+segundo-bach,Social Engineering,Crear phishing,tutorial,55 min,2,,GoPhish páginas falsas (lab).,false,hacking,colab
+segundo-bach,Social Engineering,Defensa SE,activity,45 min,3,,Entrenar a detectar ataques.,false,hacking,colab
+segundo-bach,Privilege Escalation,Linux privesc,tutorial,55 min,4,,Técnicas de escalación en Linux.,false,hacking,colab
+segundo-bach,Privilege Escalation,Windows privesc,tutorial,55 min,5,,Técnicas de escalación en Windows.,false,hacking,colab
+segundo-bach,Privilege Escalation,Práctica privesc,activity,50 min,6,,Máquinas de práctica.,false,hacking,colab
+segundo-bach,Active Directory,AD fundamentals,video,30 min,7,,Dominios usuarios grupos GPOs.,false,hacking,colab
+segundo-bach,Active Directory,AD attacks,tutorial,60 min,8,,Kerberoasting Pass-the-Hash.,false,hacking,colab
+segundo-bach,Active Directory,AD defense,tutorial,50 min,9,,Hardening de Active Directory.,false,hacking,colab
+segundo-bach,Proyecto,Red Team exercise,project,75 min,10,,Ejercicio completo red team.,false,hacking,colab
+segundo-bach,Proyecto,Presentación ejecutiva,activity,50 min,11,,Presentar hallazgos a directivos.,false,hacking,colab
+segundo-bach,Proyecto,Certificado,activity,15 min,12,,Certificado Red Team Operator.,true,hacking,colab
+tercero-bach,Blue Team,SOC operations,video,30 min,1,,Security Operations Center roles.,false,hacking,colab
+tercero-bach,Blue Team,SIEM basics,tutorial,55 min,2,,Splunk/ELK análisis de logs.,false,hacking,colab
+tercero-bach,Blue Team,Incident response,tutorial,50 min,3,,Proceso de respuesta a incidentes.,false,hacking,colab
+tercero-bach,Forensics,Digital forensics,video,30 min,4,,Evidencia digital cadena de custodia.,false,hacking,colab
+tercero-bach,Forensics,Análisis de disco,tutorial,55 min,5,,Autopsy recuperar archivos.,false,hacking,colab
+tercero-bach,Forensics,Análisis de memoria,tutorial,55 min,6,,Volatility análisis RAM.,false,hacking,colab
+tercero-bach,Malware,Análisis de malware,video,30 min,7,,Tipos comportamiento análisis.,false,hacking,colab
+tercero-bach,Malware,Análisis estático,tutorial,55 min,8,,Strings PE headers imports.,false,hacking,colab
+tercero-bach,Malware,Análisis dinámico,tutorial,55 min,9,,Sandbox comportamiento en VM.,false,hacking,colab
+tercero-bach,Capstone,Proyecto final,project,80 min,10,,Investigación de incidente completo.,false,hacking,colab
+tercero-bach,Capstone,Reporte forense,activity,55 min,11,,Documentación profesional.,false,hacking,colab
+tercero-bach,Capstone,Certificación,activity,20 min,12,,Certificado Cybersecurity Professional.,true,hacking,colab
