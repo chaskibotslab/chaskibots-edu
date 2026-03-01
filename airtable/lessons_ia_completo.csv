@@ -1,0 +1,243 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked,programId,simulatorId
+inicial-1,Robots que Aprenden,Bienvenida al mundo de la IA,video,8 min,1,,Introducción al curso de Inteligencia Artificial,false,ia,scratch
+inicial-1,Robots que Aprenden,¿Qué es un robot inteligente?,video,10 min,2,,Diferencia entre robot normal y robot que piensa,false,ia,scratch
+inicial-1,Robots que Aprenden,Robots que reconocen caras,activity,15 min,3,,Juego con títere que reconoce fotos de familia,false,ia,scratch
+inicial-1,Robots que Aprenden,Mi robot favorito,activity,12 min,4,,Dibujar un robot inteligente,false,ia,scratch
+inicial-1,Robots que Escuchan,Robots que entienden palabras,video,10 min,5,,Asistentes de voz Alexa Google,false,ia,scratch
+inicial-1,Robots que Escuchan,Dar órdenes al robot,activity,20 min,6,,Juego de roles: niño es robot recibe comandos,false,ia,scratch
+inicial-1,Robots que Escuchan,Simón dice robot,activity,15 min,7,,Juego Simón dice con comandos de robot,false,ia,scratch
+inicial-1,Robots que Ven,Robots con ojos,video,10 min,8,,Cámaras como ojos del robot,false,ia,scratch
+inicial-1,Robots que Ven,Clasificar colores,activity,15 min,9,,Clasificar objetos por color como robot,false,ia,scratch
+inicial-1,Robots que Ven,Buscar y encontrar,activity,15 min,10,,Robot encuentra objetos específicos,false,ia,scratch
+inicial-1,Mi Robot Amigo,Diseñar mi robot,activity,20 min,11,,Planificar habilidades del robot,false,ia,scratch
+inicial-1,Mi Robot Amigo,Dibujar mi robot,project,25 min,12,,Dibujar robot con habilidad especial,false,ia,scratch
+inicial-1,Mi Robot Amigo,Presentación,activity,20 min,13,,Presentar robot a la clase,true,ia,scratch
+inicial-2,Decisiones Simples,Bienvenida Inicial 2,video,8 min,1,,Introducción al nuevo año,false,ia,scratch
+inicial-2,Decisiones Simples,Si llueve uso paraguas,video,12 min,2,,Concepto si entonces,false,ia,scratch
+inicial-2,Decisiones Simples,El robot que decide,activity,20 min,3,,Tarjetas con situaciones,false,ia,scratch
+inicial-2,Decisiones Simples,Juego de decisiones,activity,18 min,4,,Practicar decisiones como robot,false,ia,scratch
+inicial-2,Patrones,Encontrar patrones,video,10 min,5,,Secuencias de colores y formas,false,ia,scratch
+inicial-2,Patrones,Completar secuencias,activity,25 min,6,,Completar patrones con bloques,false,ia,scratch
+inicial-2,Patrones,Crear mis patrones,activity,20 min,7,,Inventar patrones propios,false,ia,scratch
+inicial-2,Clasificación,Agrupar objetos,video,12 min,8,,Robots que clasifican,false,ia,scratch
+inicial-2,Clasificación,Juego de clasificación,activity,25 min,9,,Clasificar objetos del aula,false,ia,scratch
+inicial-2,Clasificación,Robot clasificador,activity,20 min,10,,Niño es robot clasificador,false,ia,scratch
+inicial-2,Robot Clasificador,Diseñar clasificador,activity,20 min,11,,Planificar robot clasificador,false,ia,scratch
+inicial-2,Robot Clasificador,Construir clasificador,project,30 min,12,,Robot de cartón clasificador,false,ia,scratch
+inicial-2,Robot Clasificador,Feria de robots,activity,25 min,13,,Presentación a padres,true,ia,scratch
+primero-egb,Secuencias,Bienvenida 1° EGB,video,10 min,1,,Introducción al pensamiento computacional,false,ia,scratch
+primero-egb,Secuencias,¿Qué es una secuencia?,video,15 min,2,,Pasos ordenados para hacer cosas,false,ia,scratch
+primero-egb,Secuencias,Ordenar pasos,activity,25 min,3,,Tarjetas desordenadas para ordenar,false,ia,scratch
+primero-egb,Secuencias,Secuencias en la vida,activity,20 min,4,,Identificar secuencias diarias,false,ia,scratch
+primero-egb,Secuencias,Mi rutina diaria,project,30 min,5,,Dibujar rutina matutina en orden,false,ia,scratch
+primero-egb,Algoritmos,Instrucciones para robots,video,15 min,6,,Algoritmo es una receta,false,ia,scratch
+primero-egb,Algoritmos,Robot humano,activity,30 min,7,,Dar instrucciones a compañero robot,false,ia,scratch
+primero-egb,Algoritmos,Laberinto en papel,activity,25 min,8,,Escribir instrucciones con flechas,false,ia,scratch
+primero-egb,Algoritmos,Programar al profesor,activity,25 min,9,,Dar instrucciones al profesor,false,ia,scratch
+primero-egb,Scratch Jr,Conociendo Scratch Jr,tutorial,20 min,10,,Interfaz y bloques básicos,false,ia,scratch
+primero-egb,Scratch Jr,Mi primer programa,activity,30 min,11,,Hacer que el gato camine,false,ia,scratch
+primero-egb,Scratch Jr,Agregar personajes,tutorial,25 min,12,,Añadir sprites y fondos,false,ia,scratch
+primero-egb,Scratch Jr,Historia animada,project,35 min,13,,Historia con 2 personajes,false,ia,scratch
+primero-egb,Proyecto Final,Planificar mi juego,video,15 min,14,,Ideas para juego simple,false,ia,scratch
+primero-egb,Proyecto Final,Crear mi juego,project,40 min,15,,Personaje recoge objetos,false,ia,scratch
+primero-egb,Proyecto Final,Presentación,activity,30 min,16,,Mostrar juegos a la clase,true,ia,scratch
+segundo-egb,Condicionales,Bienvenida 2° EGB,video,10 min,1,,Introducción a lógica,false,ia,scratch
+segundo-egb,Condicionales,Si entonces,video,15 min,2,,Decisiones en la vida,false,ia,scratch
+segundo-egb,Condicionales,Juego de decisiones,activity,25 min,3,,Tarjetas Si el semáforo...,false,ia,scratch
+segundo-egb,Condicionales,Decisiones encadenadas,activity,25 min,4,,Si entonces sino,false,ia,scratch
+segundo-egb,Condicionales,Scratch Jr condicionales,tutorial,30 min,5,,Bloque al tocar,false,ia,scratch
+segundo-egb,Bucles,Repetir acciones,video,15 min,6,,Cosas que repetimos,false,ia,scratch
+segundo-egb,Bucles,Dibujar con bucles,activity,30 min,7,,Patrones con repetir,false,ia,scratch
+segundo-egb,Bucles,Bucles en Scratch Jr,tutorial,30 min,8,,Bloque repetir,false,ia,scratch
+segundo-egb,Bucles,Animación con bucles,activity,30 min,9,,Animación infinita,false,ia,scratch
+segundo-egb,Combinando,Condicionales + Bucles,video,15 min,10,,Combinar conceptos,false,ia,scratch
+segundo-egb,Combinando,Juego interactivo,project,40 min,11,,Personaje reacciona al tocarlo,false,ia,scratch
+segundo-egb,Combinando,Mejorando mi juego,activity,35 min,12,,Agregar sonidos,false,ia,scratch
+segundo-egb,Proyecto Final,Diseñar mi app,video,15 min,13,,Planificar aplicación,false,ia,scratch
+segundo-egb,Proyecto Final,Crear mi app,project,45 min,14,,App con múltiples pantallas,false,ia,scratch
+segundo-egb,Proyecto Final,Feria de apps,activity,30 min,15,,Presentar a compañeros,true,ia,scratch
+tercero-egb,¿Qué es ML?,Bienvenida 3° EGB,video,10 min,1,,Introducción a Machine Learning,false,ia,teachable
+tercero-egb,¿Qué es ML?,Máquinas que aprenden,video,20 min,2,,Programar reglas vs aprender de ejemplos,false,ia,teachable
+tercero-egb,¿Qué es ML?,Juego de adivinanzas,activity,25 min,3,,Adivinar animal con preguntas sí/no,false,ia,teachable
+tercero-egb,¿Qué es ML?,¿Cómo aprende una máquina?,video,15 min,4,,Proceso de aprendizaje simple,false,ia,teachable
+tercero-egb,¿Qué es ML?,Teachable Machine intro,tutorial,30 min,5,,Conocer Teachable Machine de Google,false,ia,teachable
+tercero-egb,Clasificación,Clasificar imágenes,video,15 min,6,,Cómo IA reconoce gatos vs perros,false,ia,teachable
+tercero-egb,Clasificación,Preparar datos,tutorial,25 min,7,,Tomar fotos para entrenar modelo,false,ia,teachable
+tercero-egb,Clasificación,Entrenar clasificador,tutorial,35 min,8,,Clasificador de 3 objetos,false,ia,teachable
+tercero-egb,Clasificación,Mi clasificador,project,40 min,9,,Clasificador de útiles escolares,false,ia,teachable
+tercero-egb,Reconocimiento,Reconocer sonidos,video,15 min,10,,IA que reconoce aplausos silbidos,false,ia,teachable
+tercero-egb,Reconocimiento,Grabar sonidos,tutorial,25 min,11,,Preparar muestras de audio,false,ia,teachable
+tercero-egb,Reconocimiento,Entrenar con sonidos,tutorial,35 min,12,,Clasificador de sonidos,false,ia,teachable
+tercero-egb,Reconocimiento,Proyecto de sonidos,project,40 min,13,,Detector de sonidos personalizado,false,ia,teachable
+tercero-egb,Proyecto Final,Planificar proyecto IA,video,15 min,14,,Ideas con Teachable Machine,false,ia,teachable
+tercero-egb,Proyecto Final,Desarrollar proyecto,project,50 min,15,,Clasificador útil para vida diaria,false,ia,teachable
+tercero-egb,Proyecto Final,Exposición,activity,30 min,16,,Presentar y explicar cómo aprende IA,true,ia,teachable
+cuarto-egb,Scratch Avanzado,Bienvenida 4° EGB,video,10 min,1,,Introducción a IA con Scratch,false,ia,scratch
+cuarto-egb,Scratch Avanzado,Repaso Scratch,tutorial,25 min,2,,Variables listas bloques personalizados,false,ia,scratch
+cuarto-egb,Scratch Avanzado,Extensiones de IA,video,20 min,3,,Reconocimiento de voz video sensing,false,ia,scratch
+cuarto-egb,Scratch Avanzado,Instalar extensiones,tutorial,25 min,4,,Agregar extensiones de IA,false,ia,scratch
+cuarto-egb,Scratch Avanzado,Video Sensing,tutorial,35 min,5,,Detectar movimiento con cámara,false,ia,scratch
+cuarto-egb,Scratch Avanzado,Juego con cámara,activity,35 min,6,,Juego que usa cámara web,false,ia,scratch
+cuarto-egb,Reconocimiento,Reconocimiento de voz,tutorial,30 min,7,,Extensión de voz comandos,false,ia,scratch
+cuarto-egb,Reconocimiento,Comandos básicos,activity,30 min,8,,Respuestas a comandos simples,false,ia,scratch
+cuarto-egb,Reconocimiento,Juego controlado por voz,project,45 min,9,,Juego que responde a voz,false,ia,scratch
+cuarto-egb,Reconocimiento,Mejoras y ajustes,activity,35 min,10,,Mejorar precisión más comandos,false,ia,scratch
+cuarto-egb,Chatbots,¿Qué es un chatbot?,video,20 min,11,,Asistentes virtuales bots,false,ia,scratch
+cuarto-egb,Chatbots,Diseñar conversación,activity,25 min,12,,Planificar diálogos del chatbot,false,ia,scratch
+cuarto-egb,Chatbots,Crear chatbot simple,tutorial,40 min,13,,Chatbot con respuestas predefinidas,false,ia,scratch
+cuarto-egb,Chatbots,Chatbot inteligente,project,45 min,14,,Más respuestas y personalidad,false,ia,scratch
+cuarto-egb,Proyecto Final,Diseñar asistente,video,15 min,15,,Planificar asistente virtual,false,ia,teachable
+cuarto-egb,Proyecto Final,Desarrollar asistente,project,50 min,16,,Asistente que responde y ejecuta,false,ia,teachable
+cuarto-egb,Proyecto Final,Demo Day,activity,35 min,17,,Presentación de asistentes,true,ia,teachable
+quinto-egb,ML Conceptos,Bienvenida 5° EGB,video,10 min,1,,Introducción a ML para niños,false,ia,teachable
+quinto-egb,ML Conceptos,Datos de entrenamiento,video,20 min,2,,Importancia de buenos datos sesgo,false,ia,teachable
+quinto-egb,ML Conceptos,Recolectar datos,activity,30 min,3,,Crear dataset con imágenes o texto,false,ia,teachable
+quinto-egb,ML Conceptos,Machine Learning for Kids,tutorial,35 min,4,,Plataforma ML for Kids,false,ia,teachable
+quinto-egb,ML Conceptos,Mi primer proyecto ML,activity,35 min,5,,Configurar y entrenar modelo,false,ia,teachable
+quinto-egb,Texto,Clasificar texto,video,20 min,6,,Análisis de sentimientos spam,false,ia,teachable
+quinto-egb,Texto,Preparar textos,activity,25 min,7,,Recolectar ejemplos de texto,false,ia,teachable
+quinto-egb,Texto,Entrenar con texto,tutorial,40 min,8,,Clasificador de texto,false,ia,teachable
+quinto-egb,Texto,Detector de emociones,project,45 min,9,,Clasificar feliz triste enojado,false,ia,teachable
+quinto-egb,Números,Predicciones numéricas,video,20 min,10,,Predecir temperatura precios,false,ia,teachable
+quinto-egb,Números,Preparar datos numéricos,activity,25 min,11,,Organizar datos en tablas,false,ia,teachable
+quinto-egb,Números,Modelo de predicción,tutorial,40 min,12,,Modelo que predice con números,false,ia,teachable
+quinto-egb,Números,Proyecto de predicción,project,45 min,13,,Predecir clima notas etc,false,ia,teachable
+quinto-egb,Proyecto Final,Problema real,video,15 min,14,,Identificar problema para ML,false,ia,teachable
+quinto-egb,Proyecto Final,Solución con ML,project,55 min,15,,Desarrollar solución completa,false,ia,teachable
+quinto-egb,Proyecto Final,Pitch de proyecto,activity,35 min,16,,Presentar a inversionistas,true,ia,teachable
+sexto-egb,IA en Robots,Bienvenida 6° EGB,video,10 min,1,,Introducción IA y Robótica,false,ia,tinkercad
+sexto-egb,IA en Robots,Robots inteligentes,video,20 min,2,,Aspiradoras drones carros con IA,false,ia,tinkercad
+sexto-egb,IA en Robots,Sensores como sentidos,activity,30 min,3,,Mapear sensores a sentidos humanos,false,ia,tinkercad
+sexto-egb,IA en Robots,Comportamiento reactivo,tutorial,35 min,4,,Robot que reacciona a estímulos,false,ia,tinkercad
+sexto-egb,IA en Robots,Robot que aprende,activity,35 min,5,,Simular aprendizaje en robot,false,ia,tinkercad
+sexto-egb,Visión,Visión artificial básica,video,20 min,6,,Cómo robots ven con cámaras,false,ia,teachable
+sexto-egb,Visión,Detectar colores,tutorial,40 min,7,,Cámara detecta colores específicos,false,ia,teachable
+sexto-egb,Visión,Seguimiento de objetos,activity,35 min,8,,Programar seguimiento visual,false,ia,teachable
+sexto-egb,Visión,Robot sigue color,project,50 min,9,,Robot sigue objeto de color,false,ia,tinkercad
+sexto-egb,Voz,Control por voz,video,20 min,10,,Robots que obedecen voz,false,ia,teachable
+sexto-egb,Voz,Integrar reconocimiento,tutorial,45 min,11,,Agregar control de voz al robot,false,ia,tinkercad
+sexto-egb,Voz,Comandos personalizados,activity,35 min,12,,Crear comandos de voz propios,false,ia,tinkercad
+sexto-egb,Voz,Robot asistente,project,50 min,13,,Robot responde a comandos voz,false,ia,tinkercad
+sexto-egb,Proyecto Final,Robot inteligente,video,15 min,14,,Planificar robot con múltiples IA,false,ia,teachable
+sexto-egb,Proyecto Final,Construcción,project,60 min,15,,Desarrollar robot con IA,false,ia,tinkercad
+sexto-egb,Proyecto Final,Competencia,activity,45 min,16,,Competencia de robots inteligentes,true,ia,tinkercad
+septimo-egb,Python Básico,Bienvenida 7° EGB,video,10 min,1,,Introducción a Python para IA,false,ia,python
+septimo-egb,Python Básico,¿Por qué Python?,video,15 min,2,,Python lenguaje de la IA,false,ia,python
+septimo-egb,Python Básico,Primeros pasos,tutorial,30 min,3,,print() comentarios ejecutar,false,ia,python
+septimo-egb,Python Básico,Variables y tipos,tutorial,35 min,4,,int float string bool,false,ia,python
+septimo-egb,Python Básico,Entrada de datos,tutorial,30 min,5,,input() conversión tipos,false,ia,python
+septimo-egb,Python Básico,Condicionales,tutorial,35 min,6,,if elif else operadores,false,ia,python
+septimo-egb,Python Básico,Bucles for,tutorial,35 min,7,,for range() iterar,false,ia,python
+septimo-egb,Python Básico,Bucles while,tutorial,30 min,8,,while condiciones salida,false,ia,python
+septimo-egb,Listas y Funciones,Listas en Python,tutorial,35 min,9,,Crear modificar recorrer listas,false,ia,python
+septimo-egb,Listas y Funciones,Métodos de listas,tutorial,30 min,10,,append remove sort index,false,ia,python
+septimo-egb,Listas y Funciones,Funciones,tutorial,40 min,11,,def parámetros return,false,ia,python
+septimo-egb,Listas y Funciones,Mini-proyecto,project,45 min,12,,Juego de adivinanzas Python,false,ia,python
+septimo-egb,Librerías IA,NumPy básico,tutorial,40 min,13,,Arrays operaciones matemáticas,false,ia,colab
+septimo-egb,Librerías IA,Matplotlib,tutorial,35 min,14,,Gráficos líneas y barras,false,ia,colab
+septimo-egb,Librerías IA,Análisis de datos,project,50 min,15,,Analizar dataset con gráficos,false,ia,colab
+septimo-egb,Proyecto Final,Planificar proyecto,video,15 min,16,,Ideas proyectos Python,false,ia,python
+septimo-egb,Proyecto Final,Desarrollar,project,55 min,17,,Proyecto análisis de datos,false,ia,colab
+septimo-egb,Proyecto Final,Presentación,activity,35 min,18,,Mostrar resultados y código,true,ia,colab
+octavo-egb,Repaso Python,Bienvenida 8° EGB,video,10 min,1,,Introducción ML con Python,false,ia,colab
+octavo-egb,Repaso Python,Repaso estructuras,tutorial,30 min,2,,Repaso Python básico,false,ia,python
+octavo-egb,Repaso Python,Pandas intro,tutorial,40 min,3,,DataFrames leer CSV explorar,false,ia,colab
+octavo-egb,Repaso Python,Seleccionar datos,tutorial,35 min,4,,loc iloc filtros Pandas,false,ia,colab
+octavo-egb,Repaso Python,Limpieza de datos,tutorial,40 min,5,,Valores nulos normalización,false,ia,colab
+octavo-egb,Repaso Python,Práctica Pandas,activity,40 min,6,,Ejercicios manipulación datos,false,ia,colab
+octavo-egb,Scikit-learn,Introducción sklearn,video,20 min,7,,Qué es scikit-learn,false,ia,colab
+octavo-egb,Scikit-learn,Train test split,tutorial,35 min,8,,Dividir datos entrenamiento prueba,false,ia,colab
+octavo-egb,Scikit-learn,Clasificación KNN,tutorial,45 min,9,,K-Nearest Neighbors entrenar predecir,false,ia,colab
+octavo-egb,Scikit-learn,Métricas,tutorial,35 min,10,,Accuracy precision recall,false,ia,colab
+octavo-egb,Scikit-learn,Clasificador Iris,project,50 min,11,,Clasificar flores dataset Iris,false,ia,colab
+octavo-egb,Más Modelos,Árboles de decisión,tutorial,45 min,12,,Decision Trees visualizar,false,ia,colab
+octavo-egb,Más Modelos,Random Forest,tutorial,40 min,13,,Ensemble de árboles,false,ia,colab
+octavo-egb,Más Modelos,Regresión lineal,tutorial,40 min,14,,Predecir valores continuos,false,ia,colab
+octavo-egb,Más Modelos,Proyecto predicción,project,50 min,15,,Predecir precios casas,false,ia,colab
+octavo-egb,Proyecto Final,Dataset propio,video,15 min,16,,Encontrar crear dataset,false,ia,colab
+octavo-egb,Proyecto Final,Modelo completo,project,60 min,17,,Pipeline datos modelo predicción,false,ia,colab
+octavo-egb,Proyecto Final,Presentación técnica,activity,40 min,18,,Explicar modelo métricas,true,ia,colab
+noveno-egb,Redes Neuronales,Bienvenida 9° EGB,video,10 min,1,,Introducción Deep Learning,false,ia,colab
+noveno-egb,Redes Neuronales,¿Qué es una neurona?,video,25 min,2,,Neurona biológica vs artificial,false,ia,colab
+noveno-egb,Redes Neuronales,Funciones activación,video,20 min,3,,Sigmoid ReLU tanh,false,ia,colab
+noveno-egb,Redes Neuronales,Perceptrón simple,tutorial,45 min,4,,Implementar perceptrón,false,ia,colab
+noveno-egb,Redes Neuronales,Red multicapa,video,20 min,5,,Capas ocultas arquitectura,false,ia,colab
+noveno-egb,Redes Neuronales,Backpropagation,video,25 min,6,,Cómo aprende red neuronal,false,ia,colab
+noveno-egb,TensorFlow Keras,Instalación TF,tutorial,30 min,7,,Instalar TensorFlow Keras,false,ia,colab
+noveno-egb,TensorFlow Keras,Estructura Keras,tutorial,35 min,8,,Sequential layers compile fit,false,ia,colab
+noveno-egb,TensorFlow Keras,Primera red,tutorial,50 min,9,,Red clasificar dígitos MNIST,false,ia,colab
+noveno-egb,TensorFlow Keras,Entrenar evaluar,tutorial,45 min,10,,Epochs batch accuracy loss,false,ia,colab
+noveno-egb,TensorFlow Keras,Guardar modelos,tutorial,30 min,11,,save load checkpoints,false,ia,colab
+noveno-egb,Imágenes CNN,CNNs introducción,video,25 min,12,,Convolutional Neural Networks,false,ia,colab
+noveno-egb,Imágenes CNN,Capas convolucionales,tutorial,40 min,13,,Conv2D MaxPooling Flatten,false,ia,colab
+noveno-egb,Imágenes CNN,Clasificador imágenes,tutorial,55 min,14,,CNN clasificar CIFAR-10,false,ia,colab
+noveno-egb,Imágenes CNN,Transfer Learning,tutorial,45 min,15,,Modelos pre-entrenados VGG,false,ia,colab
+noveno-egb,Proyecto Final,Definir problema,video,15 min,16,,Elegir clasificación imágenes,false,ia,colab
+noveno-egb,Proyecto Final,Desarrollar CNN,project,65 min,17,,Entrenar con dataset propio,false,ia,colab
+noveno-egb,Proyecto Final,Demo y análisis,activity,45 min,18,,Demostrar analizar errores,true,ia,colab
+decimo-egb,NLP Básico,Bienvenida 10° EGB,video,10 min,1,,Introducción IA Aplicada,false,ia,colab
+decimo-egb,NLP Básico,Procesamiento texto,video,25 min,2,,Tokenización stemming lemma,false,ia,colab
+decimo-egb,NLP Básico,NLTK introducción,tutorial,45 min,3,,Librería NLTK procesar texto,false,ia,colab
+decimo-egb,NLP Básico,Bag of Words,tutorial,40 min,4,,Representación vectorial texto,false,ia,colab
+decimo-egb,NLP Básico,TF-IDF,tutorial,40 min,5,,Term Frequency IDF,false,ia,colab
+decimo-egb,NLP Básico,Análisis sentimientos,project,50 min,6,,Clasificar reviews positivas negativas,false,ia,colab
+decimo-egb,Chatbots,Chatbots con Python,video,20 min,7,,Arquitectura de chatbots,false,ia,colab
+decimo-egb,Chatbots,Chatbot rule-based,tutorial,50 min,8,,Chatbot reglas patrones regex,false,ia,colab
+decimo-egb,Chatbots,Intents y entities,tutorial,40 min,9,,Detectar intención usuario,false,ia,colab
+decimo-egb,Chatbots,Chatbot con ML,project,55 min,10,,Chatbot aprende conversaciones,false,ia,colab
+decimo-egb,Visión OpenCV,OpenCV introducción,tutorial,45 min,11,,Leer imágenes filtros bordes,false,ia,colab
+decimo-egb,Visión OpenCV,Transformaciones,tutorial,40 min,12,,Resize rotate crop threshold,false,ia,colab
+decimo-egb,Visión OpenCV,Detección rostros,tutorial,50 min,13,,Haar cascades detectar caras,false,ia,colab
+decimo-egb,Visión OpenCV,Proyecto visión,project,55 min,14,,Reconocimiento facial simple,false,ia,colab
+decimo-egb,Proyecto Final,Propuesta proyecto,video,15 min,15,,Definir proyecto IA aplicada,false,ia,colab
+decimo-egb,Proyecto Final,Desarrollo,project,70 min,16,,Implementar solución completa,false,ia,colab
+decimo-egb,Proyecto Final,Presentación,activity,45 min,17,,Demo código documentación,true,ia,colab
+primero-bach,Deep Learning,Bienvenida 1° Bach,video,10 min,1,,Introducción IA Avanzada,false,ia,colab
+primero-bach,Deep Learning,RNNs introducción,video,30 min,2,,Redes recurrentes secuencias,false,ia,colab
+primero-bach,Deep Learning,LSTM y GRU,tutorial,45 min,3,,Long Short-Term Memory,false,ia,colab
+primero-bach,Deep Learning,Predicción series,tutorial,55 min,4,,Predecir valores futuros LSTM,false,ia,colab
+primero-bach,Deep Learning,Generación texto,project,60 min,5,,Generar texto con RNN,false,ia,colab
+primero-bach,GANs,Redes generativas,video,25 min,6,,Generative Adversarial Networks,false,ia,colab
+primero-bach,GANs,Generator Discriminator,tutorial,45 min,7,,Arquitectura de GANs,false,ia,colab
+primero-bach,GANs,GAN simple,tutorial,60 min,8,,Implementar GAN básica,false,ia,colab
+primero-bach,GANs,Generar imágenes,project,65 min,9,,GAN genera imágenes simples,false,ia,colab
+primero-bach,Deployment,APIs con Flask,tutorial,50 min,10,,Crear API REST modelo ML,false,ia,colab
+primero-bach,Deployment,Frontend simple,tutorial,45 min,11,,Interfaz web consumir API,false,ia,colab
+primero-bach,Deployment,Docker básico,tutorial,45 min,12,,Containerizar aplicación,false,ia,colab
+primero-bach,Deployment,Deploy en cloud,tutorial,50 min,13,,Subir modelo Heroku,false,ia,colab
+primero-bach,Proyecto Final,Proyecto completo,video,15 min,14,,Planificar proyecto end-to-end,false,ia,colab
+primero-bach,Proyecto Final,Desarrollo full,project,75 min,15,,Modelo API Frontend,false,ia,colab
+primero-bach,Proyecto Final,Presentación,activity,50 min,16,,Demo en vivo documentación,true,ia,colab
+segundo-bach,Ética en IA,Bienvenida 2° Bach,video,10 min,1,,Introducción ética y RL,false,ia,colab
+segundo-bach,Ética en IA,Sesgo en algoritmos,video,30 min,2,,Casos sesgo racial género IA,false,ia,colab
+segundo-bach,Ética en IA,Detectar sesgo,tutorial,50 min,3,,Analizar datasets por sesgo,false,ia,colab
+segundo-bach,Ética en IA,Fairness en ML,tutorial,45 min,4,,Métricas equidad modelos,false,ia,colab
+segundo-bach,Ética en IA,IA responsable,activity,45 min,5,,Debate IA decisiones importantes,false,ia,colab
+segundo-bach,Reinforcement,RL introducción,video,30 min,6,,Agentes entornos recompensas,false,ia,colab
+segundo-bach,Reinforcement,Markov Decision,tutorial,45 min,7,,MDP estados acciones,false,ia,colab
+segundo-bach,Reinforcement,Q-Learning,tutorial,55 min,8,,Implementar Q-Learning,false,ia,colab
+segundo-bach,Reinforcement,Deep Q-Network,tutorial,55 min,9,,DQN redes neuronales,false,ia,colab
+segundo-bach,Reinforcement,Juego con RL,project,60 min,10,,Entrenar agente juego simple,false,ia,colab
+segundo-bach,LLMs,Large Language Models,video,30 min,11,,GPT BERT transformers,false,ia,colab
+segundo-bach,LLMs,Attention mechanism,tutorial,50 min,12,,Self-attention multi-head,false,ia,colab
+segundo-bach,LLMs,APIs de LLMs,tutorial,50 min,13,,Usar API OpenAI,false,ia,colab
+segundo-bach,LLMs,Prompt engineering,tutorial,45 min,14,,Técnicas mejores respuestas,false,ia,colab
+segundo-bach,LLMs,Aplicación con LLM,project,60 min,15,,Crear aplicación usando LLM,false,ia,colab
+segundo-bach,Proyecto Final,Investigación,video,20 min,16,,Elegir tema investigación IA,false,ia,colab
+segundo-bach,Proyecto Final,Paper técnico,project,70 min,17,,Escribir documento técnico,false,ia,colab
+segundo-bach,Proyecto Final,Defensa,activity,50 min,18,,Presentar defender investigación,true,ia,colab
+tercero-bach,Estado del Arte,Bienvenida 3° Bach,video,10 min,1,,Introducción IA profesional,false,ia,colab
+tercero-bach,Estado del Arte,Tendencias IA,video,30 min,2,,AGI multimodal edge AI,false,ia,colab
+tercero-bach,Estado del Arte,Papers científicos,tutorial,50 min,3,,Cómo leer papers ML IA,false,ia,colab
+tercero-bach,Estado del Arte,Arxiv conferencias,tutorial,40 min,4,,Encontrar investigación relevante,false,ia,colab
+tercero-bach,Estado del Arte,Replicar paper,project,60 min,5,,Implementar algoritmo paper,false,ia,colab
+tercero-bach,MLOps,Pipelines de ML,video,25 min,6,,MLflow experimentos versioning,false,ia,colab
+tercero-bach,MLOps,Feature stores,tutorial,45 min,7,,Gestión features ML,false,ia,colab
+tercero-bach,MLOps,Automatización,tutorial,55 min,8,,Pipeline automatizado entrenamiento,false,ia,colab
+tercero-bach,MLOps,CI/CD para ML,tutorial,50 min,9,,Tests deployment automático,false,ia,colab
+tercero-bach,Especialización,Computer Vision avanzado,tutorial,55 min,10,,Segmentación detección objetos,false,ia,colab
+tercero-bach,Especialización,NLP avanzado,tutorial,55 min,11,,Transformers fine-tuning,false,ia,colab
+tercero-bach,Especialización,Proyecto especializado,project,65 min,12,,Proyecto área elegida,false,ia,colab
+tercero-bach,Capstone,Definir capstone,video,20 min,13,,Proyecto final graduación,false,ia,colab
+tercero-bach,Capstone,Desarrollo capstone,project,80 min,14,,Proyecto completo publicable,false,ia,colab
+tercero-bach,Capstone,Presentación final,activity,60 min,15,,Defensa ante jurado,true,ia,colab
