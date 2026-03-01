@@ -18,6 +18,7 @@ import KitDisplay from '@/components/KitDisplay'
 import CourseAuthGuard from '@/components/CourseAuthGuard'
 import TasksPanel from '@/components/TasksPanel'
 import { useAuth } from '@/components/AuthProvider'
+import ModuleAccordion from '@/components/ModuleAccordion'
 
 interface APILesson {
   id: string
@@ -346,95 +347,115 @@ export default function NivelPage() {
                 </div>
               </div>
 
-              {/* Selector de Programa */}
-              <div className="flex gap-2 mb-6">
+              {/* Selector de Programa - Diseño mejorado */}
+              <div className="grid grid-cols-3 gap-3 mb-8">
                 <button
                   onClick={() => setSelectedProgram('robotica')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden ${
                     selectedProgram === 'robotica'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                      ? 'bg-gradient-to-br from-blue-500 to-cyan-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02]'
+                      : 'bg-dark-800 text-gray-400 hover:bg-dark-700 border border-dark-600'
                   }`}
                 >
-                  <Bot className="w-4 h-4" />
-                  Robótica
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    selectedProgram === 'robotica' ? 'bg-white/20' : 'bg-blue-500/20'
+                  }`}>
+                    <Bot className={`w-6 h-6 ${selectedProgram === 'robotica' ? 'text-white' : 'text-blue-400'}`} />
+                  </div>
+                  <span className="font-semibold">Robótica</span>
+                  <span className={`text-xs ${selectedProgram === 'robotica' ? 'text-blue-100' : 'text-gray-500'}`}>
+                    Construye y programa
+                  </span>
+                  {selectedProgram === 'robotica' && (
+                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-pulse" />
+                  )}
                 </button>
+                
                 <button
                   onClick={() => setSelectedProgram('ia')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden ${
                     selectedProgram === 'ia'
-                      ? 'bg-purple-500 text-white'
-                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                      ? 'bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30 scale-[1.02]'
+                      : 'bg-dark-800 text-gray-400 hover:bg-dark-700 border border-dark-600'
                   }`}
                 >
-                  <Brain className="w-4 h-4" />
-                  IA
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    selectedProgram === 'ia' ? 'bg-white/20' : 'bg-purple-500/20'
+                  }`}>
+                    <Brain className={`w-6 h-6 ${selectedProgram === 'ia' ? 'text-white' : 'text-purple-400'}`} />
+                  </div>
+                  <span className="font-semibold">Inteligencia Artificial</span>
+                  <span className={`text-xs ${selectedProgram === 'ia' ? 'text-purple-100' : 'text-gray-500'}`}>
+                    Machine Learning
+                  </span>
+                  {selectedProgram === 'ia' && (
+                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-pulse" />
+                  )}
                 </button>
+                
                 <button
                   onClick={() => setSelectedProgram('hacking')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden ${
                     selectedProgram === 'hacking'
-                      ? 'bg-red-500 text-white'
-                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                      ? 'bg-gradient-to-br from-red-500 to-orange-600 text-white shadow-lg shadow-red-500/30 scale-[1.02]'
+                      : 'bg-dark-800 text-gray-400 hover:bg-dark-700 border border-dark-600'
                   }`}
                 >
-                  <Shield className="w-4 h-4" />
-                  Hacking
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    selectedProgram === 'hacking' ? 'bg-white/20' : 'bg-red-500/20'
+                  }`}>
+                    <Shield className={`w-6 h-6 ${selectedProgram === 'hacking' ? 'text-white' : 'text-red-400'}`} />
+                  </div>
+                  <span className="font-semibold">Ciberseguridad</span>
+                  <span className={`text-xs ${selectedProgram === 'hacking' ? 'text-red-100' : 'text-gray-500'}`}>
+                    Hacking Ético
+                  </span>
+                  {selectedProgram === 'hacking' && (
+                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-pulse" />
+                  )}
                 </button>
               </div>
+              
+              {/* Estadísticas del programa seleccionado */}
+              {apiLessons.length > 0 && (
+                <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-dark-800/50 rounded-xl border border-dark-600">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">{apiLessons.length}</p>
+                    <p className="text-xs text-gray-400">Lecciones</p>
+                  </div>
+                  <div className="text-center border-x border-dark-600">
+                    <p className="text-2xl font-bold text-white">{Object.keys(groupedApiLessons).length}</p>
+                    <p className="text-xs text-gray-400">Módulos</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">
+                      {Math.round(apiLessons.reduce((acc, l) => acc + (parseInt(l.duration) || 0), 0) / 60)}h
+                    </p>
+                    <p className="text-xs text-gray-400">Duración</p>
+                  </div>
+                </div>
+              )}
 
               {/* Módulos y Lecciones - Usar API si hay datos, sino usar locales */}
               {lessonsLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan"></div>
+                <div className="flex flex-col items-center justify-center py-12 gap-4">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
+                  <p className="text-gray-400 animate-pulse">Cargando lecciones...</p>
                 </div>
               ) : apiLessons.length > 0 ? (
-                /* Lecciones desde API (Airtable) */
+                /* Lecciones desde API (Airtable) - Nueva interfaz mejorada */
                 <div className="space-y-4">
                   {Object.entries(groupedApiLessons).map(([moduleName, lessons], modIdx) => (
-                    <div key={moduleName} className="card">
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="w-10 h-10 bg-neon-cyan/10 rounded-lg flex items-center justify-center text-neon-cyan font-bold">
-                          {modIdx + 1}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-white">{moduleName}</h3>
-                          <p className="text-sm text-gray-500">{lessons.length} lecciones</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 ml-14">
-                        {lessons.sort((a, b) => a.order - b.order).map((lesson) => (
-                          <button
-                            key={lesson.id}
-                            onClick={() => !lesson.locked && setSelectedLesson(lesson.id)}
-                            disabled={lesson.locked}
-                            className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
-                              lesson.locked 
-                                ? 'bg-dark-700/30 text-gray-600 cursor-not-allowed' 
-                                : selectedLesson === lesson.id
-                                  ? 'bg-neon-cyan/10 border border-neon-cyan/30 text-white'
-                                  : 'bg-dark-700/50 text-gray-300 hover:bg-dark-600'
-                            }`}
-                          >
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                              lesson.locked ? 'bg-dark-600 text-gray-600' : 'bg-dark-600 text-gray-400'
-                            }`}>
-                              {lesson.locked ? <Lock className="w-4 h-4" /> : getLessonIcon(lesson.type)}
-                            </div>
-                            <div className="flex-1">
-                              <p className={lesson.locked ? 'text-gray-600' : 'text-white'}>{lesson.title}</p>
-                              <div className="flex items-center gap-2 text-xs text-gray-500">
-                                <Clock className="w-3 h-3" />
-                                {lesson.duration}
-                                <span className="capitalize">• {lesson.type}</span>
-                              </div>
-                            </div>
-                            {!lesson.locked && <ChevronRight className="w-4 h-4 text-gray-500" />}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                    <ModuleAccordion
+                      key={moduleName}
+                      moduleName={moduleName}
+                      lessons={lessons}
+                      moduleIndex={modIdx + 1}
+                      selectedLesson={selectedLesson}
+                      onSelectLesson={setSelectedLesson}
+                      defaultOpen={modIdx === 0}
+                      programColor={selectedProgram === 'robotica' ? 'blue' : selectedProgram === 'ia' ? 'purple' : 'red'}
+                    />
                   ))}
                 </div>
               ) : (
