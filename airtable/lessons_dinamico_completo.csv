@@ -381,3 +381,147 @@ decimo-egb,Proyecto de Graduación Seguridad,Propuesta de investigación,activit
 decimo-egb,Proyecto de Graduación Seguridad,Desarrollo y testing,project,120 min,14,,"Ejecuta tu proyecto. Si es herramienta: desarrolla y prueba. Si es investigación: experimenta y analiza.",false,hacking,kali
 decimo-egb,Proyecto de Graduación Seguridad,Presentación y defensa,activity,60 min,15,,"Presenta tu proyecto ante tribunal de expertos. Demostración técnica, preguntas, evaluación.",false,hacking,kali
 decimo-egb,Proyecto de Graduación Seguridad,Certificación: Experto en Ciberseguridad,activity,20 min,16,,"Certificado de graduación del programa de ciberseguridad. Competencias profesionales completas.",true,hacking,kali
+primero-bgu,Robótica de Competencia,Introducción a competencias,video,30 min,1,,"FIRST Robotics, VEX, RoboCup. Reglas, categorías, estrategias. La competencia impulsa la innovación.",false,robotica,arduino
+primero-bgu,Robótica de Competencia,Diseño mecánico avanzado,tutorial,45 min,2,,"CAD profesional con Fusion 360. Análisis de esfuerzos, tolerancias, materiales. Diseño para manufactura.",false,robotica,arduino
+primero-bgu,Robótica de Competencia,Sistemas de transmisión,tutorial,40 min,3,,"Engranajes, poleas, cadenas. Relaciones de transmisión, torque vs velocidad. Diseño de drivetrains.",false,robotica,arduino
+primero-bgu,Robótica de Competencia,Proyecto: Robot de competencia,project,90 min,4,,"Diseña y construye un robot para una competencia específica. Cumple con reglas, optimiza rendimiento.",false,robotica,arduino
+primero-bgu,Electrónica de Potencia,Transistores y MOSFETs,video,35 min,5,,"Transistores como switches de potencia. MOSFETs para motores grandes. Disipación de calor, drivers.",false,robotica,arduino
+primero-bgu,Electrónica de Potencia,Puentes H y controladores,tutorial,45 min,6,,"Diseña puentes H para motores bidireccionales. PWM para control de velocidad. Protecciones.",false,robotica,arduino
+primero-bgu,Electrónica de Potencia,Baterías y gestión de energía,tutorial,40 min,7,,"LiPo, Li-ion, lead-acid. BMS, balanceo, carga segura. Autonomía y dimensionamiento.",false,robotica,arduino
+primero-bgu,Electrónica de Potencia,Proyecto: Sistema de potencia,project,60 min,8,,"Diseña el sistema de potencia completo para un robot. Baterías, distribución, protecciones, monitoreo.",false,robotica,arduino
+primero-bgu,Control Avanzado,Control en espacio de estados,video,40 min,9,,"Representación matricial de sistemas. Controlabilidad, observabilidad. Más potente que PID clásico.",false,robotica,arduino
+primero-bgu,Control Avanzado,Filtro de Kalman,tutorial,50 min,10,,"Estimación óptima de estados con ruido. Fusión de sensores. Usado en navegación y tracking.",false,robotica,arduino
+primero-bgu,Control Avanzado,Control predictivo (MPC),tutorial,45 min,11,,"Model Predictive Control optimiza trayectorias futuras. Maneja restricciones. Usado en industria.",false,robotica,arduino
+primero-bgu,Control Avanzado,Proyecto: Péndulo invertido,project,70 min,12,,"Balancea un péndulo invertido usando control avanzado. Clásico problema de control no lineal.",false,robotica,arduino
+primero-bgu,Proyecto de Equipo,Formación de equipos,activity,30 min,13,,"Roles: líder, mecánico, programador, estratega. Comunicación efectiva, gestión de conflictos.",false,robotica,arduino
+primero-bgu,Proyecto de Equipo,Desarrollo del robot,project,120 min,14,,"Construye el robot de competencia en equipo. Integración de sistemas, testing, iteración.",false,robotica,arduino
+primero-bgu,Proyecto de Equipo,Competencia simulada,activity,60 min,15,,"Competencia interna siguiendo reglas oficiales. Practica estrategia, manejo de presión.",false,robotica,arduino
+primero-bgu,Proyecto de Equipo,Certificación: Competidor de Robótica,activity,20 min,16,,"Certificado por participar en competencias de robótica y demostrar trabajo en equipo.",true,robotica,arduino
+primero-bgu,Fundamentos de ML Profesional,Matemáticas para ML,video,40 min,1,,"Álgebra lineal, cálculo, probabilidad. Los fundamentos matemáticos que hacen funcionar el ML.",false,ia,jupyter
+primero-bgu,Fundamentos de ML Profesional,Regresión y clasificación,tutorial,45 min,2,,"Regresión lineal, logística. Gradient descent, funciones de pérdida. Implementación desde cero.",false,ia,jupyter
+primero-bgu,Fundamentos de ML Profesional,Árboles y ensembles,tutorial,45 min,3,,"Decision trees, Random Forest, XGBoost. Bagging, boosting. Ganadores de competencias de ML.",false,ia,jupyter
+primero-bgu,Fundamentos de ML Profesional,Proyecto: Competencia Kaggle,project,60 min,4,,"Participa en una competencia de Kaggle. Feature engineering, validación, submission.",false,ia,jupyter
+primero-bgu,Deep Learning Profesional,Frameworks: PyTorch vs TensorFlow,video,35 min,5,,"Comparación de frameworks. PyTorch más flexible, TensorFlow más producción. Elige según necesidad.",false,ia,jupyter
+primero-bgu,Deep Learning Profesional,Arquitecturas CNN avanzadas,tutorial,50 min,6,,"ResNet, EfficientNet, Vision Transformers. Arquitecturas estado del arte para visión.",false,ia,jupyter
+primero-bgu,Deep Learning Profesional,Arquitecturas NLP avanzadas,tutorial,50 min,7,,"BERT, GPT, T5. Transformers para procesamiento de lenguaje. Fine-tuning y transfer learning.",false,ia,jupyter
+primero-bgu,Deep Learning Profesional,Proyecto: Modelo estado del arte,project,70 min,8,,"Implementa y entrena un modelo estado del arte. Reproduce resultados de un paper reciente.",false,ia,jupyter
+primero-bgu,Producción de ML,APIs y microservicios,tutorial,45 min,9,,"FastAPI para servir modelos. Docker para containerización. Kubernetes para orquestación.",false,ia,jupyter
+primero-bgu,Producción de ML,Monitoreo y observabilidad,tutorial,40 min,10,,"Data drift, model drift. Prometheus, Grafana. Alertas cuando el modelo degrada.",false,ia,jupyter
+primero-bgu,Producción de ML,A/B testing para ML,tutorial,40 min,11,,"Experimentos controlados. Métricas de negocio vs métricas de ML. Decisiones basadas en datos.",false,ia,jupyter
+primero-bgu,Producción de ML,Proyecto: Sistema ML end-to-end,project,80 min,12,,"Construye un sistema completo: datos, entrenamiento, deployment, monitoreo. Producción real.",false,ia,jupyter
+primero-bgu,Ética y Regulación,Regulaciones de IA,video,35 min,13,,"EU AI Act, regulaciones por sector. Compliance, auditorías, documentación requerida.",false,ia,jupyter
+primero-bgu,Ética y Regulación,Fairness en ML,activity,40 min,14,,"Métricas de fairness, técnicas de mitigación. Casos de estudio de discriminación algorítmica.",false,ia,jupyter
+primero-bgu,Ética y Regulación,Proyecto: Auditoría ética,project,50 min,15,,"Realiza una auditoría ética completa de un sistema de ML. Recomendaciones y plan de acción.",false,ia,jupyter
+primero-bgu,Ética y Regulación,Certificación: ML Engineer,activity,20 min,16,,"Certificado por dominar ML profesional, deployment y consideraciones éticas.",true,ia,jupyter
+primero-bgu,Red Team Profesional,Adversary simulation,video,35 min,1,,"Simula APTs reales. TTPs de grupos conocidos. MITRE ATT&CK como framework.",false,hacking,kali
+primero-bgu,Red Team Profesional,Initial access techniques,tutorial,50 min,2,,"Phishing, exploit público, supply chain. Múltiples vectores de entrada inicial.",false,hacking,kali
+primero-bgu,Red Team Profesional,Lateral movement,tutorial,45 min,3,,"Pass-the-hash, Kerberoasting, pivoting. Moverse dentro de la red sin ser detectado.",false,hacking,kali
+primero-bgu,Red Team Profesional,Proyecto: Operación Red Team,project,90 min,4,,"Ejecuta una operación completa contra infraestructura de práctica. Documenta como profesional.",false,hacking,kali
+primero-bgu,Blue Team Profesional,Security monitoring,video,35 min,5,,"SIEM avanzado, correlación de eventos, detección de anomalías. Splunk, Elastic Security.",false,hacking,kali
+primero-bgu,Blue Team Profesional,Incident response avanzado,tutorial,50 min,6,,"Playbooks, automatización con SOAR, coordinación de equipos. Respuesta a incidentes reales.",false,hacking,kali
+primero-bgu,Blue Team Profesional,Digital forensics,tutorial,50 min,7,,"Adquisición de evidencia, análisis de memoria, timeline. Herramientas: Volatility, Autopsy.",false,hacking,kali
+primero-bgu,Blue Team Profesional,Proyecto: Investigación forense,project,70 min,8,,"Investiga un incidente simulado. Preserva evidencia, analiza, reconstruye el ataque.",false,hacking,kali
+primero-bgu,Seguridad de Infraestructura,Active Directory security,tutorial,50 min,9,,"AD es el objetivo principal. Ataques y defensas. Hardening, monitoreo, privileged access.",false,hacking,kali
+primero-bgu,Seguridad de Infraestructura,Cloud security avanzada,tutorial,45 min,10,,"Multi-cloud, serverless security, infrastructure as code. Terraform, CloudFormation seguros.",false,hacking,kali
+primero-bgu,Seguridad de Infraestructura,Zero Trust architecture,tutorial,40 min,11,,"Never trust, always verify. Microsegmentación, identity-centric, continuous verification.",false,hacking,kali
+primero-bgu,Seguridad de Infraestructura,Proyecto: Arquitectura segura,project,60 min,12,,"Diseña una arquitectura Zero Trust para una empresa. Documenta controles y justificaciones.",false,hacking,kali
+primero-bgu,Preparación Profesional,Certificaciones de industria,video,30 min,13,,"OSCP, OSEP, CRTO, GPEN. Preparación, costos, valor en el mercado laboral.",false,hacking,kali
+primero-bgu,Preparación Profesional,Portfolio profesional,activity,40 min,14,,"Construye tu portfolio: CTFs, proyectos, writeups, contribuciones. GitHub, blog, LinkedIn.",false,hacking,kali
+primero-bgu,Preparación Profesional,Proyecto: Preparación OSCP,project,60 min,15,,"Plan de estudio para OSCP. Practica en labs, documenta metodología, simula examen.",false,hacking,kali
+primero-bgu,Preparación Profesional,Certificación: Security Professional,activity,20 min,16,,"Certificado por completar formación profesional en seguridad ofensiva y defensiva.",true,hacking,kali
+segundo-bgu,Robótica Autónoma,Planificación de movimiento,video,40 min,1,,"A*, RRT, PRM. Algoritmos para encontrar caminos en espacios de configuración. Evitar obstáculos.",false,robotica,ros
+segundo-bgu,Robótica Autónoma,SLAM avanzado,tutorial,50 min,2,,"Visual SLAM, LiDAR SLAM. ORB-SLAM, Cartographer. Mapeo y localización simultáneos.",false,robotica,ros
+segundo-bgu,Robótica Autónoma,Navigation stack de ROS,tutorial,50 min,3,,"move_base, costmaps, planners. Navegación autónoma completa en ROS. Configuración y tuning.",false,robotica,ros
+segundo-bgu,Robótica Autónoma,Proyecto: Robot de servicio,project,90 min,4,,"Construye un robot que navegue autónomamente, evite obstáculos y complete misiones.",false,robotica,ros
+segundo-bgu,Visión Robótica,Calibración de cámaras,tutorial,40 min,5,,"Modelo pinhole, distorsión, calibración intrínseca y extrínseca. OpenCV calibration.",false,robotica,ros
+segundo-bgu,Visión Robótica,Visión estéreo,tutorial,45 min,6,,"Dos cámaras para profundidad. Rectificación, matching, disparidad. Reconstrucción 3D.",false,robotica,ros
+segundo-bgu,Visión Robótica,Deep learning para visión robótica,tutorial,50 min,7,,"Detección de objetos en tiempo real. YOLO, SSD optimizados. Integración con ROS.",false,robotica,ros
+segundo-bgu,Visión Robótica,Proyecto: Picking con visión,project,70 min,8,,"Robot que detecta objetos con visión y los recoge. Coordinación ojo-mano.",false,robotica,ros
+segundo-bgu,Robots Humanoides,Locomoción bípeda,video,40 min,9,,"Caminar es difícil para robots. ZMP, capture point, dynamic walking. Boston Dynamics, Tesla Bot.",false,robotica,ros
+segundo-bgu,Robots Humanoides,Manipulación diestra,tutorial,45 min,10,,"Manos robóticas con múltiples dedos. Grasping adaptativo, manipulación in-hand.",false,robotica,ros
+segundo-bgu,Robots Humanoides,Human-robot interaction,tutorial,40 min,11,,"Robots que interactúan naturalmente con humanos. Gestos, voz, expresiones faciales.",false,robotica,ros
+segundo-bgu,Robots Humanoides,Proyecto: Interacción natural,project,60 min,12,,"Programa un robot para interactuar con humanos. Reconoce gestos, responde con voz.",false,robotica,ros
+segundo-bgu,Emprendimiento en Robótica,Startups de robótica,video,35 min,13,,"Casos de éxito: Boston Dynamics, Waymo, Figure. Funding, pivots, exits.",false,robotica,ros
+segundo-bgu,Emprendimiento en Robótica,Business plan,activity,45 min,14,,"Escribe un business plan para una startup de robótica. Mercado, competencia, modelo de negocio.",false,robotica,ros
+segundo-bgu,Emprendimiento en Robótica,Proyecto: Pitch de startup,project,50 min,15,,"Presenta tu idea de startup ante inversores simulados. Deck, demo, Q&A.",false,robotica,ros
+segundo-bgu,Emprendimiento en Robótica,Certificación: Roboticist,activity,20 min,16,,"Certificado por dominar robótica autónoma, visión y preparación para industria.",true,robotica,ros
+segundo-bgu,Investigación en IA,Metodología de investigación,video,40 min,1,,"Cómo hacer investigación en IA. Formular hipótesis, diseñar experimentos, analizar resultados.",false,ia,jupyter
+segundo-bgu,Investigación en IA,Revisión de literatura,tutorial,45 min,2,,"Cómo encontrar y leer papers. Google Scholar, Semantic Scholar, arXiv. Gestión de referencias.",false,ia,jupyter
+segundo-bgu,Investigación en IA,Diseño experimental,tutorial,45 min,3,,"Baselines, ablations, statistical significance. Reproducibilidad y buenas prácticas.",false,ia,jupyter
+segundo-bgu,Investigación en IA,Proyecto: Replicar paper,project,70 min,4,,"Elige un paper influyente y replica sus experimentos. Documenta diferencias y aprendizajes.",false,ia,jupyter
+segundo-bgu,Fronteras de IA,Multimodal learning,video,40 min,5,,"Modelos que entienden múltiples modalidades. CLIP, Flamingo, GPT-4V. Unified architectures.",false,ia,jupyter
+segundo-bgu,Fronteras de IA,World models,tutorial,45 min,6,,"Modelos que aprenden representaciones del mundo. Dreamer, JEPA. Planificación en espacio latente.",false,ia,jupyter
+segundo-bgu,Fronteras de IA,Neuro-symbolic AI,tutorial,45 min,7,,"Combina redes neuronales con razonamiento simbólico. Lo mejor de ambos mundos.",false,ia,jupyter
+segundo-bgu,Fronteras de IA,Proyecto: Implementar técnica nueva,project,70 min,8,,"Implementa una técnica de un paper reciente (último año). Experimenta con variaciones.",false,ia,jupyter
+segundo-bgu,IA para Ciencia,AI for Science,video,35 min,9,,"AlphaFold, weather prediction, drug discovery. IA acelerando descubrimientos científicos.",false,ia,jupyter
+segundo-bgu,IA para Ciencia,Scientific ML,tutorial,45 min,10,,"Physics-informed neural networks, neural ODEs. ML que respeta leyes físicas.",false,ia,jupyter
+segundo-bgu,IA para Ciencia,Simulación y surrogate models,tutorial,40 min,11,,"Reemplaza simulaciones costosas con ML. Speedup de órdenes de magnitud.",false,ia,jupyter
+segundo-bgu,IA para Ciencia,Proyecto: IA para problema científico,project,60 min,12,,"Aplica IA a un problema científico real. Biología, física, química, clima.",false,ia,jupyter
+segundo-bgu,Carrera en IA,Roles en la industria,video,30 min,13,,"Research scientist, ML engineer, data scientist, AI product manager. Diferentes caminos.",false,ia,jupyter
+segundo-bgu,Carrera en IA,Preparación para entrevistas,activity,45 min,14,,"Coding interviews, ML system design, research presentations. Práctica y preparación.",false,ia,jupyter
+segundo-bgu,Carrera en IA,Proyecto: Portfolio de IA,project,50 min,15,,"Construye un portfolio profesional. Proyectos destacados, blog técnico, contribuciones open source.",false,ia,jupyter
+segundo-bgu,Carrera en IA,Certificación: AI Researcher,activity,20 min,16,,"Certificado por demostrar capacidades de investigación y preparación profesional en IA.",true,ia,jupyter
+segundo-bgu,Seguridad Avanzada,Kernel exploitation,video,40 min,1,,"Exploits a nivel de kernel. Más difícil pero más poderoso. Escalada de privilegios definitiva.",false,hacking,kali
+segundo-bgu,Seguridad Avanzada,Browser exploitation,tutorial,50 min,2,,"Navegadores son superficies de ataque enormes. JavaScript engines, sandbox escapes.",false,hacking,kali
+segundo-bgu,Seguridad Avanzada,Mobile security,tutorial,50 min,3,,"Android e iOS security models. Reverse engineering de apps, análisis de malware móvil.",false,hacking,kali
+segundo-bgu,Seguridad Avanzada,Proyecto: Exploit avanzado,project,80 min,4,,"Desarrolla un exploit para una vulnerabilidad compleja. Documenta técnicas y bypasses.",false,hacking,kali
+segundo-bgu,Seguridad de Hardware,Side-channel attacks,video,40 min,5,,"Timing, power analysis, electromagnetic. Extraer secretos sin atacar el software.",false,hacking,kali
+segundo-bgu,Seguridad de Hardware,Hardware hacking,tutorial,50 min,6,,"JTAG, UART, SPI flash dumping. Extraer firmware, modificar dispositivos.",false,hacking,kali
+segundo-bgu,Seguridad de Hardware,IoT security,tutorial,45 min,7,,"Dispositivos IoT son notoriamente inseguros. Metodología de análisis, vulnerabilidades comunes.",false,hacking,kali
+segundo-bgu,Seguridad de Hardware,Proyecto: Análisis de dispositivo IoT,project,70 min,8,,"Analiza la seguridad de un dispositivo IoT real. Firmware, comunicaciones, vulnerabilidades.",false,hacking,kali
+segundo-bgu,Purple Team,Integración Red/Blue,video,35 min,9,,"Purple team: colaboración entre atacantes y defensores. Mejora continua de seguridad.",false,hacking,kali
+segundo-bgu,Purple Team,Atomic Red Team,tutorial,45 min,10,,"Tests atómicos para validar detecciones. Automatización de validación de controles.",false,hacking,kali
+segundo-bgu,Purple Team,Detection engineering,tutorial,45 min,11,,"Escribir reglas de detección efectivas. Sigma, YARA, Snort. Reducir falsos positivos.",false,hacking,kali
+segundo-bgu,Purple Team,Proyecto: Ejercicio Purple Team,project,70 min,12,,"Ejecuta un ejercicio purple team. Ataca, detecta, mejora, repite.",false,hacking,kali
+segundo-bgu,Liderazgo en Seguridad,Security program management,video,35 min,13,,"Construir y liderar programas de seguridad. Presupuesto, métricas, comunicación ejecutiva.",false,hacking,kali
+segundo-bgu,Liderazgo en Seguridad,Risk management,activity,40 min,14,,"Identificar, evaluar, mitigar riesgos. Frameworks: FAIR, NIST RMF. Decisiones basadas en riesgo.",false,hacking,kali
+segundo-bgu,Liderazgo en Seguridad,Proyecto: Security roadmap,project,50 min,15,,"Crea un roadmap de seguridad para una organización. Prioridades, recursos, timeline.",false,hacking,kali
+segundo-bgu,Liderazgo en Seguridad,Certificación: Security Leader,activity,20 min,16,,"Certificado por dominar seguridad avanzada, hardware hacking y liderazgo en seguridad.",true,hacking,kali
+tercero-bgu,Robótica de Investigación,Soft robotics,video,40 min,1,,"Robots flexibles y adaptables. Actuadores neumáticos, materiales inteligentes. Aplicaciones médicas.",false,robotica,ros
+tercero-bgu,Robótica de Investigación,Swarm robotics,tutorial,45 min,2,,"Múltiples robots simples que colaboran. Comportamiento emergente, algoritmos distribuidos.",false,robotica,ros
+tercero-bgu,Robótica de Investigación,Bio-inspired robotics,tutorial,45 min,3,,"Robots inspirados en la naturaleza. Locomoción animal, sensores biológicos, morfología adaptativa.",false,robotica,ros
+tercero-bgu,Robótica de Investigación,Proyecto: Robot de investigación,project,90 min,4,,"Desarrolla un robot que explore un concepto de investigación. Documenta como paper.",false,robotica,ros
+tercero-bgu,Robótica Médica,Robots quirúrgicos,video,40 min,5,,"Da Vinci, robots para cirugía mínimamente invasiva. Precisión, telepresencia, háptica.",false,robotica,ros
+tercero-bgu,Robótica Médica,Prótesis y exoesqueletos,tutorial,45 min,6,,"Prótesis robóticas controladas por señales musculares. Exoesqueletos para rehabilitación.",false,robotica,ros
+tercero-bgu,Robótica Médica,Robots de asistencia,tutorial,40 min,7,,"Robots para cuidado de ancianos, asistencia a discapacitados. Ética y aceptación social.",false,robotica,ros
+tercero-bgu,Robótica Médica,Proyecto: Dispositivo de asistencia,project,70 min,8,,"Diseña un dispositivo robótico para asistir a personas con alguna discapacidad.",false,robotica,ros
+tercero-bgu,Robótica Espacial,Rovers y exploradores,video,40 min,9,,"Mars rovers, exploradores lunares. Autonomía extrema, comunicación con delay, supervivencia.",false,robotica,ros
+tercero-bgu,Robótica Espacial,Manipulación en microgravedad,tutorial,45 min,10,,"Brazos robóticos en estaciones espaciales. Canadarm, servicing de satélites.",false,robotica,ros
+tercero-bgu,Robótica Espacial,Robots para construcción espacial,tutorial,40 min,11,,"Construcción de estructuras en órbita y otros planetas. Impresión 3D, ensamblaje autónomo.",false,robotica,ros
+tercero-bgu,Robótica Espacial,Proyecto: Misión robótica,project,70 min,12,,"Diseña una misión robótica espacial. Objetivos, diseño del robot, operaciones.",false,robotica,ros
+tercero-bgu,Tesis de Robótica,Selección de tema,activity,40 min,13,,"Elige un tema de investigación original. Revisión de literatura, identificación de gaps.",false,robotica,ros
+tercero-bgu,Tesis de Robótica,Desarrollo de tesis,project,150 min,14,,"Ejecuta tu investigación. Metodología rigurosa, documentación completa, resultados originales.",false,robotica,ros
+tercero-bgu,Tesis de Robótica,Defensa de tesis,activity,60 min,15,,"Presenta y defiende tu tesis ante tribunal académico. Contribución al campo.",false,robotica,ros
+tercero-bgu,Tesis de Robótica,Certificación: Robotics Engineer,activity,20 min,16,,"Certificado de graduación del programa avanzado de robótica. Listo para industria o posgrado.",true,robotica,ros
+tercero-bgu,IA de Frontera,Foundation models,video,45 min,1,,"Modelos masivos pre-entrenados. GPT-4, Claude, Gemini. Capacidades emergentes, scaling laws.",false,ia,jupyter
+tercero-bgu,IA de Frontera,Alignment y safety,tutorial,50 min,2,,"Alinear IA con valores humanos. RLHF, constitutional AI, interpretability. Riesgos existenciales.",false,ia,jupyter
+tercero-bgu,IA de Frontera,Autonomous agents,tutorial,50 min,3,,"Agentes que operan autónomamente por largos períodos. Planificación, memoria, tool use.",false,ia,jupyter
+tercero-bgu,IA de Frontera,Proyecto: Sistema de agentes,project,80 min,4,,"Construye un sistema multi-agente que resuelva problemas complejos autónomamente.",false,ia,jupyter
+tercero-bgu,IA y Sociedad,Impacto económico de IA,video,40 min,5,,"Automatización, nuevos trabajos, desigualdad. Preparación para el futuro del trabajo.",false,ia,jupyter
+tercero-bgu,IA y Sociedad,Gobernanza de IA,tutorial,45 min,6,,"Quién controla la IA. Gobiernos, empresas, comunidad. Modelos de gobernanza propuestos.",false,ia,jupyter
+tercero-bgu,IA y Sociedad,IA y democracia,activity,40 min,7,,"Desinformación, deepfakes, manipulación. Cómo proteger la democracia en la era de IA.",false,ia,jupyter
+tercero-bgu,IA y Sociedad,Proyecto: Policy brief,project,60 min,8,,"Escribe un policy brief sobre un tema de IA y sociedad. Recomendaciones para tomadores de decisiones.",false,ia,jupyter
+tercero-bgu,Emprendimiento en IA,Startups de IA,video,35 min,9,,"Casos de éxito: OpenAI, Anthropic, Hugging Face. Modelos de negocio, funding, exits.",false,ia,jupyter
+tercero-bgu,Emprendimiento en IA,Producto de IA,tutorial,45 min,10,,"De modelo a producto. UX para IA, pricing, go-to-market. Diferenciación en mercado competitivo.",false,ia,jupyter
+tercero-bgu,Emprendimiento en IA,Fundraising,activity,40 min,11,,"Cómo levantar capital para startup de IA. Pitch deck, due diligence, términos.",false,ia,jupyter
+tercero-bgu,Emprendimiento en IA,Proyecto: Startup de IA,project,70 min,12,,"Desarrolla un plan completo para una startup de IA. Producto, mercado, equipo, financiamiento.",false,ia,jupyter
+tercero-bgu,Tesis de IA,Selección de tema,activity,40 min,13,,"Elige un tema de investigación en IA. Originalidad, factibilidad, impacto potencial.",false,ia,jupyter
+tercero-bgu,Tesis de IA,Desarrollo de tesis,project,150 min,14,,"Ejecuta tu investigación. Experimentos rigurosos, análisis profundo, contribución original.",false,ia,jupyter
+tercero-bgu,Tesis de IA,Defensa de tesis,activity,60 min,15,,"Presenta y defiende tu tesis. Paper en formato de conferencia, presentación, Q&A.",false,ia,jupyter
+tercero-bgu,Tesis de IA,Certificación: AI Scientist,activity,20 min,16,,"Certificado de graduación del programa avanzado de IA. Preparado para investigación o industria.",true,ia,jupyter
+tercero-bgu,Seguridad de Vanguardia,AI security,video,40 min,1,,"Ataques a sistemas de IA: adversarial examples, data poisoning, model stealing. Defensas.",false,hacking,kali
+tercero-bgu,Seguridad de Vanguardia,Blockchain security,tutorial,50 min,2,,"Smart contract vulnerabilities, DeFi exploits, bridge attacks. Auditoría de contratos.",false,hacking,kali
+tercero-bgu,Seguridad de Vanguardia,Quantum-safe cryptography,tutorial,45 min,3,,"Preparación para computadoras cuánticas. Migración a algoritmos post-cuánticos.",false,hacking,kali
+tercero-bgu,Seguridad de Vanguardia,Proyecto: Auditoría de smart contract,project,70 min,4,,"Audita un smart contract buscando vulnerabilidades. Documenta hallazgos profesionalmente.",false,hacking,kali
+tercero-bgu,Investigación en Seguridad,Publicación de investigación,video,35 min,5,,"Cómo publicar en conferencias de seguridad. Black Hat, DEF CON, academic venues.",false,hacking,kali
+tercero-bgu,Investigación en Seguridad,Responsible disclosure,tutorial,40 min,6,,"Proceso de divulgación responsable. Coordinación con vendors, timelines, CVEs.",false,hacking,kali
+tercero-bgu,Investigación en Seguridad,Building security tools,tutorial,45 min,7,,"Desarrolla herramientas de seguridad. Open source, comunidad, mantenimiento.",false,hacking,kali
+tercero-bgu,Investigación en Seguridad,Proyecto: Herramienta de seguridad,project,80 min,8,,"Desarrolla una herramienta de seguridad original. Publica en GitHub, documenta, promueve.",false,hacking,kali
+tercero-bgu,CISO Track,Strategic security,video,40 min,9,,"Seguridad como habilitador de negocio. Alineación con objetivos empresariales.",false,hacking,kali
+tercero-bgu,CISO Track,Board communication,tutorial,40 min,10,,"Comunicar riesgos a ejecutivos y board. Métricas que importan, narrativa efectiva.",false,hacking,kali
+tercero-bgu,CISO Track,Building security culture,activity,40 min,11,,"Cultura de seguridad en toda la organización. Awareness, incentivos, liderazgo.",false,hacking,kali
+tercero-bgu,CISO Track,Proyecto: Security strategy,project,60 min,12,,"Desarrolla una estrategia de seguridad completa para una organización. Visión a 3 años.",false,hacking,kali
+tercero-bgu,Tesis de Seguridad,Selección de tema,activity,40 min,13,,"Elige un tema de investigación en seguridad. Puede ser técnico, de políticas, o híbrido.",false,hacking,kali
+tercero-bgu,Tesis de Seguridad,Desarrollo de tesis,project,150 min,14,,"Ejecuta tu investigación. Metodología rigurosa, ética, contribución al campo.",false,hacking,kali
+tercero-bgu,Tesis de Seguridad,Defensa de tesis,activity,60 min,15,,"Presenta y defiende tu tesis ante expertos. Demostración, preguntas técnicas.",false,hacking,kali
+tercero-bgu,Tesis de Seguridad,Certificación: Security Expert,activity,20 min,16,,"Certificado de graduación del programa avanzado de ciberseguridad. Experto completo.",true,hacking,kali
