@@ -1,0 +1,95 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked,programId
+inicial-1,Bienvenida al Mundo Tech,¡Hola! Bienvenidos al curso,video,5 min,1,https://www.youtube.com/watch?v=8wHJjLMnikU,"¡Bienvenidos pequeños exploradores! En este curso descubriremos juntos el mágico mundo de la tecnología.",false,robotica
+inicial-1,Bienvenida al Mundo Tech,¿Qué es un robot?,video,8 min,2,https://www.youtube.com/watch?v=3XGKrPBIIjo,"Un robot es una máquina especial que puede moverse y hacer tareas. Algunos robots limpian casas, otros construyen carros.",false,robotica
+inicial-1,Bienvenida al Mundo Tech,Robots en nuestra vida,activity,15 min,3,,"Actividad: Busca robots a tu alrededor. Dibuja tu robot favorito y compártelo con la clase.",false,robotica
+inicial-1,Bienvenida al Mundo Tech,Colores de la tecnología,activity,10 min,4,,"Los robots usan luces de colores para comunicarse. Verde = todo bien, rojo = atención, amarillo = espera.",false,robotica
+inicial-1,Bienvenida al Mundo Tech,Mi primer dibujo digital,tutorial,15 min,5,https://www.youtube.com/watch?v=pmXfUMhUqFY,"Usaremos Scratch Jr para hacer nuestro primer dibujo en la computadora.",false,robotica
+inicial-1,Formas y Patrones,Formas geométricas,video,10 min,6,https://www.youtube.com/watch?v=WTeqUejf3D0,"Los robots están hechos de formas: cuadrados, círculos, triángulos y rectángulos.",false,robotica
+inicial-1,Formas y Patrones,Construyendo con bloques,activity,20 min,7,,"Actividad práctica: Usando bloques de construcción, crearemos figuras simples.",false,robotica
+inicial-1,Formas y Patrones,Patrones y secuencias,tutorial,15 min,8,,"Un patrón es algo que se repite: rojo-azul-rojo-azul. Los robots siguen patrones.",false,robotica
+inicial-1,Formas y Patrones,Proyecto: Mi robot de formas,project,25 min,9,,"Proyecto: Construiremos un robot usando solo formas geométricas con papel y tijeras.",false,robotica
+inicial-1,Movimiento y Dirección,Arriba abajo izquierda derecha,video,8 min,10,,"Los robots necesitan saber direcciones para moverse. Aprenderemos las cuatro direcciones básicas.",false,robotica
+inicial-1,Movimiento y Dirección,El juego del robot,activity,20 min,11,,"¡Juguemos a ser robots! Un niño será el programador y dará instrucciones.",false,robotica
+inicial-1,Movimiento y Dirección,Laberintos simples,tutorial,15 min,12,,"Ayudaremos a un robot virtual a salir de un laberinto usando flechas.",false,robotica
+inicial-1,Movimiento y Dirección,Proyecto: Mapa del tesoro,project,25 min,13,,"Crearemos un mapa del tesoro con instrucciones para que un robot encuentre el tesoro.",false,robotica
+inicial-1,Mi Primer Programa,¿Qué es programar?,video,10 min,14,,"Programar es darle instrucciones a una computadora. Es como escribir una receta de cocina.",false,robotica
+inicial-1,Mi Primer Programa,Scratch Jr: Primeros pasos,tutorial,20 min,15,,"Abriremos Scratch Jr y conoceremos la interfaz con bloques de colores.",false,robotica
+inicial-1,Mi Primer Programa,Haciendo que el gato camine,tutorial,15 min,16,,"Nuestro primer programa: haremos que el gato de Scratch camine de un lado a otro.",false,robotica
+inicial-1,Mi Primer Programa,Proyecto final: Mi historia animada,project,30 min,17,,"Crearemos una historia corta animada en Scratch Jr.",true,robotica
+inicial-1,Pensamiento Mágico,¿Qué es la inteligencia?,video,8 min,1,https://www.youtube.com/watch?v=mJeNghZXtMo,"La inteligencia es la capacidad de aprender, resolver problemas y tomar decisiones.",false,ia
+inicial-1,Pensamiento Mágico,Robots que aprenden,video,10 min,2,,"Algunos robots especiales pueden aprender cosas nuevas. Esto se llama Inteligencia Artificial.",false,ia
+inicial-1,Pensamiento Mágico,Juego: ¿Humano o robot?,activity,15 min,3,,"Jugaremos a adivinar: ¿esto lo hizo un humano o un robot?",false,ia
+inicial-1,Pensamiento Mágico,Clasificando objetos,activity,15 min,4,,"Aprenderemos a clasificar: frutas vs verduras, animales grandes vs pequeños.",false,ia
+inicial-1,Aprendiendo a Clasificar,¿Qué es clasificar?,video,8 min,5,,"Clasificar es poner las cosas en grupos según sus características.",false,ia
+inicial-1,Aprendiendo a Clasificar,Juego de las categorías,activity,20 min,6,,"Tendremos muchas imágenes mezcladas. Debemos separarlas en categorías.",false,ia
+inicial-1,Aprendiendo a Clasificar,Encontrando patrones,tutorial,15 min,7,,"Los patrones nos ayudan a predecir. Si veo nubes grises, predigo lluvia.",false,ia
+inicial-1,Aprendiendo a Clasificar,Proyecto: Mi clasificador,project,25 min,8,,"Crearemos nuestro propio sistema de clasificación.",false,ia
+inicial-1,Reconociendo Cosas,¿Cómo ven los robots?,video,10 min,9,,"Los robots ven con cámaras, pero necesitan que les enseñemos qué es cada cosa.",false,ia
+inicial-1,Reconociendo Cosas,Teachable Machine: Mi primera IA,tutorial,20 min,10,https://www.youtube.com/watch?v=T2qQGqZxkD0,"Usaremos Teachable Machine de Google para crear nuestra primera IA.",false,ia
+inicial-1,Reconociendo Cosas,Entrenando con más ejemplos,tutorial,15 min,11,,"Mientras más fotos le demos a la IA, mejor aprende.",false,ia
+inicial-1,Reconociendo Cosas,Proyecto: Reconocedor de objetos,project,25 min,12,,"Crearemos un reconocedor que identifique 3 objetos de tu mochila.",false,ia
+inicial-1,IA Amigable,Asistentes virtuales,video,10 min,13,,"Alexa, Siri, y Google Assistant son IAs que nos ayudan.",false,ia
+inicial-1,IA Amigable,Hablando con la IA,activity,15 min,14,,"Practicaremos haciendo preguntas a un asistente virtual.",false,ia
+inicial-1,IA Amigable,Proyecto final: Mi amigo robot,project,30 min,15,,"Diseñaremos nuestro propio asistente virtual ideal.",true,ia
+inicial-1,Internet Seguro,¿Qué es internet?,video,8 min,1,https://www.youtube.com/watch?v=Dxcc6ycZ73M,"Internet es como una biblioteca gigante donde puedes encontrar información y juegos.",false,hacking
+inicial-1,Internet Seguro,Personas de confianza,video,10 min,2,,"En internet, igual que en la calle, hay personas conocidas y desconocidas.",false,hacking
+inicial-1,Internet Seguro,Información secreta,activity,15 min,3,,"Algunas cosas son secretas: tu nombre completo, dónde vives, tu escuela.",false,hacking
+inicial-1,Internet Seguro,El semáforo de internet,activity,15 min,4,,"Verde: seguro. Amarillo: preguntar a un adulto. Rojo: peligroso.",false,hacking
+inicial-1,Contraseñas Mágicas,¿Qué es una contraseña?,video,8 min,5,https://www.youtube.com/watch?v=aEmF3Iylvr4,"Una contraseña es como la llave de tu casa digital.",false,hacking
+inicial-1,Contraseñas Mágicas,Contraseñas fuertes vs débiles,tutorial,15 min,6,,"123456 es una contraseña débil. Una fuerte tiene letras, números y es difícil de adivinar.",false,hacking
+inicial-1,Contraseñas Mágicas,Juego: Crea tu contraseña,activity,15 min,7,,"Crearemos contraseñas usando cosas que nos gustan pero que otros no pueden adivinar.",false,hacking
+inicial-1,Contraseñas Mágicas,Proyecto: Cofre del tesoro,project,20 min,8,,"Crearemos un cofre del tesoro con una contraseña secreta.",false,hacking
+inicial-1,Buenos Modales Digitales,Ser amable en línea,video,10 min,9,,"Las palabras en internet pueden hacer feliz o triste a alguien.",false,hacking
+inicial-1,Buenos Modales Digitales,Emojis y sentimientos,activity,15 min,10,,"Los emojis nos ayudan a expresar sentimientos.",false,hacking
+inicial-1,Buenos Modales Digitales,¿Qué hago si algo me molesta?,tutorial,15 min,11,,"Si algo te hace sentir mal: 1) Deja de mirar, 2) Cuéntale a un adulto.",false,hacking
+inicial-1,Buenos Modales Digitales,Proyecto: Póster de reglas,project,25 min,12,,"Crearemos un póster con las reglas de seguridad en internet.",false,hacking
+inicial-1,Superhéroe Digital,Repaso de seguridad,activity,15 min,13,,"Repasaremos todo lo aprendido con un juego de preguntas.",false,hacking
+inicial-1,Superhéroe Digital,Mi compromiso digital,activity,15 min,14,,"Escribiremos y firmaremos un Compromiso Digital.",false,hacking
+inicial-1,Superhéroe Digital,Certificación: Ciudadano Digital Jr,activity,10 min,15,,"¡Felicitaciones! Recibirás tu certificado de Ciudadano Digital Junior.",true,hacking
+cuarto-egb,Electrónica Básica,Bienvenida al mundo de la electrónica,video,15 min,1,https://www.youtube.com/watch?v=mc979OhitAg,"¡Bienvenido al fascinante mundo de la electrónica! La electricidad hace funcionar todo.",false,robotica
+cuarto-egb,Electrónica Básica,¿Qué es un circuito?,video,20 min,2,https://www.youtube.com/watch?v=HOFp8bHTN30,"Un circuito es como una autopista para la electricidad.",false,robotica
+cuarto-egb,Electrónica Básica,Componentes electrónicos,tutorial,25 min,3,,"Conoce los componentes básicos: resistencias, LEDs, capacitores, transistores.",false,robotica
+cuarto-egb,Electrónica Básica,Mi primer circuito en Tinkercad,tutorial,30 min,4,,"¡Manos a la obra! En Tinkercad Circuits crearás tu primer circuito.",false,robotica
+cuarto-egb,Electrónica Básica,Proyecto: Semáforo LED,project,40 min,5,,"Construye un semáforo con 3 LEDs (rojo, amarillo, verde).",false,robotica
+cuarto-egb,Sensores y Entradas,¿Qué es un sensor?,video,15 min,6,,"Los sensores son los sentidos de los robots. Detectan luz, temperatura, movimiento.",false,robotica
+cuarto-egb,Sensores y Entradas,El pulsador: Tu primer sensor,tutorial,25 min,7,,"El pulsador detecta cuando lo presionas. Aprenderás sobre circuitos pull-up y pull-down.",false,robotica
+cuarto-egb,Sensores y Entradas,Sensor de luz (LDR),tutorial,25 min,8,,"El LDR cambia su resistencia según la luz que recibe.",false,robotica
+cuarto-egb,Sensores y Entradas,Proyecto: Lámpara automática,project,45 min,9,,"Crea una lámpara inteligente que se enciende sola cuando hay poca luz.",false,robotica
+cuarto-egb,Introducción a Arduino,¿Qué es un microcontrolador?,video,20 min,10,https://www.youtube.com/watch?v=CqrQmQqpHXc,"Un microcontrolador es el cerebro de un robot. Arduino es el más popular.",false,robotica
+cuarto-egb,Introducción a Arduino,Conociendo el Arduino UNO,tutorial,25 min,11,,"Explora cada parte del Arduino: pines digitales, pines analógicos, puerto USB.",false,robotica
+cuarto-egb,Introducción a Arduino,Tu primer programa: Blink,tutorial,30 min,12,,"¡Hola Mundo en Arduino! El programa Blink hace parpadear un LED.",false,robotica
+cuarto-egb,Introducción a Arduino,Proyecto: Luces de policía,project,40 min,13,,"Programa luces que alternan como las de un carro de policía.",false,robotica
+cuarto-egb,Proyecto Final Robótica,Diseñando mi robot,activity,30 min,14,,"Planifica tu proyecto final: un robot con sensores y luces.",false,robotica
+cuarto-egb,Proyecto Final Robótica,Construyendo mi robot,project,50 min,15,,"¡Es hora de construir! Armarás el circuito completo en Tinkercad.",false,robotica
+cuarto-egb,Proyecto Final Robótica,Presentación y demostración,activity,30 min,16,,"Presenta tu proyecto a la clase. Explica cómo funciona.",true,robotica
+cuarto-egb,Pensamiento Computacional,¿Qué es la Inteligencia Artificial?,video,20 min,1,https://www.youtube.com/watch?v=mJeNghZXtMo,"La IA está en tu teléfono, videojuegos y carros. Las computadoras pueden aprender.",false,ia
+cuarto-egb,Pensamiento Computacional,Humanos vs Máquinas,activity,25 min,2,,"¿Qué hacen mejor los humanos? ¿Y las máquinas? Clasificaremos tareas.",false,ia
+cuarto-egb,Pensamiento Computacional,Algoritmos en la vida diaria,video,15 min,3,,"Un algoritmo es una receta paso a paso. Cepillarte los dientes es un algoritmo.",false,ia
+cuarto-egb,Pensamiento Computacional,Creando algoritmos,activity,30 min,4,,"Escribe algoritmos para tareas cotidianas: hacer la cama, preparar cereal.",false,ia
+cuarto-egb,Reconocimiento de Patrones,¿Cómo aprenden las máquinas?,video,20 min,5,,"Las máquinas aprenden encontrando patrones en datos.",false,ia
+cuarto-egb,Reconocimiento de Patrones,Teachable Machine: Tu primer modelo,tutorial,35 min,6,https://www.youtube.com/watch?v=T2qQGqZxkD0,"Usa Teachable Machine de Google para crear tu primer modelo de IA.",false,ia
+cuarto-egb,Reconocimiento de Patrones,Entrenando con más datos,tutorial,30 min,7,,"Más datos = mejor IA. Experimentarás agregando más fotos.",false,ia
+cuarto-egb,Reconocimiento de Patrones,Proyecto: Clasificador de objetos,project,45 min,8,,"Crea un clasificador que reconozca 5 objetos de tu mochila.",false,ia
+cuarto-egb,IA con Scratch,Extensiones de IA en Scratch,tutorial,25 min,9,,"Scratch tiene extensiones especiales para IA: reconocimiento de voz y video.",false,ia
+cuarto-egb,IA con Scratch,Control por voz,tutorial,35 min,10,,"Programa un personaje que responda a comandos de voz.",false,ia
+cuarto-egb,IA con Scratch,Detección de movimiento,tutorial,30 min,11,,"Usa la cámara para detectar movimiento en Scratch.",false,ia
+cuarto-egb,IA con Scratch,Proyecto: Juego controlado por IA,project,50 min,12,,"Combina reconocimiento de voz Y detección de movimiento.",false,ia
+cuarto-egb,Ética en IA,¿La IA siempre tiene razón?,video,20 min,13,,"La IA puede equivocarse. Aprenderás sobre el sesgo en IA.",false,ia
+cuarto-egb,Ética en IA,Debate: IA en nuestra vida,activity,30 min,14,,"¿Debería la IA tomar decisiones importantes? Debatiremos pros y contras.",false,ia
+cuarto-egb,Proyecto Final IA,Mi asistente inteligente,project,50 min,15,,"Diseña y programa tu propio asistente en Scratch.",false,ia
+cuarto-egb,Proyecto Final IA,Feria de IA,activity,30 min,16,,"Presenta tu asistente. Explica cómo lo entrenaste.",true,ia
+cuarto-egb,Ciudadanía Digital,Bienvenido a Internet,video,15 min,1,https://www.youtube.com/watch?v=Dxcc6ycZ73M,"Internet es una ciudad gigante donde puedes aprender, jugar y comunicarte.",false,hacking
+cuarto-egb,Ciudadanía Digital,Tu identidad digital,video,20 min,2,,"Todo lo que haces en internet deja una huella: fotos, comentarios, likes.",false,hacking
+cuarto-egb,Ciudadanía Digital,Información personal: ¿Qué NO compartir?,activity,25 min,3,,"NUNCA compartir: dirección, teléfono, escuela, contraseñas.",false,hacking
+cuarto-egb,Ciudadanía Digital,Creando reglas de seguridad,project,30 min,4,,"Diseña un póster con las 10 reglas de oro de seguridad en internet.",false,hacking
+cuarto-egb,Contraseñas Seguras,¿Por qué necesitamos contraseñas?,video,15 min,5,,"Las contraseñas son llaves de tu casa digital.",false,hacking
+cuarto-egb,Contraseñas Seguras,Anatomía de una contraseña fuerte,tutorial,25 min,6,,"Contraseña fuerte: mayúsculas + minúsculas + números + símbolos + 12 caracteres.",false,hacking
+cuarto-egb,Contraseñas Seguras,El método de la frase,activity,20 min,7,,"Convierte frases en contraseñas: Mi gato Pelusa tiene 4 patas = MgPt4p!",false,hacking
+cuarto-egb,Contraseñas Seguras,Proyecto: Gestor de contraseñas,project,35 min,8,,"Crea tu sistema para recordar contraseñas de forma segura.",false,hacking
+cuarto-egb,Amenazas en Línea,¿Qué es el phishing?,video,20 min,9,https://www.youtube.com/watch?v=XBkzBrXlle0,"Phishing: alguien finge ser otra persona para robarte información.",false,hacking
+cuarto-egb,Amenazas en Línea,Detective de correos falsos,activity,30 min,10,,"Analiza correos reales y falsos. Busca señales de phishing.",false,hacking
+cuarto-egb,Amenazas en Línea,Virus y malware,video,20 min,11,,"Virus informáticos: programas maliciosos que dañan tu computadora.",false,hacking
+cuarto-egb,Amenazas en Línea,Simulación: Ataque de phishing,activity,35 min,12,,"Simulación segura donde intentaremos engañarte con correos falsos.",false,hacking
+cuarto-egb,Proyecto Final Seguridad,Campaña de concientización,project,45 min,13,,"Crea una campaña para enseñar seguridad digital.",false,hacking
+cuarto-egb,Proyecto Final Seguridad,Presentación a la comunidad,activity,30 min,14,,"Presenta tu campaña a la clase o a tus padres.",false,hacking
+cuarto-egb,Proyecto Final Seguridad,Certificación: Ciudadano Digital Seguro,activity,15 min,15,,"¡Felicitaciones! Certificado de Ciudadano Digital Seguro.",true,hacking
