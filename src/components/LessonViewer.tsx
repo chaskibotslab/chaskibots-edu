@@ -121,6 +121,43 @@ export default function LessonViewer({ lesson, programId, onClose, onNext, onPre
     return match ? match[1] : null
   }
 
+  // Extraer ID de Google Drive
+  const getGoogleDriveId = (url: string): string | null => {
+    // Formatos: /file/d/ID/view, /file/d/ID, id=ID
+    const match = url.match(/(?:\/file\/d\/|id=)([a-zA-Z0-9_-]+)/)
+    return match ? match[1] : null
+  }
+
+  // Determinar tipo de video
+  const getVideoEmbed = (url: string) => {
+    const youtubeId = getYouTubeId(url)
+    if (youtubeId) {
+      return { type: 'youtube', embedUrl: `https://www.youtube.com/embed/${youtubeId}` }
+    }
+    
+    const driveId = getGoogleDriveId(url)
+    if (driveId) {
+      return { type: 'drive', embedUrl: `https://drive.google.com/file/d/${driveId}/preview` }
+    }
+    
+    return null
+  }
+
+  // Convertir URL de imagen de Google Drive a formato embebible
+  const getImageUrl = (url: string): string => {
+    if (!url) return ''
+    
+    // Si es Google Drive, convertir a formato de imagen directa
+    const driveId = getGoogleDriveId(url)
+    if (driveId) {
+      return `https://drive.google.com/uc?export=view&id=${driveId}`
+    }
+    
+    return url
+  }
+
+  const videoEmbed = lesson.videoUrl ? getVideoEmbed(lesson.videoUrl) : null
+
   return (
     <div className="fixed inset-0 z-50 bg-dark-900/95 backdrop-blur-sm overflow-y-auto">
       <div className="min-h-screen">
@@ -199,13 +236,13 @@ export default function LessonViewer({ lesson, programId, onClose, onNext, onPre
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Video Player - YouTube Embed */}
-                {lesson.type === 'video' && lesson.videoUrl && getYouTubeId(lesson.videoUrl) && (
+                {/* Video Player - YouTube or Google Drive */}
+                {lesson.type === 'video' && videoEmbed && (
                   <div className="aspect-video bg-dark-800 rounded-2xl overflow-hidden border border-dark-600">
                     <iframe
                       width="100%"
                       height="100%"
-                      src={`https://www.youtube.com/embed/${getYouTubeId(lesson.videoUrl)}`}
+                      src={videoEmbed.embedUrl}
                       title={lesson.title}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -215,8 +252,8 @@ export default function LessonViewer({ lesson, programId, onClose, onNext, onPre
                   </div>
                 )}
 
-                {/* Video Placeholder when no URL */}
-                {lesson.type === 'video' && !lesson.videoUrl && (
+                {/* Video Placeholder when no valid URL */}
+                {lesson.type === 'video' && !videoEmbed && (
                   <div className="aspect-video bg-dark-800 rounded-2xl overflow-hidden border border-dark-600 flex items-center justify-center">
                     <div className="text-center">
                       <div className={`w-20 h-20 ${lessonType.bg} rounded-full flex items-center justify-center mx-auto mb-4`}>
@@ -231,7 +268,7 @@ export default function LessonViewer({ lesson, programId, onClose, onNext, onPre
                 {lesson.imageUrl && (
                   <div className="rounded-2xl overflow-hidden border border-dark-600">
                     <img 
-                      src={lesson.imageUrl} 
+                      src={getImageUrl(lesson.imageUrl)} 
                       alt={lesson.title}
                       className="w-full h-64 object-cover"
                     />
