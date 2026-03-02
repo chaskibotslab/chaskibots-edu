@@ -237,7 +237,7 @@ export default function AdminLessonsPage() {
   }
 
   // Get unique levels
-  const levels = [...new Set(lessons.map(l => l.levelId))].sort()
+  const levels = Array.from(new Set(lessons.map(l => l.levelId))).sort()
 
   return (
     <div className="min-h-screen bg-dark-900 p-6">
