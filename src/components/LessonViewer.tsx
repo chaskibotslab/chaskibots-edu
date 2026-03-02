@@ -9,6 +9,18 @@ import {
   AlertTriangle, Info, Zap, Award, Brain, Shield, Bot
 } from 'lucide-react'
 
+interface Resource {
+  title: string
+  url: string
+  type?: string
+}
+
+interface ExternalLink {
+  title: string
+  url: string
+  desc?: string
+}
+
 interface LessonViewerProps {
   lesson: {
     id: string
@@ -18,7 +30,10 @@ interface LessonViewerProps {
     duration: string
     content?: string
     videoUrl?: string
+    imageUrl?: string
     images?: string[]
+    resources?: string | Resource[]
+    externalLinks?: string | ExternalLink[]
     objectives?: string[]
     materials?: string[]
     steps?: string[]
@@ -85,6 +100,26 @@ export default function LessonViewer({ lesson, programId, onClose, onNext, onPre
 
   const parsedContent = parseContent(lesson.content || '')
   const description = typeof parsedContent === 'string' ? parsedContent : parsedContent.description || lesson.content
+
+  // Parsear recursos y enlaces externos
+  const parseJsonField = <T,>(field: string | T[] | undefined): T[] => {
+    if (!field) return []
+    if (Array.isArray(field)) return field
+    try {
+      return JSON.parse(field)
+    } catch {
+      return []
+    }
+  }
+
+  const resources = parseJsonField<Resource>(lesson.resources)
+  const externalLinks = parseJsonField<ExternalLink>(lesson.externalLinks)
+
+  // Extraer video ID de YouTube
+  const getYouTubeId = (url: string): string | null => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
+    return match ? match[1] : null
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-dark-900/95 backdrop-blur-sm overflow-y-auto">
@@ -164,26 +199,42 @@ export default function LessonViewer({ lesson, programId, onClose, onNext, onPre
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Video Player Placeholder */}
-                {lesson.type === 'video' && (
+                {/* Video Player - YouTube Embed */}
+                {lesson.type === 'video' && lesson.videoUrl && getYouTubeId(lesson.videoUrl) && (
+                  <div className="aspect-video bg-dark-800 rounded-2xl overflow-hidden border border-dark-600">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src={`https://www.youtube.com/embed/${getYouTubeId(lesson.videoUrl)}`}
+                      title={lesson.title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    />
+                  </div>
+                )}
+
+                {/* Video Placeholder when no URL */}
+                {lesson.type === 'video' && !lesson.videoUrl && (
                   <div className="aspect-video bg-dark-800 rounded-2xl overflow-hidden border border-dark-600 flex items-center justify-center">
                     <div className="text-center">
                       <div className={`w-20 h-20 ${lessonType.bg} rounded-full flex items-center justify-center mx-auto mb-4`}>
                         <Play className={`w-10 h-10 ${lessonType.color}`} />
                       </div>
-                      <p className="text-gray-400">Video de la lección</p>
-                      {lesson.videoUrl && (
-                        <a 
-                          href={lesson.videoUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r ${program.gradient} rounded-lg text-white font-medium hover:opacity-90 transition-opacity`}
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Ver en YouTube
-                        </a>
-                      )}
+                      <p className="text-gray-400">Video próximamente</p>
                     </div>
+                  </div>
+                )}
+
+                {/* Lesson Image */}
+                {lesson.imageUrl && (
+                  <div className="rounded-2xl overflow-hidden border border-dark-600">
+                    <img 
+                      src={lesson.imageUrl} 
+                      alt={lesson.title}
+                      className="w-full h-64 object-cover"
+                    />
                   </div>
                 )}
 
@@ -375,26 +426,107 @@ export default function LessonViewer({ lesson, programId, onClose, onNext, onPre
           )}
 
           {activeTab === 'resources' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { icon: Video, title: 'Video Tutorial', desc: 'Explicación paso a paso', color: 'red' },
-                { icon: ImageIcon, title: 'Diagramas', desc: 'Esquemas visuales', color: 'blue' },
-                { icon: Download, title: 'Material PDF', desc: 'Guía descargable', color: 'green' },
-                { icon: Code, title: 'Código Ejemplo', desc: 'Código para practicar', color: 'purple' },
-                { icon: ExternalLink, title: 'Simulador', desc: 'Practica en línea', color: 'cyan' },
-                { icon: MessageCircle, title: 'Foro', desc: 'Pregunta a la comunidad', color: 'yellow' }
-              ].map((resource, idx) => (
-                <button 
-                  key={idx}
-                  className={`p-5 bg-dark-800 hover:bg-dark-700 rounded-2xl border border-dark-600 hover:border-${resource.color}-500/50 transition-all text-left group`}
-                >
-                  <div className={`w-12 h-12 bg-${resource.color}-500/20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                    <resource.icon className={`w-6 h-6 text-${resource.color}-400`} />
+            <div className="space-y-6">
+              {/* Resources from lesson data */}
+              {resources.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <Download className="w-5 h-5" />
+                    Materiales de la lección
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {resources.map((resource, idx) => {
+                      const iconMap: Record<string, any> = {
+                        video: Video,
+                        pdf: Download,
+                        code: Code,
+                        image: ImageIcon
+                      }
+                      const Icon = iconMap[resource.type || 'pdf'] || Download
+                      const colorMap: Record<string, string> = {
+                        video: 'red',
+                        pdf: 'green',
+                        code: 'purple',
+                        image: 'blue'
+                      }
+                      const color = colorMap[resource.type || 'pdf'] || 'gray'
+                      
+                      return (
+                        <a 
+                          key={idx}
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`p-5 bg-dark-800 hover:bg-dark-700 rounded-2xl border border-dark-600 hover:border-${color}-500/50 transition-all text-left group block`}
+                        >
+                          <div className={`w-12 h-12 bg-${color}-500/20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                            <Icon className={`w-6 h-6 text-${color}-400`} />
+                          </div>
+                          <h4 className="font-semibold text-white mb-1">{resource.title}</h4>
+                          <p className="text-sm text-gray-400 flex items-center gap-1">
+                            <ExternalLink className="w-3 h-3" />
+                            Abrir recurso
+                          </p>
+                        </a>
+                      )
+                    })}
                   </div>
-                  <h4 className="font-semibold text-white mb-1">{resource.title}</h4>
-                  <p className="text-sm text-gray-400">{resource.desc}</p>
-                </button>
-              ))}
+                </div>
+              )}
+
+              {/* External Links */}
+              {externalLinks.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <ExternalLink className="w-5 h-5" />
+                    Enlaces externos recomendados
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {externalLinks.map((link, idx) => (
+                      <a 
+                        key={idx}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-4 bg-dark-800 hover:bg-dark-700 rounded-xl border border-dark-600 hover:border-cyan-500/50 transition-all flex items-center gap-4 group"
+                      >
+                        <div className="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <ExternalLink className="w-5 h-5 text-cyan-400" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-white">{link.title}</h4>
+                          {link.desc && <p className="text-sm text-gray-400">{link.desc}</p>}
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Default resources if none provided */}
+              {resources.length === 0 && externalLinks.length === 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { icon: Video, title: 'Video Tutorial', desc: 'Explicación paso a paso', color: 'red' },
+                    { icon: ImageIcon, title: 'Diagramas', desc: 'Esquemas visuales', color: 'blue' },
+                    { icon: Download, title: 'Material PDF', desc: 'Guía descargable', color: 'green' },
+                    { icon: Code, title: 'Código Ejemplo', desc: 'Código para practicar', color: 'purple' },
+                    { icon: ExternalLink, title: 'Simulador', desc: 'Practica en línea', color: 'cyan' },
+                    { icon: MessageCircle, title: 'Foro', desc: 'Pregunta a la comunidad', color: 'yellow' }
+                  ].map((resource, idx) => (
+                    <button 
+                      key={idx}
+                      className={`p-5 bg-dark-800 hover:bg-dark-700 rounded-2xl border border-dark-600 hover:border-${resource.color}-500/50 transition-all text-left group`}
+                    >
+                      <div className={`w-12 h-12 bg-${resource.color}-500/20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                        <resource.icon className={`w-6 h-6 text-${resource.color}-400`} />
+                      </div>
+                      <h4 className="font-semibold text-white mb-1">{resource.title}</h4>
+                      <p className="text-sm text-gray-400">{resource.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
