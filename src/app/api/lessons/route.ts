@@ -49,7 +49,7 @@ export async function GET(request: Request) {
       cache.invalidate(CACHE_KEY)
     }
 
-    console.log('[Lessons API] Consultando Airtable para:', programId, levelId || 'todos')
+    console.log('[Lessons API] Consultando Airtable para:', programId, levelId || 'todos', '- v2')
     let url = AIRTABLE_API_URL
     
     // Construir filtro combinando levelId y programId
