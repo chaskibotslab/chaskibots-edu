@@ -111,17 +111,27 @@ export default function NivelPage() {
   // Cargar lecciones desde API según programa seleccionado
   useEffect(() => {
     async function loadLessons() {
+      console.log('[DEBUG] Cargando lecciones para:', { levelId, selectedProgram })
       setLessonsLoading(true)
       setApiLessons([]) // Limpiar lecciones anteriores
       try {
-        const response = await fetch(`/api/lessons?levelId=${levelId}&programId=${selectedProgram}`)
+        const url = `/api/lessons?levelId=${levelId}&programId=${selectedProgram}&nocache=1`
+        console.log('[DEBUG] Fetching:', url)
+        const response = await fetch(url)
         if (response.ok) {
           const data = await response.json()
+          console.log('[DEBUG] Respuesta API:', data.length, 'lecciones')
+          if (data.length > 0) {
+            console.log('[DEBUG] Primera lección:', data[0].title, 'programId:', data[0].programId)
+          }
           if (Array.isArray(data) && data.length > 0) {
             setApiLessons(data)
           }
+        } else {
+          console.log('[DEBUG] Error en respuesta:', response.status)
         }
       } catch (error) {
+        console.log('[DEBUG] Error:', error)
         console.log('Using local lessons data')
       }
       setLessonsLoading(false)

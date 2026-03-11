@@ -31,16 +31,22 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const levelId = searchParams.get('levelId')
   const programId = searchParams.get('programId') || 'robotica'
+  const noCache = searchParams.get('nocache') === '1'
 
   // Caché de lecciones - 15 minutos (incluye programa en la clave)
   const CACHE_KEY = `lessons_${programId}_${levelId || 'all'}`
 
   try {
-    // Intentar obtener del caché primero
-    const cached = cache.get<any[]>(CACHE_KEY)
-    if (cached) {
-      console.log('[Lessons API] Usando caché para:', programId, levelId || 'todos')
-      return NextResponse.json(cached)
+    // Intentar obtener del caché primero (si no se fuerza recarga)
+    if (!noCache) {
+      const cached = cache.get<any[]>(CACHE_KEY)
+      if (cached) {
+        console.log('[Lessons API] Usando caché para:', programId, levelId || 'todos')
+        return NextResponse.json(cached)
+      }
+    } else {
+      console.log('[Lessons API] Forzando recarga sin caché')
+      cache.invalidate(CACHE_KEY)
     }
 
     console.log('[Lessons API] Consultando Airtable para:', programId, levelId || 'todos')
@@ -142,6 +148,7 @@ export async function GET(request: Request) {
       return {
         id: record.id,
         levelId: record.fields.levelId || '',
+        programId: record.fields.programId || 'robotica',
         moduleId,
         moduleName,
         title: record.fields.title || '',
