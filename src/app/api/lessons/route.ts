@@ -10,6 +10,42 @@ const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
 // URL base de Airtable - usa una sola tabla 'lessons' con filtro por programId
 const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/lessons`
 
+// Función para obtener todos los registros con paginación de Airtable
+async function fetchAllRecords(baseUrl: string): Promise<any[]> {
+  const allRecords: any[] = []
+  let offset: string | undefined = undefined
+  
+  do {
+    const paginatedUrl: string = offset ? `${baseUrl}&offset=${offset}` : baseUrl
+    
+    const response: Response = await fetch(paginatedUrl, {
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Airtable lessons error:', errorText)
+      
+      if (response.status === 429) {
+        throw new Error('RATE_LIMIT')
+      }
+      
+      throw new Error('FETCH_ERROR')
+    }
+
+    const data: { records?: any[], offset?: string } = await response.json()
+    allRecords.push(...(data.records || []))
+    offset = data.offset
+    
+  } while (offset)
+  
+  return allRecords
+}
+
 function getVideoEmbedUrl(url: string): string {
   if (!url) return ''
   if (url.includes('drive.google.com')) {
@@ -70,30 +106,20 @@ export async function GET(request: Request) {
       url += `?sort[0][field]=order&sort[0][direction]=asc`
     }
 
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Airtable lessons error:', errorText)
-      
-      // Mensaje amigable para límite de API
-      if (response.status === 429) {
+    let allRecords: any[]
+    try {
+      allRecords = await fetchAllRecords(url)
+    } catch (error: any) {
+      if (error.message === 'RATE_LIMIT') {
         return NextResponse.json(
-          { error: getUserFriendlyError(429, errorText) },
+          { error: getUserFriendlyError(429, 'Rate limit') },
           { status: 429 }
         )
       }
-      
       return NextResponse.json({ error: 'Error fetching lessons' }, { status: 500 })
     }
 
-    const data = await response.json()
+    const data = { records: allRecords }
     
     const lessons = data.records.map((record: any) => {
       const moduleName = record.fields.moduleName || ''
