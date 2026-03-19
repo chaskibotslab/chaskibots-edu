@@ -1,0 +1,400 @@
+const fs = require('fs');
+
+// Contenido mejorado para noveno-egb Robótica - Sistemas Embebidos
+const improvedLessons = [
+  {
+    levelId: 'noveno-egb',
+    moduleName: 'Sistemas Embebidos',
+    title: 'Arquitectura de sistemas embebidos',
+    type: 'video',
+    duration: '30 min',
+    order: 1,
+    videoUrl: 'https://www.youtube.com/watch?v=K3e8Hn3HYXE',
+    content: `# Arquitectura de Sistemas Embebidos
+
+## 🎯 Objetivos de la Lección
+- Comprender qué es un sistema embebido y sus características
+- Identificar los componentes principales: CPU, memoria, periféricos
+- Conocer aplicaciones reales: desde marcapasos hasta satélites
+
+## 📚 Contenido
+
+### ¿Qué es un Sistema Embebido?
+Un sistema embebido es una computadora especializada diseñada para realizar tareas específicas. A diferencia de una PC, está optimizado para:
+- **Bajo consumo de energía**
+- **Tamaño reducido**
+- **Costo mínimo**
+- **Alta confiabilidad**
+
+### Componentes Principales
+1. **Microcontrolador (MCU)**: El cerebro del sistema
+   - CPU: Procesa instrucciones
+   - RAM: Memoria temporal (típicamente 2KB-256KB)
+   - Flash: Almacena el programa (típicamente 16KB-2MB)
+   
+2. **Periféricos integrados**:
+   - GPIO: Pines de entrada/salida digital
+   - ADC: Convertidor analógico-digital
+   - UART/SPI/I2C: Comunicación serial
+   - Timers: Temporización precisa
+   - PWM: Control de motores y LEDs
+
+3. **Componentes externos**:
+   - Sensores: Temperatura, luz, movimiento
+   - Actuadores: Motores, relés, displays
+
+### Ejemplos en la Vida Real
+| Dispositivo | MCU típico | Función |
+|-------------|------------|---------|
+| Marcapasos | ARM Cortex-M0 | Monitorear y regular ritmo cardíaco |
+| Lavadora | 8051 | Controlar ciclos de lavado |
+| Drone | STM32 | Control de vuelo y estabilización |
+| Auto | Múltiples ECUs | Motor, frenos, airbags |
+
+## 💻 Actividad Práctica
+1. Investiga qué microcontrolador usa tu teléfono
+2. Lista 5 sistemas embebidos en tu casa
+3. Compara Arduino UNO vs Raspberry Pi Pico
+
+## 📖 Recursos Adicionales
+- [Datasheet ATmega328P](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf)
+- [Tutorial ARM Cortex-M](https://www.arm.com/technologies/cortex-m)`,
+    locked: false,
+    programId: 'robotica'
+  },
+  {
+    levelId: 'noveno-egb',
+    moduleName: 'Sistemas Embebidos',
+    title: 'RTOS: Sistemas operativos de tiempo real',
+    type: 'tutorial',
+    duration: '45 min',
+    order: 2,
+    videoUrl: 'https://www.youtube.com/watch?v=F321087yYy4',
+    content: `# RTOS: Sistemas Operativos de Tiempo Real
+
+## 🎯 Objetivos
+- Entender qué es un RTOS y cuándo usarlo
+- Conocer FreeRTOS y sus conceptos básicos
+- Implementar tareas concurrentes en un microcontrolador
+
+## 📚 Contenido
+
+### ¿Por qué necesitamos un RTOS?
+Sin RTOS (bare-metal):
+\`\`\`c
+while(1) {
+    leerSensor();      // 10ms
+    procesarDatos();   // 50ms
+    actualizarLCD();   // 20ms
+    // Total: 80ms por ciclo
+}
+\`\`\`
+
+Con RTOS:
+\`\`\`c
+// Tarea 1: Lee sensor cada 10ms
+void tareaLeerSensor(void *params) {
+    while(1) {
+        leerSensor();
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+}
+
+// Tarea 2: Actualiza LCD cada 100ms
+void tareaLCD(void *params) {
+    while(1) {
+        actualizarLCD();
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+\`\`\`
+
+### Conceptos Clave de FreeRTOS
+
+1. **Tasks (Tareas)**: Funciones que se ejecutan "simultáneamente"
+2. **Scheduler**: Decide qué tarea ejecutar
+3. **Prioridades**: Tareas críticas primero
+4. **Queues**: Comunicación entre tareas
+5. **Semaphores**: Sincronización y exclusión mutua
+
+### Ejemplo Práctico: Sistema de Alarma
+\`\`\`c
+#include "FreeRTOS.h"
+#include "task.h"
+
+// Tarea de alta prioridad: Monitorear sensor
+void tareaAlarma(void *params) {
+    while(1) {
+        if (leerSensorMovimiento()) {
+            activarSirena();
+            enviarNotificacion();
+        }
+        vTaskDelay(50 / portTICK_PERIOD_MS);
+    }
+}
+
+// Tarea de baja prioridad: Mostrar estado
+void tareaDisplay(void *params) {
+    while(1) {
+        mostrarEstado();
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+}
+
+int main() {
+    xTaskCreate(tareaAlarma, "Alarma", 128, NULL, 2, NULL);
+    xTaskCreate(tareaDisplay, "Display", 128, NULL, 1, NULL);
+    vTaskStartScheduler();
+}
+\`\`\`
+
+## 💻 Práctica en Simulador
+Usa Wokwi para simular FreeRTOS en ESP32:
+[https://wokwi.com/projects/new/esp32](https://wokwi.com/projects/new/esp32)
+
+## 📖 Recursos
+- [Documentación FreeRTOS](https://www.freertos.org/Documentation/RTOS_book.html)
+- [Tutorial ESP32 + FreeRTOS](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/freertos.html)`,
+    locked: false,
+    programId: 'robotica'
+  },
+  {
+    levelId: 'noveno-egb',
+    moduleName: 'Sistemas Embebidos',
+    title: 'Bajo consumo de energía',
+    type: 'tutorial',
+    duration: '35 min',
+    order: 3,
+    videoUrl: 'https://www.youtube.com/watch?v=9FLKm2Gq5Pg',
+    content: `# Técnicas de Bajo Consumo de Energía
+
+## 🎯 Objetivos
+- Comprender los modos de bajo consumo en microcontroladores
+- Implementar técnicas de ahorro de energía
+- Diseñar sistemas IoT que funcionen con baterías
+
+## 📚 Contenido
+
+### ¿Por qué importa el consumo?
+| Modo | Corriente típica | Duración batería 2000mAh |
+|------|------------------|--------------------------|
+| Activo | 20mA | 4 días |
+| Sleep | 1mA | 83 días |
+| Deep Sleep | 10µA | 22 años |
+
+### Modos de Bajo Consumo
+
+1. **Idle Mode**: CPU detenida, periféricos activos
+2. **Sleep Mode**: Solo algunos periféricos activos
+3. **Deep Sleep**: Todo apagado excepto RTC
+4. **Hibernation**: Mínimo absoluto, pierde RAM
+
+### Código de Ejemplo: ESP32 Deep Sleep
+\`\`\`cpp
+#include <esp_sleep.h>
+
+#define TIEMPO_DORMIR 60  // segundos
+
+void setup() {
+    Serial.begin(115200);
+    
+    // Leer sensor
+    float temperatura = leerTemperatura();
+    
+    // Enviar datos por WiFi
+    enviarDatos(temperatura);
+    
+    // Configurar despertar por timer
+    esp_sleep_enable_timer_wakeup(TIEMPO_DORMIR * 1000000);
+    
+    // Entrar en deep sleep
+    Serial.println("Entrando en deep sleep...");
+    esp_deep_sleep_start();
+}
+
+void loop() {
+    // Nunca llega aquí
+}
+\`\`\`
+
+### Técnicas de Optimización
+
+1. **Reducir frecuencia del CPU**
+\`\`\`cpp
+setCpuFrequencyMhz(80);  // En lugar de 240MHz
+\`\`\`
+
+2. **Apagar periféricos no usados**
+\`\`\`cpp
+WiFi.mode(WIFI_OFF);
+btStop();
+\`\`\`
+
+3. **Usar interrupciones en lugar de polling**
+\`\`\`cpp
+attachInterrupt(PIN_BOTON, despertar, FALLING);
+\`\`\`
+
+## 💻 Proyecto: Sensor de Temperatura Solar
+Diseña un sensor que:
+- Mida temperatura cada hora
+- Envíe datos por WiFi
+- Funcione 1 año con batería de 3000mAh
+
+## 📖 Recursos
+- [ESP32 Sleep Modes](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html)
+- [Calculadora de batería](https://www.digikey.com/en/resources/conversion-calculators/conversion-calculator-battery-life)`,
+    locked: false,
+    programId: 'robotica'
+  },
+  {
+    levelId: 'noveno-egb',
+    moduleName: 'Sistemas Embebidos',
+    title: 'Proyecto: Sensor IoT con batería',
+    type: 'project',
+    duration: '60 min',
+    order: 4,
+    videoUrl: 'https://www.youtube.com/watch?v=oCMOYS71NIU',
+    content: `# Proyecto: Sensor IoT de Bajo Consumo
+
+## 🎯 Objetivo del Proyecto
+Diseñar y programar un sensor IoT que:
+- Mida temperatura y humedad
+- Envíe datos a la nube cada hora
+- Funcione **6 meses** con una batería de 2000mAh
+
+## 📋 Materiales
+- ESP32 DevKit
+- Sensor DHT22 (temperatura/humedad)
+- Batería LiPo 3.7V 2000mAh
+- Regulador de voltaje (opcional)
+- Protoboard y cables
+
+## 📚 Paso a Paso
+
+### Paso 1: Circuito
+\`\`\`
+ESP32          DHT22
+------         ------
+3.3V  -------- VCC
+GND   -------- GND
+GPIO4 -------- DATA
+\`\`\`
+
+### Paso 2: Código Completo
+\`\`\`cpp
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <DHT.h>
+#include <esp_sleep.h>
+
+#define DHT_PIN 4
+#define DHT_TYPE DHT22
+#define INTERVALO_HORAS 1
+
+const char* ssid = "TU_WIFI";
+const char* password = "TU_PASSWORD";
+const char* serverUrl = "https://api.thingspeak.com/update";
+const char* apiKey = "TU_API_KEY";
+
+DHT dht(DHT_PIN, DHT_TYPE);
+
+void setup() {
+    Serial.begin(115200);
+    dht.begin();
+    
+    // Leer sensores
+    float temp = dht.readTemperature();
+    float hum = dht.readHumidity();
+    
+    if (!isnan(temp) && !isnan(hum)) {
+        // Conectar WiFi
+        WiFi.begin(ssid, password);
+        int intentos = 0;
+        while (WiFi.status() != WL_CONNECTED && intentos < 20) {
+            delay(500);
+            intentos++;
+        }
+        
+        if (WiFi.status() == WL_CONNECTED) {
+            // Enviar datos
+            HTTPClient http;
+            String url = String(serverUrl) + "?api_key=" + apiKey +
+                        "&field1=" + String(temp) +
+                        "&field2=" + String(hum);
+            http.begin(url);
+            http.GET();
+            http.end();
+        }
+        
+        WiFi.disconnect(true);
+        WiFi.mode(WIFI_OFF);
+    }
+    
+    // Deep sleep por 1 hora
+    esp_sleep_enable_timer_wakeup(INTERVALO_HORAS * 3600 * 1000000ULL);
+    esp_deep_sleep_start();
+}
+
+void loop() {}
+\`\`\`
+
+### Paso 3: Cálculo de Batería
+| Estado | Duración | Corriente | Consumo |
+|--------|----------|-----------|---------|
+| Activo + WiFi | 5 seg | 150mA | 0.21mAh |
+| Deep Sleep | 3595 seg | 10µA | 0.01mAh |
+| **Total por hora** | | | **0.22mAh** |
+
+**Duración estimada**: 2000mAh / 0.22mAh = **9,090 horas = 378 días** ✅
+
+## 🏆 Criterios de Evaluación
+- [ ] Sensor lee correctamente (20%)
+- [ ] Datos llegan a la nube (30%)
+- [ ] Deep sleep implementado (30%)
+- [ ] Cálculo de batería correcto (20%)
+
+## 📖 Recursos
+- [ThingSpeak IoT Platform](https://thingspeak.com/)
+- [Simulador Wokwi](https://wokwi.com/projects/new/esp32)`,
+    locked: false,
+    programId: 'robotica'
+  }
+];
+
+// Convertir a CSV y actualizar
+const csvHeader = 'levelId,moduleName,title,type,duration,order,videoUrl,content,locked,programId';
+
+function escapeCSV(str) {
+  if (!str) return '';
+  // Escapar comillas dobles y envolver en comillas
+  return '"' + str.replace(/"/g, '""') + '"';
+}
+
+const csvRows = improvedLessons.map(l => {
+  return [
+    l.levelId,
+    l.moduleName,
+    l.title,
+    l.type,
+    l.duration,
+    l.order,
+    l.videoUrl,
+    escapeCSV(l.content),
+    l.locked,
+    l.programId
+  ].join(',');
+});
+
+// Guardar como archivo separado para importar
+const csvContent = csvHeader + '\n' + csvRows.join('\n');
+fs.writeFileSync('airtable/lessons_mejoradas_sistemas_embebidos.csv', csvContent);
+
+console.log('✅ Creado: lessons_mejoradas_sistemas_embebidos.csv');
+console.log(`   ${improvedLessons.length} lecciones con contenido mejorado`);
+console.log('\nContenido incluye:');
+console.log('   - Videos de YouTube educativos');
+console.log('   - Código de ejemplo funcional');
+console.log('   - Tablas y diagramas');
+console.log('   - Actividades prácticas');
+console.log('   - Recursos adicionales');

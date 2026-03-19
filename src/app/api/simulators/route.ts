@@ -32,17 +32,39 @@ export async function GET(request: Request) {
 
     const data = await response.json()
     
-    let simulators = data.records.map((record: any) => ({
-      id: record.fields.id || record.id,
-      recordId: record.id,
-      name: record.fields.name || '',
-      description: record.fields.description || '',
-      icon: record.fields.icon || 'code',
-      url: record.fields.url || '',
-      levels: record.fields.levels ? record.fields.levels.split(',').map((l: string) => l.trim()) : [],
-      programs: record.fields.programs ? record.fields.programs.split(',').map((p: string) => p.trim()) : ['robotica', 'ia', 'hacking'],
-      enabled: record.fields.enabled !== false,
-    }))
+    let simulators = data.records.map((record: any) => {
+      // Manejar levels como array o string
+      let levels: string[] = []
+      if (record.fields.levels) {
+        if (Array.isArray(record.fields.levels)) {
+          levels = record.fields.levels
+        } else if (typeof record.fields.levels === 'string') {
+          levels = record.fields.levels.split(',').map((l: string) => l.trim())
+        }
+      }
+      
+      // Manejar programs como array o string
+      let programs: string[] = ['robotica', 'ia', 'hacking']
+      if (record.fields.programs) {
+        if (Array.isArray(record.fields.programs)) {
+          programs = record.fields.programs
+        } else if (typeof record.fields.programs === 'string') {
+          programs = record.fields.programs.split(',').map((p: string) => p.trim())
+        }
+      }
+      
+      return {
+        id: record.fields.id || record.id,
+        recordId: record.id,
+        name: record.fields.name || '',
+        description: record.fields.description || '',
+        icon: record.fields.icon || 'code',
+        url: record.fields.url || '',
+        levels,
+        programs,
+        enabled: record.fields.enabled !== false,
+      }
+    })
 
     // Filtrar por nivel si se especifica
     if (levelId) {

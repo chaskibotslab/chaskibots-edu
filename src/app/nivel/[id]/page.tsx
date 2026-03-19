@@ -13,7 +13,7 @@ import {
 import { useState, useEffect } from 'react'
 import AIModule from '@/components/AIModule'
 import AIActivities from '@/components/AIActivities'
-import SimulatorTabs from '@/components/SimulatorTabs'
+import SimulatorTabsDynamic from '@/components/SimulatorTabsDynamic'
 import KitDisplay from '@/components/KitDisplay'
 import CourseAuthGuard from '@/components/CourseAuthGuard'
 import TasksPanel from '@/components/TasksPanel'
@@ -633,7 +633,7 @@ export default function NivelPage() {
                   <p className="text-gray-400">Practica programación y electrónica</p>
                 </div>
               </div>
-              <SimulatorTabs />
+              <SimulatorTabsDynamic levelId={levelId} programId={selectedProgram} />
             </div>
           )}
 

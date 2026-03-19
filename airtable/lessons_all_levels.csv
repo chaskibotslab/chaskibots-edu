@@ -525,3 +525,147 @@ tercero-bgu,Tesis de Seguridad,Selección de tema,activity,40 min,13,,"Elige un 
 tercero-bgu,Tesis de Seguridad,Desarrollo de tesis,project,150 min,14,,"Ejecuta tu investigación. Metodología rigurosa, ética, contribución al campo.",false,hacking
 tercero-bgu,Tesis de Seguridad,Defensa de tesis,activity,60 min,15,,"Presenta y defiende tu tesis ante expertos. Demostración, preguntas técnicas.",false,hacking
 tercero-bgu,Tesis de Seguridad,Certificación: Security Expert,activity,20 min,16,,"Certificado de graduación del programa avanzado de ciberseguridad. Experto completo.",true,hacking
+inicial-2,Introducción a la Tecnología,¡Bienvenidos al mundo tech!,video,8 min,1,,"Descubriremos juntos el fascinante mundo de la tecnología y los robots.",false,robotica
+inicial-2,Introducción a la Tecnología,¿Qué es un robot?,video,10 min,2,,"Los robots son máquinas que pueden moverse y realizar tareas. Aprenderemos sobre sus partes principales.",false,robotica
+inicial-2,Introducción a la Tecnología,Robots a nuestro alrededor,activity,15 min,3,,"Identificaremos robots en nuestra vida diaria: en casa, en la escuela y en la ciudad.",false,robotica
+inicial-2,Introducción a la Tecnología,Mi robot favorito,project,20 min,4,,"Dibujaremos y describiremos nuestro robot favorito, real o imaginario.",false,robotica
+inicial-2,Pensamiento Lógico,Secuencias y patrones,video,10 min,5,,"Aprenderemos a identificar y crear patrones: colores, formas y números.",false,robotica
+inicial-2,Pensamiento Lógico,Instrucciones paso a paso,tutorial,15 min,6,,"Daremos instrucciones claras para completar tareas simples.",false,robotica
+inicial-2,Pensamiento Lógico,El juego del robot,activity,20 min,7,,"Jugaremos a ser robots siguiendo instrucciones de nuestros compañeros.",false,robotica
+inicial-2,Pensamiento Lógico,Laberintos divertidos,activity,15 min,8,,"Resolveremos laberintos usando direcciones: arriba, abajo, izquierda, derecha.",false,robotica
+inicial-2,Programación Visual,¿Qué es programar?,video,8 min,9,,"Programar es dar instrucciones a una computadora para que haga lo que queremos.",false,robotica
+inicial-2,Programación Visual,Conociendo Scratch Jr,tutorial,15 min,10,,"Exploraremos la interfaz de Scratch Jr y sus bloques de colores.",false,robotica
+inicial-2,Programación Visual,Mi primer programa,tutorial,20 min,11,,"Crearemos nuestro primer programa: hacer que un personaje se mueva.",false,robotica
+inicial-2,Programación Visual,Proyecto: Historia animada,project,25 min,12,,"Crearemos una historia corta con personajes que se mueven y hablan.",false,robotica
+inicial-2,Construcción Creativa,Formas y estructuras,video,10 min,13,,"Las formas geométricas son la base de todas las construcciones.",false,robotica
+inicial-2,Construcción Creativa,Construyendo con bloques,activity,20 min,14,,"Usaremos bloques para crear torres, puentes y robots.",false,robotica
+inicial-2,Construcción Creativa,Circuitos simples,tutorial,15 min,15,,"Aprenderemos qué es un circuito y cómo fluye la electricidad.",false,robotica
+inicial-2,Construcción Creativa,Proyecto final: Mi robot,project,30 min,16,,"Construiremos un robot simple con materiales reciclados.",true,robotica
+inicial-2,Pensamiento Inteligente,¿Qué es la inteligencia?,video,8 min,1,,"La inteligencia es la capacidad de aprender, resolver problemas y adaptarse.",false,ia
+inicial-2,Pensamiento Inteligente,Humanos y máquinas,video,10 min,2,,"Comparamos cómo piensan los humanos y cómo ""piensan"" las máquinas.",false,ia
+inicial-2,Pensamiento Inteligente,¿Robot o humano?,activity,15 min,3,,"Juego para identificar si una acción la hace un robot o un humano.",false,ia
+inicial-2,Pensamiento Inteligente,Robots que aprenden,video,12 min,4,,"Algunos robots pueden aprender de sus errores, igual que nosotros.",false,ia
+inicial-2,Clasificación y Patrones,¿Qué es clasificar?,video,8 min,5,,"Clasificar es organizar cosas en grupos según sus características.",false,ia
+inicial-2,Clasificación y Patrones,Clasificando objetos,activity,15 min,6,,"Clasificaremos objetos por color, forma, tamaño y uso.",false,ia
+inicial-2,Clasificación y Patrones,Patrones en la naturaleza,video,10 min,7,,"La naturaleza está llena de patrones: flores, conchas, copos de nieve.",false,ia
+inicial-2,Clasificación y Patrones,Proyecto: Mi clasificador,project,20 min,8,,"Crearemos nuestro propio sistema de clasificación para juguetes.",false,ia
+inicial-2,Reconocimiento Visual,¿Cómo ven los robots?,video,10 min,9,,"Los robots usan cámaras y sensores para ""ver"" el mundo.",false,ia
+inicial-2,Reconocimiento Visual,Encontrando diferencias,activity,15 min,10,,"Buscaremos diferencias entre imágenes, como lo hace una IA.",false,ia
+inicial-2,Reconocimiento Visual,Reconociendo caras,tutorial,15 min,11,,"Aprenderemos cómo las computadoras reconocen rostros.",false,ia
+inicial-2,Reconocimiento Visual,Proyecto: Detective visual,project,20 min,12,,"Crearemos un juego de encontrar objetos escondidos.",false,ia
+inicial-2,IA en Nuestra Vida,Asistentes virtuales,video,10 min,13,,"Alexa, Siri y Google Assistant son ejemplos de IA que nos ayudan.",false,ia
+inicial-2,IA en Nuestra Vida,IA en los juegos,video,12 min,14,,"Los videojuegos usan IA para crear enemigos inteligentes.",false,ia
+inicial-2,IA en Nuestra Vida,Robots ayudantes,activity,15 min,15,,"Diseñaremos un robot ayudante para nuestra casa o escuela.",false,ia
+inicial-2,IA en Nuestra Vida,Proyecto final: Mi asistente,project,25 min,16,,"Imaginaremos y dibujaremos nuestro propio asistente virtual.",true,ia
+inicial-2,Seguridad Digital Básica,¿Qué es internet?,video,8 min,1,,"Internet es una red gigante que conecta computadoras de todo el mundo.",false,hacking
+inicial-2,Seguridad Digital Básica,Navegando seguros,video,10 min,2,,"Aprenderemos reglas básicas para navegar de forma segura.",false,hacking
+inicial-2,Seguridad Digital Básica,Personas de confianza,activity,15 min,3,,"Identificaremos a las personas de confianza con quienes podemos hablar en línea.",false,hacking
+inicial-2,Seguridad Digital Básica,El semáforo de internet,activity,12 min,4,,"Verde: seguro, Amarillo: preguntar a un adulto, Rojo: peligro.",false,hacking
+inicial-2,Contraseñas y Privacidad,¿Qué es una contraseña?,video,8 min,5,,"Una contraseña es como una llave secreta que protege nuestras cosas.",false,hacking
+inicial-2,Contraseñas y Privacidad,Creando contraseñas fuertes,tutorial,15 min,6,,"Aprenderemos a crear contraseñas que sean difíciles de adivinar.",false,hacking
+inicial-2,Contraseñas y Privacidad,Información privada,video,10 min,7,,"Hay información que debemos mantener privada: dirección, teléfono, escuela.",false,hacking
+inicial-2,Contraseñas y Privacidad,Proyecto: Mi caja fuerte,project,20 min,8,,"Crearemos una lista de información que debemos proteger.",false,hacking
+inicial-2,Comportamiento en Línea,Ser amable en internet,video,10 min,9,,"En internet también debemos ser respetuosos y amables con todos.",false,hacking
+inicial-2,Comportamiento en Línea,¿Qué es el ciberbullying?,video,12 min,10,,"El ciberbullying es molestar a otros por internet. Aprenderemos a evitarlo.",false,hacking
+inicial-2,Comportamiento en Línea,Pedir ayuda,activity,15 min,11,,"Si algo nos hace sentir mal en internet, debemos contarle a un adulto.",false,hacking
+inicial-2,Comportamiento en Línea,Proyecto: Reglas digitales,project,20 min,12,,"Crearemos un póster con reglas para usar internet de forma segura.",false,hacking
+inicial-2,Detectives Digitales,¿Es real o falso?,video,10 min,13,,"No todo lo que vemos en internet es verdad. Aprenderemos a identificar lo falso.",false,hacking
+inicial-2,Detectives Digitales,Verificando información,tutorial,15 min,14,,"Técnicas simples para verificar si algo es verdadero.",false,hacking
+inicial-2,Detectives Digitales,Juego: Verdadero o falso,activity,15 min,15,,"Jugaremos a identificar noticias y fotos verdaderas y falsas.",false,hacking
+inicial-2,Detectives Digitales,Proyecto final: Guardián digital,project,25 min,16,,"Nos convertiremos en guardianes digitales de nuestra familia.",true,hacking
+segundo-egb,Introducción a la Tecnología,¡Bienvenidos al mundo tech!,video,8 min,1,,"Descubriremos juntos el fascinante mundo de la tecnología y los robots.",false,robotica
+segundo-egb,Introducción a la Tecnología,¿Qué es un robot?,video,10 min,2,,"Los robots son máquinas que pueden moverse y realizar tareas. Aprenderemos sobre sus partes principales.",false,robotica
+segundo-egb,Introducción a la Tecnología,Robots a nuestro alrededor,activity,15 min,3,,"Identificaremos robots en nuestra vida diaria: en casa, en la escuela y en la ciudad.",false,robotica
+segundo-egb,Introducción a la Tecnología,Mi robot favorito,project,20 min,4,,"Dibujaremos y describiremos nuestro robot favorito, real o imaginario.",false,robotica
+segundo-egb,Pensamiento Lógico,Secuencias y patrones,video,10 min,5,,"Aprenderemos a identificar y crear patrones: colores, formas y números.",false,robotica
+segundo-egb,Pensamiento Lógico,Instrucciones paso a paso,tutorial,15 min,6,,"Daremos instrucciones claras para completar tareas simples.",false,robotica
+segundo-egb,Pensamiento Lógico,El juego del robot,activity,20 min,7,,"Jugaremos a ser robots siguiendo instrucciones de nuestros compañeros.",false,robotica
+segundo-egb,Pensamiento Lógico,Laberintos divertidos,activity,15 min,8,,"Resolveremos laberintos usando direcciones: arriba, abajo, izquierda, derecha.",false,robotica
+segundo-egb,Programación Visual,¿Qué es programar?,video,8 min,9,,"Programar es dar instrucciones a una computadora para que haga lo que queremos.",false,robotica
+segundo-egb,Programación Visual,Conociendo Scratch Jr,tutorial,15 min,10,,"Exploraremos la interfaz de Scratch Jr y sus bloques de colores.",false,robotica
+segundo-egb,Programación Visual,Mi primer programa,tutorial,20 min,11,,"Crearemos nuestro primer programa: hacer que un personaje se mueva.",false,robotica
+segundo-egb,Programación Visual,Proyecto: Historia animada,project,25 min,12,,"Crearemos una historia corta con personajes que se mueven y hablan.",false,robotica
+segundo-egb,Construcción Creativa,Formas y estructuras,video,10 min,13,,"Las formas geométricas son la base de todas las construcciones.",false,robotica
+segundo-egb,Construcción Creativa,Construyendo con bloques,activity,20 min,14,,"Usaremos bloques para crear torres, puentes y robots.",false,robotica
+segundo-egb,Construcción Creativa,Circuitos simples,tutorial,15 min,15,,"Aprenderemos qué es un circuito y cómo fluye la electricidad.",false,robotica
+segundo-egb,Construcción Creativa,Proyecto final: Mi robot,project,30 min,16,,"Construiremos un robot simple con materiales reciclados.",true,robotica
+segundo-egb,Pensamiento Inteligente,¿Qué es la inteligencia?,video,8 min,1,,"La inteligencia es la capacidad de aprender, resolver problemas y adaptarse.",false,ia
+segundo-egb,Pensamiento Inteligente,Humanos y máquinas,video,10 min,2,,"Comparamos cómo piensan los humanos y cómo ""piensan"" las máquinas.",false,ia
+segundo-egb,Pensamiento Inteligente,¿Robot o humano?,activity,15 min,3,,"Juego para identificar si una acción la hace un robot o un humano.",false,ia
+segundo-egb,Pensamiento Inteligente,Robots que aprenden,video,12 min,4,,"Algunos robots pueden aprender de sus errores, igual que nosotros.",false,ia
+segundo-egb,Clasificación y Patrones,¿Qué es clasificar?,video,8 min,5,,"Clasificar es organizar cosas en grupos según sus características.",false,ia
+segundo-egb,Clasificación y Patrones,Clasificando objetos,activity,15 min,6,,"Clasificaremos objetos por color, forma, tamaño y uso.",false,ia
+segundo-egb,Clasificación y Patrones,Patrones en la naturaleza,video,10 min,7,,"La naturaleza está llena de patrones: flores, conchas, copos de nieve.",false,ia
+segundo-egb,Clasificación y Patrones,Proyecto: Mi clasificador,project,20 min,8,,"Crearemos nuestro propio sistema de clasificación para juguetes.",false,ia
+segundo-egb,Reconocimiento Visual,¿Cómo ven los robots?,video,10 min,9,,"Los robots usan cámaras y sensores para ""ver"" el mundo.",false,ia
+segundo-egb,Reconocimiento Visual,Encontrando diferencias,activity,15 min,10,,"Buscaremos diferencias entre imágenes, como lo hace una IA.",false,ia
+segundo-egb,Reconocimiento Visual,Reconociendo caras,tutorial,15 min,11,,"Aprenderemos cómo las computadoras reconocen rostros.",false,ia
+segundo-egb,Reconocimiento Visual,Proyecto: Detective visual,project,20 min,12,,"Crearemos un juego de encontrar objetos escondidos.",false,ia
+segundo-egb,IA en Nuestra Vida,Asistentes virtuales,video,10 min,13,,"Alexa, Siri y Google Assistant son ejemplos de IA que nos ayudan.",false,ia
+segundo-egb,IA en Nuestra Vida,IA en los juegos,video,12 min,14,,"Los videojuegos usan IA para crear enemigos inteligentes.",false,ia
+segundo-egb,IA en Nuestra Vida,Robots ayudantes,activity,15 min,15,,"Diseñaremos un robot ayudante para nuestra casa o escuela.",false,ia
+segundo-egb,IA en Nuestra Vida,Proyecto final: Mi asistente,project,25 min,16,,"Imaginaremos y dibujaremos nuestro propio asistente virtual.",true,ia
+segundo-egb,Seguridad Digital Básica,¿Qué es internet?,video,8 min,1,,"Internet es una red gigante que conecta computadoras de todo el mundo.",false,hacking
+segundo-egb,Seguridad Digital Básica,Navegando seguros,video,10 min,2,,"Aprenderemos reglas básicas para navegar de forma segura.",false,hacking
+segundo-egb,Seguridad Digital Básica,Personas de confianza,activity,15 min,3,,"Identificaremos a las personas de confianza con quienes podemos hablar en línea.",false,hacking
+segundo-egb,Seguridad Digital Básica,El semáforo de internet,activity,12 min,4,,"Verde: seguro, Amarillo: preguntar a un adulto, Rojo: peligro.",false,hacking
+segundo-egb,Contraseñas y Privacidad,¿Qué es una contraseña?,video,8 min,5,,"Una contraseña es como una llave secreta que protege nuestras cosas.",false,hacking
+segundo-egb,Contraseñas y Privacidad,Creando contraseñas fuertes,tutorial,15 min,6,,"Aprenderemos a crear contraseñas que sean difíciles de adivinar.",false,hacking
+segundo-egb,Contraseñas y Privacidad,Información privada,video,10 min,7,,"Hay información que debemos mantener privada: dirección, teléfono, escuela.",false,hacking
+segundo-egb,Contraseñas y Privacidad,Proyecto: Mi caja fuerte,project,20 min,8,,"Crearemos una lista de información que debemos proteger.",false,hacking
+segundo-egb,Comportamiento en Línea,Ser amable en internet,video,10 min,9,,"En internet también debemos ser respetuosos y amables con todos.",false,hacking
+segundo-egb,Comportamiento en Línea,¿Qué es el ciberbullying?,video,12 min,10,,"El ciberbullying es molestar a otros por internet. Aprenderemos a evitarlo.",false,hacking
+segundo-egb,Comportamiento en Línea,Pedir ayuda,activity,15 min,11,,"Si algo nos hace sentir mal en internet, debemos contarle a un adulto.",false,hacking
+segundo-egb,Comportamiento en Línea,Proyecto: Reglas digitales,project,20 min,12,,"Crearemos un póster con reglas para usar internet de forma segura.",false,hacking
+segundo-egb,Detectives Digitales,¿Es real o falso?,video,10 min,13,,"No todo lo que vemos en internet es verdad. Aprenderemos a identificar lo falso.",false,hacking
+segundo-egb,Detectives Digitales,Verificando información,tutorial,15 min,14,,"Técnicas simples para verificar si algo es verdadero.",false,hacking
+segundo-egb,Detectives Digitales,Juego: Verdadero o falso,activity,15 min,15,,"Jugaremos a identificar noticias y fotos verdaderas y falsas.",false,hacking
+segundo-egb,Detectives Digitales,Proyecto final: Guardián digital,project,25 min,16,,"Nos convertiremos en guardianes digitales de nuestra familia.",true,hacking
+tercero-egb,Introducción a la Tecnología,¡Bienvenidos al mundo tech!,video,8 min,1,,"Descubriremos juntos el fascinante mundo de la tecnología y los robots.",false,robotica
+tercero-egb,Introducción a la Tecnología,¿Qué es un robot?,video,10 min,2,,"Los robots son máquinas que pueden moverse y realizar tareas. Aprenderemos sobre sus partes principales.",false,robotica
+tercero-egb,Introducción a la Tecnología,Robots a nuestro alrededor,activity,15 min,3,,"Identificaremos robots en nuestra vida diaria: en casa, en la escuela y en la ciudad.",false,robotica
+tercero-egb,Introducción a la Tecnología,Mi robot favorito,project,20 min,4,,"Dibujaremos y describiremos nuestro robot favorito, real o imaginario.",false,robotica
+tercero-egb,Pensamiento Lógico,Secuencias y patrones,video,10 min,5,,"Aprenderemos a identificar y crear patrones: colores, formas y números.",false,robotica
+tercero-egb,Pensamiento Lógico,Instrucciones paso a paso,tutorial,15 min,6,,"Daremos instrucciones claras para completar tareas simples.",false,robotica
+tercero-egb,Pensamiento Lógico,El juego del robot,activity,20 min,7,,"Jugaremos a ser robots siguiendo instrucciones de nuestros compañeros.",false,robotica
+tercero-egb,Pensamiento Lógico,Laberintos divertidos,activity,15 min,8,,"Resolveremos laberintos usando direcciones: arriba, abajo, izquierda, derecha.",false,robotica
+tercero-egb,Programación Visual,¿Qué es programar?,video,8 min,9,,"Programar es dar instrucciones a una computadora para que haga lo que queremos.",false,robotica
+tercero-egb,Programación Visual,Conociendo Scratch Jr,tutorial,15 min,10,,"Exploraremos la interfaz de Scratch Jr y sus bloques de colores.",false,robotica
+tercero-egb,Programación Visual,Mi primer programa,tutorial,20 min,11,,"Crearemos nuestro primer programa: hacer que un personaje se mueva.",false,robotica
+tercero-egb,Programación Visual,Proyecto: Historia animada,project,25 min,12,,"Crearemos una historia corta con personajes que se mueven y hablan.",false,robotica
+tercero-egb,Construcción Creativa,Formas y estructuras,video,10 min,13,,"Las formas geométricas son la base de todas las construcciones.",false,robotica
+tercero-egb,Construcción Creativa,Construyendo con bloques,activity,20 min,14,,"Usaremos bloques para crear torres, puentes y robots.",false,robotica
+tercero-egb,Construcción Creativa,Circuitos simples,tutorial,15 min,15,,"Aprenderemos qué es un circuito y cómo fluye la electricidad.",false,robotica
+tercero-egb,Construcción Creativa,Proyecto final: Mi robot,project,30 min,16,,"Construiremos un robot simple con materiales reciclados.",true,robotica
+tercero-egb,Pensamiento Inteligente,¿Qué es la inteligencia?,video,8 min,1,,"La inteligencia es la capacidad de aprender, resolver problemas y adaptarse.",false,ia
+tercero-egb,Pensamiento Inteligente,Humanos y máquinas,video,10 min,2,,"Comparamos cómo piensan los humanos y cómo ""piensan"" las máquinas.",false,ia
+tercero-egb,Pensamiento Inteligente,¿Robot o humano?,activity,15 min,3,,"Juego para identificar si una acción la hace un robot o un humano.",false,ia
+tercero-egb,Pensamiento Inteligente,Robots que aprenden,video,12 min,4,,"Algunos robots pueden aprender de sus errores, igual que nosotros.",false,ia
+tercero-egb,Clasificación y Patrones,¿Qué es clasificar?,video,8 min,5,,"Clasificar es organizar cosas en grupos según sus características.",false,ia
+tercero-egb,Clasificación y Patrones,Clasificando objetos,activity,15 min,6,,"Clasificaremos objetos por color, forma, tamaño y uso.",false,ia
+tercero-egb,Clasificación y Patrones,Patrones en la naturaleza,video,10 min,7,,"La naturaleza está llena de patrones: flores, conchas, copos de nieve.",false,ia
+tercero-egb,Clasificación y Patrones,Proyecto: Mi clasificador,project,20 min,8,,"Crearemos nuestro propio sistema de clasificación para juguetes.",false,ia
+tercero-egb,Reconocimiento Visual,¿Cómo ven los robots?,video,10 min,9,,"Los robots usan cámaras y sensores para ""ver"" el mundo.",false,ia
+tercero-egb,Reconocimiento Visual,Encontrando diferencias,activity,15 min,10,,"Buscaremos diferencias entre imágenes, como lo hace una IA.",false,ia
+tercero-egb,Reconocimiento Visual,Reconociendo caras,tutorial,15 min,11,,"Aprenderemos cómo las computadoras reconocen rostros.",false,ia
+tercero-egb,Reconocimiento Visual,Proyecto: Detective visual,project,20 min,12,,"Crearemos un juego de encontrar objetos escondidos.",false,ia
+tercero-egb,IA en Nuestra Vida,Asistentes virtuales,video,10 min,13,,"Alexa, Siri y Google Assistant son ejemplos de IA que nos ayudan.",false,ia
+tercero-egb,IA en Nuestra Vida,IA en los juegos,video,12 min,14,,"Los videojuegos usan IA para crear enemigos inteligentes.",false,ia
+tercero-egb,IA en Nuestra Vida,Robots ayudantes,activity,15 min,15,,"Diseñaremos un robot ayudante para nuestra casa o escuela.",false,ia
+tercero-egb,IA en Nuestra Vida,Proyecto final: Mi asistente,project,25 min,16,,"Imaginaremos y dibujaremos nuestro propio asistente virtual.",true,ia
+tercero-egb,Seguridad Digital Básica,¿Qué es internet?,video,8 min,1,,"Internet es una red gigante que conecta computadoras de todo el mundo.",false,hacking
+tercero-egb,Seguridad Digital Básica,Navegando seguros,video,10 min,2,,"Aprenderemos reglas básicas para navegar de forma segura.",false,hacking
+tercero-egb,Seguridad Digital Básica,Personas de confianza,activity,15 min,3,,"Identificaremos a las personas de confianza con quienes podemos hablar en línea.",false,hacking
+tercero-egb,Seguridad Digital Básica,El semáforo de internet,activity,12 min,4,,"Verde: seguro, Amarillo: preguntar a un adulto, Rojo: peligro.",false,hacking
+tercero-egb,Contraseñas y Privacidad,¿Qué es una contraseña?,video,8 min,5,,"Una contraseña es como una llave secreta que protege nuestras cosas.",false,hacking
+tercero-egb,Contraseñas y Privacidad,Creando contraseñas fuertes,tutorial,15 min,6,,"Aprenderemos a crear contraseñas que sean difíciles de adivinar.",false,hacking
+tercero-egb,Contraseñas y Privacidad,Información privada,video,10 min,7,,"Hay información que debemos mantener privada: dirección, teléfono, escuela.",false,hacking
+tercero-egb,Contraseñas y Privacidad,Proyecto: Mi caja fuerte,project,20 min,8,,"Crearemos una lista de información que debemos proteger.",false,hacking
+tercero-egb,Comportamiento en Línea,Ser amable en internet,video,10 min,9,,"En internet también debemos ser respetuosos y amables con todos.",false,hacking
+tercero-egb,Comportamiento en Línea,¿Qué es el ciberbullying?,video,12 min,10,,"El ciberbullying es molestar a otros por internet. Aprenderemos a evitarlo.",false,hacking
+tercero-egb,Comportamiento en Línea,Pedir ayuda,activity,15 min,11,,"Si algo nos hace sentir mal en internet, debemos contarle a un adulto.",false,hacking
+tercero-egb,Comportamiento en Línea,Proyecto: Reglas digitales,project,20 min,12,,"Crearemos un póster con reglas para usar internet de forma segura.",false,hacking
+tercero-egb,Detectives Digitales,¿Es real o falso?,video,10 min,13,,"No todo lo que vemos en internet es verdad. Aprenderemos a identificar lo falso.",false,hacking
+tercero-egb,Detectives Digitales,Verificando información,tutorial,15 min,14,,"Técnicas simples para verificar si algo es verdadero.",false,hacking
+tercero-egb,Detectives Digitales,Juego: Verdadero o falso,activity,15 min,15,,"Jugaremos a identificar noticias y fotos verdaderas y falsas.",false,hacking
+tercero-egb,Detectives Digitales,Proyecto final: Guardián digital,project,25 min,16,,"Nos convertiremos en guardianes digitales de nuestra familia.",true,hacking

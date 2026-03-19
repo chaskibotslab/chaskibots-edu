@@ -32,6 +32,7 @@ interface LessonViewerProps {
     videoUrl?: string
     imageUrl?: string
     images?: string[]
+    pdfUrl?: string
     resources?: string | Resource[]
     externalLinks?: string | ExternalLink[]
     objectives?: string[]
@@ -286,89 +287,78 @@ export default function LessonViewer({ lesson, programId, onClose, onNext, onPre
                   </p>
                 </div>
 
-                {/* Interactive Diagram */}
+                {/* Imágenes adicionales de la lección */}
+                {lesson.images && lesson.images.length > 0 && (
+                  <div className="bg-dark-800 rounded-2xl p-6 border border-dark-600">
+                    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                      <ImageIcon className={`w-5 h-5 text-${program.color}-400`} />
+                      Imágenes y Diagramas
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {lesson.images.map((img, idx) => (
+                        <div key={idx} className="rounded-xl overflow-hidden border border-dark-600 hover:border-neon-cyan/50 transition-colors">
+                          <img 
+                            src={getImageUrl(img)} 
+                            alt={`Diagrama ${idx + 1}`}
+                            className="w-full h-48 object-cover hover:scale-105 transition-transform cursor-pointer"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none'
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Enlace a Simuladores */}
                 <div className="bg-dark-800 rounded-2xl p-6 border border-dark-600">
                   <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     <Zap className={`w-5 h-5 text-${program.color}-400`} />
-                    Diagrama Interactivo
+                    Practica en el Simulador
                   </h2>
-                  <div className="bg-dark-900 rounded-xl p-8 border border-dark-700">
-                    {programId === 'robotica' && (
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="flex items-center gap-8">
-                          <div className="text-center">
-                            <div className="w-16 h-16 bg-yellow-500/20 rounded-xl flex items-center justify-center mb-2">
-                              <Zap className="w-8 h-8 text-yellow-400" />
-                            </div>
-                            <span className="text-sm text-gray-400">Energía</span>
-                          </div>
-                          <div className="w-16 h-1 bg-gradient-to-r from-yellow-500 to-blue-500 rounded" />
-                          <div className="text-center">
-                            <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center mb-2">
-                              <Bot className="w-8 h-8 text-blue-400" />
-                            </div>
-                            <span className="text-sm text-gray-400">Controlador</span>
-                          </div>
-                          <div className="w-16 h-1 bg-gradient-to-r from-blue-500 to-green-500 rounded" />
-                          <div className="text-center">
-                            <div className="w-16 h-16 bg-green-500/20 rounded-xl flex items-center justify-center mb-2">
-                              <CheckCircle className="w-8 h-8 text-green-400" />
-                            </div>
-                            <span className="text-sm text-gray-400">Acción</span>
-                          </div>
-                        </div>
-                        <p className="text-gray-500 text-sm mt-4">Flujo básico de un sistema robótico</p>
+                  <div className="bg-dark-900 rounded-xl p-6 border border-dark-700">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className={`w-16 h-16 bg-gradient-to-r ${program.gradient} rounded-xl flex items-center justify-center`}>
+                        <Code className="w-8 h-8 text-white" />
                       </div>
-                    )}
-                    {programId === 'ia' && (
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="flex items-center gap-6">
-                          <div className="text-center">
-                            <div className="w-16 h-16 bg-purple-500/20 rounded-xl flex items-center justify-center mb-2">
-                              <ImageIcon className="w-8 h-8 text-purple-400" />
-                            </div>
-                            <span className="text-sm text-gray-400">Datos</span>
-                          </div>
-                          <div className="w-12 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded" />
-                          <div className="text-center">
-                            <div className="w-20 h-20 bg-pink-500/20 rounded-xl flex items-center justify-center mb-2 relative">
-                              <Brain className="w-10 h-10 text-pink-400" />
-                              <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full animate-pulse" />
-                            </div>
-                            <span className="text-sm text-gray-400">Modelo IA</span>
-                          </div>
-                          <div className="w-12 h-1 bg-gradient-to-r from-pink-500 to-cyan-500 rounded" />
-                          <div className="text-center">
-                            <div className="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-2">
-                              <Lightbulb className="w-8 h-8 text-cyan-400" />
-                            </div>
-                            <span className="text-sm text-gray-400">Predicción</span>
-                          </div>
-                        </div>
-                        <p className="text-gray-500 text-sm mt-4">Proceso de Machine Learning</p>
-                      </div>
-                    )}
-                    {programId === 'hacking' && (
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="text-center p-4 bg-green-500/10 rounded-xl border border-green-500/30">
-                            <Shield className="w-8 h-8 text-green-400 mx-auto mb-2" />
-                            <span className="text-sm text-green-400 font-medium">Proteger</span>
-                          </div>
-                          <div className="text-center p-4 bg-yellow-500/10 rounded-xl border border-yellow-500/30">
-                            <AlertTriangle className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-                            <span className="text-sm text-yellow-400 font-medium">Detectar</span>
-                          </div>
-                          <div className="text-center p-4 bg-red-500/10 rounded-xl border border-red-500/30">
-                            <Zap className="w-8 h-8 text-red-400 mx-auto mb-2" />
-                            <span className="text-sm text-red-400 font-medium">Responder</span>
-                          </div>
-                        </div>
-                        <p className="text-gray-500 text-sm mt-4">Los 3 pilares de la ciberseguridad</p>
-                      </div>
-                    )}
+                      <p className="text-gray-400 text-center">Aplica lo aprendido usando nuestros simuladores interactivos</p>
+                      <button 
+                        onClick={onClose}
+                        className={`px-6 py-3 bg-gradient-to-r ${program.gradient} rounded-xl text-white font-medium hover:opacity-90 transition-opacity flex items-center gap-2`}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Ir a Simuladores
+                      </button>
+                    </div>
                   </div>
                 </div>
+
+                {/* PDF Descargable */}
+                {lesson.pdfUrl && (
+                  <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                          <Download className="w-6 h-6 text-green-400" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-white">Material PDF</h3>
+                          <p className="text-sm text-gray-400">Descarga el material de apoyo para esta lección</p>
+                        </div>
+                      </div>
+                      <a
+                        href={lesson.pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-5 py-2.5 bg-green-500 hover:bg-green-400 text-white rounded-xl font-medium flex items-center gap-2 transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                        Descargar PDF
+                      </a>
+                    </div>
+                  </div>
+                )}
 
                 {/* Steps (for tutorials/activities) */}
                 {(lesson.type === 'tutorial' || lesson.type === 'activity' || lesson.type === 'project') && (
