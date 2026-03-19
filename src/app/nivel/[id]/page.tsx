@@ -19,7 +19,7 @@ import CourseAuthGuard from '@/components/CourseAuthGuard'
 import TasksPanel from '@/components/TasksPanel'
 import { useAuth } from '@/components/AuthProvider'
 import ModuleAccordion from '@/components/ModuleAccordion'
-import LessonViewer from '@/components/LessonViewer'
+import LessonViewerModern from '@/components/LessonViewerModern'
 
 interface APILesson {
   id: string
@@ -762,7 +762,7 @@ export default function NivelPage() {
 
       {/* Modal de Lección Detallada */}
       {currentLesson && selectedLesson && (
-        <LessonViewer
+        <LessonViewerModern
           lesson={{
             id: currentLesson.id,
             title: currentLesson.title,
@@ -771,12 +771,15 @@ export default function NivelPage() {
             duration: currentLesson.duration,
             content: currentLesson.content,
             videoUrl: currentLesson.videoUrl,
-            images: currentLesson.images
+            images: currentLesson.images,
+            pdfUrl: (currentLesson as any).pdfUrl
           }}
           programId={selectedProgram}
           onClose={() => setSelectedLesson(null)}
           onNext={handleNextLesson}
           onPrev={handlePrevLesson}
+          totalLessons={apiLessons.length}
+          currentIndex={apiLessons.findIndex(l => l.id === currentLesson.id)}
         />
       )}
 
