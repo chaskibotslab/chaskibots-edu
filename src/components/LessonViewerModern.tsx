@@ -88,6 +88,7 @@ export default function LessonViewerModern({
   const [expandedSections, setExpandedSections] = useState<string[]>(['objectives'])
   const [videoProgress, setVideoProgress] = useState(0)
   const [xpEarned, setXpEarned] = useState(0)
+  const [videoError, setVideoError] = useState(false)
   
   const program = programConfig[programId]
   const lessonType = typeConfig[lesson.type]
@@ -126,6 +127,23 @@ export default function LessonViewerModern({
     }
     
     return url
+  }
+
+  // Obtener thumbnail de YouTube
+  const getYouTubeThumbnail = (url: string) => {
+    if (!url) return null
+    const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+    if (ytMatch) {
+      return `https://img.youtube.com/vi/${ytMatch[1]}/maxresdefault.jpg`
+    }
+    return null
+  }
+
+  // Abrir video en nueva pestaña (fallback)
+  const openVideoExternal = () => {
+    if (lesson.videoUrl) {
+      window.open(lesson.videoUrl, '_blank')
+    }
   }
 
   const toggleSection = (section: string) => {
@@ -221,23 +239,65 @@ export default function LessonViewerModern({
           <div className="flex-1 overflow-y-auto">
             {activeSection === 'video' && (
               <div className="p-4">
-                {/* Video Player */}
+                {/* Video Player con fallback visual */}
                 {lesson.videoUrl ? (
                   <div className="relative bg-black rounded-2xl overflow-hidden shadow-2xl">
-                    <div className="aspect-video">
-                      <iframe
-                        src={getVideoEmbedUrl(lesson.videoUrl)}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
+                    {!videoError ? (
+                      <div className="aspect-video relative">
+                        <iframe
+                          src={getVideoEmbedUrl(lesson.videoUrl)}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          onError={() => setVideoError(true)}
+                        />
+                        {/* Overlay para detectar video no disponible */}
+                      </div>
+                    ) : (
+                      /* Fallback visual cuando el video no funciona */
+                      <div className="aspect-video relative">
+                        {getYouTubeThumbnail(lesson.videoUrl) ? (
+                          <img 
+                            src={getYouTubeThumbnail(lesson.videoUrl)!}
+                            alt={lesson.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/placeholder-video.jpg'
+                            }}
+                          />
+                        ) : (
+                          <div className={`w-full h-full bg-gradient-to-br ${program.gradient} opacity-20`} />
+                        )}
+                        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center">
+                          <div className={`w-20 h-20 rounded-full bg-gradient-to-r ${program.gradient} flex items-center justify-center mb-4 cursor-pointer hover:scale-110 transition-transform`} onClick={openVideoExternal}>
+                            <ExternalLink className="w-8 h-8 text-white" />
+                          </div>
+                          <p className="text-white font-medium mb-2">Video no disponible en embed</p>
+                          <button 
+                            onClick={openVideoExternal}
+                            className={`px-6 py-2 bg-gradient-to-r ${program.gradient} rounded-full text-white font-medium hover:opacity-90 transition-opacity`}
+                          >
+                            Ver en YouTube →
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="aspect-video bg-dark-800 rounded-2xl flex items-center justify-center">
-                    <div className="text-center">
-                      <Play className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                      <p className="text-gray-400">No hay video disponible para esta lección</p>
+                  /* Sin video - mostrar contenido visual alternativo */
+                  <div className={`aspect-video bg-gradient-to-br ${program.lightGradient} rounded-2xl flex items-center justify-center border border-${program.color}-500/30`}>
+                    <div className="text-center p-8">
+                      <div className={`w-24 h-24 rounded-full bg-gradient-to-r ${program.gradient} flex items-center justify-center mx-auto mb-6`}>
+                        <ProgramIcon className="w-12 h-12 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2">{lesson.title}</h3>
+                      <p className="text-gray-300 mb-6">Esta lección es práctica. Lee el contenido y usa los simuladores.</p>
+                      <button 
+                        onClick={() => setActiveSection('content')}
+                        className={`px-6 py-3 bg-gradient-to-r ${program.gradient} rounded-xl text-white font-medium hover:opacity-90 transition-opacity`}
+                      >
+                        Ver Contenido →
+                      </button>
                     </div>
                   </div>
                 )}

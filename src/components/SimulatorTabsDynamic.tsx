@@ -228,43 +228,84 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
           <BlocklyEditor userId={user?.id} userName={user?.name} />
         </div>
       ) : activeSimulator ? (
-        <div className="bg-dark-800 border border-dark-600 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-            <div>
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+        <div className="bg-dark-800 border border-dark-600 rounded-2xl overflow-hidden">
+          {/* Header del simulador */}
+          <div className="p-6 border-b border-dark-600">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-neon-cyan to-blue-600 flex items-center justify-center">
+                  {(() => {
+                    const Icon = getIcon(activeSimulator.icon)
+                    return <Icon className="w-7 h-7 text-white" />
+                  })()}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">{activeSimulator.name}</h3>
+                  <p className="text-gray-400 text-sm">{activeSimulator.description}</p>
+                </div>
+              </div>
+              <a
+                href={activeSimulator.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-neon-cyan to-blue-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-neon-cyan/20"
+              >
+                <ExternalLink className="w-5 h-5" />
+                Abrir Simulador
+              </a>
+            </div>
+          </div>
+
+          {/* Vista previa visual atractiva */}
+          <div className="relative h-[500px] bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900">
+            {/* Patrón de fondo */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0" style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300d4ff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }} />
+            </div>
+            
+            {/* Contenido central */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-neon-cyan to-blue-600 flex items-center justify-center mb-6 shadow-2xl shadow-neon-cyan/30">
                 {(() => {
                   const Icon = getIcon(activeSimulator.icon)
-                  return <Icon className="w-6 h-6 text-neon-cyan" />
+                  return <Icon className="w-12 h-12 text-white" />
                 })()}
-                {activeSimulator.name}
-              </h3>
-              <p className="text-gray-400 mt-1">{activeSimulator.description}</p>
+              </div>
+              
+              <h2 className="text-3xl font-bold text-white mb-3">{activeSimulator.name}</h2>
+              <p className="text-gray-400 max-w-md mb-8">{activeSimulator.description}</p>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a
+                  href={activeSimulator.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-neon-cyan to-blue-600 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:opacity-90 transition-all shadow-lg shadow-neon-cyan/30 text-lg"
+                >
+                  <Zap className="w-6 h-6" />
+                  Iniciar Simulador
+                </a>
+              </div>
+              
+              <p className="text-gray-500 text-sm mt-6">
+                El simulador se abrirá en una nueva pestaña para mejor experiencia
+              </p>
             </div>
-            <a
-              href={activeSimulator.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-neon-cyan text-dark-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-neon-cyan/80 transition-colors"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Abrir en nueva pestaña
-            </a>
+
+            {/* Decoración */}
+            <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-neon-cyan/10 blur-2xl" />
+            <div className="absolute bottom-10 right-10 w-32 h-32 rounded-full bg-blue-600/10 blur-3xl" />
           </div>
 
-          <div className="relative rounded-xl overflow-hidden bg-dark-900 border border-dark-600">
-            <iframe
-              src={activeSimulator.url}
-              className="w-full h-[600px] border-none"
-              title={activeSimulator.name}
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; camera; microphone"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals"
-            />
+          {/* Tips */}
+          <div className="p-4 bg-dark-900 border-t border-dark-600">
+            <div className="flex items-center gap-3 text-sm text-gray-400">
+              <Sparkles className="w-5 h-5 text-neon-cyan" />
+              <span><strong className="text-white">Tip:</strong> Practica lo aprendido en las lecciones usando este simulador</span>
+            </div>
           </div>
-
-          <p className="text-center text-gray-500 text-sm mt-4">
-            Si el simulador no carga correctamente, usa el botón "Abrir en nueva pestaña"
-          </p>
         </div>
       ) : (
         <div className="text-center py-12 text-gray-400">
