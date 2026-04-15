@@ -65,9 +65,9 @@ export default function LoginPage() {
     <div className={`min-h-screen bg-transparent relative overflow-hidden transition-all duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
       {/* Fondo animado */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-neon-cyan/20 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-neon-purple/20 rounded-full blur-[120px] animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-blue/10 rounded-full blur-[150px] animate-pulse" style={{animationDelay: '0.5s'}}></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-purple/20 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-cyan/20 rounded-full blur-[120px] animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-indigo/10 rounded-full blur-[150px] animate-pulse" style={{animationDelay: '0.5s'}}></div>
       </div>
 
       {/* Contenido principal */}
@@ -77,7 +77,7 @@ export default function LoginPage() {
         <div className={`text-center transition-all duration-700 ease-out ${showForm ? 'scale-75 -translate-y-8 opacity-90' : 'scale-100 translate-y-0'}`}>
           {/* Logo animado */}
           <div className="relative inline-block mb-6">
-            <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink rounded-3xl blur-2xl opacity-60 animate-pulse scale-110"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-purple via-brand-violet to-brand-indigo rounded-3xl blur-2xl opacity-60 animate-pulse scale-110"></div>
             <div className="relative">
               <Image 
                 src="/chaski.png" 
@@ -90,10 +90,10 @@ export default function LoginPage() {
           </div>
           
           {/* Título */}
-          <h1 className={`font-black bg-gradient-to-r from-white via-neon-cyan to-white bg-clip-text text-transparent transition-all duration-500 ${showForm ? 'text-3xl mb-2' : 'text-5xl md:text-6xl mb-4'}`}>
+          <h1 className={`font-black bg-gradient-to-r from-white via-brand-purple to-white bg-clip-text text-transparent transition-all duration-500 ${showForm ? 'text-3xl mb-2' : 'text-5xl md:text-6xl mb-4'}`}>
             ChaskiBots
           </h1>
-          <p className={`text-neon-cyan font-medium tracking-[0.3em] uppercase transition-all duration-500 ${showForm ? 'text-xs mb-4' : 'text-sm mb-8'}`}>
+          <p className={`text-brand-purple font-medium tracking-[0.3em] uppercase transition-all duration-500 ${showForm ? 'text-xs mb-4' : 'text-sm mb-8'}`}>
             Educación del Futuro
           </p>
 
@@ -104,7 +104,7 @@ export default function LoginPage() {
               className="group flex flex-col items-center gap-2 mx-auto animate-bounce"
             >
               <span className="text-gray-400 text-sm">Iniciar Sesión</span>
-              <ChevronDown className="w-6 h-6 text-neon-cyan group-hover:text-white transition-colors" />
+              <ChevronDown className="w-6 h-6 text-brand-purple group-hover:text-white transition-colors" />
             </button>
           )}
         </div>

@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-md border-b border-neon-cyan/20">
+      <header className="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-md border-b border-brand-purple/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Back Button + Logo */}
@@ -45,7 +45,7 @@ export default function Header() {
                   className="p-2 rounded-lg bg-dark-800 border border-dark-600 hover:border-neon-cyan/50 hover:bg-dark-700 transition-all duration-200 group"
                   title="Volver"
                 >
-                  <ChevronLeft className="w-5 h-5 text-gray-400 group-hover:text-neon-cyan transition-colors" />
+                  <ChevronLeft className="w-5 h-5 text-gray-400 group-hover:text-brand-purple transition-colors" />
                 </button>
               )}
               
@@ -59,7 +59,7 @@ export default function Header() {
                 />
                 <div className="hidden sm:flex flex-col">
                   <span className="font-bold text-xl text-white">ChaskiBots</span>
-                  <span className="text-[10px] text-neon-cyan tracking-widest">EDUCATION PLATFORM</span>
+                  <span className="text-[10px] text-brand-purple tracking-widest">EDUCATION PLATFORM</span>
                 </div>
               </Link>
             </div>

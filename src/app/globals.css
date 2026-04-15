@@ -3,13 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --neon-cyan: #00f5ff;
-  --neon-purple: #bf00ff;
-  --neon-green: #00ff88;
-  --neon-pink: #ff00aa;
-  --dark-900: #0a0a0f;
-  --dark-800: #12121a;
-  --dark-700: #1a1a25;
+  --primary: #8b5cf6;
+  --secondary: #06b6d4;
+  --accent: #10b981;
+  --neon-cyan: #06b6d4;
+  --neon-purple: #8b5cf6;
+  --neon-green: #10b981;
+  --neon-pink: #ec4899;
+  --gold: #fbbf24;
+  --dark-950: #0a0a0f;
+  --dark-900: #12121a;
+  --dark-800: #1a1a24;
+  --dark-700: #252532;
+  --dark-600: #32324a;
 }
 
 * {
@@ -39,11 +45,11 @@ body {
 .btn-primary {
   padding: 0.75rem 1.5rem;
   font-weight: 600;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, var(--neon-cyan), #00c8d4);
-  color: var(--dark-900);
-  border: 1px solid rgba(0, 245, 255, 0.5);
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  color: white;
+  border: 1px solid rgba(139, 92, 246, 0.5);
   position: relative;
   overflow: hidden;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -65,8 +71,8 @@ body {
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 10px var(--neon-cyan), 0 0 30px rgba(0, 245, 255, 0.5), 0 4px 15px rgba(0, 0, 0, 0.3);
-  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn-primary:active {
@@ -76,26 +82,26 @@ body {
 .btn-secondary {
   padding: 0.75rem 1.5rem;
   font-weight: 600;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   transition: all 0.3s;
   background: var(--dark-700);
-  color: var(--neon-cyan);
-  border: 1px solid rgba(0, 245, 255, 0.3);
+  color: var(--primary);
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 .btn-secondary:hover {
-  background: #252532;
-  border-color: rgba(0, 245, 255, 0.6);
+  background: var(--dark-600);
+  border-color: rgba(139, 92, 246, 0.6);
 }
 
 /* Cards Futuristas */
 .card {
-  background: rgba(18, 18, 26, 0.9);
+  background: rgba(26, 26, 36, 0.95);
   backdrop-filter: blur(12px);
   border-radius: 1rem;
   padding: 1.5rem;
-  border: 1px solid rgba(0, 245, 255, 0.1);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
@@ -107,7 +113,7 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.05), transparent);
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.05), transparent);
   transition: left 0.6s;
 }
 
@@ -116,8 +122,8 @@ body {
 }
 
 .card:hover {
-  border-color: rgba(0, 245, 255, 0.4);
-  box-shadow: 0 0 30px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.03);
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
   transform: translateY(-4px);
 }
 
@@ -129,18 +135,18 @@ body {
   transition: all 0.2s;
   background: var(--dark-700);
   color: #9ca3af;
-  border: 1px solid #252532;
+  border: 1px solid var(--dark-600);
 }
 
 .tab-btn:hover {
-  color: var(--neon-cyan);
-  border-color: rgba(0, 245, 255, 0.3);
+  color: var(--primary);
+  border-color: rgba(139, 92, 246, 0.3);
 }
 
 .tab-btn.active {
-  background: #252532;
-  color: var(--neon-cyan);
-  border-color: rgba(0, 245, 255, 0.5);
+  background: var(--dark-600);
+  color: var(--primary);
+  border-color: rgba(139, 92, 246, 0.5);
 }
 
 /* Level Cards */
@@ -150,16 +156,16 @@ body {
   border-radius: 1rem;
   padding: 1.5rem;
   cursor: pointer;
-  background: rgba(18, 18, 26, 0.6);
-  backdrop-filter: blur(4px);
-  border: 1px solid #252532;
+  background: rgba(26, 26, 36, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--dark-600);
   transition: all 0.3s;
 }
 
 .level-card:hover {
-  transform: scale(1.05);
-  border-color: rgba(0, 245, 255, 0.5);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  transform: scale(1.03);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.15);
 }
 
 /* Badges */
@@ -174,15 +180,15 @@ body {
 }
 
 .badge-cyan {
-  background: rgba(0, 245, 255, 0.1);
-  color: var(--neon-cyan);
-  border: 1px solid rgba(0, 245, 255, 0.3);
+  background: rgba(6, 182, 212, 0.1);
+  color: var(--secondary);
+  border: 1px solid rgba(6, 182, 212, 0.3);
 }
 
 .badge-purple {
-  background: rgba(191, 0, 255, 0.1);
-  color: var(--neon-purple);
-  border: 1px solid rgba(191, 0, 255, 0.3);
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 .badge-green {
@@ -220,8 +226,8 @@ body {
 
 .input-cyber:focus {
   outline: none;
-  border-color: rgba(0, 245, 255, 0.5);
-  box-shadow: 0 0 10px rgba(0, 245, 255, 0.2);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
 }
 
 /* Glassmorphism */
@@ -278,12 +284,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-cyan);
+  background: var(--primary);
 }
 
 /* Animations */
@@ -332,8 +338,8 @@ body {
 
 /* Hero Gradient */
 .hero-gradient {
-  background: radial-gradient(ellipse at top, rgba(0,245,255,0.15) 0%, transparent 50%),
-              radial-gradient(ellipse at bottom right, rgba(191,0,255,0.1) 0%, transparent 50%),
+  background: radial-gradient(ellipse at top, rgba(139,92,246,0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at bottom right, rgba(6,182,212,0.1) 0%, transparent 50%),
               var(--dark-900);
 }
 

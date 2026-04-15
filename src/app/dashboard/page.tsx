@@ -31,7 +31,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
       </div>
     )
   }
@@ -53,13 +53,13 @@ export default function DashboardPage() {
           <div className="bg-dark-800/80 backdrop-blur rounded-2xl p-6 border border-dark-600">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-neon-cyan/20 to-neon-purple/20 flex items-center justify-center border border-neon-cyan/30">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-purple/20 to-brand-cyan/20 flex items-center justify-center border border-brand-purple/30">
                   <Image src="/chaski.png" alt="ChaskiBots" width={40} height={40} className="rounded-xl" />
                 </div>
                 <div>
                   <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Bienvenido</p>
                   <h1 className="text-2xl font-bold text-white">{user?.name}</h1>
-                  <p className="text-neon-cyan text-sm">{currentLevel.name}</p>
+                  <p className="text-brand-purple text-sm">{currentLevel.name}</p>
                 </div>
               </div>
               <div className="flex gap-3">
