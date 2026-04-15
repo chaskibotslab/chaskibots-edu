@@ -7,883 +7,409 @@ import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import {
   ArrowLeft, Save, Plus, Trash2, Edit, Video,
-  FileText, ChevronDown, ChevronRight, ChevronUp,
-  GripVertical, Eye, X, Check, ExternalLink, Loader2, RefreshCw,
-  Download, Code, BookOpen, FileCode
+  FileText, ChevronDown, ChevronRight, X, Loader2, 
+  Download, Play
 } from 'lucide-react'
-
-interface DynamicLevel {
-  id: string
-  name: string
-  fullName: string
-  category: string
-  ageRange: string
-  gradeNumber: number
-  icon?: string
-  color?: string
-  neonColor?: string
-}
-
-// Función para convertir URLs de Google Drive al formato de imagen directa
-function convertGoogleDriveUrl(url: string): string {
-  if (!url) return ''
-  // Si ya está en formato uc?id=, devolverlo tal cual
-  if (url.includes('drive.google.com/uc?id=')) return url
-  // Convertir formato /file/d/ID/view o /file/d/ID/preview
-  const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
-  if (match && match[1]) {
-    return `https://drive.google.com/uc?id=${match[1]}`
-  }
-  // Formato ?id=ID
-  const idMatch = url.match(/[?&]id=([^&]+)/)
-  if (idMatch && idMatch[1]) {
-    return `https://drive.google.com/uc?id=${idMatch[1]}`
-  }
-  return url
-}
 
 interface Lesson {
   id: string
   levelId: string
-  moduleId: string
   moduleName: string
-  title: string
-  type: 'video' | 'activity' | 'tutorial' | 'project' | 'quiz'
-  duration: string
-  order: number
-  videoUrl: string
-  content: string
-  locked: boolean
-  pdfUrl?: string
-}
-
-interface Document {
-  id: string
-  title: string
-  description: string
-  driveUrl: string
-  levelId: string
-  moduleId?: string
-  category: 'codigo' | 'tutorial' | 'ejercicio' | 'referencia' | 'otro'
-  tags: string[]
-  createdAt: string
-  isActive: boolean
-}
-
-interface EditFormData {
   title: string
   type: string
   duration: string
+  order: number
   videoUrl: string
-  content: string
-  locked: boolean
-  pdfUrl: string
+  pdfUrl?: string
 }
 
 export default function ContenidoAdminPage() {
   const router = useRouter()
-  const { isAdmin, isAuthenticated, isLoading } = useAuth()
-  const [selectedLevel, setSelectedLevel] = useState<string>('')
+  const { isAdmin, isAuthenticated, isLoading: authLoading } = useAuth()
+  
+  const [selectedLevel, setSelectedLevel] = useState('')
   const [lessons, setLessons] = useState<Lesson[]>([])
-  const [loadingLessons, setLoadingLessons] = useState(true)
-  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
+  const [loading, setLoading] = useState(false)
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
+  
+  const [showModal, setShowModal] = useState(false)
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
   const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
-  const [dynamicLevels, setDynamicLevels] = useState<DynamicLevel[]>([])
-  const [levelsLoading, setLevelsLoading] = useState(true)
-  const [editFormData, setEditFormData] = useState<EditFormData>({
+  const [error, setError] = useState('')
+  
+  const [formData, setFormData] = useState({
+    id: '',
     title: '',
-    type: 'video',
-    duration: '5 min',
+    moduleName: '',
     videoUrl: '',
-    content: '',
-    locked: false,
-    pdfUrl: ''
-  })
-  const [showNewLessonModal, setShowNewLessonModal] = useState(false)
-  const [showNewModuleModal, setShowNewModuleModal] = useState(false)
-  const [editingModuleId, setEditingModuleId] = useState<string | null>(null)
-  const [newModuleName, setNewModuleName] = useState('')
-  const [newLessonData, setNewLessonData] = useState({
-    title: '',
-    type: 'video',
-    duration: '5 min',
-    videoUrl: '',
-    content: '',
-    moduleId: '',
-    moduleName: ''
+    pdfUrl: '',
+    order: 1
   })
 
-  // Cargar niveles dinámicamente desde Airtable
   useEffect(() => {
-    const loadLevels = async () => {
-      try {
-        const res = await fetch('/api/admin/levels')
-        const data = await res.json()
-        if (data.levels && data.levels.length > 0) {
-          setDynamicLevels(data.levels)
-          // Seleccionar el primer nivel por defecto
-          if (!selectedLevel && data.levels.length > 0) {
-            setSelectedLevel(data.levels[0].id)
-          }
-        } else {
-          // Fallback a niveles locales si no hay en Airtable
-          setDynamicLevels(EDUCATION_LEVELS.map(l => ({
-            id: l.id,
-            name: l.name,
-            fullName: l.fullName,
-            category: l.category,
-            ageRange: l.ageRange,
-            gradeNumber: l.gradeNumber
-          })))
-          if (!selectedLevel) {
-            setSelectedLevel(EDUCATION_LEVELS[0].id)
-          }
-        }
-      } catch (error) {
-        console.error('Error loading levels:', error)
-        // Fallback a niveles locales
-        setDynamicLevels(EDUCATION_LEVELS.map(l => ({
-          id: l.id,
-          name: l.name,
-          fullName: l.fullName,
-          category: l.category,
-          ageRange: l.ageRange,
-          gradeNumber: l.gradeNumber
-        })))
-        if (!selectedLevel) {
-          setSelectedLevel(EDUCATION_LEVELS[0].id)
-        }
-      }
-      setLevelsLoading(false)
+    if (!selectedLevel && EDUCATION_LEVELS.length > 0) {
+      setSelectedLevel(EDUCATION_LEVELS[0].id)
     }
-    loadLevels()
-  }, [])
+  }, [selectedLevel])
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       router.push('/login?redirect=/admin/contenido')
     }
-    if (!isLoading && isAuthenticated && !isAdmin) {
+    if (!authLoading && isAuthenticated && !isAdmin) {
       router.push('/')
     }
-  }, [isLoading, isAuthenticated, isAdmin, router])
+  }, [authLoading, isAuthenticated, isAdmin, router])
 
   useEffect(() => {
-    loadLessons()
+    if (selectedLevel) loadLessons()
   }, [selectedLevel])
 
   const loadLessons = async () => {
-    setLoadingLessons(true)
+    setLoading(true)
     try {
-      let url = '/api/lessons'
-      if (selectedLevel) {
-        url += `?levelId=${selectedLevel}`
-      }
-      const response = await fetch(url)
-      if (response.ok) {
-        const data = await response.json()
+      const res = await fetch(`/api/lessons?levelId=${selectedLevel}`)
+      if (res.ok) {
+        const data = await res.json()
         setLessons(Array.isArray(data) ? data : [])
+        const moduleNames = new Set(data.map((l: Lesson) => l.moduleName))
+        setExpandedModules(moduleNames as Set<string>)
       }
-    } catch (error) {
-      console.error('Error loading lessons:', error)
+    } catch (err) {
+      console.error('Error:', err)
     }
-    setLoadingLessons(false)
+    setLoading(false)
+  }
+
+  const modules = lessons.reduce((acc, lesson) => {
+    const key = lesson.moduleName || 'Sin módulo'
+    if (!acc[key]) acc[key] = []
+    acc[key].push(lesson)
+    return acc
+  }, {} as Record<string, Lesson[]>)
+
+  Object.keys(modules).forEach(key => {
+    modules[key].sort((a, b) => (a.order || 0) - (b.order || 0))
+  })
+
+  const toggleModule = (name: string) => {
+    const newSet = new Set(expandedModules)
+    if (newSet.has(name)) newSet.delete(name)
+    else newSet.add(name)
+    setExpandedModules(newSet)
+  }
+
+  const openCreateModal = (moduleName?: string) => {
+    setFormData({
+      id: '',
+      title: '',
+      moduleName: moduleName || '',
+      videoUrl: '',
+      pdfUrl: '',
+      order: moduleName ? (modules[moduleName]?.length || 0) + 1 : 1
+    })
+    setModalMode('create')
+    setError('')
+    setShowModal(true)
   }
 
   const openEditModal = (lesson: Lesson) => {
-    setEditingLesson(lesson)
-    setEditFormData({
+    setFormData({
+      id: lesson.id,
       title: lesson.title,
-      type: lesson.type,
-      duration: lesson.duration,
+      moduleName: lesson.moduleName,
       videoUrl: lesson.videoUrl || '',
-      content: lesson.content || '',
-      locked: lesson.locked,
-      pdfUrl: lesson.pdfUrl || ''
+      pdfUrl: lesson.pdfUrl || '',
+      order: lesson.order || 1
     })
-    setMessage(null)
+    setModalMode('edit')
+    setError('')
+    setShowModal(true)
   }
 
-  const handleSaveLesson = async () => {
-    if (!editingLesson) return
-    setSaving(true)
-    setMessage(null)
-
-    try {
-      const response = await fetch('/api/lessons', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: editingLesson.id,
-          ...editFormData
-        })
-      })
-
-      if (response.ok) {
-        setMessage({ type: 'success', text: 'Lección guardada correctamente' })
-        loadLessons()
-        setTimeout(() => {
-          setEditingLesson(null)
-        }, 1500)
-      } else {
-        const error = await response.json()
-        setMessage({ type: 'error', text: error.message || 'Error al guardar' })
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Error de conexión' })
-    }
-    setSaving(false)
-  }
-
-  const handleCreateLesson = async () => {
-    if (!newLessonData.title || !newLessonData.moduleId) {
-      setMessage({ type: 'error', text: 'Título y módulo son requeridos' })
+  const handleSave = async () => {
+    if (!formData.title.trim()) {
+      setError('El título es requerido')
       return
     }
+    if (!formData.moduleName.trim()) {
+      setError('El módulo es requerido')
+      return
+    }
+
     setSaving(true)
+    setError('')
+
     try {
-      const response = await fetch('/api/lessons', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          levelId: selectedLevel,
-          ...newLessonData,
-          order: lessons.filter(l => l.moduleId === newLessonData.moduleId).length + 1
-        })
-      })
-      if (response.ok) {
-        loadLessons()
-        setShowNewLessonModal(false)
-        setNewLessonData({ title: '', type: 'video', duration: '5 min', videoUrl: '', content: '', moduleId: '', moduleName: '' })
-      } else {
-        const error = await response.json()
-        alert(error.message || 'Error al crear lección')
+      const body = {
+        ...(modalMode === 'edit' ? { id: formData.id } : {}),
+        levelId: selectedLevel,
+        programId: 'robotica',
+        moduleName: formData.moduleName,
+        title: formData.title,
+        type: 'video',
+        duration: '10 min',
+        videoUrl: formData.videoUrl,
+        pdfUrl: formData.pdfUrl,
+        order: formData.order
       }
-    } catch (error) {
-      alert('Error de conexión')
+
+      const res = await fetch('/api/lessons', {
+        method: modalMode === 'edit' ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (res.ok) {
+        loadLessons()
+        setShowModal(false)
+      } else {
+        const err = await res.json()
+        setError(err.message || 'Error al guardar')
+      }
+    } catch {
+      setError('Error de conexión')
     }
     setSaving(false)
   }
 
-  const handleCreateModule = async () => {
-    if (!newModuleName.trim()) return
-    setSaving(true)
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`¿Eliminar "${title}"?`)) return
     try {
-      const response = await fetch('/api/lessons', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          levelId: selectedLevel,
-          moduleName: newModuleName,
-          title: 'Nueva lección (editar)',
-          type: 'video',
-          duration: '5 min',
-          order: modules.length + 1
-        })
-      })
-      if (response.ok) {
-        loadLessons()
-        setShowNewModuleModal(false)
-        setNewModuleName('')
-      } else {
-        const error = await response.json()
-        alert(error.message || 'Error al crear módulo')
-      }
-    } catch (error) {
-      alert('Error al crear módulo')
-    }
-    setSaving(false)
-  }
-
-  const handleMoveLesson = async (lessonId: string, direction: 'up' | 'down') => {
-    const lesson = lessons.find(l => l.id === lessonId)
-    if (!lesson) return
-    
-    const moduleLessons = lessons
-      .filter(l => l.moduleName === lesson.moduleName)
-      .sort((a, b) => a.order - b.order)
-    
-    const currentIndex = moduleLessons.findIndex(l => l.id === lessonId)
-    const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
-    
-    if (swapIndex < 0 || swapIndex >= moduleLessons.length) return
-    
-    const swapLesson = moduleLessons[swapIndex]
-    
-    try {
-      await Promise.all([
-        fetch('/api/lessons', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: lesson.id, order: swapLesson.order })
-        }),
-        fetch('/api/lessons', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: swapLesson.id, order: lesson.order })
-        })
-      ])
-      loadLessons()
-    } catch (error) {
-      alert('Error al mover lección')
-    }
-  }
-
-  const handleUpdateModuleName = async (moduleId: string, newName: string) => {
-    const moduleLessons = lessons.filter(l => l.moduleId === moduleId)
-    try {
-      for (const lesson of moduleLessons) {
-        await fetch('/api/lessons', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: lesson.id, moduleName: newName })
-        })
-      }
-      loadLessons()
-      setEditingModuleId(null)
-    } catch (error) {
-      alert('Error al actualizar módulo')
-    }
-  }
-
-  const handleDeleteLesson = async (lessonId: string) => {
-    if (!confirm('¿Eliminar esta lección?')) return
-    try {
-      const response = await fetch(`/api/lessons?id=${lessonId}`, { method: 'DELETE' })
-      if (response.ok) loadLessons()
-    } catch (error) {
+      const res = await fetch(`/api/lessons?id=${id}`, { method: 'DELETE' })
+      if (res.ok) loadLessons()
+    } catch {
       alert('Error al eliminar')
     }
   }
 
-  const openNewLessonModal = (moduleId: string, moduleName: string) => {
-    setNewLessonData({ ...newLessonData, moduleId, moduleName })
-    setShowNewLessonModal(true)
-  }
-
-  const lessonsByModule = lessons.reduce((acc, lesson) => {
-    const moduleKey = lesson.moduleId || 'sin-modulo'
-    if (!acc[moduleKey]) {
-      acc[moduleKey] = {
-        id: moduleKey,
-        name: lesson.moduleName || 'Sin módulo',
-        lessons: []
-      }
-    }
-    acc[moduleKey].lessons.push(lesson)
-    return acc
-  }, {} as Record<string, { id: string; name: string; lessons: Lesson[] }>)
-
-  const modules = Object.values(lessonsByModule)
-
-  if (isLoading || !isAdmin) {
+  if (authLoading) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
       </div>
     )
   }
 
-  const levels = dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS
-  const currentLevel = levels.find(l => l.id === selectedLevel)
+  if (!isAdmin) return null
 
-  const toggleModule = (moduleId: string) => {
-    const newExpanded = new Set(expandedModules)
-    if (newExpanded.has(moduleId)) {
-      newExpanded.delete(moduleId)
-    } else {
-      newExpanded.add(moduleId)
-    }
-    setExpandedModules(newExpanded)
-  }
-
-  const getLessonTypeIcon = (type: string) => {
-    switch (type) {
-      case 'video': return <Video className="w-4 h-4 text-blue-400" />
-      case 'activity': return <FileText className="w-4 h-4 text-green-400" />
-      case 'tutorial': return <FileText className="w-4 h-4 text-purple-400" />
-      case 'project': return <FileText className="w-4 h-4 text-orange-400" />
-      default: return <FileText className="w-4 h-4 text-gray-400" />
-    }
-  }
+  const currentLevel = EDUCATION_LEVELS.find(l => l.id === selectedLevel)
 
   return (
-    <div className="min-h-screen bg-dark-900">
-      <header className="bg-dark-800 border-b border-dark-600 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-gray-400 hover:text-white">
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Header */}
+      <header className="bg-gray-800 border-b border-gray-700 px-4 py-3">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/admin" className="p-2 hover:bg-gray-700 rounded-lg">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <div>
-              <h1 className="text-xl font-bold text-white">Gestión de Contenido</h1>
-              <p className="text-sm text-gray-400">Edita videos, imágenes y lecciones de cada curso</p>
-            </div>
+            <h1 className="text-lg font-bold">Lecciones</h1>
           </div>
-          <button 
-            onClick={loadLessons}
-            className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90"
+          <button
+            onClick={() => openCreateModal()}
+            className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-sm font-medium"
           >
-            <RefreshCw className="w-4 h-4" />
-            Recargar
+            <Plus className="w-4 h-4" />
+            Nueva
           </button>
         </div>
       </header>
 
-      <div className="flex">
-        <aside className="w-64 bg-dark-800 border-r border-dark-600 min-h-[calc(100vh-73px)]">
-          <div className="p-4">
-            <h3 className="text-sm font-medium text-gray-400 mb-3">Niveles Educativos</h3>
-            <div className="space-y-1">
-              {levels.map(level => (
-                <button
-                  key={level.id}
-                  onClick={() => setSelectedLevel(level.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${
-                    selectedLevel === level.id
-                      ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/30'
-                      : 'text-gray-400 hover:bg-dark-700 hover:text-white'
-                  }`}
-                >
-                  <span className="text-lg">{level.icon}</span>
-                  <span className="text-sm">{level.name}</span>
-                </button>
-              ))}
-            </div>
+      <div className="max-w-4xl mx-auto p-4">
+        {/* Level selector */}
+        <select
+          value={selectedLevel}
+          onChange={(e) => setSelectedLevel(e.target.value)}
+          className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 mb-4 focus:border-cyan-500 focus:outline-none"
+        >
+          {EDUCATION_LEVELS.map(level => (
+            <option key={level.id} value={level.id}>
+              {level.icon} {level.name} - {level.fullName}
+            </option>
+          ))}
+        </select>
+
+        {/* Stats */}
+        <div className="bg-gray-800 rounded-lg p-3 mb-4 flex items-center justify-between">
+          <span className="text-gray-300">{currentLevel?.fullName}</span>
+          <span className="text-sm text-gray-500">{lessons.length} lecciones</span>
+        </div>
+
+        {/* Lessons */}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
           </div>
-        </aside>
-
-        <main className="flex-1 p-6">
-          {loadingLessons ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-neon-cyan" />
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="bg-dark-800 rounded-xl border border-dark-600 p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">
-                      Curso {currentLevel?.name || selectedLevel}
-                    </h2>
-                    <p className="text-gray-400">Contenido educativo para {currentLevel?.fullName || selectedLevel}</p>
-                    <div className="flex gap-4 mt-4 text-sm">
-                      <span className="text-gray-400">{modules.length} módulos</span>
-                      <span className="text-gray-400">{lessons.length} lecciones</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-white">Módulos y Lecciones</h3>
-                  <button 
-                    onClick={() => setShowNewModuleModal(true)}
-                    className="flex items-center gap-2 px-3 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+        ) : Object.keys(modules).length === 0 ? (
+          <div className="bg-gray-800 rounded-lg p-8 text-center">
+            <FileText className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+            <p className="text-gray-400 mb-4">No hay lecciones</p>
+            <button
+              onClick={() => openCreateModal()}
+              className="px-4 py-2 bg-cyan-600 rounded-lg text-sm"
+            >
+              Crear primera lección
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {Object.entries(modules).map(([moduleName, moduleLessons]) => (
+              <div key={moduleName} className="bg-gray-800 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => toggleModule(moduleName)}
+                  className="w-full flex items-center gap-2 p-3 hover:bg-gray-700/50 text-left"
+                >
+                  {expandedModules.has(moduleName) ? (
+                    <ChevronDown className="w-4 h-4 text-cyan-400" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                  )}
+                  <span className="flex-1 font-medium text-sm">{moduleName}</span>
+                  <span className="text-xs text-gray-500">{moduleLessons.length}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openCreateModal(moduleName) }}
+                    className="p-1 hover:bg-gray-600 rounded text-gray-400"
                   >
                     <Plus className="w-4 h-4" />
-                    Nuevo Módulo
                   </button>
-                </div>
+                </button>
 
-                {modules.length === 0 ? (
-                  <div className="bg-dark-800 rounded-xl border border-dark-600 p-12 text-center">
-                    <p className="text-gray-400 mb-4">No hay lecciones para este nivel aún.</p>
-                    <p className="text-sm text-gray-500">Agrega lecciones en la tabla &quot;lessons&quot; de Airtable</p>
-                  </div>
-                ) : (
-                  modules.map((module) => (
-                    <div key={module.id} className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
+                {expandedModules.has(moduleName) && (
+                  <div className="border-t border-gray-700">
+                    {moduleLessons.map((lesson, idx) => (
                       <div
-                        className="flex items-center gap-3 p-4 cursor-pointer hover:bg-dark-700/50"
-                        onClick={() => toggleModule(module.id)}
+                        key={lesson.id}
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700/30 border-b border-gray-700/50 last:border-0"
                       >
-                        <GripVertical className="w-4 h-4 text-gray-500" />
-                        {expandedModules.has(module.id) ? (
-                          <ChevronDown className="w-5 h-5 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-5 h-5 text-gray-400" />
-                        )}
-                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
-                          {editingModuleId === module.id ? (
-                            <input
-                              type="text"
-                              defaultValue={module.name}
-                              autoFocus
-                              className="bg-dark-600 border border-neon-cyan rounded px-2 py-1 text-white text-sm w-64"
-                              onBlur={(e) => handleUpdateModuleName(module.id, e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleUpdateModuleName(module.id, e.currentTarget.value)
-                                if (e.key === 'Escape') setEditingModuleId(null)
-                              }}
-                            />
-                          ) : (
-                            <h4 className="text-white font-medium">{module.name}</h4>
-                          )}
-                          <p className="text-sm text-gray-400">{module.lessons.length} lecciones</p>
+                        <span className="text-gray-500 text-xs w-5">{idx + 1}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm truncate">{lesson.title}</p>
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            {lesson.videoUrl && (
+                              <span className="text-green-400 flex items-center gap-1">
+                                <Play className="w-3 h-3" /> Video
+                              </span>
+                            )}
+                            {lesson.pdfUrl && (
+                              <span className="text-blue-400 flex items-center gap-1">
+                                <Download className="w-3 h-3" /> PDF
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                          <button 
-                            onClick={() => setEditingModuleId(module.id)}
-                            className="p-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-600 rounded-lg"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-600 rounded-lg">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => openEditModal(lesson)}
+                          className="p-1.5 hover:bg-gray-600 rounded text-gray-400 hover:text-cyan-400"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(lesson.id, lesson.title)}
+                          className="p-1.5 hover:bg-gray-600 rounded text-gray-400 hover:text-red-400"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-
-                      {expandedModules.has(module.id) && (
-                        <div className="border-t border-dark-600">
-                          {module.lessons.map((lesson) => (
-                            <div
-                              key={lesson.id}
-                              className="flex items-center gap-3 px-4 py-3 border-b border-dark-600/50 last:border-0 hover:bg-dark-700/30"
-                            >
-                              <GripVertical className="w-4 h-4 text-gray-600" />
-                              <div className="w-8 h-8 bg-dark-600 rounded-lg flex items-center justify-center">
-                                {getLessonTypeIcon(lesson.type)}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-white text-sm truncate">{lesson.title}</p>
-                                <div className="flex items-center gap-3 text-xs text-gray-500">
-                                  <span>{lesson.type}</span>
-                                  <span>{lesson.duration}</span>
-                                  {lesson.videoUrl ? (
-                                    <span className="text-green-400 flex items-center gap-1">
-                                      <Check className="w-3 h-3" /> Video
-                                    </span>
-                                  ) : (
-                                    <span className="text-yellow-400">Sin video</span>
-                                  )}
-                                  {lesson.pdfUrl && (
-                                    <span className="text-blue-400 flex items-center gap-1">
-                                      <Download className="w-3 h-3" /> PDF
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <button
-                                  onClick={() => handleMoveLesson(lesson.id, 'up')}
-                                  className="p-1 text-gray-500 hover:text-white hover:bg-dark-600 rounded"
-                                  title="Mover arriba"
-                                >
-                                  <ChevronUp className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleMoveLesson(lesson.id, 'down')}
-                                  className="p-1 text-gray-500 hover:text-white hover:bg-dark-600 rounded"
-                                  title="Mover abajo"
-                                >
-                                  <ChevronDown className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => openEditModal(lesson)}
-                                  className="p-2 text-gray-400 hover:text-neon-cyan hover:bg-dark-600 rounded-lg"
-                                  title="Editar lección"
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </button>
-                                <button className="p-2 text-gray-400 hover:text-blue-400 hover:bg-dark-600 rounded-lg" title="Ver">
-                                  <Eye className="w-4 h-4" />
-                                </button>
-                                <button 
-                                  onClick={() => handleDeleteLesson(lesson.id)}
-                                  className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-600 rounded-lg" 
-                                  title="Eliminar"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                          <button 
-                            onClick={() => openNewLessonModal(module.id, module.name)}
-                            className="w-full flex items-center justify-center gap-2 p-3 text-gray-400 hover:text-neon-cyan hover:bg-dark-700/30"
-                          >
-                            <Plus className="w-4 h-4" />
-                            Agregar Lección
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 )}
               </div>
-            </div>
-          )}
-        </main>
+            ))}
+          </div>
+        )}
       </div>
 
-      {editingLesson && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-xl border border-dark-600 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-dark-600">
-              <h3 className="text-xl font-semibold text-white">Editar Lección</h3>
-              <button
-                onClick={() => setEditingLesson(null)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg"
-              >
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl w-full max-w-md">
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              <h3 className="font-semibold">
+                {modalMode === 'edit' ? 'Editar' : 'Nueva Lección'}
+              </h3>
+              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-700 rounded">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {message && (
-              <div className={`mx-6 mt-4 p-3 rounded-lg ${message.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                {message.text}
+            {error && (
+              <div className="mx-4 mt-4 p-2 bg-red-500/20 text-red-400 rounded text-sm">
+                {error}
               </div>
             )}
 
-            <div className="p-6 space-y-6">
+            <div className="p-4 space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Título de la Lección</label>
+                <label className="block text-sm text-gray-400 mb-1">Módulo *</label>
                 <input
                   type="text"
-                  value={editFormData.title}
-                  onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                  value={formData.moduleName}
+                  onChange={(e) => setFormData({ ...formData, moduleName: e.target.value })}
+                  placeholder="Ej: Módulo 1: Introducción"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Tipo</label>
-                  <select
-                    value={editFormData.type}
-                    onChange={(e) => setEditFormData({ ...editFormData, type: e.target.value })}
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                  >
-                    <option value="video">Video</option>
-                    <option value="activity">Actividad</option>
-                    <option value="tutorial">Tutorial</option>
-                    <option value="project">Proyecto</option>
-                    <option value="quiz">Quiz</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Duración</label>
-                  <input
-                    type="text"
-                    value={editFormData.duration}
-                    onChange={(e) => setEditFormData({ ...editFormData, duration: e.target.value })}
-                    placeholder="ej: 15 min"
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                  />
-                </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">
-                  <Video className="w-4 h-4 inline mr-2" />
-                  URLs de Videos e Imágenes (una por línea)
-                </label>
-                <textarea
-                  rows={4}
-                  value={editFormData.videoUrl}
-                  onChange={(e) => setEditFormData({ ...editFormData, videoUrl: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/ID/preview&#10;https://drive.google.com/file/d/IMAGEN_ID/view"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none font-mono text-sm"
+                <label className="block text-sm text-gray-400 mb-1">Título *</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="Ej: Circuito LED en Serie"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
                 />
-                <p className="text-xs text-gray-500 mt-2">
-                  <strong>Videos:</strong> usa <code className="text-neon-cyan">/preview</code> al final • 
-                  <strong> Imágenes:</strong> pega el link normal de Google Drive
-                </p>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">
-                  <FileText className="w-4 h-4 inline mr-2" />
-                  Descripción / Contenido
-                </label>
-                <textarea
-                  rows={4}
-                  value={editFormData.content}
-                  onChange={(e) => setEditFormData({ ...editFormData, content: e.target.value })}
-                  placeholder="Describe el contenido de esta lección..."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none"
-                />
-              </div>
-
-              <div className="p-4 bg-gradient-to-r from-green-900/20 to-blue-900/20 rounded-xl border border-green-500/30">
-                <label className="block text-sm text-white font-medium mb-2">
-                  <Download className="w-4 h-4 inline mr-2" />
-                  📄 Documento PDF (opcional)
+                <label className="block text-sm text-gray-400 mb-1">
+                  <Video className="w-3 h-3 inline mr-1" />
+                  URL Video (YouTube o Drive)
                 </label>
                 <input
                   type="url"
-                  value={editFormData.pdfUrl}
-                  onChange={(e) => setEditFormData({ ...editFormData, pdfUrl: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/..."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-green focus:outline-none"
+                  value={formData.videoUrl}
+                  onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                  placeholder="https://youtube.com/watch?v=..."
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
                 />
-                <p className="text-xs text-gray-500 mt-2">
-                  Sube el PDF a Google Drive → Compartir → Cualquier persona con el enlace → Pega el enlace aquí
-                </p>
-                {editFormData.pdfUrl && (
-                  <a 
-                    href={editFormData.pdfUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg"
-                  >
-                    <Download className="w-4 h-4" /> Ver PDF
-                  </a>
-                )}
               </div>
 
-              <div className="flex items-center gap-6">
-                <label className="flex items-center gap-2 text-gray-300">
-                  <input
-                    type="checkbox"
-                    checked={editFormData.locked}
-                    onChange={(e) => setEditFormData({ ...editFormData, locked: e.target.checked })}
-                    className="rounded bg-dark-700 border-dark-600"
-                  />
-                  Bloqueada (requiere completar anteriores)
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  <Download className="w-3 h-3 inline mr-1" />
+                  URL PDF (código)
                 </label>
+                <input
+                  type="url"
+                  value={formData.pdfUrl}
+                  onChange={(e) => setFormData({ ...formData, pdfUrl: e.target.value })}
+                  placeholder="https://drive.google.com/file/d/..."
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
+                />
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 p-4 border-t border-dark-600">
+            <div className="flex justify-end gap-2 p-4 border-t border-gray-700">
               <button
-                onClick={() => setEditingLesson(null)}
-                className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 text-gray-400 hover:text-white text-sm"
               >
                 Cancelar
               </button>
-              <button 
-                onClick={handleSaveLesson}
+              <button
+                onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-sm font-medium disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                Guardar Lección
+                Guardar
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Modal Nuevo Módulo */}
-      {showNewModuleModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-xl border border-dark-600 w-full max-w-md">
-            <div className="flex items-center justify-between p-4 border-b border-dark-600">
-              <h3 className="text-xl font-semibold text-white">Nuevo Módulo</h3>
-              <button onClick={() => setShowNewModuleModal(false)} className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Nombre del Módulo</label>
-                <input
-                  type="text"
-                  value={newModuleName}
-                  onChange={(e) => setNewModuleName(e.target.value)}
-                  placeholder="Ej: Módulo 1: Introducción"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 p-4 border-t border-dark-600">
-              <button onClick={() => setShowNewModuleModal(false)} className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600">
-                Cancelar
-              </button>
-              <button onClick={handleCreateModule} disabled={saving || !newModuleName.trim()} className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                Crear Módulo
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Nueva Lección */}
-      {showNewLessonModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-xl border border-dark-600 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-dark-600">
-              <h3 className="text-xl font-semibold text-white">Nueva Lección - {newLessonData.moduleName}</h3>
-              <button onClick={() => setShowNewLessonModal(false)} className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Título de la Lección</label>
-                <input
-                  type="text"
-                  value={newLessonData.title}
-                  onChange={(e) => setNewLessonData({ ...newLessonData, title: e.target.value })}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Tipo</label>
-                  <select
-                    value={newLessonData.type}
-                    onChange={(e) => setNewLessonData({ ...newLessonData, type: e.target.value })}
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                  >
-                    <option value="video">Video</option>
-                    <option value="activity">Actividad</option>
-                    <option value="tutorial">Tutorial</option>
-                    <option value="project">Proyecto</option>
-                    <option value="quiz">Quiz</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Duración</label>
-                  <input
-                    type="text"
-                    value={newLessonData.duration}
-                    onChange={(e) => setNewLessonData({ ...newLessonData, duration: e.target.value })}
-                    placeholder="ej: 3 min"
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">URL del Video (opcional)</label>
-                <input
-                  type="url"
-                  value={newLessonData.videoUrl}
-                  onChange={(e) => setNewLessonData({ ...newLessonData, videoUrl: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/ID/preview"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Contenido / Descripción</label>
-                <textarea
-                  rows={3}
-                  value={newLessonData.content}
-                  onChange={(e) => setNewLessonData({ ...newLessonData, content: e.target.value })}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 p-4 border-t border-dark-600">
-              <button onClick={() => setShowNewLessonModal(false)} className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600">
-                Cancelar
-              </button>
-              <button onClick={handleCreateLesson} disabled={saving || !newLessonData.title.trim()} className="flex items-center gap-2 px-4 py-2 bg-neon-green text-dark-900 rounded-lg font-medium hover:bg-neon-green/90 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                Crear Lección
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   )
 }

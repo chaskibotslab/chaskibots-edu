@@ -215,16 +215,30 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
-    // Campos básicos requeridos - NO incluir 'type' si Airtable tiene opciones restringidas
+    // Valores válidos para campos select en Airtable
+    const VALID_TYPES = ['video', 'activity', 'tutorial', 'project']
+    const VALID_PROGRAMS = ['robotica', 'ia', 'hacking']
+    
+    // Campos básicos requeridos
     const fields: Record<string, any> = {
       levelId: body.levelId || '',
       moduleName: body.moduleName || '',
       title: body.title || '',
-      duration: body.duration || '5 min',
+      duration: body.duration || '10 min',
       order: body.order || 0,
     }
     
-    // Solo agregar campos opcionales si tienen valor
+    // Agregar type solo si es válido
+    if (body.type && VALID_TYPES.includes(body.type)) {
+      fields.type = body.type
+    }
+    
+    // Agregar programId solo si es válido
+    if (body.programId && VALID_PROGRAMS.includes(body.programId)) {
+      fields.programId = body.programId
+    }
+    
+    // Campos opcionales
     if (body.videoUrl) fields.videoUrl = body.videoUrl
     if (body.content) fields.content = body.content
     if (body.locked !== undefined) fields.locked = body.locked
@@ -247,12 +261,10 @@ export async function POST(request: Request) {
       const errorText = await response.text()
       console.error('Airtable error creating lesson:', errorText)
       
-      // Si es error de INVALID_MULTIPLE_CHOICE, el campo moduleName o type tiene un valor no permitido
-      if (errorText.includes('INVALID_MULTIPLE_CHOICE')) {
-        // Intentar sin moduleName (usar un valor genérico o vacío)
+      // Si es error de campo desconocido (pdfUrl no existe), reintentar sin él
+      if (errorText.includes('UNKNOWN_FIELD_NAME') && errorText.includes('pdfUrl')) {
         const retryFields = { ...fields }
-        delete retryFields.moduleName
-        if (body.type) delete retryFields.type
+        delete retryFields.pdfUrl
         
         response = await fetch(AIRTABLE_API_URL, {
           method: 'POST',
@@ -265,17 +277,34 @@ export async function POST(request: Request) {
           })
         })
         
-        if (!response.ok) {
-          const retryError = await response.text()
-          console.error('Airtable retry error:', retryError)
-          return NextResponse.json({ 
-            error: 'Error creating lesson', 
-            message: 'El nombre del módulo no es válido. Verifica que el módulo exista en Airtable o usa un nombre existente.',
-            details: errorText 
-          }, { status: 500 })
+        if (response.ok) {
+          console.log('Nota: Campo pdfUrl no existe en Airtable. Crear el campo manualmente.')
         }
-      } else {
-        return NextResponse.json({ error: 'Error creating lesson', message: errorText }, { status: 500 })
+      }
+      
+      // Si es error de INVALID_MULTIPLE_CHOICE, el campo moduleName o type tiene un valor no permitido
+      if (!response.ok && errorText.includes('INVALID_MULTIPLE_CHOICE')) {
+        const retryFields = { ...fields }
+        delete retryFields.moduleName
+        delete retryFields.pdfUrl
+        if (body.type) delete retryFields.type
+        
+        response = await fetch(AIRTABLE_API_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            records: [{ fields: retryFields }]
+          })
+        })
+      }
+      
+      if (!response.ok) {
+        const finalError = await response.text()
+        console.error('Airtable final error:', finalError)
+        return NextResponse.json({ error: 'Error creating lesson', message: finalError }, { status: 500 })
       }
     }
 
@@ -307,7 +336,7 @@ export async function PUT(request: Request) {
     if (body.locked !== undefined) fields.locked = body.locked
     if (body.pdfUrl !== undefined) fields.pdfUrl = body.pdfUrl
 
-    const response = await fetch(AIRTABLE_API_URL, {
+    let response = await fetch(AIRTABLE_API_URL, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
@@ -324,7 +353,28 @@ export async function PUT(request: Request) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Airtable error:', errorText)
-      return NextResponse.json({ error: 'Error updating lesson', message: errorText }, { status: 500 })
+      
+      // Si pdfUrl no existe en Airtable, reintentar sin él
+      if (errorText.includes('UNKNOWN_FIELD_NAME') && errorText.includes('pdfUrl')) {
+        delete fields.pdfUrl
+        response = await fetch(AIRTABLE_API_URL, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            records: [{ id: body.id, fields }]
+          })
+        })
+        if (response.ok) {
+          console.log('Nota: Campo pdfUrl no existe en Airtable. Crear el campo manualmente.')
+        }
+      }
+      
+      if (!response.ok) {
+        return NextResponse.json({ error: 'Error updating lesson', message: errorText }, { status: 500 })
+      }
     }
 
     const data = await response.json()
