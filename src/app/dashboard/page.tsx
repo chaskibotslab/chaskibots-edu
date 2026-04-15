@@ -12,6 +12,7 @@ import {
   Bot, Brain, Shield, BookOpen, Trophy, Clock, ArrowRight, Play, 
   Zap, Cpu, Loader2, Sparkles
 } from 'lucide-react'
+import BadgesDisplay from '@/components/BadgesDisplay'
 
 export default function DashboardPage() {
   const { user, isAuthenticated, isLoading } = useAuth()
@@ -140,29 +141,12 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-dark-800/80 backdrop-blur rounded-xl p-4 text-center border border-dark-600">
-              <Trophy className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
-              <p className="text-xl font-bold text-white">0</p>
-              <p className="text-xs text-gray-500">Logros</p>
-            </div>
-            <div className="bg-dark-800/80 backdrop-blur rounded-xl p-4 text-center border border-dark-600">
-              <BookOpen className="w-6 h-6 text-neon-blue mx-auto mb-2" />
-              <p className="text-xl font-bold text-white">0</p>
-              <p className="text-xs text-gray-500">Lecciones</p>
-            </div>
-            <div className="bg-dark-800/80 backdrop-blur rounded-xl p-4 text-center border border-dark-600">
-              <Bot className="w-6 h-6 text-neon-purple mx-auto mb-2" />
-              <p className="text-xl font-bold text-white">0</p>
-              <p className="text-xs text-gray-500">Proyectos</p>
-            </div>
-            <div className="bg-dark-800/80 backdrop-blur rounded-xl p-4 text-center border border-dark-600">
-              <Clock className="w-6 h-6 text-neon-green mx-auto mb-2" />
-              <p className="text-xl font-bold text-white">0h</p>
-              <p className="text-xs text-gray-500">Tiempo</p>
-            </div>
-          </div>
+          {/* Badges/Insignias */}
+          <BadgesDisplay 
+            completedLessons={user?.completedLessons || 0}
+            streak={user?.streak || 0}
+            programsCompleted={user?.programsCompleted || []}
+          />
 
         </div>
       </main>

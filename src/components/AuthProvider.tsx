@@ -15,6 +15,9 @@ export interface User {
   progress: number
   createdAt: string
   lastLogin?: string
+  completedLessons?: number
+  streak?: number
+  programsCompleted?: string[]
 }
 
 export interface AccessLog {
