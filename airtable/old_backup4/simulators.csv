@@ -1,0 +1,8 @@
+id,name,description,icon,url,levels,enabled
+scratch,Scratch,Programación visual con bloques para crear juegos y animaciones,blocks,https://scratch.mit.edu/projects/editor,"inicial-1,inicial-2,primero-egb,segundo-egb,tercero-egb,cuarto-egb,quinto-egb",true
+makecode,MakeCode Arcade,Crea videojuegos retro con bloques o JavaScript,gamepad,https://arcade.makecode.com,"tercero-egb,cuarto-egb,quinto-egb,sexto-egb,septimo-egb",true
+tinkercad,Tinkercad Circuits,Simulador de circuitos y Arduino en línea,cpu,https://www.tinkercad.com/circuits,"sexto-egb,septimo-egb,octavo-egb,noveno-egb,decimo-egb",true
+wokwi,Wokwi ESP32,Simulador de ESP32 y Arduino avanzado,microchip,https://wokwi.com,"octavo-egb,noveno-egb,decimo-egb,primero-bach,segundo-bach,tercero-bach",true
+python,Python Tutor,Visualiza código Python paso a paso,code,https://pythontutor.com,"septimo-egb,octavo-egb,noveno-egb,decimo-egb,primero-bach,segundo-bach,tercero-bach",true
+colab,Google Colab,Notebooks de Python para IA y Machine Learning,brain,https://colab.research.google.com,"noveno-egb,decimo-egb,primero-bach,segundo-bach,tercero-bach",true
+teachable,Teachable Machine,Entrena modelos de IA sin código,sparkles,https://teachablemachine.withgoogle.com,"cuarto-egb,quinto-egb,sexto-egb,septimo-egb,octavo-egb,noveno-egb,decimo-egb,primero-bach,segundo-bach,tercero-bach",true

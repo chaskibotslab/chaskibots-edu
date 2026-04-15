@@ -1,0 +1,12 @@
+id,levelId,title,description,order
+mod-i1-1,inicial-1,Módulo 1: Bienvenida al Mundo Tech,Conociendo qué es la tecnología y los robots,1
+mod-i1-2,inicial-1,Módulo 2: Conociendo Mi Kit,Exploramos los componentes del kit de robótica,2
+mod-i1-3,inicial-1,Módulo 3: Mi Primer Circuito,Aprendemos a encender un LED,3
+mod-i1-4,inicial-1,Módulo 4: Proyectos del Año,Proyectos creativos para todo el año escolar,4
+mod-i1-5,inicial-1,Módulo 5: IA para Pequeños,Introducción a la inteligencia artificial,5
+mod-i2-1,inicial-2,Módulo 1: Recordando lo Aprendido,Repaso de conceptos básicos de tecnología,1
+mod-i2-2,inicial-2,Módulo 2: Mi Nuevo Kit,Conociendo los nuevos componentes,2
+mod-i2-3,inicial-2,Módulo 3: Energía del Viento,Aprendemos sobre energía renovable,3
+mod-i2-4,inicial-2,Módulo 4: Circuitos con Cinta,Creamos circuitos usando cinta de cobre,4
+mod-i2-5,inicial-2,Módulo 5: Proyectos Creativos,Proyectos avanzados del año,5
+mod-i2-6,inicial-2,Módulo 6: IA y Reconocimiento,Jugamos con inteligencia artificial,6

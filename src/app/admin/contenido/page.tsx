@@ -21,13 +21,21 @@ interface Lesson {
   order: number
   videoUrl: string
   pdfUrl?: string
+  programId?: string
 }
+
+const PROGRAMS = [
+  { value: 'robotica', label: '🤖 Robótica', color: 'bg-cyan-600' },
+  { value: 'ia', label: '🧠 Inteligencia Artificial', color: 'bg-purple-600' },
+  { value: 'hacking', label: '🔐 Ciberseguridad', color: 'bg-green-600' },
+]
 
 export default function ContenidoAdminPage() {
   const router = useRouter()
   const { isAdmin, isAuthenticated, isLoading: authLoading } = useAuth()
   
   const [selectedLevel, setSelectedLevel] = useState('')
+  const [selectedProgram, setSelectedProgram] = useState('robotica')
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [loading, setLoading] = useState(false)
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
@@ -63,12 +71,12 @@ export default function ContenidoAdminPage() {
 
   useEffect(() => {
     if (selectedLevel) loadLessons()
-  }, [selectedLevel])
+  }, [selectedLevel, selectedProgram])
 
   const loadLessons = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/lessons?levelId=${selectedLevel}`)
+      const res = await fetch(`/api/lessons?levelId=${selectedLevel}&programId=${selectedProgram}`)
       if (res.ok) {
         const data = await res.json()
         setLessons(Array.isArray(data) ? data : [])
@@ -144,7 +152,7 @@ export default function ContenidoAdminPage() {
       const body = {
         ...(modalMode === 'edit' ? { id: formData.id } : {}),
         levelId: selectedLevel,
-        programId: 'robotica',
+        programId: selectedProgram,
         moduleName: formData.moduleName,
         title: formData.title,
         type: 'video',
@@ -217,23 +225,36 @@ export default function ContenidoAdminPage() {
       </header>
 
       <div className="max-w-4xl mx-auto p-4">
-        {/* Level selector */}
-        <select
-          value={selectedLevel}
-          onChange={(e) => setSelectedLevel(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 mb-4 focus:border-cyan-500 focus:outline-none"
-        >
-          {EDUCATION_LEVELS.map(level => (
-            <option key={level.id} value={level.id}>
-              {level.icon} {level.name} - {level.fullName}
-            </option>
-          ))}
-        </select>
+        {/* Selectors */}
+        <div className="flex gap-3 mb-4">
+          <select
+            value={selectedLevel}
+            onChange={(e) => setSelectedLevel(e.target.value)}
+            className="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 focus:border-cyan-500 focus:outline-none"
+          >
+            {EDUCATION_LEVELS.map(level => (
+              <option key={level.id} value={level.id}>
+                {level.icon} {level.name} - {level.fullName}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedProgram}
+            onChange={(e) => setSelectedProgram(e.target.value)}
+            className="w-48 bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 focus:border-cyan-500 focus:outline-none"
+          >
+            {PROGRAMS.map(p => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </select>
+        </div>
 
         {/* Stats */}
         <div className="bg-gray-800 rounded-lg p-3 mb-4 flex items-center justify-between">
           <span className="text-gray-300">{currentLevel?.fullName}</span>
-          <span className="text-sm text-gray-500">{lessons.length} lecciones</span>
+          <span className="text-sm text-gray-500">
+            {PROGRAMS.find(p => p.value === selectedProgram)?.label} • {lessons.length} lecciones
+          </span>
         </div>
 
         {/* Lessons */}

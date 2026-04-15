@@ -1,0 +1,88 @@
+id,levelId,moduleId,moduleName,title,type,duration,order,locked,content
+l1,inicial-1,mod-i1-1,Módulo 1: Bienvenida al Mundo Tech,¡Hola! Bienvenidos al curso,video,5 min,1,false,Introducción al curso de tecnología para niños
+l2,inicial-1,mod-i1-1,Módulo 1: Bienvenida al Mundo Tech,¿Qué es un robot?,video,8 min,2,false,Explicación sencilla de qué son los robots
+l3,inicial-1,mod-i1-1,Módulo 1: Bienvenida al Mundo Tech,Robots en nuestra vida,activity,15 min,3,false,Identificar robots en casa y la escuela
+l4,inicial-1,mod-i1-1,Módulo 1: Bienvenida al Mundo Tech,Colores de la tecnología,activity,10 min,4,true,Aprender los colores de los componentes
+l5,inicial-1,mod-i1-2,Módulo 2: Conociendo Mi Kit,Abriendo mi kit (Unboxing),video,10 min,5,false,Video de unboxing del kit
+l6,inicial-1,mod-i1-2,Módulo 2: Conociendo Mi Kit,Los LEDs: Luces mágicas,video,8 min,6,false,Conociendo los LEDs de colores
+l7,inicial-1,mod-i1-2,Módulo 2: Conociendo Mi Kit,Cables y conexiones,tutorial,15 min,7,true,Cómo conectar cables de forma segura
+l8,inicial-1,mod-i1-2,Módulo 2: Conociendo Mi Kit,La pila: Energía para todo,video,8 min,8,true,Entendiendo la fuente de energía
+l9,inicial-1,mod-i1-3,Módulo 3: Mi Primer Circuito,¿Qué es un circuito?,video,10 min,9,false,Concepto básico de circuito eléctrico
+l10,inicial-1,mod-i1-3,Módulo 3: Mi Primer Circuito,Conectando el LED,tutorial,20 min,10,true,Paso a paso para conectar un LED
+l11,inicial-1,mod-i1-3,Módulo 3: Mi Primer Circuito,¡Mi LED enciende!,project,25 min,11,true,Proyecto de encender el primer LED
+l12,inicial-1,mod-i1-4,Módulo 4: Proyectos del Año,Proyecto: Luz Mágica,project,30 min,12,true,Crear una luz que cambia de color
+l13,inicial-1,mod-i1-4,Módulo 4: Proyectos del Año,Proyecto: Semáforo de Colores,project,45 min,13,true,Construir un semáforo con LEDs
+l14,inicial-1,mod-i1-4,Módulo 4: Proyectos del Año,Proyecto: Tarjeta Luminosa,project,40 min,14,true,Tarjeta de cumpleaños con LED
+l15,inicial-1,mod-i1-4,Módulo 4: Proyectos del Año,Proyecto: Árbol de Navidad,project,50 min,15,true,Decoración navideña con LEDs
+l16,inicial-1,mod-i1-4,Módulo 4: Proyectos del Año,Proyecto: Robot Amigo,project,60 min,16,true,Crear un robot simple con luces
+l17,inicial-1,mod-i1-5,Módulo 5: IA para Pequeños,¿Qué es la IA?,video,8 min,17,false,Introducción a inteligencia artificial
+l18,inicial-1,mod-i1-5,Módulo 5: IA para Pequeños,Jugando con colores (IA),activity,15 min,18,true,Usar IA para reconocer colores
+l19,inicial-2,mod-i2-1,Módulo 1: Recordando lo Aprendido,Bienvenidos de vuelta,video,5 min,1,false,Inicio del segundo año
+l20,inicial-2,mod-i2-1,Módulo 1: Recordando lo Aprendido,Repaso: ¿Qué es un circuito?,video,8 min,2,false,Recordando conceptos del año anterior
+l21,inicial-2,mod-i2-1,Módulo 1: Recordando lo Aprendido,Mis logros del año pasado,activity,10 min,3,false,Reflexión sobre lo aprendido
+l22,inicial-2,mod-i2-2,Módulo 2: Mi Nuevo Kit,Unboxing Kit Inicial 2,video,12 min,4,false,Conociendo el nuevo kit
+l23,inicial-2,mod-i2-2,Módulo 2: Mi Nuevo Kit,El generador eólico,video,10 min,5,true,Introducción a energía eólica
+l24,inicial-2,mod-i2-2,Módulo 2: Mi Nuevo Kit,Cinta de cobre conductora,tutorial,15 min,6,true,Cómo usar la cinta conductora
+l25,inicial-2,mod-i2-2,Módulo 2: Mi Nuevo Kit,Nuevos LEDs y componentes,video,10 min,7,true,Conociendo nuevos componentes
+l26,inicial-2,mod-i2-3,Módulo 3: Energía del Viento,¿Qué es la energía eólica?,video,10 min,8,false,Explicación de energía del viento
+l27,inicial-2,mod-i2-3,Módulo 3: Energía del Viento,Armando el generador,tutorial,25 min,9,true,Paso a paso del generador
+l28,inicial-2,mod-i2-3,Módulo 3: Energía del Viento,¡Mi generador funciona!,project,30 min,10,true,Proyecto de generador eólico
+l29,inicial-2,mod-i2-4,Módulo 4: Circuitos con Cinta,La cinta mágica conductora,video,8 min,11,false,Propiedades de la cinta de cobre
+l30,inicial-2,mod-i2-4,Módulo 4: Circuitos con Cinta,Dibujando circuitos,tutorial,20 min,12,true,Crear circuitos con cinta
+l31,inicial-2,mod-i2-4,Módulo 4: Circuitos con Cinta,Tarjeta con circuito,project,35 min,13,true,Proyecto de tarjeta interactiva
+l32,inicial-2,mod-i2-5,Módulo 5: Proyectos Creativos,Proyecto: Casa iluminada,project,45 min,14,false,Maqueta de casa con LEDs
+l33,inicial-2,mod-i2-5,Módulo 5: Proyectos Creativos,Proyecto: Molino de viento,project,50 min,15,true,Molino funcional con generador
+l34,inicial-2,mod-i2-5,Módulo 5: Proyectos Creativos,Proyecto: Libro interactivo,project,60 min,16,true,Libro con luces y circuitos
+l35,inicial-2,mod-i2-6,Módulo 6: IA y Reconocimiento,La IA reconoce colores,activity,15 min,17,false,Usar cámara para detectar colores
+l36,inicial-2,mod-i2-6,Módulo 6: IA y Reconocimiento,Clasificando objetos,activity,15 min,18,true,IA clasifica objetos cotidianos
+l37,inicial-2,mod-i2-6,Módulo 6: IA y Reconocimiento,Comandos de voz,activity,20 min,19,true,Controlar con la voz
+l38,inicial-2,mod-i2-6,Módulo 6: IA y Reconocimiento,Mi asistente robot,project,25 min,20,true,Crear asistente simple
+l39,primero-egb,mod-1egb-1,Módulo 1: Mis Primeros Robots,Robot con Articulaciones,video,15 min,1,false,Introducción al ensamblaje de robots articulados
+l40,primero-egb,mod-1egb-1,Módulo 1: Mis Primeros Robots,Ensamblando el Robot,activity,30 min,2,false,Ensambla tu primer robot articulado paso a paso
+l41,primero-egb,mod-1egb-1,Módulo 1: Mis Primeros Robots,Robot Pintor,project,35 min,3,true,Construye un robot que puede dibujar
+l42,primero-egb,mod-1egb-2,Módulo 2: Robot 4x4,Introducción al 4x4,video,10 min,4,false,Conoce las partes del robot todo terreno
+l43,primero-egb,mod-1egb-2,Módulo 2: Robot 4x4,Armando el 4x4,activity,40 min,5,true,Arma tu robot todo terreno
+l44,segundo-egb,mod-2egb-1,Módulo 1: Robots Avanzados,Robot Radiocontrolado,video,15 min,1,false,Introducción a los robots con control remoto
+l45,segundo-egb,mod-2egb-1,Módulo 1: Robots Avanzados,Ensamblaje RC,activity,35 min,2,false,Ensambla tu robot radiocontrolado
+l46,segundo-egb,mod-2egb-2,Módulo 2: Navegación Acuática,Robot Acuático,video,12 min,3,false,Conoce cómo funcionan los robots acuáticos
+l47,segundo-egb,mod-2egb-2,Módulo 2: Navegación Acuática,Construyendo el Barco,project,40 min,4,true,Construye tu robot de navegación acuática
+l48,tercero-egb,mod-3egb-1,Módulo 1: Robots Escaladores,Robot Escalador,video,15 min,1,false,Introducción a los mecanismos de escalada
+l49,tercero-egb,mod-3egb-1,Módulo 1: Robots Escaladores,Ensamblaje Escalador,activity,35 min,2,false,Ensambla tu robot escalador
+l50,tercero-egb,mod-3egb-2,Módulo 2: Energía Eólica,Robot Eólico,video,12 min,3,false,Aprende sobre energía eólica y robots
+l51,tercero-egb,mod-3egb-2,Módulo 2: Energía Eólica,Construyendo Eólico,project,40 min,4,true,Construye tu robot eólico
+l52,cuarto-egb,mod-4egb-1,Módulo 1: Electrónica Básica,Rueda de la Fortuna,video,15 min,1,false,Introducción a circuitos con la rueda de la fortuna
+l53,cuarto-egb,mod-4egb-1,Módulo 1: Electrónica Básica,Ensamblaje Rueda,activity,30 min,2,false,Ensambla tu rueda de la fortuna electrónica
+l54,cuarto-egb,mod-4egb-2,Módulo 2: Radio FM,Introducción a Radio FM,video,12 min,3,false,Cómo funciona una radio FM
+l55,cuarto-egb,mod-4egb-2,Módulo 2: Radio FM,Construyendo Radio,project,35 min,4,true,Construye tu radio FM 76-108MHz
+l56,quinto-egb,mod-5egb-1,Módulo 1: Radio Avanzada,Radio RF-FM,video,15 min,1,false,Diferencias entre RF y FM
+l57,quinto-egb,mod-5egb-1,Módulo 1: Radio Avanzada,Ensamblaje Radio RF,activity,35 min,2,true,Ensambla tu radio RF-FM
+l58,sexto-egb,mod-6egb-1,Módulo 1: Robot 4 en 1,Introducción Robot 4 en 1,video,15 min,1,false,Conoce las 4 configuraciones del robot
+l59,sexto-egb,mod-6egb-1,Módulo 1: Robot 4 en 1,Configuración 1,activity,30 min,2,false,Primera configuración del robot
+l60,sexto-egb,mod-6egb-2,Módulo 2: Circuitos Electrónicos,Generador Aleatorio,video,12 min,3,false,Circuito generador aleatorio con micrófono
+l61,sexto-egb,mod-6egb-2,Módulo 2: Circuitos Electrónicos,Ensamblaje Circuito,project,35 min,4,true,Construye el circuito generador
+l62,septimo-egb,mod-7egb-1,Módulo 1: Proyectos Avanzados,Robot 4 en 1 Avanzado,video,15 min,1,false,Configuraciones avanzadas del robot
+l63,septimo-egb,mod-7egb-1,Módulo 1: Proyectos Avanzados,Avión DIY,project,40 min,2,true,Construye tu avión DIY
+l64,octavo-egb,mod-8egb-1,Módulo 1: ESP32 Básico,Introducción a ESP32,video,20 min,1,false,Conoce el microcontrolador ESP32
+l65,octavo-egb,mod-8egb-1,Módulo 1: ESP32 Básico,Configuración ESP32,tutorial,30 min,2,false,Configura tu entorno de desarrollo
+l66,octavo-egb,mod-8egb-2,Módulo 2: Carro Bluetooth,Carro Bluetooth WiFi,video,15 min,3,false,Introducción al carro controlado por Bluetooth
+l67,octavo-egb,mod-8egb-2,Módulo 2: Carro Bluetooth,Programación Carro,activity,45 min,4,false,Programa tu carro Bluetooth
+l68,octavo-egb,mod-8egb-2,Módulo 2: Carro Bluetooth,Proyecto Final Carro,project,60 min,5,true,Completa tu carro Bluetooth WiFi
+l69,noveno-egb,mod-9egb-1,Módulo 1: Sensores Infrarrojos,Introducción Sensores IR,video,15 min,1,false,Cómo funcionan los sensores infrarrojos
+l70,noveno-egb,mod-9egb-1,Módulo 1: Sensores Infrarrojos,Seguidor de Línea,activity,40 min,2,false,Programa tu seguidor de línea
+l71,noveno-egb,mod-9egb-1,Módulo 1: Sensores Infrarrojos,Proyecto Seguidor,project,50 min,3,true,Completa el seguidor de línea con 2 sensores
+l72,decimo-egb,mod-10egb-1,Módulo 1: Sensores Ultrasónicos,Introducción Ultrasonido,video,15 min,1,false,Cómo funcionan los sensores ultrasónicos
+l73,decimo-egb,mod-10egb-1,Módulo 1: Sensores Ultrasónicos,Robot Evita Obstáculos,activity,45 min,2,false,Programa tu robot evita obstáculos
+l74,decimo-egb,mod-10egb-1,Módulo 1: Sensores Ultrasónicos,Proyecto Final,project,55 min,3,true,Completa el robot evita obstáculos
+l75,primero-bach,mod-1bach-1,Módulo 1: Arduino Avanzado,Introducción Robot Otto,video,20 min,1,false,Conoce el robot Otto y sus capacidades
+l76,primero-bach,mod-1bach-1,Módulo 1: Arduino Avanzado,Ensamblaje Otto,activity,45 min,2,false,Ensambla tu robot Otto
+l77,primero-bach,mod-1bach-1,Módulo 1: Arduino Avanzado,Programación Otto,tutorial,40 min,3,false,Programa movimientos básicos de Otto
+l78,primero-bach,mod-1bach-1,Módulo 1: Arduino Avanzado,Proyecto Otto,project,60 min,4,true,Proyecto final con robot Otto
+l79,segundo-bach,mod-2bach-1,Módulo 1: Robótica Competitiva,Robot Soccer,video,20 min,1,false,Introducción a robots de competencia
+l80,segundo-bach,mod-2bach-1,Módulo 1: Robótica Competitiva,Ensamblaje Soccer,activity,50 min,2,false,Ensambla tu robot soccer
+l81,segundo-bach,mod-2bach-2,Módulo 2: Mini Sumo,Robot Mini Sumo,video,15 min,3,false,Estrategias para mini sumo
+l82,segundo-bach,mod-2bach-2,Módulo 2: Mini Sumo,Programación Sumo,activity,45 min,4,false,Programa tu robot mini sumo
+l83,segundo-bach,mod-2bach-2,Módulo 2: Mini Sumo,Proyecto Competencia,project,60 min,5,true,Prepara tu robot para competir
+l84,tercero-bach,mod-3bach-1,Módulo 1: IoT Básico,Introducción a IoT,video,20 min,1,false,¿Qué es el Internet de las Cosas?
+l85,tercero-bach,mod-3bach-1,Módulo 1: IoT Básico,Sensores IoT,activity,35 min,2,false,Conecta sensores de temperatura luz y humedad
+l86,tercero-bach,mod-3bach-2,Módulo 2: Domótica,Casa Inteligente,video,15 min,3,false,Introducción a la domótica
+l87,tercero-bach,mod-3bach-2,Módulo 2: Domótica,Proyecto Domótica,project,60 min,4,true,Crea tu sistema de domótica con ESP32

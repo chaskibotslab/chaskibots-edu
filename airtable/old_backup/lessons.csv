@@ -1,0 +1,172 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked
+inicial-1,Módulo 1: Bienvenida al Mundo Tech,¡Hola! Bienvenidos al curso,video,5 min,1,,Introducción al mundo de la tecnología para los más pequeños,false
+inicial-1,Módulo 1: Bienvenida al Mundo Tech,¿Qué es un robot?,video,8 min,2,,Conociendo qué son los robots y dónde los encontramos,false
+inicial-1,Módulo 1: Bienvenida al Mundo Tech,Robots en nuestra vida,activity,15 min,3,,Actividad: Identificar robots en casa y la escuela,false
+inicial-1,Módulo 1: Bienvenida al Mundo Tech,Colores de la tecnología,activity,10 min,4,,Aprendemos los colores de los LEDs y componentes,true
+inicial-1,Módulo 2: Conociendo Mi Kit,Mi caja de herramientas,video,10 min,5,,Exploramos los componentes del kit inicial,false
+inicial-1,Módulo 2: Conociendo Mi Kit,LEDs mágicos,activity,15 min,6,,Encendemos nuestro primer LED,false
+inicial-1,Módulo 2: Conociendo Mi Kit,Circuito con stickers,project,20 min,7,,Proyecto: Crear un circuito decorativo con stickers conductores,true
+inicial-2,Semana 1-2: Electricidad Básica,¿Qué necesita electricidad?,video,15 min,1,,Clasificar objetos que usan electricidad. Experimento con linterna (quitar/poner pilas). Circuito abierto vs cerrado.,false
+inicial-2,Semana 1-2: Electricidad Básica,Primer Circuito con LED,activity,25 min,2,,Pegar cinta de cobre en plantilla. Colocar pila CR2032 y LED 3mm. ¡Enciende! Aprender polaridad (+ y -).,false
+inicial-2,Semana 3-4: Circuitos Creativos,Circuito en Paralelo,activity,30 min,3,,Crear circuito con 2 LEDs. Camino se divide en Y. Si un LED falla el otro funciona (redundancia).,false
+inicial-2,Semana 3-4: Circuitos Creativos,Proyecto Arte Eléctrico,project,35 min,4,,Decorar circuito con dibujos. Agregar más LEDs de colores. Galería de arte eléctrico.,false
+inicial-2,Semana 5-6: Generador Eólico,Energía Renovable,video,15 min,5,,¿De dónde viene electricidad? Energía renovable vs no renovable. Ensamblar generador eólico.,false
+inicial-2,Semana 5-6: Generador Eólico,Experimentos con Viento,activity,25 min,6,,Soplar→LED enciende. Viento suave vs fuerte. LED más/menos brillante. Decorar hélice. Energía limpia.,false
+inicial-2,Semana 7-8: Introducción Robots,¿Qué es un Robot?,video,20 min,7,,Videos de robots (aspiradora brazo carro). Robot = máquina que hace tareas sola. Dibujar robot imaginario.,false
+inicial-2,Semana 7-8: Introducción Robots,Feria de Robótica,project,30 min,8,,Presentar proyectos a padres. Explicar cómo funcionan. Certificado Pequeño Ingeniero.,true
+primero-egb,Semana 1-4: Robot Pintor,Base y Ruedas,activity,30 min,1,,Ensamblar base acrílica. Instalar 2 ruedas traseras con tornillos. Porta-marcador como tercera pata.,false
+primero-egb,Semana 1-4: Robot Pintor,Motor y Leva Excéntrica,activity,35 min,2,,Fijar motor en centro. Instalar leva descentrada en eje. Girar a mano→vibración. Concepto: peso desequilibrado.,false
+primero-egb,Semana 1-4: Robot Pintor,Soldadura Supervisada 1:1,tutorial,40 min,3,,Soldadura con cautín supervisión 1:1. Soldar: portapilas→interruptor→motor. Verificar con multímetro. ¡Motor gira!,false
+primero-egb,Semana 1-4: Robot Pintor,Pruebas y Competencia,project,35 min,4,,Colocar marcador. Robot dibuja patrones al vibrar. Diferentes superficies. Competencia: patrón más creativo.,false
+primero-egb,Semana 5-8: Carro Jet,Concepto de Propulsión,video,20 min,5,,Acción-reacción. Ensamblar chasis. Instalar 4 ruedas. Concepto: empuje hacia atrás = avance.,false
+primero-egb,Semana 5-8: Carro Jet,Motor y Hélice,activity,35 min,6,,Fijar motor en parte trasera. Instalar hélice bien ajustada. Girar→genera viento. ⚠️No tocar hélice en movimiento.,false
+primero-egb,Semana 5-8: Carro Jet,Circuito Eléctrico Jet,tutorial,40 min,7,,Soldadura del circuito mismo proceso. Motor gira→hélice empuja aire. Verificar funcionamiento.,false
+primero-egb,Semana 5-8: Carro Jet,Carreras y Conceptos IA,activity,30 min,8,,Pista de 3 metros. Competencia velocidad. ¿Puede evitar chocar? No necesita sensores. Intro IA.,false
+primero-egb,Semana 9-12: Robot Perro,Biomimética,video,20 min,9,,Bio(vida)+Mímesis(imitar). Cómo caminan perros. Ensamblar cuerpo + 4 patas articuladas.,false
+primero-egb,Semana 9-12: Robot Perro,Mecanismo de Caminata,activity,40 min,10,,Motor central con 4 levas desfasadas 90°. Conectar a patas. Girar a mano→patas se mueven alternadas.,false
+primero-egb,Semana 9-12: Robot Perro,Circuito y Decoración,tutorial,35 min,11,,Soldar circuito. Decorar: ojos cola de cartulina nariz. Pruebas de caminata.,false
+primero-egb,Semana 9-12: Robot Perro,Exposición Final 3 Robots,project,45 min,12,,Presentar 3 robots a padres. Explicar funcionamiento. Demostración. Certificados.,true
+segundo-egb,Semana 1-4: Pez Robótico,Movimiento Ondulatorio,video,20 min,1,,Cómo nadan peces (cola se mueve lado a lado). Ensamblar cuerpo del pez. Cola articulada.,false
+segundo-egb,Semana 1-4: Pez Robótico,Motor y Mecanismo,activity,35 min,2,,Motor genera oscilación. Barra conecta motor a cola. Probar movimiento en seco (sin agua).,false
+segundo-egb,Semana 1-4: Pez Robótico,Impermeabilización,tutorial,40 min,3,,⚠️Agua+electricidad=peligro. Sellar compartimento motor con silicona. Soldar circuito supervisión 1:2.,false
+segundo-egb,Semana 1-4: Pez Robótico,Pruebas en Agua,project,35 min,4,,Piscina inflable pequeña. ¿Flota? ¿Se mueve? Ajustar peso con plastilina. Competencia de natación.,false
+segundo-egb,Semana 5-8: Lámpara Moderna,Diseño y Planificación,video,20 min,5,,Tipos de lámparas. Boceto personal. Ensamblar estructura base de lámpara.,false
+segundo-egb,Semana 5-8: Lámpara Moderna,Circuito 5 LEDs Paralelo,activity,40 min,6,,5 LEDs en paralelo diferentes colores. Calcular resistencias necesarias. Diseño del circuito.,false
+segundo-egb,Semana 5-8: Lámpara Moderna,Soldadura Compleja,tutorial,45 min,7,,Supervisión 1:2. Soldar 5 LEDs + resistencias. Verificar cada LED individualmente.,false
+segundo-egb,Semana 5-8: Lámpara Moderna,Decoración y Exposición,project,35 min,8,,Pantalla decorativa (papel translúcido tela). Pintar base. Galería de lámparas.,false
+segundo-egb,Semana 9-12: Carro RC,Control Remoto Conceptos,video,20 min,9,,¿Cómo funcionan controles remotos? (ondas radio). Ensamblar chasis RC. 2 motores: dirección + tracción.,false
+segundo-egb,Semana 9-12: Carro RC,Sistema de Dirección,activity,40 min,10,,Servomotor para volante. Calibrar ángulos (izq centro der). Probar giros manualmente.,false
+segundo-egb,Semana 9-12: Carro RC,Circuito RC Completo,tutorial,45 min,11,,Receptor RF + controlador. Soldar conexiones. Emparejar control remoto con receptor.,false
+segundo-egb,Semana 9-12: Carro RC,Carreras y Competencias,project,40 min,12,,Pista con curvas. Control a distancia. Slalom. Concepto: navegación manual vs autónoma.,true
+tercero-egb,Semana 1-4: Carrusel Giratorio,Mecanismos Rotacionales,video,20 min,1,,Cómo funcionan carruseles. Base giratoria central. Ensamblar plataforma circular grande.,false
+tercero-egb,Semana 1-4: Carrusel Giratorio,Transmisión Vertical,activity,40 min,2,,Motor horizontal→eje vertical. Engranajes cónicos 90°. Instalar 6-8 asientos colgantes.,false
+tercero-egb,Semana 1-4: Carrusel Giratorio,Iluminación Decorativa,tutorial,35 min,3,,LEDs en borde giratorio. Contactos rotatorios (escobillas cobre). Circuito con switch. Soldadura.,false
+tercero-egb,Semana 1-4: Carrusel Giratorio,Decoración y Música,project,40 min,4,,Pintar carrusel colores vivos. Buzzer con melodía simple. Presentación con luces y música.,false
+tercero-egb,Semana 5-8: Planeador Motorizado,Aerodinámica Básica,video,20 min,5,,Por qué vuelan aviones (sustentación). Ensamblar alas de balsa/foam. Probar planeando sin motor.,false
+tercero-egb,Semana 5-8: Planeador Motorizado,Motor de Propulsión,activity,40 min,6,,Hélice frontal. Balance centro de gravedad. Instalar motor en nariz. Agregar peso si necesario.,false
+tercero-egb,Semana 5-8: Planeador Motorizado,Circuito de Vuelo,tutorial,35 min,7,,Batería ligera LiPo 3.7V con supervisión. Interruptor de seguridad. Soldar circuito compacto.,false
+tercero-egb,Semana 5-8: Planeador Motorizado,Vuelos de Prueba,project,45 min,8,,⚠️Solo exterior área despejada. Lanzar y observar trayectoria. Ajustar timón/alerones. Competencia distancia.,false
+tercero-egb,Semana 9-12: Carro Eólico,Energía del Viento,video,20 min,9,,Molinos históricos. Ensamblar chasis. Diseñar aspas grandes (cartón o plástico).,false
+tercero-egb,Semana 9-12: Carro Eólico,Transmisión Eólica,activity,40 min,10,,Viento→aspas→eje→ruedas. Sistema de engranajes aumentar velocidad. Probar con ventilador.,false
+tercero-egb,Semana 9-12: Carro Eólico,Optimización,activity,35 min,11,,Diferentes tamaños aspas. Diferentes ángulos. Medir: ¿cuál más eficiente? Registrar resultados.,false
+tercero-egb,Semana 9-12: Carro Eólico,Carreras Eólicas,project,45 min,12,,Pista con 3 ventiladores. ¿Qué carro llega más lejos? Concepto: energía renovable en transporte.,true
+cuarto-egb,Semana 1-2: Kit Extra,Práctica 1-2: LED Básico y Pulsador,activity,40 min,1,,LED con resistencia 220Ω. Polaridad (pata larga +). Pulsador cierra/abre circuito. Concepto: interruptor y limitación de corriente.,false
+cuarto-egb,Semana 1-2: Kit Extra,Práctica 3-4: Potenciómetro y Buzzer,activity,45 min,2,,Potenciómetro controla brillo LED (divisor voltaje). Buzzer con transistor 2N2222A. Diferentes frecuencias = tonos diferentes.,false
+cuarto-egb,Semana 1-2: Kit Extra,Práctica 5-6: Transistor y Alarma,activity,50 min,3,,Transistor como switch electrónico (Base Colector Emisor). Proyecto integrado: pulsador activa buzzer + LED parpadeante.,false
+cuarto-egb,Semana 3-5: Avión Motorizado,Construcción Avanzada del Avión,project,60 min,4,,Alas de balsa reforzadas. Motor brushless potente. Balance preciso del centro de gravedad. Mejora respecto a 3º EGB.,false
+cuarto-egb,Semana 3-5: Avión Motorizado,Electrónica de Navegación,activity,45 min,5,,LEDs de navegación del Kit Extra: verde ala derecha rojo ala izquierda. Buzzer de despegue. Circuito con switch.,false
+cuarto-egb,Semana 3-5: Avión Motorizado,Vuelo Nocturno y Competencia,activity,50 min,6,,LEDs de colores efecto visual. Vuelos al atardecer. Competencia: distancia + estabilidad. Seguridad en vuelo.,false
+cuarto-egb,Semana 6-9: Rueda de la Fortuna,Mecánica de Estructura,project,60 min,7,,Rueda 40cm diámetro. Motor con reducción 1:100. Base estable cartón/MDF. 8 góndolas colgantes balanceadas.,false
+cuarto-egb,Semana 6-9: Rueda de la Fortuna,Sistema de Rotación e Iluminación,activity,55 min,8,,Transmisión de engranajes. Motor lento con torque. 8 LEDs en paralelo. Secuencias: todas juntas alternadas persecución.,false
+cuarto-egb,Semana 6-9: Rueda de la Fortuna,Música y Presentación,activity,45 min,9,,Buzzer con melodía simple. Sincronizar luces con música. Feria de atracciones miniatura completa.,false
+cuarto-egb,Semana 10-12: Radio FM,Ensamblaje de Radio,project,60 min,10,,Kit radio FM 76-108MHz. Identificar componentes en PCB. Soldar componentes pequeños (práctica soldadura fina).,false
+cuarto-egb,Semana 10-12: Radio FM,Sintonización y Antena,activity,45 min,11,,Capacitor variable para sintonizar. Antena telescópica o cable 75cm. Buscar emisoras locales. Ajustar volumen.,false
+cuarto-egb,Semana 10-12: Radio FM,Conceptos de Ondas y Física,video,30 min,12,,¿Cómo viaja el sonido por ondas? Modulación FM vs AM. Frecuencias y espectro electromagnético. Historia de la radio.,true
+quinto-egb,Semana 1-2: Kit Extra Repaso,Kit Extra Rápido e Independiente,activity,45 min,1,,Mismas 6 prácticas que 4º pero más rápido. Mayor independencia. Énfasis en aplicaciones prácticas y creatividad.,false
+quinto-egb,Semana 1-2: Kit Extra Repaso,Circuitos Complejos en Protoboard,activity,50 min,2,,Usar protoboard con más componentes simultáneos. Proyectos personalizados. Introducción a circuitos más complejos.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Diseño y Planificación,video,30 min,3,,Rueda 50cm diámetro. 12 góndolas. Diseño personalizado (tema: feria espacio fantasía). Planificación completa.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Construcción Mecánica Reforzada,project,70 min,4,,Estructura reforzada. Motor con control velocidad variable. Base giratoria con rodamientos. Balance perfecto.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Sistema Iluminación Complejo,activity,60 min,5,,12 LEDs + 1 LED RGB central. Secuencias con temporizador 555. Efectos: persecución fade arcoíris.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Control de Velocidad,activity,45 min,6,,Potenciómetro del Kit Extra controla velocidad motor. Lento para subir pasajeros rápido para emoción.,false
+quinto-egb,Semana 3-8: Rueda Fortuna Avanzada,Sonidos Efectos y Presentación,activity,50 min,7,,Buzzer con diferentes tonos. Sensor proximidad opcional. Competencia: diseño más creativo mejor iluminación.,false
+quinto-egb,Semana 9-12: Radio RF-FM,Ensamblaje Completo Radio Avanzada,project,70 min,8,,Kit radio más avanzado. Más componentes mayor sensibilidad. Soldar 40+ piezas con precisión.,false
+quinto-egb,Semana 9-12: Radio RF-FM,Calibración Precisa,activity,50 min,9,,Ajuste fino de frecuencias. Capacitor variable. Bobina para mejorar recepción. Filtros de ruido.,false
+quinto-egb,Semana 9-12: Radio RF-FM,Amplificador de Audio,activity,55 min,10,,Agregar etapa amplificadora. Altavoz de mejor calidad. Control de volumen y tono (graves/agudos).,false
+quinto-egb,Semana 9-12: Radio RF-FM,Teoría de Comunicaciones,video,35 min,11,,Modulación AM vs FM. Ancho de banda. Propagación de ondas. Aplicaciones: WiFi Bluetooth radio.,false
+quinto-egb,Semana 9-12: Radio RF-FM,Competencia Final Radio,project,45 min,12,,Demostración de radio funcionando. Sintonizar emisoras. Calidad de audio. Presentación técnica.,true
+sexto-egb,Semana 1-2: Kit Extra Aplicado,Mini-Proyectos con Kit Extra,activity,50 min,1,,Semáforo automático con LEDs. Sistema seguridad con buzzer. Indicador nivel batería. Control remoto IR simple.,false
+sexto-egb,Semana 1-2: Kit Extra Aplicado,Aplicaciones Prácticas Reales,activity,45 min,2,,Usar componentes del Kit para proyectos personales pequeños. Creatividad y aplicación de conocimientos.,false
+sexto-egb,Semana 3-6: Carro Solar,Energía Fotovoltaica,video,30 min,3,,¿Cómo funcionan celdas solares? Luz→electricidad. Panel solar 6V/100mA. Medir voltaje con multímetro.,false
+sexto-egb,Semana 3-6: Carro Solar,Construcción del Chasis,project,60 min,4,,Chasis ligero plástico/cartón. Panel solar en techo. 2 motores pequeños bajo consumo. 4 ruedas eficientes.,false
+sexto-egb,Semana 3-6: Carro Solar,Sistema de Almacenamiento,activity,50 min,5,,Batería recargable NiMH. Circuito de carga solar. Diodo evita descarga inversa. Pruebas de carga.,false
+sexto-egb,Semana 3-6: Carro Solar,Pruebas y Competencia Solar,activity,45 min,6,,Pruebas exterior sol directo. Interior con lámpara. Competencia: ¿cuánto tiempo funciona después de 1h carga?,false
+sexto-egb,Semana 7-12: Robot 4 en 1,Construcción Base del Robot,project,60 min,7,,Chasis robusto. 2 motores con driver L293D. Espacio para 4 sistemas sensores. Portapilas central.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,MODO 1 - Control por Voz/Aplauso,activity,50 min,8,,Micrófono electret detecta sonido. Circuito amplificador. 1 palmada=avanza 2=gira 3=detiene.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,MODO 2 - Control Infrarrojo,activity,50 min,9,,Receptor IR y control remoto. Comandos: adelante atrás izquierda derecha stop. Programar respuestas.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,MODO 3 - Seguidor de Línea,activity,55 min,10,,2 sensores IR parte inferior. Detectan línea negra sobre blanco. Lógica: si sensor pierde línea→gira.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,MODO 4 - Evita Obstáculos Táctil,activity,50 min,11,,2 bumpers (switches) adelante. Toca obstáculo→retrocede→gira 90°→continúa. Navegación por contacto.,false
+sexto-egb,Semana 7-12: Robot 4 en 1,Competencias y Comparación,project,60 min,12,,Carrera con cada modo. ¿Cuál más preciso? ¿Más rápido? ¿Más autónomo? Sensores = sentidos del robot.,true
+septimo-egb,Semana 1: Kit Extra,Kit Extra Rápido Experto,activity,40 min,1,,Las 6 prácticas en una semana. Ya dominan componentes. Mayor velocidad y autonomía total.,false
+septimo-egb,Semana 2: Programación Visual,Scratch/Blockly Introducción,tutorial,50 min,2,,Programación sin código. Bloques tipo puzzle. Conceptos: secuencias bucles (repeat) condicionales (if).,false
+septimo-egb,Semana 2: Programación Visual,Programas en Scratch,activity,55 min,3,,Programa 1: Secuencia simple. Programa 2: Bucle repeat 10. Programa 3: Condicional si toca borde rebotar. Programa 4: Variables contador.,false
+septimo-egb,Semana 3-6: Carro Robot Avanzado,Planificación Multi-Sensor,video,30 min,4,,Robot con 3 sensores: ultrasónico (adelante) IR (abajo línea) bumpers (laterales). Todo integrado.,false
+septimo-egb,Semana 3-6: Carro Robot Avanzado,Construcción e Integración,project,70 min,5,,Chasis grande para sensores. Driver L298N. Conexiones organizadas. Cable management profesional.,false
+septimo-egb,Semana 3-6: Carro Robot Avanzado,Lógica de Comportamiento,tutorial,45 min,6,,Escribir pseudocódigo en papel: SI obstáculo a 20cm ENTONCES detener y girar. Lógica completa.,false
+septimo-egb,Semana 3-6: Carro Robot Avanzado,Pruebas y Ajustes,activity,50 min,7,,Probar cada sensor individualmente. Luego combinados. Pista con línea + obstáculos. Ajustar tiempos.,false
+septimo-egb,Semana 7-10: Robot 4en1 Mejorado,Construcción Versión Mejorada,project,60 min,8,,Mismos 4 modos que 6º pero mejorados. Sensores más sensibles. Mejor control motores. Más robusto.,false
+septimo-egb,Semana 7-10: Robot 4en1 Mejorado,Personalización con Bloques,activity,50 min,9,,Usar bloques simulador para diseñar comportamiento. Ajustar sensibilidad. Velocidades variables.,false
+septimo-egb,Semana 7-10: Robot 4en1 Mejorado,Secuencias Complejas,activity,55 min,10,,Programar: avanza→detecta línea→sigue 1m→busca obstáculo→empuja. Combinar múltiples modos.,false
+septimo-egb,Semana 11-12: Preparación 8º EGB,Introducción a Microcontroladores,video,35 min,11,,¿Qué es microcontrolador? Arduino vs ESP32. Pines digitales vs analógicos. Diferencia robot mecánico vs programable.,false
+septimo-egb,Semana 11-12: Preparación 8º EGB,Primer Contacto con Código,tutorial,45 min,12,,Ver código Arduino IDE sin programar. Estructura: setup() loop(). Leer código LED parpadeante. Comparar con Scratch.,true
+octavo-egb,Semana 1-2: Kit Extra y Arduino IDE,Kit Extra Completo,activity,60 min,1,,Las 6 prácticas del Kit Extra en 5 días. Preparación para programación real con microcontroladores.,false
+octavo-egb,Semana 1-2: Kit Extra y Arduino IDE,Setup Arduino IDE,tutorial,45 min,2,,Instalar Arduino IDE. Configurar placa ESP32. Drivers USB. Primer programa Blink. Conceptos: pinMode digitalWrite delay.,false
+octavo-egb,Semana 3-4: LEDs y Semáforo,LEDs de la PCB RC DRAGON,tutorial,30 min,3,,Identificar LEDs D1 D6 en PCB. Encenderlos con código. Parpadeo alternado. Concepto OUTPUT digital.,false
+octavo-egb,Semana 3-4: LEDs y Semáforo,Semáforo con LEDs,activity,40 min,4,,Secuencias Verde→Amarillo→Rojo. Delays diferentes. Funciones personalizadas para cada estado.,false
+octavo-egb,Semana 5-6: Control de Motores,Control de UN Motor,tutorial,45 min,5,,⚡PRÁCTICA CRÍTICA: Control motores TB6612FNG. Pines AIN1=14 AIN2=12 PWMA=27. ledcWrite() en ESP32. Configurar canales PWM.,false
+octavo-egb,Semana 5-6: Control de Motores,Control de DOS Motores,activity,50 min,6,,Motor B: BIN1=26 BIN2=25 PWMB=33 STBY=5. Coordinar ambos. Funciones adelante() atras() girarIzquierda() girarDerecha().,false
+octavo-egb,Semana 7-8: Bluetooth,Bluetooth Serial,tutorial,40 min,7,,Librería BluetoothSerial. Recibir datos de smartphone. Comandos: F=adelante B=atrás L=izquierda R=derecha S=stop.,false
+octavo-egb,Semana 7-8: Bluetooth,Integración Bluetooth + Motores,activity,50 min,8,,Combinar todo: recibir comando→ejecutar movimiento. App Serial Bluetooth Terminal. Control velocidad variable 0-9.,false
+octavo-egb,Semana 9-10: Ensamblaje Carro,Ensamblaje del Chasis,project,60 min,9,,Montar motores en chasis 3D. Instalar ruedas 65mm. Colocar PCB. Organizar cables. Portapilas 3xAA en parte trasera.,false
+octavo-egb,Semana 9-10: Ensamblaje Carro,Código Completo y Pruebas,tutorial,50 min,10,,Cargar código final. Probar todos los movimientos. Ajustar velocidades. Agregar bocina buzzer y LEDs direccionales.,false
+octavo-egb,Semana 11-12: Competencias,Optimización y Debugging,activity,45 min,11,,Solucionar problemas: ruedas desbalanceadas motor no responde. Verificar conexiones. Mejorar respuesta.,false
+octavo-egb,Semana 11-12: Competencias,Competencia Carro Bluetooth,project,90 min,12,,Carrera de obstáculos. Slalom. Estacionamiento en reversa. Presentación del proyecto final.,true
+noveno-egb,Semana 1-2: Kit Extra y Repaso,Kit Extra Rápido,activity,45 min,1,,Repaso Kit Extra en 1 semana. Énfasis en sensores y lectura de valores digitales.,false
+noveno-egb,Semana 1-2: Kit Extra y Repaso,Repaso Programación ESP32,tutorial,40 min,2,,Revisar conceptos de 8º: pinMode digitalRead digitalWrite. Preparación para sensores IR.,false
+noveno-egb,Semana 3-4: Sensores IR,Leer UN Sensor IR,tutorial,35 min,3,,Conectar sensor IR TCRT5000 a GPIO18. digitalRead(18). Sensor sobre línea negra=0 sobre blanco=1. LED indicador.,false
+noveno-egb,Semana 3-4: Sensores IR,Leer DOS Sensores,activity,40 min,4,,Sensor izq GPIO18 sensor der GPIO19. Leer ambos en loop. Mostrar valores en Serial Monitor.,false
+noveno-egb,Semana 5-6: Lógica Seguidor,Lógica if-else Seguimiento,tutorial,45 min,5,,Pseudocódigo: SI ambos en línea(0 0)→Adelante. SI izq fuera(1 0)→Gira derecha. SI der fuera(0 1)→Gira izquierda.,false
+noveno-egb,Semana 5-6: Lógica Seguidor,Implementar Lógica en Código,activity,50 min,6,,int izq=digitalRead(18); int der=digitalRead(19); if(izq==0 && der==0) adelante(); else if... Integrar con motores L298N.,false
+noveno-egb,Semana 7-8: Integración,Control Motores según Sensores,activity,55 min,7,,Conectar motores al L298N. Integrar lógica de sensores con movimiento. Pruebas básicas de seguimiento.,false
+noveno-egb,Semana 7-8: Integración,Ensamblaje Robot Seguidor,project,60 min,8,,Montar sensores en parte delantera (3cm separación). Motores en chasis. ESP32 Super Mini en centro.,false
+noveno-egb,Semana 9-10: Calibración,Calibración de Sensores,tutorial,40 min,9,,Ajustar altura sensores (5mm sobre piso). Probar diferentes superficies. Línea negra 2cm ancho sobre blanco.,false
+noveno-egb,Semana 9-10: Calibración,Pruebas y Ajustes,activity,50 min,10,,Pista con curvas. Velocidad muy alta→se sale. Muy baja→lento. Encontrar balance óptimo.,false
+noveno-egb,Semana 11-12: Competencias,Optimización Final,activity,45 min,11,,Mejorar respuesta en curvas cerradas. Ajustar velocidades por sensor. Código más eficiente.,false
+noveno-egb,Semana 11-12: Competencias,Carrera Seguidor de Línea,project,90 min,12,,Competencia en pista con curvas cerradas. El más rápido sin salirse gana. Presentación proyecto.,true
+decimo-egb,Semana 1-2: Kit Extra,Kit Extra Avanzado,activity,45 min,1,,Repaso rápido Kit Extra. Énfasis en sensores y toma de decisiones autónomas.,false
+decimo-egb,Semana 1-2: Kit Extra,Preparación PCB RC DRAGON,tutorial,40 min,2,,Verificar soldadura regulador 7805. Conexiones sensor ultrasónico: TRIGGER→GPIO13 ECHO→GPIO15.,false
+decimo-egb,Semana 3-4: Sensor Ultrasónico,Funcionamiento HC-SR04,video,25 min,3,,Principio: envía pulso ultrasónico mide tiempo retorno. Distancia=(duración×0.034)/2 cm.,false
+decimo-egb,Semana 3-4: Sensor Ultrasónico,Medir Distancia con Código,tutorial,45 min,4,,digitalWrite(TRIGGER HIGH); delayMicroseconds(10); long duracion=pulseIn(ECHO HIGH); int distancia=duracion*0.034/2;,false
+decimo-egb,Semana 5-6: Algoritmo Evasión,Lógica de Decisión,tutorial,40 min,5,,SI distancia>20cm→Adelante (camino libre). SI distancia<20cm→Detener retroceder girar.,false
+decimo-egb,Semana 5-6: Algoritmo Evasión,Implementar Algoritmo,activity,50 min,6,,if(distancia>20) adelante(); else { detener(); delay(300); atras(); delay(500); girarDerecha(); delay(600); },false
+decimo-egb,Semana 7-8: Integración PCB,Montar Sensor en Robot,activity,45 min,7,,Sensor ultrasónico en parte delantera. Cables organizados. Verificar alimentación 5V del regulador 7805.,false
+decimo-egb,Semana 7-8: Integración PCB,Pruebas con Obstáculos,activity,50 min,8,,Probar en pista con obstáculos. Ajustar distancia de detección. Verificar respuesta de motores.,false
+decimo-egb,Semana 9-10: Optimización,Ensamblaje Completo,project,60 min,9,,Robot terminado con sensor montado. Verificar todas las conexiones. Cargar código final.,false
+decimo-egb,Semana 9-10: Optimización,Optimización Algoritmo,tutorial,45 min,10,,¿Gira siempre derecha? Agregar random o alternar izq/der. Mejorar búsqueda de espacio libre.,false
+decimo-egb,Semana 11-12: Competencias,Pruebas de Campo,activity,50 min,11,,Pista con múltiples obstáculos. ¿Evita todos? ¿Se queda atrapado en esquinas? Ajustar parámetros.,false
+decimo-egb,Semana 11-12: Competencias,Competencia Laberinto,project,90 min,12,,Laberinto simple. Robot debe salir sin tocar paredes. Tiempo + eficiencia. Presentación final.,true
+primero-bach,Semana 1-2: Kit Extra y Servos,Kit Extra Experto,activity,40 min,1,,Kit Extra en 1 semana. Ya son expertos. Práctica rápida y autónoma.,false
+primero-bach,Semana 1-2: Kit Extra y Servos,Introducción Servomotores,tutorial,45 min,2,,Diferencia DC motor vs servo. Control de ángulo preciso 0-180°. Librería Servo.h. servo.attach(9); servo.write(90);,false
+primero-bach,Semana 3-4: Construcción Otto,Ensamblaje del Cuerpo,project,60 min,3,,Imprimir partes 3D: cabeza cuerpo piernas pies. Ensamblar estructura. Instalar 4 servos (2 caderas 2 tobillos).,false
+primero-bach,Semana 3-4: Construcción Otto,Conexión Electrónica,tutorial,50 min,4,,Arduino Nano en centro. Servos: cadera izq→pin2 cadera der→pin3 tobillo izq→pin4 tobillo der→pin5. Sensor ultrasónico en cabeza.,false
+primero-bach,Semana 5-6: Calibración Otto,Calibración de Servos,tutorial,45 min,5,,Todos los servos a 90° (posición neutral). Ajustar tornillos para que Otto esté de pie recto. Funciones de calibración.,false
+primero-bach,Semana 5-6: Calibración Otto,Primer Movimiento - Caminar,activity,60 min,6,,Secuencia: 1.Levantar pie izq(tobillo 110°) 2.Inclinar cadera 3.Adelantar pie 4.Bajar pie. Repetir espejo pie derecho.,false
+primero-bach,Semana 7-8: Movimientos,Movimientos Adicionales,activity,50 min,7,,Bailar: mover caderas lado a lado. Saltar: ambos tobillos arriba/abajo. Inclinarse: doblar cadera adelante.,false
+primero-bach,Semana 7-8: Movimientos,Sensor Ultrasónico Otto,tutorial,45 min,8,,Detectar obstáculos. Si distancia<15cm→detener y retroceder. Evita chocar mientras camina.,false
+primero-bach,Semana 9-10: Comportamiento,Sonidos y Expresiones,activity,45 min,9,,Buzzer para sonidos: feliz triste asustado. LED RGB o matriz para ojos expresivos.,false
+primero-bach,Semana 9-10: Comportamiento,Comportamiento Autónomo,tutorial,50 min,10,,Combinar: Otto camina→detecta obstáculo→sonido asustado→retrocede→gira→continúa. Lógica completa.,false
+primero-bach,Semana 11-12: Competencias,Personalización Otto,activity,45 min,11,,Decorar Otto (pintura stickers). Crear coreografía única. Programar respuestas a diferentes distancias.,false
+primero-bach,Semana 11-12: Competencias,Competencias Otto,project,90 min,12,,Carrera caminata 10m. Evita obstáculos laberinto. Coreografía más creativa. Presentación final proyectos.,true
+segundo-bach,Semana 1-2: Kit Extra y Repaso,Kit Extra Rápido,video,20 min,1,,Práctica de componentes del Kit Extra. Preparación para sensores de borde. Dominio de componentes electrónicos básicos.,false
+segundo-bach,Semana 1-2: Kit Extra y Repaso,Repaso Control RC,tutorial,30 min,2,,Revisar código base de 8º EGB. Control de motores con PCB RC DRAGON V2. Funciones: adelante() atras() izquierda() derecha() detener(). Pines: AIN1=14 AIN2=12 PWMA=27 BIN1=26 BIN2=25 PWMB=33 STBY=5.,false
+segundo-bach,Semana 3-4: Sensores de Borde,Montar Sensores IR,activity,40 min,3,,Instalar 2 sensores IR TCRT5000 en bordes inferiores del robot. Sensor izquierdo→GPIO13 Sensor derecho→GPIO15. Código: int bordeIzq=digitalRead(13); Superficie negra=1 línea blanca=0.,false
+segundo-bach,Semana 3-4: Sensores de Borde,Función detectoBorde(),tutorial,35 min,4,,Crear función bool detectoBorde() que retorna true si cualquier sensor detecta línea blanca. Crear evitarBorde() que retrocede y gira. Pruebas en ring de práctica.,false
+segundo-bach,Semana 5-6: Modo Minisumo,Construcción Robot Minisumo,project,60 min,5,,Chasis bajo y ancho (máx 10x10cm). Centro de gravedad bajo. Peso adicional en parte delantera. Pala frontal de metal o plástico duro. Ruedas con máxima tracción.,false
+segundo-bach,Semana 5-6: Modo Minisumo,Estrategia buscarOponente(),tutorial,40 min,6,,Algoritmo de búsqueda circular: avanza 1 segundo→gira 45°→repite. Al detectar borde: evitarBorde() y continuar. Con sensor ultrasónico opcional: detecta oponente y embiste.,false
+segundo-bach,Semana 7-8: Modo Soccer,Construcción Robot Soccer,project,60 min,7,,Chasis más alto que minisumo. Mecanismo de pateo frontal (servo + brazo mecánico). Sensor IR frontal para detectar pelota infrarroja especial.,false
+segundo-bach,Semana 7-8: Modo Soccer,Algoritmo de Juego,tutorial,45 min,8,,if(detectaPelota()) { acercarseAPelota(); patear(); } else { buscarPelota(); } if(detectoBorde()) evitarBorde(); Coordinación de múltiples robots en equipo.,false
+segundo-bach,Semana 9-10: Estrategias Avanzadas,Estrategias de Ataque,video,25 min,9,,Estrategia agresiva: embiste al máximo. Defensiva: espera en centro contraataque. Mixta: alterna búsqueda y espera. Análisis de oponente: ¿rápido? ¿pesado?,false
+segundo-bach,Semana 9-10: Estrategias Avanzadas,Optimización de Código,tutorial,40 min,10,,Velocidad máxima en embiste. Giros rápidos (menos delay). Reducir código innecesario. Usar millis() para temporizadores no bloqueantes.,false
+segundo-bach,Semana 11-12: Competencias,Torneo Interno Minisumo,activity,90 min,11,,Ring circular 77cm diámetro estándar. Borde blanco 2cm. Eliminatorias mejor de 3 rounds. Gana quien saca al oponente del ring.,false
+segundo-bach,Semana 11-12: Competencias,Torneo Soccer Final,project,90 min,12,,Cancha 120x90cm. 2vs2 o 3vs3. Pelota infrarroja. Premiación: mejor estrategia robot más robusto código más eficiente.,true
+tercero-bach,Semana 1-2: Kit Extra y WiFi,Kit Extra Aplicado IoT,activity,40 min,1,,Mini-proyectos IoT: Sistema de alarma con buzzer+LED. Indicador de temperatura con LEDs (frío=azul caliente=rojo). Control LED con potenciómetro (dimmer).,false
+tercero-bach,Semana 1-2: Kit Extra y WiFi,Conectar ESP32 a WiFi,tutorial,35 min,2,,Librería WiFi.h. WiFi.begin(ssid password). Obtener IP: WiFi.localIP(). Crear servidor web simple. Acceder desde navegador en smartphone.,false
+tercero-bach,Semana 3-4: Servidor Web,Página Web de Control,tutorial,45 min,3,,Interfaz HTML embebida en ESP32. Botones ON/OFF para 4 relés. server.on('/relay1/on' []() { digitalWrite(25 HIGH); }); Acceso desde red local.,false
+tercero-bach,Semana 3-4: Servidor Web,Sensores en Tiempo Real,activity,40 min,4,,Temperatura DHT22 con librería DHT.h. Luminosidad LDR: analogRead(34). Actualización automática cada 5 segundos con JavaScript.,false
+tercero-bach,Semana 5-7: Telegram Bot,Crear Bot en Telegram,tutorial,30 min,5,,Hablar con @BotFather. Obtener token API. Librería UniversalTelegramBot.h. bot.sendMessage(chat_id 'Hola desde ESP32');,false
+tercero-bach,Semana 5-7: Telegram Bot,Comandos del Bot,tutorial,45 min,6,,Comandos: /temp /luz /lampara_on /lampara_off /ventilador_on /ventilador_off /status. Respuestas automáticas del ESP32.,false
+tercero-bach,Semana 5-7: Telegram Bot,Alertas Automáticas,activity,40 min,7,,if(temperatura>30) bot.sendMessage('⚠️ Temperatura alta'). if(luminosidad<20) bot.sendMessage('🌙 Está oscuro'). Notificaciones de movimiento.,false
+tercero-bach,Semana 8-10: Casa Inteligente,Diseño del Sistema,video,25 min,8,,Planificar casa miniatura: Sala (lámpara sensor luz) Cocina (ventilador sensor temp) Dormitorio (LED RGB alarma) Puerta (cerradura sensor). Maqueta en cartón o 3D.,false
+tercero-bach,Semana 8-10: Casa Inteligente,Construcción e Integración,project,90 min,9,,Cablear componentes en protoboard. Relés conectados a LEDs. Sensores en habitaciones. ESP32 como cerebro central de la casa.,false
+tercero-bach,Semana 8-10: Casa Inteligente,Automatizaciones,tutorial,50 min,10,,Auto1: Si oscurece→encender luces. Auto2: Si temp>28°C→ventilador. Auto3: Si sonido fuerte→luz+alerta. Modo Ausente: apagar todo excepto seguridad.,false
+tercero-bach,Semana 11-12: Presentación,Interfaz Mejorada,activity,45 min,11,,Dashboard con gráficas (Chart.js). App móvil opcional (MIT App Inventor o Blynk). Integración voz opcional (Google Assistant/Alexa).,false
+tercero-bach,Semana 11-12: Presentación,Exposición Final,project,60 min,12,,Presentar casa inteligente. Demostración en vivo: control remoto automatizaciones alertas. Explicar código y arquitectura. Defender decisiones de diseño.,true

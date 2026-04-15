@@ -352,8 +352,8 @@ export default function LessonViewerModern({
               <div className="p-6 max-w-3xl mx-auto">
                 {/* Contenido formateado */}
                 <div 
-                  className="prose prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: `<p class="text-gray-300 leading-relaxed mb-3">${parseMarkdown(lesson.content || '')}</p>` }}
+                  className="prose prose-invert max-w-none [&_img]:relative [&_img]:z-0 [&_img]:max-w-[200px] [&_img]:float-right [&_img]:ml-4 [&_img]:mb-4 [&_img]:rounded-xl [&_p]:relative [&_p]:z-10"
+                  dangerouslySetInnerHTML={{ __html: `<div class="text-gray-300 leading-relaxed space-y-3">${parseMarkdown(lesson.content || '')}</div>` }}
                 />
 
                 {/* Imágenes */}
@@ -390,13 +390,66 @@ export default function LessonViewerModern({
                     Aplica lo aprendido usando nuestros simuladores interactivos. 
                     Experimenta, equivócate y aprende haciendo.
                   </p>
-                  <button 
-                    onClick={onClose}
-                    className={`px-6 py-3 bg-gradient-to-r ${program.gradient} rounded-xl text-white font-medium hover:opacity-90 transition-opacity flex items-center gap-2`}
-                  >
-                    <Code className="w-5 h-5" />
-                    Ir a Simuladores
-                  </button>
+                  
+                  {/* Simuladores disponibles */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <a 
+                      href="https://scratch.mit.edu/projects/editor" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 bg-dark-800/50 rounded-xl hover:bg-dark-700/50 transition-colors"
+                    >
+                      <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                        <Code className="w-5 h-5 text-orange-400" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">Scratch</p>
+                        <p className="text-gray-500 text-xs">Bloques visuales</p>
+                      </div>
+                    </a>
+                    <a 
+                      href="https://wokwi.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 bg-dark-800/50 rounded-xl hover:bg-dark-700/50 transition-colors"
+                    >
+                      <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <Zap className="w-5 h-5 text-green-400" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">Wokwi</p>
+                        <p className="text-gray-500 text-xs">Circuitos ESP32</p>
+                      </div>
+                    </a>
+                    <a 
+                      href="https://www.tinkercad.com/circuits" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 bg-dark-800/50 rounded-xl hover:bg-dark-700/50 transition-colors"
+                    >
+                      <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <Lightbulb className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">Tinkercad</p>
+                        <p className="text-gray-500 text-xs">Circuitos Arduino</p>
+                      </div>
+                    </a>
+                    <a 
+                      href="https://trinket.io/python" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 bg-dark-800/50 rounded-xl hover:bg-dark-700/50 transition-colors"
+                    >
+                      <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                        <Code className="w-5 h-5 text-yellow-400" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">Trinket</p>
+                        <p className="text-gray-500 text-xs">Python online</p>
+                      </div>
+                    </a>
+                  </div>
                 </div>
 
                 {/* Tips */}

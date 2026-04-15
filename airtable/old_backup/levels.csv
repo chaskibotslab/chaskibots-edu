@@ -1,0 +1,18 @@
+id,name,fullName,category,ageRange,gradeNumber,kitPrice,hasHacking,hasAdvancedIA,color,neonColor,icon
+inicial-1,Inicial 1,Educación Inicial 1,inicial,3-4 años,-1,30,false,false,from-fuchsia-500 to-pink-600,#e879f9,🧒
+inicial-2,Inicial 2,Educación Inicial 2,inicial,4-5 años,0,35,false,false,from-pink-500 to-rose-600,#ff6b9d,🎒
+primero-egb,1° EGB,Primero de EGB - Preparatoria,preparatoria,5-6 años,1,50,false,false,from-orange-500 to-amber-600,#ffa726,✏️
+segundo-egb,2° EGB,Segundo de EGB - Elemental,elemental,6-7 años,2,50,false,false,from-amber-500 to-yellow-600,#ffca28,📚
+tercero-egb,3° EGB,Tercero de EGB - Elemental,elemental,7-8 años,3,50,false,false,from-yellow-500 to-lime-600,#c0ca33,🔬
+cuarto-egb,4° EGB,Cuarto de EGB - Elemental,elemental,8-9 años,4,50,false,false,from-lime-500 to-green-600,#7cb342,🤖
+quinto-egb,5° EGB,Quinto de EGB - Media,media,9-10 años,5,50,false,false,from-green-500 to-emerald-600,#43a047,💡
+sexto-egb,6° EGB,Sexto de EGB - Media,media,10-11 años,6,70,false,true,from-teal-500 to-cyan-600,#26a69a,⚡
+septimo-egb,7° EGB,Séptimo de EGB - Media,media,11-12 años,7,70,false,true,from-cyan-500 to-sky-600,#00acc1,🎮
+octavo-egb,8° EGB,Octavo de EGB - Superior,superior,12-13 años,8,75,true,true,from-sky-500 to-blue-600,#039be5,🔧
+noveno-egb,9° EGB,Noveno de EGB - Superior,superior,13-14 años,9,75,true,true,from-blue-500 to-indigo-600,#1e88e5,🛠️
+decimo-egb,10° EGB,Décimo de EGB - Superior,superior,14-15 años,10,75,true,true,from-indigo-500 to-violet-600,#3949ab,💻
+primero-bach,1° BGU,Primero de Bachillerato General Unificado,bachillerato,15-16 años,11,80,true,true,from-violet-500 to-purple-600,#5e35b1,🧠
+segundo-bach,2° BGU,Segundo de Bachillerato General Unificado,bachillerato,16-17 años,12,75,true,true,from-purple-500 to-fuchsia-600,#8e24aa,🔐
+tercero-bach,3° BGU,Tercero de Bachillerato General Unificado,bachillerato,17-18 años,13,40,true,true,from-pink-500 to-rose-600,#d81b60,🚀
+universidad,Universidad,Cursos Universitarios y Profesionales,universidad,18+ años,20,100,true,true,from-slate-500 to-gray-700,#475569,🎓
+curso-libre,Curso Libre,Cursos Cortos y Talleres,curso-libre,Todas las edades,99,50,true,true,from-amber-500 to-orange-600,#f59e0b,📚
