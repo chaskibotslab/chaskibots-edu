@@ -11,10 +11,10 @@ import { useAuth } from '@/components/AuthProvider'
 const RobotSimulator3D = dynamic(() => import('./RobotSimulator3D'), { 
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-full bg-dark-900">
+    <div className="flex items-center justify-center h-full bg-white">
       <div className="text-center">
         <Loader2 className="w-8 h-8 animate-spin text-purple-400 mx-auto mb-2" />
-        <p className="text-xs text-gray-400">Cargando simulador 3D...</p>
+        <p className="text-xs text-gray-600">Cargando simulador 3D...</p>
       </div>
     </div>
   )
@@ -1278,13 +1278,13 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
   }
 
   return (
-    <div className={`flex flex-col bg-dark-900 overflow-hidden border border-dark-600 ${
+    <div className={`flex flex-col bg-white overflow-hidden border border-gray-200 ${
       isFullscreen 
         ? 'fixed inset-0 z-50 rounded-none' 
         : 'h-full rounded-xl'
     }`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-neon-cyan/20 to-neon-purple/20 border-b border-dark-600 p-3">
+      <div className="bg-gradient-to-r from-brand-purple/20 to-brand-violet/20 border-b border-gray-200 p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image 
@@ -1295,15 +1295,15 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
               className="rounded-xl"
             />
             <div>
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                 ChaskiBlocks
                 {currentProjectName && (
-                  <span className="text-sm font-normal text-neon-purple">
+                  <span className="text-sm font-normal text-brand-violet">
                     — {currentProjectName}
                   </span>
                 )}
               </h2>
-              <p className="text-xs text-gray-400">Programación visual para robótica</p>
+              <p className="text-xs text-gray-600">Programación visual para robótica</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -1314,14 +1314,14 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                     loadProjects()
                     setShowProjectsModal(true)
                   }}
-                  className="flex items-center gap-2 px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-300 rounded-lg text-sm transition-colors"
                 >
                   <FolderOpen className="w-4 h-4" />
                   <span className="hidden sm:inline">Mis Proyectos</span>
                 </button>
                 <button
                   onClick={() => setShowSaveModal(true)}
-                  className="flex items-center gap-2 px-3 py-2 bg-neon-cyan/20 hover:bg-neon-cyan/30 text-neon-cyan rounded-lg text-sm transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 bg-brand-purple/20 hover:bg-brand-purple/30 text-brand-purple rounded-lg text-sm transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   <span className="hidden sm:inline">Guardar</span>
@@ -1330,14 +1330,14 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
             )}
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm transition-colors"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-300 rounded-lg text-sm transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
               <span className="hidden sm:inline">Nuevo</span>
             </button>
             <button
               onClick={() => setIsFullscreen(!isFullscreen)}
-              className="flex items-center gap-2 px-3 py-2 bg-neon-purple/20 hover:bg-neon-purple/30 text-neon-purple rounded-lg text-sm transition-colors"
+              className="flex items-center gap-2 px-3 py-2 bg-brand-violet/20 hover:bg-brand-violet/30 text-brand-violet rounded-lg text-sm transition-colors"
               title={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -1365,7 +1365,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
             className="absolute inset-0 w-full h-full z-10"
           />
           {!isBlocklyLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-dark-800 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neon-cyan/5 via-dark-800 to-dark-900">
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand-purple/5 via-dark-800 to-dark-900">
               <div className="text-center">
                 <Image 
                   src="/chaski.png" 
@@ -1374,8 +1374,8 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                   height={80}
                   className="mx-auto mb-4 opacity-50 animate-pulse"
                 />
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan mx-auto mb-4"></div>
-                <p className="text-gray-400">Cargando editor de bloques...</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-purple mx-auto mb-4"></div>
+                <p className="text-gray-600">Cargando editor de bloques...</p>
                 <p className="text-xs text-gray-500 mt-2">ChaskiBlocks v1.0</p>
               </div>
             </div>
@@ -1383,17 +1383,17 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
         </div>
 
         {/* Right Panel - Tabs */}
-        <div className={`bg-dark-800 border-l border-dark-600 flex flex-col ${
+        <div className={`bg-gray-50 border-l border-gray-200 flex flex-col ${
           isFullscreen ? 'w-[550px]' : 'w-[450px]'
         }`} style={{ minWidth: isFullscreen ? '550px' : '450px' }}>
           {/* Tabs */}
-          <div className="flex border-b border-dark-600">
+          <div className="flex border-b border-gray-200">
             <button
               onClick={() => setRightPanelTab('simulator')}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
                 rightPanelTab === 'simulator'
                   ? 'bg-purple-500/20 text-purple-400 border-b-2 border-purple-400'
-                  : 'text-gray-400 hover:text-white hover:bg-dark-700'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               <Monitor className="w-4 h-4" />
@@ -1404,7 +1404,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
                 rightPanelTab === 'code'
                   ? 'bg-green-500/20 text-green-400 border-b-2 border-green-400'
-                  : 'text-gray-400 hover:text-white hover:bg-dark-700'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               <FileCode className="w-4 h-4" />
@@ -1416,13 +1416,13 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
           {rightPanelTab === 'simulator' ? (
             <div className="flex-1 overflow-auto flex flex-col">
               {/* Toggle 2D/3D */}
-              <div className="p-2 border-b border-dark-600 flex items-center justify-center gap-2">
+              <div className="p-2 border-b border-gray-200 flex items-center justify-center gap-2">
                 <button
                   onClick={() => setSimulatorMode('2d')}
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     simulatorMode === '2d'
                       ? 'bg-purple-500/30 text-purple-300 border border-purple-500/50'
-                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   <Layers className="w-3 h-3" />
@@ -1433,7 +1433,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     simulatorMode === '3d'
                       ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/50'
-                      : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   <Box className="w-3 h-3" />
@@ -1458,35 +1458,35 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
             </div>
           ) : (
             <div className="flex-1 flex flex-col">
-              <div className="p-3 border-b border-dark-600 flex items-center justify-between">
+              <div className="p-3 border-b border-gray-200 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Code className="w-4 h-4 text-neon-green" />
-                  <span className="text-sm font-medium text-white">Código Generado</span>
+                  <span className="text-sm font-medium text-gray-900">Código Generado</span>
                 </div>
                 <button
                   onClick={handleCopyCode}
                   className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
                     copied 
                       ? 'bg-green-500/20 text-green-400' 
-                      : 'bg-dark-700 hover:bg-dark-600 text-gray-300'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-300'
                   }`}
                 >
                   <Copy className="w-3 h-3" />
                   {copied ? '¡Copiado!' : 'Copiar'}
                 </button>
               </div>
-              <div className="flex-1 overflow-auto p-3 bg-dark-900">
+              <div className="flex-1 overflow-auto p-3 bg-white">
                 <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
                   {generatedCode || '// Arrastra bloques para generar código\n// El código Arduino aparecerá aquí\n\n// Ejemplo:\n// void setup() {\n//   Serial.begin(9600);\n// }\n// \n// void loop() {\n//   // Tu código aquí\n// }'}
                 </pre>
               </div>
               
               {/* Tips */}
-              <div className="p-3 border-t border-dark-600 bg-dark-900/50">
+              <div className="p-3 border-t border-gray-200 bg-white/50">
                 <div className="flex items-start gap-2">
                   <Lightbulb className="w-4 h-4 text-yellow-400 mt-0.5" />
                   <div>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-600">
                       <span className="text-yellow-400 font-medium">Tip:</span> Copia este código y pégalo en Arduino IDE para programar tu robot real.
                     </p>
                   </div>
@@ -1500,15 +1500,15 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
       {/* Modal: Mis Proyectos */}
       {showProjectsModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-2xl border border-dark-600 w-full max-w-lg max-h-[80vh] overflow-hidden">
-            <div className="p-4 border-b border-dark-600 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <FolderOpen className="w-5 h-5 text-neon-cyan" />
+          <div className="bg-gray-50 rounded-2xl border border-gray-200 w-full max-w-lg max-h-[80vh] overflow-hidden">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <FolderOpen className="w-5 h-5 text-brand-purple" />
                 Mis Proyectos
               </h3>
               <button
                 onClick={() => setShowProjectsModal(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-600 hover:text-gray-900"
               >
                 ✕
               </button>
@@ -1516,12 +1516,12 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
             <div className="p-4 overflow-y-auto max-h-[60vh]">
               {loadingProjects ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+                  <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
                 </div>
               ) : projects.length === 0 ? (
                 <div className="text-center py-8">
                   <FolderOpen className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-400">No tienes proyectos guardados</p>
+                  <p className="text-gray-600">No tienes proyectos guardados</p>
                   <p className="text-xs text-gray-500 mt-1">Crea bloques y guárdalos</p>
                 </div>
               ) : (
@@ -1529,7 +1529,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                   {projects.map(project => (
                     <div
                       key={project.id}
-                      className="bg-dark-700 rounded-xl p-3 hover:bg-dark-600 transition-colors group"
+                      className="bg-gray-100 rounded-xl p-3 hover:bg-gray-200 transition-colors group"
                     >
                       <div className="flex items-center justify-between">
                         <div 
@@ -1537,7 +1537,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                           onClick={() => handleLoadProject(project)}
                         >
                           <div className="flex items-center gap-2">
-                            <h4 className="font-medium text-white">{project.projectName}</h4>
+                            <h4 className="font-medium text-gray-900">{project.projectName}</h4>
                             {project.isPublic ? (
                               <Globe className="w-3 h-3 text-green-400" />
                             ) : (
@@ -1573,22 +1573,22 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
       {/* Modal: Guardar Proyecto */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-2xl border border-dark-600 w-full max-w-md">
-            <div className="p-4 border-b border-dark-600 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Save className="w-5 h-5 text-neon-cyan" />
+          <div className="bg-gray-50 rounded-2xl border border-gray-200 w-full max-w-md">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Save className="w-5 h-5 text-brand-purple" />
                 {currentProjectId ? 'Guardar Cambios' : 'Nuevo Proyecto'}
               </h3>
               <button
                 onClick={() => setShowSaveModal(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-600 hover:text-gray-900"
               >
                 ✕
               </button>
             </div>
             <div className="p-4 space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Nombre del proyecto</label>
+                <label className="block text-sm text-gray-600 mb-2">Nombre del proyecto</label>
                 <input
                   type="text"
                   value={currentProjectId ? currentProjectName : newProjectName}
@@ -1597,7 +1597,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                     : setNewProjectName(e.target.value)
                   }
                   placeholder="Mi Robot Increíble"
-                  className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-xl text-white placeholder:text-gray-500 focus:border-neon-cyan focus:outline-none"
+                  className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-500 focus:border-brand-purple focus:outline-none"
                 />
               </div>
               <div className="flex items-center gap-3">
@@ -1606,7 +1606,7 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors ${
                     isPublicProject 
                       ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
-                      : 'bg-dark-700 text-gray-400 border border-dark-600'
+                      : 'bg-gray-100 text-gray-600 border border-gray-200'
                   }`}
                 >
                   {isPublicProject ? <Globe className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
@@ -1617,17 +1617,17 @@ export default function BlocklyEditor({ onCodeChange, userId, userName }: Blockl
                 </span>
               </div>
             </div>
-            <div className="p-4 border-t border-dark-600 flex gap-3">
+            <div className="p-4 border-t border-gray-200 flex gap-3">
               <button
                 onClick={() => setShowSaveModal(false)}
-                className="flex-1 px-4 py-3 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-xl text-sm font-medium transition-colors"
+                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-300 rounded-xl text-sm font-medium transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSaveProject}
                 disabled={savingProject}
-                className="flex-1 px-4 py-3 bg-neon-cyan hover:bg-neon-cyan/80 text-dark-900 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 bg-brand-purple hover:bg-brand-purple/80 text-dark-900 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
               >
                 {savingProject ? (
                   <>

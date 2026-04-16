@@ -201,7 +201,7 @@ export default function SubmissionsPanel() {
           <CheckCircle className="w-3 h-3" /> Calificado
         </span>
       default:
-        return <span className="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded-full">
+        return <span className="px-2 py-1 bg-gray-500/20 text-gray-600 text-xs rounded-full">
           {status}
         </span>
     }
@@ -247,11 +247,11 @@ export default function SubmissionsPanel() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Send className="w-7 h-7 text-neon-green" />
             Entregas de Estudiantes
           </h2>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-gray-600 text-sm mt-1">
             {isTeacher && !isAdmin ? 'Entregas de tus cursos asignados' : 'Tareas enviadas desde los simuladores'}
           </p>
         </div>
@@ -279,7 +279,7 @@ export default function SubmissionsPanel() {
           )}
           <button
             onClick={loadSubmissions}
-            className="p-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg transition-colors"
+            className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-300 rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -292,7 +292,7 @@ export default function SubmissionsPanel() {
         <select
           value={studentFilter}
           onChange={(e) => setStudentFilter(e.target.value)}
-          className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+          className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
         >
           <option value="">Todos los estudiantes</option>
           {Array.from(new Set(submissions.map(s => s.studentName))).filter(Boolean).sort().map(name => (
@@ -304,7 +304,7 @@ export default function SubmissionsPanel() {
         <select
           value={taskFilter}
           onChange={(e) => setTaskFilter(e.target.value)}
-          className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+          className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
         >
           <option value="">Todas las tareas</option>
           {Array.from(new Set(submissions.map(s => s.taskId))).filter(Boolean).sort().map(task => (
@@ -316,12 +316,12 @@ export default function SubmissionsPanel() {
       {/* Submissions List */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-purple"></div>
         </div>
       ) : submissions.length === 0 ? (
-        <div className="bg-dark-800 border border-dark-600 rounded-xl p-12 text-center">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-12 text-center">
           <Send className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-400">No hay entregas aún</p>
+          <p className="text-gray-600">No hay entregas aún</p>
           <p className="text-gray-500 text-sm mt-1">
             {isTeacher && !isAdmin && teacherCourses.length === 0 
               ? 'No tienes cursos asignados. Contacta al administrador.'
@@ -333,12 +333,12 @@ export default function SubmissionsPanel() {
           {submissions.map(submission => (
             <div
               key={submission.id}
-              className="bg-dark-800 border border-dark-600 rounded-xl p-4 hover:border-dark-500 transition-colors"
+              className="bg-gray-50 border border-gray-200 rounded-xl p-4 hover:border-dark-500 transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-white font-medium">{submission.studentName}</h3>
+                    <h3 className="text-gray-900 font-medium">{submission.studentName}</h3>
                     {getStatusBadge(submission.status)}
                     {submission.grade !== undefined && (
                       <span className={`px-2 py-1 rounded-full text-sm font-bold ${getScoreColor(submission.grade)}`}>
@@ -346,7 +346,7 @@ export default function SubmissionsPanel() {
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
                     <span className="flex items-center gap-1">
                       <FileCode className="w-4 h-4" />
                       {submission.taskId}
@@ -367,7 +367,7 @@ export default function SubmissionsPanel() {
                       setGradeInput(submission.grade || 10)
                       setFeedbackInput(submission.feedback || '')
                     }}
-                    className="p-2 text-neon-cyan hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                    className="p-2 text-brand-purple hover:bg-brand-purple/20 rounded-lg transition-colors"
                     title="Ver y calificar"
                   >
                     <Eye className="w-5 h-5" />
@@ -389,18 +389,18 @@ export default function SubmissionsPanel() {
       {/* Grade Modal */}
       {selectedSubmission && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-dark-800 border border-dark-600 rounded-2xl max-w-4xl w-full my-8">
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl max-w-4xl w-full my-8">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-dark-600">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <div>
-                <h3 className="text-xl font-bold text-white">{selectedSubmission.studentName}</h3>
-                <p className="text-sm text-gray-400">
+                <h3 className="text-xl font-bold text-gray-900">{selectedSubmission.studentName}</h3>
+                <p className="text-sm text-gray-600">
                   {selectedSubmission.taskId} • {new Date(selectedSubmission.submittedAt).toLocaleString('es-EC')}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedSubmission(null)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg"
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -410,26 +410,26 @@ export default function SubmissionsPanel() {
             <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dark-600">
               {/* Code */}
               <div className="p-4">
-                <h4 className="text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
+                <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
                   <FileCode className="w-4 h-4" /> Código Python
                 </h4>
-                <pre className="bg-dark-900 rounded-lg p-4 text-sm text-gray-300 overflow-auto max-h-64 font-mono">
+                <pre className="bg-white rounded-lg p-4 text-sm text-gray-300 overflow-auto max-h-64 font-mono">
                   {selectedSubmission.code}
                 </pre>
               </div>
 
               {/* Output */}
               <div className="p-4">
-                <h4 className="text-sm font-medium text-gray-400 mb-2">Resultado</h4>
-                <pre className="bg-dark-900 rounded-lg p-4 text-sm text-green-400 overflow-auto max-h-64 font-mono">
+                <h4 className="text-sm font-medium text-gray-600 mb-2">Resultado</h4>
+                <pre className="bg-white rounded-lg p-4 text-sm text-green-400 overflow-auto max-h-64 font-mono">
                   {selectedSubmission.output || '(Sin salida)'}
                 </pre>
               </div>
             </div>
 
             {/* Archivos del Estudiante */}
-            <div className="p-4 border-t border-dark-600 bg-gradient-to-r from-blue-900/20 to-purple-900/20">
-              <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+            <div className="p-4 border-t border-gray-200 bg-gradient-to-r from-blue-900/20 to-purple-900/20">
+              <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-blue-400" /> Archivos del Estudiante
               </h4>
               <div className="space-y-3">
@@ -437,7 +437,7 @@ export default function SubmissionsPanel() {
                   <div className="bg-purple-900/30 border border-purple-500/40 rounded-lg p-3">
                     <p className="text-xs text-purple-300 mb-2">Dibujo:</p>
                     <img src={selectedSubmission.drawing} alt="Dibujo" className="max-w-full max-h-48 rounded border border-purple-500/30 mb-2" />
-                    <a href={selectedSubmission.drawing} download className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium">
+                    <a href={selectedSubmission.drawing} download className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-gray-900 rounded-lg text-sm font-medium">
                       <Download className="w-4 h-4" /> Descargar dibujo
                     </a>
                   </div>
@@ -452,9 +452,9 @@ export default function SubmissionsPanel() {
                         <div className="space-y-2">
                           {files.map((f: {name: string, url?: string, data?: string}, i: number) => {
                             const url = f.url || f.data || ''
-                            if (!url) return <div key={i} className="text-gray-400 text-sm">{f.name} (no disponible)</div>
+                            if (!url) return <div key={i} className="text-gray-600 text-sm">{f.name} (no disponible)</div>
                             return (
-                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium">
+                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-gray-900 rounded-lg text-sm font-medium">
                                 <Download className="w-4 h-4" /> {f.name}
                               </a>
                             )
@@ -471,13 +471,13 @@ export default function SubmissionsPanel() {
             </div>
 
             {/* Grading Section */}
-            <div className="p-4 border-t border-dark-600 bg-dark-900/50">
-              <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+            <div className="p-4 border-t border-gray-200 bg-white/50">
+              <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
                 <Award className="w-4 h-4 text-yellow-400" /> Calificar
               </h4>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Calificación (0-10)</label>
+                  <label className="block text-sm text-gray-600 mb-1">Calificación (0-10)</label>
                   <input
                     type="number"
                     min="0"
@@ -485,7 +485,7 @@ export default function SubmissionsPanel() {
                     step="0.5"
                     value={gradeInput}
                     onChange={(e) => setGradeInput(parseFloat(e.target.value) || 0)}
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-xl font-bold text-center"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-xl font-bold text-center"
                   />
                   <div className="flex justify-between mt-2">
                     {[0, 2.5, 5, 7.5, 10].map(score => (
@@ -494,8 +494,8 @@ export default function SubmissionsPanel() {
                         onClick={() => setGradeInput(score)}
                         className={`px-2 py-1 rounded text-xs ${
                           gradeInput === score 
-                            ? 'bg-neon-cyan text-dark-900' 
-                            : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                            ? 'bg-brand-purple text-dark-900' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
                         {score}
@@ -504,23 +504,23 @@ export default function SubmissionsPanel() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Feedback (opcional)</label>
+                  <label className="block text-sm text-gray-600 mb-1">Feedback (opcional)</label>
                   <textarea
                     value={feedbackInput}
                     onChange={(e) => setFeedbackInput(e.target.value)}
                     placeholder="Comentarios para el estudiante..."
                     rows={3}
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white resize-none"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 resize-none"
                   />
                 </div>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 p-4 border-t border-dark-600">
+            <div className="flex justify-end gap-3 p-4 border-t border-gray-200">
               <button
                 onClick={() => setSelectedSubmission(null)}
-                className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+                className="px-4 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200"
               >
                 Cancelar
               </button>

@@ -51,7 +51,7 @@ export default function DashboardPage() {
         <div className="max-w-5xl mx-auto space-y-6">
           
           {/* Welcome Card */}
-          <div className="bg-dark-800/80 backdrop-blur rounded-2xl p-6 border border-dark-600">
+          <div className="bg-gray-50/80 backdrop-blur rounded-2xl p-6 border border-gray-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-purple/20 to-brand-cyan/20 flex items-center justify-center border border-brand-purple/30">
@@ -59,12 +59,12 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Bienvenido</p>
-                  <h1 className="text-2xl font-bold text-white">{user?.name}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
                   <p className="text-brand-purple text-sm">{currentLevel.name}</p>
                 </div>
               </div>
               <div className="flex gap-3">
-                <div className="bg-dark-700 rounded-xl px-4 py-2 border border-dark-600">
+                <div className="bg-gray-100 rounded-xl px-4 py-2 border border-gray-200">
                   <p className="text-xs text-gray-500">Progreso</p>
                   <p className="text-lg font-bold text-neon-green">{user?.progress || 0}%</p>
                 </div>
@@ -74,35 +74,35 @@ export default function DashboardPage() {
 
           {/* Quick Actions */}
           <div className="grid sm:grid-cols-3 gap-4">
-            <Link href={`/nivel/${currentLevel.id}`} className="group bg-dark-800/80 backdrop-blur rounded-2xl p-5 border border-dark-600 hover:border-neon-cyan/50 transition-all hover:shadow-glow">
-              <div className="w-12 h-12 rounded-xl bg-neon-cyan/10 flex items-center justify-center mb-4">
-                <Play className="w-6 h-6 text-neon-cyan" />
+            <Link href={`/nivel/${currentLevel.id}`} className="group bg-gray-50/80 backdrop-blur rounded-2xl p-5 border border-gray-200 hover:border-brand-purple/50 transition-all hover:shadow-glow">
+              <div className="w-12 h-12 rounded-xl bg-brand-purple/10 flex items-center justify-center mb-4">
+                <Play className="w-6 h-6 text-brand-purple" />
               </div>
-              <h3 className="font-semibold text-white mb-1">Continuar</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Continuar</h3>
               <p className="text-sm text-gray-500 mb-3">{currentLevel.name}</p>
-              <span className="text-neon-cyan text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
+              <span className="text-brand-purple text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
                 Ir al curso <ArrowRight className="w-4 h-4" />
               </span>
             </Link>
 
-            <Link href="/simuladores" className="group bg-dark-800/80 backdrop-blur rounded-2xl p-5 border border-dark-600 hover:border-neon-orange/50 transition-all">
-              <div className="w-12 h-12 rounded-xl bg-neon-orange/10 flex items-center justify-center mb-4">
-                <Cpu className="w-6 h-6 text-neon-orange" />
+            <Link href="/simuladores" className="group bg-gray-50/80 backdrop-blur rounded-2xl p-5 border border-gray-200 hover:border-brand-cyan/50 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-brand-cyan/10 flex items-center justify-center mb-4">
+                <Cpu className="w-6 h-6 text-brand-cyan" />
               </div>
-              <h3 className="font-semibold text-white mb-1">Simuladores</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Simuladores</h3>
               <p className="text-sm text-gray-500 mb-3">Laboratorio virtual</p>
-              <span className="text-neon-orange text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
+              <span className="text-brand-cyan text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
                 Explorar <ArrowRight className="w-4 h-4" />
               </span>
             </Link>
 
-            <Link href="/niveles" className="group bg-dark-800/80 backdrop-blur rounded-2xl p-5 border border-dark-600 hover:border-neon-purple/50 transition-all">
-              <div className="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center mb-4">
-                <BookOpen className="w-6 h-6 text-neon-purple" />
+            <Link href="/niveles" className="group bg-gray-50/80 backdrop-blur rounded-2xl p-5 border border-gray-200 hover:border-brand-violet/50 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-brand-violet/10 flex items-center justify-center mb-4">
+                <BookOpen className="w-6 h-6 text-brand-violet" />
               </div>
-              <h3 className="font-semibold text-white mb-1">Niveles</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Niveles</h3>
               <p className="text-sm text-gray-500 mb-3">Ver todos los cursos</p>
-              <span className="text-neon-purple text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
+              <span className="text-brand-violet text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
                 Ver más <ArrowRight className="w-4 h-4" />
               </span>
             </Link>
@@ -110,32 +110,32 @@ export default function DashboardPage() {
 
           {/* Study Areas */}
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-neon-pink" />
               Áreas de Estudio
             </h2>
             <div className="grid sm:grid-cols-3 gap-4">
-              <Link href="/robotica" className="group bg-dark-800/80 backdrop-blur rounded-2xl p-5 border border-dark-600 hover:border-neon-blue/50 transition-all">
-                <div className="w-10 h-10 rounded-lg bg-neon-blue/10 flex items-center justify-center mb-3">
-                  <Bot className="w-5 h-5 text-neon-blue" />
+              <Link href="/robotica" className="group bg-gray-50/80 backdrop-blur rounded-2xl p-5 border border-gray-200 hover:border-brand-purple/50 transition-all">
+                <div className="w-10 h-10 rounded-lg bg-brand-purple/10 flex items-center justify-center mb-3">
+                  <Bot className="w-5 h-5 text-brand-purple" />
                 </div>
-                <h3 className="font-semibold text-white mb-1">Robótica</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">Robótica</h3>
                 <p className="text-sm text-gray-500">Programación y electrónica</p>
               </Link>
 
-              <Link href="/ia" className="group bg-dark-800/80 backdrop-blur rounded-2xl p-5 border border-dark-600 hover:border-neon-purple/50 transition-all">
-                <div className="w-10 h-10 rounded-lg bg-neon-purple/10 flex items-center justify-center mb-3">
-                  <Brain className="w-5 h-5 text-neon-purple" />
+              <Link href="/ia" className="group bg-gray-50/80 backdrop-blur rounded-2xl p-5 border border-gray-200 hover:border-brand-violet/50 transition-all">
+                <div className="w-10 h-10 rounded-lg bg-brand-violet/10 flex items-center justify-center mb-3">
+                  <Brain className="w-5 h-5 text-brand-violet" />
                 </div>
-                <h3 className="font-semibold text-white mb-1">Inteligencia Artificial</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">Inteligencia Artificial</h3>
                 <p className="text-sm text-gray-500">Machine learning</p>
               </Link>
 
-              <Link href="/hacking" className="group bg-dark-800/80 backdrop-blur rounded-2xl p-5 border border-dark-600 hover:border-neon-green/50 transition-all">
+              <Link href="/hacking" className="group bg-gray-50/80 backdrop-blur rounded-2xl p-5 border border-gray-200 hover:border-neon-green/50 transition-all">
                 <div className="w-10 h-10 rounded-lg bg-neon-green/10 flex items-center justify-center mb-3">
                   <Shield className="w-5 h-5 text-neon-green" />
                 </div>
-                <h3 className="font-semibold text-white mb-1">Hacking Ético</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">Hacking Ético</h3>
                 <p className="text-sm text-gray-500">Ciberseguridad</p>
               </Link>
             </div>

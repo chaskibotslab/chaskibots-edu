@@ -3,19 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --primary: #8b5cf6;
-  --secondary: #06b6d4;
-  --accent: #10b981;
-  --neon-cyan: #06b6d4;
-  --neon-purple: #8b5cf6;
-  --neon-green: #10b981;
-  --neon-pink: #ec4899;
-  --gold: #fbbf24;
-  --dark-950: #0a0a0f;
-  --dark-900: #12121a;
-  --dark-800: #1a1a24;
-  --dark-700: #252532;
-  --dark-600: #32324a;
+  --primary: #558C89;
+  --secondary: #74AFAD;
+  --accent: #D9853B;
+  --neon-cyan: #74AFAD;
+  --neon-purple: #558C89;
+  --neon-green: #558C89;
+  --neon-pink: #D9853B;
+  --gold: #D9853B;
+  --light: #ECECEA;
+  --white: #FFFFFF;
+  --bg-main: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-dark: #1a1a1a;
+  --text-muted: #6b6b6b;
+  --border-light: #E0E0E0;
+  --dark-950: #1a1a1a;
+  --dark-900: #2d2d2d;
+  --dark-800: #404040;
+  --dark-700: #525252;
+  --dark-600: #6b6b6b;
 }
 
 * {
@@ -28,8 +35,9 @@ html {
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: var(--dark-900);
-  color: #e0e0e0;
+  background: var(--bg-main);
+  color: var(--text-dark);
+  font-family: 'Inter', system-ui, sans-serif;
   min-height: 100vh;
 }
 
@@ -47,9 +55,9 @@ body {
   font-weight: 600;
   border-radius: 0.75rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  background: linear-gradient(135deg, var(--primary), #4a7a77);
   color: white;
-  border: 1px solid rgba(139, 92, 246, 0.5);
+  border: 1px solid rgba(85, 140, 137, 0.5);
   position: relative;
   overflow: hidden;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -71,7 +79,7 @@ body {
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 20px rgba(85, 140, 137, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);
   transform: translateY(-2px);
 }
 
@@ -85,22 +93,23 @@ body {
   border-radius: 0.75rem;
   transition: all 0.3s;
   background: var(--dark-700);
-  color: var(--primary);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: var(--secondary);
+  border: 1px solid rgba(116, 175, 173, 0.3);
 }
 
 .btn-secondary:hover {
   background: var(--dark-600);
-  border-color: rgba(139, 92, 246, 0.6);
+  border-color: rgba(116, 175, 173, 0.6);
 }
 
 /* Cards Futuristas */
 .card {
-  background: rgba(26, 26, 36, 0.95);
+  background: #FFFFFF;
   backdrop-filter: blur(12px);
   border-radius: 1rem;
   padding: 1.5rem;
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  border: 1px solid #E0E0E0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -113,7 +122,7 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.05), transparent);
+  background: linear-gradient(90deg, transparent, rgba(85, 140, 137, 0.1), transparent);
   transition: left 0.6s;
 }
 
@@ -122,8 +131,8 @@ body {
 }
 
 .card:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
+  border-color: #558C89;
+  box-shadow: 0 8px 24px rgba(85, 140, 137, 0.15);
   transform: translateY(-4px);
 }
 
@@ -139,14 +148,14 @@ body {
 }
 
 .tab-btn:hover {
-  color: var(--primary);
-  border-color: rgba(139, 92, 246, 0.3);
+  color: var(--secondary);
+  border-color: rgba(116, 175, 173, 0.3);
 }
 
 .tab-btn.active {
   background: var(--dark-600);
-  color: var(--primary);
-  border-color: rgba(139, 92, 246, 0.5);
+  color: var(--secondary);
+  border-color: rgba(116, 175, 173, 0.5);
 }
 
 /* Level Cards */
@@ -156,16 +165,17 @@ body {
   border-radius: 1rem;
   padding: 1.5rem;
   cursor: pointer;
-  background: rgba(26, 26, 36, 0.8);
+  background: #FFFFFF;
   backdrop-filter: blur(8px);
-  border: 1px solid var(--dark-600);
+  border: 1px solid #E0E0E0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   transition: all 0.3s;
 }
 
 .level-card:hover {
   transform: scale(1.03);
-  border-color: rgba(139, 92, 246, 0.5);
-  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.15);
+  border-color: #558C89;
+  box-shadow: 0 12px 32px rgba(85, 140, 137, 0.2);
 }
 
 /* Badges */
@@ -226,8 +236,8 @@ body {
 
 .input-cyber:focus {
   outline: none;
-  border-color: rgba(139, 92, 246, 0.5);
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+  border-color: rgba(85, 140, 137, 0.5);
+  box-shadow: 0 0 15px rgba(85, 140, 137, 0.2);
 }
 
 /* Glassmorphism */
@@ -338,9 +348,9 @@ body {
 
 /* Hero Gradient */
 .hero-gradient {
-  background: radial-gradient(ellipse at top, rgba(139,92,246,0.15) 0%, transparent 50%),
-              radial-gradient(ellipse at bottom right, rgba(6,182,212,0.1) 0%, transparent 50%),
-              var(--dark-900);
+  background: radial-gradient(ellipse at top, rgba(85,140,137,0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at bottom right, rgba(217,133,59,0.1) 0%, transparent 50%),
+              #FAFAFA;
 }
 
 /* Section Divider */

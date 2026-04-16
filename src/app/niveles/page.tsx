@@ -45,11 +45,11 @@ export default function NivelesPage() {
           
           {/* Header Section */}
           <div className="text-center py-8">
-            <div className="inline-flex items-center gap-2 bg-dark-800 rounded-full px-4 py-2 mb-4 border border-dark-600">
-              <Sparkles className="w-4 h-4 text-neon-cyan" />
-              <span className="text-sm text-gray-400">Plataforma Educativa</span>
+            <div className="inline-flex items-center gap-2 bg-gray-50 rounded-full px-4 py-2 mb-4 border border-gray-200">
+              <Sparkles className="w-4 h-4 text-brand-purple" />
+              <span className="text-sm text-gray-600">Plataforma Educativa</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
               Niveles Educativos
             </h1>
             <p className="text-gray-500 max-w-xl mx-auto">
@@ -63,7 +63,7 @@ export default function NivelesPage() {
                   <Baby className="w-6 h-6 text-pink-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Educación Inicial</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Educación Inicial</h2>
                   <p className="text-gray-500 text-sm">3-5 años • Primeros pasos en tecnología</p>
                 </div>
               </div>
@@ -82,14 +82,14 @@ export default function NivelesPage() {
                     <Link
                       key={level.id}
                       href={`/nivel/${level.id}`}
-                      className="group bg-dark-800 border border-dark-700 rounded-xl p-6 hover:border-pink-500/50 hover:bg-dark-700/50 transition-all duration-300"
+                      className="group bg-gray-50 border border-dark-700 rounded-xl p-6 hover:border-pink-500/50 hover:bg-gray-100/50 transition-all duration-300"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center group-hover:bg-pink-500/10 transition-colors">
-                          <IconComponent className="w-6 h-6 text-gray-400 group-hover:text-pink-400 transition-colors" />
+                        <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-pink-500/10 transition-colors">
+                          <IconComponent className="w-6 h-6 text-gray-600 group-hover:text-pink-400 transition-colors" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-white">{level.name}</h3>
+                          <h3 className="font-semibold text-gray-900">{level.name}</h3>
                           <p className="text-gray-500 text-sm">{level.ageRange}</p>
                         </div>
                         <ArrowRight className="w-5 h-5 text-gray-600 group-hover:text-pink-400 group-hover:translate-x-1 transition-all" />
@@ -107,7 +107,7 @@ export default function NivelesPage() {
                   <BookOpen className="w-6 h-6 text-cyan-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Educación Básica Elemental</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Educación Básica Elemental</h2>
                   <p className="text-gray-500 text-sm">5-9 años • Fundamentos de programación</p>
                 </div>
               </div>
@@ -126,13 +126,13 @@ export default function NivelesPage() {
                     <Link
                       key={level.id}
                       href={`/nivel/${level.id}`}
-                      className="group bg-dark-800 border border-dark-700 rounded-xl p-5 hover:border-cyan-500/50 hover:bg-dark-700/50 transition-all duration-300"
+                      className="group bg-gray-50 border border-dark-700 rounded-xl p-5 hover:border-cyan-500/50 hover:bg-gray-100/50 transition-all duration-300"
                     >
                       <div className="flex flex-col items-center text-center">
-                        <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center mb-3 group-hover:bg-cyan-500/10 transition-colors">
-                          <IconComponent className="w-6 h-6 text-gray-400 group-hover:text-cyan-400 transition-colors" />
+                        <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-cyan-500/10 transition-colors">
+                          <IconComponent className="w-6 h-6 text-gray-600 group-hover:text-cyan-400 transition-colors" />
                         </div>
-                        <h3 className="font-semibold text-white text-sm">{level.name}</h3>
+                        <h3 className="font-semibold text-gray-900 text-sm">{level.name}</h3>
                         <p className="text-gray-500 text-xs mt-1">{level.ageRange}</p>
                       </div>
                     </Link>
@@ -148,7 +148,7 @@ export default function NivelesPage() {
                   <Code className="w-6 h-6 text-purple-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Educación Básica Media y Superior</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Educación Básica Media y Superior</h2>
                   <p className="text-gray-500 text-sm">9-15 años • Proyectos avanzados</p>
                 </div>
               </div>
@@ -167,14 +167,14 @@ export default function NivelesPage() {
                     <Link
                       key={level.id}
                       href={`/nivel/${level.id}`}
-                      className="group bg-dark-800 border border-dark-700 rounded-xl p-5 hover:border-purple-500/50 hover:bg-dark-700/50 transition-all duration-300"
+                      className="group bg-gray-50 border border-dark-700 rounded-xl p-5 hover:border-purple-500/50 hover:bg-gray-100/50 transition-all duration-300"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-dark-700 rounded-lg flex items-center justify-center group-hover:bg-purple-500/10 transition-colors">
-                          <IconComponent className="w-5 h-5 text-gray-400 group-hover:text-purple-400 transition-colors" />
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-purple-500/10 transition-colors">
+                          <IconComponent className="w-5 h-5 text-gray-600 group-hover:text-purple-400 transition-colors" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-white text-sm">{level.name}</h3>
+                          <h3 className="font-semibold text-gray-900 text-sm">{level.name}</h3>
                           <p className="text-gray-500 text-xs">{level.ageRange}</p>
                         </div>
                       </div>
@@ -191,7 +191,7 @@ export default function NivelesPage() {
                   <GraduationCap className="w-6 h-6 text-green-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Bachillerato</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Bachillerato</h2>
                   <p className="text-gray-500 text-sm">15-18 años • Especialización profesional</p>
                 </div>
               </div>
@@ -210,14 +210,14 @@ export default function NivelesPage() {
                     <Link
                       key={level.id}
                       href={`/nivel/${level.id}`}
-                      className="group bg-dark-800 border border-dark-700 rounded-xl p-6 hover:border-green-500/50 hover:bg-dark-700/50 transition-all duration-300"
+                      className="group bg-gray-50 border border-dark-700 rounded-xl p-6 hover:border-green-500/50 hover:bg-gray-100/50 transition-all duration-300"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center group-hover:bg-green-500/10 transition-colors">
-                          <IconComponent className="w-6 h-6 text-gray-400 group-hover:text-green-400 transition-colors" />
+                        <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-green-500/10 transition-colors">
+                          <IconComponent className="w-6 h-6 text-gray-600 group-hover:text-green-400 transition-colors" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-white">{level.name}</h3>
+                          <h3 className="font-semibold text-gray-900">{level.name}</h3>
                           <p className="text-gray-500 text-sm">{level.ageRange}</p>
                         </div>
                         <ArrowRight className="w-5 h-5 text-gray-600 group-hover:text-green-400 group-hover:translate-x-1 transition-all" />

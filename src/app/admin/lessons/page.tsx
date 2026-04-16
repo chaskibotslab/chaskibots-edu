@@ -240,17 +240,17 @@ export default function AdminLessonsPage() {
   const levels = Array.from(new Set(lessons.map(l => l.levelId))).sort()
 
   return (
-    <div className="min-h-screen bg-dark-900 p-6">
+    <div className="min-h-screen bg-white p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white">Administrar Lecciones</h1>
-            <p className="text-gray-400 mt-1">Edita videos, imágenes y recursos de las lecciones</p>
+            <h1 className="text-3xl font-bold text-gray-900">Administrar Lecciones</h1>
+            <p className="text-gray-600 mt-1">Edita videos, imágenes y recursos de las lecciones</p>
           </div>
           <button 
             onClick={fetchLessons}
-            className="flex items-center gap-2 px-4 py-2 bg-dark-700 hover:bg-dark-600 rounded-lg text-gray-300 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-300 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Actualizar
@@ -268,18 +268,18 @@ export default function AdminLessonsPage() {
         )}
 
         {/* Filters */}
-        <div className="bg-dark-800 rounded-2xl p-4 mb-6 border border-dark-600">
+        <div className="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-200">
           <div className="flex flex-wrap gap-4">
             {/* Search */}
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
                 <input
                   type="text"
                   placeholder="Buscar lección..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
@@ -288,7 +288,7 @@ export default function AdminLessonsPage() {
             <select
               value={filterLevel}
               onChange={(e) => setFilterLevel(e.target.value)}
-              className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-500"
             >
               <option value="">Todos los niveles</option>
               {levels.map(level => (
@@ -300,7 +300,7 @@ export default function AdminLessonsPage() {
             <select
               value={filterProgram}
               onChange={(e) => setFilterProgram(e.target.value)}
-              className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-500"
             >
               <option value="">Todos los programas</option>
               <option value="robotica">Robótica</option>
@@ -312,24 +312,24 @@ export default function AdminLessonsPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-dark-800 rounded-xl p-4 border border-dark-600">
-            <p className="text-gray-400 text-sm">Total lecciones</p>
-            <p className="text-2xl font-bold text-white">{lessons.length}</p>
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <p className="text-gray-600 text-sm">Total lecciones</p>
+            <p className="text-2xl font-bold text-gray-900">{lessons.length}</p>
           </div>
-          <div className="bg-dark-800 rounded-xl p-4 border border-dark-600">
-            <p className="text-gray-400 text-sm">Con video</p>
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <p className="text-gray-600 text-sm">Con video</p>
             <p className="text-2xl font-bold text-green-400">
               {lessons.filter(l => l.videoUrl).length}
             </p>
           </div>
-          <div className="bg-dark-800 rounded-xl p-4 border border-dark-600">
-            <p className="text-gray-400 text-sm">Con imagen</p>
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <p className="text-gray-600 text-sm">Con imagen</p>
             <p className="text-2xl font-bold text-blue-400">
               {lessons.filter(l => l.imageUrl).length}
             </p>
           </div>
-          <div className="bg-dark-800 rounded-xl p-4 border border-dark-600">
-            <p className="text-gray-400 text-sm">Con recursos</p>
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <p className="text-gray-600 text-sm">Con recursos</p>
             <p className="text-2xl font-bold text-purple-400">
               {lessons.filter(l => l.resources && parseJsonField(l.resources).length > 0).length}
             </p>
@@ -339,8 +339,8 @@ export default function AdminLessonsPage() {
         {/* Lessons list */}
         {loading ? (
           <div className="text-center py-12">
-            <RefreshCw className="w-8 h-8 text-gray-400 animate-spin mx-auto mb-4" />
-            <p className="text-gray-400">Cargando lecciones...</p>
+            <RefreshCw className="w-8 h-8 text-gray-600 animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Cargando lecciones...</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -358,8 +358,8 @@ export default function AdminLessonsPage() {
               return (
                 <div 
                   key={lesson.id}
-                  className={`bg-dark-800 rounded-xl border transition-all ${
-                    isEditing ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-dark-600 hover:border-dark-500'
+                  className={`bg-gray-50 rounded-xl border transition-all ${
+                    isEditing ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-200 hover:border-dark-500'
                   }`}
                 >
                   {/* Lesson header */}
@@ -373,9 +373,9 @@ export default function AdminLessonsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <TypeIcon className={`w-4 h-4 ${lessonType.color}`} />
-                        <span className="text-white font-medium truncate">{lesson.title}</span>
+                        <span className="text-gray-900 font-medium truncate">{lesson.title}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
                         <span>{lesson.levelId}</span>
                         <span>•</span>
                         <span>{lesson.moduleName}</span>
@@ -414,7 +414,7 @@ export default function AdminLessonsPage() {
                     {!isEditing ? (
                       <button
                         onClick={() => startEditing(lesson)}
-                        className="p-2 bg-dark-700 hover:bg-dark-600 rounded-lg text-gray-400 hover:text-white transition-colors"
+                        className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 hover:text-gray-900 transition-colors"
                       >
                         <Edit className="w-5 h-5" />
                       </button>
@@ -430,7 +430,7 @@ export default function AdminLessonsPage() {
 
                   {/* Edit form */}
                   {isEditing && (
-                    <div className="border-t border-dark-600 p-4 space-y-6">
+                    <div className="border-t border-gray-200 p-4 space-y-6">
                       {/* Video URL */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -442,7 +442,7 @@ export default function AdminLessonsPage() {
                           value={formData.videoUrl}
                           onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
                           placeholder="https://www.youtube.com/watch?v=... o https://drive.google.com/..."
-                          className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500"
                         />
                         <p className="text-xs text-gray-500 mt-1">
                           Soporta: YouTube, Google Drive (compartido públicamente)
@@ -460,7 +460,7 @@ export default function AdminLessonsPage() {
                           value={formData.imageUrl}
                           onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
                           placeholder="https://images.unsplash.com/... o https://drive.google.com/..."
-                          className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500"
                         />
                         <p className="text-xs text-gray-500 mt-1">
                           Usa Unsplash, Google Drive (link directo), o cualquier URL de imagen
@@ -490,19 +490,19 @@ export default function AdminLessonsPage() {
                                 value={resource.title}
                                 onChange={(e) => updateResource(idx, 'title', e.target.value)}
                                 placeholder="Título"
-                                className="flex-1 px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
                               />
                               <input
                                 type="text"
                                 value={resource.url}
                                 onChange={(e) => updateResource(idx, 'url', e.target.value)}
                                 placeholder="URL (Google Drive, etc.)"
-                                className="flex-[2] px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-[2] px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
                               />
                               <select
                                 value={resource.type || 'pdf'}
                                 onChange={(e) => updateResource(idx, 'type', e.target.value)}
-                                className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm"
+                                className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-500 text-sm"
                               >
                                 <option value="pdf">PDF</option>
                                 <option value="video">Video</option>
@@ -546,21 +546,21 @@ export default function AdminLessonsPage() {
                                 value={link.title}
                                 onChange={(e) => updateExternalLink(idx, 'title', e.target.value)}
                                 placeholder="Título"
-                                className="flex-1 px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
                               />
                               <input
                                 type="text"
                                 value={link.url}
                                 onChange={(e) => updateExternalLink(idx, 'url', e.target.value)}
                                 placeholder="URL"
-                                className="flex-1 px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
                               />
                               <input
                                 type="text"
                                 value={link.desc || ''}
                                 onChange={(e) => updateExternalLink(idx, 'desc', e.target.value)}
                                 placeholder="Descripción"
-                                className="flex-1 px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
                               />
                               <button
                                 onClick={() => removeExternalLink(idx)}
@@ -577,17 +577,17 @@ export default function AdminLessonsPage() {
                       </div>
 
                       {/* Save button */}
-                      <div className="flex justify-end gap-3 pt-4 border-t border-dark-600">
+                      <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                         <button
                           onClick={cancelEditing}
-                          className="px-4 py-2 bg-dark-700 hover:bg-dark-600 rounded-lg text-gray-300 transition-colors"
+                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-300 transition-colors"
                         >
                           Cancelar
                         </button>
                         <button
                           onClick={saveLesson}
                           disabled={saving}
-                          className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors disabled:opacity-50"
+                          className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-gray-900 font-medium transition-colors disabled:opacity-50"
                         >
                           {saving ? (
                             <RefreshCw className="w-4 h-4 animate-spin" />
@@ -604,9 +604,9 @@ export default function AdminLessonsPage() {
             })}
 
             {filteredLessons.length === 0 && (
-              <div className="text-center py-12 bg-dark-800 rounded-xl border border-dark-600">
+              <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
                 <Search className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400">No se encontraron lecciones</p>
+                <p className="text-gray-600">No se encontraron lecciones</p>
               </div>
             )}
           </div>

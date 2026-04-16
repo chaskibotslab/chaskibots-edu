@@ -2013,7 +2013,7 @@ export default function RobotSimulator3D({
   }
 
   return (
-    <div className={`bg-dark-800 rounded-xl border border-dark-600 overflow-hidden transition-all duration-300 ${
+    <div className={`bg-gray-50 rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 ${
       isExpanded ? 'fixed inset-4 z-50 flex flex-col' : ''
     }`}>
       {/* Overlay para modo expandido */}
@@ -2025,13 +2025,13 @@ export default function RobotSimulator3D({
       )}
       
       {/* Header con logo */}
-      <div className="bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-b border-dark-600 p-3 flex-shrink-0">
+      <div className="bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-b border-gray-200 p-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Image src="/chaski.png" alt="ChaskiBots" width={32} height={32} className="rounded-lg" />
             <div>
-              <h3 className="text-sm font-bold text-white">Simulador 3D</h3>
-              <p className="text-xs text-gray-400">ChaskiBots</p>
+              <h3 className="text-sm font-bold text-gray-900">Simulador 3D</h3>
+              <p className="text-xs text-gray-600">ChaskiBots</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -2066,7 +2066,7 @@ export default function RobotSimulator3D({
             )}
             <button
               onClick={resetRobot}
-              className="flex items-center gap-1 px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-xs font-medium transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-300 rounded-lg text-xs font-medium transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
               Reset
@@ -2083,7 +2083,7 @@ export default function RobotSimulator3D({
       </div>
 
       {/* Selector de categoría */}
-      <div className="bg-dark-900/50 border-b border-dark-600 p-2 flex-shrink-0">
+      <div className="bg-white/50 border-b border-gray-200 p-2 flex-shrink-0">
         <div className="flex items-center justify-center gap-2">
           {(Object.keys(CATEGORY_INFO) as ChallengeCategory[]).map((cat) => (
             <button
@@ -2091,8 +2091,8 @@ export default function RobotSimulator3D({
               onClick={() => changeCategory(cat)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 selectedCategory === cat
-                  ? `bg-gradient-to-r ${CATEGORY_INFO[cat].color} border border-white/20 text-white`
-                  : 'bg-dark-700 hover:bg-dark-600 text-gray-400'
+                  ? `bg-gradient-to-r ${CATEGORY_INFO[cat].color} border border-white/20 text-gray-900`
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
               }`}
             >
               <span>{CATEGORY_INFO[cat].icon}</span>
@@ -2106,11 +2106,11 @@ export default function RobotSimulator3D({
       </div>
 
       {/* Selector de desafío dentro de la categoría */}
-      <div className={`bg-gradient-to-r ${CATEGORY_INFO[selectedCategory].color} border-b border-dark-600 p-2 flex-shrink-0`}>
+      <div className={`bg-gradient-to-r ${CATEGORY_INFO[selectedCategory].color} border-b border-gray-200 p-2 flex-shrink-0`}>
         <div className="flex items-center justify-between">
           <button
             onClick={() => changeChallenge('prev')}
-            className="p-1.5 bg-dark-700/50 hover:bg-dark-600 rounded-lg transition-colors"
+            className="p-1.5 bg-gray-100/50 hover:bg-gray-200 rounded-lg transition-colors"
           >
             <ChevronLeft className="w-4 h-4 text-gray-300" />
           </button>
@@ -2118,7 +2118,7 @@ export default function RobotSimulator3D({
           <div className="flex-1 text-center">
             <div className="flex items-center justify-center gap-2">
               <span className="text-lg">{CATEGORY_INFO[selectedCategory].icon}</span>
-              <span className="text-sm font-medium text-white">{currentChallenge.name}</span>
+              <span className="text-sm font-medium text-gray-900">{currentChallenge.name}</span>
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                 currentChallenge.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
                 currentChallenge.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
@@ -2133,7 +2133,7 @@ export default function RobotSimulator3D({
           
           <button
             onClick={() => changeChallenge('next')}
-            className="p-1.5 bg-dark-700/50 hover:bg-dark-600 rounded-lg transition-colors"
+            className="p-1.5 bg-gray-100/50 hover:bg-gray-200 rounded-lg transition-colors"
           >
             <ChevronRight className="w-4 h-4 text-gray-300" />
           </button>
@@ -2156,7 +2156,7 @@ export default function RobotSimulator3D({
       {totalCollectibles > 0 && (
         <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-purple-500/30 p-2 flex-shrink-0">
           <div className="flex items-center justify-center gap-3">
-            <span className="text-xs text-gray-400">Coleccionables:</span>
+            <span className="text-xs text-gray-600">Coleccionables:</span>
             <div className="flex items-center gap-1">
               {currentChallenge.collectibles?.map((item) => (
                 <div 
@@ -2186,7 +2186,7 @@ export default function RobotSimulator3D({
       {totalPushables > 0 && (
         <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-b border-red-500/30 p-2 flex-shrink-0">
           <div className="flex items-center justify-center gap-3">
-            <span className="text-xs text-gray-400">🥋 Mini Sumo:</span>
+            <span className="text-xs text-gray-600">🥋 Mini Sumo:</span>
             <div className="flex items-center gap-1">
               {currentChallenge.pushableObjects?.map((obj) => (
                 <div 
@@ -2228,17 +2228,17 @@ export default function RobotSimulator3D({
       {/* Modal de envío de reto */}
       {showSubmitModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100]">
-          <div className="bg-dark-800 rounded-xl border border-dark-600 p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
               <Trophy className="w-5 h-5 text-yellow-400" />
               Enviar Reto Completado
             </h3>
-            <div className="bg-dark-700 rounded-lg p-4 mb-4">
+            <div className="bg-gray-100 rounded-lg p-4 mb-4">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">{CATEGORY_INFO[selectedCategory].icon}</span>
-                <span className="text-white font-medium">{currentChallenge.name}</span>
+                <span className="text-gray-900 font-medium">{currentChallenge.name}</span>
               </div>
-              <p className="text-sm text-gray-400">{currentChallenge.description}</p>
+              <p className="text-sm text-gray-600">{currentChallenge.description}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className={`text-[10px] px-2 py-0.5 rounded-full ${
                   currentChallenge.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
@@ -2251,13 +2251,13 @@ export default function RobotSimulator3D({
                 <span className="text-xs text-gray-500">Categoría: {CATEGORY_INFO[selectedCategory].name}</span>
               </div>
             </div>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-gray-600 mb-4">
               ¿Deseas enviar este reto como completado a tu docente?
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="flex-1 px-4 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
+                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-300 rounded-lg text-sm font-medium transition-colors"
               >
                 Cancelar
               </button>
@@ -2285,7 +2285,7 @@ export default function RobotSimulator3D({
 
       <div className={`flex ${isExpanded ? 'flex-1 min-h-0 overflow-hidden' : ''}`}>
         {/* Canvas 3D */}
-        <div className={`flex-1 bg-dark-900 relative ${isExpanded ? 'h-full' : 'h-[400px]'}`}>
+        <div className={`flex-1 bg-white relative ${isExpanded ? 'h-full' : 'h-[400px]'}`}>
           <Canvas shadows className="w-full h-full">
             <Scene 
               robotState={robotState} 
@@ -2300,26 +2300,26 @@ export default function RobotSimulator3D({
         </div>
 
         {/* Panel de control */}
-        <div className={`w-48 bg-dark-900 border-l border-dark-600 p-3 space-y-4 flex-shrink-0 ${isExpanded ? 'overflow-y-auto max-h-full' : ''}`}>
+        <div className={`w-48 bg-white border-l border-gray-200 p-3 space-y-4 flex-shrink-0 ${isExpanded ? 'overflow-y-auto max-h-full' : ''}`}>
           {/* Controles de dirección */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium">Control Manual</p>
+            <p className="text-xs text-gray-600 mb-2 font-medium">Control Manual</p>
             <div className="grid grid-cols-3 gap-1">
               <div></div>
               <button
                 onMouseDown={() => handleManualControl('up')}
                 onMouseUp={() => handleManualControl('stop')}
-                className="p-2 bg-dark-700 hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-brand-purple/20 rounded-lg transition-colors"
               >
-                <ArrowUp className="w-4 h-4 text-neon-cyan mx-auto" />
+                <ArrowUp className="w-4 h-4 text-brand-purple mx-auto" />
               </button>
               <div></div>
               <button
                 onMouseDown={() => handleManualControl('left')}
                 onMouseUp={() => handleManualControl('stop')}
-                className="p-2 bg-dark-700 hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-brand-purple/20 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-4 h-4 text-neon-cyan mx-auto" />
+                <ArrowLeft className="w-4 h-4 text-brand-purple mx-auto" />
               </button>
               <button
                 onClick={() => handleManualControl('stop')}
@@ -2330,17 +2330,17 @@ export default function RobotSimulator3D({
               <button
                 onMouseDown={() => handleManualControl('right')}
                 onMouseUp={() => handleManualControl('stop')}
-                className="p-2 bg-dark-700 hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-brand-purple/20 rounded-lg transition-colors"
               >
-                <ArrowRight className="w-4 h-4 text-neon-cyan mx-auto" />
+                <ArrowRight className="w-4 h-4 text-brand-purple mx-auto" />
               </button>
               <div></div>
               <button
                 onMouseDown={() => handleManualControl('down')}
                 onMouseUp={() => handleManualControl('stop')}
-                className="p-2 bg-dark-700 hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-brand-purple/20 rounded-lg transition-colors"
               >
-                <ArrowDown className="w-4 h-4 text-neon-cyan mx-auto" />
+                <ArrowDown className="w-4 h-4 text-brand-purple mx-auto" />
               </button>
               <div></div>
             </div>
@@ -2348,7 +2348,7 @@ export default function RobotSimulator3D({
 
           {/* LEDs */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium flex items-center gap-1">
+            <p className="text-xs text-gray-600 mb-2 font-medium flex items-center gap-1">
               <Lightbulb className="w-3 h-3" /> LEDs
             </p>
             <div className="flex gap-2">
@@ -2362,10 +2362,10 @@ export default function RobotSimulator3D({
                         : pin === 12 ? 'bg-green-500 border-green-400 shadow-lg shadow-green-500/50'
                         : pin === 11 ? 'bg-blue-500 border-blue-400 shadow-lg shadow-blue-500/50'
                         : 'bg-yellow-500 border-yellow-400 shadow-lg shadow-yellow-500/50'
-                      : 'bg-dark-700 border-dark-500'
+                      : 'bg-gray-100 border-dark-500'
                   }`}
                 >
-                  <span className="text-[8px] text-white font-bold">{pin}</span>
+                  <span className="text-[8px] text-gray-900 font-bold">{pin}</span>
                 </button>
               ))}
             </div>
@@ -2373,29 +2373,29 @@ export default function RobotSimulator3D({
 
           {/* Servo */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium">Servo: {robotState.servoAngle}°</p>
+            <p className="text-xs text-gray-600 mb-2 font-medium">Servo: {robotState.servoAngle}°</p>
             <input
               type="range"
               min="0"
               max="180"
               value={robotState.servoAngle}
               onChange={(e) => executeCommand({ type: 'servo', params: { angle: parseInt(e.target.value) } })}
-              className="w-full h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
+              className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-orange-500"
             />
           </div>
 
           {/* Sensores */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium flex items-center gap-1">
+            <p className="text-xs text-gray-600 mb-2 font-medium flex items-center gap-1">
               <Eye className="w-3 h-3" /> Sensores
             </p>
             <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between bg-dark-700 rounded-lg px-2 py-1.5">
-                <span className="text-gray-400">Ultrasónico</span>
+              <div className="flex items-center justify-between bg-gray-100 rounded-lg px-2 py-1.5">
+                <span className="text-gray-600">Ultrasónico</span>
                 <span className="text-purple-400 font-mono">{Math.round(robotState.ultrasonicDistance)} cm</span>
               </div>
-              <div className="flex items-center justify-between bg-dark-700 rounded-lg px-2 py-1.5">
-                <span className="text-gray-400">IR</span>
+              <div className="flex items-center justify-between bg-gray-100 rounded-lg px-2 py-1.5">
+                <span className="text-gray-600">IR</span>
                 <span className={robotState.irSensor ? 'text-red-400' : 'text-green-400'}>
                   {robotState.irSensor ? 'Obstáculo' : 'Libre'}
                 </span>
@@ -2405,24 +2405,24 @@ export default function RobotSimulator3D({
 
           {/* Motores */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium flex items-center gap-1">
+            <p className="text-xs text-gray-600 mb-2 font-medium flex items-center gap-1">
               <Gauge className="w-3 h-3" /> Motores
             </p>
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 w-6">Izq</span>
-                <div className="flex-1 h-2 bg-dark-700 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-neon-cyan transition-all"
+                    className="h-full bg-brand-purple transition-all"
                     style={{ width: `${(robotState.leftMotor / 255) * 100}%` }}
                   />
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 w-6">Der</span>
-                <div className="flex-1 h-2 bg-dark-700 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-neon-cyan transition-all"
+                    className="h-full bg-brand-purple transition-all"
                     style={{ width: `${(robotState.rightMotor / 255) * 100}%` }}
                   />
                 </div>

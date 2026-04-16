@@ -680,7 +680,7 @@ print("Nivel: " .. nivel)`)
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Gamepad2 className="w-5 h-5 text-red-400" />
-          <h3 className="font-bold text-white">Editor Roblox Lua</h3>
+          <h3 className="font-bold text-gray-900">Editor Roblox Lua</h3>
           <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded">
             {getLevel().charAt(0).toUpperCase() + getLevel().slice(1)}
           </span>
@@ -689,7 +689,7 @@ print("Nivel: " .. nivel)`)
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value as any)}
-            className="px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-white"
+            className="px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-900"
           >
             <option value="todos">Todos los niveles</option>
             <option value="basico">Básico</option>
@@ -720,16 +720,16 @@ print("Nivel: " .. nivel)`)
                   onClick={() => setActiveGuide(activeGuide === idx ? null : idx)}
                   className="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
                 >
-                  <span className="font-medium text-white">{guide.title}</span>
+                  <span className="font-medium text-gray-900">{guide.title}</span>
                   {activeGuide === idx ? (
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                    <ChevronDown className="w-4 h-4 text-gray-600" />
                   ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-600" />
                   )}
                 </button>
                 {activeGuide === idx && (
                   <div className="p-3 bg-gray-900/50 border-t border-gray-700">
-                    <p className="text-sm text-gray-400 mb-3">{guide.content}</p>
+                    <p className="text-sm text-gray-600 mb-3">{guide.content}</p>
                     <div className="grid gap-2">
                       {guide.examples.map((example, exIdx) => (
                         <button
@@ -739,7 +739,7 @@ print("Nivel: " .. nivel)`)
                         >
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-white">{example.title}</span>
+                              <span className="text-sm font-medium text-gray-900">{example.title}</span>
                               <span className={`px-1.5 py-0.5 text-xs rounded ${
                                 example.category === 'basico' ? 'bg-green-500/20 text-green-400' :
                                 example.category === 'intermedio' ? 'bg-yellow-500/20 text-yellow-400' :
@@ -771,7 +771,7 @@ print("Nivel: " .. nivel)`)
               <div className="w-3 h-3 rounded-full bg-red-500" />
               <div className="w-3 h-3 rounded-full bg-yellow-500" />
               <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span className="ml-2 text-sm text-gray-400">script.lua</span>
+              <span className="ml-2 text-sm text-gray-600">script.lua</span>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -782,7 +782,7 @@ print("Nivel: " .. nivel)`)
                 {copied ? (
                   <Check className="w-4 h-4 text-green-400" />
                 ) : (
-                  <Copy className="w-4 h-4 text-gray-400" />
+                  <Copy className="w-4 h-4 text-gray-600" />
                 )}
               </button>
               <button
@@ -790,7 +790,7 @@ print("Nivel: " .. nivel)`)
                 className="p-1.5 hover:bg-gray-700 rounded transition-colors"
                 title="Limpiar"
               >
-                <RotateCcw className="w-4 h-4 text-gray-400" />
+                <RotateCcw className="w-4 h-4 text-gray-600" />
               </button>
             </div>
           </div>
@@ -807,13 +807,13 @@ print("Nivel: " .. nivel)`)
         <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-700">
           <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
             <div className="flex items-center gap-2">
-              <Box className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-gray-400">Output</span>
+              <Box className="w-4 h-4 text-gray-600" />
+              <span className="text-sm text-gray-600">Output</span>
             </div>
             <button
               onClick={runCode}
               disabled={isRunning}
-              className="flex items-center gap-2 px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+              className="flex items-center gap-2 px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-gray-900 rounded-lg transition-colors text-sm"
             >
               <Play className="w-4 h-4" />
               {isRunning ? 'Ejecutando...' : 'Simular'}
@@ -821,7 +821,7 @@ print("Nivel: " .. nivel)`)
           </div>
           <div className="h-64 p-4 overflow-y-auto font-mono text-sm">
             {output.map((line, idx) => (
-              <div key={idx} className="text-white">
+              <div key={idx} className="text-gray-900">
                 {line}
               </div>
             ))}

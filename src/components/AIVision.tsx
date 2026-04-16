@@ -548,48 +548,48 @@ void loop() {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h3 className="text-xl font-bold text-white mb-2">Vision IA y Herramientas</h3>
-        <p className="text-gray-400">Experimenta con IA y ciberseguridad de forma practica</p>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Vision IA y Herramientas</h3>
+        <p className="text-gray-600">Experimenta con IA y ciberseguridad de forma practica</p>
       </div>
 
       {/* Mode selector */}
       {!activeMode && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           <button onClick={() => setActiveMode('camera')}
-            className="bg-dark-700/50 rounded-xl p-5 border border-dark-600 hover:border-neon-cyan/50 text-left">
-            <Camera className="w-8 h-8 text-neon-cyan mb-3" />
-            <h4 className="text-white font-bold mb-1">Detector de Objetos</h4>
+            className="bg-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-brand-purple/50 text-left">
+            <Camera className="w-8 h-8 text-brand-purple mb-3" />
+            <h4 className="text-gray-900 font-bold mb-1">Detector de Objetos</h4>
             <p className="text-gray-500 text-sm">Detecta objetos con tu camara en tiempo real</p>
           </button>
 
           <button onClick={() => setActiveMode('draw')}
-            className="bg-dark-700/50 rounded-xl p-5 border border-dark-600 hover:border-neon-pink/50 text-left">
+            className="bg-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-neon-pink/50 text-left">
             <Pencil className="w-8 h-8 text-neon-pink mb-3" />
-            <h4 className="text-white font-bold mb-1">Dibuja y Adivina</h4>
+            <h4 className="text-gray-900 font-bold mb-1">Dibuja y Adivina</h4>
             <p className="text-gray-500 text-sm">Dibuja algo y la IA intentara adivinar</p>
           </button>
 
           <button onClick={() => setActiveMode('upload')}
-            className="bg-dark-700/50 rounded-xl p-5 border border-dark-600 hover:border-neon-orange/50 text-left">
-            <Upload className="w-8 h-8 text-neon-orange mb-3" />
-            <h4 className="text-white font-bold mb-1">Clasificar Imagen</h4>
+            className="bg-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-brand-cyan/50 text-left">
+            <Upload className="w-8 h-8 text-brand-cyan mb-3" />
+            <h4 className="text-gray-900 font-bold mb-1">Clasificar Imagen</h4>
             <p className="text-gray-500 text-sm">Sube una imagen para clasificarla</p>
           </button>
 
           {isAdvancedLevel && (
             <button onClick={() => setActiveMode('hacking')}
-              className="bg-dark-700/50 rounded-xl p-5 border border-dark-600 hover:border-green-500/50 text-left">
+              className="bg-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-green-500/50 text-left">
               <Terminal className="w-8 h-8 text-green-400 mb-3" />
-              <h4 className="text-white font-bold mb-1">Simuladores Hacking</h4>
+              <h4 className="text-gray-900 font-bold mb-1">Simuladores Hacking</h4>
               <p className="text-gray-500 text-sm">Terminal, cifrado y analisis de passwords</p>
             </button>
           )}
 
           {isBachillerato && (
             <button onClick={() => setActiveMode('badusb')}
-              className="bg-dark-700/50 rounded-xl p-5 border border-dark-600 hover:border-red-500/50 text-left">
+              className="bg-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-red-500/50 text-left">
               <Cpu className="w-8 h-8 text-red-400 mb-3" />
-              <h4 className="text-white font-bold mb-1">Tutorial BadUSB</h4>
+              <h4 className="text-gray-900 font-bold mb-1">Tutorial BadUSB</h4>
               <p className="text-gray-500 text-sm">Aprende a crear un BadUSB con Digispark</p>
             </button>
           )}
@@ -599,8 +599,8 @@ void loop() {
       {/* Loading */}
       {isLoading && (
         <div className="flex flex-col items-center py-12">
-          <Loader2 className="w-12 h-12 text-neon-cyan animate-spin mb-4" />
-          <p className="text-gray-400">{loadingMessage}</p>
+          <Loader2 className="w-12 h-12 text-brand-purple animate-spin mb-4" />
+          <p className="text-gray-600">{loadingMessage}</p>
         </div>
       )}
 
@@ -608,18 +608,18 @@ void loop() {
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
           <p className="text-red-400">{error}</p>
-          <button onClick={() => setError(null)} className="text-gray-400 text-sm mt-2">Cerrar</button>
+          <button onClick={() => setError(null)} className="text-gray-600 text-sm mt-2">Cerrar</button>
         </div>
       )}
 
       {/* Camera Mode */}
       {activeMode === 'camera' && !isLoading && (
-        <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-          <div className="bg-dark-700 px-4 py-3 flex justify-between items-center">
-            <span className="text-white font-semibold flex items-center gap-2">
-              <Eye className="w-5 h-5 text-neon-cyan" /> Detector de Objetos
+        <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-gray-100 px-4 py-3 flex justify-between items-center">
+            <span className="text-gray-900 font-semibold flex items-center gap-2">
+              <Eye className="w-5 h-5 text-brand-purple" /> Detector de Objetos
             </span>
-            <button onClick={() => { stopCamera(); setActiveMode(null) }} className="text-gray-400 hover:text-white text-sm">Cerrar</button>
+            <button onClick={() => { stopCamera(); setActiveMode(null) }} className="text-gray-600 hover:text-gray-900 text-sm">Cerrar</button>
           </div>
           <div className="p-4">
             <div className="relative bg-black rounded-lg overflow-hidden max-w-xl mx-auto">
@@ -636,7 +636,7 @@ void loop() {
             {detections.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {detections.map((d, i) => (
-                  <span key={i} className="px-3 py-1 bg-neon-cyan/20 text-neon-cyan rounded-full text-sm">
+                  <span key={i} className="px-3 py-1 bg-brand-purple/20 text-brand-purple rounded-full text-sm">
                     {TRANSLATIONS[d.class] || d.class} ({Math.round(d.score * 100)}%)
                   </span>
                 ))}
@@ -654,26 +654,26 @@ void loop() {
             <div className="mt-6 space-y-4">
               {/* Como funciona */}
               <div className="bg-gradient-to-r from-cyan-900/20 to-blue-900/20 border border-cyan-500/30 rounded-xl p-4">
-                <h4 className="text-white font-bold mb-2 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-neon-cyan" /> {AI_LEARNING_INFO.detector.title}
+                <h4 className="text-gray-900 font-bold mb-2 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-brand-purple" /> {AI_LEARNING_INFO.detector.title}
                 </h4>
                 <p className="text-gray-300 text-sm mb-3">{AI_LEARNING_INFO.detector.howItWorks}</p>
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
-                    <p className="text-neon-cyan text-xs font-semibold mb-1">Destrezas que desarrollas:</p>
-                    <ul className="text-gray-400 text-xs space-y-1">
+                    <p className="text-brand-purple text-xs font-semibold mb-1">Destrezas que desarrollas:</p>
+                    <ul className="text-gray-600 text-xs space-y-1">
                       {AI_LEARNING_INFO.detector.skills.map((skill, i) => (
                         <li key={i} className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 bg-neon-cyan rounded-full"></span> {skill}
+                          <span className="w-1.5 h-1.5 bg-brand-purple rounded-full"></span> {skill}
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div>
-                    <p className="text-neon-purple text-xs font-semibold mb-1">Aplicaciones reales:</p>
+                    <p className="text-brand-violet text-xs font-semibold mb-1">Aplicaciones reales:</p>
                     <div className="flex flex-wrap gap-1">
                       {AI_LEARNING_INFO.detector.realWorld.map((app, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-neon-purple/20 text-neon-purple rounded text-xs">{app}</span>
+                        <span key={i} className="px-2 py-0.5 bg-brand-violet/20 text-brand-violet rounded text-xs">{app}</span>
                       ))}
                     </div>
                   </div>
@@ -681,15 +681,15 @@ void loop() {
               </div>
 
               {/* Lista de objetos detectables */}
-              <div className="bg-dark-700/50 border border-dark-600 rounded-xl p-4">
-                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-neon-orange" /> 80 Objetos que puedo detectar
+              <div className="bg-gray-100/50 border border-gray-200 rounded-xl p-4">
+                <h4 className="text-gray-900 font-bold mb-3 flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-brand-cyan" /> 80 Objetos que puedo detectar
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {Object.entries(COCO_CATEGORIES).map(([category, items]) => (
-                    <div key={category} className="bg-dark-800/50 rounded-lg p-2">
-                      <p className="text-neon-cyan text-xs font-semibold capitalize mb-1">{category}</p>
-                      <p className="text-gray-400 text-xs">{items.join(', ')}</p>
+                    <div key={category} className="bg-gray-50/50 rounded-lg p-2">
+                      <p className="text-brand-purple text-xs font-semibold capitalize mb-1">{category}</p>
+                      <p className="text-gray-600 text-xs">{items.join(', ')}</p>
                     </div>
                   ))}
                 </div>
@@ -704,27 +704,27 @@ void loop() {
 
       {/* Draw Mode */}
       {activeMode === 'draw' && (
-        <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-          <div className="bg-dark-700 px-4 py-3 flex justify-between items-center">
-            <span className="text-white font-semibold flex items-center gap-2">
+        <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-gray-100 px-4 py-3 flex justify-between items-center">
+            <span className="text-gray-900 font-semibold flex items-center gap-2">
               <Pencil className="w-5 h-5 text-neon-pink" /> Dibuja y Adivina
             </span>
             <div className="flex items-center gap-4">
-              <span className="text-neon-cyan font-bold">Puntos: {drawScore}</span>
-              <button onClick={() => setActiveMode(null)} className="text-gray-400 hover:text-white text-sm">Cerrar</button>
+              <span className="text-brand-purple font-bold">Puntos: {drawScore}</span>
+              <button onClick={() => setActiveMode(null)} className="text-gray-600 hover:text-gray-900 text-sm">Cerrar</button>
             </div>
           </div>
           <div className="p-4">
             <div className="text-center mb-4">
-              <p className="text-gray-400">Dibuja:</p>
-              <p className="text-3xl font-bold text-white">{targetItem.toUpperCase()}</p>
+              <p className="text-gray-600">Dibuja:</p>
+              <p className="text-3xl font-bold text-gray-900">{targetItem.toUpperCase()}</p>
             </div>
             <div className="flex justify-center mb-4">
               <canvas
                 ref={drawCanvasRef}
                 width={350}
                 height={350}
-                className="border-2 border-dark-600 rounded-xl cursor-crosshair touch-none"
+                className="border-2 border-gray-200 rounded-xl cursor-crosshair touch-none"
                 style={{ touchAction: 'none' }}
                 onMouseDown={handleDrawStart}
                 onMouseMove={handleDrawMove}
@@ -757,20 +757,20 @@ void loop() {
 
       {/* Upload Mode */}
       {activeMode === 'upload' && !isLoading && (
-        <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-          <div className="bg-dark-700 px-4 py-3 flex justify-between items-center">
-            <span className="text-white font-semibold flex items-center gap-2">
-              <Upload className="w-5 h-5 text-neon-orange" /> Clasificar Imagen
+        <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-gray-100 px-4 py-3 flex justify-between items-center">
+            <span className="text-gray-900 font-semibold flex items-center gap-2">
+              <Upload className="w-5 h-5 text-brand-cyan" /> Clasificar Imagen
             </span>
-            <button onClick={() => { setActiveMode(null); setUploadedImage(null); setImagePredictions([]) }} className="text-gray-400 hover:text-white text-sm">Cerrar</button>
+            <button onClick={() => { setActiveMode(null); setUploadedImage(null); setImagePredictions([]) }} className="text-gray-600 hover:text-gray-900 text-sm">Cerrar</button>
           </div>
           <div className="p-6">
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
             {!uploadedImage ? (
               <div onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-dark-500 rounded-xl p-12 text-center cursor-pointer hover:border-neon-orange/50">
+                className="border-2 border-dashed border-dark-500 rounded-xl p-12 text-center cursor-pointer hover:border-brand-cyan/50">
                 <Upload className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                <p className="text-gray-400">Haz clic para subir una imagen</p>
+                <p className="text-gray-600">Haz clic para subir una imagen</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -778,15 +778,15 @@ void loop() {
                   <img src={uploadedImage} alt="Uploaded" className="max-h-64 rounded-xl" />
                 </div>
                 {imagePredictions.length > 0 && (
-                  <div className="bg-dark-700 rounded-xl p-4">
-                    <p className="text-gray-400 text-sm mb-3">La IA cree que es:</p>
+                  <div className="bg-gray-100 rounded-xl p-4">
+                    <p className="text-gray-600 text-sm mb-3">La IA cree que es:</p>
                     {imagePredictions.map((pred, i) => (
                       <div key={i} className="flex items-center gap-3 mb-2">
                         <div className="flex-1 bg-dark-600 rounded-full h-3 overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-neon-orange to-neon-pink" style={{ width: (pred.probability * 100) + '%' }} />
+                          <div className="h-full bg-gradient-to-r from-brand-cyan to-neon-pink" style={{ width: (pred.probability * 100) + '%' }} />
                         </div>
-                        <span className="text-white text-sm w-28 truncate">{pred.className}</span>
-                        <span className="text-gray-400 text-sm w-10">{Math.round(pred.probability * 100)}%</span>
+                        <span className="text-gray-900 text-sm w-28 truncate">{pred.className}</span>
+                        <span className="text-gray-600 text-sm w-10">{Math.round(pred.probability * 100)}%</span>
                       </div>
                     ))}
                   </div>
@@ -801,17 +801,17 @@ void loop() {
 
             {/* Informacion Educativa del Clasificador */}
             <div className="mt-6 bg-gradient-to-r from-orange-900/20 to-pink-900/20 border border-orange-500/30 rounded-xl p-4">
-              <h4 className="text-white font-bold mb-2 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-neon-orange" /> {AI_LEARNING_INFO.classifier.title}
+              <h4 className="text-gray-900 font-bold mb-2 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-brand-cyan" /> {AI_LEARNING_INFO.classifier.title}
               </h4>
               <p className="text-gray-300 text-sm mb-3">{AI_LEARNING_INFO.classifier.howItWorks}</p>
               <div className="grid md:grid-cols-2 gap-3">
                 <div>
-                  <p className="text-neon-orange text-xs font-semibold mb-1">Destrezas que desarrollas:</p>
-                  <ul className="text-gray-400 text-xs space-y-1">
+                  <p className="text-brand-cyan text-xs font-semibold mb-1">Destrezas que desarrollas:</p>
+                  <ul className="text-gray-600 text-xs space-y-1">
                     {AI_LEARNING_INFO.classifier.skills.map((skill, i) => (
                       <li key={i} className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 bg-neon-orange rounded-full"></span> {skill}
+                        <span className="w-1.5 h-1.5 bg-brand-cyan rounded-full"></span> {skill}
                       </li>
                     ))}
                   </ul>
@@ -825,9 +825,9 @@ void loop() {
                   </div>
                 </div>
               </div>
-              <div className="mt-3 p-3 bg-dark-800/50 rounded-lg">
-                <p className="text-gray-400 text-xs">
-                  <strong className="text-white">Dato curioso:</strong> MobileNet puede clasificar imagenes en mas de 1000 categorias diferentes, 
+              <div className="mt-3 p-3 bg-gray-50/50 rounded-lg">
+                <p className="text-gray-600 text-xs">
+                  <strong className="text-gray-900">Dato curioso:</strong> MobileNet puede clasificar imagenes en mas de 1000 categorias diferentes, 
                   desde animales y objetos hasta comida y vehiculos. Fue disenada para ser lo suficientemente ligera para funcionar en tu celular!
                 </p>
               </div>
@@ -840,26 +840,26 @@ void loop() {
       {activeMode === 'hacking' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
               <Terminal className="w-5 h-5 text-green-400" /> Simuladores de Hacking
             </h3>
-            <button onClick={() => setActiveMode(null)} className="text-gray-400 hover:text-white text-sm">Cerrar</button>
+            <button onClick={() => setActiveMode(null)} className="text-gray-600 hover:text-gray-900 text-sm">Cerrar</button>
           </div>
 
           {/* Terminal Simulator */}
-          <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-            <div className="bg-dark-700 px-4 py-2 flex items-center gap-2">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-gray-100 px-4 py-2 flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-red-500" />
               <div className="w-3 h-3 rounded-full bg-yellow-500" />
               <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span className="text-gray-400 text-sm ml-2">Terminal Linux</span>
+              <span className="text-gray-600 text-sm ml-2">Terminal Linux</span>
             </div>
             <div className="bg-black p-4 font-mono text-sm h-48 overflow-y-auto">
               {terminalOutput.map((line, i) => (
                 <div key={i} className={line.startsWith('$') ? 'text-green-400' : 'text-gray-300'}>{line}</div>
               ))}
             </div>
-            <div className="bg-dark-900 p-2 flex items-center gap-2">
+            <div className="bg-white p-2 flex items-center gap-2">
               <span className="text-green-400 font-mono">$</span>
               <input
                 type="text"
@@ -867,30 +867,30 @@ void loop() {
                 onChange={e => setTerminalInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleTerminalCommand(terminalInput)}
                 placeholder="Escribe un comando (help para ayuda)"
-                className="flex-1 bg-transparent text-white font-mono outline-none"
+                className="flex-1 bg-transparent text-gray-900 font-mono outline-none"
               />
             </div>
           </div>
 
           {/* Caesar Cipher */}
-          <div className="bg-dark-800 rounded-xl border border-dark-600 p-4">
-            <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+            <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
               <Lock className="w-5 h-5 text-yellow-400" /> Cifrado Cesar
             </h4>
-            <p className="text-gray-400 text-sm mb-3">El cifrado Cesar desplaza cada letra un numero de posiciones en el alfabeto.</p>
+            <p className="text-gray-600 text-sm mb-3">El cifrado Cesar desplaza cada letra un numero de posiciones en el alfabeto.</p>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="text-gray-400 text-sm">Texto a cifrar:</label>
+                <label className="text-gray-600 text-sm">Texto a cifrar:</label>
                 <input
                   type="text"
                   value={encryptText}
                   onChange={e => setEncryptText(e.target.value)}
                   placeholder="Escribe tu mensaje secreto"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white mt-1"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 mt-1"
                 />
               </div>
               <div>
-                <label className="text-gray-400 text-sm">Desplazamiento: {encryptShift}</label>
+                <label className="text-gray-600 text-sm">Desplazamiento: {encryptShift}</label>
                 <input
                   type="range"
                   min="1"
@@ -906,15 +906,15 @@ void loop() {
             </button>
             {encryptedResult && (
               <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-gray-400 text-sm">Resultado cifrado:</p>
+                <p className="text-gray-600 text-sm">Resultado cifrado:</p>
                 <p className="text-green-400 font-mono text-lg">{encryptedResult}</p>
               </div>
             )}
           </div>
 
           {/* Password Checker */}
-          <div className="bg-dark-800 rounded-xl border border-dark-600 p-4">
-            <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+            <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
               <Key className="w-5 h-5 text-purple-400" /> Analizador de Contraseñas
             </h4>
             <input
@@ -922,7 +922,7 @@ void loop() {
               value={passwordToCheck}
               onChange={e => { setPasswordToCheck(e.target.value); checkPasswordStrength(e.target.value) }}
               placeholder="Escribe una contraseña para analizar"
-              className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white"
+              className="w-full bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-gray-900"
             />
             {passwordStrength && (
               <div className="mt-3">
@@ -962,10 +962,10 @@ void loop() {
       {activeMode === 'badusb' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
               <Cpu className="w-5 h-5 text-red-400" /> Tutorial BadUSB con Digispark
             </h3>
-            <button onClick={() => setActiveMode(null)} className="text-gray-400 hover:text-white text-sm">Cerrar</button>
+            <button onClick={() => setActiveMode(null)} className="text-gray-600 hover:text-gray-900 text-sm">Cerrar</button>
           </div>
 
           <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
@@ -984,21 +984,21 @@ void loop() {
               const Icon = step.icon
               return (
                 <div key={i} 
-                  className={`bg-dark-800 rounded-xl border transition-all cursor-pointer ${badusbStep === i ? 'border-red-500/50' : 'border-dark-600'}`}
+                  className={`bg-gray-50 rounded-xl border transition-all cursor-pointer ${badusbStep === i ? 'border-red-500/50' : 'border-gray-200'}`}
                   onClick={() => setBadusbStep(i)}
                 >
                   <div className="p-4 flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${badusbStep === i ? 'bg-red-500/20' : 'bg-dark-700'}`}>
-                      <Icon className={`w-5 h-5 ${badusbStep === i ? 'text-red-400' : 'text-gray-400'}`} />
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${badusbStep === i ? 'bg-red-500/20' : 'bg-gray-100'}`}>
+                      <Icon className={`w-5 h-5 ${badusbStep === i ? 'text-red-400' : 'text-gray-600'}`} />
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-white font-semibold">Paso {i + 1}: {step.title}</h4>
+                      <h4 className="text-gray-900 font-semibold">Paso {i + 1}: {step.title}</h4>
                     </div>
                     <ChevronRight className={`w-5 h-5 transition-transform ${badusbStep === i ? 'rotate-90 text-red-400' : 'text-gray-500'}`} />
                   </div>
                   {badusbStep === i && (
                     <div className="px-4 pb-4">
-                      <pre className="text-gray-300 text-sm whitespace-pre-wrap bg-dark-900 rounded-lg p-3">
+                      <pre className="text-gray-300 text-sm whitespace-pre-wrap bg-white rounded-lg p-3">
                         {step.content}
                       </pre>
                     </div>
@@ -1009,17 +1009,17 @@ void loop() {
           </div>
 
           {/* Code */}
-          <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-            <div className="bg-dark-700 px-4 py-2 flex justify-between items-center">
-              <span className="text-white font-semibold flex items-center gap-2">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-gray-100 px-4 py-2 flex justify-between items-center">
+              <span className="text-gray-900 font-semibold flex items-center gap-2">
                 <Code className="w-5 h-5 text-green-400" /> Codigo Arduino
               </span>
-              <button onClick={copyCode} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white">
+              <button onClick={copyCode} className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
                 {copiedCode ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                 {copiedCode ? 'Copiado!' : 'Copiar'}
               </button>
             </div>
-            <pre className="p-4 text-sm text-gray-300 overflow-x-auto font-mono bg-dark-900">
+            <pre className="p-4 text-sm text-gray-300 overflow-x-auto font-mono bg-white">
               {BADUSB_CODE}
             </pre>
           </div>

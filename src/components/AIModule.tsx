@@ -338,17 +338,17 @@ export default function AIModule({ levelId }: AIModuleProps) {
     <div className="max-w-4xl mx-auto">
       {/* Header personalizado por nivel */}
       {levelId && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 border border-neon-pink/30 rounded-xl">
+        <div className="mb-6 p-4 bg-gradient-to-r from-neon-pink/10 to-brand-violet/10 border border-neon-pink/30 rounded-xl">
           <div className="flex items-center gap-3 mb-2">
             <Sparkles className="w-6 h-6 text-neon-pink" />
-            <h3 className="text-lg font-bold text-white">{config.title}</h3>
+            <h3 className="text-lg font-bold text-gray-900">{config.title}</h3>
           </div>
-          <p className="text-gray-400 text-sm mb-3">{config.description}</p>
+          <p className="text-gray-600 text-sm mb-3">{config.description}</p>
           {/* Mostrar actividades de API si existen */}
           {apiActivities.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {apiActivities.map((activity) => (
-                <span key={activity.id} className="px-2 py-1 bg-dark-700 text-gray-300 text-xs rounded-full">
+                <span key={activity.id} className="px-2 py-1 bg-gray-100 text-gray-300 text-xs rounded-full">
                   {activity.activityName}
                 </span>
               ))}
@@ -356,7 +356,7 @@ export default function AIModule({ levelId }: AIModuleProps) {
           ) : (
             <div className="flex flex-wrap gap-2">
               {config.features.map((feature, idx) => (
-                <span key={idx} className="px-2 py-1 bg-dark-700 text-gray-300 text-xs rounded-full">
+                <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-300 text-xs rounded-full">
                   {feature}
                 </span>
               ))}
@@ -495,7 +495,7 @@ export default function AIModule({ levelId }: AIModuleProps) {
                 onChange={handleFileUpload}
                 className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 
                          file:rounded-lg file:border-0 file:text-sm file:font-semibold 
-                         file:bg-chaski-blue file:text-white hover:file:bg-blue-700
+                         file:bg-chaski-blue file:text-gray-900 hover:file:bg-blue-700
                          cursor-pointer"
               />
               {previewUrl && (
@@ -594,8 +594,8 @@ export default function AIModule({ levelId }: AIModuleProps) {
       {/* Hacking Ético Panel */}
       {activeTab === 'hacking' && (
         <div className="card animate-fadeIn">
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <Shield className="w-6 h-6 text-neon-orange" />
+          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Shield className="w-6 h-6 text-brand-cyan" />
             Hacking Ético
           </h3>
           <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-xl p-4 mb-6">
@@ -609,14 +609,14 @@ export default function AIModule({ levelId }: AIModuleProps) {
           {currentTabActivities.length > 0 ? (
             <div className="space-y-4">
               {currentTabActivities.map((activity) => (
-                <div key={activity.id} className="bg-dark-700/50 rounded-xl p-4 border border-dark-600 hover:border-neon-orange/30 transition-colors">
+                <div key={activity.id} className="bg-gray-100/50 rounded-xl p-4 border border-gray-200 hover:border-brand-cyan/30 transition-colors">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-neon-orange/20 rounded-lg flex items-center justify-center">
-                      <Terminal className="w-6 h-6 text-neon-orange" />
+                    <div className="w-12 h-12 bg-brand-cyan/20 rounded-lg flex items-center justify-center">
+                      <Terminal className="w-6 h-6 text-brand-cyan" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-white font-semibold">{activity.activityName}</h4>
-                      <p className="text-gray-400 text-sm mt-1">{activity.description}</p>
+                      <h4 className="text-gray-900 font-semibold">{activity.activityName}</h4>
+                      <p className="text-gray-600 text-sm mt-1">{activity.description}</p>
                       <span className={`inline-block mt-2 text-xs px-2 py-1 rounded-full ${
                         activity.difficulty === 'experto' ? 'bg-red-500/20 text-red-400' :
                         activity.difficulty === 'avanzado' ? 'bg-orange-500/20 text-orange-400' :
@@ -631,66 +631,66 @@ export default function AIModule({ levelId }: AIModuleProps) {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-dark-700/50 rounded-xl p-4 border border-dark-600">
+              <div className="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
                 <div className="flex items-center gap-3 mb-3">
-                  <Lock className="w-5 h-5 text-neon-orange" />
-                  <h4 className="text-white font-semibold">Seguridad de Contraseñas</h4>
+                  <Lock className="w-5 h-5 text-brand-cyan" />
+                  <h4 className="text-gray-900 font-semibold">Seguridad de Contraseñas</h4>
                 </div>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-600 text-sm">
                   Aprende a crear contraseñas seguras y entiende cómo funcionan los ataques de fuerza bruta.
                 </p>
               </div>
               
-              <div className="bg-dark-700/50 rounded-xl p-4 border border-dark-600">
+              <div className="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
                 <div className="flex items-center gap-3 mb-3">
-                  <Terminal className="w-5 h-5 text-neon-orange" />
-                  <h4 className="text-white font-semibold">Línea de Comandos</h4>
+                  <Terminal className="w-5 h-5 text-brand-cyan" />
+                  <h4 className="text-gray-900 font-semibold">Línea de Comandos</h4>
                 </div>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-600 text-sm">
                   Domina la terminal y los comandos básicos de seguridad en sistemas.
                 </p>
               </div>
               
-              <div className="bg-dark-700/50 rounded-xl p-4 border border-dark-600">
+              <div className="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
                 <div className="flex items-center gap-3 mb-3">
-                  <Key className="w-5 h-5 text-neon-orange" />
-                  <h4 className="text-white font-semibold">Criptografía Básica</h4>
+                  <Key className="w-5 h-5 text-brand-cyan" />
+                  <h4 className="text-gray-900 font-semibold">Criptografía Básica</h4>
                 </div>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-600 text-sm">
                   Entiende cómo funcionan los cifrados y la encriptación de datos.
                 </p>
               </div>
               
-              <div className="bg-dark-700/50 rounded-xl p-4 border border-dark-600">
+              <div className="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
                 <div className="flex items-center gap-3 mb-3">
-                  <Shield className="w-5 h-5 text-neon-orange" />
-                  <h4 className="text-white font-semibold">Pentesting Intro</h4>
+                  <Shield className="w-5 h-5 text-brand-cyan" />
+                  <h4 className="text-gray-900 font-semibold">Pentesting Intro</h4>
                 </div>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-600 text-sm">
                   Introducción a las pruebas de penetración y auditoría de seguridad.
                 </p>
               </div>
             </div>
           )}
           
-          <div className="mt-6 p-4 bg-dark-700/30 rounded-xl border border-dark-600">
-            <h4 className="text-white font-semibold mb-2">🎯 Recursos Recomendados</h4>
-            <ul className="text-sm text-gray-400 space-y-1">
-              <li>• <a href="https://tryhackme.com" target="_blank" rel="noopener noreferrer" className="text-neon-cyan hover:underline">TryHackMe</a> - Plataforma de aprendizaje interactivo</li>
-              <li>• <a href="https://overthewire.org" target="_blank" rel="noopener noreferrer" className="text-neon-cyan hover:underline">OverTheWire</a> - Wargames para practicar</li>
-              <li>• <a href="https://picoctf.org" target="_blank" rel="noopener noreferrer" className="text-neon-cyan hover:underline">PicoCTF</a> - CTF para principiantes</li>
+          <div className="mt-6 p-4 bg-gray-100/30 rounded-xl border border-gray-200">
+            <h4 className="text-gray-900 font-semibold mb-2">🎯 Recursos Recomendados</h4>
+            <ul className="text-sm text-gray-600 space-y-1">
+              <li>• <a href="https://tryhackme.com" target="_blank" rel="noopener noreferrer" className="text-brand-purple hover:underline">TryHackMe</a> - Plataforma de aprendizaje interactivo</li>
+              <li>• <a href="https://overthewire.org" target="_blank" rel="noopener noreferrer" className="text-brand-purple hover:underline">OverTheWire</a> - Wargames para practicar</li>
+              <li>• <a href="https://picoctf.org" target="_blank" rel="noopener noreferrer" className="text-brand-purple hover:underline">PicoCTF</a> - CTF para principiantes</li>
             </ul>
           </div>
           
           <div className="mt-4 p-4 bg-orange-500/10 rounded-xl border border-orange-500/30">
-            <h4 className="text-white font-semibold mb-2">🔧 Proyecto: BadUSB con Digispark</h4>
-            <p className="text-sm text-gray-400 mb-2">
+            <h4 className="text-gray-900 font-semibold mb-2">🔧 Proyecto: BadUSB con Digispark</h4>
+            <p className="text-sm text-gray-600 mb-2">
               Crea tu propio dispositivo BadUSB usando un Digispark ATtiny85. Aprende sobre ataques de inyeccion de teclado.
             </p>
             <div className="flex flex-wrap gap-2">
-              <span className="px-2 py-1 bg-dark-700 text-gray-300 text-xs rounded-full">Digispark ATtiny85</span>
-              <span className="px-2 py-1 bg-dark-700 text-gray-300 text-xs rounded-full">Arduino IDE</span>
-              <span className="px-2 py-1 bg-dark-700 text-gray-300 text-xs rounded-full">Ducky Script</span>
+              <span className="px-2 py-1 bg-gray-100 text-gray-300 text-xs rounded-full">Digispark ATtiny85</span>
+              <span className="px-2 py-1 bg-gray-100 text-gray-300 text-xs rounded-full">Arduino IDE</span>
+              <span className="px-2 py-1 bg-gray-100 text-gray-300 text-xs rounded-full">Ducky Script</span>
             </div>
           </div>
         </div>
@@ -699,82 +699,82 @@ export default function AIModule({ levelId }: AIModuleProps) {
       {/* Seccion de Modelos de IA - Solo para niveles avanzados */}
       {levelId && ['octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'].includes(levelId) && (
         <div className="mt-8 card">
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <Brain className="w-6 h-6 text-neon-purple" />
+          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Brain className="w-6 h-6 text-brand-violet" />
             Aprende sobre Modelos de IA
           </h3>
           
           <div className="grid md:grid-cols-2 gap-4 mb-6">
-            <div className="bg-dark-700/50 rounded-xl p-4 border border-dark-600">
+            <div className="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
                   <span className="text-lg">🎯</span>
                 </div>
-                <h4 className="text-white font-semibold">YOLO (You Only Look Once)</h4>
+                <h4 className="text-gray-900 font-semibold">YOLO (You Only Look Once)</h4>
               </div>
-              <p className="text-gray-400 text-sm mb-2">
+              <p className="text-gray-600 text-sm mb-2">
                 Modelo de deteccion de objetos en tiempo real. Usado en vehiculos autonomos, vigilancia y robotica.
               </p>
               <a href="https://github.com/ultralytics/yolov5" target="_blank" rel="noopener noreferrer" 
-                 className="text-neon-cyan text-sm hover:underline">Ver YOLOv5 en GitHub</a>
+                 className="text-brand-purple text-sm hover:underline">Ver YOLOv5 en GitHub</a>
             </div>
             
-            <div className="bg-dark-700/50 rounded-xl p-4 border border-dark-600">
+            <div className="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
                   <span className="text-lg">🧠</span>
                 </div>
-                <h4 className="text-white font-semibold">TensorFlow / TensorFlow Lite</h4>
+                <h4 className="text-gray-900 font-semibold">TensorFlow / TensorFlow Lite</h4>
               </div>
-              <p className="text-gray-400 text-sm mb-2">
+              <p className="text-gray-600 text-sm mb-2">
                 Framework de Google para ML. TF Lite permite ejecutar modelos en dispositivos moviles y microcontroladores.
               </p>
               <a href="https://www.tensorflow.org/lite" target="_blank" rel="noopener noreferrer" 
-                 className="text-neon-cyan text-sm hover:underline">Ver TensorFlow Lite</a>
+                 className="text-brand-purple text-sm hover:underline">Ver TensorFlow Lite</a>
             </div>
             
-            <div className="bg-dark-700/50 rounded-xl p-4 border border-dark-600">
+            <div className="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
                   <span className="text-lg">📦</span>
                 </div>
-                <h4 className="text-white font-semibold">Edge Impulse</h4>
+                <h4 className="text-gray-900 font-semibold">Edge Impulse</h4>
               </div>
-              <p className="text-gray-400 text-sm mb-2">
+              <p className="text-gray-600 text-sm mb-2">
                 Plataforma para crear modelos de ML para dispositivos edge como ESP32, Arduino y Raspberry Pi.
               </p>
               <a href="https://edgeimpulse.com" target="_blank" rel="noopener noreferrer" 
-                 className="text-neon-cyan text-sm hover:underline">Ir a Edge Impulse</a>
+                 className="text-brand-purple text-sm hover:underline">Ir a Edge Impulse</a>
             </div>
             
-            <div className="bg-dark-700/50 rounded-xl p-4 border border-dark-600">
+            <div className="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
                   <span className="text-lg">👁️</span>
                 </div>
-                <h4 className="text-white font-semibold">MediaPipe</h4>
+                <h4 className="text-gray-900 font-semibold">MediaPipe</h4>
               </div>
-              <p className="text-gray-400 text-sm mb-2">
+              <p className="text-gray-600 text-sm mb-2">
                 Framework de Google para vision por computadora: deteccion de manos, poses, rostros en tiempo real.
               </p>
               <a href="https://google.github.io/mediapipe/" target="_blank" rel="noopener noreferrer" 
-                 className="text-neon-cyan text-sm hover:underline">Ver MediaPipe</a>
+                 className="text-brand-purple text-sm hover:underline">Ver MediaPipe</a>
             </div>
           </div>
           
-          <div className="bg-gradient-to-r from-neon-purple/10 to-neon-pink/10 rounded-xl p-4 border border-neon-purple/30">
-            <h4 className="text-white font-semibold mb-3">🚀 Hardware para Proyectos de IA</h4>
+          <div className="bg-gradient-to-r from-brand-violet/10 to-neon-pink/10 rounded-xl p-4 border border-brand-violet/30">
+            <h4 className="text-gray-900 font-semibold mb-3">🚀 Hardware para Proyectos de IA</h4>
             <div className="grid md:grid-cols-3 gap-3">
-              <div className="bg-dark-800/50 rounded-lg p-3">
-                <p className="text-white font-medium text-sm">NVIDIA Jetson Nano</p>
+              <div className="bg-gray-50/50 rounded-lg p-3">
+                <p className="text-gray-900 font-medium text-sm">NVIDIA Jetson Nano</p>
                 <p className="text-gray-500 text-xs">GPU para IA embebida, ideal para YOLO y vision</p>
               </div>
-              <div className="bg-dark-800/50 rounded-lg p-3">
-                <p className="text-white font-medium text-sm">Raspberry Pi 4</p>
+              <div className="bg-gray-50/50 rounded-lg p-3">
+                <p className="text-gray-900 font-medium text-sm">Raspberry Pi 4</p>
                 <p className="text-gray-500 text-xs">Versatil, soporta TensorFlow Lite y OpenCV</p>
               </div>
-              <div className="bg-dark-800/50 rounded-lg p-3">
-                <p className="text-white font-medium text-sm">ESP32-CAM</p>
+              <div className="bg-gray-50/50 rounded-lg p-3">
+                <p className="text-gray-900 font-medium text-sm">ESP32-CAM</p>
                 <p className="text-gray-500 text-xs">Economico, WiFi integrado, Edge Impulse</p>
               </div>
             </div>

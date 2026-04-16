@@ -102,7 +102,7 @@ export default function HackingPage() {
   }, [allLevels, allowedLevelIds, isAdmin])
 
   return (
-    <div className="min-h-screen flex flex-col bg-dark-900">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       
       <main className="flex-1 py-6 px-4">
@@ -113,7 +113,7 @@ export default function HackingPage() {
             <div className="w-16 h-16 bg-neon-green/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-neon-green/30">
               <Shield className="w-8 h-8 text-neon-green" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Hacking Ético</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Hacking Ético</h1>
             <p className="text-gray-500 max-w-lg mx-auto">
               Seguridad informática y ciberseguridad responsable
             </p>
@@ -121,47 +121,47 @@ export default function HackingPage() {
 
           {/* Features */}
           <div className="grid sm:grid-cols-3 gap-4">
-            <div className="bg-dark-800/80 backdrop-blur rounded-2xl p-5 border border-dark-600 text-center">
+            <div className="bg-gray-50/80 backdrop-blur rounded-2xl p-5 border border-gray-200 text-center">
               <div className="w-12 h-12 bg-neon-green/10 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Lock className="w-6 h-6 text-neon-green" />
               </div>
-              <h3 className="font-semibold text-white mb-1">Seguridad</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Seguridad</h3>
               <p className="text-gray-500 text-sm">Contraseñas y privacidad</p>
             </div>
-            <div className="bg-dark-800/80 backdrop-blur rounded-2xl p-5 border border-dark-600 text-center">
-              <div className="w-12 h-12 bg-neon-cyan/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Eye className="w-6 h-6 text-neon-cyan" />
+            <div className="bg-gray-50/80 backdrop-blur rounded-2xl p-5 border border-gray-200 text-center">
+              <div className="w-12 h-12 bg-brand-purple/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Eye className="w-6 h-6 text-brand-purple" />
               </div>
-              <h3 className="font-semibold text-white mb-1">Análisis</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Análisis</h3>
               <p className="text-gray-500 text-sm">Vulnerabilidades</p>
             </div>
-            <div className="bg-dark-800/80 backdrop-blur rounded-2xl p-5 border border-dark-600 text-center">
-              <div className="w-12 h-12 bg-neon-purple/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Key className="w-6 h-6 text-neon-purple" />
+            <div className="bg-gray-50/80 backdrop-blur rounded-2xl p-5 border border-gray-200 text-center">
+              <div className="w-12 h-12 bg-brand-violet/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Key className="w-6 h-6 text-brand-violet" />
               </div>
-              <h3 className="font-semibold text-white mb-1">Criptografía</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Criptografía</h3>
               <p className="text-gray-500 text-sm">Cifrado de datos</p>
             </div>
           </div>
 
           {/* Warning */}
-          <div className="bg-neon-orange/10 border border-neon-orange/30 rounded-2xl p-4">
-            <p className="text-neon-orange text-sm text-center">
+          <div className="bg-brand-cyan/10 border border-brand-cyan/30 rounded-2xl p-4">
+            <p className="text-brand-cyan text-sm text-center">
               ⚠️ El hacking ético se practica solo con autorización y fines educativos
             </p>
           </div>
 
           {/* Levels */}
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4">Selecciona tu Nivel</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Selecciona tu Nivel</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {visibleLevels.map((level) => (
                 <Link
                   key={level.id}
                   href={`/nivel/${level.id}?area=hacking`}
-                  className="group bg-dark-800/80 backdrop-blur rounded-xl p-4 border border-dark-600 hover:border-neon-green/50 transition-all"
+                  className="group bg-gray-50/80 backdrop-blur rounded-xl p-4 border border-gray-200 hover:border-neon-green/50 transition-all"
                 >
-                  <h3 className="font-semibold text-white text-sm mb-1">{level.name}</h3>
+                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{level.name}</h3>
                   <p className="text-gray-500 text-xs">{level.ageRange}</p>
                 </Link>
               ))}
@@ -169,11 +169,11 @@ export default function HackingPage() {
           </div>
 
           {/* Tools */}
-          <div className="bg-dark-800/80 backdrop-blur rounded-2xl p-6 border border-dark-600">
-            <h3 className="font-semibold text-white mb-4 text-center">Herramientas</h3>
+          <div className="bg-gray-50/80 backdrop-blur rounded-2xl p-6 border border-gray-200">
+            <h3 className="font-semibold text-gray-900 mb-4 text-center">Herramientas</h3>
             <div className="flex flex-wrap justify-center gap-2">
               {['CrypTool', 'Wireshark', 'Nmap', 'OWASP', 'Kali Linux', 'HackTheBox'].map((tool) => (
-                <span key={tool} className="px-3 py-1 bg-dark-700 text-gray-400 rounded-full text-sm border border-dark-600">
+                <span key={tool} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm border border-gray-200">
                   {tool}
                 </span>
               ))}

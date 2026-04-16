@@ -45,11 +45,11 @@ interface Task {
 }
 
 const CATEGORIES = [
-  { id: 'robotica', name: 'Robótica', icon: Bot, color: 'text-neon-cyan' },
+  { id: 'robotica', name: 'Robótica', icon: Bot, color: 'text-brand-purple' },
   { id: 'electronica', name: 'Electrónica', icon: CircuitBoard, color: 'text-yellow-400' },
   { id: 'programacion', name: 'Programación', icon: Code, color: 'text-neon-green' },
   { id: 'ia', name: 'Inteligencia Artificial', icon: Lightbulb, color: 'text-neon-pink' },
-  { id: 'general', name: 'General', icon: BookOpen, color: 'text-gray-400' },
+  { id: 'general', name: 'General', icon: BookOpen, color: 'text-gray-600' },
 ]
 
 const TYPES = [
@@ -413,19 +413,19 @@ function AdminTareasContent() {
   }, {} as Record<string, Task[]>)
 
   return (
-    <div className="min-h-screen bg-dark-900 p-6">
+    <div className="min-h-screen bg-white p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <Link href="/admin" className="text-gray-400 hover:text-neon-cyan text-sm flex items-center gap-1 mb-2">
+            <Link href="/admin" className="text-gray-600 hover:text-brand-purple text-sm flex items-center gap-1 mb-2">
               <ArrowLeft className="w-4 h-4" /> Volver al panel
             </Link>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <FileText className="w-8 h-8 text-yellow-400" />
               Gestión de Tareas
             </h1>
-            <p className="text-gray-400 mt-1">Crea y administra tareas para cada nivel educativo</p>
+            <p className="text-gray-600 mt-1">Crea y administra tareas para cada nivel educativo</p>
           </div>
           
           <button
@@ -438,7 +438,7 @@ function AdminTareasContent() {
         </div>
 
         {/* Filters */}
-        <div className="bg-dark-800 border border-dark-600 rounded-xl p-4 mb-6">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
@@ -448,7 +448,7 @@ function AdminTareasContent() {
                   placeholder="Buscar tareas..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder:text-gray-500"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-500"
                 />
               </div>
             </div>
@@ -457,7 +457,7 @@ function AdminTareasContent() {
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+              className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
             >
               {isAdmin && <option value="">Todos los niveles</option>}
               {allowedLevels.map(level => (
@@ -465,12 +465,12 @@ function AdminTareasContent() {
               ))}
             </select>
 
-            <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
+            <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
               <input
                 type="checkbox"
                 checked={showInactive}
                 onChange={(e) => setShowInactive(e.target.checked)}
-                className="w-4 h-4 rounded bg-dark-700 border-dark-600"
+                className="w-4 h-4 rounded bg-gray-100 border-gray-200"
               />
               Mostrar inactivas
             </label>
@@ -479,20 +479,20 @@ function AdminTareasContent() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
-            <p className="text-gray-400 text-sm">Total Tareas</p>
-            <p className="text-2xl font-bold text-white">{tasks.length}</p>
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <p className="text-gray-600 text-sm">Total Tareas</p>
+            <p className="text-2xl font-bold text-gray-900">{tasks.length}</p>
           </div>
-          <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
-            <p className="text-gray-400 text-sm">Activas</p>
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <p className="text-gray-600 text-sm">Activas</p>
             <p className="text-2xl font-bold text-neon-green">{tasks.filter(t => t.isActive).length}</p>
           </div>
-          <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
-            <p className="text-gray-400 text-sm">Niveles con tareas</p>
-            <p className="text-2xl font-bold text-neon-cyan">{Object.keys(tasksByLevel).length}</p>
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <p className="text-gray-600 text-sm">Niveles con tareas</p>
+            <p className="text-2xl font-bold text-brand-purple">{Object.keys(tasksByLevel).length}</p>
           </div>
-          <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
-            <p className="text-gray-400 text-sm">Total Puntos</p>
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <p className="text-gray-600 text-sm">Total Puntos</p>
             <p className="text-2xl font-bold text-yellow-400">{tasks.reduce((sum, t) => sum + t.points, 0)}</p>
           </div>
         </div>
@@ -500,16 +500,16 @@ function AdminTareasContent() {
         {/* Tasks List */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+            <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
           </div>
         ) : filteredTasks.length === 0 ? (
-          <div className="bg-dark-800 border border-dark-600 rounded-xl p-12 text-center">
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-12 text-center">
             <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg">No hay tareas</p>
+            <p className="text-gray-600 text-lg">No hay tareas</p>
             <p className="text-gray-500 mt-1">Crea tu primera tarea para comenzar</p>
             <button
               onClick={openCreateModal}
-              className="mt-4 bg-neon-cyan text-dark-900 px-6 py-2 rounded-lg font-medium"
+              className="mt-4 bg-brand-purple text-dark-900 px-6 py-2 rounded-lg font-medium"
             >
               Crear Tarea
             </button>
@@ -519,12 +519,12 @@ function AdminTareasContent() {
             {Object.entries(tasksByLevel).map(([levelId, levelTasks]) => {
               const level = (dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS).find(l => l.id === levelId)
               return (
-                <div key={levelId} className="bg-dark-800 border border-dark-600 rounded-xl overflow-hidden">
-                  <div className="bg-dark-700 px-4 py-3 border-b border-dark-600 flex items-center justify-between">
+                <div key={levelId} className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
+                  <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{level?.icon || '📚'}</span>
                       <div>
-                        <h3 className="font-medium text-white">{level?.name || levelId}</h3>
+                        <h3 className="font-medium text-gray-900">{level?.name || levelId}</h3>
                         <p className="text-xs text-gray-500">{levelTasks.length} tareas</p>
                       </div>
                     </div>
@@ -534,19 +534,19 @@ function AdminTareasContent() {
                     {levelTasks.map(task => (
                       <div key={task.id} className={`p-4 ${!task.isActive ? 'opacity-50' : ''}`}>
                         <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 rounded-lg bg-dark-700 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
                             {getCategoryIcon(task.category)}
                           </div>
                           
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <h4 className="font-medium text-white">{task.title}</h4>
+                              <h4 className="font-medium text-gray-900">{task.title}</h4>
                               <span className={`px-2 py-0.5 rounded-full text-xs ${
                                 DIFFICULTIES.find(d => d.id === task.difficulty)?.color || ''
                               }`}>
                                 {task.difficulty}
                               </span>
-                              <span className="px-2 py-0.5 bg-dark-600 text-gray-400 rounded-full text-xs">
+                              <span className="px-2 py-0.5 bg-dark-600 text-gray-600 rounded-full text-xs">
                                 {task.type}
                               </span>
                               {!task.isActive && (
@@ -555,7 +555,7 @@ function AdminTareasContent() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-400 mb-2">{task.description}</p>
+                            <p className="text-sm text-gray-600 mb-2">{task.description}</p>
                             <div className="flex items-center gap-4 text-xs text-gray-500">
                               <span className="flex items-center gap-1">
                                 <Award className="w-3 h-3" /> {task.points} pts
@@ -575,7 +575,7 @@ function AdminTareasContent() {
                               className={`p-2 rounded-lg transition-colors ${
                                 task.isActive 
                                   ? 'text-green-400 hover:bg-green-500/20' 
-                                  : 'text-gray-500 hover:bg-dark-600'
+                                  : 'text-gray-500 hover:bg-gray-200'
                               }`}
                               title={task.isActive ? 'Desactivar' : 'Activar'}
                             >
@@ -583,7 +583,7 @@ function AdminTareasContent() {
                             </button>
                             <button
                               onClick={() => openEditModal(task)}
-                              className="p-2 text-neon-cyan hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                              className="p-2 text-brand-purple hover:bg-brand-purple/20 rounded-lg transition-colors"
                               title="Editar"
                             >
                               <Edit className="w-4 h-4" />
@@ -610,14 +610,14 @@ function AdminTareasContent() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-dark-800 border border-dark-600 rounded-2xl max-w-2xl w-full my-8">
-            <div className="flex items-center justify-between p-4 border-b border-dark-600">
-              <h3 className="text-xl font-bold text-white">
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl max-w-2xl w-full my-8">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900">
                 {editingTask ? 'Editar Tarea' : 'Nueva Tarea'}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg"
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -627,11 +627,11 @@ function AdminTareasContent() {
               {/* Level & Title */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Nivel *</label>
+                  <label className="block text-sm text-gray-600 mb-1">Nivel *</label>
                   <select
                     value={formData.levelId}
                     onChange={(e) => setFormData(prev => ({ ...prev, levelId: e.target.value }))}
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   >
                     <option value="">Seleccionar nivel...</option>
                     {allowedLevels.map(level => (
@@ -640,37 +640,37 @@ function AdminTareasContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Título *</label>
+                  <label className="block text-sm text-gray-600 mb-1">Título *</label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="Título de la tarea"
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   />
                 </div>
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Descripción</label>
+                <label className="block text-sm text-gray-600 mb-1">Descripción</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Descripción de la tarea..."
                   rows={2}
-                  className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white resize-none"
+                  className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 resize-none"
                 />
               </div>
 
               {/* Type, Category, Difficulty */}
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Tipo</label>
+                  <label className="block text-sm text-gray-600 mb-1">Tipo</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as Task['type'] }))}
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   >
                     {TYPES.map(type => (
                       <option key={type.id} value={type.id}>{type.name}</option>
@@ -678,11 +678,11 @@ function AdminTareasContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Categoría</label>
+                  <label className="block text-sm text-gray-600 mb-1">Categoría</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as Task['category'] }))}
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   >
                     {CATEGORIES.map(cat => (
                       <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -690,11 +690,11 @@ function AdminTareasContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Dificultad</label>
+                  <label className="block text-sm text-gray-600 mb-1">Dificultad</label>
                   <select
                     value={formData.difficulty}
                     onChange={(e) => setFormData(prev => ({ ...prev, difficulty: e.target.value as Task['difficulty'] }))}
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   >
                     {DIFFICULTIES.map(diff => (
                       <option key={diff.id} value={diff.id}>{diff.name}</option>
@@ -706,29 +706,29 @@ function AdminTareasContent() {
               {/* Points & Due Date */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Puntos</label>
+                  <label className="block text-sm text-gray-600 mb-1">Puntos</label>
                   <input
                     type="number"
                     value={formData.points}
                     onChange={(e) => setFormData(prev => ({ ...prev, points: parseInt(e.target.value) || 0 }))}
                     min="0"
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Fecha límite de entrega</label>
+                  <label className="block text-sm text-gray-600 mb-1">Fecha límite de entrega</label>
                   <input
                     type="date"
                     value={formData.dueDate}
                     onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   />
                 </div>
               </div>
 
               {/* Attachment / Document */}
               <div className="p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-xl border border-blue-500/30">
-                <label className="block text-sm text-white font-medium mb-3">📎 Material de Apoyo (opcional)</label>
+                <label className="block text-sm text-gray-900 font-medium mb-3">📎 Material de Apoyo (opcional)</label>
                 
                 {/* Botones de selección de tipo */}
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -737,8 +737,8 @@ function AdminTareasContent() {
                     onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'none', attachmentUrl: '', attachmentData: '', attachmentName: '' }))}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       formData.attachmentType === 'none' 
-                        ? 'bg-gray-600 text-white' 
-                        : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                        ? 'bg-gray-600 text-gray-900' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     Sin adjunto
@@ -748,8 +748,8 @@ function AdminTareasContent() {
                     onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'drive', attachmentData: '', attachmentName: '' }))}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                       formData.attachmentType === 'drive' 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                        ? 'bg-blue-600 text-gray-900' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -762,8 +762,8 @@ function AdminTareasContent() {
                     onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'upload', attachmentUrl: '' }))}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       formData.attachmentType === 'upload' 
-                        ? 'bg-green-600 text-white' 
-                        : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                        ? 'bg-green-600 text-gray-900' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     Archivo pequeño (&lt;100KB)
@@ -773,8 +773,8 @@ function AdminTareasContent() {
                     onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'link', attachmentData: '', attachmentName: '' }))}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       formData.attachmentType === 'link' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                        ? 'bg-purple-600 text-gray-900' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     Otro enlace
@@ -785,7 +785,7 @@ function AdminTareasContent() {
                   {formData.attachmentType === 'upload' && (
                     <div className="col-span-2">
                       <div 
-                        className="border-2 border-dashed border-dark-500 rounded-lg p-4 text-center hover:border-neon-cyan/50 transition-colors cursor-pointer"
+                        className="border-2 border-dashed border-dark-500 rounded-lg p-4 text-center hover:border-brand-purple/50 transition-colors cursor-pointer"
                         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         onDrop={async (e) => {
                           e.preventDefault();
@@ -843,10 +843,10 @@ function AdminTareasContent() {
                           <div className="text-neon-green">
                             <Upload className="w-6 h-6 mx-auto mb-2" />
                             <p className="text-sm">{(formData as any).attachmentName}</p>
-                            <p className="text-xs text-gray-400 mt-1">Clic para cambiar</p>
+                            <p className="text-xs text-gray-600 mt-1">Clic para cambiar</p>
                           </div>
                         ) : (
-                          <div className="text-gray-400">
+                          <div className="text-gray-600">
                             <Upload className="w-6 h-6 mx-auto mb-2" />
                             <p className="text-sm">Arrastra un archivo aquí o haz clic para seleccionar</p>
                             <p className="text-xs mt-1">PDF, Word, imagen, etc. <span className="text-yellow-400">(máx. 100KB)</span></p>
@@ -869,7 +869,7 @@ function AdminTareasContent() {
                         value={formData.attachmentUrl}
                         onChange={(e) => setFormData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
                         placeholder="Pega aquí el enlace de Google Drive..."
-                        className="w-full px-4 py-3 bg-dark-700 border border-blue-500/50 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+                        className="w-full px-4 py-3 bg-gray-100 border border-blue-500/50 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-400 focus:outline-none"
                       />
                       {formData.attachmentUrl && (
                         <p className="text-xs text-neon-green mt-2 flex items-center gap-1">✓ Enlace guardado correctamente</p>
@@ -884,7 +884,7 @@ function AdminTareasContent() {
                         value={formData.attachmentUrl}
                         onChange={(e) => setFormData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
                         placeholder="https://..."
-                        className="w-full px-4 py-3 bg-dark-700 border border-purple-500/50 rounded-lg text-white placeholder-gray-500 focus:border-purple-400 focus:outline-none"
+                        className="w-full px-4 py-3 bg-gray-100 border border-purple-500/50 rounded-lg text-gray-900 placeholder-gray-500 focus:border-purple-400 focus:outline-none"
                       />
                       {formData.attachmentUrl && (
                         <p className="text-xs text-neon-green mt-2">✓ Enlace guardado</p>
@@ -897,18 +897,18 @@ function AdminTareasContent() {
               {/* Questions */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm text-gray-400">Preguntas / Actividades</label>
+                  <label className="text-sm text-gray-600">Preguntas / Actividades</label>
                   <button
                     type="button"
                     onClick={addQuestion}
-                    className="text-neon-cyan text-sm hover:underline flex items-center gap-1"
+                    className="text-brand-purple text-sm hover:underline flex items-center gap-1"
                   >
                     <Plus className="w-4 h-4" /> Agregar pregunta
                   </button>
                 </div>
                 <div className="space-y-4">
                   {formData.questions.map((question, index) => (
-                    <div key={index} className="p-3 bg-dark-700/50 rounded-lg border border-dark-600">
+                    <div key={index} className="p-3 bg-gray-100/50 rounded-lg border border-gray-200">
                       <div className="flex items-start gap-2 mb-2">
                         <span className="text-gray-500 text-sm mt-2 font-bold">{index + 1}.</span>
                         <div className="flex-1 space-y-2">
@@ -923,8 +923,8 @@ function AdminTareasContent() {
                                   onClick={() => updateQuestion(index, 'type', qt.id)}
                                   className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
                                     question.type === qt.id 
-                                      ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50' 
-                                      : 'bg-dark-600 text-gray-400 hover:bg-dark-500'
+                                      ? 'bg-brand-purple/20 text-brand-purple border border-brand-purple/50' 
+                                      : 'bg-dark-600 text-gray-600 hover:bg-dark-500'
                                   }`}
                                   title={qt.desc}
                                 >
@@ -947,7 +947,7 @@ function AdminTareasContent() {
                               question.type === 'multiple' ? 'Escribe la pregunta de opción múltiple...' :
                               'Escribe la pregunta...'
                             }
-                            className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+                            className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
                           />
                           
                           {/* Opciones para opción múltiple */}
@@ -962,7 +962,7 @@ function AdminTareasContent() {
                                     value={option}
                                     onChange={(e) => updateOption(index, optIndex, e.target.value)}
                                     placeholder={`Opción ${String.fromCharCode(65 + optIndex)}`}
-                                    className="flex-1 px-2 py-1 bg-dark-600 border border-dark-500 rounded text-white text-sm"
+                                    className="flex-1 px-2 py-1 bg-dark-600 border border-dark-500 rounded text-gray-900 text-sm"
                                   />
                                   <button
                                     type="button"
@@ -976,7 +976,7 @@ function AdminTareasContent() {
                               <button
                                 type="button"
                                 onClick={() => addOption(index)}
-                                className="text-xs text-neon-cyan hover:underline flex items-center gap-1"
+                                className="text-xs text-brand-purple hover:underline flex items-center gap-1"
                               >
                                 <Plus className="w-3 h-3" /> Agregar opción
                               </button>
@@ -1009,10 +1009,10 @@ function AdminTareasContent() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 p-4 border-t border-dark-600">
+            <div className="flex justify-end gap-3 p-4 border-t border-gray-200">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+                className="px-4 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200"
               >
                 Cancelar
               </button>
@@ -1039,8 +1039,8 @@ function AdminTareasContent() {
 export default function AdminTareasPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
       </div>
     }>
       <AdminTareasContent />

@@ -178,37 +178,37 @@ export default function KitsAdminPage() {
 
   if (isLoading || !isAdmin) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-purple"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-dark-900">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-dark-800 border-b border-dark-600 px-6 py-4">
+      <header className="bg-gray-50 border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-gray-400 hover:text-white">
+            <Link href="/admin" className="text-gray-600 hover:text-gray-900">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-white">Gestión de Kits</h1>
-              <p className="text-sm text-gray-400">Administra los kits de cada nivel educativo</p>
+              <h1 className="text-xl font-bold text-gray-900">Gestión de Kits</h1>
+              <p className="text-sm text-gray-600">Administra los kits de cada nivel educativo</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={loadKits}
-              className="flex items-center gap-2 px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200"
             >
               <RefreshCw className="w-4 h-4" />
               Recargar
             </button>
             <button
               onClick={openCreateModal}
-              className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-purple text-dark-900 rounded-lg font-medium hover:bg-brand-purple/90"
             >
               <Plus className="w-4 h-4" />
               Nuevo Kit
@@ -221,15 +221,15 @@ export default function KitsAdminPage() {
       <main className="p-6">
         {loadingKits ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-purple"></div>
           </div>
         ) : kits.length === 0 ? (
-          <div className="bg-dark-800 rounded-xl border border-dark-600 p-12 text-center">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-12 text-center">
             <Package className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-            <p className="text-gray-400 mb-4">No hay kits registrados aún.</p>
+            <p className="text-gray-600 mb-4">No hay kits registrados aún.</p>
             <button
               onClick={openCreateModal}
-              className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium mx-auto"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-purple text-dark-900 rounded-lg font-medium mx-auto"
             >
               <Plus className="w-4 h-4" />
               Crear Primer Kit
@@ -240,10 +240,10 @@ export default function KitsAdminPage() {
             {kits.map(kit => (
               <div
                 key={kit.id}
-                className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden hover:border-dark-500 transition-all"
+                className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden hover:border-dark-500 transition-all"
               >
                 {/* Kit Image Preview */}
-                <div className="aspect-video bg-dark-700 relative">
+                <div className="aspect-video bg-gray-100 relative">
                   {kit.images && kit.images.length > 0 ? (
                     <img
                       src={kit.images[0]}
@@ -258,7 +258,7 @@ export default function KitsAdminPage() {
                       <ImageIcon className="w-12 h-12 text-gray-600" />
                     </div>
                   )}
-                  <div className="absolute top-2 right-2 bg-dark-900/80 px-2 py-1 rounded text-xs text-gray-300">
+                  <div className="absolute top-2 right-2 bg-white/80 px-2 py-1 rounded text-xs text-gray-300">
                     {kit.images?.length || 0} fotos
                   </div>
                 </div>
@@ -267,17 +267,17 @@ export default function KitsAdminPage() {
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h3 className="text-white font-semibold">{kit.name}</h3>
-                      <p className="text-sm text-neon-cyan">{getLevelName(kit.levelId)}</p>
+                      <h3 className="text-gray-900 font-semibold">{kit.name}</h3>
+                      <p className="text-sm text-brand-purple">{getLevelName(kit.levelId)}</p>
                     </div>
-                    <span className="text-lg font-bold text-neon-cyan">${kit.price}</span>
+                    <span className="text-lg font-bold text-brand-purple">${kit.price}</span>
                   </div>
-                  <p className="text-gray-400 text-sm line-clamp-2 mb-4">{kit.description}</p>
+                  <p className="text-gray-600 text-sm line-clamp-2 mb-4">{kit.description}</p>
                   
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => openEditModal(kit)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200"
                     >
                       <Edit className="w-4 h-4" />
                       Editar
@@ -285,7 +285,7 @@ export default function KitsAdminPage() {
                     <Link
                       href={`/nivel/${kit.levelId}`}
                       target="_blank"
-                      className="px-3 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+                      className="px-3 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200"
                     >
                       <Eye className="w-4 h-4" />
                     </Link>
@@ -300,14 +300,14 @@ export default function KitsAdminPage() {
       {/* Modal de Edición/Creación */}
       {(editingKit || isCreating) && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-xl border border-dark-600 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-dark-600">
-              <h3 className="text-xl font-semibold text-white">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900">
                 {isCreating ? 'Crear Nuevo Kit' : 'Editar Kit'}
               </h3>
               <button
                 onClick={closeModal}
-                className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg"
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -323,7 +323,7 @@ export default function KitsAdminPage() {
 
               {/* Level ID */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Nivel Educativo *</label>
+                <label className="block text-sm text-gray-600 mb-2">Nivel Educativo *</label>
                 <select
                   value={formData.levelId}
                   onChange={(e) => {
@@ -335,7 +335,7 @@ export default function KitsAdminPage() {
                       name: formData.name || (selectedLevel ? `Kit ${selectedLevel.name}` : '')
                     })
                   }}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none"
                 >
                   <option value="">-- Seleccionar nivel --</option>
                   {isCreating ? (
@@ -372,66 +372,66 @@ export default function KitsAdminPage() {
 
               {/* Nombre */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Nombre del Kit *</label>
+                <label className="block text-sm text-gray-600 mb-2">Nombre del Kit *</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="ej: Kit Inicial 1 - Mis Primeras Luces"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none"
                 />
               </div>
 
               {/* Descripción */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Descripción</label>
+                <label className="block text-sm text-gray-600 mb-2">Descripción</label>
                 <textarea
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Describe el kit..."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none resize-none"
                 />
               </div>
 
               {/* Precio */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Precio (USD)</label>
+                <label className="block text-sm text-gray-600 mb-2">Precio (USD)</label>
                 <input
                   type="number"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none"
                 />
               </div>
 
               {/* Componentes */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Componentes (separados por coma)</label>
+                <label className="block text-sm text-gray-600 mb-2">Componentes (separados por coma)</label>
                 <textarea
                   rows={2}
                   value={formData.components}
                   onChange={(e) => setFormData({ ...formData, components: e.target.value })}
                   placeholder="LED, Cables, Pila CR2032, etc."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none resize-none"
                 />
               </div>
 
               {/* Habilidades */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Habilidades (separadas por coma)</label>
+                <label className="block text-sm text-gray-600 mb-2">Habilidades (separadas por coma)</label>
                 <input
                   type="text"
                   value={formData.skills}
                   onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
                   placeholder="Circuitos básicos, Motricidad fina, etc."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none"
                 />
               </div>
 
               {/* URLs de Imágenes de Google Drive */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">
+                <label className="block text-sm text-gray-600 mb-2">
                   <ImageIcon className="w-4 h-4 inline mr-2" />
                   URLs de Imágenes (Google Drive)
                 </label>
@@ -440,11 +440,11 @@ export default function KitsAdminPage() {
                   value={formData.image_urls}
                   onChange={(e) => setFormData({ ...formData, image_urls: e.target.value })}
                   placeholder="Pega las URLs de Google Drive separadas por coma"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none resize-none font-mono text-sm"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none resize-none font-mono text-sm"
                 />
-                <div className="mt-2 p-3 bg-dark-700/50 rounded-lg border border-dark-600">
-                  <p className="text-xs text-neon-cyan font-medium mb-1">📁 Cómo obtener la URL:</p>
-                  <ol className="text-xs text-gray-400 space-y-1 list-decimal list-inside">
+                <div className="mt-2 p-3 bg-gray-100/50 rounded-lg border border-gray-200">
+                  <p className="text-xs text-brand-purple font-medium mb-1">📁 Cómo obtener la URL:</p>
+                  <ol className="text-xs text-gray-600 space-y-1 list-decimal list-inside">
                     <li>Sube la imagen a tu carpeta en Google Drive</li>
                     <li>Clic derecho → "Obtener enlace" → "Cualquier persona con el enlace"</li>
                     <li>Copia el enlace (formato: https://drive.google.com/file/d/ID/view)</li>
@@ -455,7 +455,7 @@ export default function KitsAdminPage() {
                 {/* Preview de imágenes */}
                 {formData.image_urls && (
                   <div className="mt-3">
-                    <p className="text-xs text-gray-400 mb-2">Vista previa:</p>
+                    <p className="text-xs text-gray-600 mb-2">Vista previa:</p>
                     <div className="flex flex-wrap gap-2">
                       {formData.image_urls.split(',').filter(url => url.trim()).slice(0, 6).map((url, idx) => {
                         const cleanUrl = url.trim()
@@ -474,7 +474,7 @@ export default function KitsAdminPage() {
                             key={idx}
                             src={displayUrl}
                             alt={`Preview ${idx + 1}`}
-                            className="w-16 h-16 object-cover rounded-lg border border-dark-600"
+                            className="w-16 h-16 object-cover rounded-lg border border-gray-200"
                             onError={(e) => {
                               (e.target as HTMLImageElement).style.display = 'none'
                             }}
@@ -482,7 +482,7 @@ export default function KitsAdminPage() {
                         )
                       })}
                       {formData.image_urls.split(',').filter(url => url.trim()).length > 6 && (
-                        <div className="w-16 h-16 bg-dark-600 rounded-lg flex items-center justify-center text-gray-400 text-xs">
+                        <div className="w-16 h-16 bg-dark-600 rounded-lg flex items-center justify-center text-gray-600 text-xs">
                           +{formData.image_urls.split(',').filter(url => url.trim()).length - 6}
                         </div>
                       )}
@@ -493,29 +493,29 @@ export default function KitsAdminPage() {
 
               {/* Video URL */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">URL del Video Tutorial (opcional)</label>
+                <label className="block text-sm text-gray-600 mb-2">URL del Video Tutorial (opcional)</label>
                 <input
                   type="url"
                   value={formData.videoUrl}
                   onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                   placeholder="https://drive.google.com/file/d/ID/preview"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-neon-cyan focus:outline-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex justify-end gap-3 p-4 border-t border-dark-600">
+            <div className="flex justify-end gap-3 p-4 border-t border-gray-200">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+                className="px-4 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving || (isCreating && (!formData.levelId || !formData.name))}
-                className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-purple text-dark-900 rounded-lg font-medium hover:bg-brand-purple/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />

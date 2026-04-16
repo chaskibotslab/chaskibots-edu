@@ -204,7 +204,7 @@ export default function ContenidoAdminPage() {
   const currentLevel = EDUCATION_LEVELS.find(l => l.id === selectedLevel)
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-900 text-gray-900">
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -265,7 +265,7 @@ export default function ContenidoAdminPage() {
         ) : Object.keys(modules).length === 0 ? (
           <div className="bg-gray-800 rounded-lg p-8 text-center">
             <FileText className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400 mb-4">No hay lecciones</p>
+            <p className="text-gray-600 mb-4">No hay lecciones</p>
             <button
               onClick={() => openCreateModal()}
               className="px-4 py-2 bg-cyan-600 rounded-lg text-sm"
@@ -290,7 +290,7 @@ export default function ContenidoAdminPage() {
                   <span className="text-xs text-gray-500">{moduleLessons.length}</span>
                   <button
                     onClick={(e) => { e.stopPropagation(); openCreateModal(moduleName) }}
-                    className="p-1 hover:bg-gray-600 rounded text-gray-400"
+                    className="p-1 hover:bg-gray-600 rounded text-gray-600"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -321,13 +321,13 @@ export default function ContenidoAdminPage() {
                         </div>
                         <button
                           onClick={() => openEditModal(lesson)}
-                          className="p-1.5 hover:bg-gray-600 rounded text-gray-400 hover:text-cyan-400"
+                          className="p-1.5 hover:bg-gray-600 rounded text-gray-600 hover:text-cyan-400"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(lesson.id, lesson.title)}
-                          className="p-1.5 hover:bg-gray-600 rounded text-gray-400 hover:text-red-400"
+                          className="p-1.5 hover:bg-gray-600 rounded text-gray-600 hover:text-red-400"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -362,7 +362,7 @@ export default function ContenidoAdminPage() {
 
             <div className="p-4 space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Módulo *</label>
+                <label className="block text-sm text-gray-600 mb-1">Módulo *</label>
                 <input
                   type="text"
                   value={formData.moduleName}
@@ -373,7 +373,7 @@ export default function ContenidoAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Título *</label>
+                <label className="block text-sm text-gray-600 mb-1">Título *</label>
                 <input
                   type="text"
                   value={formData.title}
@@ -384,7 +384,7 @@ export default function ContenidoAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm text-gray-600 mb-1">
                   <Video className="w-3 h-3 inline mr-1" />
                   URL Video (YouTube o Drive)
                 </label>
@@ -398,7 +398,7 @@ export default function ContenidoAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm text-gray-600 mb-1">
                   <Download className="w-3 h-3 inline mr-1" />
                   URL PDF (código)
                 </label>
@@ -415,7 +415,7 @@ export default function ContenidoAdminPage() {
             <div className="flex justify-end gap-2 p-4 border-t border-gray-700">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-gray-400 hover:text-white text-sm"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm"
               >
                 Cancelar
               </button>

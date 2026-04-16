@@ -210,36 +210,36 @@ function EntregasContent() {
       case 'returned':
         return <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full flex items-center gap-1"><MessageSquare className="w-3 h-3" /> Devuelto</span>
       default:
-        return <span className="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded-full">{status}</span>
+        return <span className="px-2 py-1 bg-gray-500/20 text-gray-600 text-xs rounded-full">{status}</span>
     }
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-dark-900">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-dark-800 border-b border-dark-600 px-6 py-4">
+      <header className="bg-gray-50 border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href={isAdmin ? "/admin" : "/dashboard"}
-              className="p-2 hover:bg-dark-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <FileText className="w-6 h-6 text-purple-400" />
                 Entregas de Estudiantes
               </h1>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-600">
                 {submissions.length} entregas totales • {submissions.filter(s => s.status === 'pending').length} pendientes
               </p>
             </div>
@@ -247,7 +247,7 @@ function EntregasContent() {
           {activeTab === 'tareas' && (
             <button
               onClick={loadSubmissions}
-              className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-white rounded-lg transition-colors"
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg transition-colors"
             >
               Actualizar
             </button>
@@ -262,7 +262,7 @@ function EntregasContent() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                 activeTab === 'tareas'
                   ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                  : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               <FileText className="w-4 h-4" />
@@ -273,7 +273,7 @@ function EntregasContent() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                 activeTab === 'simulador'
                   ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                  : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               <Gamepad2 className="w-4 h-4" />
@@ -293,24 +293,24 @@ function EntregasContent() {
         {activeTab === 'tareas' && (
           <>
             {/* Filters */}
-            <div className="bg-dark-800 border border-dark-600 rounded-xl p-4 mb-6">
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex-1 min-w-[200px]">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Buscar por nombre, código..."
-                      className="w-full pl-10 pr-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                      className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500"
                     />
                   </div>
                 </div>
                 <select
                   value={selectedLevel}
                   onChange={(e) => setSelectedLevel(e.target.value)}
-                  className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 >
                   <option value="">Todos los niveles</option>
                   {(isAdmin ? levels : levels.filter(l => allowedLevelIds.includes(l.id))).map(level => (
@@ -320,7 +320,7 @@ function EntregasContent() {
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 >
                   <option value="">Todos los estados</option>
                   <option value="pending">Pendientes</option>
@@ -336,10 +336,10 @@ function EntregasContent() {
                 <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
               </div>
             ) : filteredSubmissions.length === 0 ? (
-              <div className="bg-dark-800 border border-dark-600 rounded-xl p-12 text-center">
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-12 text-center">
                 <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">No hay entregas</h3>
-                <p className="text-gray-400">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">No hay entregas</h3>
+                <p className="text-gray-600">
                   {searchTerm || selectedLevel || selectedStatus
                     ? 'No se encontraron entregas con los filtros seleccionados'
                     : 'Aún no hay entregas de estudiantes'}
@@ -350,7 +350,7 @@ function EntregasContent() {
                 {filteredSubmissions.map(submission => (
                   <div
                     key={submission.id}
-                    className="bg-dark-800 border border-dark-600 rounded-xl overflow-hidden hover:border-purple-500/30 transition-colors"
+                    className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden hover:border-purple-500/30 transition-colors"
                   >
                     <div className="p-4">
                       <div className="flex items-start justify-between gap-4">
@@ -360,13 +360,13 @@ function EntregasContent() {
                               <User className="w-5 h-5 text-purple-400" />
                             </div>
                             <div>
-                              <h3 className="font-bold text-white">{submission.studentName}</h3>
-                              <p className="text-sm text-gray-400">{submission.taskId}</p>
+                              <h3 className="font-bold text-gray-900">{submission.studentName}</h3>
+                              <p className="text-sm text-gray-600">{submission.taskId}</p>
                             </div>
                             {getStatusBadge(submission.status)}
                           </div>
                           
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-3">
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
                             <span className="flex items-center gap-1">
                               <GraduationCap className="w-4 h-4" />
                               {getLevelName(submission.levelId)}
@@ -390,7 +390,7 @@ function EntregasContent() {
                           </div>
 
                           {/* Code Preview */}
-                          <div className="bg-dark-900 rounded-lg p-3 max-h-32 overflow-hidden">
+                          <div className="bg-white rounded-lg p-3 max-h-32 overflow-hidden">
                             <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
                               {submission.code.slice(0, 300)}
                               {submission.code.length > 300 && '...'}
@@ -439,19 +439,19 @@ function EntregasContent() {
       {/* Grade Modal */}
       {selectedSubmission && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 border border-dark-600 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="p-4 border-b border-dark-600 flex items-center justify-between">
+          <div className="bg-gray-50 border border-gray-200 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-white">Calificar Entrega</h3>
-                <p className="text-sm text-gray-400">
+                <h3 className="text-lg font-bold text-gray-900">Calificar Entrega</h3>
+                <p className="text-sm text-gray-600">
                   {selectedSubmission.studentName} • {selectedSubmission.taskId}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedSubmission(null)}
-                className="p-2 hover:bg-dark-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-gray-400" />
+                <X className="w-5 h-5 text-gray-600" />
               </button>
             </div>
 
@@ -459,11 +459,11 @@ function EntregasContent() {
               <div className="grid md:grid-cols-2 gap-4">
                 {/* Code */}
                 <div>
-                  <h4 className="text-sm font-medium text-white mb-2 flex items-center gap-2">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
                     <Code className="w-4 h-4 text-purple-400" />
                     Código / Respuestas
                   </h4>
-                  <div className="bg-dark-900 rounded-lg p-4 h-64 overflow-auto">
+                  <div className="bg-white rounded-lg p-4 h-64 overflow-auto">
                     <pre className="text-sm text-gray-300 font-mono whitespace-pre-wrap">
                       {selectedSubmission.code.replace(/\[DIBUJO_ADJUNTO_BASE64\]/g, '').replace(/\[ARCHIVOS:[^\]]+\]/g, '')}
                     </pre>
@@ -472,8 +472,8 @@ function EntregasContent() {
 
                 {/* Output */}
                 <div>
-                  <h4 className="text-sm font-medium text-white mb-2">Salida / Info</h4>
-                  <div className="bg-dark-900 rounded-lg p-4 h-64 overflow-auto">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Salida / Info</h4>
+                  <div className="bg-white rounded-lg p-4 h-64 overflow-auto">
                     <pre className="text-sm text-green-400 font-mono whitespace-pre-wrap">
                       {selectedSubmission.output || 'Sin salida'}
                     </pre>
@@ -484,8 +484,8 @@ function EntregasContent() {
               {/* Adjuntos - Dibujo y Archivos */}
               {(selectedSubmission.drawing || selectedSubmission.files || 
                 selectedSubmission.output?.includes('📁 ADJUNTOS')) && (
-                <div className="mt-4 p-4 bg-dark-700 rounded-lg border border-dark-600">
-                  <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+                <div className="mt-4 p-4 bg-gray-100 rounded-lg border border-gray-200">
+                  <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
                     <Paperclip className="w-4 h-4 text-green-400" />
                     Archivos Adjuntos del Estudiante
                   </h4>
@@ -539,7 +539,7 @@ function EntregasContent() {
                                 >
                                   <Download className="w-5 h-5 text-blue-400" />
                                   <span className="text-sm text-blue-300 flex-1">{file.name}</span>
-                                  <span className="text-xs text-gray-400">Ver en Google Drive →</span>
+                                  <span className="text-xs text-gray-600">Ver en Google Drive →</span>
                                 </a>
                               )
                             }
@@ -557,7 +557,7 @@ function EntregasContent() {
                                 >
                                   <Download className="w-5 h-5 text-green-400" />
                                   <span className="text-sm text-green-300 flex-1">{file.name}</span>
-                                  <span className="text-xs text-gray-400">Descargar archivo</span>
+                                  <span className="text-xs text-gray-600">Descargar archivo</span>
                                 </a>
                               )
                             }
@@ -567,7 +567,7 @@ function EntregasContent() {
                                 key={idx}
                                 className="flex items-center gap-2 p-3 bg-gray-500/10 rounded-lg border border-gray-500/30"
                               >
-                                <FileText className="w-5 h-5 text-gray-400" />
+                                <FileText className="w-5 h-5 text-gray-600" />
                                 <span className="text-sm text-gray-300 flex-1">{file.name}</span>
                                 <span className="text-xs text-gray-500">({file.type || 'archivo'})</span>
                               </div>
@@ -583,7 +583,7 @@ function EntregasContent() {
                   {/* Fallback si no hay datos pero hay indicadores en output */}
                   {!selectedSubmission.drawing && !selectedSubmission.files && 
                    selectedSubmission.output?.includes('📁 ADJUNTOS') && (
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-600">
                       Los archivos fueron enviados pero no se pudieron guardar en la base de datos.
                       Por favor, crea los campos "drawing" y "files" en tu tabla de Airtable.
                     </p>
@@ -594,7 +594,7 @@ function EntregasContent() {
               {/* Grading Form */}
               <div className="mt-4 grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
                     Calificación (0-10)
                   </label>
                   <input
@@ -604,36 +604,36 @@ function EntregasContent() {
                     step="0.5"
                     value={gradeInput}
                     onChange={(e) => setGradeInput(e.target.value)}
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-purple-500"
                     placeholder="Ej: 8.5"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
                     Retroalimentación
                   </label>
                   <textarea
                     value={feedbackInput}
                     onChange={(e) => setFeedbackInput(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white resize-none focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 resize-none focus:outline-none focus:border-purple-500"
                     placeholder="Comentarios para el estudiante..."
                   />
                 </div>
               </div>
             </div>
 
-            <div className="p-4 border-t border-dark-600 flex justify-end gap-3">
+            <div className="p-4 border-t border-gray-200 flex justify-end gap-3">
               <button
                 onClick={() => setSelectedSubmission(null)}
-                className="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleGrade}
                 disabled={saving || !gradeInput}
-                className="px-6 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="px-6 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-gray-900 rounded-lg font-medium flex items-center gap-2 transition-colors"
               >
                 {saving ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Guardando...</>
@@ -653,7 +653,7 @@ function EntregasContent() {
 export default function EntregasPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
       </div>
     }>

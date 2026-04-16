@@ -139,11 +139,11 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl">
-            <Brain className="w-6 h-6 text-white" />
+            <Brain className="w-6 h-6 text-gray-900" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">IA y Programación</h2>
-            <p className="text-sm text-gray-400">Experimenta con IA y aprende a programar</p>
+            <h2 className="text-xl font-bold text-gray-900">IA y Programación</h2>
+            <p className="text-sm text-gray-600">Experimenta con IA y aprende a programar</p>
           </div>
         </div>
         <div className={`flex items-center gap-2 px-3 py-1.5 ${levelInfo.bgColor} rounded-full`}>
@@ -159,8 +159,8 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
             onClick={() => setActiveCategory('all')}
             className={`px-4 py-2 rounded-lg transition-colors ${
               activeCategory === 'all' 
-                ? 'bg-purple-600 text-white' 
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                ? 'bg-purple-600 text-gray-900' 
+                : 'bg-gray-800 text-gray-600 hover:bg-gray-700'
             }`}
           >
             Todas
@@ -169,8 +169,8 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
             onClick={() => setActiveCategory('ia')}
             className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
               activeCategory === 'ia' 
-                ? 'bg-cyan-600 text-white' 
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                ? 'bg-cyan-600 text-gray-900' 
+                : 'bg-gray-800 text-gray-600 hover:bg-gray-700'
             }`}
           >
             <Eye className="w-4 h-4" /> Inteligencia Artificial
@@ -179,8 +179,8 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
             onClick={() => setActiveCategory('programacion')}
             className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
               activeCategory === 'programacion' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                ? 'bg-blue-600 text-gray-900' 
+                : 'bg-gray-800 text-gray-600 hover:bg-gray-700'
             }`}
           >
             <Code className="w-4 h-4" /> Programación
@@ -203,7 +203,7 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
                 }`}
             >
               {!activity.available && (
-                <div className="absolute top-2 right-2 px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-400">
+                <div className="absolute top-2 right-2 px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-600">
                   Nivel avanzado
                 </div>
               )}
@@ -212,14 +212,14 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
                 <div className={activity.color}>{activity.icon}</div>
               </div>
               
-              <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
                 {activity.title}
                 {activity.available && (
                   <ChevronRight className={`w-4 h-4 ${activity.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
                 )}
               </h3>
               
-              <p className="text-sm text-gray-400">{activity.description}</p>
+              <p className="text-sm text-gray-600">{activity.description}</p>
               
               {activity.available && (
                 <div className={`mt-4 flex items-center gap-2 text-sm ${activity.color}`}>
@@ -257,9 +257,9 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
           <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-4 border border-blue-500/20">
             <div className="flex items-center gap-2 mb-2">
               <BookOpen className="w-5 h-5 text-blue-400" />
-              <h4 className="font-semibold text-white">Aprende Paso a Paso</h4>
+              <h4 className="font-semibold text-gray-900">Aprende Paso a Paso</h4>
             </div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Cada actividad incluye guías interactivas y ejemplos listos para usar. 
               Comienza con lo básico y avanza a tu ritmo.
             </p>
@@ -268,9 +268,9 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
           <div className="bg-gradient-to-br from-green-500/10 to-cyan-500/10 rounded-xl p-4 border border-green-500/20">
             <div className="flex items-center gap-2 mb-2">
               <Shield className="w-5 h-5 text-green-400" />
-              <h4 className="font-semibold text-white">Ambiente Seguro</h4>
+              <h4 className="font-semibold text-gray-900">Ambiente Seguro</h4>
             </div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Todos los simuladores funcionan en tu navegador. Puedes experimentar 
               sin miedo a romper nada. ¡Aprende haciendo!
             </p>
@@ -281,33 +281,33 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
       {/* Quick Tips */}
       {!activeActivity && (
         <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-          <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
+          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Cpu className="w-4 h-4 text-purple-400" />
             Consejos Rápidos
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
             <div className="flex items-start gap-2">
               <span className="text-cyan-400">🤖</span>
-              <span className="text-gray-400">
-                <strong className="text-white">Visión IA:</strong> Usa tu cámara para detectar objetos y clasificar imágenes.
+              <span className="text-gray-600">
+                <strong className="text-gray-900">Visión IA:</strong> Usa tu cámara para detectar objetos y clasificar imágenes.
               </span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-blue-400">💡</span>
-              <span className="text-gray-400">
-                <strong className="text-white">Python:</strong> Ideal para comenzar. Aprende lógica de programación.
+              <span className="text-gray-600">
+                <strong className="text-gray-900">Python:</strong> Ideal para comenzar. Aprende lógica de programación.
               </span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-red-400">🎮</span>
-              <span className="text-gray-400">
-                <strong className="text-white">Roblox:</strong> Crea juegos reales. Copia los scripts a Roblox Studio.
+              <span className="text-gray-600">
+                <strong className="text-gray-900">Roblox:</strong> Crea juegos reales. Copia los scripts a Roblox Studio.
               </span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-green-400">🔐</span>
-              <span className="text-gray-400">
-                <strong className="text-white">Terminal:</strong> Aprende comandos de Linux y ciberseguridad ética.
+              <span className="text-gray-600">
+                <strong className="text-gray-900">Terminal:</strong> Aprende comandos de Linux y ciberseguridad ética.
               </span>
             </div>
           </div>

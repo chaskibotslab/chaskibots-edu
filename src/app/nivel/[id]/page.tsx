@@ -193,8 +193,8 @@ export default function NivelPage() {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Cargando nivel...</p>
+          <div className="w-8 h-8 border-2 border-brand-purple border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando nivel...</p>
         </div>
       </div>
     )
@@ -204,7 +204,7 @@ export default function NivelPage() {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Nivel no encontrado</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Nivel no encontrado</h1>
           <Link href="/niveles" className="btn-primary">
             Ver todos los niveles
           </Link>
@@ -228,18 +228,18 @@ export default function NivelPage() {
     <CourseAuthGuard levelId={levelId} levelName={level.name}>
       <div className="min-h-screen bg-transparent flex">
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-dark-800/90 backdrop-blur-sm border-r border-dark-600 transition-all duration-300 overflow-hidden flex-shrink-0`}>
+      <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-gray-50/90 backdrop-blur-sm border-r border-gray-200 transition-all duration-300 overflow-hidden flex-shrink-0`}>
         <div className="h-full flex flex-col">
           {/* Header del Sidebar */}
-          <div className="p-4 border-b border-dark-600">
-            <Link href="/niveles" className="flex items-center gap-2 text-gray-400 hover:text-neon-cyan mb-4 text-sm">
+          <div className="p-4 border-b border-gray-200">
+            <Link href="/niveles" className="flex items-center gap-2 text-gray-600 hover:text-brand-purple mb-4 text-sm">
               <ArrowLeft className="w-4 h-4" />
               Volver a niveles
             </Link>
             <div className="flex items-center gap-3">
               <div className="text-3xl">{level.icon}</div>
               <div>
-                <h2 className="font-bold text-white">{level.name}</h2>
+                <h2 className="font-bold text-gray-900">{level.name}</h2>
                 <p className="text-xs text-gray-500">{level.ageRange}</p>
               </div>
             </div>
@@ -250,42 +250,42 @@ export default function NivelPage() {
             <div className="space-y-1">
               <button
                 onClick={() => setActiveTab('lessons')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'lessons' ? 'bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30' : 'text-gray-400 hover:bg-dark-700'}`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'lessons' ? 'bg-brand-purple/10 text-brand-purple border border-brand-purple/30' : 'text-gray-600 hover:bg-gray-100'}`}
               >
                 <BookOpen className="w-5 h-5" />
                 <span>Lecciones</span>
               </button>
               <button
                 onClick={() => setActiveTab('kit')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'kit' ? 'bg-neon-purple/10 text-neon-purple border border-neon-purple/30' : 'text-gray-400 hover:bg-dark-700'}`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'kit' ? 'bg-brand-violet/10 text-brand-violet border border-brand-violet/30' : 'text-gray-600 hover:bg-gray-100'}`}
               >
                 <Package className="w-5 h-5" />
                 <span>Mi Kit</span>
               </button>
               <button
                 onClick={() => setActiveTab('calendar')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'calendar' ? 'bg-neon-green/10 text-neon-green border border-neon-green/30' : 'text-gray-400 hover:bg-dark-700'}`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'calendar' ? 'bg-neon-green/10 text-neon-green border border-neon-green/30' : 'text-gray-600 hover:bg-gray-100'}`}
               >
                 <Calendar className="w-5 h-5" />
                 <span>Plan del Año</span>
               </button>
               <button
                 onClick={() => setActiveTab('ai')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'ai' ? 'bg-neon-pink/10 text-neon-pink border border-neon-pink/30' : 'text-gray-400 hover:bg-dark-700'}`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'ai' ? 'bg-neon-pink/10 text-neon-pink border border-neon-pink/30' : 'text-gray-600 hover:bg-gray-100'}`}
               >
                 <Brain className="w-5 h-5" />
                 <span>IA en Vivo</span>
               </button>
               <button
                 onClick={() => setActiveTab('simulators')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'simulators' ? 'bg-neon-orange/10 text-neon-orange border border-neon-orange/30' : 'text-gray-400 hover:bg-dark-700'}`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'simulators' ? 'bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/30' : 'text-gray-600 hover:bg-gray-100'}`}
               >
                 <Cpu className="w-5 h-5" />
                 <span>Simuladores</span>
               </button>
               <button
                 onClick={() => setActiveTab('tasks')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'tasks' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' : 'text-gray-400 hover:bg-dark-700'}`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${activeTab === 'tasks' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' : 'text-gray-600 hover:bg-gray-100'}`}
               >
                 <FileText className="w-5 h-5" />
                 <span>Tareas</span>
@@ -293,14 +293,14 @@ export default function NivelPage() {
             </div>
 
             {/* Progreso */}
-            <div className="mt-6 p-3 bg-dark-700/50 rounded-lg border border-dark-600">
+            <div className="mt-6 p-3 bg-gray-100/50 rounded-lg border border-gray-200">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-400">Progreso</span>
-                <span className="text-neon-cyan">{progress}%</span>
+                <span className="text-gray-600">Progreso</span>
+                <span className="text-brand-purple">{progress}%</span>
               </div>
               <div className="h-2 bg-dark-600 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-neon-cyan to-neon-purple rounded-full transition-all"
+                  className="h-full bg-gradient-to-r from-brand-purple to-brand-violet rounded-full transition-all"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -308,7 +308,7 @@ export default function NivelPage() {
 
             {/* Opciones de Profesor */}
             {isTeacher && (
-              <div className="mt-6 pt-4 border-t border-dark-600">
+              <div className="mt-6 pt-4 border-t border-gray-200">
                 <p className="text-xs text-gray-500 mb-2 px-1">Herramientas del Profesor</p>
                 <Link
                   href={`/admin/entregas?levelId=${levelId}`}
@@ -327,7 +327,7 @@ export default function NivelPage() {
                 </Link>
                 <Link
                   href={`/admin/tareas?levelId=${levelId}`}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all text-gray-400 hover:bg-dark-700 mt-1"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all text-gray-600 hover:bg-gray-100 mt-1"
                 >
                   <Settings className="w-5 h-5" />
                   <span>Gestionar Tareas</span>
@@ -341,18 +341,18 @@ export default function NivelPage() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Top Bar */}
-        <header className="h-14 bg-dark-800/80 backdrop-blur border-b border-dark-600 flex items-center px-4 gap-4">
+        <header className="h-14 bg-gray-50/80 backdrop-blur border-b border-gray-200 flex items-center px-4 gap-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-gray-400 hover:text-white transition-colors"
+            className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
           <div className="flex-1">
-            <h1 className="text-white font-semibold">{courseData.title}</h1>
+            <h1 className="text-gray-900 font-semibold">{courseData.title}</h1>
             <p className="text-xs text-gray-500">{courseData.description}</p>
           </div>
-          <Link href="/" className="p-2 text-gray-400 hover:text-neon-cyan transition-colors">
+          <Link href="/" className="p-2 text-gray-600 hover:text-brand-purple transition-colors">
             <Home className="w-5 h-5" />
           </Link>
         </header>
@@ -363,12 +363,12 @@ export default function NivelPage() {
           {activeTab === 'lessons' && (
             <div className="max-w-4xl mx-auto">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-neon-cyan/10 border border-neon-cyan/30 rounded-xl flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-neon-cyan" />
+                <div className="w-12 h-12 bg-brand-purple/10 border border-brand-purple/30 rounded-xl flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-brand-purple" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Lecciones del Curso</h2>
-                  <p className="text-gray-400">
+                  <h2 className="text-2xl font-bold text-gray-900">Lecciones del Curso</h2>
+                  <p className="text-gray-600">
                     {apiLessons.length > 0 ? `${apiLessons.length} lecciones` : `${courseData.totalLessons} lecciones`} • {courseData.duration}
                   </p>
                 </div>
@@ -380,14 +380,14 @@ export default function NivelPage() {
                   onClick={() => setSelectedProgram('robotica')}
                   className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden ${
                     selectedProgram === 'robotica'
-                      ? 'bg-gradient-to-br from-blue-500 to-cyan-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02]'
-                      : 'bg-dark-800 text-gray-400 hover:bg-dark-700 border border-dark-600'
+                      ? 'bg-gradient-to-br from-blue-500 to-cyan-600 text-gray-900 shadow-lg shadow-blue-500/30 scale-[1.02]'
+                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                     selectedProgram === 'robotica' ? 'bg-white/20' : 'bg-blue-500/20'
                   }`}>
-                    <Bot className={`w-6 h-6 ${selectedProgram === 'robotica' ? 'text-white' : 'text-blue-400'}`} />
+                    <Bot className={`w-6 h-6 ${selectedProgram === 'robotica' ? 'text-gray-900' : 'text-blue-400'}`} />
                   </div>
                   <span className="font-semibold">Robótica</span>
                   <span className={`text-xs ${selectedProgram === 'robotica' ? 'text-blue-100' : 'text-gray-500'}`}>
@@ -402,14 +402,14 @@ export default function NivelPage() {
                   onClick={() => setSelectedProgram('ia')}
                   className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden ${
                     selectedProgram === 'ia'
-                      ? 'bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30 scale-[1.02]'
-                      : 'bg-dark-800 text-gray-400 hover:bg-dark-700 border border-dark-600'
+                      ? 'bg-gradient-to-br from-purple-500 to-pink-600 text-gray-900 shadow-lg shadow-purple-500/30 scale-[1.02]'
+                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                     selectedProgram === 'ia' ? 'bg-white/20' : 'bg-purple-500/20'
                   }`}>
-                    <Brain className={`w-6 h-6 ${selectedProgram === 'ia' ? 'text-white' : 'text-purple-400'}`} />
+                    <Brain className={`w-6 h-6 ${selectedProgram === 'ia' ? 'text-gray-900' : 'text-purple-400'}`} />
                   </div>
                   <span className="font-semibold">Inteligencia Artificial</span>
                   <span className={`text-xs ${selectedProgram === 'ia' ? 'text-purple-100' : 'text-gray-500'}`}>
@@ -424,14 +424,14 @@ export default function NivelPage() {
                   onClick={() => setSelectedProgram('hacking')}
                   className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden ${
                     selectedProgram === 'hacking'
-                      ? 'bg-gradient-to-br from-red-500 to-orange-600 text-white shadow-lg shadow-red-500/30 scale-[1.02]'
-                      : 'bg-dark-800 text-gray-400 hover:bg-dark-700 border border-dark-600'
+                      ? 'bg-gradient-to-br from-red-500 to-orange-600 text-gray-900 shadow-lg shadow-red-500/30 scale-[1.02]'
+                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                     selectedProgram === 'hacking' ? 'bg-white/20' : 'bg-red-500/20'
                   }`}>
-                    <Shield className={`w-6 h-6 ${selectedProgram === 'hacking' ? 'text-white' : 'text-red-400'}`} />
+                    <Shield className={`w-6 h-6 ${selectedProgram === 'hacking' ? 'text-gray-900' : 'text-red-400'}`} />
                   </div>
                   <span className="font-semibold">Ciberseguridad</span>
                   <span className={`text-xs ${selectedProgram === 'hacking' ? 'text-red-100' : 'text-gray-500'}`}>
@@ -445,20 +445,20 @@ export default function NivelPage() {
               
               {/* Estadísticas del programa seleccionado */}
               {apiLessons.length > 0 && (
-                <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-dark-800/50 rounded-xl border border-dark-600">
+                <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-gray-50/50 rounded-xl border border-gray-200">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">{apiLessons.length}</p>
-                    <p className="text-xs text-gray-400">Lecciones</p>
+                    <p className="text-2xl font-bold text-gray-900">{apiLessons.length}</p>
+                    <p className="text-xs text-gray-600">Lecciones</p>
                   </div>
-                  <div className="text-center border-x border-dark-600">
-                    <p className="text-2xl font-bold text-white">{Object.keys(groupedApiLessons).length}</p>
-                    <p className="text-xs text-gray-400">Módulos</p>
+                  <div className="text-center border-x border-gray-200">
+                    <p className="text-2xl font-bold text-gray-900">{Object.keys(groupedApiLessons).length}</p>
+                    <p className="text-xs text-gray-600">Módulos</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-gray-900">
                       {Math.round(apiLessons.reduce((acc, l) => acc + (parseInt(l.duration) || 0), 0) / 60)}h
                     </p>
-                    <p className="text-xs text-gray-400">Duración</p>
+                    <p className="text-xs text-gray-600">Duración</p>
                   </div>
                 </div>
               )}
@@ -466,8 +466,8 @@ export default function NivelPage() {
               {/* Módulos y Lecciones - Usar API si hay datos, sino usar locales */}
               {lessonsLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
-                  <p className="text-gray-400 animate-pulse">Cargando lecciones...</p>
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-purple"></div>
+                  <p className="text-gray-600 animate-pulse">Cargando lecciones...</p>
                 </div>
               ) : apiLessons.length > 0 ? (
                 /* Lecciones desde API (Airtable) - Nueva interfaz mejorada */
@@ -491,11 +491,11 @@ export default function NivelPage() {
                   {courseData.modules.map((module, modIdx) => (
                     <div key={module.id} className="card">
                       <div className="flex items-start gap-4 mb-4">
-                        <div className="w-10 h-10 bg-neon-cyan/10 rounded-lg flex items-center justify-center text-neon-cyan font-bold">
+                        <div className="w-10 h-10 bg-brand-purple/10 rounded-lg flex items-center justify-center text-brand-purple font-bold">
                           {modIdx + 1}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-white">{module.title}</h3>
+                          <h3 className="font-bold text-gray-900">{module.title}</h3>
                           <p className="text-sm text-gray-500">{module.description}</p>
                         </div>
                       </div>
@@ -508,23 +508,23 @@ export default function NivelPage() {
                             disabled={lesson.locked}
                             className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
                               lesson.locked 
-                                ? 'bg-dark-700/30 text-gray-600 cursor-not-allowed' 
+                                ? 'bg-gray-100/30 text-gray-600 cursor-not-allowed' 
                                 : selectedLesson === lesson.id
-                                  ? 'bg-neon-cyan/10 border border-neon-cyan/30 text-white'
-                                  : 'bg-dark-700/50 text-gray-300 hover:bg-dark-600'
+                                  ? 'bg-brand-purple/10 border border-brand-purple/30 text-gray-900'
+                                  : 'bg-gray-100/50 text-gray-300 hover:bg-gray-200'
                             }`}
                           >
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                               lesson.completed ? 'bg-neon-green/20 text-neon-green' :
                               lesson.locked ? 'bg-dark-600 text-gray-600' :
-                              'bg-dark-600 text-gray-400'
+                              'bg-dark-600 text-gray-600'
                             }`}>
                               {lesson.completed ? <CheckCircle className="w-4 h-4" /> :
                                lesson.locked ? <Lock className="w-4 h-4" /> :
                                getLessonIcon(lesson.type)}
                             </div>
                             <div className="flex-1">
-                              <p className={lesson.locked ? 'text-gray-600' : 'text-white'}>{lesson.title}</p>
+                              <p className={lesson.locked ? 'text-gray-600' : 'text-gray-900'}>{lesson.title}</p>
                               <div className="flex items-center gap-2 text-xs text-gray-500">
                                 <Clock className="w-3 h-3" />
                                 {lesson.duration}
@@ -557,8 +557,8 @@ export default function NivelPage() {
                   <Calendar className="w-6 h-6 text-neon-green" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Plan del Año Escolar</h2>
-                  <p className="text-gray-400">Lo que aprenderás mes a mes</p>
+                  <h2 className="text-2xl font-bold text-gray-900">Plan del Año Escolar</h2>
+                  <p className="text-gray-600">Lo que aprenderás mes a mes</p>
                 </div>
               </div>
 
@@ -571,21 +571,21 @@ export default function NivelPage() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-dark-600">
-                          <th className="text-left py-3 px-4 text-gray-400 font-medium">Mes</th>
-                          <th className="text-left py-3 px-4 text-gray-400 font-medium">Tema</th>
-                          <th className="text-left py-3 px-4 text-gray-400 font-medium">Proyecto</th>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-4 text-gray-600 font-medium">Mes</th>
+                          <th className="text-left py-3 px-4 text-gray-600 font-medium">Tema</th>
+                          <th className="text-left py-3 px-4 text-gray-600 font-medium">Proyecto</th>
                         </tr>
                       </thead>
                       <tbody>
                         {yearPlan.map((plan, idx) => (
-                          <tr key={idx} className="border-b border-dark-700 hover:bg-dark-700/30 transition-colors">
+                          <tr key={idx} className="border-b border-dark-700 hover:bg-gray-100/30 transition-colors">
                             <td className="py-3 px-4">
                               <span className="text-neon-green font-semibold">{plan.month}</span>
                             </td>
                             <td className="py-3 px-4 text-gray-300">{plan.topic}</td>
                             <td className="py-3 px-4">
-                              <span className="px-2 py-1 bg-neon-purple/10 text-neon-purple text-sm rounded-lg">
+                              <span className="px-2 py-1 bg-brand-violet/10 text-brand-violet text-sm rounded-lg">
                                 {plan.project}
                               </span>
                             </td>
@@ -598,7 +598,7 @@ export default function NivelPage() {
               ) : (
                 <div className="card text-center py-8">
                   <Calendar className="w-12 h-12 text-gray-500 mx-auto mb-3" />
-                  <p className="text-gray-400">No hay plan del año configurado para este nivel</p>
+                  <p className="text-gray-600">No hay plan del año configurado para este nivel</p>
                   <p className="text-gray-500 text-sm mt-1">Agrega el plan en la tabla year_plans de Airtable</p>
                 </div>
               )}
@@ -613,8 +613,8 @@ export default function NivelPage() {
                   <Brain className="w-6 h-6 text-neon-pink" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Inteligencia Artificial</h2>
-                  <p className="text-gray-400">Aprende IA de forma interactiva</p>
+                  <h2 className="text-2xl font-bold text-gray-900">Inteligencia Artificial</h2>
+                  <p className="text-gray-600">Aprende IA de forma interactiva</p>
                 </div>
               </div>
               <AIActivities levelId={levelId} />
@@ -625,12 +625,12 @@ export default function NivelPage() {
           {activeTab === 'simulators' && (
             <div className="max-w-4xl mx-auto">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-neon-orange/10 border border-neon-orange/30 rounded-xl flex items-center justify-center">
-                  <Cpu className="w-6 h-6 text-neon-orange" />
+                <div className="w-12 h-12 bg-brand-cyan/10 border border-brand-cyan/30 rounded-xl flex items-center justify-center">
+                  <Cpu className="w-6 h-6 text-brand-cyan" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Simuladores Online</h2>
-                  <p className="text-gray-400">Practica programación y electrónica</p>
+                  <h2 className="text-2xl font-bold text-gray-900">Simuladores Online</h2>
+                  <p className="text-gray-600">Practica programación y electrónica</p>
                 </div>
               </div>
               <SimulatorTabsDynamic levelId={levelId} programId={selectedProgram} />
@@ -659,23 +659,23 @@ export default function NivelPage() {
             onClick={() => setSelectedLesson(null)}
           >
             <div 
-              className="bg-dark-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-dark-600 shadow-2xl"
+              className="bg-gray-50 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-200 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="sticky top-0 bg-dark-800 border-b border-dark-600 p-4 flex items-center justify-between z-10">
+              <div className="sticky top-0 bg-gray-50 border-b border-gray-200 p-4 flex items-center justify-between z-10">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-neon-cyan/20 rounded-lg flex items-center justify-center">
-                    <Play className="w-5 h-5 text-neon-cyan" />
+                  <div className="w-10 h-10 bg-brand-purple/20 rounded-lg flex items-center justify-center">
+                    <Play className="w-5 h-5 text-brand-purple" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">{lesson.title}</h3>
-                    <p className="text-sm text-gray-400">{lesson.duration} • {lesson.type}</p>
+                    <h3 className="text-lg font-bold text-gray-900">{lesson.title}</h3>
+                    <p className="text-sm text-gray-600">{lesson.duration} • {lesson.type}</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setSelectedLesson(null)}
-                  className="p-2 hover:bg-dark-700 rounded-lg text-gray-400 hover:text-white transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -685,7 +685,7 @@ export default function NivelPage() {
               <div className="p-4 space-y-4">
                 {/* Video */}
                 {videoUrl && (
-                  <div className="aspect-video bg-dark-900 rounded-xl overflow-hidden">
+                  <div className="aspect-video bg-white rounded-xl overflow-hidden">
                     <iframe
                       src={videoUrl}
                       className="w-full h-full"
@@ -698,7 +698,7 @@ export default function NivelPage() {
                 {/* Galería de imágenes */}
                 {'images' in lesson && Array.isArray(lesson.images) && lesson.images.length > 0 && (
                   <div>
-                    <p className="text-sm text-gray-400 mb-3">📷 Galería ({lesson.images.length} {lesson.images.length === 1 ? 'imagen' : 'imágenes'})</p>
+                    <p className="text-sm text-gray-600 mb-3">📷 Galería ({lesson.images.length} {lesson.images.length === 1 ? 'imagen' : 'imágenes'})</p>
                     <div className="flex gap-3 overflow-x-auto pb-2">
                       {lesson.images.map((img: string, idx: number) => {
                         const proxyUrl = img.includes('drive.google.com') 
@@ -707,7 +707,7 @@ export default function NivelPage() {
                         return (
                           <div 
                             key={idx} 
-                            className="flex-shrink-0 w-40 h-28 bg-dark-700 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-neon-cyan transition-all"
+                            className="flex-shrink-0 w-40 h-28 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-brand-purple transition-all"
                             onClick={() => setZoomImage(proxyUrl)}
                           >
                             <img 
@@ -728,20 +728,20 @@ export default function NivelPage() {
                 
                 {/* Descripción */}
                 {'content' in lesson && lesson.content && (
-                  <div className="bg-dark-700/50 rounded-xl p-4">
+                  <div className="bg-gray-100/50 rounded-xl p-4">
                     <p className="text-gray-300 whitespace-pre-line">{lesson.content}</p>
                   </div>
                 )}
                 
                 {/* Botón de PDF */}
                 {'pdfUrl' in lesson && lesson.pdfUrl && (
-                  <div className="flex items-center gap-3 p-4 bg-dark-700/50 rounded-xl">
+                  <div className="flex items-center gap-3 p-4 bg-gray-100/50 rounded-xl">
                     <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
                       <FileText className="w-5 h-5 text-red-400" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-white font-medium">Documento PDF</p>
-                      <p className="text-sm text-gray-400">Material de apoyo para esta lección</p>
+                      <p className="text-gray-900 font-medium">Documento PDF</p>
+                      <p className="text-sm text-gray-600">Material de apoyo para esta lección</p>
                     </div>
                     <a
                       href={lesson.pdfUrl}
@@ -790,7 +790,7 @@ export default function NivelPage() {
           onClick={() => setZoomImage(null)}
         >
           <button 
-            className="absolute top-4 right-4 text-white hover:text-neon-cyan p-2 z-10"
+            className="absolute top-4 right-4 text-gray-900 hover:text-brand-purple p-2 z-10"
             onClick={() => setZoomImage(null)}
           >
             <X className="w-8 h-8" />

@@ -256,37 +256,37 @@ export default function SimuladoresAdminPage() {
 
   if (isLoading || !isAdmin) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-purple"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-dark-900">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-dark-800 border-b border-dark-600 px-6 py-4">
+      <header className="bg-gray-50 border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-gray-400 hover:text-white">
+            <Link href="/admin" className="text-gray-600 hover:text-gray-900">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-white">Gestión de Simuladores</h1>
-              <p className="text-sm text-gray-400">Administra los simuladores por nivel y programa</p>
+              <h1 className="text-xl font-bold text-gray-900">Gestión de Simuladores</h1>
+              <p className="text-sm text-gray-600">Administra los simuladores por nivel y programa</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={loadSimulators}
-              className="flex items-center gap-2 px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200"
             >
               <RefreshCw className="w-4 h-4" />
               Recargar
             </button>
             <button
               onClick={openCreateModal}
-              className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-purple text-dark-900 rounded-lg font-medium hover:bg-brand-purple/90"
             >
               <Plus className="w-4 h-4" />
               Nuevo Simulador
@@ -298,14 +298,14 @@ export default function SimuladoresAdminPage() {
       {/* Filters */}
       <div className="px-6 py-4 border-b border-dark-700">
         <div className="flex items-center gap-4">
-          <span className="text-gray-400 text-sm">Filtrar por programa:</span>
+          <span className="text-gray-600 text-sm">Filtrar por programa:</span>
           <div className="flex gap-2">
             <button
               onClick={() => setFilterProgram('all')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 filterProgram === 'all' 
-                  ? 'bg-neon-cyan text-dark-900' 
-                  : 'bg-dark-700 text-gray-300 hover:bg-dark-600'
+                  ? 'bg-brand-purple text-dark-900' 
+                  : 'bg-gray-100 text-gray-300 hover:bg-gray-200'
               }`}
             >
               Todos ({simulators.length})
@@ -316,8 +316,8 @@ export default function SimuladoresAdminPage() {
                 onClick={() => setFilterProgram(prog.id)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                   filterProgram === prog.id 
-                    ? `${prog.color} text-white` 
-                    : 'bg-dark-700 text-gray-300 hover:bg-dark-600'
+                    ? `${prog.color} text-gray-900` 
+                    : 'bg-gray-100 text-gray-300 hover:bg-gray-200'
                 }`}
               >
                 {prog.name} ({simulators.filter(s => s.programs.includes(prog.id)).length})
@@ -331,15 +331,15 @@ export default function SimuladoresAdminPage() {
       <main className="p-6">
         {loadingSimulators ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-purple"></div>
           </div>
         ) : filteredSimulators.length === 0 ? (
-          <div className="bg-dark-800 rounded-xl border border-dark-600 p-12 text-center">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-12 text-center">
             <Monitor className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-            <p className="text-gray-400 mb-4">No hay simuladores registrados.</p>
+            <p className="text-gray-600 mb-4">No hay simuladores registrados.</p>
             <button
               onClick={openCreateModal}
-              className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium mx-auto"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-purple text-dark-900 rounded-lg font-medium mx-auto"
             >
               <Plus className="w-4 h-4" />
               Crear Primer Simulador
@@ -350,22 +350,22 @@ export default function SimuladoresAdminPage() {
             {filteredSimulators.map(simulator => (
               <div
                 key={simulator.id}
-                className={`bg-dark-800 rounded-xl border ${simulator.enabled ? 'border-dark-600' : 'border-red-900/50 opacity-60'} overflow-hidden hover:border-dark-500 transition-all`}
+                className={`bg-gray-50 rounded-xl border ${simulator.enabled ? 'border-gray-200' : 'border-red-900/50 opacity-60'} overflow-hidden hover:border-dark-500 transition-all`}
               >
                 {/* Header */}
                 <div className="p-4 border-b border-dark-700">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-dark-700 flex items-center justify-center text-neon-cyan">
+                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-brand-purple">
                         {getIconComponent(simulator.icon)}
                       </div>
                       <div>
-                        <h3 className="text-white font-semibold">{simulator.name}</h3>
+                        <h3 className="text-gray-900 font-semibold">{simulator.name}</h3>
                         <a 
                           href={simulator.url} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-xs text-gray-500 hover:text-neon-cyan flex items-center gap-1"
+                          className="text-xs text-gray-500 hover:text-brand-purple flex items-center gap-1"
                         >
                           <ExternalLink className="w-3 h-3" />
                           Abrir
@@ -387,8 +387,8 @@ export default function SimuladoresAdminPage() {
                         key={prog.id}
                         className={`px-2 py-0.5 rounded text-xs ${
                           simulator.programs.includes(prog.id)
-                            ? `${prog.color} text-white`
-                            : 'bg-dark-700 text-gray-500'
+                            ? `${prog.color} text-gray-900`
+                            : 'bg-gray-100 text-gray-500'
                         }`}
                       >
                         {prog.name.split(' ')[0]}
@@ -402,12 +402,12 @@ export default function SimuladoresAdminPage() {
                   <p className="text-xs text-gray-500 mb-2">Niveles ({simulator.levels.length}):</p>
                   <div className="flex flex-wrap gap-1 max-h-16 overflow-y-auto">
                     {simulator.levels.slice(0, 6).map(levelId => (
-                      <span key={levelId} className="px-2 py-0.5 bg-dark-700 rounded text-xs text-gray-300">
+                      <span key={levelId} className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-300">
                         {getLevelName(levelId)}
                       </span>
                     ))}
                     {simulator.levels.length > 6 && (
-                      <span className="px-2 py-0.5 bg-dark-600 rounded text-xs text-gray-400">
+                      <span className="px-2 py-0.5 bg-dark-600 rounded text-xs text-gray-600">
                         +{simulator.levels.length - 6} más
                       </span>
                     )}
@@ -418,7 +418,7 @@ export default function SimuladoresAdminPage() {
                 <div className="p-4 flex items-center gap-2">
                   <button
                     onClick={() => openEditModal(simulator)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200"
                   >
                     <Edit className="w-4 h-4" />
                     Editar
@@ -444,13 +444,13 @@ export default function SimuladoresAdminPage() {
       {/* Modal */}
       {(editingSimulator || isCreating) && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-xl border border-dark-600 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-dark-700">
-              <h2 className="text-lg font-bold text-white">
+              <h2 className="text-lg font-bold text-gray-900">
                 {isCreating ? 'Nuevo Simulador' : 'Editar Simulador'}
               </h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-white">
+              <button onClick={closeModal} className="text-gray-600 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -465,52 +465,52 @@ export default function SimuladoresAdminPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">ID (único)</label>
+                  <label className="block text-sm text-gray-600 mb-1">ID (único)</label>
                   <input
                     type="text"
                     value={formData.id}
                     onChange={e => setFormData({ ...formData, id: e.target.value.toLowerCase().replace(/\s/g, '-') })}
-                    className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                     placeholder="ej: scratch, wokwi"
                     disabled={!isCreating}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Nombre</label>
+                  <label className="block text-sm text-gray-600 mb-1">Nombre</label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                    className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                     placeholder="ej: Scratch"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">URL</label>
+                <label className="block text-sm text-gray-600 mb-1">URL</label>
                 <input
                   type="url"
                   value={formData.url}
                   onChange={e => setFormData({ ...formData, url: e.target.value })}
-                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   placeholder="https://scratch.mit.edu/projects/editor/"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Descripción</label>
+                <label className="block text-sm text-gray-600 mb-1">Descripción</label>
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   rows={2}
                   placeholder="Descripción breve del simulador"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Icono</label>
+                <label className="block text-sm text-gray-600 mb-1">Icono</label>
                 <div className="flex flex-wrap gap-2">
                   {ICON_OPTIONS.map(opt => (
                     <button
@@ -519,8 +519,8 @@ export default function SimuladoresAdminPage() {
                       onClick={() => setFormData({ ...formData, icon: opt.id })}
                       className={`p-2 rounded-lg border ${
                         formData.icon === opt.id 
-                          ? 'border-neon-cyan bg-neon-cyan/10 text-neon-cyan' 
-                          : 'border-dark-600 bg-dark-700 text-gray-400 hover:border-dark-500'
+                          ? 'border-brand-purple bg-brand-purple/10 text-brand-purple' 
+                          : 'border-gray-200 bg-gray-100 text-gray-600 hover:border-dark-500'
                       }`}
                       title={opt.name}
                     >
@@ -532,7 +532,7 @@ export default function SimuladoresAdminPage() {
 
               {/* Programs */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Programas</label>
+                <label className="block text-sm text-gray-600 mb-2">Programas</label>
                 <div className="flex flex-wrap gap-2">
                   {PROGRAMS.map(prog => (
                     <button
@@ -541,8 +541,8 @@ export default function SimuladoresAdminPage() {
                       onClick={() => toggleProgram(prog.id)}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                         formData.programs.includes(prog.id)
-                          ? `${prog.color} text-white`
-                          : 'bg-dark-700 text-gray-400 hover:bg-dark-600'
+                          ? `${prog.color} text-gray-900`
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
                       {formData.programs.includes(prog.id) && <Check className="w-3 h-3 inline mr-1" />}
@@ -555,12 +555,12 @@ export default function SimuladoresAdminPage() {
               {/* Levels */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm text-gray-400">Niveles ({formData.levels.length} seleccionados)</label>
+                  <label className="text-sm text-gray-600">Niveles ({formData.levels.length} seleccionados)</label>
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={selectAllLevels}
-                      className="text-xs text-neon-cyan hover:underline"
+                      className="text-xs text-brand-purple hover:underline"
                     >
                       Seleccionar todos
                     </button>
@@ -573,7 +573,7 @@ export default function SimuladoresAdminPage() {
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 bg-dark-700 rounded-lg">
+                <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 bg-gray-100 rounded-lg">
                   {levels.map(level => (
                     <button
                       key={level.id}
@@ -581,8 +581,8 @@ export default function SimuladoresAdminPage() {
                       onClick={() => toggleLevel(level.id)}
                       className={`px-2 py-1.5 rounded text-xs text-left transition-all ${
                         formData.levels.includes(level.id)
-                          ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50'
-                          : 'bg-dark-600 text-gray-400 hover:bg-dark-500'
+                          ? 'bg-brand-purple/20 text-brand-purple border border-brand-purple/50'
+                          : 'bg-dark-600 text-gray-600 hover:bg-dark-500'
                       }`}
                     >
                       {formData.levels.includes(level.id) && <Check className="w-3 h-3 inline mr-1" />}
@@ -597,7 +597,7 @@ export default function SimuladoresAdminPage() {
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, enabled: !formData.enabled })}
-                  className={`w-12 h-6 rounded-full transition-all ${formData.enabled ? 'bg-neon-cyan' : 'bg-dark-600'}`}
+                  className={`w-12 h-6 rounded-full transition-all ${formData.enabled ? 'bg-brand-purple' : 'bg-dark-600'}`}
                 >
                   <div className={`w-5 h-5 rounded-full bg-white transition-all ${formData.enabled ? 'ml-6' : 'ml-0.5'}`} />
                 </button>
@@ -611,14 +611,14 @@ export default function SimuladoresAdminPage() {
             <div className="flex items-center justify-end gap-3 p-4 border-t border-dark-700">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600"
+                className="px-4 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 bg-neon-cyan text-dark-900 rounded-lg font-medium hover:bg-neon-cyan/90 disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-purple text-dark-900 rounded-lg font-medium hover:bg-brand-purple/90 disabled:opacity-50"
               >
                 {saving ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />

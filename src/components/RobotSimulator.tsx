@@ -544,17 +544,17 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
   }
 
   return (
-    <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
+    <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-dark-600 p-3">
+      <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-gray-200 p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
               <Activity className="w-5 h-5 text-purple-400" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">Simulador de Robot</h3>
-              <p className="text-xs text-gray-400">Vista en tiempo real</p>
+              <h3 className="text-sm font-bold text-gray-900">Simulador de Robot</h3>
+              <p className="text-xs text-gray-600">Vista en tiempo real</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -572,7 +572,7 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
             </button>
             <button
               onClick={resetRobot}
-              className="flex items-center gap-1 px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg text-xs font-medium transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-300 rounded-lg text-xs font-medium transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
               Reset
@@ -588,32 +588,32 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
             ref={canvasRef}
             width={400}
             height={400}
-            className="rounded-lg border border-dark-600 w-full"
+            className="rounded-lg border border-gray-200 w-full"
             style={{ maxWidth: '400px' }}
           />
         </div>
 
         {/* Panel de control */}
-        <div className="w-48 bg-dark-900 border-l border-dark-600 p-3 space-y-4">
+        <div className="w-48 bg-white border-l border-gray-200 p-3 space-y-4">
           {/* Controles de dirección */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium">Control Manual</p>
+            <p className="text-xs text-gray-600 mb-2 font-medium">Control Manual</p>
             <div className="grid grid-cols-3 gap-1">
               <div></div>
               <button
                 onMouseDown={() => handleManualControl('up')}
                 onMouseUp={() => handleManualControl('stop')}
-                className="p-2 bg-dark-700 hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-brand-purple/20 rounded-lg transition-colors"
               >
-                <ArrowUp className="w-4 h-4 text-neon-cyan mx-auto" />
+                <ArrowUp className="w-4 h-4 text-brand-purple mx-auto" />
               </button>
               <div></div>
               <button
                 onMouseDown={() => handleManualControl('left')}
                 onMouseUp={() => handleManualControl('stop')}
-                className="p-2 bg-dark-700 hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-brand-purple/20 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-4 h-4 text-neon-cyan mx-auto" />
+                <ArrowLeft className="w-4 h-4 text-brand-purple mx-auto" />
               </button>
               <button
                 onClick={() => handleManualControl('stop')}
@@ -624,17 +624,17 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
               <button
                 onMouseDown={() => handleManualControl('right')}
                 onMouseUp={() => handleManualControl('stop')}
-                className="p-2 bg-dark-700 hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-brand-purple/20 rounded-lg transition-colors"
               >
-                <ArrowRight className="w-4 h-4 text-neon-cyan mx-auto" />
+                <ArrowRight className="w-4 h-4 text-brand-purple mx-auto" />
               </button>
               <div></div>
               <button
                 onMouseDown={() => handleManualControl('down')}
                 onMouseUp={() => handleManualControl('stop')}
-                className="p-2 bg-dark-700 hover:bg-neon-cyan/20 rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-brand-purple/20 rounded-lg transition-colors"
               >
-                <ArrowDown className="w-4 h-4 text-neon-cyan mx-auto" />
+                <ArrowDown className="w-4 h-4 text-brand-purple mx-auto" />
               </button>
               <div></div>
             </div>
@@ -642,7 +642,7 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
 
           {/* LEDs */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium flex items-center gap-1">
+            <p className="text-xs text-gray-600 mb-2 font-medium flex items-center gap-1">
               <Lightbulb className="w-3 h-3" /> LEDs
             </p>
             <div className="flex gap-2">
@@ -656,10 +656,10 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
                         : pin === 12 ? 'bg-green-500 border-green-400 shadow-lg shadow-green-500/50'
                         : pin === 11 ? 'bg-blue-500 border-blue-400 shadow-lg shadow-blue-500/50'
                         : 'bg-yellow-500 border-yellow-400 shadow-lg shadow-yellow-500/50'
-                      : 'bg-dark-700 border-dark-500'
+                      : 'bg-gray-100 border-dark-500'
                   }`}
                 >
-                  <span className="text-[8px] text-white font-bold">{pin}</span>
+                  <span className="text-[8px] text-gray-900 font-bold">{pin}</span>
                 </button>
               ))}
             </div>
@@ -667,29 +667,29 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
 
           {/* Servo */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium">Servo: {robotState.servoAngle}°</p>
+            <p className="text-xs text-gray-600 mb-2 font-medium">Servo: {robotState.servoAngle}°</p>
             <input
               type="range"
               min="0"
               max="180"
               value={robotState.servoAngle}
               onChange={(e) => executeCommand({ type: 'servo', params: { angle: parseInt(e.target.value) } })}
-              className="w-full h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
+              className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-orange-500"
             />
           </div>
 
           {/* Sensores */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium flex items-center gap-1">
+            <p className="text-xs text-gray-600 mb-2 font-medium flex items-center gap-1">
               <Eye className="w-3 h-3" /> Sensores
             </p>
             <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between bg-dark-700 rounded-lg px-2 py-1.5">
-                <span className="text-gray-400">Ultrasónico</span>
+              <div className="flex items-center justify-between bg-gray-100 rounded-lg px-2 py-1.5">
+                <span className="text-gray-600">Ultrasónico</span>
                 <span className="text-purple-400 font-mono">{Math.round(robotState.ultrasonicDistance)} cm</span>
               </div>
-              <div className="flex items-center justify-between bg-dark-700 rounded-lg px-2 py-1.5">
-                <span className="text-gray-400">IR</span>
+              <div className="flex items-center justify-between bg-gray-100 rounded-lg px-2 py-1.5">
+                <span className="text-gray-600">IR</span>
                 <span className={robotState.irSensor ? 'text-red-400' : 'text-green-400'}>
                   {robotState.irSensor ? 'Obstáculo' : 'Libre'}
                 </span>
@@ -699,24 +699,24 @@ export default function RobotSimulator({ commands = [], onStateChange }: RobotSi
 
           {/* Motores */}
           <div>
-            <p className="text-xs text-gray-400 mb-2 font-medium flex items-center gap-1">
+            <p className="text-xs text-gray-600 mb-2 font-medium flex items-center gap-1">
               <Gauge className="w-3 h-3" /> Motores
             </p>
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 w-6">Izq</span>
-                <div className="flex-1 h-2 bg-dark-700 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-neon-cyan transition-all"
+                    className="h-full bg-brand-purple transition-all"
                     style={{ width: `${(robotState.leftMotor / 255) * 100}%` }}
                   />
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 w-6">Der</span>
-                <div className="flex-1 h-2 bg-dark-700 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-neon-cyan transition-all"
+                    className="h-full bg-brand-purple transition-all"
                     style={{ width: `${(robotState.rightMotor / 255) * 100}%` }}
                   />
                 </div>

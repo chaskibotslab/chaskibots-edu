@@ -126,29 +126,29 @@ export default function CertificateGenerator({
 
       {showPreview && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-dark-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-auto border border-dark-600">
-            <div className="sticky top-0 bg-dark-800 p-4 border-b border-dark-600 flex items-center justify-between">
+          <div className="bg-gray-50 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-auto border border-gray-200">
+            <div className="sticky top-0 bg-gray-50 p-4 border-b border-gray-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-brand-purple/20 flex items-center justify-center">
                   <Award className="w-5 h-5 text-brand-purple" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white">Tu Certificado</h3>
+                  <h3 className="font-bold text-gray-900">Tu Certificado</h3>
                   <p className="text-sm text-gray-500">{colors.name} - {levelName}</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowPreview(false)}
-                className="p-2 hover:bg-dark-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-gray-400" />
+                <X className="w-5 h-5 text-gray-600" />
               </button>
             </div>
 
             <div className="p-6">
               {/* Certificate Preview */}
               <div 
-                className="w-full aspect-[4/3] rounded-xl overflow-hidden border border-dark-600 mb-6"
+                className="w-full aspect-[4/3] rounded-xl overflow-hidden border border-gray-200 mb-6"
                 dangerouslySetInnerHTML={{ __html: generateCertificateSVG() }}
               />
 
@@ -157,7 +157,7 @@ export default function CertificateGenerator({
                 <button
                   onClick={downloadCertificate}
                   disabled={isGenerating}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-purple to-brand-violet rounded-xl text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-purple to-brand-violet rounded-xl text-gray-900 font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {isGenerating ? (
                     <>
@@ -172,7 +172,7 @@ export default function CertificateGenerator({
                   )}
                 </button>
                 <button
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-dark-700 border border-dark-600 rounded-xl text-white font-medium hover:bg-dark-600 transition-colors"
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-900 font-medium hover:bg-gray-200 transition-colors"
                 >
                   <Share2 className="w-5 h-5" />
                   Compartir
@@ -184,7 +184,7 @@ export default function CertificateGenerator({
                 <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-green-400 font-medium">¡Felicitaciones!</p>
-                  <p className="text-sm text-gray-400">Has completado este curso exitosamente. Tu certificado está listo para descargar.</p>
+                  <p className="text-sm text-gray-600">Has completado este curso exitosamente. Tu certificado está listo para descargar.</p>
                 </div>
               </div>
             </div>

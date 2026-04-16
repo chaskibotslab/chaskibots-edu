@@ -44,7 +44,7 @@ export default function RegisterPage() {
             {/* Teléfono */}
             <a 
               href="tel:+593968653593" 
-              className="flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl mb-4 transition-all shadow-lg hover:shadow-xl"
+              className="flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-gray-900 font-bold py-3 px-6 rounded-xl mb-4 transition-all shadow-lg hover:shadow-xl"
             >
               <Phone className="w-5 h-5" />
               <span className="text-lg">0968653593</span>
@@ -55,7 +55,7 @@ export default function RegisterPage() {
               href="https://wa.me/593968653593?text=Hola,%20me%20interesa%20inscribirme%20en%20ChaskiBots%20EDU" 
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 px-6 rounded-xl mb-4 transition-all shadow-lg hover:shadow-xl"
+              className="flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#128C7E] text-gray-900 font-bold py-3 px-6 rounded-xl mb-4 transition-all shadow-lg hover:shadow-xl"
             >
               <MessageCircle className="w-5 h-5" />
               <span>Escríbenos por WhatsApp</span>

@@ -156,14 +156,14 @@ export default function BadgesDisplay({
   const unlockedCount = badges.filter(b => b.unlocked).length
 
   return (
-    <div className="bg-dark-800/80 backdrop-blur rounded-2xl p-6 border border-dark-600">
+    <div className="bg-gray-50/80 backdrop-blur rounded-2xl p-6 border border-gray-200">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-brand-purple/20 flex items-center justify-center">
             <Award className="w-5 h-5 text-brand-purple" />
           </div>
           <div>
-            <h3 className="font-bold text-white">Mis Insignias</h3>
+            <h3 className="font-bold text-gray-900">Mis Insignias</h3>
             <p className="text-sm text-gray-500">{unlockedCount} de {badges.length} desbloqueadas</p>
           </div>
         </div>
@@ -179,7 +179,7 @@ export default function BadgesDisplay({
               className={`relative p-3 rounded-xl border transition-all duration-300 ${
                 badge.unlocked 
                   ? `${badge.bgColor} border-transparent hover:scale-105` 
-                  : 'bg-dark-700/50 border-dark-600 opacity-50'
+                  : 'bg-gray-100/50 border-gray-200 opacity-50'
               }`}
             >
               <div className="flex flex-col items-center gap-2">
@@ -193,7 +193,7 @@ export default function BadgesDisplay({
                   )}
                 </div>
                 <span className={`text-xs font-medium text-center ${
-                  badge.unlocked ? 'text-white' : 'text-gray-600'
+                  badge.unlocked ? 'text-gray-900' : 'text-gray-600'
                 }`}>
                   {badge.name}
                 </span>
@@ -222,12 +222,12 @@ export default function BadgesDisplay({
           onClick={() => setSelectedBadge(null)}
         >
           <div 
-            className="bg-dark-800 rounded-2xl p-6 max-w-sm w-full border border-dark-600"
+            className="bg-gray-50 rounded-2xl p-6 max-w-sm w-full border border-gray-200"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex flex-col items-center text-center">
               <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-4 ${
-                selectedBadge.unlocked ? selectedBadge.bgColor : 'bg-dark-700'
+                selectedBadge.unlocked ? selectedBadge.bgColor : 'bg-gray-100'
               }`}>
                 {selectedBadge.unlocked ? (
                   <selectedBadge.icon className={`w-10 h-10 ${selectedBadge.color}`} />
@@ -235,16 +235,16 @@ export default function BadgesDisplay({
                   <Lock className="w-8 h-8 text-gray-600" />
                 )}
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">{selectedBadge.name}</h3>
-              <p className="text-gray-400 mb-4">{selectedBadge.description}</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedBadge.name}</h3>
+              <p className="text-gray-600 mb-4">{selectedBadge.description}</p>
               
               {selectedBadge.maxProgress && !selectedBadge.unlocked && (
                 <div className="w-full">
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-gray-500">Progreso</span>
-                    <span className="text-white">{selectedBadge.progress}/{selectedBadge.maxProgress}</span>
+                    <span className="text-gray-900">{selectedBadge.progress}/{selectedBadge.maxProgress}</span>
                   </div>
-                  <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div 
                       className={`h-full ${selectedBadge.bgColor.replace('/20', '')}`}
                       style={{ width: `${((selectedBadge.progress || 0) / selectedBadge.maxProgress) * 100}%` }}
@@ -263,7 +263,7 @@ export default function BadgesDisplay({
             
             <button
               onClick={() => setSelectedBadge(null)}
-              className="w-full mt-6 py-2 bg-dark-700 hover:bg-dark-600 rounded-xl text-white font-medium transition-colors"
+              className="w-full mt-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-900 font-medium transition-colors"
             >
               Cerrar
             </button>

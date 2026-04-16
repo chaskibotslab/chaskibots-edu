@@ -195,23 +195,23 @@ export default function AdminLeccionesContent() {
 
   if (isLoading || !isAdmin) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-purple"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-dark-900">
-      <header className="bg-dark-800 border-b border-dark-600 px-6 py-4">
+    <div className="min-h-screen bg-white">
+      <header className="bg-gray-50 border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-gray-400 hover:text-white">
+            <Link href="/admin" className="text-gray-600 hover:text-gray-900">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-white">Gestion de Lecciones</h1>
-              <p className="text-sm text-gray-400">Administra las lecciones de cada nivel</p>
+              <h1 className="text-xl font-bold text-gray-900">Gestion de Lecciones</h1>
+              <p className="text-sm text-gray-600">Administra las lecciones de cada nivel</p>
             </div>
           </div>
           <button onClick={openCreateModal} className="btn-primary flex items-center gap-2">
@@ -223,11 +223,11 @@ export default function AdminLeccionesContent() {
 
       <div className="p-6">
         <div className="mb-6">
-          <label className="block text-sm text-gray-400 mb-2">Filtrar por nivel:</label>
+          <label className="block text-sm text-gray-600 mb-2">Filtrar por nivel:</label>
           <select
             value={selectedLevel}
             onChange={(e) => setSelectedLevel(e.target.value)}
-            className="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+            className="bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
           >
             <option value="">Todos los niveles</option>
             {(dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS).map(level => (
@@ -240,32 +240,32 @@ export default function AdminLeccionesContent() {
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-purple"></div>
           </div>
         ) : lessons.length === 0 ? (
           <div className="text-center py-12">
             <BookOpen className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400">No hay lecciones{selectedLevel ? ' para este nivel' : ''}</p>
-            <button onClick={openCreateModal} className="mt-4 text-neon-cyan hover:underline">
+            <p className="text-gray-600">No hay lecciones{selectedLevel ? ' para este nivel' : ''}</p>
+            <button onClick={openCreateModal} className="mt-4 text-brand-purple hover:underline">
               Crear primera leccion
             </button>
           </div>
         ) : (
           <div className="space-y-6">
             {Object.entries(groupedLessons).map(([moduleName, moduleLessons]) => (
-              <div key={moduleName} className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-                <div className="bg-dark-700 px-4 py-3 border-b border-dark-600">
-                  <h3 className="font-semibold text-white">{moduleName}</h3>
-                  <p className="text-sm text-gray-400">{moduleLessons.length} lecciones</p>
+              <div key={moduleName} className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                <div className="bg-gray-100 px-4 py-3 border-b border-gray-200">
+                  <h3 className="font-semibold text-gray-900">{moduleName}</h3>
+                  <p className="text-sm text-gray-600">{moduleLessons.length} lecciones</p>
                 </div>
                 <div className="divide-y divide-dark-600">
                   {moduleLessons.sort((a, b) => a.order - b.order).map(lesson => (
-                    <div key={lesson.id} className="px-4 py-3 flex items-center gap-4 hover:bg-dark-700/50">
-                      <div className="w-8 h-8 bg-dark-600 rounded-lg flex items-center justify-center text-gray-400">
+                    <div key={lesson.id} className="px-4 py-3 flex items-center gap-4 hover:bg-gray-100/50">
+                      <div className="w-8 h-8 bg-dark-600 rounded-lg flex items-center justify-center text-gray-600">
                         {getLessonIcon(lesson.type)}
                       </div>
                       <div className="flex-1">
-                        <p className="text-white font-medium">{lesson.title}</p>
+                        <p className="text-gray-900 font-medium">{lesson.title}</p>
                         <div className="flex items-center gap-3 text-sm text-gray-500">
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />
@@ -278,13 +278,13 @@ export default function AdminLeccionesContent() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => openEditModal(lesson)}
-                          className="p-2 text-gray-400 hover:text-neon-cyan transition-colors"
+                          className="p-2 text-gray-600 hover:text-brand-purple transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(lesson.id)}
-                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          className="p-2 text-gray-600 hover:text-red-500 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -300,12 +300,12 @@ export default function AdminLeccionesContent() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-dark-800 border-b border-dark-600 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white">
+          <div className="bg-gray-50 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-gray-50 border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">
                 {isCreating ? 'Nueva Leccion' : 'Editar Leccion'}
               </h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-white">
+              <button onClick={closeModal} className="text-gray-600 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -319,11 +319,11 @@ export default function AdminLeccionesContent() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Nivel *</label>
+                  <label className="block text-sm text-gray-600 mb-1">Nivel *</label>
                   <select
                     value={formData.levelId}
                     onChange={(e) => setFormData({ ...formData, levelId: e.target.value })}
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                   >
                     <option value="">Seleccionar nivel</option>
                     {(dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS).map(level => (
@@ -335,35 +335,35 @@ export default function AdminLeccionesContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Nombre del Modulo *</label>
+                  <label className="block text-sm text-gray-600 mb-1">Nombre del Modulo *</label>
                   <input
                     type="text"
                     value={formData.moduleName}
                     onChange={(e) => setFormData({ ...formData, moduleName: e.target.value })}
                     placeholder="Ej: Modulo 1: Introduccion"
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Titulo de la Leccion *</label>
+                <label className="block text-sm text-gray-600 mb-1">Titulo de la Leccion *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Ej: Hola! Bienvenidos al curso"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Tipo</label>
+                  <label className="block text-sm text-gray-600 mb-1">Tipo</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value as Lesson['type'] })}
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                   >
                     {LESSON_TYPES.map(type => (
                       <option key={type.value} value={type.value}>{type.label}</option>
@@ -372,35 +372,35 @@ export default function AdminLeccionesContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Duracion</label>
+                  <label className="block text-sm text-gray-600 mb-1">Duracion</label>
                   <input
                     type="text"
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                     placeholder="Ej: 10 min"
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Orden</label>
+                  <label className="block text-sm text-gray-600 mb-1">Orden</label>
                   <input
                     type="number"
                     value={formData.order}
                     onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">URL del Video (Google Drive o YouTube)</label>
+                <label className="block text-sm text-gray-600 mb-1">URL del Video (Google Drive o YouTube)</label>
                 <input
                   type="text"
                   value={formData.videoUrl}
                   onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                   placeholder="https://drive.google.com/file/d/..."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none font-mono text-sm"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none font-mono text-sm"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Pega el enlace de Google Drive o YouTube. El video se mostrara embebido.
@@ -408,13 +408,13 @@ export default function AdminLeccionesContent() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Contenido / Descripcion</label>
+                <label className="block text-sm text-gray-600 mb-1">Contenido / Descripcion</label>
                 <textarea
                   rows={4}
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   placeholder="Descripcion o contenido de la leccion..."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none resize-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none resize-none"
                 />
               </div>
 
@@ -424,7 +424,7 @@ export default function AdminLeccionesContent() {
                   id="locked"
                   checked={formData.locked}
                   onChange={(e) => setFormData({ ...formData, locked: e.target.checked })}
-                  className="w-4 h-4 rounded border-dark-600 bg-dark-700 text-neon-cyan focus:ring-neon-cyan"
+                  className="w-4 h-4 rounded border-gray-200 bg-gray-100 text-brand-purple focus:ring-brand-purple"
                 />
                 <label htmlFor="locked" className="text-gray-300">
                   Leccion bloqueada (requiere completar anteriores)
@@ -432,8 +432,8 @@ export default function AdminLeccionesContent() {
               </div>
             </div>
 
-            <div className="sticky bottom-0 bg-dark-800 border-t border-dark-600 px-6 py-4 flex justify-end gap-3">
-              <button onClick={closeModal} className="px-4 py-2 text-gray-400 hover:text-white">
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+              <button onClick={closeModal} className="px-4 py-2 text-gray-600 hover:text-gray-900">
                 Cancelar
               </button>
               <button

@@ -12,10 +12,10 @@ import {
 const BlocklyEditor = dynamic(() => import('./BlocklyEditor'), { 
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[600px] bg-dark-800 rounded-xl">
+    <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-xl">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan mx-auto mb-4"></div>
-        <p className="text-gray-400">Cargando ChaskiBlocks...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-purple mx-auto mb-4"></div>
+        <p className="text-gray-600">Cargando ChaskiBlocks...</p>
       </div>
     </div>
   )
@@ -301,8 +301,8 @@ export default function SimulatorTabs() {
               }}
               className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all ${
                 activeCategory === cat.id 
-                  ? 'bg-neon-cyan text-dark-900' 
-                  : 'bg-dark-700 text-gray-400 hover:bg-dark-600 hover:text-white'
+                  ? 'bg-brand-purple text-dark-900' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -322,8 +322,8 @@ export default function SimulatorTabs() {
               onClick={() => setActiveSimulator(sim)}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-medium transition-all ${
                 activeSimulator.id === sim.id 
-                  ? 'bg-dark-600 text-white border border-neon-cyan/50' 
-                  : 'bg-dark-800 text-gray-500 hover:bg-dark-700 hover:text-gray-300 border border-dark-600'
+                  ? 'bg-dark-600 text-gray-900 border border-brand-purple/50' 
+                  : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-300 border border-gray-200'
               }`}
             >
               <Icon className="w-3 h-3" />
@@ -343,30 +343,30 @@ export default function SimulatorTabs() {
           <BlocklyEditor userId={user?.id} userName={user?.name} />
         </div>
       ) : (
-        <div className="bg-dark-800 border border-dark-600 rounded-2xl p-6">
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
             <div>
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 {(() => {
                   const Icon = activeSimulator.icon
-                  return <Icon className="w-6 h-6 text-neon-cyan" />
+                  return <Icon className="w-6 h-6 text-brand-purple" />
                 })()}
                 {activeSimulator.name}
               </h3>
-              <p className="text-gray-400 mt-1">{activeSimulator.description}</p>
+              <p className="text-gray-600 mt-1">{activeSimulator.description}</p>
             </div>
             <a
               href={activeSimulator.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-neon-cyan text-dark-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-neon-cyan/80 transition-colors"
+              className="bg-brand-purple text-dark-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-brand-purple/80 transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
               Abrir en su web
             </a>
           </div>
 
-          <div className="relative rounded-xl overflow-hidden bg-dark-900 border border-dark-600">
+          <div className="relative rounded-xl overflow-hidden bg-white border border-gray-200">
             <iframe
               src={activeSimulator.url}
               className="w-full h-[600px] border-none"

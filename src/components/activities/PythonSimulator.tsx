@@ -697,7 +697,7 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Code className="w-5 h-5 text-blue-400" />
-          <h3 className="font-bold text-white">Simulador Python</h3>
+          <h3 className="font-bold text-gray-900">Simulador Python</h3>
           <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs rounded">
             {getLevel().charAt(0).toUpperCase() + getLevel().slice(1)}
           </span>
@@ -725,16 +725,16 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
                   onClick={() => setActiveGuide(activeGuide === idx ? null : idx)}
                   className="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
                 >
-                  <span className="font-medium text-white">{guide.title}</span>
+                  <span className="font-medium text-gray-900">{guide.title}</span>
                   {activeGuide === idx ? (
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                    <ChevronDown className="w-4 h-4 text-gray-600" />
                   ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-600" />
                   )}
                 </button>
                 {activeGuide === idx && (
                   <div className="p-3 bg-gray-900/50 border-t border-gray-700">
-                    <p className="text-sm text-gray-400 mb-3">{guide.content}</p>
+                    <p className="text-sm text-gray-600 mb-3">{guide.content}</p>
                     <div className="grid gap-2">
                       {guide.examples.map((example, exIdx) => (
                         <button
@@ -743,7 +743,7 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
                           className="flex items-center justify-between p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-left"
                         >
                           <div>
-                            <div className="text-sm font-medium text-white">{example.title}</div>
+                            <div className="text-sm font-medium text-gray-900">{example.title}</div>
                             <div className="text-xs text-gray-500">{example.description}</div>
                           </div>
                           <Zap className="w-4 h-4 text-yellow-400" />
@@ -767,7 +767,7 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
               <div className="w-3 h-3 rounded-full bg-red-500" />
               <div className="w-3 h-3 rounded-full bg-yellow-500" />
               <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span className="ml-2 text-sm text-gray-400">codigo.py</span>
+              <span className="ml-2 text-sm text-gray-600">codigo.py</span>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -778,7 +778,7 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
                 {copied ? (
                   <Check className="w-4 h-4 text-green-400" />
                 ) : (
-                  <Copy className="w-4 h-4 text-gray-400" />
+                  <Copy className="w-4 h-4 text-gray-600" />
                 )}
               </button>
               <button
@@ -786,7 +786,7 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
                 className="p-1.5 hover:bg-gray-700 rounded transition-colors"
                 title="Limpiar"
               >
-                <RotateCcw className="w-4 h-4 text-gray-400" />
+                <RotateCcw className="w-4 h-4 text-gray-600" />
               </button>
             </div>
           </div>
@@ -803,13 +803,13 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
         <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-700">
           <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
             <div className="flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-gray-400">Salida</span>
+              <Terminal className="w-4 h-4 text-gray-600" />
+              <span className="text-sm text-gray-600">Salida</span>
             </div>
             <button
               onClick={runCode}
               disabled={isRunning}
-              className="flex items-center gap-2 px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+              className="flex items-center gap-2 px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-gray-900 rounded-lg transition-colors text-sm"
             >
               <Play className="w-4 h-4" />
               {isRunning ? 'Ejecutando...' : 'Ejecutar'}
@@ -820,7 +820,7 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
             className="h-64 p-4 overflow-y-auto font-mono text-sm"
           >
             {output.map((line, idx) => (
-              <div key={idx} className="text-white">
+              <div key={idx} className="text-gray-900">
                 {line}
               </div>
             ))}
@@ -834,11 +834,11 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-white font-medium flex items-center gap-2">
+                <p className="text-sm text-gray-900 font-medium flex items-center gap-2">
                   <Send className="w-4 h-4 text-purple-400" />
                   Enviar al Profesor
                 </p>
-                <p className="text-xs text-gray-400">Tu código y resultado se enviarán para calificación</p>
+                <p className="text-xs text-gray-600">Tu código y resultado se enviarán para calificación</p>
               </div>
             </div>
             
@@ -848,13 +848,13 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
                 placeholder="Tu nombre..."
-                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-white"
+                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-gray-900"
               />
               
               <select
                 value={selectedTask}
                 onChange={(e) => setSelectedTask(e.target.value)}
-                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-white"
+                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-gray-900"
               >
                 <option value="">Selecciona tarea (opcional)</option>
                 {tasks.map(task => (
@@ -866,7 +866,7 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
               <button
                 onClick={handleSendToTeacher}
                 disabled={isSending || sendSuccess}
-                className="bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                className="bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-gray-900 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
               >
                 {isSending ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>

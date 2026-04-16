@@ -128,8 +128,8 @@ export default function FileUpload({
         onDragLeave={handleDragLeave}
         className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
           dragOver 
-            ? 'border-neon-cyan bg-neon-cyan/10' 
-            : 'border-dark-500 hover:border-dark-400 bg-dark-700/50'
+            ? 'border-brand-purple bg-brand-purple/10' 
+            : 'border-dark-500 hover:border-dark-400 bg-gray-100/50'
         }`}
       >
         <input
@@ -143,14 +143,14 @@ export default function FileUpload({
         
         {uploading ? (
           <div className="flex flex-col items-center gap-2">
-            <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
-            <p className="text-gray-400">Procesando archivos...</p>
+            <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+            <p className="text-gray-600">Procesando archivos...</p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
-            <Upload className={`w-8 h-8 ${dragOver ? 'text-neon-cyan' : 'text-gray-500'}`} />
-            <p className="text-gray-400">
-              <span className="text-neon-cyan">Haz clic</span> o arrastra archivos aquí
+            <Upload className={`w-8 h-8 ${dragOver ? 'text-brand-purple' : 'text-gray-500'}`} />
+            <p className="text-gray-600">
+              <span className="text-brand-purple">Haz clic</span> o arrastra archivos aquí
             </p>
             <p className="text-xs text-gray-500">
               PDF, Imágenes, Word, Excel • Máx {maxSizeMB}MB por archivo • {maxFiles - files.length} restantes
@@ -169,7 +169,7 @@ export default function FileUpload({
             return (
               <div
                 key={index}
-                className="flex items-center gap-3 p-3 bg-dark-700 border border-dark-600 rounded-lg"
+                className="flex items-center gap-3 p-3 bg-gray-100 border border-gray-200 rounded-lg"
               >
                 {isImage ? (
                   <img 
@@ -179,12 +179,12 @@ export default function FileUpload({
                   />
                 ) : (
                   <div className="w-10 h-10 bg-dark-600 rounded flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-gray-400" />
+                    <Icon className="w-5 h-5 text-gray-600" />
                   </div>
                 )}
                 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white truncate">{file.name}</p>
+                  <p className="text-sm text-gray-900 truncate">{file.name}</p>
                   <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
                 </div>
                 
@@ -192,7 +192,7 @@ export default function FileUpload({
                 
                 <button
                   onClick={(e) => { e.stopPropagation(); removeFile(index); }}
-                  className="p-1 text-gray-400 hover:text-red-400 hover:bg-red-500/20 rounded"
+                  className="p-1 text-gray-600 hover:text-red-400 hover:bg-red-500/20 rounded"
                 >
                   <X className="w-4 h-4" />
                 </button>

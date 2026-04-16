@@ -103,8 +103,8 @@ export default function LoginPage() {
               onClick={() => setShowForm(true)}
               className="group flex flex-col items-center gap-2 mx-auto animate-bounce"
             >
-              <span className="text-gray-400 text-sm">Iniciar Sesión</span>
-              <ChevronDown className="w-6 h-6 text-brand-purple group-hover:text-white transition-colors" />
+              <span className="text-gray-600 text-sm">Iniciar Sesión</span>
+              <ChevronDown className="w-6 h-6 text-brand-purple group-hover:text-gray-900 transition-colors" />
             </button>
           )}
         </div>
@@ -113,7 +113,7 @@ export default function LoginPage() {
         <div className={`w-full max-w-sm transition-all duration-700 ease-out ${showForm ? 'opacity-100 translate-y-0 mt-4' : 'opacity-0 translate-y-20 pointer-events-none absolute'}`}>
           
           {/* Card del formulario */}
-          <div className="bg-dark-800/80 backdrop-blur-2xl rounded-3xl p-6 border border-white/10 shadow-2xl">
+          <div className="bg-gray-50/80 backdrop-blur-2xl rounded-3xl p-6 border border-white/10 shadow-2xl">
             
             {/* Tabs minimalistas */}
             <div className="flex gap-2 mb-6">
@@ -122,8 +122,8 @@ export default function LoginPage() {
                 onClick={() => setLoginMode('code')}
                 className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
                   loginMode === 'code' 
-                    ? 'bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-lg' 
-                    : 'bg-dark-700/50 text-gray-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-brand-violet to-neon-pink text-gray-900 shadow-lg' 
+                    : 'bg-gray-100/50 text-gray-600 hover:text-gray-900'
                 }`}
               >
                 <Key className="w-4 h-4 inline mr-2" />
@@ -134,8 +134,8 @@ export default function LoginPage() {
                 onClick={() => setLoginMode('email')}
                 className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
                   loginMode === 'email' 
-                    ? 'bg-gradient-to-r from-neon-cyan to-neon-blue text-white shadow-lg' 
-                    : 'bg-dark-700/50 text-gray-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-brand-purple to-neon-blue text-gray-900 shadow-lg' 
+                    : 'bg-gray-100/50 text-gray-600 hover:text-gray-900'
                 }`}
               >
                 <Mail className="w-4 h-4 inline mr-2" />
@@ -157,7 +157,7 @@ export default function LoginPage() {
                       type="text"
                       value={accessCode}
                       onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                      className="w-full px-4 py-4 bg-dark-700/50 border-2 border-dark-600 rounded-2xl focus:border-neon-purple focus:ring-0 transition-all placeholder:text-gray-500 font-mono text-xl tracking-[0.2em] text-center text-white uppercase"
+                      className="w-full px-4 py-4 bg-gray-100/50 border-2 border-gray-200 rounded-2xl focus:border-brand-violet focus:ring-0 transition-all placeholder:text-gray-500 font-mono text-xl tracking-[0.2em] text-center text-gray-900 uppercase"
                       placeholder="TU CÓDIGO"
                       maxLength={10}
                       required
@@ -175,7 +175,7 @@ export default function LoginPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-dark-700/50 border-2 border-dark-600 rounded-2xl focus:border-neon-cyan focus:ring-0 transition-all placeholder:text-gray-500 text-white"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-100/50 border-2 border-gray-200 rounded-2xl focus:border-brand-purple focus:ring-0 transition-all placeholder:text-gray-500 text-gray-900"
                       placeholder="tu@email.com"
                       required
                     />
@@ -187,14 +187,14 @@ export default function LoginPage() {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-12 pr-12 py-4 bg-dark-700/50 border-2 border-dark-600 rounded-2xl focus:border-neon-cyan focus:ring-0 transition-all placeholder:text-gray-500 text-white"
+                      className="w-full pl-12 pr-12 py-4 bg-gray-100/50 border-2 border-gray-200 rounded-2xl focus:border-brand-purple focus:ring-0 transition-all placeholder:text-gray-500 text-gray-900"
                       placeholder="Contraseña"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-900 transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -205,7 +205,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-4 bg-gradient-to-r from-neon-cyan via-neon-blue to-neon-purple text-white font-bold rounded-2xl hover:scale-[1.02] hover:shadow-2xl hover:shadow-neon-cyan/30 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden"
+                className="w-full py-4 bg-gradient-to-r from-brand-purple via-neon-blue to-brand-violet text-gray-900 font-bold rounded-2xl hover:scale-[1.02] hover:shadow-2xl hover:shadow-brand-purple/30 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500"></span>
                 {isLoading ? (
@@ -220,9 +220,9 @@ export default function LoginPage() {
             </form>
 
             {/* Contacto minimalista */}
-            <div className="mt-6 pt-4 border-t border-dark-600 text-center">
+            <div className="mt-6 pt-4 border-t border-gray-200 text-center">
               <p className="text-gray-500 text-xs mb-2">¿Necesitas ayuda?</p>
-              <a href="tel:+593968653593" className="text-neon-cyan font-semibold hover:text-white transition-colors">
+              <a href="tel:+593968653593" className="text-brand-purple font-semibold hover:text-gray-900 transition-colors">
                 📞 0968653593
               </a>
             </div>
@@ -231,7 +231,7 @@ export default function LoginPage() {
           {/* Botón para ocultar formulario */}
           <button
             onClick={() => setShowForm(false)}
-            className="w-full mt-4 py-2 text-gray-500 text-sm hover:text-white transition-colors"
+            className="w-full mt-4 py-2 text-gray-500 text-sm hover:text-gray-900 transition-colors"
           >
             ← Volver
           </button>

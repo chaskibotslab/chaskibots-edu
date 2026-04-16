@@ -19,13 +19,13 @@ export default function AnimatedBackground() {
     resize()
     window.addEventListener('resize', resize)
 
-    // Colores suaves azul/gris
+    // Colores claros con paleta del usuario
     const colors = {
-      bg: '#1a1f2e',
-      grid: 'rgba(100, 150, 200, 0.05)',
-      gear: ['#5a8fbc', '#7ba3c9', '#4a7a9e', '#8bb5d6'],
-      particle: ['#6a9bc3', '#8ab4d4', '#5a8ab3', '#9cc5e5'],
-      robot: '#5a8fbc'
+      bg: '#FAFAFA',
+      grid: 'rgba(85, 140, 137, 0.08)',
+      gear: ['#558C89', '#74AFAD', '#D9853B', '#6a9e9b'],
+      particle: ['#558C89', '#74AFAD', '#D9853B', '#8ab8b5'],
+      robot: '#558C89'
     }
 
     // Engranajes con colores suaves
@@ -339,7 +339,7 @@ export default function AnimatedBackground() {
       ctx.globalAlpha = 1
 
       // Conectar partículas cercanas
-      ctx.strokeStyle = 'rgba(100, 150, 200, 0.03)'
+      ctx.strokeStyle = 'rgba(85, 140, 137, 0.06)'
       ctx.lineWidth = 1
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -373,10 +373,10 @@ export default function AnimatedBackground() {
         className="absolute inset-0 w-full h-full"
       />
       
-      {/* Orbes de luz suaves azul */}
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-400/5 rounded-full blur-[200px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-300/5 rounded-full blur-[180px]" />
-      <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-sky-400/4 rounded-full blur-[150px]" />
+      {/* Orbes de luz suaves con paleta del usuario */}
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#558C89]/5 rounded-full blur-[200px]" />
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#74AFAD]/5 rounded-full blur-[180px]" />
+      <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-[#D9853B]/5 rounded-full blur-[150px]" />
     </div>
   )
 }

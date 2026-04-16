@@ -465,7 +465,7 @@ export default function UsersManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
       </div>
     )
   }
@@ -475,27 +475,27 @@ export default function UsersManager() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h3 className="text-lg font-bold text-white">Usuarios y Códigos de Acceso</h3>
-          <p className="text-sm text-gray-400">{users.length} usuarios registrados</p>
+          <h3 className="text-lg font-bold text-gray-900">Usuarios y Códigos de Acceso</h3>
+          <p className="text-sm text-gray-600">{users.length} usuarios registrados</p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={exportUsers}
-            className="flex items-center gap-2 px-3 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
           >
             <Download className="w-4 h-4" />
             Exportar
           </button>
           <button
             onClick={() => { setShowBulkForm(!showBulkForm); setShowImportForm(false) }}
-            className="flex items-center gap-2 px-4 py-2 bg-neon-orange/20 text-neon-orange rounded-lg hover:bg-neon-orange/30 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-cyan/20 text-brand-cyan rounded-lg hover:bg-brand-cyan/30 transition-colors"
           >
             <Users className="w-4 h-4" />
             Crear en Lote
           </button>
           <button
             onClick={() => { setShowImportForm(!showImportForm); setShowBulkForm(false) }}
-            className="flex items-center gap-2 px-4 py-2 bg-neon-purple/20 text-neon-purple rounded-lg hover:bg-neon-purple/30 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-violet/20 text-brand-violet rounded-lg hover:bg-brand-violet/30 transition-colors"
           >
             <FileSpreadsheet className="w-4 h-4" />
             Importar Lista
@@ -513,11 +513,11 @@ export default function UsersManager() {
       {/* Filters */}
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-400" />
+          <Filter className="w-4 h-4 text-gray-600" />
           <select
             value={filterLevel}
             onChange={(e) => setFilterLevel(e.target.value)}
-            className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+            className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
           >
             <option value="all">Todos los niveles</option>
             {levels.map(level => (
@@ -528,7 +528,7 @@ export default function UsersManager() {
         <select
           value={filterRole}
           onChange={(e) => setFilterRole(e.target.value)}
-          className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+          className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
         >
           <option value="all">Todos los roles</option>
           <option value="admin">Administradores</option>
@@ -539,39 +539,39 @@ export default function UsersManager() {
 
       {/* Bulk Create Form */}
       {showBulkForm && (
-        <form onSubmit={handleBulkCreate} className="bg-dark-800 rounded-xl p-6 border border-neon-orange/30 space-y-4">
-          <h4 className="text-white font-semibold flex items-center gap-2">
-            <Users className="w-5 h-5 text-neon-orange" />
+        <form onSubmit={handleBulkCreate} className="bg-gray-50 rounded-xl p-6 border border-brand-cyan/30 space-y-4">
+          <h4 className="text-gray-900 font-semibold flex items-center gap-2">
+            <Users className="w-5 h-5 text-brand-cyan" />
             Crear Usuarios en Lote
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Cantidad</label>
+              <label className="block text-sm text-gray-600 mb-1">Cantidad</label>
               <input
                 type="number"
                 value={bulkData.count}
                 onChange={(e) => setBulkData({ ...bulkData, count: parseInt(e.target.value) })}
                 min={1}
                 max={100}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Prefijo Nombre</label>
+              <label className="block text-sm text-gray-600 mb-1">Prefijo Nombre</label>
               <input
                 type="text"
                 value={bulkData.namePrefix}
                 onChange={(e) => setBulkData({ ...bulkData, namePrefix: e.target.value })}
                 placeholder="Estudiante"
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Nivel</label>
+              <label className="block text-sm text-gray-600 mb-1">Nivel</label>
               <select
                 value={bulkData.levelId}
                 onChange={(e) => setBulkData({ ...bulkData, levelId: e.target.value })}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 required
               >
                 <option value="">Seleccionar...</option>
@@ -581,17 +581,17 @@ export default function UsersManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Nombre del Curso</label>
+              <label className="block text-sm text-gray-600 mb-1">Nombre del Curso</label>
               <input
                 type="text"
                 value={bulkData.courseName}
                 onChange={(e) => setBulkData({ ...bulkData, courseName: e.target.value })}
                 placeholder="8vo A Matutino"
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Colegio</label>
+              <label className="block text-sm text-gray-600 mb-1">Colegio</label>
               <select
                 value={bulkData.schoolId}
                 onChange={(e) => {
@@ -602,7 +602,7 @@ export default function UsersManager() {
                     schoolName: school?.name || ''
                   })
                 }}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               >
                 <option value="">Sin asignar</option>
                 {schools.map(school => (
@@ -615,14 +615,14 @@ export default function UsersManager() {
             <button
               type="button"
               onClick={() => setShowBulkForm(false)}
-              className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-2 bg-neon-orange text-dark-900 font-semibold rounded-lg hover:bg-neon-orange/90 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-brand-cyan text-dark-900 font-semibold rounded-lg hover:bg-brand-cyan/90 transition-colors disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Users className="w-4 h-4" />}
               Crear {bulkData.count} Usuarios
@@ -633,24 +633,24 @@ export default function UsersManager() {
 
       {/* Import Form - Lista de nombres */}
       {showImportForm && (
-        <form onSubmit={handleImportCreate} className="bg-dark-800 rounded-xl p-6 border border-neon-purple/30 space-y-4">
-          <h4 className="text-white font-semibold flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-neon-purple" />
+        <form onSubmit={handleImportCreate} className="bg-gray-50 rounded-xl p-6 border border-brand-violet/30 space-y-4">
+          <h4 className="text-gray-900 font-semibold flex items-center gap-2">
+            <FileSpreadsheet className="w-5 h-5 text-brand-violet" />
             Importar Lista de Estudiantes
           </h4>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600">
             Pega los nombres de los estudiantes (uno por línea). Puedes copiar directamente desde Excel.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-1">
-              <label className="block text-sm text-gray-400 mb-1">Nombres (uno por línea)</label>
+              <label className="block text-sm text-gray-600 mb-1">Nombres (uno por línea)</label>
               <textarea
                 value={importData.names}
                 onChange={(e) => setImportData({ ...importData, names: e.target.value })}
                 placeholder="Juan Pérez&#10;María García&#10;Carlos López&#10;Ana Martínez"
                 rows={8}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white font-mono text-sm resize-none"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 font-mono text-sm resize-none"
                 required
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -660,11 +660,11 @@ export default function UsersManager() {
             
             <div className="space-y-3">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Nivel *</label>
+                <label className="block text-sm text-gray-600 mb-1">Nivel *</label>
                 <select
                   value={importData.levelId}
                   onChange={(e) => setImportData({ ...importData, levelId: e.target.value })}
-                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                   required
                 >
                   <option value="">Seleccionar...</option>
@@ -675,7 +675,7 @@ export default function UsersManager() {
               </div>
               
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Programa</label>
+                <label className="block text-sm text-gray-600 mb-1">Programa</label>
                 <select
                   value={importData.programId}
                   onChange={(e) => {
@@ -686,7 +686,7 @@ export default function UsersManager() {
                       programName: program?.name || ''
                     })
                   }}
-                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 >
                   <option value="">Sin asignar</option>
                   {programs.map(program => (
@@ -696,18 +696,18 @@ export default function UsersManager() {
               </div>
               
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Curso/Clase</label>
+                <label className="block text-sm text-gray-600 mb-1">Curso/Clase</label>
                 <input
                   type="text"
                   value={importData.courseName}
                   onChange={(e) => setImportData({ ...importData, courseName: e.target.value })}
                   placeholder="8vo A Matutino"
-                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 />
               </div>
               
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Colegio</label>
+                <label className="block text-sm text-gray-600 mb-1">Colegio</label>
                 <select
                   value={importData.schoolId}
                   onChange={(e) => {
@@ -718,7 +718,7 @@ export default function UsersManager() {
                       schoolName: school?.name || ''
                     })
                   }}
-                  className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                  className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 >
                   <option value="">Sin asignar</option>
                   {schools.map(school => (
@@ -733,14 +733,14 @@ export default function UsersManager() {
             <button
               type="button"
               onClick={() => setShowImportForm(false)}
-              className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving || !importData.names.trim() || !importData.levelId}
-              className="flex items-center gap-2 px-6 py-2 bg-neon-purple text-white font-semibold rounded-lg hover:bg-neon-purple/90 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-brand-violet text-gray-900 font-semibold rounded-lg hover:bg-brand-violet/90 transition-colors disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
               Crear {importData.names.split('\n').filter(n => n.trim()).length} Usuarios
@@ -751,35 +751,35 @@ export default function UsersManager() {
 
       {/* Single User Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-dark-800 rounded-xl p-6 border border-dark-600 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl p-6 border border-gray-200 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Nombre Completo</label>
+              <label className="block text-sm text-gray-600 mb-1">Nombre Completo</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Juan Pérez"
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Email (opcional)</label>
+              <label className="block text-sm text-gray-600 mb-1">Email (opcional)</label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="email@ejemplo.com"
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Rol</label>
+              <label className="block text-sm text-gray-600 mb-1">Rol</label>
               <select
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               >
                 <option value="student">Estudiante</option>
                 <option value="teacher">Profesor</option>
@@ -790,11 +790,11 @@ export default function UsersManager() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Nivel</label>
+              <label className="block text-sm text-gray-600 mb-1">Nivel</label>
               <select
                 value={formData.levelId}
                 onChange={(e) => handleLevelChange(e.target.value)}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 required
               >
                 <option value="">Seleccionar...</option>
@@ -804,11 +804,11 @@ export default function UsersManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Programa</label>
+              <label className="block text-sm text-gray-600 mb-1">Programa</label>
               <select
                 value={formData.programId}
                 onChange={(e) => handleProgramChange(e.target.value)}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               >
                 <option value="">Seleccionar...</option>
                 {filteredPrograms.map(prog => (
@@ -817,11 +817,11 @@ export default function UsersManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Curso/Clase (opcional)</label>
+              <label className="block text-sm text-gray-600 mb-1">Curso/Clase (opcional)</label>
               <select
                 value={formData.courseId}
                 onChange={(e) => handleCourseChange(e.target.value)}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               >
                 <option value="">Sin asignar</option>
                 {displayCourses.map(course => (
@@ -833,7 +833,7 @@ export default function UsersManager() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Colegio/Institución</label>
+              <label className="block text-sm text-gray-600 mb-1">Colegio/Institución</label>
               <select
                 value={formData.schoolId}
                 onChange={(e) => {
@@ -844,7 +844,7 @@ export default function UsersManager() {
                     schoolName: school?.name || ''
                   })
                 }}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               >
                 <option value="">Sin asignar</option>
                 {schools.map(school => (
@@ -858,7 +858,7 @@ export default function UsersManager() {
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               Cancelar
             </button>
@@ -875,30 +875,30 @@ export default function UsersManager() {
       )}
 
       {/* Users Table */}
-      <div className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden overflow-x-auto">
+      <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[800px]">
-          <thead className="bg-dark-700">
+          <thead className="bg-gray-100">
             <tr>
-              <th className="px-4 py-3 text-left text-sm text-gray-400">Código</th>
-              <th className="px-4 py-3 text-left text-sm text-gray-400">Usuario</th>
-              <th className="px-4 py-3 text-left text-sm text-gray-400">Nivel</th>
-              <th className="px-4 py-3 text-left text-sm text-gray-400">Programa</th>
-              <th className="px-4 py-3 text-left text-sm text-gray-400">Rol</th>
-              <th className="px-4 py-3 text-left text-sm text-gray-400">Estado</th>
-              <th className="px-4 py-3 text-right text-sm text-gray-400">Acciones</th>
+              <th className="px-4 py-3 text-left text-sm text-gray-600">Código</th>
+              <th className="px-4 py-3 text-left text-sm text-gray-600">Usuario</th>
+              <th className="px-4 py-3 text-left text-sm text-gray-600">Nivel</th>
+              <th className="px-4 py-3 text-left text-sm text-gray-600">Programa</th>
+              <th className="px-4 py-3 text-left text-sm text-gray-600">Rol</th>
+              <th className="px-4 py-3 text-left text-sm text-gray-600">Estado</th>
+              <th className="px-4 py-3 text-right text-sm text-gray-600">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-dark-600">
             {filteredUsers.map((user) => (
-              <tr key={user.id} className="hover:bg-dark-700/50">
+              <tr key={user.id} className="hover:bg-gray-100/50">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <code className="px-2 py-1 bg-dark-600 rounded text-neon-cyan font-mono text-sm">
+                    <code className="px-2 py-1 bg-dark-600 rounded text-brand-purple font-mono text-sm">
                       {user.accessCode}
                     </code>
                     <button
                       onClick={() => copyCode(user.accessCode)}
-                      className="p-1 text-gray-400 hover:text-white transition-colors"
+                      className="p-1 text-gray-600 hover:text-gray-900 transition-colors"
                     >
                       {copiedCode === user.accessCode ? (
                         <Check className="w-4 h-4 text-green-400" />
@@ -909,7 +909,7 @@ export default function UsersManager() {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <p className="text-white font-medium">{user.name}</p>
+                  <p className="text-gray-900 font-medium">{user.name}</p>
                   <p className="text-xs text-gray-500">{user.email || 'Sin email'}</p>
                 </td>
                 <td className="px-4 py-3 text-gray-300">{user.levelId}</td>
@@ -927,7 +927,7 @@ export default function UsersManager() {
                   <button
                     onClick={() => handleToggleActive(user)}
                     className={`px-2 py-0.5 rounded text-xs ${
-                      user.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
+                      user.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-600'
                     }`}
                   >
                     {user.isActive ? 'Activo' : 'Inactivo'}
@@ -937,21 +937,21 @@ export default function UsersManager() {
                   <div className="flex justify-end gap-1">
                     <button
                       onClick={() => handleRegenerateCode(user.id)}
-                      className="p-1.5 text-gray-400 hover:text-neon-orange transition-colors"
+                      className="p-1.5 text-gray-600 hover:text-brand-cyan transition-colors"
                       title="Regenerar código"
                     >
                       <RefreshCw className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleEdit(user)}
-                      className="p-1.5 text-gray-400 hover:text-neon-cyan transition-colors"
+                      className="p-1.5 text-gray-600 hover:text-brand-purple transition-colors"
                       title="Editar usuario"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(user.id, user.name)}
-                      className="p-1.5 text-gray-400 hover:text-red-400 transition-colors"
+                      className="p-1.5 text-gray-600 hover:text-red-400 transition-colors"
                       title="Eliminar usuario"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -965,7 +965,7 @@ export default function UsersManager() {
       </div>
 
       {filteredUsers.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-gray-600">
           <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
           <p>No hay usuarios con estos filtros</p>
         </div>

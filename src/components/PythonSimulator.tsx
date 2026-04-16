@@ -436,16 +436,16 @@ ${output}
   }
 
   return (
-    <div className="bg-dark-800 border border-dark-600 rounded-2xl overflow-hidden">
+    <div className="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden">
       {/* Header */}
-      <div className="bg-dark-900 px-4 py-3 border-b border-dark-600 flex items-center justify-between flex-wrap gap-3">
+      <div className="bg-white px-4 py-3 border-b border-gray-200 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
-          <span className="text-gray-400 text-sm font-mono">codigo.py</span>
+          <span className="text-gray-600 text-sm font-mono">codigo.py</span>
         </div>
         
         <div className="flex items-center gap-2">
@@ -454,18 +454,18 @@ ${output}
             placeholder="Tu nombre (opcional)"
             value={studentName}
             onChange={(e) => setStudentName(e.target.value)}
-            className="px-3 py-1.5 bg-dark-700 border border-dark-600 rounded-lg text-sm text-white placeholder:text-gray-500 w-40"
+            className="px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 w-40"
           />
           <button
             onClick={resetCode}
-            className="p-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             title="Restaurar código inicial"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
           <button
             onClick={clearCode}
-            className="p-2 text-gray-400 hover:text-red-400 hover:bg-dark-700 rounded-lg transition-colors"
+            className="p-2 text-gray-600 hover:text-red-400 hover:bg-gray-100 rounded-lg transition-colors"
             title="Limpiar todo"
           >
             <Trash2 className="w-4 h-4" />
@@ -480,7 +480,7 @@ ${output}
           <div className="absolute top-2 right-2 z-10">
             <button
               onClick={() => copyToClipboard(code, 'code')}
-              className="p-1.5 bg-dark-700 hover:bg-dark-600 rounded text-gray-400 hover:text-white transition-colors"
+              className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600 hover:text-gray-900 transition-colors"
               title="Copiar código"
             >
               {copied === 'code' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
@@ -490,21 +490,21 @@ ${output}
             ref={textareaRef}
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="w-full h-80 p-4 bg-dark-900 text-gray-200 font-mono text-sm resize-none focus:outline-none"
+            className="w-full h-80 p-4 bg-white text-gray-200 font-mono text-sm resize-none focus:outline-none"
             placeholder="Escribe tu código Python aquí..."
             spellCheck={false}
           />
         </div>
 
         {/* Output */}
-        <div className="relative bg-dark-900/50">
+        <div className="relative bg-white/50">
           <div className="absolute top-2 left-2 flex items-center gap-2">
             <span className="text-xs text-gray-500 font-mono">▶ Salida</span>
           </div>
           <div className="absolute top-2 right-2 z-10">
             <button
               onClick={() => copyToClipboard(output, 'output')}
-              className="p-1.5 bg-dark-700 hover:bg-dark-600 rounded text-gray-400 hover:text-white transition-colors"
+              className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600 hover:text-gray-900 transition-colors"
               title="Copiar resultado"
             >
               {copied === 'output' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
@@ -521,12 +521,12 @@ ${output}
       </div>
 
       {/* Actions Bar */}
-      <div className="bg-dark-900 px-4 py-3 border-t border-dark-600 flex items-center justify-between flex-wrap gap-3">
+      <div className="bg-white px-4 py-3 border-t border-gray-200 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <button
             onClick={runCode}
             disabled={!isPyodideReady || isRunning}
-            className="bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+            className="bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
           >
             <Play className="w-4 h-4" />
             {isRunning ? 'Ejecutando...' : 'Ejecutar'}
@@ -570,7 +570,7 @@ ${output}
                 setIsSending(false)
               }}
               disabled={isSending || sendSuccess}
-              className="bg-neon-purple hover:bg-neon-purple/80 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+              className="bg-brand-violet hover:bg-brand-violet/80 disabled:bg-gray-600 text-gray-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
             >
               {isSending ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
@@ -588,7 +588,7 @@ ${output}
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-sm text-white"
+              className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900"
             >
               <option value="">Tu nivel...</option>
               <option value="inicial-1">Inicial 1</option>
@@ -610,7 +610,7 @@ ${output}
           )}
           <button
             onClick={exportCode}
-            className="bg-dark-700 hover:bg-dark-600 text-gray-300 px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-300 px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors"
             title="Descargar código .py"
           >
             <FileCode className="w-4 h-4" />
@@ -619,7 +619,7 @@ ${output}
           <button
             onClick={prepareExport}
             disabled={!output}
-            className="bg-neon-cyan hover:bg-neon-cyan/80 disabled:opacity-50 disabled:cursor-not-allowed text-dark-900 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+            className="bg-brand-purple hover:bg-brand-purple/80 disabled:opacity-50 disabled:cursor-not-allowed text-dark-900 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
             title="Exportar tarea con ID único y QR"
           >
             <QrCode className="w-4 h-4" />
@@ -639,20 +639,20 @@ ${output}
 
       {/* Send to Teacher Section - Hidden, keeping for backwards compatibility */}
       {false && output && (
-        <div className="px-4 py-3 border-t border-dark-600 bg-gradient-to-r from-green-900/20 to-emerald-900/20">
+        <div className="px-4 py-3 border-t border-gray-200 bg-gradient-to-r from-green-900/20 to-emerald-900/20">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <div className="flex-1">
-              <p className="text-sm text-white font-medium flex items-center gap-2">
+              <p className="text-sm text-gray-900 font-medium flex items-center gap-2">
                 <Send className="w-4 h-4 text-green-400" />
                 Enviar al Profesor
               </p>
-              <p className="text-xs text-gray-400">Tu código y resultado se enviarán para calificación</p>
+              <p className="text-xs text-gray-600">Tu código y resultado se enviarán para calificación</p>
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <select
                 value={selectedLevel}
                 onChange={(e) => setSelectedLevel(e.target.value)}
-                className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-sm text-white flex-1 sm:flex-none"
+                className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-900 flex-1 sm:flex-none"
               >
                 <option value="">Selecciona tu nivel...</option>
                 <option value="inicial-1">Inicial 1</option>
@@ -707,7 +707,7 @@ ${output}
                   setIsSending(false)
                 }}
                 disabled={isSending || sendSuccess}
-                className="bg-green-600 hover:bg-green-500 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap"
+                className="bg-green-600 hover:bg-green-500 disabled:bg-gray-600 text-gray-900 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap"
               >
                 {isSending ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
@@ -732,21 +732,21 @@ ${output}
       {/* Export Modal */}
       {showExportModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 border border-dark-600 rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <QrCode className="w-6 h-6 text-neon-cyan" />
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <QrCode className="w-6 h-6 text-brand-purple" />
               Exportar Tarea
             </h3>
             
             {/* Task ID */}
-            <div className="bg-dark-900 rounded-xl p-4 mb-4">
+            <div className="bg-white rounded-xl p-4 mb-4">
               <p className="text-xs text-gray-500 mb-1">ID de Verificación:</p>
               <div className="flex items-center gap-2">
                 <Hash className="w-5 h-5 text-yellow-400" />
                 <code className="text-yellow-400 font-mono text-lg">{lastTaskId}</code>
                 <button
                   onClick={() => copyToClipboard(lastTaskId || '', 'taskId')}
-                  className="ml-auto p-1.5 bg-dark-700 hover:bg-dark-600 rounded text-gray-400 hover:text-white transition-colors"
+                  className="ml-auto p-1.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   {copied === 'taskId' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                 </button>
@@ -756,7 +756,7 @@ ${output}
             {/* QR Code Preview */}
             {qrDataUrl && (
               <div className="flex justify-center mb-4">
-                <div className="bg-dark-900 p-4 rounded-xl">
+                <div className="bg-white p-4 rounded-xl">
                   <img src={qrDataUrl} alt="QR Code" className="w-40 h-40" />
                   <p className="text-xs text-gray-500 text-center mt-2">Escanea para verificar</p>
                 </div>
@@ -764,11 +764,11 @@ ${output}
             )}
 
             {/* Student Info */}
-            <div className="bg-dark-900/50 rounded-xl p-3 mb-4 text-sm">
-              <p className="text-gray-400">
+            <div className="bg-white/50 rounded-xl p-3 mb-4 text-sm">
+              <p className="text-gray-600">
                 <span className="text-gray-500">Estudiante:</span> {studentName || 'Sin nombre'}
               </p>
-              <p className="text-gray-400">
+              <p className="text-gray-600">
                 <span className="text-gray-500">Fecha:</span> {new Date().toLocaleString('es-EC')}
               </p>
             </div>
@@ -777,9 +777,9 @@ ${output}
             <div className="space-y-2">
               <button
                 onClick={exportBoth}
-                className="w-full bg-dark-700 hover:bg-dark-600 text-white px-4 py-3 rounded-xl flex items-center gap-3 transition-colors"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-3 rounded-xl flex items-center gap-3 transition-colors"
               >
-                <FileText className="w-5 h-5 text-gray-400" />
+                <FileText className="w-5 h-5 text-gray-600" />
                 <div className="text-left">
                   <p className="font-medium">Descargar .TXT</p>
                   <p className="text-xs text-gray-500">Archivo de texto con código y resultado</p>
@@ -788,12 +788,12 @@ ${output}
               
               <button
                 onClick={exportWithQR}
-                className="w-full bg-neon-cyan/20 hover:bg-neon-cyan/30 border border-neon-cyan/50 text-white px-4 py-3 rounded-xl flex items-center gap-3 transition-colors"
+                className="w-full bg-brand-purple/20 hover:bg-brand-purple/30 border border-brand-purple/50 text-gray-900 px-4 py-3 rounded-xl flex items-center gap-3 transition-colors"
               >
-                <QrCode className="w-5 h-5 text-neon-cyan" />
+                <QrCode className="w-5 h-5 text-brand-purple" />
                 <div className="text-left">
-                  <p className="font-medium text-neon-cyan">Descargar Imagen con QR</p>
-                  <p className="text-xs text-gray-400">Imagen PNG con código QR de verificación</p>
+                  <p className="font-medium text-brand-purple">Descargar Imagen con QR</p>
+                  <p className="text-xs text-gray-600">Imagen PNG con código QR de verificación</p>
                 </div>
               </button>
             </div>
@@ -801,7 +801,7 @@ ${output}
             {/* Close Button */}
             <button
               onClick={() => setShowExportModal(false)}
-              className="w-full mt-4 text-gray-500 hover:text-white text-sm transition-colors"
+              className="w-full mt-4 text-gray-500 hover:text-gray-900 text-sm transition-colors"
             >
               Cancelar
             </button>
@@ -810,14 +810,14 @@ ${output}
       )}
 
       {/* Example Exercises */}
-      <div className="px-4 py-3 border-t border-dark-600 bg-dark-800/50">
+      <div className="px-4 py-3 border-t border-gray-200 bg-gray-50/50">
         <p className="text-xs text-gray-500 mb-2">Ejercicios de ejemplo:</p>
         <div className="flex gap-2 flex-wrap">
           {EXAMPLE_EXERCISES.map((example, index) => (
             <button
               key={index}
               onClick={() => loadExample(example.code)}
-              className="px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-gray-400 hover:text-white text-xs rounded-lg transition-colors"
+              className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 text-xs rounded-lg transition-colors"
             >
               {example.title}
             </button>

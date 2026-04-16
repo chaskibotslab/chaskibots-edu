@@ -126,8 +126,8 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-chaski-dark via-blue-900 to-indigo-900">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 text-white animate-spin mx-auto mb-4" />
-          <p className="text-white/80">Verificando acceso...</p>
+          <Loader2 className="w-10 h-10 text-gray-900 animate-spin mx-auto mb-4" />
+          <p className="text-gray-900/80">Verificando acceso...</p>
         </div>
       </div>
     )
@@ -171,7 +171,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-gradient-to-br from-chaski-accent to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-10 h-10 text-white" />
+            <Shield className="w-10 h-10 text-gray-900" />
           </div>
           <h2 className="text-2xl font-bold text-chaski-dark mb-2">
             Acceso al Curso
@@ -200,7 +200,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
               O ingresa la contraseña del curso
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
@@ -213,7 +213,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>

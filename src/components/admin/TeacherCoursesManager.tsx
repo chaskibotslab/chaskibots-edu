@@ -298,7 +298,7 @@ export default function TeacherCoursesManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
       </div>
     )
   }
@@ -308,8 +308,8 @@ export default function TeacherCoursesManager() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h3 className="text-lg font-bold text-white">Asignación de Cursos a Profesores</h3>
-          <p className="text-sm text-gray-400">
+          <h3 className="text-lg font-bold text-gray-900">Asignación de Cursos a Profesores</h3>
+          <p className="text-sm text-gray-600">
             {assignments.length} asignaciones · {teachers.length} profesores · {courses.length} cursos
           </p>
         </div>
@@ -325,7 +325,7 @@ export default function TeacherCoursesManager() {
           </button>
           <button
             onClick={loadData}
-            className="flex items-center gap-2 px-3 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Actualizar
@@ -338,7 +338,7 @@ export default function TeacherCoursesManager() {
                 setSelectedCourses([])
               }
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-neon-cyan/20 text-neon-cyan rounded-lg hover:bg-neon-cyan/30 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-purple/20 text-brand-purple rounded-lg hover:bg-brand-purple/30 transition-colors"
           >
             {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showForm ? 'Cancelar' : 'Asignar Cursos'}
@@ -351,7 +351,7 @@ export default function TeacherCoursesManager() {
         <select
           value={filterSchool}
           onChange={(e) => setFilterSchool(e.target.value)}
-          className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+          className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
         >
           <option value="all">Todos los colegios</option>
           {schools.map(school => (
@@ -361,7 +361,7 @@ export default function TeacherCoursesManager() {
         <select
           value={filterTeacher}
           onChange={(e) => setFilterTeacher(e.target.value)}
-          className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+          className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
         >
           <option value="all">Todos los profesores</option>
           {teachers
@@ -374,19 +374,19 @@ export default function TeacherCoursesManager() {
 
       {/* Formulario de asignación */}
       {showForm && (
-        <div className="bg-dark-800 rounded-xl p-6 border border-neon-cyan/30 space-y-4">
-          <h4 className="text-white font-semibold flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-neon-cyan" />
+        <div className="bg-gray-50 rounded-xl p-6 border border-brand-purple/30 space-y-4">
+          <h4 className="text-gray-900 font-semibold flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-brand-purple" />
             Asignar Cursos a Profesor
           </h4>
           
           {/* Selector de profesor */}
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Seleccionar Profesor</label>
+            <label className="block text-sm text-gray-600 mb-2">Seleccionar Profesor</label>
             <select
               value={selectedTeacher}
               onChange={(e) => handleTeacherSelect(e.target.value)}
-              className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
             >
               <option value="">-- Seleccionar profesor --</option>
               {teachers
@@ -402,10 +402,10 @@ export default function TeacherCoursesManager() {
           {/* Multi-select de cursos */}
           {selectedTeacher && (
             <div>
-              <label className="block text-sm text-gray-400 mb-2">
+              <label className="block text-sm text-gray-600 mb-2">
                 Seleccionar Cursos (click para marcar/desmarcar)
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-dark-700 rounded-lg border border-dark-600">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-gray-100 rounded-lg border border-gray-200">
                 {courses.length === 0 ? (
                   <p className="text-gray-500 col-span-full text-center py-4">No hay cursos disponibles</p>
                 ) : (
@@ -444,7 +444,7 @@ export default function TeacherCoursesManager() {
 
           {/* Botón guardar */}
           {selectedTeacher && (
-            <div className="flex justify-end gap-3 pt-4 border-t border-dark-600">
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
               <button
                 type="button"
                 onClick={() => {
@@ -472,29 +472,29 @@ export default function TeacherCoursesManager() {
       {/* Lista de asignaciones agrupadas por profesor */}
       <div className="space-y-4">
         {Object.keys(groupedByTeacher).length === 0 ? (
-          <div className="text-center py-12 bg-dark-800 rounded-xl border border-dark-600">
+          <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
             <Users className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400">No hay asignaciones de cursos</p>
+            <p className="text-gray-600">No hay asignaciones de cursos</p>
             <p className="text-sm text-gray-500 mt-1">
               Usa el botón "Asignar Cursos" para comenzar
             </p>
           </div>
         ) : (
           Object.values(groupedByTeacher).map(group => (
-            <div key={group.teacherId} className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
+            <div key={group.teacherId} className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
               {/* Header del profesor */}
-              <div className="px-4 py-3 bg-dark-700 flex items-center justify-between">
+              <div className="px-4 py-3 bg-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-neon-purple to-neon-pink rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">{group.teacherName.charAt(0)}</span>
+                  <div className="w-10 h-10 bg-gradient-to-br from-brand-violet to-neon-pink rounded-full flex items-center justify-center">
+                    <span className="text-gray-900 font-bold">{group.teacherName.charAt(0)}</span>
                   </div>
                   <div>
-                    <p className="text-white font-medium">{group.teacherName}</p>
-                    <p className="text-xs text-gray-400 flex items-center gap-1">
+                    <p className="text-gray-900 font-medium">{group.teacherName}</p>
+                    <p className="text-xs text-gray-600 flex items-center gap-1">
                       <School className="w-3 h-3" />
                       {group.schoolName || 'Sin colegio'}
                       <span className="mx-1">·</span>
-                      <span className="text-neon-cyan">{group.courses.length} curso(s)</span>
+                      <span className="text-brand-purple">{group.courses.length} curso(s)</span>
                     </p>
                   </div>
                 </div>
@@ -515,11 +515,11 @@ export default function TeacherCoursesManager() {
                   {group.courses.map(assignment => (
                     <div
                       key={assignment.id}
-                      className="flex items-center gap-2 px-3 py-2 bg-dark-700 rounded-lg border border-dark-600"
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg border border-gray-200"
                     >
-                      <GraduationCap className="w-4 h-4 text-neon-cyan" />
+                      <GraduationCap className="w-4 h-4 text-brand-purple" />
                       <div>
-                        <p className="text-sm text-white">{assignment.courseName}</p>
+                        <p className="text-sm text-gray-900">{assignment.courseName}</p>
                         <p className="text-xs text-gray-500">{getLevelName(assignment.levelId)}</p>
                       </div>
                       <button

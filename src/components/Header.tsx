@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-md border-b border-brand-purple/20">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-brand-purple/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Back Button + Logo */}
@@ -42,10 +42,10 @@ export default function Header() {
               {!isHomePage && !isLoginPage && (
                 <button
                   onClick={handleBack}
-                  className="p-2 rounded-lg bg-dark-800 border border-dark-600 hover:border-neon-cyan/50 hover:bg-dark-700 transition-all duration-200 group"
+                  className="p-2 rounded-lg bg-gray-50 border border-gray-200 hover:border-brand-purple/50 hover:bg-gray-100 transition-all duration-200 group"
                   title="Volver"
                 >
-                  <ChevronLeft className="w-5 h-5 text-gray-400 group-hover:text-brand-purple transition-colors" />
+                  <ChevronLeft className="w-5 h-5 text-gray-600 group-hover:text-brand-purple transition-colors" />
                 </button>
               )}
               
@@ -58,7 +58,7 @@ export default function Header() {
                   className="rounded-xl shadow-lg group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="hidden sm:flex flex-col">
-                  <span className="font-bold text-xl text-white">ChaskiBots</span>
+                  <span className="font-bold text-xl text-gray-900">ChaskiBots</span>
                   <span className="text-[10px] text-brand-purple tracking-widest">EDUCATION PLATFORM</span>
                 </div>
               </Link>
@@ -71,15 +71,15 @@ export default function Header() {
                   {isAdmin && (
                     <Link 
                       href="/admin" 
-                      className="hidden sm:flex items-center gap-2 px-3 py-2 bg-neon-purple/20 border border-neon-purple/30 rounded-lg hover:border-neon-purple/60 hover:bg-neon-purple/30 transition-all"
+                      className="hidden sm:flex items-center gap-2 px-3 py-2 bg-brand-violet/20 border border-brand-violet/30 rounded-lg hover:border-brand-violet/60 hover:bg-brand-violet/30 transition-all"
                     >
-                      <Settings className="w-4 h-4 text-neon-purple" />
-                      <span className="text-sm font-medium text-neon-purple">Admin</span>
+                      <Settings className="w-4 h-4 text-brand-violet" />
+                      <span className="text-sm font-medium text-brand-violet">Admin</span>
                     </Link>
                   )}
-                  <Link href="/dashboard" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-dark-700 border border-neon-cyan/30 rounded-lg hover:border-neon-cyan/60 transition-all">
-                    <User className="w-4 h-4 text-neon-cyan" />
-                    <span className="text-sm font-medium text-white">{user?.name}</span>
+                  <Link href="/dashboard" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-100 border border-brand-purple/30 rounded-lg hover:border-brand-purple/60 transition-all">
+                    <User className="w-4 h-4 text-brand-purple" />
+                    <span className="text-sm font-medium text-gray-900">{user?.name}</span>
                   </Link>
                   <button
                     onClick={logout}
@@ -92,17 +92,17 @@ export default function Header() {
                   {/* Menú hamburguesa móvil */}
                   <button
                     onClick={() => setMenuOpen(!menuOpen)}
-                    className="sm:hidden p-2 rounded-lg bg-dark-800 border border-dark-600 hover:border-neon-cyan/50 transition-all"
+                    className="sm:hidden p-2 rounded-lg bg-gray-50 border border-gray-200 hover:border-brand-purple/50 transition-all"
                   >
                     {menuOpen ? (
-                      <X className="w-6 h-6 text-neon-cyan" />
+                      <X className="w-6 h-6 text-brand-purple" />
                     ) : (
-                      <Menu className="w-6 h-6 text-gray-400" />
+                      <Menu className="w-6 h-6 text-gray-600" />
                     )}
                   </button>
                 </>
               ) : (
-                <Link href="/login" className="px-5 py-2 bg-gradient-to-r from-neon-cyan to-neon-blue text-dark-900 font-semibold rounded-lg hover:shadow-neon-cyan transition-all duration-300 text-sm">
+                <Link href="/login" className="px-5 py-2 bg-gradient-to-r from-brand-purple to-neon-blue text-dark-900 font-semibold rounded-lg hover:shadow-brand-purple transition-all duration-300 text-sm">
                   Iniciar Sesión
                 </Link>
               )}
@@ -120,15 +120,15 @@ export default function Header() {
         />
         
         {/* Panel del menú */}
-        <div className={`absolute right-0 top-0 h-full w-72 bg-dark-900 border-l border-neon-cyan/20 shadow-2xl transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className={`absolute right-0 top-0 h-full w-72 bg-white border-l border-brand-purple/20 shadow-2xl transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           {/* Header del menú */}
           <div className="p-4 border-b border-dark-700">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-cyan/20 to-neon-purple/20 flex items-center justify-center border border-neon-cyan/30">
-                <User className="w-6 h-6 text-neon-cyan" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-purple/20 to-brand-violet/20 flex items-center justify-center border border-brand-purple/30">
+                <User className="w-6 h-6 text-brand-purple" />
               </div>
               <div>
-                <p className="font-semibold text-white">{user?.name}</p>
+                <p className="font-semibold text-gray-900">{user?.name}</p>
                 <p className="text-xs text-gray-500">{user?.role === 'admin' ? 'Administrador' : user?.role === 'teacher' ? 'Profesor' : 'Estudiante'}</p>
               </div>
             </div>
@@ -146,8 +146,8 @@ export default function Header() {
                   onClick={() => setMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     isActive 
-                      ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/30' 
-                      : 'text-gray-400 hover:bg-dark-800 hover:text-white'
+                      ? 'bg-brand-purple/20 text-brand-purple border border-brand-purple/30' 
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -162,8 +162,8 @@ export default function Header() {
                 onClick={() => setMenuOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                   pathname === '/admin' 
-                    ? 'bg-neon-purple/20 text-neon-purple border border-neon-purple/30' 
-                    : 'text-gray-400 hover:bg-dark-800 hover:text-neon-purple'
+                    ? 'bg-brand-violet/20 text-brand-violet border border-brand-violet/30' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-brand-violet'
                 }`}
               >
                 <Settings className="w-5 h-5" />

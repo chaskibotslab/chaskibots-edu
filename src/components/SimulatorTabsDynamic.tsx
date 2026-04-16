@@ -12,10 +12,10 @@ import {
 const BlocklyEditor = dynamic(() => import('./BlocklyEditor'), { 
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[600px] bg-dark-800 rounded-xl">
+    <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-xl">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan mx-auto mb-4"></div>
-        <p className="text-gray-400">Cargando ChaskiBlocks...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-purple mx-auto mb-4"></div>
+        <p className="text-gray-600">Cargando ChaskiBlocks...</p>
       </div>
     </div>
   )
@@ -149,8 +149,8 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
-        <span className="ml-3 text-gray-400">Cargando simuladores...</span>
+        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+        <span className="ml-3 text-gray-600">Cargando simuladores...</span>
       </div>
     )
   }
@@ -159,10 +159,10 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center">
         <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
-        <p className="text-gray-400 mb-4">{error}</p>
+        <p className="text-gray-600 mb-4">{error}</p>
         <button
           onClick={loadSimulators}
-          className="flex items-center gap-2 px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200"
         >
           <RefreshCw className="w-4 h-4" />
           Reintentar
@@ -190,8 +190,8 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
               }}
               className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all ${
                 activeCategory === cat.id 
-                  ? 'bg-neon-cyan text-dark-900' 
-                  : 'bg-dark-700 text-gray-400 hover:bg-dark-600 hover:text-white'
+                  ? 'bg-brand-purple text-dark-900' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -211,8 +211,8 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
               onClick={() => setActiveSimulator(sim)}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-medium transition-all ${
                 activeSimulator?.id === sim.id 
-                  ? 'bg-dark-600 text-white border border-neon-cyan/50' 
-                  : 'bg-dark-800 text-gray-500 hover:bg-dark-700 hover:text-gray-300 border border-dark-600'
+                  ? 'bg-dark-600 text-gray-900 border border-brand-purple/50' 
+                  : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-300 border border-gray-200'
               }`}
             >
               <Icon className="w-3 h-3" />
@@ -228,27 +228,27 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
           <BlocklyEditor userId={user?.id} userName={user?.name} />
         </div>
       ) : activeSimulator ? (
-        <div className="bg-dark-800 border border-dark-600 rounded-2xl overflow-hidden">
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden">
           {/* Header del simulador */}
-          <div className="p-6 border-b border-dark-600">
+          <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-neon-cyan to-blue-600 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-purple to-blue-600 flex items-center justify-center">
                   {(() => {
                     const Icon = getIcon(activeSimulator.icon)
-                    return <Icon className="w-7 h-7 text-white" />
+                    return <Icon className="w-7 h-7 text-gray-900" />
                   })()}
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">{activeSimulator.name}</h3>
-                  <p className="text-gray-400 text-sm">{activeSimulator.description}</p>
+                  <h3 className="text-xl font-bold text-gray-900">{activeSimulator.name}</h3>
+                  <p className="text-gray-600 text-sm">{activeSimulator.description}</p>
                 </div>
               </div>
               <a
                 href={activeSimulator.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-gradient-to-r from-neon-cyan to-blue-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-neon-cyan/20"
+                className="bg-gradient-to-r from-brand-purple to-blue-600 text-gray-900 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-brand-purple/20"
               >
                 <ExternalLink className="w-5 h-5" />
                 Abrir Simulador
@@ -267,22 +267,22 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
             
             {/* Contenido central */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
-              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-neon-cyan to-blue-600 flex items-center justify-center mb-6 shadow-2xl shadow-neon-cyan/30">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-brand-purple to-blue-600 flex items-center justify-center mb-6 shadow-2xl shadow-brand-purple/30">
                 {(() => {
                   const Icon = getIcon(activeSimulator.icon)
-                  return <Icon className="w-12 h-12 text-white" />
+                  return <Icon className="w-12 h-12 text-gray-900" />
                 })()}
               </div>
               
-              <h2 className="text-3xl font-bold text-white mb-3">{activeSimulator.name}</h2>
-              <p className="text-gray-400 max-w-md mb-8">{activeSimulator.description}</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">{activeSimulator.name}</h2>
+              <p className="text-gray-600 max-w-md mb-8">{activeSimulator.description}</p>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href={activeSimulator.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gradient-to-r from-neon-cyan to-blue-600 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:opacity-90 transition-all shadow-lg shadow-neon-cyan/30 text-lg"
+                  className="bg-gradient-to-r from-brand-purple to-blue-600 text-gray-900 px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:opacity-90 transition-all shadow-lg shadow-brand-purple/30 text-lg"
                 >
                   <Zap className="w-6 h-6" />
                   Iniciar Simulador
@@ -295,20 +295,20 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
             </div>
 
             {/* Decoración */}
-            <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-neon-cyan/10 blur-2xl" />
+            <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-brand-purple/10 blur-2xl" />
             <div className="absolute bottom-10 right-10 w-32 h-32 rounded-full bg-blue-600/10 blur-3xl" />
           </div>
 
           {/* Tips */}
-          <div className="p-4 bg-dark-900 border-t border-dark-600">
-            <div className="flex items-center gap-3 text-sm text-gray-400">
-              <Sparkles className="w-5 h-5 text-neon-cyan" />
-              <span><strong className="text-white">Tip:</strong> Practica lo aprendido en las lecciones usando este simulador</span>
+          <div className="p-4 bg-white border-t border-gray-200">
+            <div className="flex items-center gap-3 text-sm text-gray-600">
+              <Sparkles className="w-5 h-5 text-brand-purple" />
+              <span><strong className="text-gray-900">Tip:</strong> Practica lo aprendido en las lecciones usando este simulador</span>
             </div>
           </div>
         </div>
       ) : (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-gray-600">
           Selecciona un simulador para comenzar
         </div>
       )}

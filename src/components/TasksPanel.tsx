@@ -237,11 +237,11 @@ const getCategoryIcon = (category: string) => {
 
 const getCategoryColor = (category: string) => {
   switch (category) {
-    case 'robotica': return 'text-neon-cyan bg-neon-cyan/20'
+    case 'robotica': return 'text-brand-purple bg-brand-purple/20'
     case 'electronica': return 'text-yellow-400 bg-yellow-500/20'
     case 'programacion': return 'text-neon-green bg-neon-green/20'
     case 'ia': return 'text-neon-pink bg-neon-pink/20'
-    default: return 'text-gray-400 bg-gray-500/20'
+    default: return 'text-gray-600 bg-gray-500/20'
   }
 }
 
@@ -497,31 +497,31 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
   return (
     <div className="space-y-6">
       {/* Header con pestañas */}
-      <div className="bg-gradient-to-r from-neon-cyan/10 to-neon-green/10 border border-neon-cyan/30 rounded-xl p-4">
+      <div className="bg-gradient-to-r from-brand-purple/10 to-neon-green/10 border border-brand-purple/30 rounded-xl p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <FileText className="w-5 h-5 text-neon-cyan" />
+            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-brand-purple" />
               Tareas y Actividades
             </h3>
-            <p className="text-sm text-gray-400">Completa las tareas y envíalas al profesor</p>
+            <p className="text-sm text-gray-600">Completa las tareas y envíalas al profesor</p>
           </div>
           {studentName && (
-            <div className="flex items-center gap-2 bg-dark-700 px-3 py-2 rounded-lg border border-dark-600">
-              <span className="text-sm text-gray-400">Estudiante:</span>
-              <span className="text-sm text-white font-medium">{studentName}</span>
+            <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-200">
+              <span className="text-sm text-gray-600">Estudiante:</span>
+              <span className="text-sm text-gray-900 font-medium">{studentName}</span>
             </div>
           )}
         </div>
         
         {/* Pestañas */}
-        <div className="flex gap-2 mt-4 border-t border-dark-600 pt-4">
+        <div className="flex gap-2 mt-4 border-t border-gray-200 pt-4">
           <button
             onClick={() => setActiveTab('tareas')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'tareas'
-                ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50'
-                : 'bg-dark-700 text-gray-400 hover:text-white border border-transparent'
+                ? 'bg-brand-purple/20 text-brand-purple border border-brand-purple/50'
+                : 'bg-gray-100 text-gray-600 hover:text-gray-900 border border-transparent'
             }`}
           >
             <ClipboardList className="w-4 h-4" />
@@ -532,7 +532,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'calificaciones'
                 ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
-                : 'bg-dark-700 text-gray-400 hover:text-white border border-transparent'
+                : 'bg-gray-100 text-gray-600 hover:text-gray-900 border border-transparent'
             }`}
           >
             <Star className="w-4 h-4" />
@@ -550,7 +550,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
       {/* Tasks List */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+          <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
         </div>
       ) : (
       <div className="space-y-4">
@@ -560,12 +560,12 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
           return (
           <div
             key={task.id}
-            className={`bg-dark-800 border rounded-xl overflow-hidden transition-all ${
+            className={`bg-gray-50 border rounded-xl overflow-hidden transition-all ${
               isAlreadySubmitted 
                 ? 'border-green-500/50' 
                 : expandedTask === task.id 
-                  ? 'border-neon-cyan/50' 
-                  : 'border-dark-600 hover:border-dark-500'
+                  ? 'border-brand-purple/50' 
+                  : 'border-gray-200 hover:border-dark-500'
             }`}
           >
             {/* Task Header */}
@@ -584,7 +584,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="font-medium text-white">{task.title}</h4>
+                  <h4 className="font-medium text-gray-900">{task.title}</h4>
                   {getDifficultyBadge(task.difficulty)}
                   {isAlreadySubmitted && (
                     <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full flex items-center gap-1">
@@ -592,7 +592,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-400 truncate">{task.description}</p>
+                <p className="text-sm text-gray-600 truncate">{task.description}</p>
                 <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
                   <span className="capitalize">{task.category}</span>
                   <span className="flex items-center gap-1">
@@ -610,16 +610,16 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
 
               {!isAlreadySubmitted && (
                 expandedTask === task.id ? (
-                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                  <ChevronUp className="w-5 h-5 text-gray-600" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                  <ChevronDown className="w-5 h-5 text-gray-600" />
                 )
               )}
             </button>
 
             {/* Task Content */}
             {expandedTask === task.id && !isAlreadySubmitted && (
-              <div className="px-4 pb-4 border-t border-dark-600">
+              <div className="px-4 pb-4 border-t border-gray-200">
                 <div className="pt-4 space-y-4">
                   {/* Archivo adjunto del docente */}
                   {task.attachmentUrl && (
@@ -632,7 +632,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                         href={task.attachmentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-3 px-5 py-3 bg-blue-500 hover:bg-blue-400 text-white font-medium rounded-lg transition-colors shadow-lg"
+                        className="inline-flex items-center gap-3 px-5 py-3 bg-blue-500 hover:bg-blue-400 text-gray-900 font-medium rounded-lg transition-colors shadow-lg"
                       >
                         <Download className="w-5 h-5" />
                         Descargar archivo adjunto
@@ -642,8 +642,8 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                   
                   {task.questions?.map((question, idx) => (
                     <div key={question.id} className="space-y-2">
-                      <label className="block text-sm text-white">
-                        <span className="text-neon-cyan font-medium">{idx + 1}.</span> {question.question}
+                      <label className="block text-sm text-gray-900">
+                        <span className="text-brand-purple font-medium">{idx + 1}.</span> {question.question}
                       </label>
                       
                       {/* Tipo: Texto */}
@@ -653,7 +653,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                           onChange={(e) => handleAnswerChange(task.id, question.id, e.target.value)}
                           placeholder="Escribe tu respuesta..."
                           rows={3}
-                          className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-white resize-none focus:outline-none focus:border-neon-cyan"
+                          className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 resize-none focus:outline-none focus:border-brand-purple"
                         />
                       )}
                       
@@ -664,7 +664,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                           onChange={(e) => handleAnswerChange(task.id, question.id, e.target.value)}
                           placeholder="Escribe tu código aquí..."
                           rows={6}
-                          className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-white font-mono text-sm resize-none focus:outline-none focus:border-neon-cyan"
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 font-mono text-sm resize-none focus:outline-none focus:border-brand-purple"
                         />
                       )}
                       
@@ -679,9 +679,9 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                                 value={option}
                                 checked={answers[task.id]?.[question.id] === option}
                                 onChange={(e) => handleAnswerChange(task.id, question.id, e.target.value)}
-                                className="w-4 h-4 text-neon-cyan bg-dark-700 border-dark-500 focus:ring-neon-cyan"
+                                className="w-4 h-4 text-brand-purple bg-gray-100 border-dark-500 focus:ring-brand-purple"
                               />
-                              <span className="text-gray-300 group-hover:text-white transition-colors">
+                              <span className="text-gray-300 group-hover:text-gray-900 transition-colors">
                                 {String.fromCharCode(65 + optIdx)}. {option}
                               </span>
                             </label>
@@ -692,7 +692,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                       {/* Tipo: Dibujo */}
                       {question.type === 'drawing' && (
                         <div className="space-y-2">
-                          <p className="text-xs text-gray-400">🎨 Dibuja tu respuesta en el canvas</p>
+                          <p className="text-xs text-gray-600">🎨 Dibuja tu respuesta en el canvas</p>
                           <DrawingCanvas onSave={(data) => handleDrawingSave(task.id, data)} />
                           {drawings[task.id] && (
                             <p className="text-xs text-green-400 flex items-center gap-1">
@@ -705,7 +705,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                       {/* Tipo: Subir archivo */}
                       {question.type === 'upload' && (
                         <div className="space-y-2">
-                          <p className="text-xs text-gray-400">📎 Sube tu archivo (PDF, documento, código)</p>
+                          <p className="text-xs text-gray-600">📎 Sube tu archivo (PDF, documento, código)</p>
                           <FileUpload onUpload={(files) => handleFilesUpload(task.id, files)} />
                         </div>
                       )}
@@ -713,7 +713,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                       {/* Tipo: Foto/Imagen */}
                       {question.type === 'image' && (
                         <div className="space-y-2">
-                          <p className="text-xs text-gray-400">📷 Toma o sube una foto de tu proyecto</p>
+                          <p className="text-xs text-gray-600">📷 Toma o sube una foto de tu proyecto</p>
                           <FileUpload 
                             onUpload={(files) => handleFilesUpload(task.id, files)} 
                             acceptedTypes={['image/*']}
@@ -724,8 +724,8 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                       {/* Tipo: Bloques (ChaskiBlocks) */}
                       {question.type === 'blocks' && (
                         <div className="space-y-2">
-                          <p className="text-xs text-gray-400">🧩 Programa con bloques usando ChaskiBlocks</p>
-                          <div className="h-[500px] border border-dark-600 rounded-lg overflow-hidden">
+                          <p className="text-xs text-gray-600">🧩 Programa con bloques usando ChaskiBlocks</p>
+                          <div className="h-[500px] border border-gray-200 rounded-lg overflow-hidden">
                             <BlocklyEditor 
                               onCodeChange={(code) => handleAnswerChange(task.id, question.id, code)}
                             />
@@ -742,12 +742,12 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
 
                   {/* Sección de Dibujo opcional - solo si NO hay preguntas tipo drawing */}
                   {!task.questions?.some(q => q.type === 'drawing') && (
-                    <div className="space-y-2 pt-4 border-t border-dark-600">
-                      <div className="flex items-center gap-2 text-white">
-                        <Pencil className="w-4 h-4 text-neon-purple" />
+                    <div className="space-y-2 pt-4 border-t border-gray-200">
+                      <div className="flex items-center gap-2 text-gray-900">
+                        <Pencil className="w-4 h-4 text-brand-violet" />
                         <span className="font-medium">Dibujo (opcional)</span>
                       </div>
-                      <p className="text-xs text-gray-400">Puedes hacer un dibujo para complementar tu respuesta</p>
+                      <p className="text-xs text-gray-600">Puedes hacer un dibujo para complementar tu respuesta</p>
                       <DrawingCanvas onSave={(data) => handleDrawingSave(task.id, data)} />
                       {drawings[task.id] && (
                         <p className="text-xs text-green-400 flex items-center gap-1">
@@ -759,12 +759,12 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
 
                   {/* Sección de Archivos opcional - solo si NO hay preguntas tipo upload/image */}
                   {!task.questions?.some(q => q.type === 'upload' || q.type === 'image') && (
-                    <div className="space-y-2 pt-4 border-t border-dark-600">
-                      <div className="flex items-center gap-2 text-white">
-                        <Upload className="w-4 h-4 text-neon-orange" />
+                    <div className="space-y-2 pt-4 border-t border-gray-200">
+                      <div className="flex items-center gap-2 text-gray-900">
+                        <Upload className="w-4 h-4 text-brand-cyan" />
                         <span className="font-medium">Archivos adjuntos (opcional)</span>
                       </div>
-                      <p className="text-xs text-gray-400">Sube fotos, PDFs, documentos Word o Excel</p>
+                      <p className="text-xs text-gray-600">Sube fotos, PDFs, documentos Word o Excel</p>
                       <FileUpload onUpload={(files) => handleFilesUpload(task.id, files)} />
                     </div>
                   )}
@@ -791,9 +791,9 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
       )}
 
       {tasks.length === 0 && !loading && (
-        <div className="bg-dark-800 border border-dark-600 rounded-xl p-8 text-center">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
           <FileText className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-400">No hay tareas disponibles para este nivel</p>
+          <p className="text-gray-600">No hay tareas disponibles para este nivel</p>
         </div>
       )}
       </>

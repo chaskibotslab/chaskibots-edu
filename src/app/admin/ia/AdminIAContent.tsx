@@ -23,10 +23,10 @@ interface AIActivity {
 }
 
 const ACTIVITY_TYPES = [
-  { value: 'camera', label: 'Cámara / Visión', icon: Camera, color: 'neon-cyan' },
-  { value: 'upload', label: 'Clasificación de Imágenes', icon: Upload, color: 'neon-purple' },
+  { value: 'camera', label: 'Cámara / Visión', icon: Camera, color: 'brand-purple' },
+  { value: 'upload', label: 'Clasificación de Imágenes', icon: Upload, color: 'brand-violet' },
   { value: 'voice', label: 'Voz / Audio', icon: Mic, color: 'neon-green' },
-  { value: 'hacking', label: 'Hacking Ético', icon: Shield, color: 'neon-orange' },
+  { value: 'hacking', label: 'Hacking Ético', icon: Shield, color: 'brand-cyan' },
 ]
 
 const DIFFICULTY_LEVELS = [
@@ -213,26 +213,26 @@ export default function AdminIAContent() {
 
   if (isLoading || !isAdmin) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-purple"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-dark-900">
-      <header className="bg-dark-800 border-b border-dark-600 px-6 py-4">
+    <div className="min-h-screen bg-white">
+      <header className="bg-gray-50 border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-gray-400 hover:text-white">
+            <Link href="/admin" className="text-gray-600 hover:text-gray-900">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <Brain className="w-6 h-6 text-neon-pink" />
                 Gestión de Actividades IA
               </h1>
-              <p className="text-sm text-gray-400">Configura las actividades de IA y Hacking Ético por nivel</p>
+              <p className="text-sm text-gray-600">Configura las actividades de IA y Hacking Ético por nivel</p>
             </div>
           </div>
           <button onClick={openCreateModal} className="btn-primary flex items-center gap-2">
@@ -245,11 +245,11 @@ export default function AdminIAContent() {
       <div className="p-6">
         <div className="mb-6 flex flex-wrap gap-4 items-center">
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Filtrar por nivel:</label>
+            <label className="block text-sm text-gray-600 mb-2">Filtrar por nivel:</label>
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none min-w-[200px]"
+              className="bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none min-w-[200px]"
             >
               <option value="">Todos los niveles</option>
               {EDUCATION_LEVELS.map(level => (
@@ -272,13 +272,13 @@ export default function AdminIAContent() {
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-neon-cyan"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-purple"></div>
           </div>
         ) : activities.length === 0 ? (
           <div className="text-center py-12">
             <Brain className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400">No hay actividades de IA{selectedLevel ? ' para este nivel' : ''}</p>
-            <button onClick={openCreateModal} className="mt-4 text-neon-cyan hover:underline">
+            <p className="text-gray-600">No hay actividades de IA{selectedLevel ? ' para este nivel' : ''}</p>
+            <button onClick={openCreateModal} className="mt-4 text-brand-purple hover:underline">
               Crear primera actividad
             </button>
           </div>
@@ -289,26 +289,26 @@ export default function AdminIAContent() {
               if (typeActivities.length === 0) return null
               
               return (
-                <div key={type.value} className="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-                  <div className={`bg-${type.color}/10 px-4 py-3 border-b border-dark-600 flex items-center gap-3`}>
+                <div key={type.value} className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                  <div className={`bg-${type.color}/10 px-4 py-3 border-b border-gray-200 flex items-center gap-3`}>
                     <type.icon className={`w-5 h-5 text-${type.color}`} />
-                    <h3 className="font-semibold text-white">{type.label}</h3>
-                    <span className="text-sm text-gray-400">({typeActivities.length} actividades)</span>
+                    <h3 className="font-semibold text-gray-900">{type.label}</h3>
+                    <span className="text-sm text-gray-600">({typeActivities.length} actividades)</span>
                   </div>
                   <div className="divide-y divide-dark-600">
                     {typeActivities.map(activity => (
-                      <div key={activity.id} className={`px-4 py-3 flex items-center gap-4 hover:bg-dark-700/50 ${!activity.enabled ? 'opacity-50' : ''}`}>
+                      <div key={activity.id} className={`px-4 py-3 flex items-center gap-4 hover:bg-gray-100/50 ${!activity.enabled ? 'opacity-50' : ''}`}>
                         <div className={`w-10 h-10 bg-${type.color}/20 rounded-lg flex items-center justify-center`}>
                           {getTypeIcon(activity.activityType)}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <p className="text-white font-medium">{activity.activityName}</p>
+                            <p className="text-gray-900 font-medium">{activity.activityName}</p>
                             {!activity.enabled && <Lock className="w-4 h-4 text-gray-500" />}
                           </div>
                           <p className="text-sm text-gray-500">{activity.description}</p>
                           <div className="flex items-center gap-3 mt-1">
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-gray-600">
                               Nivel: {EDUCATION_LEVELS.find(l => l.id === activity.levelId)?.name || activity.levelId}
                             </span>
                             <span className={`text-xs px-2 py-0.5 rounded-full bg-${getDifficultyColor(activity.difficulty)}-500/20 text-${getDifficultyColor(activity.difficulty)}-400`}>
@@ -319,20 +319,20 @@ export default function AdminIAContent() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => toggleEnabled(activity)}
-                            className={`p-2 rounded-lg transition-colors ${activity.enabled ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}
+                            className={`p-2 rounded-lg transition-colors ${activity.enabled ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-600'}`}
                             title={activity.enabled ? 'Desactivar' : 'Activar'}
                           >
                             {activity.enabled ? <Eye className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                           </button>
                           <button
                             onClick={() => openEditModal(activity)}
-                            className="p-2 text-gray-400 hover:text-neon-cyan transition-colors"
+                            className="p-2 text-gray-600 hover:text-brand-purple transition-colors"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(activity.id)}
-                            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                            className="p-2 text-gray-600 hover:text-red-500 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -349,12 +349,12 @@ export default function AdminIAContent() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-dark-800 border-b border-dark-600 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white">
+          <div className="bg-gray-50 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-gray-50 border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">
                 {isCreating ? 'Nueva Actividad de IA' : 'Editar Actividad'}
               </h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-white">
+              <button onClick={closeModal} className="text-gray-600 hover:text-gray-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -367,11 +367,11 @@ export default function AdminIAContent() {
               )}
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Nivel Educativo *</label>
+                <label className="block text-sm text-gray-600 mb-1">Nivel Educativo *</label>
                 <select
                   value={formData.levelId}
                   onChange={(e) => setFormData({ ...formData, levelId: e.target.value })}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                 >
                   <option value="">Seleccionar nivel</option>
                   {EDUCATION_LEVELS.map(level => (
@@ -383,23 +383,23 @@ export default function AdminIAContent() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Nombre de la Actividad *</label>
+                <label className="block text-sm text-gray-600 mb-1">Nombre de la Actividad *</label>
                 <input
                   type="text"
                   value={formData.activityName}
                   onChange={(e) => setFormData({ ...formData, activityName: e.target.value })}
                   placeholder="Ej: Detector de Objetos"
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Tipo de Actividad</label>
+                  <label className="block text-sm text-gray-600 mb-1">Tipo de Actividad</label>
                   <select
                     value={formData.activityType}
                     onChange={(e) => setFormData({ ...formData, activityType: e.target.value as AIActivity['activityType'] })}
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                   >
                     {ACTIVITY_TYPES.map(type => (
                       <option key={type.value} value={type.value}>{type.label}</option>
@@ -408,11 +408,11 @@ export default function AdminIAContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Dificultad</label>
+                  <label className="block text-sm text-gray-600 mb-1">Dificultad</label>
                   <select
                     value={formData.difficulty}
                     onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as AIActivity['difficulty'] })}
-                    className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none"
+                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
                   >
                     {DIFFICULTY_LEVELS.map(diff => (
                       <option key={diff.value} value={diff.value}>{diff.label}</option>
@@ -422,13 +422,13 @@ export default function AdminIAContent() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Descripción</label>
+                <label className="block text-sm text-gray-600 mb-1">Descripción</label>
                 <textarea
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Describe la actividad..."
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:border-neon-cyan focus:outline-none resize-none"
+                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none resize-none"
                 />
               </div>
 
@@ -438,7 +438,7 @@ export default function AdminIAContent() {
                   id="enabled"
                   checked={formData.enabled}
                   onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
-                  className="w-4 h-4 rounded border-dark-600 bg-dark-700 text-neon-cyan focus:ring-neon-cyan"
+                  className="w-4 h-4 rounded border-gray-200 bg-gray-100 text-brand-purple focus:ring-brand-purple"
                 />
                 <label htmlFor="enabled" className="text-gray-300">
                   Actividad habilitada
@@ -446,8 +446,8 @@ export default function AdminIAContent() {
               </div>
             </div>
 
-            <div className="sticky bottom-0 bg-dark-800 border-t border-dark-600 px-6 py-4 flex justify-end gap-3">
-              <button onClick={closeModal} className="px-4 py-2 text-gray-400 hover:text-white">
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+              <button onClick={closeModal} className="px-4 py-2 text-gray-600 hover:text-gray-900">
                 Cancelar
               </button>
               <button

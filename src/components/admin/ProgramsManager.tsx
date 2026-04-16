@@ -155,13 +155,13 @@ export default function ProgramsManager() {
     : programs.filter(p => p.levelId === filterLevel)
 
   const getTypeStyle = (type: string) => {
-    return programTypes.find(t => t.value === type)?.color || 'bg-gray-500/20 text-gray-400'
+    return programTypes.find(t => t.value === type)?.color || 'bg-gray-500/20 text-gray-600'
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
+        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
       </div>
     )
   }
@@ -171,16 +171,16 @@ export default function ProgramsManager() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h3 className="text-lg font-bold text-white">Programas</h3>
-          <p className="text-sm text-gray-400">{programs.length} programas en {levels.length} niveles</p>
+          <h3 className="text-lg font-bold text-gray-900">Programas</h3>
+          <p className="text-sm text-gray-600">{programs.length} programas en {levels.length} niveles</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+            <Filter className="w-4 h-4 text-gray-600" />
             <select
               value={filterLevel}
               onChange={(e) => setFilterLevel(e.target.value)}
-              className="px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white text-sm"
+              className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
             >
               <option value="all">Todos los niveles</option>
               {levels.map(level => (
@@ -190,7 +190,7 @@ export default function ProgramsManager() {
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 px-4 py-2 bg-neon-purple/20 text-neon-purple rounded-lg hover:bg-neon-purple/30 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-violet/20 text-brand-violet rounded-lg hover:bg-brand-violet/30 transition-colors"
           >
             {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showForm ? 'Cancelar' : 'Nuevo Programa'}
@@ -200,25 +200,25 @@ export default function ProgramsManager() {
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-dark-800 rounded-xl p-6 border border-dark-600 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl p-6 border border-gray-200 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Nombre del Programa</label>
+              <label className="block text-sm text-gray-600 mb-1">Nombre del Programa</label>
               <input
                 type="text"
                 value={formData.name || ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="ej: Robótica Avanzada"
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Nivel Educativo</label>
+              <label className="block text-sm text-gray-600 mb-1">Nivel Educativo</label>
               <select
                 value={formData.levelId || ''}
                 onChange={(e) => handleLevelChange(e.target.value)}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
                 required
               >
                 <option value="">Seleccionar nivel...</option>
@@ -230,23 +230,23 @@ export default function ProgramsManager() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Descripción</label>
+            <label className="block text-sm text-gray-600 mb-1">Descripción</label>
             <textarea
               value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Describe el programa..."
               rows={2}
-              className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white resize-none"
+              className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 resize-none"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Tipo de Programa</label>
+              <label className="block text-sm text-gray-600 mb-1">Tipo de Programa</label>
               <select
                 value={formData.type || 'robotica'}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               >
                 {programTypes.map(type => (
                   <option key={type.value} value={type.value}>{type.label}</option>
@@ -254,22 +254,22 @@ export default function ProgramsManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Duración</label>
+              <label className="block text-sm text-gray-600 mb-1">Duración</label>
               <input
                 type="text"
                 value={formData.duration || ''}
                 onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                 placeholder="ej: 6 meses"
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Precio ($)</label>
+              <label className="block text-sm text-gray-600 mb-1">Precio ($)</label>
               <input
                 type="number"
                 value={formData.price || 50}
                 onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg text-white"
+                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
           </div>
@@ -278,14 +278,14 @@ export default function ProgramsManager() {
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-2 bg-neon-purple text-white font-semibold rounded-lg hover:bg-neon-purple/90 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-brand-violet text-gray-900 font-semibold rounded-lg hover:bg-brand-violet/90 transition-colors disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {editingId ? 'Actualizar' : 'Crear'} Programa
@@ -297,41 +297,41 @@ export default function ProgramsManager() {
       {/* Programs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredPrograms.map((program) => (
-          <div key={program.id} className="bg-dark-800 rounded-xl p-4 border border-dark-600 hover:border-dark-500 transition-colors">
+          <div key={program.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-dark-500 transition-colors">
             <div className="flex items-start justify-between mb-3">
               <div>
                 <span className={`inline-block px-2 py-0.5 rounded text-xs ${getTypeStyle(program.type)}`}>
                   {programTypes.find(t => t.value === program.type)?.label || program.type}
                 </span>
-                <h4 className="text-white font-semibold mt-2">{program.name}</h4>
+                <h4 className="text-gray-900 font-semibold mt-2">{program.name}</h4>
                 <p className="text-sm text-gray-500">{program.levelName}</p>
               </div>
               <div className="flex gap-1">
                 <button
                   onClick={() => handleEdit(program)}
-                  className="p-1.5 text-gray-400 hover:text-neon-cyan transition-colors"
+                  className="p-1.5 text-gray-600 hover:text-brand-purple transition-colors"
                 >
                   <Edit className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(program.id)}
-                  className="p-1.5 text-gray-400 hover:text-red-400 transition-colors"
+                  className="p-1.5 text-gray-600 hover:text-red-400 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
-            <p className="text-sm text-gray-400 mb-3 line-clamp-2">{program.description}</p>
+            <p className="text-sm text-gray-600 mb-3 line-clamp-2">{program.description}</p>
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500">{program.duration}</span>
-              <span className="text-neon-cyan font-semibold">${program.price}</span>
+              <span className="text-brand-purple font-semibold">${program.price}</span>
             </div>
           </div>
         ))}
       </div>
 
       {filteredPrograms.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-gray-600">
           <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
           <p>No hay programas {filterLevel !== 'all' ? 'para este nivel' : ''}</p>
         </div>

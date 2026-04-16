@@ -62,9 +62,9 @@ export default function LessonCard({ lesson, isSelected, onSelect, index }: Less
 
   if (lesson.locked) {
     return (
-      <div className="relative bg-dark-800/50 rounded-xl p-4 border border-dark-600/50 opacity-60">
+      <div className="relative bg-gray-50/50 rounded-xl p-4 border border-gray-200/50 opacity-60">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
             <Lock className="w-5 h-5 text-gray-600" />
           </div>
           <div className="flex-1">
@@ -80,7 +80,7 @@ export default function LessonCard({ lesson, isSelected, onSelect, index }: Less
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 flex items-center justify-center bg-dark-900/50 rounded-xl">
+        <div className="absolute inset-0 flex items-center justify-center bg-white/50 rounded-xl">
           <div className="flex items-center gap-2 text-gray-500">
             <Lock className="w-4 h-4" />
             <span className="text-sm">Bloqueado</span>
@@ -93,28 +93,28 @@ export default function LessonCard({ lesson, isSelected, onSelect, index }: Less
   return (
     <button
       onClick={onSelect}
-      className={`w-full text-left bg-dark-800/80 rounded-xl p-4 border transition-all duration-300 hover:scale-[1.01] ${
+      className={`w-full text-left bg-gray-50/80 rounded-xl p-4 border transition-all duration-300 hover:scale-[1.01] ${
         isSelected 
           ? `${config.border} border-2 shadow-lg shadow-${config.color}/10` 
-          : 'border-dark-600/50 hover:border-dark-500'
+          : 'border-gray-200/50 hover:border-dark-500'
       }`}
     >
       <div className="flex items-start gap-4">
         {/* Número de lección e ícono */}
         <div className={`relative w-14 h-14 ${config.bg} rounded-xl flex items-center justify-center`}>
           <Icon className={`w-6 h-6 ${config.color}`} />
-          <span className="absolute -top-2 -left-2 w-6 h-6 bg-dark-700 rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-dark-800">
+          <span className="absolute -top-2 -left-2 w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-900 border-2 border-dark-800">
             {index}
           </span>
         </div>
 
         {/* Contenido */}
         <div className="flex-1 min-w-0">
-          <h4 className="font-semibold text-white truncate">{lesson.title}</h4>
+          <h4 className="font-semibold text-gray-900 truncate">{lesson.title}</h4>
           
           {/* Descripción corta */}
           {lesson.content && (
-            <p className="text-sm text-gray-400 mt-1 line-clamp-2">
+            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
               {lesson.content}
             </p>
           )}
@@ -144,7 +144,7 @@ export default function LessonCard({ lesson, isSelected, onSelect, index }: Less
         </div>
 
         {/* Flecha */}
-        <ChevronRight className={`w-5 h-5 transition-transform ${isSelected ? 'text-white rotate-90' : 'text-gray-500'}`} />
+        <ChevronRight className={`w-5 h-5 transition-transform ${isSelected ? 'text-gray-900 rotate-90' : 'text-gray-500'}`} />
       </div>
     </button>
   )
