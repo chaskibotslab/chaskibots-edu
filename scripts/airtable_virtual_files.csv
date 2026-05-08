@@ -1,0 +1,59 @@
+id,userId,userName,path,name,type,content,mimeType,size,permissions,createdAt,updatedAt
+file_demo_001,demo_user,Usuario Demo,/home/usuario,hola_mundo.py,file,"# Mi primer programa en Python
+print('¡Hola Mundo!')
+print('Bienvenido a ChaskiBots')
+
+nombre = 'Estudiante'
+print(f'Hola {nombre}!')",text/x-python,142,rw-r--r--,2024-01-15T10:00:00Z,2024-01-15T10:00:00Z
+file_demo_002,demo_user,Usuario Demo,/home/usuario,notas_clase.txt,file,"NOTAS DE CLASE - Hacking Ético
+
+1. Siempre pedir permiso antes de hacer pruebas
+2. Documentar todo lo que haces
+3. Reportar vulnerabilidades de forma responsable
+4. Nunca usar conocimientos para dañar",text/plain,198,rw-r--r--,2024-01-15T10:05:00Z,2024-01-15T10:05:00Z
+file_demo_003,demo_user,Usuario Demo,/home/usuario/documentos,calculadora.py,file,"# Calculadora simple
+def sumar(a, b):
+    return a + b
+
+def restar(a, b):
+    return a - b
+
+def multiplicar(a, b):
+    return a * b
+
+def dividir(a, b):
+    if b != 0:
+        return a / b
+    return 'Error: división por cero'
+
+# Pruebas
+print(sumar(5, 3))
+print(multiplicar(4, 7))",text/x-python,289,rw-r--r--,2024-01-15T10:10:00Z,2024-01-15T10:10:00Z
+file_demo_004,demo_user,Usuario Demo,/home/usuario,mi_robot.py,file,"# Control de Robot ChaskiBot
+import time
+
+def mover_adelante():
+    print('Robot avanzando...')
+
+def girar_derecha():
+    print('Robot girando a la derecha')
+
+def girar_izquierda():
+    print('Robot girando a la izquierda')
+
+# Secuencia de movimientos
+mover_adelante()
+girar_derecha()
+mover_adelante()",text/x-python,301,rw-r--r--,2024-01-15T10:15:00Z,2024-01-15T10:15:00Z
+file_demo_005,demo_user,Usuario Demo,/home/usuario,passwords.txt,file,"CONTRASEÑAS SEGURAS - Guía
+
+❌ Malas contraseñas:
+- 123456
+- password
+- qwerty
+
+✅ Buenas contraseñas:
+- Usa 12+ caracteres
+- Mezcla mayúsculas y minúsculas
+- Incluye números y símbolos
+- No uses información personal",text/plain,223,rw-r--r--,2024-01-15T10:20:00Z,2024-01-15T10:20:00Z

@@ -6,7 +6,7 @@ import QRCode from 'qrcode'
 
 declare global {
   interface Window {
-    loadPyodide: () => Promise<any>
+    loadPyodide: (config?: { indexURL?: string }) => Promise<any>
     pyodide: any
   }
 }
@@ -145,30 +145,67 @@ export default function PythonSimulator() {
 
   useEffect(() => {
     const loadPyodideScript = async () => {
+      // Si ya está cargado, usarlo
       if (window.pyodide) {
         setIsPyodideReady(true)
         setIsLoading(false)
+        setOutput('✅ Python listo. Haz clic en "Ejecutar"')
+        return
+      }
+
+      // Verificar si el script ya existe
+      const existingScript = document.querySelector('script[src*="pyodide"]')
+      if (existingScript) {
+        // Esperar a que cargue
+        const checkPyodide = setInterval(async () => {
+          if ((window as any).loadPyodide) {
+            clearInterval(checkPyodide)
+            try {
+              window.pyodide = await (window as any).loadPyodide({
+                indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'
+              })
+              setIsPyodideReady(true)
+              setIsLoading(false)
+              setOutput('✅ Python listo. Haz clic en "Ejecutar"')
+            } catch (error) {
+              console.error('Error initializing Pyodide:', error)
+              setOutput('⚠️ Error al inicializar Python. Recarga la página.')
+              setIsLoading(false)
+            }
+          }
+        }, 100)
         return
       }
 
       const script = document.createElement('script')
-      script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js'
+      script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js'
       script.async = true
       
       script.onload = async () => {
         try {
-          window.pyodide = await window.loadPyodide()
+          // Pequeña pausa para asegurar que loadPyodide esté disponible
+          await new Promise(resolve => setTimeout(resolve, 100))
+          
+          if (!(window as any).loadPyodide) {
+            throw new Error('loadPyodide no disponible')
+          }
+          
+          window.pyodide = await (window as any).loadPyodide({
+            indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'
+          })
           setIsPyodideReady(true)
           setIsLoading(false)
+          setOutput('✅ Python listo. Haz clic en "Ejecutar"')
         } catch (error) {
           console.error('Error loading Pyodide:', error)
-          setOutput('Error al cargar Python. Recarga la página.')
+          setOutput('⚠️ Error al cargar Python. Recarga la página.')
           setIsLoading(false)
         }
       }
 
-      script.onerror = () => {
-        setOutput('Error al cargar Python. Verifica tu conexión.')
+      script.onerror = (e) => {
+        console.error('Script load error:', e)
+        setOutput('❌ Error al cargar Python. Verifica tu conexión a internet.')
         setIsLoading(false)
       }
 
@@ -179,31 +216,55 @@ export default function PythonSimulator() {
   }, [])
 
   const runCode = async () => {
-    if (!isPyodideReady || isRunning) return
+    if (!isPyodideReady || isRunning) {
+      if (!isPyodideReady) {
+        setOutput('⏳ Python aún está cargando. Espera un momento...')
+      }
+      return
+    }
 
     setIsRunning(true)
-    setOutput('Ejecutando...')
+    setOutput('🔄 Ejecutando código...')
 
     try {
+      // Reiniciar stdout y stderr
       window.pyodide.runPython(`
 import sys
 from io import StringIO
 sys.stdout = StringIO()
 sys.stderr = StringIO()
-      `)
+`)
 
+      // Ejecutar el código del usuario
       await window.pyodide.runPythonAsync(code)
 
+      // Obtener la salida
       const stdout = window.pyodide.runPython('sys.stdout.getvalue()')
       const stderr = window.pyodide.runPython('sys.stderr.getvalue()')
 
-      if (stderr) {
-        setOutput(`${stdout}\n⚠️ Errores:\n${stderr}`)
+      if (stderr && stderr.trim()) {
+        setOutput(`${stdout}\n⚠️ Advertencias:\n${stderr}`)
+      } else if (stdout && stdout.trim()) {
+        setOutput(stdout)
       } else {
-        setOutput(stdout || '(Sin salida)')
+        setOutput('✅ Código ejecutado correctamente (sin salida de print)')
       }
     } catch (error: any) {
-      setOutput(`❌ Error:\n${error.message}`)
+      // Formatear el error para que sea más legible
+      let errorMsg = error.message || String(error)
+      
+      // Extraer solo la parte relevante del error de Python
+      if (errorMsg.includes('PythonError:')) {
+        const lines = errorMsg.split('\n')
+        const relevantLines = lines.filter((line: string) => 
+          line.includes('Error') || 
+          line.includes('line') || 
+          line.trim().startsWith('>')
+        )
+        errorMsg = relevantLines.join('\n') || errorMsg
+      }
+      
+      setOutput(`❌ Error en el código:\n${errorMsg}`)
     } finally {
       setIsRunning(false)
     }
