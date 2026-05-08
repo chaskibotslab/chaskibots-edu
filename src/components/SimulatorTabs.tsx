@@ -301,8 +301,8 @@ export default function SimulatorTabs() {
               }}
               className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all ${
                 activeCategory === cat.id 
-                  ? 'bg-brand-purple text-dark-900' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+                  ? 'bg-[#558C89] text-white shadow-md' 
+                  : 'bg-white text-gray-700 hover:bg-[#558C89]/10 hover:text-[#558C89] border border-gray-200'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -322,14 +322,14 @@ export default function SimulatorTabs() {
               onClick={() => setActiveSimulator(sim)}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-medium transition-all ${
                 activeSimulator.id === sim.id 
-                  ? 'bg-dark-600 text-gray-900 border border-brand-purple/50' 
-                  : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-300 border border-gray-200'
+                  ? 'bg-[#D9853B] text-white shadow-md border border-[#D9853B]' 
+                  : 'bg-white text-gray-700 hover:bg-[#D9853B]/10 hover:text-[#D9853B] border border-gray-200'
               }`}
             >
               <Icon className="w-3 h-3" />
               {sim.name}
               {!sim.requiresLogin && (
-                <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded">Sin registro</span>
+                <span className="text-[10px] bg-[#558C89]/20 text-[#558C89] px-1.5 py-0.5 rounded font-medium">Sin registro</span>
               )}
             </button>
           )
@@ -343,13 +343,13 @@ export default function SimulatorTabs() {
           <BlocklyEditor userId={user?.id} userName={user?.name} />
         </div>
       ) : (
-        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
             <div>
               <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 {(() => {
                   const Icon = activeSimulator.icon
-                  return <Icon className="w-6 h-6 text-brand-purple" />
+                  return <Icon className="w-6 h-6 text-[#558C89]" />
                 })()}
                 {activeSimulator.name}
               </h3>
@@ -359,7 +359,7 @@ export default function SimulatorTabs() {
               href={activeSimulator.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-brand-purple text-dark-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-brand-purple/80 transition-colors"
+              className="bg-[#D9853B] text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-[#c77632] transition-colors shadow-md"
             >
               <ExternalLink className="w-4 h-4" />
               Abrir en su web

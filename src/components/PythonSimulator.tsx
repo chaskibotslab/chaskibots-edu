@@ -436,9 +436,9 @@ ${output}
   }
 
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden">
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
       {/* Header */}
-      <div className="bg-white px-4 py-3 border-b border-gray-200 flex items-center justify-between flex-wrap gap-3">
+      <div className="bg-gradient-to-r from-[#558C89]/10 to-[#74AFAD]/10 px-4 py-3 border-b border-gray-200 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -474,45 +474,55 @@ ${output}
       </div>
 
       {/* Main Content */}
-      <div className="grid md:grid-cols-2 divide-x divide-dark-600">
-        {/* Code Editor */}
-        <div className="relative">
-          <div className="absolute top-2 right-2 z-10">
+      <div className="grid md:grid-cols-2 divide-x divide-gray-700">
+        {/* Code Editor - Fondo oscuro para código */}
+        <div className="relative bg-[#1e1e2e]">
+          <div className="absolute top-2 left-2 flex items-center gap-2">
+            <span className="text-xs text-gray-400 font-mono">codigo.py</span>
+          </div>
+          <div className="absolute top-2 right-2 z-10 flex gap-1">
             <button
               onClick={() => copyToClipboard(code, 'code')}
-              className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600 hover:text-gray-900 transition-colors"
+              className="p-1.5 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 hover:text-white transition-colors"
               title="Copiar código"
             >
               {copied === 'code' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={resetCode}
+              className="p-1.5 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 hover:text-white transition-colors"
+              title="Restaurar"
+            >
+              <RotateCcw className="w-4 h-4" />
             </button>
           </div>
           <textarea
             ref={textareaRef}
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="w-full h-80 p-4 bg-white text-gray-200 font-mono text-sm resize-none focus:outline-none"
+            className="w-full h-80 p-4 pt-8 bg-[#1e1e2e] text-[#9cdcfe] font-mono text-sm resize-none focus:outline-none"
             placeholder="Escribe tu código Python aquí..."
             spellCheck={false}
           />
         </div>
 
-        {/* Output */}
-        <div className="relative bg-white/50">
+        {/* Output - Fondo oscuro para salida */}
+        <div className="relative bg-[#1e1e2e]">
           <div className="absolute top-2 left-2 flex items-center gap-2">
-            <span className="text-xs text-gray-500 font-mono">▶ Salida</span>
+            <span className="text-xs text-gray-400 font-mono">▶ Salida</span>
           </div>
           <div className="absolute top-2 right-2 z-10">
             <button
               onClick={() => copyToClipboard(output, 'output')}
-              className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600 hover:text-gray-900 transition-colors"
+              className="p-1.5 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 hover:text-white transition-colors"
               title="Copiar resultado"
             >
               {copied === 'output' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
-          <pre className="w-full h-80 p-4 pt-8 text-green-400 font-mono text-sm overflow-auto whitespace-pre-wrap">
+          <pre className="w-full h-80 p-4 pt-8 text-[#4ec9b0] font-mono text-sm overflow-auto whitespace-pre-wrap">
             {isLoading ? (
-              <span className="text-yellow-400">⏳ Cargando Python...</span>
+              <span className="text-[#dcdcaa]">⏳ Cargando Python...</span>
             ) : output || (
               <span className="text-gray-500">La salida aparecerá aquí...</span>
             )}
@@ -526,7 +536,7 @@ ${output}
           <button
             onClick={runCode}
             disabled={!isPyodideReady || isRunning}
-            className="bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+            className="bg-[#558C89] hover:bg-[#4a7a78] disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-md"
           >
             <Play className="w-4 h-4" />
             {isRunning ? 'Ejecutando...' : 'Ejecutar'}
@@ -570,7 +580,7 @@ ${output}
                 setIsSending(false)
               }}
               disabled={isSending || sendSuccess}
-              className="bg-brand-violet hover:bg-brand-violet/80 disabled:bg-gray-600 text-gray-900 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+              className="bg-[#D9853B] hover:bg-[#c77632] disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-md"
             >
               {isSending ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
@@ -610,7 +620,7 @@ ${output}
           )}
           <button
             onClick={exportCode}
-            className="bg-gray-100 hover:bg-gray-200 text-gray-300 px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors border border-gray-200"
             title="Descargar código .py"
           >
             <FileCode className="w-4 h-4" />
@@ -619,7 +629,7 @@ ${output}
           <button
             onClick={prepareExport}
             disabled={!output}
-            className="bg-brand-purple hover:bg-brand-purple/80 disabled:opacity-50 disabled:cursor-not-allowed text-dark-900 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+            className="bg-[#74AFAD] hover:bg-[#558C89] disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors border border-[#558C89]"
             title="Exportar tarea con ID único y QR"
           >
             <QrCode className="w-4 h-4" />
@@ -630,8 +640,8 @@ ${output}
 
       {/* Send Success Message */}
       {sendSuccess && (
-        <div className="px-4 py-2 bg-green-500/20 border-t border-green-500/30">
-          <p className="text-green-400 text-sm text-center">
+        <div className="px-4 py-2 bg-[#558C89]/20 border-t border-[#558C89]/30">
+          <p className="text-[#558C89] text-sm text-center font-medium">
             ✅ Tu código fue enviado al profesor. Lo verá en su panel de calificaciones.
           </p>
         </div>
