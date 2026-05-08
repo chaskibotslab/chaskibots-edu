@@ -2,11 +2,21 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import AIModule from '@/components/AIModule'
 import { useAuth } from '@/components/AuthProvider'
 import { Brain, Camera, Upload, Mic, Lightbulb, Loader2 } from 'lucide-react'
+
+const AIModule = dynamic(() => import('@/components/AIModule'), {
+  loading: () => (
+    <div className="flex items-center justify-center p-12">
+      <Loader2 className="w-8 h-8 animate-spin text-brand-violet" />
+      <span className="ml-2 text-gray-600">Cargando módulo de IA...</span>
+    </div>
+  ),
+  ssr: false
+})
 
 export default function IAPage() {
   const { user, isLoading, isAuthenticated } = useAuth()

@@ -2,24 +2,57 @@
 
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { EDUCATION_LEVELS, LEVEL_CONTENT, SIMULATORS } from '@/lib/constants'
 import { ALL_COURSES, calculateProgress, Module, Lesson, AssemblyStep, YearPlanItem } from '@/data/courses'
 import { 
   Bot, Brain, Shield, Play, BookOpen, Wrench, ArrowLeft, 
   ChevronRight, CheckCircle, Lock, Clock, Package, 
   Calendar, Video, FileText, Zap, Home, Settings,
-  GraduationCap, Cpu, Menu, X
+  GraduationCap, Cpu, Menu, X, Loader2
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import AIModule from '@/components/AIModule'
-import AIActivities from '@/components/AIActivities'
-import SimulatorTabsDynamic from '@/components/SimulatorTabsDynamic'
-import KitDisplay from '@/components/KitDisplay'
 import CourseAuthGuard from '@/components/CourseAuthGuard'
-import TasksPanel from '@/components/TasksPanel'
 import { useAuth } from '@/components/AuthProvider'
 import ModuleAccordion from '@/components/ModuleAccordion'
-import LessonViewerModern from '@/components/LessonViewerModern'
+import { logger } from '@/lib/logger'
+
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center p-8">
+    <Loader2 className="w-8 h-8 animate-spin text-brand-purple" />
+    <span className="ml-2 text-gray-600">Cargando...</span>
+  </div>
+)
+
+const AIModule = dynamic(() => import('@/components/AIModule'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
+const AIActivities = dynamic(() => import('@/components/AIActivities'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
+const SimulatorTabsDynamic = dynamic(() => import('@/components/SimulatorTabsDynamic'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
+const KitDisplay = dynamic(() => import('@/components/KitDisplay'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
+const TasksPanel = dynamic(() => import('@/components/TasksPanel'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
+const LessonViewerModern = dynamic(() => import('@/components/LessonViewerModern'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
 
 interface APILesson {
   id: string
@@ -44,9 +77,9 @@ export default function NivelPage() {
   const levelId = params.id as string
   const { user, isTeacher, isAdmin } = useAuth()
   
-  // Debug: mostrar info del usuario en consola
+  // Debug: mostrar info del usuario en consola (solo en desarrollo)
   useEffect(() => {
-    console.log('[Nivel] Usuario:', user?.name, 'Role:', user?.role, 'isTeacher:', isTeacher, 'isAdmin:', isAdmin)
+    logger.debug('[Nivel] Usuario:', user?.name, 'Role:', user?.role, 'isTeacher:', isTeacher, 'isAdmin:', isAdmin)
   }, [user, isTeacher, isAdmin])
   
   const [activeTab, setActiveTab] = useState<'lessons' | 'kit' | 'calendar' | 'ai' | 'simulators' | 'tasks'>('lessons')
@@ -111,28 +144,23 @@ export default function NivelPage() {
   // Cargar lecciones desde API según programa seleccionado
   useEffect(() => {
     async function loadLessons() {
-      console.log('[DEBUG] Cargando lecciones para:', { levelId, selectedProgram })
+      logger.debug('Cargando lecciones para:', { levelId, selectedProgram })
       setLessonsLoading(true)
-      setApiLessons([]) // Limpiar lecciones anteriores
+      setApiLessons([])
       try {
         const url = `/api/lessons?levelId=${levelId}&programId=${selectedProgram}&nocache=1`
-        console.log('[DEBUG] Fetching:', url)
         const response = await fetch(url)
         if (response.ok) {
           const data = await response.json()
-          console.log('[DEBUG] Respuesta API:', data.length, 'lecciones')
-          if (data.length > 0) {
-            console.log('[DEBUG] Primera lección:', data[0].title, 'programId:', data[0].programId)
-          }
+          logger.debug('Lecciones cargadas:', data.length)
           if (Array.isArray(data) && data.length > 0) {
             setApiLessons(data)
           }
         } else {
-          console.log('[DEBUG] Error en respuesta:', response.status)
+          logger.debug('Error en respuesta:', response.status)
         }
       } catch (error) {
-        console.log('[DEBUG] Error:', error)
-        console.log('Using local lessons data')
+        logger.debug('Error cargando lecciones:', error)
       }
       setLessonsLoading(false)
     }

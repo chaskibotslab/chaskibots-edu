@@ -1,11 +1,27 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import SimulatorTabs from '@/components/SimulatorTabs'
-import PythonSimulator from '@/components/PythonSimulator'
-import { Code, Copy, Check, Terminal, Lightbulb, BookOpen, Download } from 'lucide-react'
+import { Code, Copy, Check, Terminal, Lightbulb, BookOpen, Download, Loader2 } from 'lucide-react'
+
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center p-8">
+    <Loader2 className="w-8 h-8 animate-spin text-brand-purple" />
+    <span className="ml-2 text-gray-600">Cargando simulador...</span>
+  </div>
+)
+
+const SimulatorTabs = dynamic(() => import('@/components/SimulatorTabs'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
+const PythonSimulator = dynamic(() => import('@/components/PythonSimulator'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
 
 export default function SimuladoresPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
