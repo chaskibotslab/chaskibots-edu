@@ -4,11 +4,13 @@ import { useState, useRef, useEffect } from 'react'
 import { 
   Terminal, Lock, Key, Wifi, Shield, Code, Copy, Check, 
   ChevronRight, ChevronDown, BookOpen, Lightbulb, Zap,
-  Eye, EyeOff, Hash, RefreshCw
+  Eye, EyeOff, Hash, RefreshCw, Download, Upload, Save, FolderOpen
 } from 'lucide-react'
 
 interface HackingTerminalProps {
   levelId: string
+  userId?: string
+  userName?: string
 }
 
 interface Command {
@@ -158,11 +160,12 @@ const FILE_SYSTEM: Record<string, any> = {
   }
 }
 
-export default function HackingTerminal({ levelId }: HackingTerminalProps) {
+export default function HackingTerminal({ levelId, userId, userName }: HackingTerminalProps) {
   const [terminalOutput, setTerminalOutput] = useState<string[]>([
     '╔══════════════════════════════════════════════════════════╗',
     '║  🖥️  SIMULADOR DE TERMINAL - HACKING ÉTICO              ║',
     '║  Escribe "help" para ver comandos disponibles           ║',
+    '║  Comandos nuevos: save, load, export, myfiles           ║',
     '╚══════════════════════════════════════════════════════════╝',
     ''
   ])
@@ -191,8 +194,74 @@ export default function HackingTerminal({ levelId }: HackingTerminalProps) {
     tips: string[]
   } | null>(null)
 
+  // Sistema de archivos virtuales (base de datos)
+  const [userFiles, setUserFiles] = useState<any[]>([])
+  const [showFileManager, setShowFileManager] = useState(false)
+  const [editingFile, setEditingFile] = useState<any>(null)
+  const [fileContent, setFileContent] = useState('')
+
   const terminalRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Cargar archivos del usuario desde la base de datos
+  const loadUserFiles = async () => {
+    if (!userId) return
+    try {
+      const res = await fetch(`/api/virtual-files?userId=${userId}`)
+      if (res.ok) {
+        const files = await res.json()
+        setUserFiles(files)
+      }
+    } catch (error) {
+      console.error('Error loading files:', error)
+    }
+  }
+
+  // Guardar archivo en la base de datos
+  const saveFileToDb = async (name: string, content: string, path: string) => {
+    if (!userId) {
+      return { success: false, error: 'Debes iniciar sesión para guardar archivos' }
+    }
+    try {
+      const res = await fetch('/api/virtual-files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          userName: userName || 'Usuario',
+          path,
+          name,
+          type: 'file',
+          content,
+          mimeType: name.endsWith('.py') ? 'text/x-python' : 'text/plain'
+        })
+      })
+      if (res.ok) {
+        await loadUserFiles()
+        return { success: true }
+      }
+      return { success: false, error: 'Error al guardar' }
+    } catch (error) {
+      return { success: false, error: 'Error de conexión' }
+    }
+  }
+
+  // Exportar archivo (descargar)
+  const exportFile = (name: string, content: string) => {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = name
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  useEffect(() => {
+    if (userId) loadUserFiles()
+  }, [userId])
 
   const caesarCipher = (text: string, shift: number, decrypt: boolean = false): string => {
     if (decrypt) shift = -shift
@@ -282,8 +351,15 @@ export default function HackingTerminal({ levelId }: HackingTerminalProps) {
             '  Seguridad:  whoami, sudo, chmod, encrypt, decrypt',
             '  Sistema:    clear, echo, date, uptime, history',
             '',
-            '  Herramientas especiales:',
-            '    crypto    - Abre herramienta de cifrado',
+            '  📁 Archivos en la nube:',
+            '    save <nombre> <contenido> - Guarda archivo',
+            '    myfiles    - Lista tus archivos guardados',
+            '    open <nombre>  - Abre un archivo',
+            '    export <nombre> - Descarga archivo',
+            '    rm <nombre>    - Elimina archivo',
+            '',
+            '  🔧 Herramientas especiales:',
+            '    crypto    - Herramienta de cifrado',
             '    passcheck - Verificador de contraseñas',
             '',
             'Escribe "help <comando>" para más detalles'
@@ -542,6 +618,110 @@ export default function HackingTerminal({ levelId }: HackingTerminalProps) {
       case 'passcheck':
         setShowPasswordChecker(true)
         output = ['🔑 Abriendo verificador de contraseñas...']
+        break
+
+      // === NUEVOS COMANDOS DE ARCHIVOS ===
+      case 'save':
+        if (args.length < 2) {
+          output = ['Uso: save <nombre_archivo> <contenido>']
+        } else {
+          const fileName = args[0]
+          const content = args.slice(1).join(' ')
+          if (!userId) {
+            output = ['⚠️ Debes iniciar sesión para guardar archivos']
+          } else {
+            saveFileToDb(fileName, content, currentDir).then(result => {
+              if (result.success) {
+                setTerminalOutput(prev => [...prev, `✅ Archivo "${fileName}" guardado en la nube`])
+              } else {
+                setTerminalOutput(prev => [...prev, `❌ ${result.error}`])
+              }
+            })
+            output = [`💾 Guardando "${fileName}"...`]
+          }
+        }
+        break
+
+      case 'myfiles':
+        setShowFileManager(true)
+        if (userFiles.length === 0) {
+          output = ['📂 No tienes archivos guardados aún', 'Usa: save <nombre> <contenido> para crear uno']
+        } else {
+          output = [
+            '📂 TUS ARCHIVOS EN LA NUBE:',
+            '',
+            ...userFiles.map(f => `  📄 ${f.name} (${f.size} bytes) - ${f.path}`),
+            '',
+            `Total: ${userFiles.length} archivo(s)`,
+            'Usa: open <nombre> para ver contenido',
+            'Usa: export <nombre> para descargar'
+          ]
+        }
+        break
+
+      case 'open':
+        if (!args[0]) {
+          output = ['Uso: open <nombre_archivo>']
+        } else {
+          const fileToOpen = userFiles.find(f => f.name === args[0])
+          if (fileToOpen) {
+            output = [
+              `📄 ${fileToOpen.name}`,
+              '─'.repeat(40),
+              ...fileToOpen.content.split('\n'),
+              '─'.repeat(40)
+            ]
+          } else {
+            // Buscar en sistema de archivos local
+            const localPath = `${currentDir}/${args[0]}`.replace('//', '/')
+            const localFile = FILE_SYSTEM[localPath]
+            if (localFile && localFile.type === 'file') {
+              output = localFile.content.split('\n')
+            } else {
+              output = [`Archivo no encontrado: ${args[0]}`]
+            }
+          }
+        }
+        break
+
+      case 'export':
+        if (!args[0]) {
+          output = ['Uso: export <nombre_archivo>']
+        } else {
+          const fileToExport = userFiles.find(f => f.name === args[0])
+          if (fileToExport) {
+            exportFile(fileToExport.name, fileToExport.content)
+            output = [`📥 Descargando "${fileToExport.name}"...`]
+          } else {
+            // Exportar archivo del sistema local
+            const localPath = `${currentDir}/${args[0]}`.replace('//', '/')
+            const localFile = FILE_SYSTEM[localPath]
+            if (localFile && localFile.type === 'file') {
+              exportFile(args[0], localFile.content)
+              output = [`📥 Descargando "${args[0]}"...`]
+            } else {
+              output = [`Archivo no encontrado: ${args[0]}`]
+            }
+          }
+        }
+        break
+
+      case 'rm':
+        if (!args[0]) {
+          output = ['Uso: rm <nombre_archivo>']
+        } else {
+          const fileToDelete = userFiles.find(f => f.name === args[0])
+          if (fileToDelete) {
+            fetch(`/api/virtual-files?recordId=${fileToDelete.recordId}`, { method: 'DELETE' })
+              .then(() => {
+                loadUserFiles()
+                setTerminalOutput(prev => [...prev, `🗑️ Archivo "${args[0]}" eliminado`])
+              })
+            output = [`Eliminando "${args[0]}"...`]
+          } else {
+            output = [`Archivo no encontrado en tus archivos: ${args[0]}`]
+          }
+        }
         break
 
       case '':
