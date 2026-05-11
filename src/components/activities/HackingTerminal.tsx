@@ -351,7 +351,12 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
             '  Seguridad:  whoami, sudo, chmod, encrypt, decrypt',
             '  Sistema:    clear, echo, date, uptime, history',
             '',
-            '  📁 Archivos en la nube:',
+            '  � Python:',
+            '    python <archivo.py> - Ejecuta archivo Python',
+            '    run <archivo>       - Ejecuta archivo',
+            '    edit <archivo>      - Info para editar',
+            '',
+            '  �📁 Archivos en la nube:',
             '    save <nombre> <contenido> - Guarda archivo',
             '    myfiles    - Lista tus archivos guardados',
             '    open <nombre>  - Abre un archivo',
@@ -720,6 +725,125 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
             output = [`Eliminando "${args[0]}"...`]
           } else {
             output = [`Archivo no encontrado en tus archivos: ${args[0]}`]
+          }
+        }
+        break
+
+      case 'python':
+      case 'python3':
+        if (!args[0]) {
+          output = [
+            '🐍 Python 3.10.0 (simulado)',
+            'Uso: python <archivo.py>',
+            'Ejemplo: python proyecto.py'
+          ]
+        } else {
+          const pyFileName = args[0]
+          // Buscar en archivos del usuario
+          let pyFile = userFiles.find(f => f.name === pyFileName)
+          let pyContent = pyFile?.content
+          
+          // Si no está en archivos del usuario, buscar en sistema local
+          if (!pyContent) {
+            const localPath = pyFileName.startsWith('/') 
+              ? pyFileName 
+              : `${currentDir}/${pyFileName}`.replace('//', '/')
+            const localFile = FILE_SYSTEM[localPath]
+            if (localFile && localFile.type === 'file') {
+              pyContent = localFile.content
+            }
+          }
+          
+          if (pyContent) {
+            // Simular ejecución de Python
+            output = ['🐍 Ejecutando Python...', '─'.repeat(40)]
+            const lines = pyContent.split('\n')
+            const variables: Record<string, any> = {}
+            
+            for (const line of lines) {
+              const trimmed = line.trim()
+              if (!trimmed || trimmed.startsWith('#')) continue
+              
+              // Simular print()
+              const printMatch = trimmed.match(/print\s*\(\s*["'](.*)["']\s*\)/)
+              if (printMatch) {
+                output.push(printMatch[1])
+                continue
+              }
+              
+              // print con variables
+              const printVarMatch = trimmed.match(/print\s*\(\s*(.+)\s*\)/)
+              if (printVarMatch) {
+                const content = printVarMatch[1]
+                // Evaluar contenido simple
+                if (content.startsWith('"') || content.startsWith("'")) {
+                  output.push(content.replace(/["']/g, ''))
+                } else if (variables[content] !== undefined) {
+                  output.push(String(variables[content]))
+                } else {
+                  output.push(content)
+                }
+                continue
+              }
+              
+              // Asignación de variable simple
+              const assignMatch = trimmed.match(/^(\w+)\s*=\s*(.+)$/)
+              if (assignMatch) {
+                const [, varName, value] = assignMatch
+                if (value.startsWith('"') || value.startsWith("'")) {
+                  variables[varName] = value.replace(/["']/g, '')
+                } else if (!isNaN(Number(value))) {
+                  variables[varName] = Number(value)
+                }
+              }
+              
+              // def function (solo mostrar que se definió)
+              if (trimmed.startsWith('def ')) {
+                const funcMatch = trimmed.match(/def\s+(\w+)/)
+                if (funcMatch) {
+                  output.push(`[Función ${funcMatch[1]}() definida]`)
+                }
+              }
+            }
+            
+            output.push('─'.repeat(40), '✅ Ejecución completada')
+          } else {
+            output = [`❌ Archivo no encontrado: ${pyFileName}`, 'Usa "ls" para ver archivos disponibles']
+          }
+        }
+        break
+
+      case 'edit':
+      case 'nano':
+      case 'vim':
+        if (!args[0]) {
+          output = ['Uso: edit <archivo>', 'Crea o edita un archivo']
+        } else {
+          const editFileName = args[0]
+          output = [
+            `📝 Editor de texto: ${editFileName}`,
+            '─'.repeat(40),
+            'Para crear/editar archivos usa:',
+            `  save ${editFileName} <contenido>`,
+            '',
+            'Ejemplo:',
+            `  save ${editFileName} print("Hola Mundo!")`,
+            '─'.repeat(40)
+          ]
+        }
+        break
+
+      case 'run':
+        if (!args[0]) {
+          output = ['Uso: run <archivo>', 'Ejecuta un archivo (detecta tipo automáticamente)']
+        } else {
+          const runFile = args[0]
+          if (runFile.endsWith('.py')) {
+            // Redirigir a python
+            processCommand(`python ${runFile}`)
+            return
+          } else {
+            output = [`Tipo de archivo no soportado: ${runFile}`, 'Archivos soportados: .py']
           }
         }
         break
