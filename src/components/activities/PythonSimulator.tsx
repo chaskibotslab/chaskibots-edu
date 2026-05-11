@@ -704,7 +704,7 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
         </div>
         <button
           onClick={() => setShowGuides(!showGuides)}
-          className="flex items-center gap-1 px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-colors text-sm"
+          className="flex items-center gap-1 px-3 py-1 bg-[#558C89]/20 text-[#558C89] rounded-lg hover:bg-[#558C89]/30 transition-colors text-sm font-medium"
         >
           <BookOpen className="w-4 h-4" />
           {showGuides ? 'Ocultar' : 'Mostrar'} Guías
@@ -713,40 +713,40 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
 
       {/* Guides */}
       {showGuides && (
-        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+        <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <Lightbulb className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm text-gray-300">Guías y Ejemplos</span>
+            <Lightbulb className="w-4 h-4 text-[#D9853B]" />
+            <span className="text-sm text-gray-700 font-medium">Guías y Ejemplos</span>
           </div>
           <div className="space-y-2">
             {guides.map((guide, idx) => (
-              <div key={idx} className="border border-gray-700 rounded-lg overflow-hidden">
+              <div key={idx} className="border border-gray-200 rounded-lg overflow-hidden">
                 <button
                   onClick={() => setActiveGuide(activeGuide === idx ? null : idx)}
-                  className="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
+                  className="w-full flex items-center justify-between p-3 bg-[#558C89]/10 hover:bg-[#558C89]/20 transition-colors"
                 >
-                  <span className="font-medium text-gray-900">{guide.title}</span>
+                  <span className="font-medium text-gray-800">{guide.title}</span>
                   {activeGuide === idx ? (
-                    <ChevronDown className="w-4 h-4 text-gray-600" />
+                    <ChevronDown className="w-4 h-4 text-[#558C89]" />
                   ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-600" />
+                    <ChevronRight className="w-4 h-4 text-[#558C89]" />
                   )}
                 </button>
                 {activeGuide === idx && (
-                  <div className="p-3 bg-gray-900/50 border-t border-gray-700">
+                  <div className="p-3 bg-gray-50 border-t border-gray-200">
                     <p className="text-sm text-gray-600 mb-3">{guide.content}</p>
                     <div className="grid gap-2">
                       {guide.examples.map((example, exIdx) => (
                         <button
                           key={exIdx}
                           onClick={() => loadExample(example)}
-                          className="flex items-center justify-between p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-left"
+                          className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:bg-[#D9853B]/10 hover:border-[#D9853B] transition-colors text-left"
                         >
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{example.title}</div>
+                            <div className="text-sm font-medium text-gray-800">{example.title}</div>
                             <div className="text-xs text-gray-500">{example.description}</div>
                           </div>
-                          <Zap className="w-4 h-4 text-yellow-400" />
+                          <Zap className="w-4 h-4 text-[#D9853B]" />
                         </button>
                       ))}
                     </div>
@@ -761,55 +761,55 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
       {/* Editor */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Code Editor */}
-        <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-700">
-          <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+        <div className="bg-[#1e1e2e] rounded-xl overflow-hidden border border-gray-300 shadow-md">
+          <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d3d] border-b border-gray-600">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-red-500" />
               <div className="w-3 h-3 rounded-full bg-yellow-500" />
               <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span className="ml-2 text-sm text-gray-600">codigo.py</span>
+              <span className="ml-2 text-sm text-gray-300">codigo.py</span>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={copyCode}
-                className="p-1.5 hover:bg-gray-700 rounded transition-colors"
+                className="p-1.5 hover:bg-gray-600 rounded transition-colors"
                 title="Copiar código"
               >
                 {copied ? (
                   <Check className="w-4 h-4 text-green-400" />
                 ) : (
-                  <Copy className="w-4 h-4 text-gray-600" />
+                  <Copy className="w-4 h-4 text-gray-400" />
                 )}
               </button>
               <button
                 onClick={() => setCode('# Escribe tu código Python aquí\n')}
-                className="p-1.5 hover:bg-gray-700 rounded transition-colors"
+                className="p-1.5 hover:bg-gray-600 rounded transition-colors"
                 title="Limpiar"
               >
-                <RotateCcw className="w-4 h-4 text-gray-600" />
+                <RotateCcw className="w-4 h-4 text-gray-400" />
               </button>
             </div>
           </div>
           <textarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="w-full h-64 p-4 bg-gray-900 text-green-400 font-mono text-sm resize-none focus:outline-none"
+            className="w-full h-64 p-4 bg-[#1e1e2e] text-[#9cdcfe] font-mono text-sm resize-none focus:outline-none"
             spellCheck={false}
             placeholder="# Escribe tu código Python aquí"
           />
         </div>
 
         {/* Output */}
-        <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-700">
-          <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+        <div className="bg-[#1e1e2e] rounded-xl overflow-hidden border border-gray-300 shadow-md">
+          <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d3d] border-b border-gray-600">
             <div className="flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-gray-600" />
-              <span className="text-sm text-gray-600">Salida</span>
+              <Terminal className="w-4 h-4 text-gray-300" />
+              <span className="text-sm text-gray-300">Salida</span>
             </div>
             <button
               onClick={runCode}
               disabled={isRunning}
-              className="flex items-center gap-2 px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-gray-900 rounded-lg transition-colors text-sm"
+              className="flex items-center gap-2 px-3 py-1.5 bg-[#558C89] hover:bg-[#4a7a78] disabled:bg-gray-500 text-white rounded-lg transition-colors text-sm font-medium shadow-sm"
             >
               <Play className="w-4 h-4" />
               {isRunning ? 'Ejecutando...' : 'Ejecutar'}
@@ -817,10 +817,10 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
           </div>
           <div
             ref={outputRef}
-            className="h-64 p-4 overflow-y-auto font-mono text-sm"
+            className="h-64 p-4 overflow-y-auto font-mono text-sm bg-[#1e1e2e]"
           >
             {output.map((line, idx) => (
-              <div key={idx} className="text-gray-900">
+              <div key={idx} className="text-[#4ec9b0]">
                 {line}
               </div>
             ))}
@@ -830,15 +830,15 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
 
       {/* Enviar al Profesor */}
       {output.length > 0 && (
-        <div className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 rounded-xl p-4">
+        <div className="bg-gradient-to-r from-[#558C89]/10 to-[#D9853B]/10 border border-[#558C89]/30 rounded-xl p-4">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-900 font-medium flex items-center gap-2">
-                  <Send className="w-4 h-4 text-purple-400" />
+                <p className="text-sm text-gray-800 font-medium flex items-center gap-2">
+                  <Send className="w-4 h-4 text-[#D9853B]" />
                   Enviar al Profesor
                 </p>
-                <p className="text-xs text-gray-600">Tu código y resultado se enviarán para calificación</p>
+                <p className="text-xs text-gray-500">Tu código y resultado se enviarán para calificación</p>
               </div>
             </div>
             
@@ -848,13 +848,13 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
                 placeholder="Tu nombre..."
-                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-gray-900"
+                className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-800 placeholder:text-gray-400"
               />
               
               <select
                 value={selectedTask}
                 onChange={(e) => setSelectedTask(e.target.value)}
-                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-gray-900"
+                className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-800"
               >
                 <option value="">Selecciona tarea (opcional)</option>
                 {tasks.map(task => (
@@ -866,7 +866,7 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
               <button
                 onClick={handleSendToTeacher}
                 disabled={isSending || sendSuccess}
-                className="bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-gray-900 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                className="bg-[#D9853B] hover:bg-[#c77835] disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors shadow-sm"
               >
                 {isSending ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
@@ -879,8 +879,8 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
             </div>
           </div>
           {sendSuccess && (
-            <div className="mt-3 p-2 bg-green-500/20 border border-green-500/30 rounded-lg">
-              <p className="text-green-400 text-sm text-center">
+            <div className="mt-3 p-2 bg-green-100 border border-green-300 rounded-lg">
+              <p className="text-green-700 text-sm text-center">
                 ✅ Tu código fue enviado correctamente. El profesor lo verá en su panel de calificaciones.
               </p>
             </div>
@@ -889,11 +889,11 @@ export default function PythonSimulator({ levelId }: PythonSimulatorProps) {
       )}
 
       {/* Tips */}
-      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+      <div className="bg-[#558C89]/10 border border-[#558C89]/30 rounded-lg p-3">
         <div className="flex items-start gap-2">
-          <Lightbulb className="w-4 h-4 text-blue-400 mt-0.5" />
-          <div className="text-sm text-blue-300">
-            <strong>Tip:</strong> Este es un simulador educativo. Soporta variables, print, bucles for, 
+          <Lightbulb className="w-4 h-4 text-[#558C89] mt-0.5" />
+          <div className="text-sm text-gray-600">
+            <strong className="text-gray-800">Tip:</strong> Este es un simulador educativo. Soporta variables, print, bucles for, 
             condicionales if/else, y operaciones básicas. ¡Perfecto para aprender los fundamentos!
           </div>
         </div>
