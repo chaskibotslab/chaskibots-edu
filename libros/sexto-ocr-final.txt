@@ -1,0 +1,3417 @@
+
+
+==================== PÁGINA 1 ====================
+
+- QQ ——2 — — —
+“— 1775 PO = Ad |
+O y e a
+= o — < / e
+o ps j 1 == A
+IL Ú AL
+a,
+- “E
+o * E
+1 - La “ » : A =
+> r |
+——! DN - |
+e: — |
+ORO 6 E — E - , a —- . - ——
+Ae! Doe: ——
+= > _—
+N > —-— =— 7
+E, " N 7
+=> Mm .. N /
+Lord + , “—
+Ro
+| Scanned with:
+| E CamScanner
+
+
+==================== PÁGINA 2 ====================
+
+= O | ua DE n Ns a.
+” ll Y j 1 7 O a
+[7 Y V d Ne A E p DA a
+[CE DN AA -—
+: g =1 y Y as ml PA A —
+>) o Y UN ¿ 2 AE A =———
+a E | dl u a + a 2
+Tu = i 'E ME LA £L L >
+YH á / ... 5 |
+—..—*: -— AE E
+5 AE l
+ue —— Al ME E E
+es E Ne Es e % (í Cu NÓ - S :
+— fed -. 5 _ OO
+Ss E qua == “EA E
+a a a a 4 N
+a 4 a Ta EN 7
+M7 a ———
+| Scamed with —
+| E CamsScanner H
+
+
+==================== PÁGINA 3 ====================
+
+| ) —
+: |
+A ———————— ——]]]—————]—————
+F
+1 1
+E UA
+4 ]
+ESA
+17 ¿
+f
+! | |
+7 n Se CYBER BOT+1A 6 - ROBÓTICA -
+E | | EDUCACIÓN PRIMARIA Fe
+E PRODUCCIÓN: —_
+Ei MB LIBROS a
+d GERENTE GENERAL _7
+JENNY REYES CEVALLOS e
+AUTOR: 10
+NASIM MALDONADO | N
+AGAPITO ACÁRO E. | y
+- 1:
+DISEÑO Y DIAGRAMACIÓN 5— —
+FRED RIOFRIO VIVANCO
+EDICIÓN: au | É
+GRUPO EDITORIAL E
+Cel.: 0987061875 "
+L mblibrosEQhotmail.con UN
+y e
+E ,
+ISBN: 978-9907-0-0109-9 h
+Copyright 2026 con
+PROHIBIDA SU REPRODUCCIÓN TOTAL O PARCIAL, Y |
+POR CUALQUIER MEDIO O MÉTODO DE ESTE LIBRO | /
+SIN PREVIA AUTORIZACIÓN. s
+QUITO - ECUADOR ts ; Lo + ”
+——A
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 4 ====================
+
+Mn su se ue su
+
+EST |
+
+PE 7 | Ea
+RETA == ESA | NN
+
+EEE NAT 7 A |+ 1
+> “Em ra SN j f
+y é ue E a NN
+Mus - A NA E
+E. h |
+as WY E X= — <u ¿"e e !
+” N
+=> 1 J 4 2 > x=
+[E 41 AE xy + |
+—— =— a 8 2/7 NN E 4 |
+—_ “ar - É
+Cuadernode Robótica hc Az y
+. ... incluye . . E :
+inteligencia artificial (0:28) |
+
+Presentación
+J Bienvenidos al fascinante mundo de la robótica. Este libro está diseñado
+| i — para estudiantes de Educación General Básica, proporcionando
+herramientas para explorar y aprender sobre robótica e introducción a la
+| > 16 inteligencia artificial de manera interactiva y práctica.
+Í— scanned with
+| 29 CamsScanner”
+
+
+==================== PÁGINA 5 ====================
+
+r —— < — —
+Objetivos
+1 Familiarizar a alumnos, profesores y padres de familia $ Estimular la participación activa de los alumnos como
+con el mundo de la robótica y la programación. creadores de ideas para desarrollar los proyectos
+: - ropuestos.
+4% Introducir a los estudiantes en los lenguajes de Be -
+programación de manera espontánea y lúdica. %  Abordar cortenidos curriculares desde una perspectiva
+4 Potenciar el aprendizaje por descubrimiento, ensayo- E TONCES dentro
+error y el método científico como herramientas para :
+resolver problemas. 4% Desarrollar habilidades blandas (soft skills) a través de
+4% Fomentar la creatividad y el trabajo en equipo en el Sa enteprevecos deu
+aula.
+Metodología de Aprendizaje
+El libro utiliza una metodología práctica y motivadora, con un enfoque en el aprendizaje activo.
+A través de la construcción y programación de robots, los estudiantes aplicarán conocimientos y
+desarrollarán habilidades de manera divertida y dinámica.
+Esperamos que disfrutes de esta aventura en la robótica y que cada actividad te inspire a seguir
+explorando y aprendiendo.
+Í— scanned with
+¡E Camscanner !
+
+
+==================== PÁGINA 6 ====================
+
+E Ar EN MEE a NN ——]TTTT———]]_—]]Ñ]] E Y E AA AN PACA ANT UTE EN q E ALAS EA E ETE
+| Contenido del Libro: :
+Bienvenidos al fascinante mundo de la robótica. Este libro está diseñado para estudiantes de educación primaria,
+proporcionando herramientas para explorar y aprender sobre robótica de manera interactiva y práctica.
+| MODULO 1: MODULO 2:
+! Programación co bi |
+| g n robots EdCrane
+| * Programa con EdScratch y conduce a Edison por un NE
+lobeu : S e Descripción
+| laberinto evitando obstáculos
+Y * Ensamblaje
+| Programación con robots ll
+| e Programación
+* Programa con EdScratch y mueve a Edison por un
+cuadrado y un triángulo SE RN
+| * — Descripción 0
+5 A:
+R C P e Ensamblaje -
+ontenida E E un
+D D e Programación
+- E—_— a -
+| MODULO 1. Programación con robots ................«.=.........D y ho T ho
+| Programación con robots II .................-........16 ODE : 4 -
+MODULO 2. EdCrane ......eneroeneenenenennnnsanenennen 31 ME LAN
+: Scratch + Inteligencia artificial - .
+EdRnmtenaa ea: DO N ¿
+y - 5
+MODULO 3. Mis Primeros Pasos en Scratch.................... 54 q N A
+T_ ANEXO: NE bs Y
+Scratch + Inteligencia artificial .................... 65 / N N
+* Electricidad Básica, conceptos y y. b
+ANEXO: — Electricidad básica ................—.e.eemeeeceneenee. 78 :
+| - elementos de la electricidad a
+| — -
+1 scanned with —
+: E Camscanner'
+
+
+==================== PÁGINA 7 ====================
+
+| ¡Tara 200 eos ; E : De
+He US e :
+y Prueba de entrada
+a R
+N Nombre: 2 CN TE ET NO eN Ape COLE
+Antes de comenzar con nuestras lecciones sobre robótica, queremos saber cuánto conoces sobre el tema. A continuación, encontrarás
+un conjunto de preguntas de opción múltiple. No te preocupes si no conoces todas las respuestas; esta evaluación es solo para que
+podamos entender mejor tu conocimiento previo. Lee cada pregunta con atención y selecciona la opción que creas que es correcta.
+¿Qué es EdScratch? g ¿Cuál es una característica de la programación de EdPrinter? -
+a) Un tipo de robot a) Permite mover a Edison en un laberinto
+b) Un lenguaje de programación basado en bloques para el robot Edison b) Dib ja utilizando un lápiz
+C) Un sensor de movimiento c) Genera melodías musicales ea
+d) Una aplicación de edición de videos d) Conduce a Edison al ritmo de la música Es
+¿Cuál es el objetivo al programar al robot Edison en un laberinto? 5] ¿Qué es Scratch?
+a) Hacerlo girar en círculos a) Un programa para escribir textos y hacer documentos Lo
+b) Conducirlo de inicio a fin b) Un lenguaje de programación visual creado por el MIT Media Lab en 2007 |
+c) Detenerlo en un punto específico c) Una red social para compartir fotos y videos ES
+d) Moverlo al ritmo de la música d) Un sistema operativo para computadoras a
+ag ¿Cuál es una característica de la programación de EdCrane? ag ¿Qué tipo de Machine Learning reconoce sonidos, palabras y música? +
+a) Permite mover a Edison en un laberinto a) Clasificación de imágenes
+b) Controla los movimientos de un brazo robótico b) Clasificación de audio
+€) Genera melodías musicales €) Clasificación de poses
+d) Conduce a Edison al ritmo de la música d) Clasificación de textos escritos
+Exc To,
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 8 ====================
+
+! E A
+h 6 e Mipurioro ea >. A o)
+Pol VE N MO
+.. — y CA 7
+t —— Ez
+- N —— a 5 A -— > >. | NS )
+7 4% “a CAN
+1 NW Ko:
+E DEN: e AN he, "dí
+> Programación con robots
+> Programación con robots Il
+qe
+
+
+==================== PÁGINA 9 ====================
+
+a —_iee——Ú— z hÑ—]]] ] —.[;];;——o] TSURU -ITI TS —
+— Hill EI SA Pi Le A
+H | | ema
+1] |
+|
+J o ( )
+F a
+1 O
+En esta sección aprenderá:
+o y , -
+xá ramación con robots
+E o Prog 44 Programa con EdScratch
+es , y conduce a Edison por un
+7 esa > E o laberinto evitando obstáculos
+2; Ml :
+- a“ E TES
+Y —- A En esta unidad aprenderemos a programar
+Nun: == ; AE E : A el robot Edison utilizando EdScratch, una pla-
+Te s * Er a -
+> - d - | AE taforma de programación visual basada en
+* a L se => Ex bloques similar a Scratch. Exploraremos cómo
+E —— y e Ta utilizar esta herramienta para guiar a Edison
+= Kn NS 1 — Ml a través de un laberinto evitando obstáculos,
+o 2 (ERE A E R
+—————] *— F na FT: diseñando movimientos precisos y tomando”...
+5 n | Á DAA Ñ decisiones en cada giro. Estas actividades nos
+] Mu permitirán comprender la lógica detrás de los)
+y D - A -. e algoritmos, mejorar nuestras habilidades en
+- 4 _ Mis = o programación y desarrollar un enfoque 0
+Ne 67 — ara xa |
+exa ..— tivo para resolver problemas con robótica. |
+=, o >
+1 scanned with —
+| EE CamsScanner:
+
+
+==================== PÁGINA 10 ====================
+
+Ne
+TT T + - 4 |
+! * | |
+y y a
+a | 3 208 a | n |
+= 27 YÑ 1 ACE |
+N En 1 FE | been 5 » |
+Le- h 205 893 Y N sáa8 D al |
+: y 225 MOMO 1.8 39% En o |
+-. La A yr EE 2 :
+E KE N ECU Za "E E q |
+o E” N er ZA | > z |
+3 a — € Wa y MU <UÚr" o | o |
+de e A Le LL E 7 3
+A A 2... WE u : |
+ES AY: E
+LE £ az<5 MI uu A E
+— 10. EEC » Ea |
+a : EA hd | yA .
+1 h y 238 h y EL: y
+N- t | 1" 4 785 PEZ:
+1: N Era .. AA n - BOSE EL |
+De , 1 uE |
+TA TE ] 1 23% e
+E AN = | NX
+ÉS 85 W A Y AA == A |
+e :. 428 NB >
+, ) 30 Mes e f | AN y N |
+1 a LEE) 1 e = |
+14 880 y z Wu e |
+E a :: a 35 UPA :: |
+E CA <A: 2i |
+! [ | . e MON UEFEEE 38 |
+y 1 YI $85 % |
+Li y y | Ty Ma 2 A S 4 |
+LE  WeL |
+| A * ”- LA N A > |
+O Dr (1 ME E da |
+1a)
+le =
+a Le UN | L — Po
+q 6 —N | En
+e A > A E T
+e 5 Te na | EEE
+a NEL | (a | FEL
+| TEEN 6 u | ta:
+e A 5 A s A — 1 NES
++ | - 6 He. = HE
+e b 1 ó
+e 4 - UTE
+5 ] . | Él | ñ ñ
+" a a NA ¿
+-— Ul h | = A Kn o. hoi Á
+E (o) | E. | 573 17, 2 > Td
+E, e | * PAN * | y NIE
+(89 Y — (0) |'. Nu a NETO
+" Z e Pu PL
+a ú es 7 => E
+, ve E e 5 a E
+N: ) E e so ( (A
+E Be ) ER bel
+E Bs y Al |
+| Es Er 6 me |
+a =a N N 5 |
+7 : | : ). ¿ES |
+| TT a El |
+E | N E > |
+- |
+|
+|
+! |
+b CA A > Elan
+£ scamned with
+y ES CamScanner”
+
+
+==================== PÁGINA 11 ====================
+
+| e
+[NS 4 Una luz LED infrarroja es un tipo de dispositivo que emite luz en el
+o ( Conceptualización espectro infrarrojo, el cual no es visible para el ojo humano. Estas
+US luces funcionan de manera similar a los LEDs normales (que emi-
+EN ten luz visible), pero están diseñadas para emitir longitudes de
+? f r onda en el rango infrarrojo, generalmente entre 700 nm y 1 mm.
+— RE Botón grabar: Características principales:
+| 1 1. Espectro de luz:
+. e Laluz infrarroja está fuera del espectro visible, por lo
+que no podemos verla, pero puede ser detectada por
+! dispositivos específicos como cámaras, sensores o de-
+b tectores infrarrojos.
+2. Aplicaciones comunes:
+5 * Sensores de proximidad: Los LEDs infrarrojos emiten
+luz que rebota en los objetos cercanos y regresa a un :
+A serfsor, permitiendo detectar la presencia de obstácu-
+— a LED rojo izquierdo los.
+- da - > > — 7 .
+AD a > [CLED infrarrojo izquierdo *  Telecomandos: Los controles remotos de televisores
+EI : LAT y otros dispositivos utilizan luz LED infrarroja para en-
+e 17 viar señales a través de pulsos.
+DD e : 7
+— La A 7 * Cámaras de visión nocturna: Estas cámaras usan
+- == sensor/de luz izquierda LEDs infrarrojos para iluminar el área en condicione:
+—£“dkx de poca luz.
+Sensor de luz derecho 3. Funcionamiento:
+Eu = É |
+EDEN *  Lacorriente eléctrica pasa a trávés del diodo Fr
+infrarroja] | |
+LED infrarrojo derecho frarrojo, lo que genera luz
+; "
+GEES) |
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 12 ====================
+
+—y—— o,
+| u |
+1 de (per == <D
+A ó
+o:
+L
+E EZ EE
+[e] 22.
+— E 3239
+£ l ; 038%
+1 ra | 1 * BIIL
+Hi > 2IIS
++ NN 7» 23:
+N <a39
+Nu Dd nas
+1 Nal ) E MESE
+N ! Í U EE
+1 N =382
+- NU > "1 l ZE
+Y H y 7222a28
+". IxasS
+: E 23.
+| N =0s
+o > UN BERE
+A y UN >=22
+ri l " e «
+_ sH N UN
+er EA S A Na —_—
+* N 3 * a<TT
+2 e ” SEIS:
+O [ Ea:
+: N — EttEL
+E TIIZIS
+aca Q< 28
+A —_EFERESS Saa
+220 esazo
+/ ' £x=e3 a<do
+E£a288 O
+E a2" == zan
+1 ASC OSDND
+Ñ 21/1167 1. RESET SIS
+. LA ! y abaza E
+u AN *u DERIO IRA
+e aReIa Ce
+f TE Sa
+>| aR<5O ESE !
+== da 1 xn: Saja
+A | idogZ a8e
+h. Y astas] 2=8
+“Y == ON --
+- “-_ 2asa zas
+QRO
+8383
+23I=
+Saa
+safg=
+Ra
+EC
+II
+ASA
+SOS JU
+O - |
+| Scamed with —
+| E CamScanner
+
+
+==================== PÁGINA 13 ====================
+
+| 1 Fi
+E: <S
+- j
+Aplicación : E
+E
+E y —< : Start
+ral | a Ingresa a https://educatemas.com/Scb01 y explora toda la interfaz de
+[a E) EdScratch y sus principales elementos. Escribe sobre tu experiencia. rm [s)
+| Respuesta abierto beep Eo
+¿ ec
+f z Wait (os) sec [oc
+| 5 E
+"*
+o E Crea un nuevo programa en EdScratch Sm
+Establece un evento de inicio para el
+robot, como tres pitidos sonoros, para tum obstacie detection beam on v
+indicar el comienzo de la actividad y
+que luego arranque el movimiento de repeat [3) A
+Edison.
+beep *
+Ahora activa el sensor de obstáculos TY
+que es requisito indispensable para wait (os) sec E
+poder trabajar con este sensor. Lo -
+puedes ubicar después del bloque y E
+Inicio (Start) | ¿
+2
+Ea
+mao >=
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 14 ====================
+
+ls
+EJ Ahora programa para que Edison avance hasta que se EJ Ahora modifica el programa para que Edison no se fre- — T
+encuentre con un obstáculo. Además, que encienda los ne cuando encuentre un obstáculo y continúe movién-
+LEDs cuando se choque y emita un pitido dose, pero dirigiéndose a otra dirección.
+letra dates Edie Ten >
+tum obstacie detection beam on <= 2
+3
+e. os ye
+JS forever
+repeatuntil — obstacie detected anywhere y " obstacio detected anywhero = thor 5
+ica boi meten
+set both motors to drive fowards » atspeed 5 v 6
+tumilen LED on
+J
+tum rot LED on
+stop both motors y
+been
+tumieft LED on =
+Ta O NES iEs
+tumright LED on» Eo Vo
+CEE, re Os
+1
+beep
+- Sel boy motors lo. drive forwarda » al speed 8 +
+er
+-= f tum ront LED. on y
+| Jj
+| |
+| — L
+t o o TE: |
+A | |
+a
+— |
+daa aa. E
+!— scamed with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 15 ====================
+
+| 1 Wu —— vio
+e e E
+| Les Y
+mo ve 78 Conecta el robot Edison a tu computador usando el cable Edcomm
+E
+| J | | 5.1. Conecta el robot Edison a tu computador usando el cable Edcomm.
+le E
++ E 5.2. Verifica que el volumen de tu computador esté
+Ea completamente subido al máximo. Ti
+If AT
++ 5.3. Presiona el botón grabar (redondo) del robot Edison una SOUND
+DY vez. 6 - Ay
+f É : Ae, ANN
+| 5.4. Ve a la barra de menús en EdScratch y haz clic en el En > NS
+] botón Program Edison 7 e. - >
+| 5.5. Se abrirá una ventana emergente. Una vez que el * E 7 E
+i programa esté listo, un programa llamado Edison 7
+Le) aparecerá en la parte inferior de la ventana emergente. N
+5.6. Haz clic en el botón Program Edison de la ventana
+emergente.
+[a * ñ
+Betore cicking the Program Edison' button below: . *
+1. Connect Edison to your computer's heacohone jack using the EsComnm cable. Y y e
+2. Check trat your computer's volums is et maximum. 6
+3 Press he mund (record) burton on Edison one time. ||]
+"e 3 ——!
+| E.
+: | 7 |
+| E CN EE
+-———] lo rá -=
+Dr, Na A A
+Í— scanned with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 16 ====================
+
+> ; mi | Fr —]""WO
+a )
+EA =>
+1 LU a
+a a EN: di.» "00
+A NE Ai 1 ma
+0 TRE MOR GR A -
+ne : : : : : - E E E =£. 200 Ec
+ó BO Mu 5
+ER E 10 16 1 1 ME To
+Ba A 06 O
+EN AU 0-2 €
+Do E ATM A CE
+E e: dicos 1 E <O
+PA a ie: AE: 16 Da
+FA A A 0 10 NN Ei. 106 co
+E Ai NE: As 25
+A 050 SEA <o
+RO A E € a
+RNE E: TA EEN 1 E 27
+E EI MPA $STA o
+E OS E ESO - 24 E
+: - : = - 3 Es : z E - : $ : +
+PA A CA AMEN 1 NE [C-
+e 0 AE 50 mf
+MEE UC A SE Ca A PA E
+vea A EE
+S : E : S a R e > s e = : E o
+> 1 eN A A: o»
+E 0 SAL PA 25
+: : : E E S Y S : 7 É : - o
+—— 5 6 o E E n
+E de DIE y a
+E b : - x S : E : - : - : : on
+E IL LN =
+A A A es
+0 ATA A a FA
+Ba e e E ES E]
+ENE. e Mo 108 20
+EEE ECO OM EE o
+NED AA. AN A E 105 Ds
+-. YESO RAE E 7 AAA 5e
+1 DA e ETE SAA a
+ra do Y 1 EM A iS e vo
+a 3 : E : E E - a E S - + q a
+EC E 1 E CAE 0
+Pes AMS e Ti EE CA 03 23
+Z PA CO E E
+E E ds
+AA E , 107 Ar A AM uu Fa
+(AUD) E : E - - : 5 : - N
+Wa E a A -— MEE Le
+! 0 a 7 o L
+1 1 210 Ma as US <2 ><. ÓN o
+D- iz AE e ag t
+Ñ E: : ñ E e A + 5 S Q
+Ha Aa 3 y
+- | Eds! Ea SN pS
+Z H HD A — : E eta o |
+ESE eee SE e!
+r” »— - H : : Es E : : > "
+|—— AE q
+— : HUA A E -
+e : 51 E MS E —
+—— =
+a
+o 1
+E |
+Í— Scamned with
+| E CamScanner”
+
+
+==================== PÁGINA 17 ====================
+
+Es SEUS e
+BO) Práctica m1
+her 18 Carrera de evasión usando un control Procedimiento:
+<= 1. Programar a Edison para ser controlado por un
+ri —— remoto control remoto, usando los códigos de barras
+E Objetivo: respectivos.
+ra Programar al robot Edison para moverse utilizando el 2. A tela e EdScratch que e el
+control remoto, pero con la capacidad de detenerse au- E ue e y e eto: En
+tomáticamente al detectar obstáculos usando el sensor UA NINO TESEO etectaran
+1» IR. objeto a distancia determinada.
+Bt Enales necesarios: 3. Diseñen el circuito de la pista usando una cinta
+| adhesiva para marcar las curvas y las rectas. Co-
+-? 1. Un robot Edison por equipo de trabajo. loquen obstáculos (bloques, cajas, etc.) en pun-
+2. Un control remoto compatible con Edison (como to estratégicos de la pista. Asignen un punto de
+el de una TV estándar). incioNUnemeta:
+3. Computadora o tableta con el software de pro- 4. Realicen competencias cronometrando los tiem-
+gramación de Edison (EdScratch). pos, bajo las siguientes reglas:
+4. Objetos para crear obstáculos (bloques, botellas, ee elroboNcnacajea = CRC ENS
+cajas, etc) se detendrá y se penalizará al equipo con 5
+Moe segundos extra.
+5. int hesi r una pisti ircuito. É
+NU TOTO camunaipistalo arcuito *  Siel robot no detecta correctamente un obs-
+6. Cronómetro o temporizador para medir tiempos. táculo, el equipo debe mejorar su programa-
+ción antes de intentarlo nuevamente. -
+- Pe
+Pu
+: ———e— lo
+[ATEN ES he. 2
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 18 ====================
+
+yb —.e;Úr( a
+Reflexión grupal: 1
+e Dibuja o pega la impresión del programa creadó' en
+EdScratch |
+e ¿Qué tan eficiente fue el programa en detener al robot y
+ante los obstáculos? (ED)
+Hespuestarbienas es mies ES noes —_
+* ¿Qué desafíos encontraron al manejar el robot con el
+control remoto?
+AESPUÉESIAADIENS arias. DO
+»
+| * ¿Qué podrían mejorar en su diseño y estrategia?
+pet O
+*
+E
+LL. " IEA
+Er
+ERRE
+¡E Emo a
+E gina
+m— ==)
+Ho
+| +
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 19 ====================
+
+=— —
+€ - T
+| a
++ | |
+| > |
+| | AL. - q
+_2 A
+Y + oz : - 6 4
+D, Programación con robots ll e Programa con Edscrateh y
+y —] mueve a Edison por un cua
+f K O AAA AA o drado y un triángulo.
+a aa O LO
+> N * >» KA A e En esta unidad continuaremos pro-
+> A gramando el robot Edison utilizando
+y 4 f ”” b EdScratch. En este proyecto haremos
+A Lá £ / que Edison dibuje formas geométri-
+4 Y, 'E A cas prediseñadas mediante la simple
+Y y ma E” «y alteración de variables. Este enfoque
+E j AN un interdisciplinario no solo fomentará
+b —— / — N una comprensión más profunda de la
+E — "ó “ geometría y las matemáticas, sino que
+4 7 Ne ”-— también afinará tus habilidades de pro-
+A E A gramación al desafiarte a modificar el
+1) L Ea ea ri código para lograr diferentes figuras
+ELLE DS con cambios mínimos S > bo
+p ' .—. í
+tt le ES RES
+o — : mm. L bd d
+7 MEE Ara
+1 scanned with —
+| EE CamScanner
+
+
+==================== PÁGINA 20 ====================
+
+1 r " o n—. — Uu " ” uti da
+| | E 1 7
+1 ——$ 4 ———
+1 TÍ | 7
+a
+NUDE m
+| | 9 *x
+| 4 |
+| o
+-“ á =—
+1 ba E a ERES O
+Do s S FEA =-
+— A :: VE:
+| á NSUD= > 25085 > o)
+| D EN [320 7 e mb = E
+NE -— > HE Ca CAER ES
+$ Ent 7 NS « R 3208 Ea —
+| E a N E N <5z
+lao “ “a EL — AÑ
+UN N ra > =.
+k 74 el RCD Ñ PE D
+| a /=8 W 53% 5 a
+1 Sa £8<5 2 IDE
+- ? (a) |'. ) MI <laa ÉSA |:
+E 255 MOM <->
+re > EEE
+) Y 1 38 — 23 - ¡77 EL
+h — NE 25 AU US
+4 1. UY : _—
+á . N A A
+: s >
+| a re EEE
+E e L E
+| "EN Ue MELES
+| > METE 1“ 90>a
+CELE “a BREA
+D =3:8 = 9783
+7 E En E SS PEE
+Y A =? da FER
+“u 558 Y FEE
+y a >—Q =:: 4
+- IDO [ y ta
+== PEC ><
+E | 25%; EE Po 8 N
+| EEE Es Mol:
+8: . 2
+PE 29:65 553 MA NY Eos
+| VELL FA A, E
+| A E 25 Aa. 2agS
+le 5 >" A" OB
+/ AO ED — — UE
+Y y —_ H ERA Ss:
+E
+mE í i
+Es | e
+y “
+DL —— 1 A
+4 =
+- QT >.
+A A Saggm
+Ls ¡even | - QUA
+2D " 7 0 a EE IS ú
+256 Pen NA >> |
+=25 E ñ TE L
+225 MN q > aa (|
+325 E A/.7 ME sas ? |
+232 MITOS ) < | A
+2a< | "E. boe | a
+20 | y E ! J fe fi
+7o3 1. 22n El Níaj(:) — NH
+<¿ miau 23 oO | |
+E Do | 4" NN
+(4 » E LA |
+"a U—! : , U
+-
+Qro
+pas,
+|
+|
+1 |
+“mo NE
+a a rs Wu E pupIUn e
+— o“
+) | f
+| O-——e— 1 !
+1 Scannedwith |
+| E CamScanner
+
+
+==================== PÁGINA 21 ====================
+
+| | A ==
+| 2 e
+| e ú
+—
+. ..
+| Conceptualización
+EA]
+| Este proyecto te permitirá descubrir cómo aplicar la teoría de codificación, esta experiencia es una aventura que
+40 E Ne | E Re
+(1 | matemática de forma creativa en el diseño de figuras y en desarrollará tus habilidades en resolución de problemas y
+." | la programación práctica, sumergiéndote en el fascinante pensamiento lógico, preparándote para enfrentar con éxito
+' | mundo de la robótica educativa. Más que un simple ejercicio futuros retos en tecnología y diseño.
+perth
+Lo y)
+Este proyecto te permitirá descubrir cómo aplicar la teoría matemática de forma creativa i
+e JJ en el diseño de figuras y en la programación práctica, sumergiéndote en el fascinante —
+mundo de la robótica educativa. Más que un simple ejercicio de codificación, esta
+experiencia es una aventura que desarrollará tus habilidades en resolución de problemas
+o y pensamiento lógico, preparándote para enfrentar con éxito futuros retos en tecnología
+La y diseño. —
+o Después de haber ensamblado robots utilizando Edison y haber adquirido una mayor (ora [+)
+- habilidad en programación con Scratch, en esta unidad avanzaremos a utilizar EdScratch. YA [s) ESPE
+S Esta plataforma, basada en Scratch, nos permitirá programar los robots Edison de
+manera más sofisticada. os ES
+- En este proyecto desarrollaremos un programa sofisticado usando EdScratch, destinado a — spin y - left for (so) degrees » atspeed 3-
+N permitir que Edison dibuje formas geométricas prediseñadas mediante la simple alteración
+4 de variables. Este enfoque interdisciplinario no solo fomentará una comprensión más wet CI) se
+profunda de la geometría y las matemáticas, sino que también afinará tus habilidades :
+Jj de programación al desafiarte a modificar el código para lograr diferentes figuras con - |
+7 cambios mínimos. A través de este proyecto, tendrás la oportunidad de experimentar
+) cómo la teoría matemática se puede aplicar creativamente en el diseño de formas y
+en la programación práctica, todo mientras se adentran en el estimulante campo de N
+la robótica educativa. Este proyecto no es solo un ejercicio de codificación, sino una
+A aventura en la resolución de problemas y el pensamiento lógico, preparándote para
+futuros desafíos en tecnología y diseño. y MD
+a. |
+á i YU ( Y= -—. Qe
+1. Para programar un robot Edison para que se mueva en lizar bloques de código que controlen el movimiento en
+forma de cuadrado usando EdScratch, necesitaríamos uti- línea recta y gire en ángulos Era
+| =
+|
+r (
+e u | E -
+T 1 e EE
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 22 ====================
+
+do —
+2. Para programar un robot Edison para que se mueva 3. Para programar un robot Edison para que se mueva |
+en forma de triángulo equilátero usando EdScratch, en forma de rectángulo usando EdScratch, necesita- —
+tendríamos que programarlo para que se mueva hacia rás crear una secuencia que incluya dos pares de mo- | |
+adelante y luego gire 120 grados en la misma dirección vimientos hacia adelante de diferente longitud y giros o | |
+para cada uno de los tres lados del triángulo. Cada de 90 grados para cambiar de dirección entre cada | A
+segmento tendría la misma longitud y cada ángulo in- movimiento. | “-
+terno sería de 120 grados, que es el ángulo interno de U
+un triángulo equilátero. [2 E
+Start
+2
+Start 2)
+repaat (4) forwards for [s) cm atspeed 3v 4 A
+forwards for [s) cm» atspeed 3 Ds (03) Ts 5
+walt fo) o. spin + Jeft for [00] degrees y atspeed 3 i
+E CE O 6
+forwards lor EE) cm y atipesd 3
+watt CB) sec
+d wait CP) sec ,
+E e eno E) degeesatpeed 3 >
+vai CE) sec c
+y q
+- L
+A
+ETE
+EX
+EUA
+—_M— o —o
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 23 ====================
+
+! | | IU —+—
+li
+| E
+H 14. pora programar un robot Edison para que se mueva 5. Para programar un robot Edison para que se mueva en
+4 | en forma de hexágono usando EdScratch, se necesita forma de rombo con EdScratch, debemos considerar que
+| | establecer una secuencia de movimientos hacia ade- un rombo tiene lados de igual longitud y ángulos opuestos
+J | lante y giros de 60 grados (el ángulo interno de un iguales. Los giros necesarios para un rombo dependerán
+Pu hexágono regular). Este patrón se repetirá seis veces de los ángulos internos que desees; para un rombo con
+| para formar el hexágono. ángulos de 45 grados y 135 grados respectivamente.
+]
+—
+/
+|
+H Start tant
+1e y: bpoat
+et Y o
+| forwards for (5) cmv atspeed 3v
+|
+i
+ao) spin y right for (60) degrees y atspeed 5 war CE) se
+O (03) _ spin = -leftor CE) degrees y atspeed 37
+walt CE) sec
+e EE O
+wait (03) sec wail (E) sec a
+Jj spin > “leftfor CES) degrees - atspeed 3- N
+ñ É
+wat CE) sec ==
+E f
+) SE
+: | |
+—
+TED sa NN SY
+O—— ! *
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 24 ====================
+
+es mos EE —B— N
+| NE ] 1
+EX '
+6. Para que Edison dibuje diferentes formas geométri- forma dibujará el robot. Por ejemplo, si la variable es |
+cas se lo puede hacer utilizando una variable. Esta va- cero, podría dibujar un cuadrado; si la variable es uno, | !
+riable comenzará en cero y su valor determinará que podría dibujar un triángulo, y así sucesivamente. |
+Para cambiar cómo dibuja el robot, puedes usar los botones robot Edison para decir “¡cambio de forma!”), = |
+de inicio y grabación, o incluso otros métodos como un que está cambiando la figura que va a dibujar. e —
+control remoto o señales especiales. o a - E)
+Si las luces se apagan y escuchas varios BEEPs seguidos,
+Por ejemplo: el robot está dibujando una figura, y la cantidad de pitidos A
+- te indica qué tipo o tamaño es esa figura.
+Si las luces del frente del robot están encendidas, es que el q Li La =
+programa está empezando. Recuerda que hay muchas formas de hacer esta actividad,
+Si h ido BEEP itid el y lo que te mostramos es solo una opción. ¡Tú también 4
+- E — ER TA ET MES puedes probar y crear tus propias ideas o mejoras!
+5
+hi Remate code recsves
+ham LED n= 6
+mg LED
+repeat peso
+b sep
+5
+<<. “>
+o
+MT Os
+.. | Tu
+1 e
+¿o | | E,
+k 1
+: r har pa PA
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 25 ====================
+
+| ñ TEBA
+—_ Em
++—r0 Escribe cada uno de los programas anteriores en EdScratch y descárguelo a tu robot Edison. Ejecuta uno a uno
+j f | — cada programa y escribe las conclusiones de cada uno.
+- J * Cuadrado Respuesta abierta * Hexágono Respuesta abierta
+» * Triángulo Respuesta abierta * Rombo Respuesta abierta
+*  Rectángulo Respuesta abierta * Diferentes formas Respuesta abierta
+P
+| Ea
+Y eacar RE
+= y en WM ETC E
+—— si CA
+To ' , a
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 26 ====================
+
+|
+|
+E Encuentra otra posible solución para programar a Edison y dibuje libremente. Dibuja el programa que obtuviste PE
+en EdScratch. |
+A
+4
+5
+6
+-
+|
+l Fi
+El a e “ E PT,
+E | E | |
+TL e
+N —— 2D i
+O |
++ A —+o
+Í— scanned with
+Ecamscamner:
+
+
+==================== PÁGINA 27 ====================
+
+“us ZE |
+| | +
+I eno
+| [O) Práctica H1 si
+| a M
+Re
+Dibuja una estrella de cinco puntas Materiales necesarios:
+1] T .
+— 1. Enestapráctica, los estudiantes aprenderán a programar * Un robot o A conruedca mn |
+d el robot Edison usando EdScratch para dibujar una marcador de punta fina.
+y estrella de cinco puntas. Este ejercicio combina conceptos * Papel tamaño A4 o A5 asegurado en la base de
+- geométricos con habilidades de programación, desafiando trabajo. |
+alos estudiantes a ajustar ángulos y distancias para crear
+un diseño preciso. Una estrella de cinco puntas requiere * Acceso a una computadora con EdScratch
+, movimientos en línea recta alternados con giros agudos, |
+lo que la convierte en una forma compleja pero alcanzable |
+para principiantes en robótica. Contexto geométrico:
+Objetivos: Una estrella de cinco puntas se forma al trazar líneas rec-
+hina > —
+* Comprender ángulos y giros: Explorar el concep- me e E m—————
+; to de giros de 144”, necesarios para formar las al Mea R E MN
+puntas de la estrella,
+* Uso de bucles: Aprender a repetir patrones de Procedimiento:
+movimiento mediante bloques de "Repetir" en p
+EdScratch. 1. Coloca el robot Edison con el marcador asegura-
+a 6 A y Y do en su soporte y el papel fijado sobre una su-
+* — Precisión en la programación: Ajustar distancias perficie plana.
+y ángulos para lograr un diseño simétrico.
+A * Trabajo en equipo: Colaborar para diseñar, pro-
+ó a gramar y ajustar el código del robot,
+f |
+| ——
+| | —
+7 Te 1 SER |
+o NU 1 , ARES
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 28 ====================
+
+N 7
+19 |
+> ae | y ]
+OL y —
+AS, D |
+. Ea VAR 7 |
+2 a o
+E > 4 Y 7
+; — LI Y
+— Ea L
+e A
+NES. SAA
+NS EL SP
+» Ce
+<<
+|
+2. Abre EdScratch y utiliza bloques de "Mover ha- EdsScratch. Prueba el programa en el robot para
+L cia adelante" y "Girar a la derecha". Usa un bucle asegurarte de que los giros y movimientos son
+"Repetir" para automatizar las cinco líneas y gi- precisos.
+|. ros necesarios para la estrella. Configura los blo- E
+| ques como _ a 9 4. Coloca el robot en el centro del papel y presiona
+4 E el botón de Inicio. Observa cómo el robot traza
+| * Repetir (5 veces): las líneas para formar la estrella.
+fa * Mover hacia adelante (10 cm). 5. Si las líneas no se conectan correctamente o los
+| a E giros no son precisos, revisa el programa. Ajusta
+158 > ENE ERE las distancias o el ángulo de giro según sea nece-
+> Ma 3. Carga el programa: Conecta el robot Edison a sario.
+L la computadora y transfiere el programa desde
+| — E |
+E ;
+== ¡e " — | — -——o
+Í— scanned with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 29 ====================
+
+| | E e e O
+| e |
+ETA Reflexión grupal: * — Dibuja o pega la impresión del programa creado en
+/ o EdScratch
+e ¿Por qué es necesario girar 144* para formar una
+——.. Estrella de cinco puntas?
+[ " Respuesta abierta.............—mrmmnaie ies
+* ¿Qué sucede si cambias el ángulo de giro?
+LE
+Respuestnrabierta:.....—. emana ir
+* ¿Cómo podrías modificar el programa para dibujar
+una estrella con más o menos puntas?
+RESPUESTA nacos em
+|
+. | ————
+Qe pra
+a A. Y
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 30 ====================
+
+—— Lan!
+uU
+PROYECTO STEAM: “EDISON EXPLORA Y DIBUJA EL MUNDO” | —
+[o] | |
+Tema central |
+Los estudiantes integran programación, sensores y geometría para guiar al robot Edison en dos desafíos: evitar (
+obstáculos en un laberinto y dibujar figuras geométricas, aplicando lógica algorítmica y pensamiento matemático. | a
+Objetivo general 1
+Programar el robot Edison con EdScratch para que tome decisiones al detectar obstáculos y represente figuras [ 2
+geométricas mediante movimientos precisos.
+Objetivos específicos 3
+* Programar a Edison para desplazarse y evitar obstáculos usando el sensor infrarrojo.
+* Comprender cómo los sensores permiten al robot tomar decisiones. “
+* Aplicar conceptos de ángulos, giros y distancias para dibujar figuras geométricas. E» Li !
+* Modificar variables para generar distintas formas con un mismo programa.
+* Fomentar el trab: laborativo y | lución d bl .
+mentar el ajo col 0 y la resolución de problemas. a AE 5 l
+Materiales — A
+* Robot Edison * Computador con EdScratch == f [)
+* Cable Edcomm * Cinta adhesiva negra 1 Cer | e
+* Cartulina o papel grande * Marcador para el robot ' A
+* Objetos para obstáculos %
+: Y Desarrollo del proyecto s y
+| 1. Programar a Edison para avanzar y evitar obstáculos usando el sensor IR. Ue » ,
+Mi 2. Probar y ajustar el programa en un laberinto físico. M-..
+2 3. Crear un segundo programa para que Edison dibuje una figura geométrica usando giros y repeticiones. q
+f | 4. Modificar variables para cambiar la figura sín rehacer todo el código. L — !
+“1 Producto final ez |
+El e —..* Unrecorridó exitoso del laberinto sin choques.
+| | * Una figura geométrica dibujada correctamente por el robot.
+EN E Vu del programa y de las decisiones del robot. | E
+El Lo! *—— 27 xi L N
+Ed. —— - 1 ——].————— — — y 2 5
+— FE.
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 31 ====================
+
+Demas
+E Evaluación Módulo 1
+— Nombre: Curso: Fecha:
+- Indicaciones: Lee atentamente cada pregunta y marca la respuesta correcta.
+* E
+1. ¿Qué función cumple el sensor infrarrojo del robot Edison? |
+a“ A) Emitir sonidos
+B) Detectar obstáculos y tomar decisiones e |
+C) Dibujar figuras geométricas |
+E D) Aumentar la velocidad del robot |
+2. Cuando Edison detecta un obstáculo y gira automáticamente, se dice que el robot: —
+A A) Se mueve al azar E
+- B) Ejecuta un programa sin lógica ES
+C) Toma decisiones según sensores E
+D) Está descargado ==
+3. ¿Qué bloque de programación permite repetir una acción varlas veces para dibujar una figura? : 3
+A) Esperar a
+B) Repetir |
+C) Detener És |
+D) Sonido "
+4. Para que Edison dibuje un cuadrado correctamente, es necesarlo programar giros de: : —
+A) 45* |
+B) 60% 2 |
+€) 90% ( —-
+D) 180* E |
+| reza
+al | NE ! La
+os —— 1 * >
+1 Scamed with —
+| EE CamsScanner:
+
+
+==================== PÁGINA 32 ====================
+
+haa ¡ga 7 E |
+
+—e———Ú————]] | |
+5. ¿Qué área STEAM se trabaja principalmente al calcular giros y distancias del robot? y EE | Es
+A) Ciencia | |
+B) Arte o) | |
+C) Matemática l |
+D) Lengua Le ||
+
+MM S
+6. SI Edison choca con un obstáculo, ¿qué acción es la más adecuada?  —
+A) Apagar el robot ME | ==
+B) Cambiar el sensor Z ” “
+C) Ajustar el programa y probar nuevamente he y f E)
+D) Reiniciar el computador Fe ( ul
+A — —
+7. ¿Qué permite modificar variables en un programa del robot? y Y
+A) Cambiar el color del robot 7 y
+B) Dibujar distintas figuras con el mismo código RT y
+C) Descargar energía U A g -
+D) Activar sonidos | 7 |
+8. El laberinto construido en el proyecto representa principalmente el área de: e 1 N e
+A) Ciencia 15
+B) Ingeniería "O
+C) Arte e
+D) Matemática L Y 0
+9. ¿Cuál es el producto final del proyecto STEAM? 1
+A) Un dibujo en el cuaderno A
+B) Un robot encendido > |
+C) Un recorrido sin choques y una figura geométrica dibujada E
+| D) Un cuestionario resuelto
+10. ¿Qué habilidad se fortalece al trabajar en equipo durante el proyecto?
+A) Memorización
+.. B) Competencia individual
+C) Colaboración y resolución de problemas
+—D) Velocidad al programar :
+1 scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 33 ====================
+
+A Y
+ra Ur.
+>” | e, e
+7 4/70
+“al! E e. : :
+Mimá YN 85 -
+A NN mODULO
+A y PU a 1
+_- MEE » —
+EA e ..00..) 7 ==
+EdCrane
+EdPrint
+emir
+
+
+==================== PÁGINA 34 ====================
+
+aa aaa ooo danesa ee san Daiana mea —— - er sd Ue ——]]];—;e"E——]— EN -—
+—— e
+RO
+| |
+ó Í |
+(eE sección aprenderas: |
+( ) e
+4 Descripción | 1 |
+17 > : 1
+dt S 4 Ensamblaje e
+A E
+= EdCrane 4 Programación |
+(O o
+- ED
+a yt e is En esta unidad, aprenderemos a tra- ms
+o “a f LD O bajar con EdCRane, un proyecto espe- |
+o 27 > cial que convierte al robot Edison en ÉS
+| una grúa controlada. Comenzaremos a
+| E explorando sus características, lue- Z |
+N x Ñ go pasaremos al ensamblaje paso a al
+d í paso para construir el EdCRane con a
+| Y las piezas adicionales necesarias. Fi- má
+P y nalmente, programaremos EdCRane
+[ “e 1 para realizar tareas específicas, como
+N yt 7 —_ levantar, transportar y colocar objetos
+| 7 a á pa N pequeños. Este proyecto nos permitirá
+| » Ú 7 o comprender mejor cómo funcionan los
+> ñ mecanismos y la programación de ro-
+Br “Ll Te LAI bots, desarrollando nuestras habilida-
+El e E EN £ — o des en robótica y diseño.
+EL O EEE
+| E Pc: ¡SONES a AAA?
+| E e
+1 | a | ) | [
+=—— — ==
+r —— o PO
+1 Scanned with
+| EE CamsScanner:
+
+
+==================== PÁGINA 35 ====================
+
+——— Cd —
+MTL TL T———————————————————— XL] FX MwVwwlT TLT———T—————]—]———]—;———— L M .—————T—].É—]] _]——] LL
+! +
+= l - 1 ¿Sabías que puedes convertir a Edison en una grúa controlada por control remoto?
+Exp oracion E Di , ,
+| D ¿Qué partes crees que necesitarías para transformar a Edison en un EdCrane? ¿Qué
+y funciones nuevas podrías darle al robot?
+| E Lee la historieta. Primero, ensombioremos
+-_ A". ¡Genial! el brazo mecánico y lo fijoremos a tu
+á ¿Cómo lo vamos a N estructura. Esto te permitirá mover y
+E Hoy es hacer? sa e : levontor cosos. >
+$ Hoy <a —— — E mu —— —
+vamos a “E S Pr, — p po
+u convertirte en Y “un E -- La 6 -
+; Cc p a — — Rs
+EdCRane, una $ A e E ra pe > — =
+grúa controlada ME = e Bs NS 2
+que puede 4 == RE - Z A - 2 E. E <a
+q - A 1 A áw N—— ¡o .
+poi 2 [DE 2 . A -_ Áiza A empiezo a a
+a Ea: a == sentirme más Mau
+EN — une! A
+A o E -
+<a — aa — — Y
+=— E. ¡ZO ¡No veo la hora de Y “>.
+Te esto > 2. 41 intentario! E.
+/ remando Y == —_ “a 7 y.
+/ programando = y — + e
+| pora que levantes, y N' a 3 E: q Y a
+| tronsportesy . > E * ) a = -
+coloques objetos ha 7 Cn. — ——d — . ?
+con precisión. A Ml ! Pu y
+a Ns ¡Lo hiciste, Ñ o -
+EdCRene: ¡Eres una di pi Le o
+úa perfecta! ”
+grúa perfecta! objetos E
+> 1 1 i fócimente. ;
+> -o - : E
+Í— scanned with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 36 ====================
+
+a
+= .- ATTE:
+Conceptualización a | |
+EdCrane es una grúa controlada por control remoto UN 1 N
+que se puede programar usando los códigos de barras Pes ==
+en esta guía más un programa descargable y contro- 5
+lada con un control remoto estándar de TV o DVD. Po- y 2
+drás girar la grúa en el sentido de las agujas del reloj
+o en sentido contrario sobre su base. También podrás [-
+levantar y bajar el "gancho" magnético.
+| , “a E.
+= = E
+ENSAMBLAJE Y PROGRAMACIÓN : En E
+| r» “6
+Para armar la grúa EdCrane, necesitarás: É y
+—
+* 2 robots Edison | sa Te 594 29 3346 E |
+E * 1 kit de construcción EdCreate para ro- | — Para qt a grúa EdCrane fun- | Í |
+) bots Edison | -— cione, tendrás que usar un con- | |
+E * 1 control remoto de televisión o DVD e ol remoto con 26 on ÓcA | -
+y diferel usa ndo los códigos |
+* Los códigos de barras para programar de barras que vienen en esta |
+| “ guia. e a J
++ o
+E |
+LA | -
+es | ,
+A
+- > E — A
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 37 ====================
+
++
+1 Imagina que tienes una grúa de juguete, pero no una IR Código 2: Gire el carrete en sentido antihorario
+cualquiera, ¡una que puedes mover con un control re-
+moto! Y en la punta de esta grúa hay un súper gancho
+.—...Que puede atraer cosas de metal, como si tuviera su-
+perpoderes magnéticos. Con él, puedes levantar cosas (ZE
+metálicas pequeñitas, como clips o tornillitos.
+*  Programando Edison con el código de barras
+La grúa usa un robot Edison que necesita ser progra- IR Código 3: Gire EdCrane en sentido antihorario
+mado con cuatro códigos de barras. i l E l !
+| <Q
+Me E : . . EMO MBR: e 7 RC
+IR Código 1: Gire el carrete en sentido de las agujas del reloj — El robot Edison controlará el movimiento de la EdCrane en
+su base (girar en sentido Fo girar en a anti-
+— horario) y el movimiento del carrete que enrolla el gancho
+- magnético en sentido horario o antihorario para subir o —
+(0) bajar el gancho. Conduce tu Edison sobre los siguientes
+códig os de barras, p rog ramando cada uno a un botónen
+elle ontro re moto. e
+—
+a 7 —
+ml e SE ——
+1 Scamed with —
+| EE CamsScanner:
+
+
+==================== PÁGINA 38 ====================
+
+ena di TT e 5 T ¡am == UN AR
+1 Un LA 4
+T— —:ef
+É Dia ¿ | | |
+| : e ; E | va En
+| La configuración sugerida para el control remoto es la siguiente: | N
+| |
+É |
+e > O
+| | Gira la grúa en sen- |
+| tido anti-horario Gira la grúa en sen- | Ls:
+E tido horario | __—
+Í
+| / Ve
+Girar el carrete del - q N 20 E
+| gancho magnético Girar el carrete del NE TTEST |
+| en sentido horario gancho magnético en Y EF a
+| sentido antihorario 7 ME 4
+= 5
+Ñ C
+[=)
++ wUna vez que hayas terminado de pro- + a : E
+1 gramar EdCrane, es momento de pro- D Un robot armado no es solo
+ceder al ensamblaje. Puedes pedirle a a tecnología, es la prueba de
+: tu profesor el manual de instrucciones 2 r que tu ingenio puede dar E
+y o imprimirlo desde el enlace proporcio- vidaagrandes ideas.
+nado https://educatemas.com/5cb02. | PENE —— $
+EE También tienes la opción de ver un . ECN NDA
+| Elisa tutorial detallado paso a paso, acce- Eo
+—.. ; (diendo al enlace QR correspondiente
+E AZ | https://educatemas.com/5cb03. E E
+“ena BN
+== hu
+ito) JJ
+"_ IE TE 2 E
+1 scanned with —
+| EE CamsScanner:
+
+
+==================== PÁGINA 39 ====================
+
+Y Ne] Ae
+TT a j
+O
+i | e!
+! Aplicación EJ Observa el video de montaje del robot Edison paso a paso en
+ES el https://educatemas.com/5cb04 Explica tus conclusiones des- -
+| | | pués de realizar el proceso de ensamblaje.
+si E E y
+UU IUUIII
+—
+¿ BESAS LE e... DA An RT De Lo CN A MMS, 620477 MN [Ro
+! RA
+E
+| eneeeceneeeoeaoreceoa cea ecenarnoeoeona enana eo eenneraoen re ocanecanocaocanerereaoeereneraorao recae rernacerocanereroner rene rerraerrereorercocerereane reee erraner ceo eerrerreneercorrereooo errar eo nee eee.
+1
+|
+|
+|
+|
+|
+|
+nac ml | oa «
+; O —
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 40 ====================
+
+e
+La
+O) Prácuca Hl n
+| Desafío de construcción: "La torre más alta" ala vez del "área de materiales", transportarlo — —
+P ue : 6 y : y colocarlo en la torre de su zona. Los bloques i
+En esta actividad, los estudiantes ormarán equipos deben ser apilados de manera estable para =
+para trabajar con EdCrane en un emocionante desafío evitar que la torre se derrumbe. El tiempo y ==
+de construcción. El objetivo es utilizar el robot para límite para el desafío será de 15 minuids 2
+apilar bloques y construir la torre más alta posible , é
+dentro de un tiempo determinado. Esta práctica 4. Los equipos disponen de 5 minutos para [3]
+fomenta la colaboración, la planificación estratégica, planificar cómo programarán a EdCrane y
+y pone a prueba las habilidades de programación y qué bloques usarán primero (por ejemplo,
+control de los estudiantes. bloques más grandes en la base para mayor 4
+estabilidad). Durante este tiempo, pueden
+realizar pruebas iniciales con el robot para
+| 1. Coloca bloques de diferentes tamaños y ajustar el control del brazo mecánico y la -
+colores en una zona designada como "área programación.
+de materiales". Define un espacio para cada 5. Una vez que comience el tiempo, los equipos
+equipo donde construirán su torre. Asegúrate deben poner en marcha a EdCrane para
+E de tener un robot Edison configurado como construir su torre. Los estudiantes deben
+) EdCrane y acceso a una computadora para coordinarse para ajustar la programación si
+1 programarlo. es necesario y asegurarse de que la torre no
+| 2. Organizarse en equipos de 3 a 5 integrantes. se derrumbe.
+Asignar roles dentro del equipo, «como 6. Cuando el tiempo termine, todos los equipos
+programador, operador, diseñador de deben detener su robot y dejar la torre en el
+Flal Estratea as MODE vado estado que esté. Se mide la altura de cada
+UD 3. Programar a EdCrane para recoger un bloque torre y se evalúa su estabilidad.
+| :
+| — E
+“—e + o | A >
+E y —o l
+1 Scamed with —
+| EE CamsScanner:
+
+
+==================== PÁGINA 41 ====================
+
+(8,6 :
+OL o.
+Reglas: * ¿Cómo podrías mejorar tu desempeño en futuras
+f * Los bloques deben ser movidos únicamente por p rústicas,
+EdCrane, no por los estudiantes. BASPHASIa.ADIAIA e ena
+* Si la torre se derrumba, los bloques deben ser
+recogidos y apilados nuevamente dentro del tiempo LTL XL LDL
+J permitido,
+equipos. * Documenta tus observaciones y conclusiones en un
+informe breve, destacando los aprendizajes obtenidos
+* ¿Qué desafíos encontraste al controlar EdCrane? y las áreas de mejora dente dae
+A Respuesta aer a E
+y nr Ne INFRA a |
+* ¿Qué estrategias fueron más efectivas para ua e f
+N [2vania ies bioadee? PANA CA ENS A e deso ias |
+A : ;
+, | ri» ?
+| | —
+, te” lo+—f -=
+o TS SL
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 42 ====================
+
+4 A
+== AA |
+| [ ——
+| E
+|
+| E
+NN [e.) En esta sec ción aprenderás: La
+) e . D . .Z
+4 y EdPrinter cesión “
+DA 4 Ensamblaje
+A LAA AA - Lo -
+É - A O Programación
+N y Fe NU A 7 En esta unidad, exploraremos EdPrinter,
+NE e i a A un innovador proyecto que convierte al
+Lo. N a Emme] y robot Edison en una impresora de tra-
+y 7 e j : E Ta zos. Comenzaremos ensamblando paso
+N% mm 7 Uf S de 4 a paso el EdPrinter utilizando dos robots
+4 A N ; e 7: MT : Edison y el kit EdCreate. Este proyecto
+N | > a Dz < O: | no solo nos permitirá comprender los
+| “h 4 — N fundamentos de la programación y el
+' ea < L C o = o N diseño mecánico, sino también desarro-
+y: . Saz - AE L llar nuestra creatividad al crear nues-
+- TE , tras propias figuras y diseños. ¡Prepá-
+o — TN rate para transformar ideas en dibujos
+ke í | con Edison!
+HH ——
+EA ¿
+E> Le A |
+Ll E). 6 INEEENA 39
+- | DEA A T . 39
+=— ALE :
+!— scamed with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 43 ====================
+
+y e E |
+| f " |——
+T Ex loración 1 ¿Sabías que puedes convertir a Edison en impresora que dibuja?
+| ñ í :
+| Pp Y ¿Qué partes crees que necesitarías para transformar a Edison en un EdPrinter? ¿Qué funciones
+| di nuevas podrías darle al robot?
+|
+|
+7 mar E Lee la historieta.
+| | Primero, ensamblaré la base
+Lc H a -— y colocaré un soporte para el lápiz. Así Jl
+D ias E Na podrás moverlo y dibujar. E
+—— te convertiré a a . E
+4 en EdPrinter, una a a * — e £ a
+) impresora que puede Y E ye? Ns 7 E ÉS AA
+— dibujar formas. , Va xn. MESS T AA 1 (=) — y da
+A — A e LESS
+> IR - E , MEA
+== — dr AN: == “a y 5 a
+, 1 ¡Esosuena Vi — | y
+|. emocionante! | Sen > ¡Qué interesante! W
+. ¿Qué haremos MU Te Estoy listo para
+UL primero? " comenzar.
+)
+A _— [. TT
+j 2
+— le ¡Dibujar suena divertido! PD E
+E N Estoy listo para aprender. AU Y A
+a — RECI a ¡Soy todo un
+—_ 6! ,— e. UA Y | artista! ¿Cuál
+A = EP ES. será nuestro L)
+Te programoré Va - | “a Y primo dibujo,
+controles el lápiz . Ae N . a A Aa
+YImMUevas CIBAPEL 1 e Dibujaste un ( Y 1 |
+Dibujarás líneas . e 1 UA al
+en'tódasilas rectángulo y su o L.
+direcciones. perfecto. EA TAN ZOO
+E - —e ——
+e ZE E Es
+a 1 | $
+m——a——— o a
+1 scanned with —
+| 29 CamScanner”:
+
+
+==================== PÁGINA 44 ====================
+
+o_o
+“4
+a
+——————] y |
+- |
+!
+- .z N
+Conceptualización ¿
+|
+|
+El EdPrinter es un trazador de pluma que puede ser pro- El EdPrinter ofrece un mejor rendimiento al utilizar herra- 1
+gramado para dibujar una variedad de formas utilizando el mientas de escritura que no requieran aplicar mucha pre- _
+lenguaje de programación EdPy. sión, como marcadores o plumas de punta fina. También es HE
+posible emplear lápices de color, siempre que la mina sea
+lo suficientemente suave para deslizarse fácilmente sobre el
+ENSAMBLAJE Y PROGRAMACIÓN par
+Para amarEdiantenhecesitaras: El papel debe colocarse en la base del marco interior del Ta
+* 2 robots Edison EdPrinter. Se recomienda usar papel tamaño A5 estándar
+y a , (14.8 cm x 21 cm), papel carta de EE. UU. (8.5 x 11 pulgadas)
+* 1 kit EdCreate (kit de creación para robots Edison) o papel A4 cortado a la mitad. Para obtener los mejores re- '
+1 pluma de punta fina, marcador o lápiz de color sultados, el peso del papel debe estar entre 80 y 150 gramos
+de grosor.
+í e Papel (dimensiones detalladas más adelante) c
+ao Glosario
+EG
+17270 LA |
+E Wa
+a == Dr Funcionamiento del EdPrinter
+a z El EdPrinter utiliza dos robots Edison: E
+h 1. Robot controlador del papel: Este robot, con ruedas
+adjuntas, se encarga de mover el papel en la direc-
+a ción deseada.
+| ,
+bid Y TO
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 45 ====================
+
+i ED ———— 3
+| ( | NE
+
+EE dina
+
+OA Robot controlador de la pluma: Este ont Fa da +
+| ñ robot maneja el cinturón donde está Ca E
+| | sujeto el utensilio de escritura. Es el — _ Pm ;
+motor principal del EdPrinter. NN o q
+2 9 A —— "e
+| | Ambos robots deben estar programados utili- =>
+— | zando EdPy. came
+E 1 me de perno [Okr:40)
+d Pasos para ensamblar el EdPrinter Toma de eje cruzado Agujeros pasador s
+A Paso 1: Programar Edison TA CRTAECUA ACE [DA
+
+; Ambos robots Edison utilizados en el EdPrinter | i
+deberán ser programados usando EdPy. Pue- : : El El
+
+, des cargar los programas en los robots antes: H E y
+o después de ensamblar el EdPrinter. : 1 : [PA
+Puedes descargar tanto el programa base i :
+
+) para el robot controlador del papel: https:// —: 1 [Oha:40)
+educatemas.com/5cb05 como el programa : ; :
+base para el robot controlador de la pluma: ht- H Ela
+tps://educatemas.com/5cb09 utilizando EdPy, E
+disponible en Y O
+Para más información como programar, mira | E
+el tutorial paso a paso para que aprendas a : PA
+programar tus robots con EdPy en el link ht- : Ue '
+tps://educatemas.com/5cb06 ] 2 DEN 3
+Paso 2: Ensamblar EdPrinter : | H —— E
+Sigue las ilustraciones paso a paso en esta guía —| Ne —— !
+para construir el marco y ensamblar los robots. — *.....................—+—+—+—m—eeeeeeee ee a a ;
+
+RECORTABLE PAGINA 87
+— tt e— TE A
+Y | E T T
+O— AM Y
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 46 ====================
+
+EriIS 1 I
+: 5 *
+
+ESE | i |
+FE e f o. ' >
+| 7 | E hi i
+Le) hi hi i
+e 5 H |
+
+- E E :
+Dí E 1 !
+
+[a T N
+
+Ñ - ii . E =
+
+m E *d *
+
+o HE HE |
+
+o 6 hi
+
+7 HE , H
+
+— e L7 He |
+
+PA - 7% - |
+
+5 E, hi |
+
+— :5 10 !
+
+m 17 14 1
+
+E a 7 !
+
+o Las 7 ¡ |
+
+E N 1 v Ñ o
+
+- e E 6
+
+co e o hi
+
+= hí a
+
+- e a
+
+1” f
+cam
+f |. |
+| Scanned with” |
+¡E Camscanner
+
+
+==================== PÁGINA 47 ====================
+
+ln Nim e |
+o E o El os
+N E La hi bu
+; o E = H >
+Aa ; Ñ
+o da de :
+O ME HD HE !
+=D .. HE :
+a 1 ES :
+4] N H Le H = !
+m e a hi co hi (e) :
+— Me hi hi
+> e hi hi i
+Me h hi :
+z HE HE :
+> H Hi '
+LE 1 o hi hi |
+NE
+E camseamer
+
+
+==================== PÁGINA 48 ====================
+
+—— |
+NA diamiiiia N
+- 7 y ?
+Aplicación 3 —
++
+1 |
+EY Observa el video de montaje de EdPrint paso a paso en el link https://educatemas.com/5cb07 ——— |
+HAN L
+Explica tus conclusiones después de realizar el proceso de ensamblaje. po — A y 1
+. TA y
+UU vv UU UV UU UV A —
+: EE
+| Bespuesta.abierta.......... canino Cada intento te acerca : A —
+| más al éxito. No te rindas, a
+A. NA EPs porque incluso los robots
+más complejos comenzaron [ 4)
+IE nncieinn AABT con una sola pieza.
+| e , |
+| > —= E F -
+l UA,
+| de y
+O um
+E E ZA me
+!— scamed with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 49 ====================
+
+- OLX
+Dibujando un marco con EdPrinter o
+En esta práctica, los estudiantes programarán el EdPrinter para dibujar un marco utilizando 3
+! funciones básicas en EdPy. Este ejercicio les permitirá comprender cómo coordinar movi- — á
++ mientos en diferentes direcciones y ajustar dimensiones utilizando variables.
+/ [ Observa como furcone Y
+Materiales necesarios:
+Ei
+* 2 robots Edison |
+1
+[¿ * Kit EdCreate para ensamblar el EdPrinter ne |
+* Pluma o marcador de punta fina |
+* Papel tamaño A5 o carta ajustado a la base del EdPrinter
+* Computadora con acceso a EdPy
+» (https://educatemas.com/5cb08) :
+Procedimiento: y |
+1. Ensambla el EdPrinter siguiendo las instrucciones del kit EdCreate. Asegúrate de que — « y
+el papel esté correctamente colocado y la pluma esté alineada con el papel. MN L
+El qa
+2. Ingresa a la plataforma de EdPy, modifica las dimensiones del marco a dibujar, para :
+y este ejemplo, ayudate con el codigo siguiente. Eras
+https://educatemas.com/5cb08 ane | 1h
+f— scamedwith |
+| 29 CamsScanner”
+
+
+==================== PÁGINA 50 ====================
+
+LA
+O) Práctica 441 Ea
+Dibujando un marco con EdPrinter e
+En esta práctica, los estudiantes programarán el EdPrinter para di- PET ALLE29
+bujar un marco utilizando funciones básicas en EdPy. Este ejercicio Ss
+les permitirá comprender cómo coordinar movimientos en diferentes Cada error en la programación
+direcciones y ajustar dimensiones utilizando variables. es un paso hacia la solución.
+No te rindas, el código siempre
+funciona cuando la persistencia
+08... drawLineLeft(1s) : E a 7.
+0 99 ......drawLineForward(!1) MACRI UTA A
+| 100 ...... 9rawLineright(1s) . : RO ANECA
+| 101... GrwiineBaciwardi). no AD A a ,
+| 1102... GrawLineForward(e) E LA : == y
+| drawLineLeft(9) N
+[- 103 ......SrawLineLeft(9) de Tp lado caco Um
+ES 104..... drawLineForward(s) o ide E 1
+Ajos... drawineright7 E a a
+| A 106......drawlIneBackward(6) os : rasero ra
+14
+|
+Y í
+r | Y | .
+[y a
+ER Te A OTE
+| ENS SO E — 10
+| Scannedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 51 ====================
+
+4 na
+LO) Práctica «tl
+1
+Ea Materiales necesarios: ,
+| * 2 robots Edison E ;
+“e e Kit EdCreate para ensamblar el EdPrinter dá : E E
+y e Pluma o marcador de punta fina é y ——
+* Papel tamaño A5 o carta ajustado a la base del =
+EdPrinter ——
+EE
+* Computadora con acceso a EdPy E |
+E |
+(https://educatemas.com/5cb08) (al! Le A |
+Procedimiento:
+1. Ensambla el EdPrinter siguiendo las instrucciones
+del kit EdCreate. Asegúrate de que el papel esté 3. Carga el programa en el robot controlador de la
+correctamente colocado y la pluma esté alineada pluma. Asegúrate de que ambos robots (contro-
+con el papel. lador del papel y controlador de la pluma) estén
+programados correctamente.
+2. Ingresa a la plataforma de EdPy, modifica las di-
+mensiones del marco a dibujar, para este ejemplo, RECUERDA QUE SOLO DEBES MODIFICAR
+ayudate con el codigo siguiente. ESTAS VARIABLES PARA AJUSTAR
+https:, .
+ps://educatemas.com/5cb08 EL TAMAÑO DEL MARCO
+1 scanned with —
+E LES) CamScanner
+
+
+==================== PÁGINA 52 ====================
+
+| da E de
+LO ——- >
+y Y e 2
+! 1
+| | a, 7
+re LME MR A - P
+|| EE o,
+E 5 des 30 EST
+| BE E A) == CN Do a
+ó E A js 20 a
+e = 1 2 A De EE
+| E A 050" 2 21B
+| ES e: 0 9 era Ne ro
+[A Ea AS alu” Da o
+Ko A A CA —9 ERA
+o E AS dra > 27m
+Us == < a 5230 e Ds
+— E FC a ==
+—- E + ur. 00 E
+| — E A CE ha 225
+EA <=. E PEE E =25
+A E : q : : : 5 = 3. E EC.
+e, == ME sgDo El e
+re E NL ages 5
+| -— — E 3%
+ó -. <= < A ORT o 35
+— E E LEE o Ein
+-— == E A Dog os
+= <= - sago E E
++ == 1H O a Q a
+- == 1 A a<L a
+- E E POÓS c 2
+- E E o. E) E
+- E 2.59 o
+: : : E H : : a 7 D o
+- E Sa 2D La Da
+- E Tas E 3
+RE: : : : S é Da Ree
+- == DO El MY
+- = a Se [e] Do
+- = 7 = a
+== Ea A o <o
+-— -—. 5 £ Ae A > .
+— AA
+2 Ea
+55 2 CE AA
+2 2 1 6. 7 CA O rs
+= E dC UN E
+SEA O EL
+E Ae E E
+dE Eta: + 1 US 2
+SAN E E UE IS =>
+ll 1 dei E a << 9
+1 MEA E SS A
+17 $ FE LA E: ES =
+Pi dE. TEE - - A o
+E : : E ó E E : E A : E a 2
+Do ai EEE: <A -
+E E re
+¡E Ey 101 MU 5
+107 FRE EME. e: a
+Ha SA A 10 mm
+ii Pa EE A =
+A E |
+17 Tu AE Ea > $ |
+AE aa Geo E
+Z : : : ; H : : : a f : : q D > ==
+1. 1. KA AMET AE ma a n | j
+A A NE a A
+¡ $. id 5 e
+: fa: 20 Frame -
+i- ci [ed fe ¡Ei 77 A q
+RA E s e
+: e : 4 : : : 1 *: 7 E : : E o I
+: |
+1 |
+Om
+f ma “a
+¡— Scannedwith |
+E es] CamScanner
+
+
+==================== PÁGINA 53 ====================
+
+Cies — 1
+mui PROYECTO STEAM: “Del movimiento al diseño: robots que construyen y dibujan”
+[9]
+E Tema integrador
+——- Losestudiantes transforman el robot Edison en una grúa (EdCrane) y una impresora de trazos (EdPrinter)
+Le f para comprender cómo la programación, la mecánica y la creatividad permiten resolver desafíos reales
+PR mediante la robótica.
+k “Objetivo general
+Integrar programación, diseño mecánico y pensamiento creativo mediante el uso del robot Edison para
+E transportar objetos y crear figuras geométricas, desarrollando habilidades STEAM.
+| Materiales —
+* Robots Edison (1 para EdCrane, 2 para EdPrinter)
+* Kit EdCreate lA
+* Control remoto (TV o DVD) 1
+* Objetos metálicos pequeños (clips, tomillos) *
+| * Pluma o marcador de punta fina =>
+> * Papel tamaño A5 o carta he —_
+* Computadora con acceso a EdPy y =
+e
+“ Desarrollo del proyecto [ar LL |
+1. Fase 1 — Construcción y control (EdCrane): --
+Los estudiantes ensamblan EdCrane y lo programan para levantar y trasladar objetos metálicos, constru- e NU
+yendo una pequeña torre en equipo. —
+2. Fase 2 — Precisión y diseño (EdPrinter): ——
+Ensamblan EdPrinter y lo programan en EdPy para dibujar un rectángulo o figura geométrica, ajustando au
+medidas y movimientos. X a
+3. Fase 3 - Integración creativa: '
+Relacionan ambos proyectos reflexionando cómo el control del movimiento permite construir y crear. '; ,
+“Producto final a ; |
+* Una estructura construida con EdCrane. ( «-
+* Un dibujo geométrico preciso realizado por EdPrinter. PES Aa El
+* Explicación oral del proceso y mejoras posibles. ; | | P
+. | / E
+EE) - ¿2
+—“ 7]
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 54 ====================
+
+to . f
+1
+Evaluación Módulo 2: o |
+Nombre; Le - Curso: Focha: , L |
+Indicaciones: Loo atentamente cada pregunta y marca la respuesta correcta,
+“1, ¿Cuál es la función principal del EdCrane? DELE
+A) Dibujar figuras geométricas y EAU NE E
+B) Levantar y trasladar objetos metálicos j
+— €) Detectar sonidos
+— D) Encender luces LED
+2. ¿Qué principio permite que EdCrane levante objetos metálicos? PRD
+—A) Electricidad estática EPA
+B) Magnetismo : 1
+C) Calor , ¿ha
+D) Gravedad ,
+3, ¿Para qué se utiliza el EdPrintor?
+A) Para Imprimir textos 1 4
+B) Para mover objetos
+| C) Para dibujar figuras usando movimientos programados
+| D) Para detectar obstáculos y
+;
+[E 4. ¿Qué habilidad es necesaria para que EdPrinter dibuje correctamente una figura?
+| | |. A) Memorización
+er B) Precisión en movimientos y giros
+|. |...€) Fuerza física
+a DD) Velocidad | Y
+Pa 470 TA
+HL
+! DESEA +
+Í— scanned with
+Bcamscaer
+
+
+==================== PÁGINA 55 ====================
+
+. : ef! ia a p A A ARICA LE Vu e —_
+y: e pe EA LEA Ele
+ER EEE... SE.
+| | 5. ¿Qué herramienta se utiliza para programar los movimientos del robot en este proyecto?
+| | A) PowerPoint L
+B) EdPy o códigos de barras A
+C) Excel Re +
+D) Navegador web M
+D,
+6. ¿Qué área STEAM se trabaja al ensamblar las piezas del EdCrane y EdPrinter? = Á a
+A) Ciencia —
+| B) Tecnología ú sy
+¿ C) Ingeniería <A N
+D) Arte AR
+Ñ
+7. ¿Qué concepto matemático se aplica al programar figuras geométricas con EdPrinter? f 7 7
+A) Lectura í r
+B) Ángulos y distancias a ¡el
+* C) Escritura 4
+D) Colores y L
+8. ¿Por qué es importante probar y ajustar el programa del robot? E we
+A) Para gastar más batería Era
+B) Para que el robot funcione con mayor precisión 1
+C) Para cambiar su apariencia L |
+D) Para apagarlo : !
+9. ¿Qué producto final se obtiene en este proyecto STEAM? : po ;
+A) Un informe escrito á DA
+B) Un robot decorado x <a
+C) Una estructura levantada y una figura dibujada por el robot
+D) Un examen resuelto a
+10. ¿Qué habilidad se fortalece principalmente al trabajar este proyecto en equipo?
+A) Competencia individual
+B) Trabajo colaborativo y resolución de problemas 1
+C) Memorización í
+D) Copia de instrucciones E -
+O—— 1 A
+1 Scamedwith
+| E Camscanner
+
+
+==================== PÁGINA 56 ====================
+
+|
+—
+xa 4 DA 1
+7 . 7
+el. “E
+Mis primeros pasos en Scratch
+Scratch + Inteligencia artificial
+
+
+==================== PÁGINA 57 ====================
+
+| : 4 Qué es Scratch y cómo crear tus prime-
+E ¡e ( ) ros programas.
+— Y Los elementos básicos: sprites, esce-
+— TT harios y bloques de código.
+q = . .
+_—D > Mis Primeros Pasos en Scratch 1 Cómo crear animaciones, historias in-
+NE - teractivas y juegos.
+o — Programación Visual con Bloques
+Nu SS UU, ¡Bienvenido al emocionante mundo de la progra-
+= ZE Nan E mación! En esta unidad darás tus primeros pa-
+7 NU TAS a UN sos en Scratch, una herramienta poderosa que
+? E Nan e te permitirá crear proyectos increíbles sin necesi
+Eu TONE - 7| dad de ser un experto.
+OU hr, , f Scratch es un lenguaje de programación visual
+CA CN LT ; L desarrollado por el MIT (Instituto Tecnológico de
+E Ne 2 Pe Rai E Massachusetts) que te permite crear historias
+e É—] da interactivas, juegos y animaciones simplemente
+p E rra | arrastrando y conectando bloques de colores.
+, Eee SeRA: ] cH N No necesitas escribir código complicado, solo
+S | Y N conectar piezas como si fuera un rompecabezas.
+Í e 3 TE—— Sa E) Lo mejor de todo: ¡es completamente gratis!
+a ¡OA : den al | Funciona directamente en tu navegador web,
+—e e AA: 0 ue E ÓN puedes compartir tus proyectos ton el mundo-
+aaa lA A == NQNUE — entero, y unirte a una comunidad de más de 100
+millones de programadóres que ya usan Scratch.
+| ——e—— -
+y po | ol
+ELISA Es LAA OSA. ML
+i Scanned with H
+| EE CamsScanner:
+
+
+==================== PÁGINA 58 ====================
+
+——]—————————Z O onza
+a
+)
+|
+e E Lee la historieta. | L EN]
+Exploración "Tera
+5 ,
+¿Alguna vez has jugado videojuegos? ¿Te imaginas crear
+Da Ss SeratehBot: SeratehBot, el mundo de la programación.
+tu propio juego? ¡No di Pagado Ea delo o
+Y ¿Qué historias te gustaría contar de forma interactiva? er
+Y si pudieras darle instrucciones a un personaje para que A Pe pregemación de tal Micctras emremat Se = E
+haga lo que tú quieras, ¿qué le pedirías? lamas ma >
+q xl
+SeratehBot: ¡Casi cualquier cosal Haremos que un gatito camine — [== SS, ==
+y hable: ¡Tu imaginación es el limite! - ZA |
+e ES
+e ea e
+Ve | Rae
+e; —
+> + —
+| * - — (M3 -
+E
+< A
+5 ES í e y E)
+- N — rs -
+- j : ma KC
+_— N == =0 av
+1 - E -—-— e. y E
+» ,” — ES
+Y : 1 Xx . ==Ñ=ÉZ)a-=>
+| y -— > * E A
+4 e lAna: ¿Y es solo para niños pequeños? —
+| ==
+| = =>
+MN -
+““ due
+E.
+— 2 E 2
+mm — — EXE
+El ——
+EA
+—o| TN EE
+| "SE LD
+1 scanned with —
+| EE CamScanner
+
+
+==================== PÁGINA 59 ====================
+
+2 manco -
+| ¿ :
++ a “ “7
+| Conceptualización
+; — Scratch esun lenguaje de programación visual creado por Elementos básicos de Scratch
+mai el MIT Media Lab en 2007. Fue diseñado especialmente
+A. para que niños y principiantes aprendan a programar de GEA ¿Qué es? GX
+manera divertida y creativa. En lugar de escribir código :
+“con palabras complicadas, en Scratch arrastras y conectas Sprite | Personaje u objeto que El gato de Scratch, una pelota, un
+E bloques de colores. aparece en el escenario dinosaurio
+Escenario El fondo donde se mueven | Un bosque, el espacio, una ciudad
+| los sprites |
+Datos interesantes: T
+Bloques de código | Instrucciones que le das a | Mover 10 pasos, decir "Hola",
+* Más de 100 millones de personas en todo el mundo los sprites cambiar color
+usan Scratch |
+» Conjunto de bloques | Alhacer clic, el gato se mueve y
+* Se han creado más de 120 millones de proyectos conectados que forman un: maúlla
+os 3 a programa |
+* Está disponible en más de 70 idiomas |
+E | Disfraces Diferentes apariencias de | Gato parado, gato caminando,
+e Es completamente gratuito y funciona en tu navega- un sprite | gato saltando
+dor web, sin necesidad de instalar nada a T
+Sonidos | Audio que puede Maullido, música, efectos
+*  Fuecreado por Mitchel Resnick y su equipo en el MIT | reproducir un sprite | especiales
+,
+m
+mej
+) |
+|
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 60 ====================
+
+Categorías de bloques en Scratch E
+Los bloques en Scratch están organizados por colores se-
+gún su función:
+o—
+o: E S Conceptos importantes de programación 1
+Categoría Color Para qué sirve - Ejemplos
+Movimiento | Azul oscuro Mover, girar, ira posiciones - Mi 10 pasos, Seciendaaiosbleque sa decitan ino despuesdellotro,
+, , = O! " . -
+AA E [O de arriba hacia abajo. 2
+girar 90 grados
+: 5 i if últiples veces usando bl
+Apariencia — Morado Cambiar disfraces, decir algo, efectos - Decir pudes Repetir eo múltp bloques
+Ape como “repetir” o "por siempre". 3
+| 'Hola", mostrar/esconder
+a PEONES o N Condicionales: Tomar decisiones usando "si... entonces"
+| Sonido Rosa Reproducir sonidos y música - Tocar sonido, x a a
+| para que el programa haga cosas diferentes según la si- 4
+| cambiar volumen .
+tuación.
+Eventos Amarillo Iniciar programas - Al hacer clic en bandera, al u o a a
+| remar cada Variables: Guardar información que puede cambiar, SB
+La | como el puntaje de un juego o el nombre del jugador.
+r Control | Naranja Repetir acciones, condiciones - Repetir 10, por
+| | Siempre, claim ne Eventos: Hacer que algo ocurra cuando sucede algo es-
+[ L e pecífico (hacer clic, presionar una tecla, tocar otro sprite).
+! Sensores Celeste Detectar toques, preguntar - ¿Tocando...?, " a . . e
+! preguntar y esperar Paralelismo: Múltiples scripts pueden ejecutarse al mismo
+! | tiempo en diferentes sprites.
+Y Variables Naranja oscuro» Guardar información - Puntaje, nombre, vidas,
+nivel
+| Operadores | Verde claro Hacer cálculos y comparaciones - Sumar,
+UN | restar, menor que
+]
+Mis Bloques | Rojo oscuro Crear tus propios bloques - Saltar, atacar,
+resetear juego
+[
+—
+—
+! —e— —
+e———t0
+EA 1 2: >) a
+—
+Í- Scanned with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 61 ====================
+
+Í TI __—_— ED
+l a a
+h [A
+- = 7
+| Aplicación
+— E Relaciona los conceptos
+Término Definición
+Es | Sprite Personaje u objeto en Scratch que puede programarse
+
+f | Script Conjunto de bloques conectados que forman un programa
+
+| | |
+) Bucle Estructura que repite acciones varias veces
+
+| Evento Algo que inicia un programa (clic, tecla presionada)
+P %
+
+| Variable Espacio para guardar información que puede cambiar | Co)
+
+Disfraz Diferentes apariencias que puede tener un sprite e DD
+
+|
+| Coordenadas Posición en el escenario usando X (horizontal) e Y (vertical)
+Condicional Estructura "si... entonces" que toma decisiones 4
+| )
+Y nm
+La
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 62 ====================
+
+——. A A Tn »
+— E
+O) Práctica xH1 Ne
+Mi Primer Programa en Scratch 1. Abre tu navegador y ve aiitipsseratenmited)
+Título: El Gato Saltarín 2. Haz clic en “Crear” para empezar un proyecto 1 |
+nuevo Nenas
+Objetivo: Crear tu primer programa en Scratch para 3. Ob: lisprialdelinar -
+familiarizarte con la interfaz y los bloques básicos. - seva en sprite: der ario Que apre ema z
+camente
+| 4. En la categoría "Eventos" (amarillo), arrastra el EA —
+0 7 6 no ajax bloque “al hacer clic en bandera verde"
+— |
+M-05| | R ' | 5. En “Apariencia” (morado), conecta el bloque "de- Z 4
+e [05] | cir Hola por 2 segundos
+| 1 E | 1 6. En "Movimiento" (azul), agrega "mover 10 pasos" E
+2D | es | 7. En “Control” (naranja), añade “repetir 10" :
+|
+<= Y | 8. Dentro del bloque repetir, coloca "cambiar y por
+lo | |
+1 CENA  —— A 10" y "esperar 0.1 segundos"
+MU --—0) | CE O
+N pe _ a :
+| E —Ee -D—- - 9. Después del repetir, agrega otro
+| [70] 9 7 "repetir 10" con "cambiar y por -10" +
+a |
+| [50] e _- 10. Haz clic en la bandera verde para
+$ ver tu gato saltar r
+O Todas las instrucciones o bloques O Escenario
+O Nombre de mi proyecto O Extensiones
+Iniciar / Detener la ejecuación de mi proyecto O Objetos
+Instrucciones o bloques de mi proyecto O Fondos pe
+| E
+VD EE) E
+Í— scanned with
+| EE CamsScanner:
+
+
+==================== PÁGINA 63 ====================
+
+Structura del código: 3. Experimenta: ¿Qué pasa si cambias el número 10 por 20 en
+Al hacer Clic en bandera verde CIDIOdUeNEnCUn
+E- Decir "¡Hola!" por 2 segundos a
+P - Mover 10 pasos ———— —
+E Repetir 10 veces: _—_—————————————
+4 | E-Cambiar y por 10 (sube) —————— LME.
+- | L— Esperar 0.1 segundos o
+| L— Repetir 10 veces:
+b - Cambiar y por -10 (baja) 4. E ie e de bloques que usaste y para qu
+| L— Esperar 0.1 segundos
+5 Preguntas de reflexión: NEU TOS +. USES A
+1. ¿Qué pasó cuando hiciste clic en la bandera verde? Te: A IE EL $
+2. ¿Para qué sirve el bloque "repetir 10"? TA AS me Y
+EAN? Eva Me SON EMI ENE ENTE RE ONLDAS ENUD ERA ELE ESTA O
+a= 2
+Ed
+f— scamedwith |
+[Senso
+
+
+==================== PÁGINA 64 ====================
+
+—+t —A | 1 |
+(O) Práctica H2 €
+Animación con Diálogos Desafío adicional: |
+Título: Conversación entre Amigos * Añade un tercer sprite que llegue al final y se una a la a o.
+— conversación —
+Objetivo: Aprender a crear animaciones con múltiples spri- 6
+tes que interactúan entre sí. * Cambia el fondo del escenario durante la conversación Una
+Procedimiento: * Agrega música de fondo
+ión: | ua
+1. Crea un nuevo proyecto en Scratch Preguntas de reflexión: |
+2. Mantén el sprite del gato y añade un nuevo sprite (elige 1. ¿Cómo lograste que los sprites hablaran en el orden correcto?
+el que quieras de la biblioteca) 4
+3. Posiciona los sprites en lados opuestos del escenario
+4. Programa al gato: Al hacer clic en bandera verde > Decir 5) c
+“¡Hola! ¿Cómo estás?" por 2 segundos + Esperar 2 segun- - Tun N a
+dos + Decir "¡Qué bueno! ¿Quieres jugar?" por 2 segundos 2. ¿Qué pasaría si no usaras los bloques “esperar”?
+5. Programa al segundo sprite: Al hacer clic en bandera ver- ——
+de + Esperar 2 segundos + Decir “¡Muy bien! ¿Y tú?" por
+2 segundos + Esperar 2 segundos + Decir "¡Sí! Vamos a
+jugar" por 2 segundos PA EE O UT
+6. Añade movimientos: haz que ambos sprites se acerquen 3. ¿Cómo podrías hacer que los sprites se muevan de forma
+al centro del escenario más realista?
+7. Agrega cambios de disfraz para simular movimiento dedo A A
+| —
+*—B. Incluye sonidos cuando cada sprite habla da A A ea
+h —e | .
+- +—er-o|
+!— scamed with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 65 ====================
+
+o
+EE E ——.
+ES —o Práctica H2
+[ ¡ Mi Pri imer Juego Programa del personaje (nave/cohete):
+Título: Atrapa las Estrellas Al hacer clic en bandera verde
+E
+| J Objetivo: Crear un juego completo con puntuación, movi- |- Ir a x:0 y:-140 (abajo en el centro) |
+— 1. miento controlado por el jugador, y objetos que aparecen HF Fijar Puntos a 0
+7 aleatoriamente. Ra
+Por siempre:
+ME Procedimiento: , |
+[Si tecla flecha derecha presionada entonces:
+1. Crea un nuevo proyecto
+EL | E Cambiar x por 10
+La 2. Elimina el gato y añade un sprite que será tu personaje E : |
+(ej: un cohete o una nave) E Si tecla flecha izquierda presionada entonces:
+5 3. Añade un sprite de estrella (0 cualquier objeto coleccio- | 1 Cambiar x por -10
+pablo L- Si tocando borde entonces:
+4. Crea una variable llamada “Puntos” L_ Rebotar
+5. Programa el personaje para moverse con las flechas iz- |
+quierda y derecha
+6. Programa la estrella para caer desde arriba en posicio- programaidellajestrella: h
+nes aleatorias Al hacer clic en bandera verde |
+7. Suma puntos cuando la nave toca la estrella L— Por siempre:
+8. Duplica el sprite de la estrella 2-3 veces para que haya - Ir a x:(número al azar entre -200 y 200) y:180
+más objetos cayendo .
+[- Repetir hasta que y < -180:
+9. Añade un fondo del espacio ME |
+1 | Cambiar y por -5
+10. Agrega música de fondo
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 66 ====================
+
+LS - Li si | |
+” | |
+= |
+E Si tocando [Nave] entonces: 2. ¿Cómo funciona la detección de colisiones entre sprites? |
+el L
+E Sumar 1 a Puntos 1 |
+E Tocar sonido [pop] a ii 3
+E Ira x:número al azar entre -200 y 200) y:180 MAME ENO ABEdds e e Ls 2 MN
+3 3 Y
+Mejoras opcionales: |
+Te. ML 77 CL O ANO NT AA |
+* Crea objetos malos que resten puntos 4 N
+* Añade niveles de dificultad (que caigan más rápido) y
+[e Agrega vidas y game over 3. Describe dos mejoras que podrías hacer a tu juego: 5) J
+- e Crea un cronómetro de tiempo o
+, -— Preguntas de reflexión:
+|: —————
+pa ¿Qué fue lo más difícil de programar el juego?
+]
+1
+NA y EA LL E
+!
+1
+LU
+—
+N
+4
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 67 ====================
+
+% -———————
+r= E —]; ——Ñ
+v
+— Dn
+Desafío Extra
+L o
+; Proyecto: Laberinto Interactivo Q Para Reflexionar
+io Acabas de dar tus primeros pasos en el mundo de la pro-
+C E E gramación. Lo que aprendiste hay es la base de cómo fun-
+rea un juego de laberinto donde: cionan todas las aplicaciones y videojuegos. Los bloques — |
+4 1.El jugador controle un sprite con las teclas de dirección de Scratch representan conceptos de programación que se
+" usan en lenguajes profesionales como Python, Javascript o
+2. Haya un inicio y una meta C++.
+3. Si el sprite toca las paredes, vuelve al inicio La programación no es solo sobre computadoras, es sobre:
+4. Hay un cronómetro que mide cuánto tardas * Pensamiento lógico: Dividir problemas grandes en pasos
+5. Al llegar a la meta, aparece un mensaje de victoria con Pequelo
+tu tiempo * Creatividad: Imaginar proyectos únicos y darles vida
+* Resolución de problemas: Encontrar y corregir errores
+, debuggin
+Pistas: ( gging)
+* Perseverancia: Probar, fallar, aprender y volver a intentar
+* Usa el sensor “¿tocando color...?" para detectar las pare- p y
+des
+e Dibuja el laberinto como fondo o usa sprites — ¡Felicidades! Ya no eres solo un usuario de tecnología, L
+L jable * z a ETE - ahora eres un creador. Cada aplicación que uses, piensa:
+* Usa la variable “cronómetro" para medir el tiempo "¿Cómo estará programada? ¿Podría yo crear algo así?"
+* Añade enemigos que se muevan por el laberinto para Ts RE TA A 4
+más desafío —
+N y
+| | ||
+i | A
+. Il ri e——
+Y y [
+Ps [E
+y A —
+o. Ne 1 € —
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 68 ====================
+
+e Tas 1
+U — ÉS Na
+e Ae nea, NES TES — 1
+(+) Nesta sección aprenderás: —__|-
+Y Qué es la inteligencia artificial y cómo
+( )) funciona el machine learning D— L
+4% Cómo entrenar tu propio modelo de 1A C
+F con Teachable Machine
+a * Conect delos de IA Scratch
+ES) e o ego e onectar modelos de con Scratc
+e Scratch De Inteligencia Artificial para crear proyectos interactivos L.
+o
+po X Diseñar aplicaciones que reconozcan
+Y 5 imágenes, sonidos y gestos
+En esta unidad combinarás lo que aprendiste de
+ñ Scratch con el poder del machine learning para
+T N ' crear proyectos verdaderamente inteligentes.
+| es , Ya sabes programar en Scratch, ahora apren- 6
+| — derás a crear aplicaciones que pueden ver, es-
+J > cuchar y aprender. Imagina crear un juego que
+y «a E responda cuando sonríes, una aplicación que re-
+"A conozca objetos de tu casa, o un proyecto que
+| | b N reaccione a los sonidos que haces. ¡Todo esto sin
+1 escribir una sola línea de código complicado!
+j + Usaremos Teachable Machine, una herramienta
+| o o de Google que te permite entrenar modelos de
+: | | pa inteligencia artificial con tu propia cámara y mi-
+FT | | [ | crófono. Le enseñarás a la computadora a reco-
++ e O + +— nocer lo que tú quieras, y luego conectarás ese
+| | | y ss 1 Y “cerebro artificial” con tus proyectos de Scratch.
+Ol | | ,
+E | | "a
+“Ul — 1 TA o,
+un |  -— —w
+: e * NAT A A E e
+1 scanned with —
+| EE CamScanner
+
+
+==================== PÁGINA 69 ====================
+
++ | "
+- A ¿Cómo crees que las aplicaciones de tu teléfono reconocen tu cara o tu voz?
+Exploración 4% ¿Alguna vez has usado filtros en redes sociales que detectan tu rostro? ¿Cómo funcionan?
+1% Si pudieras enseñarle algo a una computadora, ¿qué le enseñarías?
+Lo Le ¿Qué juegos o aplicaciones conoces que usen inteligencia artificial?
+E Lee la historieta.
+e AT
+Manz: ¡Hola Scratehlot! Va sé programar enSentdk, [1 an Alella: q re lAna: Suena complicado... ¿Necesito ser una a
+pero quiero acer algo más avanzado. ¿Qué es aprender como yo aprendo en la escuela 1 je
+150 de la inteligencia artificial? E a E enim os —l
+"| 4 Be ; —
+SeratchDot: ¡Excelente preguntal La IA es cando [4 Pu” O | ET]
+las computadoras pueden aprender y tomar — | E Perro AT
+depen | A. > ED 4d | 1D J
+7 Ma DO a = =—
+£ 6 SIGA («) UE
+- e _— Y » :
+Ps SN mal EE
+wi » - EU o EE a
+y e — e E —— ZN — »
+lAna: ¡Para nada! Con Teachable Machine puedes, % VAna: Y puedo ar sintlgerca al | Ana: Wow" Dame un ejemplo once.) “| —
+4 7 - —— ——
+E a UT ET o NESST imagina un juego donde tu personaje a
+de lo que quieres que reconazza y ¡listo! - Me (Claro! Puedes crear juegos que — Ed M salta cuando tú saltas enla vida real; ZE
+Ios are 3 - BN eacciónen cuando sonries, HA E o un plano que suene cuando mueves tus 1
+== dh — < “7 MU) | pliacions que reonozzan objetis BA] [| manos, un contader que detecte Li. ón
+p = 4 7 controles por gestos, detección cuando levantas objetos especcificos. — ESA
+=== KE => A de postrs... as posibi- E 4 e) !
+ez — (MP Y MN | dadesson infinitas! — 7 El PE ho ——
+Yi CIA Y 7 LA IA N
+a H =— - > - e pe Ú e NN e |
+a FC |
+A => y
+» ARA NE 0 ——— 1
+= pa
+1 Scamed with —
+| EE CamsScanner:
+
+
+==================== PÁGINA 70 ====================
+
+E == pue li ( |
+" "Z uE
+Conceptualización J
+La Inteligencia Artificial (IA) es la capacidad de las máqui- Tipos de Machine Learning que usaremos:
+nas para realizar tareas que normalmente requieren inteli- |
+| gencia humana, como: Tipo. ¿Qué reconoce? Ejemplo de uso |
+| * Reconocer objetos en imágenes se de Objetos, personas, gestos Menea frutas, detectar si
+| * Entender el lenguaje hablado
+Clasificación de Sonidos, palabras, música Reconocer tu voz, identificar
+* Tomar decisiones basadas en datos audio resonar) muy ememaaci
++ Aprender de experiencias pasadas Clasificación de | Posiciones del cuerpo ¡
+poses un brazo
+: [d
+¿Qué es Teachable Machine?
+| ¿Qué es el Machine Learning? Teachable Machine es una herramienta gratuita de Google [e]
+que te permite entrenar modelos de inteligencia artificial de
+El Machine Learning (Aprendizaje Automático) es una rama forma visual y sencilla, sin escribir código. Fue diseñada es-
+de la IA donde las computadoras aprenden patrones a par- pecíficamente para educación y experimentación.
+y . ' P! PI La Pp
+tir de ejemplos, sin ser programadas explícitamente para 2 é
+cada'situación. Características principales:
+Ejemplo del mundo real: * Funciona directo en el navegador
+rogramación tradicional: Le dices a la computadora “Si la * No requiere instalación
+agen tiene 4 patas Y cola Y ladra, entonces es un perro" * Es completamente gratuito
+| | |* Machine Learning: Le muestras 1000 fotos de perros y la + Permite exportar modelos para usarlos en otros proyectos
+e computador prende -solg qué características tienen los . y
+perros. * Soporta imágenes, sonidos y poses
+1; _ €
+a
+Nite eo AR IL dE TSE
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 71 ====================
+
+Fe
+É .
+e a [o pnemao TUNE Carectrcos Y
+£ 5 E wena stretha guia Versión de Serateh con !
+[1 Recolector datos (ejemplos): Grobas ejemplos de lo que antena doraraderemal Za
+Queres reconocer. Mientras más ejemplos, major aprenderá. pe cMezcouA | Plataforma educativacon |
+[E a - perra Serateh integrado y |
+- Entrenor el modela: La lA analiza tus ejemplos y aprende | herrera
+— EeTONEs. Tama slo uNES SeguNdos o minutas. | PePVETO uma | software descargable basado —|
+— 3 Preber y exporter: Verificos que funcione correctamente y ——- - | enscreten contnimomorda
+4 exqortese modelo para usario. La extensión TM2Scratch
+b: Carcentes importantes del entrenamiento TM2Scrateh es una extensión que permite conectar modelos
+Coses: Categories que quieres que la A reconozca. de Teachable Machine con Scratch mediante un enlace web.
+Ea: Close 1 = Pulgor arriba, Close 2 = Pulgar cheja Clase -—- Bloques especiales que añade:
+3= Mono atera * “cuendo se recibe etiqueta [nombrel" - Activa código cuan-
+Detes de entrenomiento: Los ejemplos que le des a la lA para do se detecta una clase especifica
+e + “etiqueta” - Devuelve el nombre de la clase detectada
+Precsión: Qué Ton den el modelo reconoce correctamente. * “nivel de confianza de [nombrel” - Indica qué tan seguro
+Una bueno precisión es Y% o más. está el madelo (0-100%)
+Overfitting: Cuando el madelo solo funciona con los ejemplos Flujo de trabajo completo
+eaCiOS que le moStTuSte, pero no generaliza. 1. Entrenar modelo en Teachable Machine a
+Cómo exitario: Varias los condiciones al erader Giumincción. 2. Exportar modelo (obtener enlace web) |
+a : 3. Abrir Stretch3 f
+Comectondo Teacheble Machine con Saratah 4. Cargar extensión TM2Scratch
+Opciones para usar lA. en Soctch 5. Pegar enlace del modelo a
+Foro user modelos de lA en tus proyectos de Sarcich necesi 6. Usar bloques de IA en tus programas !
+tos UNO versión que soporte extensiones de LA: 7. ¡Proyecto inteligente completo! —— | j
+- | A
+| | | fa
+o— N | | . _
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 72 ====================
+
+h E O AE
+——————].da
+NL]
+A li .7 Y
+icacion :
+P c Laboratorio 1: Detector de Objetos Inteligente .
+—
+Saatch para un proyecto nea
+— Materiales - Compuradora con cámara web
+Inteligencia Artificial | Capacidad de las máquinas para realizar tareas inteligentes E — Ale
+| * Buena iluminación o
+Machine Leaming La computadora aprende patrones a partir de ejemplos
+Teachable Machi ienta de Google para PE Parte A: Entrenando el Modelo en Teachable Machine ¿
+fácilmente Paso 1: Acceder a Teachable Machine
+PO IO MIO DI CNO Y UE A] Abre tu navegador web (Chrome, Firefox o Edge recomen- A
+o Modelo de IA Resultado del entrenamiento que puede reconocer patrones a. ( o : e
+- Case Categoría que quieres que la lA reconczca 2. Ve a: https://teachablemachine withgoogle.com [EE]
+——————— 1 Hezdicenel botón azul “Get Started" (Comenzar) a
+Entrenamiento Proceso donde la LA aprende de los ejemplos - a
+1 4. Selecciona “Image Project” (Proyecto de Imogen)
+EU———————
+— Precisión Porcentaje de veces que el modelo acierta correctamente 5. Elige “Standard image model” (Modelo de imagen están-
+dar)
+ad LALA LALA
+| TM2Scratch Extensión que conecta Teachable Machine con Soratch
+TD
+TX Y Consejo: Si la página está en inglés y prefieres español,
+Eiza ps puedes usar el traductor de tu navegador (dic derecho E Tre-
+| ducir al español.
+e ——————————
+? e i
+—. |
+ama e
+1 LE AL E Sa —
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 73 ====================
+
+' |
++ Configurar las Clases * Muévete un poco para cambiar el fondo |
+Verás dos clases por defecto (Class 1 y Class 2). Vamos a crear 14. Deberías tener al menos 50-100 imágenes (el contador
+tres clases para nuestro proyecto: aparece debajo)
+a ?En "Class 1", haz clic en el (cono de lápiz (editar) y cámbiale Para la clase "Cuaderno": |
+" "Lápiz" ; |
+mob 15. Repite el proceso anterior pero con el cuaderno |
+N " E i E " |
+MEN" Class cam Eo ES 16. Muéstralo en diferentes posiciones (horizontal, vertical,
+8. Haz clic en "Add a class" (Añadir una clase) y nómbrala abierto, cerrado)
+, Nec 17. Graba 50-100 imágenes
+Importante: La clase "Nada" es esencial. Sirve para que el da ñas
+modelo sepa cuando NO hay ningún objeto presente. Sin esta Para la clase "Nada":
+, clase, el modelo siempre intentará reconocer algo incluso 18. NO sostengas ningún objeto
+cuando no haya nada.
+Paso 3: Grabar Ejemplos para cada Clase TNCUba ore Nan ageía
+>| y 20. Mueve la cámara o muévete tú para mostrar diferentes fondos
+Ahora vamos a grabar ejemplos para entrenar el modelo:
+sil 21. Graba 50-100 imágenes
+Para la clase "Lápiz":
+| 1 lápi Consejo Pro: Cuanto más variadas sean tus imágenes de en-
+| 9. Toma el lápiz con tu mano trenamiento, mejor funcionará tu modelo. Intenta grabar con
+| 10. Bajo la clase "Lápiz", haz clic en "Webcam" diferentes iluminaciones, fondos y posiciones.
+11. Si te pide permiso para usar la cámara, acepta Paso 4: Entrenar el Modelo A
+12. Manté ionado el botón “Hold to R " (Mant 22. Una vez que hayas grabado ejemplos para las 3 clases,
+para graban tr" Ea ele corea haz clic en el botón “Train Model" (Entrenar Modelo) ,
+Y |
+13. Mientras grabas (mantén presionado por 5-10 segundos): re mientras el modelo se entrena (puede tomar n
+* Mueve el lápiz lent te de izqui derechi |
+E PENES delgUier eer 24. Verás una barra de progreso que dice "Training==" (Entrenando.
+* Gíralo para t if tes ángulo:
+para mostrar diferentes ángulos 25. Cuando termine, verás "Traini ET a
+* Acércalo y aléjalo de la cámara miento completo!) J
+2 Y _
+Í— scanned with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 74 ====================
+
+-— a
+Nu— ——
+Paso 5: Probar el Modelo siguiente parte del laboratorio. | re |
+En la sección "Preview" (Vista previa), prueba tu modelo: Parte B: Conectando con Scratch = |
+26. Muestra el lápiz frente a la cámara Paso 7: Abrir Stretch3 -- L
+* ¿Aparece “Lápiz” con una barra verde alta? 35. Abre una nueva pestaña en tu navegador 1 ;
+27. Muestra el cuaderno 36. Ve a: https://stretch3.github.io —
+* ¿Aparece "Cuaderno" con una barra verde alta? 37. Verás una pantalla muy similar a Scratch, pero con so- 2
+porte para IA
+28. No muestres nada _—
+* ¿Aparece "Nada" con una barra verde alta? :
+Pi B:C la Extensión TM2Scratch
+Á ¿El modelo no funciona bien? Si el modelo se confunde o => SEA Eno pe
+no reconoce bien los objetos, graba más ejemplos para las 38. En la esquina inferior izquierda, busca el ícono de exten- 4
+clases que fallen. Haz clic en “Hold to Record" nuevamente y siones (parece un +)
+-50 5 . y E
+agrega 30-50 imágenes más. Luego entrena de nuevo 30M az.dicienlicono de onciónes -
+T e e 40. Busca y selecciona "TM2Scratch" de la lista
+29.H Ti " a
+aeloemelbotóntE port Model" (Exportar Modelo) 41. Aparecerá una nueva categoría de bloques llamada CS)
+| 30. Selecciona la pestaña "Upload (shareable link)" (Subir - “TM2Scratch” (color turquesa)
+j enlace compartible)
+| H La "” H L
+eS Haz clic en "Upload my model” (Subir mi modelo) PascivConactartuadedo
+| 32. Espera a que el modelo se suba es tomar 1-2 minutos) 42. Haz clic en la categoría "TM2Scratch"
+ine, lace. ¡ JALO! ita- - í
+o Penes SER eN ABORTO onicossito 43. Verás un bloque que dice "set TM2Scratch [URL]"
+Er ; a MIRE
+| 34, El enlace se verá algo así: https://teachablemachine.wi- 44: Haz clic en el campo donde dice "URL
+E -hgecalg com meniel/aBcDeFg123/ 45. Pegael enlace que copiaste de Teachable Machine
+Ena _ Guarda el enlace: Copia el enlace y pégalo en un docu- 46. Arrastra este bloque al área de código
+:... mento de texto o envíatelo por correo. Lo necesitarás en la
+Ea || ———— ! ,
+REO
+Eo sun eu a
+“ mm +) +-
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 75 ====================
+
+| l > -
+| 7
+1E
+| —47.Haz y en el bloque para conectar tu modelo Tocar sonido [pop]
+| f | 48. Espera 10-20 segundos mientras carga Esperar 0.2 segundos
+149. Verás un mensaje "Model loaded successfully" (Modelo EURO
+y; f | cargado exitosamente) Esconder
+AN ¿Problemas al conectar? Asegúrate de haber copiado el Fijar tamaño a 100%
+enlace completo, incluyendo https://. Si el modelo no carga, Paso 12: Programar el Sprite del Cuaderno
+intenta refrescar la página de Stretch3 y volver a intentarlo. 7 Z
+Selecciona el sprite del cuaderno y usa el mismo código, pero
+Paso 10: Crear Sprites cambia:
+50. Elimina el sprite del gato (clic derecho 1 eliminar) * La posición: x: 150 y: 0
+51. Crea 3 nuevos sprites: * La condición: (etiqueta de TM2Scratch) = [Cuaderno]
+* Sprite 1: Dibuja o selecciona una imagen de un lápiz * El mensaje: ¡Cuaderno detectado!)
+* Sprite 2: Dibuja o selecciona una imagen de un cuaderno Paso 13: Programar el Sprite de Nada
+* Sprite 3: Elige una estrella o cualquier sprite que indique Al hacer clic en
+“nada detectado" Esconder
+Paso 11: Programar el Sprite del Lápiz Irax: 0 y:-100
+Selecciona el sprite del lápiz y programa: Herp
+4 P PRIpIea 1 Si (etiqueta de TM2Scratch) = [Nada] entonces
+Al hacer clic en 1 |
+Mostrar
+Esconder Sino
+Irax:-150 y: 0 N
+je Esconder
+Fijar tamaño a 100%
+Por siempre Paso 14: Probar el Proyecto a
+Si (etiquet = i 52. Haz clic en la bandera verde
+(etiqueta de TM2Scratch) = [Lápiz] entonces : So
+Mostrar 53. Si te pide permiso para usar la cámara, acepta
+Decir [iLópiz detectado!) por 1 segundos 54. Muestra el lápiz frente a la cámara
+Cambiar tamaño por 5 , CN E
+E=9) o
+E
+1 Scamed with —
+| EE CamsScanner:
+
+
+==================== PÁGINA 76 ====================
+
+|
+: : : !
+* ¿Aparece el sprite del lápiz? sume 1 cada vez que muestres un objeto correctamente.
+É ..9 f
+55. Muestra el cuaderno * Efectos visuales: Añade efectos de color, rotación o brillo
+s cuando se detecte un objeto.
+* ¿Aparece el sprite del cuaderno? y
+56. N t d * Más objetos: Vuelve a Teachable Machine, añade 2 clases — )
+» No muestres nada más con nuevos objetos, y crea sprites para ellos.
+* ¿Aparece solo la estrella? * Juego de velocidad: Usa un cronómetro. Scratch te pide mos-
+$ ¡Felicidades! Completaste el Laboratorio 1 trar objetos específicos y debes hacerlo rápido.
++ Solución de Problemas * Contador de detecciones: Crea variables para contar cuán- —
+tas veces has mostrado cada objeto. |
+Problema Solución
+| El modelo no carga en Verifica que el enlace esté completo. Refresca la página y 2 Preguntas de Reflexión
+| Stretch3 vuelve a intentar. Asegúrate de que tu conexión a internet 1. ¿Por qué es importante la clase "Nada" en tu modelo de
+| sea estable. 1A?
+| El modelo confunde los | Vuelve a Teachable Machine y graba más ejemplos
+| objetos variados. Asegúrate de tener buena iluminación, Entrena TEE CAT E AR ELERacd > -— Jake
+| el modelo nuevamente. [6]
+| Los sprites no aparecen | Revisa que los nombres en el código coincidan
+| exactamente con los nombres de las clases en Teachable
+Machine (Lápiz, Cuaderno, Nada).
+a cámara no funciona | Asegúrate de dar permiso cuando el navegador te lo pida. 2. ¿Qué pasaría si solo grabaras el lápiz en una sola posición
+Verifica que ninguna otra aplicación esté usando la sin moverlo?
+cámara. Cierra otras pestañas que usen la cámara. |
+47 Extensiones del Proyecto TT E OIao ION MI NR EA
+ER ora que dominas lo ? úsico, intenta estas mejoras: NTE pin a 7 ua jui ds" a sr ne e
+NN TEMO ente e una variable "Puntos" que EI e TE. IR MS a "37
+o au
+50 a 2 A E=)
+Í— scanned with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 77 ====================
+
+- | Y ! N— |
+| | MS
+ME DD A E
+3, Menciona tres aplicaciones del mundo real que usen reco- * Snapchat/Instagram filters: Detección de caras y poses
+7 nocimiento de objetos similar a tu proyecto: TT j
+| | * Shazam: Reconocimiento de audio
+| | A DE TA AO * Alexa y Siri: Reconocimiento de voz
+> m=
+D A IE APO NANI ¡Felicidades! Ya no eres solo un creador de tecnología, ahora
+= q a o ID TN ON eres un creador de tecnología inteligente. Cada vez que uses
+; : E una app que reconoce tu cara, voz o gestos, recuerda: ¡tú ya
+4. ¿Cómo mejorarías tu modelo para que funcione en condi- E funciona eso! 7
+ciones de poca luz? -
+——— ———————— NN —]——.]—
+“Nota importante: Siempre ten en cuenta la privacidad y la
+_—————][———]T DAD E ética al usar IA. No entrenes modelos con imágenes de per-
+sonas sin su permiso, y piensa en cómo tu tecnología puede
+ayudar aotrosdeformaposita
+bo) mo NOE NATA 17 ENENYACIENO: uE r
+Q Para Reflexionar
+Acabas de combinar dos mundos fascinantes: la programa-
+ción y la inteligencia artificial. Lo que aprendiste hoy es la 1
+base de cómo funcionan miles de aplicaciones que usas todos
+los días. 1
+Aplicaciones reales que funcionan similar a lo que creaste: |
+CT
+* FacelD de iPhone: Reconocimiento facial (como tu detector | |
+de gestos) |
+* Google Lens: Identificación de objetos (como tu detector de A
+objetos) ) |
+di LU
+? —
+o—— E
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 78 ====================
+
+PROYECTO STEAM: “Detectives de Objetos con Scratch + Inteligencia Artificial” t uu
+1) Reto / Situación problemática — — 5) Materiales
+En nuestra vida diaria usamos tecnología que reconoce caras, voces y obje- * Computadora con cámara web e intemet
+tos, pero... + Scratch / Stretch3 0
+¿cómo aprende una computadora a identificar lo que ve? * Teachable Machine E E
+En este proyecto, los estudiantes crearán una aplicación inteligente que * 3 objetos físicos (ejemplo sugerido: lápiz, cuademo y "nada”)
+detecte objetos con la cámara usando Teachable Machine y se conecte a 6) Fases del proyecto (paso a paso)
+Scratch para generar una respuesta interactiva. Fase 1: Programación en Scratch (Base)
+1. Crear un proyecto simple con un sprite.
+2)0bjeMvo generas 2. Agregar un evento de inicio: bandera verde.
+Desarrollar una experiencia práctica donde el estudiante: 3. Incluir diálogo, movimiento y repetición (bucle).
+aprenda a programar en Scratch (con bloques), Producto parcial: “Mini animación interactiva”.
+E) entrene un modelo de Inteligencia Artificial, Fase 2: Entrenamiento del modelo de IA
+conecte IA con un programa interactivo, 1. Entrar a Teachable Machine.
+y presente una solución creativa con enfoque STEAM. 2. Crear un proyecto de clasificación de imágenes. a
+3. Crear clases:
+3) Aprendizajes esperados — o Lápiz o Cuademo
+Al finalizar, el estudiante será capaz de: 0 Nada (importantísima para que el modelo sepa cuando no detecta nada)
+* Crear proyectos en Scratch usando sprites, escenarios, eventos y bloques 4. Grabar ejemplos variados (ánguios, fondos, fuminación). Ls 1
+* Aplicar conceptos de programación: secuencia, bucles, condicionales y 5. Entrenar y probar el modelo.
+verlables (4) Producto parcial: Modelo IA entrenado y validado”. a Cs)
+* Explicar la diferencia entre programación tradicional y machine leaming Fase 9: Conexión IA + Scratch (Proyecto inteligente) >
+* Entrenar un modelo de IA en Teachable Machine con clases y ejemplos 6 as ¿ TOVOCIO EOS a t
+1. Abrir Stretch8 (Scratch con soporte de IA). —
+* Integrar IA mediante Stretch3 + extensión TM2Scratch 2. Cargar la extensión TM2Scralch. E
+i 3. Pegar el enlace del modelo exportado. ——
+— 4) Áreas STEAM integradas —— 4, Programar spritos
+o 5 G para que aparezcan cuando se detecte su clase. El
+: Ea sra operan experimentación, prueba y análisis de g roo final: Dolcirlgui cio (con respuestas e
+* T (Technology - Tecnología): Scratch, cámara web, herramientas de e <
+Google, IA educativa 7) Producto final (entregable)
+E (Engineering - Ingeniería): Diseño de una solución funcional (detector El estudiante presentará: L
+Interactivo) E Un programa en Scratch que: L -
+_A (Aris - Arte): Diseño creativo de sprites, fondos, sonidos y estilo del + muestre un personaje o ícono diferente si la cámara
+Juego | ; detecta lápiz / cuademo / nada a
+-M-(Math—Matemática):-Uso de variables (puntos), tiempo, porcentajes de * incluya un mensaje en pantalla y sonidos
+recisión/contianza * opcional: sistema de puntos o reto de tiempo
+| Ds ES,
+—_ A E, A a 7
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 79 ====================
+
+ES Seca
+e —— f -
+( o A
+E. E
+f 3 Evaluación Módulo 3:
+“
+Nombre: | Curso: Fecha:
+a y | Indicaciones: Lee atentamente cada pregunta y marca la respuesta correcta.
+1
+) 1. ¿Qué esla Inteligencia Artificial (1A)? a
+- A) Un programa que solo funciona con internet 4
+B) La capacidad de las máquinas para realizar tareas que requieren inteligencia humana a
+C) Un tipo de robot que solo sirve para jugar 3
+6 D) Un sistema que solo hace cálculos matemáticos a
+2. ¿Qué es el Machine Leaming (Aprendizaje Automático)? a
+A) Programar robots usando cables e
+? B) Un juego de Scratch avanzado A
+C) Una rama de la IA donde las computadoras aprenden con ejemplos a
+D) Una forma de copiar respuestas de internet r
+3. ¿Cuál es la diferencia entre programación tradicional y Machine Learning? : “
+A) En Machine Learning la computadora aprende con ejemplos, no con reglas exactas
+B) En programación tradicional se usan fotos y videos Al
+C) En Machine Learning se escribe más código |
+D) No existe ninguna diferencia LU
+4. ¿Qué es Teachable Machine? —
+A) Un antivirus para computadoras |
+B) Una herramienta de Google para entrenar modelos de IA fácilmente pa
+C) Una red social educativa -— 1. |
+D) Un programa para hacer presentaciones o
+_ »
+!— scamed with
+i CamScanner !
+
+
+==================== PÁGINA 80 ====================
+
+e —< 7 |
+5. ¿Cuáles son los 3 pasos del entrenamiento de un modelo en Teachable Machine? | 1 - —
+A) Descargar - Instalar - Reiniciar LS]
+B) Crear - Copiar - Pegar 2 |
+C) Recolectar datos - Entrenar - Probar y exportar e”
+D) Dibujar - Pintar - Guardar -Z |
+6. ¿Qué son las “clases” dentro del entrenamiento de un modelo? 7 | 1
+A) Las materias del colegio , YA —
+B) Los archivos del computador É y d
+C) Categorías que la IA debe reconocer (por ejemplo, pulgar arriba o abajo) E SUN 2
+D) Los niveles de Scratch (básico, medio, experto) A
+7. ¿Qué significa “overfitting” en un modelo de 1A? , =P 3
+A) Cuando el modelo se apaga solo iS
+B) Cuando el modelo aprende demasiado bien y no funciona con ejemplos nuevos eds D
+C) Cuando el modelo se conecta a internet A TA 4 4
+D) Cuando el modelo se instala en Scratch n ]
+8. ¿Cuál es una forma de evitar el overfitting? 3 5 Po
+A) Grabar siempre con el mismo fondo y la misma luz Ps > _
+B) No usar cámara re
+C) Variar iluminación, ángulos y fondos al recolectar datos Ea Cs)
+D) Usar solo una clase ! ¿ e]
+| 9. ¿Qué es TM2Scratch? 1»
+— A) Un bloque de sonido de Scratch -. E
+B) Una extensión para conectar modelos de Teachable Machine DO >
+con Scratch mediante un enlace <a
+C) Un robot de programación
+Les D) Una app para ver videos
+10. ¿Cuál es el flujo correcto para usar IA con Scratch según el módulo?
+—.—.—.. A) Entrenar en Teachable Machine - Exportar enlace — Abrir Stretch3
+— Cargar TM2Scratch -+ Pegar enlace —+ Usar bloques IA
+——B) Abrir Scratch — escribir código —+ crear IA
+| N €) Descargar una app + conectar cables — instalar
+N _D) Pintar un sprite > jugar
+==
+MED o
+1 sScamnedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 81 ====================
+
+| MEN UTIETICOSE: — — 0 MN CE 1370 TEME OTE E
+ELECTRICIDAD BÁSICA
+DD cameemer
+
+
+==================== PÁGINA 82 ====================
+
+y
+— L |
+ELECTRICIDAD |
+—— 1- Conceptos Básicos en Electricidad Carga Eléctrica.- Es una propiedad de ARGA
+la materia que está presente en las ELÉCTRICA - |
+Átomo.- Un átomo es la partícula más pequeña de un ele: partículas subatómicas y se manifiesta
+mento, Está compuesto por un núcleo y una corteza, en fuerzas de atracción o de repulsión -o had: 0-
+a entre ellas, a través de campos elec-— «=$ -— Q-» a—- |
+En el NUCLEO se encuen re tromagnéticos. Gracias a esta propie- o Lu o
+tran los Protones que po- lo' dad existen cargas eléctricas positivas 0-+-0 Bu
+seen una carga eléctrica po- y negativas. N
+sitiva y Neutrones que son |
+eléctricamente neutros y en a Las cargas Iguales se repelen y las cargas opuestas se |
+la CORTEZA se encuentran atraen, 4
+los meca que posean Noni El fenómeno físico de desplazamiento o flujo de una carga —. |
+carga eléctrica negativa. eléctrica, generalmente de electrones, a través de un mate- |
+y rial conductor, se denomina corriente eléctrica. c
+En su estado normal, los átomos de un cuerpo son eléctrica-
+mente neutros, es decir, la carga negativa de sus electrones Para que haya corriente eléctrica, los electrones que están [6]
+se anula con la carga positiva de sus protones. más alejados del núcleo del átomo de un determinado ma-
+| y terial tienen que desprenderse y circular de forma libre a
+t | través de un conductor en un circuito eléctrico.
+h sa 6 Protonos
+| 0 Noutronos
+| 0 Rloctrones e e e—
+— e—9- e—
+1 0 0— e
+Un o
+++.—o Protón
+ELLE, 9 Te yy
+N == | | . O Noutrón —e -—e .,:*
+$ | L —] Pr tal de un Átomo
+ra e
+o 7. EE
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 83 ====================
+
+1. ova E
+]
+2. Elementos que conforman un circuito Conduit E Mu
+Ñ minos por donde circulará
+eléctrico y electrónico. la corriente eléctrica; están
+) _Un circuito ELÉCTRICO Y ELECTRÓNICO, está conformado construidos por materiales
+si básicamente por: Hs E po la
+| circulación de la corriente
+“E Fuente de Alimentación (Generador).- Sea de Corriente eléctrica y sirven de unión
+Alterna o Corriente Continua. entre los distintos elemen-
+| tos del circuito eléctrico.
+| Lo, Generalmente se utiliza: Oro, plata, platino, cobre, aluminio.
+| Sua E
+| > N e a Aislante.- Su función es aislar el material conductor con
+¿ Ta a Su —— su entorno, se construyen con materiales que no conducen
+, NA e < electricidad, generalmente: Plástico, caucho, vidrio, madera.
+E NN
+o 2 m de
+EAN Wa Y
+» — sí”
+| -=
+S E | | =
+_
+a “6 . BA ,
+Es la encargada de Producir la tensión o diferencia de po- e a
+tencial que impulsa la corriente eléctrica a través del circui- —> A
+to, estas pueden ser: Generadores, baterías, pilas, fuentes == : o J
+de alimentación, alternadores, panel solar, entre otros. A <a
+y E
+La tensión en un generador se denomina Fuerza Electromo- f | !
+triz (FEM). [ | | |
+1 / "EN
+EE a NÓ na
+LOTT NA 27 UE ED
+1 scanned with —
+| EE CamsScanner:
+
+
+==================== PÁGINA 84 ====================
+
+Interruptores.- Dispositivos que sirven para interrumpir o Dispositivos de protección.- Como su nombre lo [indica
+
+dejar circular la corriente eléctrica a través del circuito. protegen al circuito y a las personas de posibles daños por
+| efectos de la electricidad, como cortocircuitos, sobrecargas,
+E fugas a tierra o sobrevoltajes. Cuando hay alguna anoma-
+
+lía se desactivan y dejan sin energía al circuito.
+7 pe
+O Ls.
+Es A —— e e
+. “ "
+== y A
+s <
+
+Bobinas, diodos, condensadores, resistencias.- Elementos S
+
+pasivos, que al ser energizados transforman la energía SD
+
+eléctrica en otro tipo de energía. Estos los encontramos en
+
+Motores, lámparas, dispositivos electrónicos, entre otros. L U
+
+QQ |
+I=
+-uD—  —
+«a y "
+estos-elementos se produce siempre una caída de ten- Entre estos elementos encontramos: Fusibles, térmicos, di-
+
+ión. ferenciales.
+
+! = ll EE)
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 85 ====================
+
+i TT E  —
++
+3 Magnitudes Eléctricas Intensidad de Corriente Eléctrica (1).- Es la carga eléctrica
+| £l S y Ñ AN, que atraviesa una sección de un conductor en una unidad
+| El Af de comprender el funcionamiento de los circuitos eléc- de segundo; para que esta se produzca es necesario que
+— tricos y electrónicos es necesario tener conocimiento de las haya una diferencia de potencial entre dos puntos de un
+E TT moonitudes eléctricas, sus efectos y unidades de medida. circuito.
+". É N
+— En este apartado estudiaremos las magnitudes elementa- Se lo denomina con la letra 1.
+les como: El Voltaje, la Resistencia, la Intensidad de corrien- . .
+te y la Potencia, todas ellas en Corriente Continua (CC) Su unidad de medida es el Amperio y se lo representa con
+y la letra A mayúscula.
+Rs Rs e
+md: Resistencia Eléctrica (R).- Es la oposición que encuentra
+¿ la corriente eléctrica al fluir por un conductor o:elemento.
+Ra Esta depende de las propiedades del material: composi-
+p propi
+ción, longitud y espesor. Materiales como el oro, plata, pla-
+L 2 tino, cobre, aluminio tienen baja resistencia, se los utiliza
+E INTERRUPTOR como conductores; en cambio el plástico, caucho, vidrio y
+L madera, tienen alta resistencia y actúan como aislantes.
+——
+VOUAJE TE
+- v
+Potencia.- (P)
+E Es la energía consumida o producida por un elemento eléc-
+Voltaje (V).- Se lo conoce también como tensión eléctrica. trico. Esta energía es el producto de la diferencia de poten- |
+| Es la diferencia de potencial eléctrico entre dos puntos de cial en los extremos de dicho elemento por la intensidad de —*
+un circuito; se constituye en la fuerza que impulsa a los corriente que pasa por éste. !
+electrones a moverse a través de un conductor. Se la denomina con la letra P, al
+Se lo denomina con la letra V. Su unidad de medida es el VATIO y se loTepresénta coi UU
+Su unidad de medida es el Voltio, se lo representa con una letra W mayúscula. Er
+V mayúscula. )
+Í— scanned with
+| 29 CamScanner”:
+
+
+==================== PÁGINA 86 ====================
+
+4.- Calcular las principales magnitudes eléctricas R = V/I nos permite conocer el valor de la men
+Ley de Ohm Conociendo estas magnitudes podemos saber la potencia
+(P) en vatios requerida en un circuito o la disipada por un
+Descubierta por el físico y matemático alemán Georg Si- elemento participante, de la siguiente manera:
+món Ohm en 1827, de donde deriva su nombre. A
+Esta ley nos permite calcular y obtener formulas referentes ;
+a la electricidad y la electrónica. Su fórmula es bastante
+sencilla. Múltiplos y submúltiplos de las unidades de medidas eléc-
+p P!
+tricas
+AN V=]-R — [uurmos [sumas [minos [suo
+10% KQ |10'm9 || 103 KA [109ma |
+de Ohm en forma algebraica
+/I| RX mp re me 104MQ [1092 | [105 MA Tropa —
+Doom nt ETA 10% | [TA [10% pA |
+La
+1 En donde la |, es la intensidad de corriente que es medida
+1 prromperos (4)
+| , es el voltaje, que es la diferencia de potencial y se mide
+Fan mezo Ya-
+| .
+| es la resistencia eléctrica que se mide en ohmios (0). [10%GV |100v |
+== doc
+|] e la fórmula principal se derivan las siguientes: 107 TV_|10" py
+——.
+| - Vi ermite conocerla corriente que circula por un
+* | tircuito o ramal; Lo ¡
+|
+El AT LO ]—]—————
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 87 ====================
+
+p=""MIE ERES UN UNES
+| E
+“Cálculo de magnitudes eléctricas en circuito serie La Resistencia total del circuito será la suma de las tres resis-
+! Antes de-iniciar es necesario explicar estos tres principios "nc
+| clave que se deben tener en cuenta en un circuito serie: Rt= R1 + R2 + R3, reemplazando valores tenemos,
+7 “Resistencia: La resistencia total de un circuito en serie es. Rt=3KQ0+10KQ+5K0
+igual a la suma de las resistencias individuales. RE = 18 KO = 18000 Q
+pain LME ME COMES La corriente total del circuito, aplicando la formula despeja-
+y da de la Ley de Ohm, tenemos:
+Voltaje: La caída de voltaje total en un circuito en serie es
+igual a la suma de las caídas de voltaje individuales. 1=V/R
+1=9V/18000 Q
+En el siguiente CIRCUITO SERIE que consta de tres resisten- 1= 0.0005 A.
+cias y una sola batería, analizaremos estos tres principios. 1=0.5 mA
+| ES NECESARIO ACLARAR QUE PARA REALIZAR LAS OPERA- Para calcular el voltaje en cada resistencia, procedemos así: — “
+CIONES Y OBTENER RESULTADOS ÓPTIMOS SE DEBE TRA- e ! un
+BAJAR EN LAS MISMAS UNIDADES DE MEDIDAS, CASO CON- VR1=1*R1
+TRARIO TENDRÍAMOS RESULTADOS ERRONEOS VR1 = 0.0005 A *3000 Q
+VR1=1.5V (
+R,=3k0 VR2=1*R1 r
+1 2 VR2 = 0.0005 A *10000 Q N
++ T VR2=5V |
+9 — R,=:
+le VR3=1*R1 LL
+VR3 = 0.0005 A *5000 Q LL
+4 3 VR3=2.5V JH,
+- E=Y)
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 88 ====================
+
+|: 4
+! Sumando los voltajes en cada resistencia, la suma total
+debe darnos el voltaje de fuente: — 1
+Vt=VR1+ VR2 + VR3 Td,
+100 2010
+VE=15V+5V+23V
+VE=9v. Rt= - E
+. (0.1+0.5+1)09
+Ahora explicaremos como calcular las magnitudes eléctri-
+cas fundamentales en un CIRCUITO PARALELO. 1
+R=-——
+1.60
+Ve Vi Vo Vi |
+— RE= 0.625 ( (Resistencia Equivalente) |
+1t nl 4
++
+v R, El voltaje de fuente es igual en cada resistencia. |
+IV " Vf=V1=V2=V3= 9V d
+La corriente total es igual al voltaje total dividido para la (Ss)
+resistencia total (equivalente)
+Para calcular la resistencia total o equivalente se procede vf U
+de la siguiente manera: lt=—
+Rt
+= 97
+0.625 Q
+Il=144A
+f— scamedwith |
+| 29 CamScanner”:
+
+
+==================== PÁGINA 89 ====================
+
+LI Nail e ame —
+1- res La corriante en cada ramal se calcula asf:
+. vi Í
+[Na E RI di Y)
+1 9v y
+en 0 “ss 7 o
+n=094 eS | u
+» | v2 A NN
+| L=— ZA 17 1%
++9 T 1 1»
+9v X Am
+a |
+L=454A 1 A
+MO a
+v2 | »
+Bs E —
+e. |
+9v oo o—
+E AE |
+| B=9A J
+!— scamed with
+¡ECamscaner
+
+
+==================== PÁGINA 90 ====================
+
+| >| al 2
+Pe MORA 77 H a" |
+|
+7 |
+— |
+| ¡OA NP
+y S319YyL4093Y
+E CamScanner
+
+
+==================== PÁGINA 91 ====================
+
+COR TABLES mr
+1. E, E
+e EA pe |
+- 7. L N
+Ea í -
+> |
+— NN E  —- DU
+7 sl >» E“ 1
+ÉE24 ; >» |
+| > f
+- E ; L
+| a O | > $ |
+1 Scamedwith
+| (9 CamScanner
+
+
+==================== PÁGINA 92 ====================
+
+E E - y
+: Pr M7 Mis Lo
+| -0:0 | - ;
+f $ Ol 0 g e e
+H Hi IU A É ll, -
+Ao PQ :
+E ES >
+Pa | : Ue |
+> n E H ZEN lo, :
+| : | UN |
+| | E |
+1 Scamed with —
+E LES) CamScanner
+
+
+==================== PÁGINA 93 ====================
+
+z u V
+S >
+A EAN N 6
+NEO Le » Ns.
+Ea > >
+| E - .
+| Ss == 2 —= 3) Eo
+| ES E
+p - E 2 ¡15 — NES | A 5' A =
+TAN Pel ZE: NTE e 7
+N pedo E. —"] a E e“
+Y 7 Aa 7 a | E > ,
+uu 1974 e e a y MO) Le Eo, O ||2 e =D.
+y: 5 (ul N 5 4 E _- a EE
+— EA yal | b YE e
+a ES NI NE
+he 0) | — $ | ==
+ENS EA EEES e a MA
+“MOLUMIIINTO LIBROS 8 CAPACITACIÓN
+Y NIN ¡MB Celular: 098 706 1875
+> E-mail: mblibrosEhotmail.com
+alesso7lo01099 Quito - Ecuador
+[-scamed ui
+| EE CamScanner

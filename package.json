@@ -47,6 +47,11 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.35",
     "jsdom": "^28.1.0",
+    "pdf-parse": "^2.4.5",
+    "pdf-poppler": "^0.2.3",
+    "pdf2pic": "^3.2.0",
+    "pdfjs-dist": "^5.7.284",
+    "tesseract.js": "^7.0.0",
     "typescript": "^5.4.5",
     "vitest": "^4.0.18"
   }

@@ -926,31 +926,31 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
 
       {/* Guides */}
       {showGuides && (
-        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700 max-h-64 overflow-y-auto">
+        <div className="bg-[#1a3a3a] rounded-xl p-4 border border-[#2d5a5a] max-h-64 overflow-y-auto">
           <div className="flex items-center gap-2 mb-3">
             <Lightbulb className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm text-gray-300">Guía de Comandos</span>
+            <span className="text-sm text-[#7dd3c0]">Guía de Comandos</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             {TERMINAL_GUIDES.map((guide, idx) => (
-              <div key={idx} className="border border-gray-700 rounded-lg overflow-hidden">
+              <div key={idx} className="border border-[#2d5a5a] rounded-lg overflow-hidden">
                 <button
                   onClick={() => setActiveGuide(activeGuide === idx ? null : idx)}
-                  className="w-full flex items-center justify-between p-2 bg-gray-800/50 hover:bg-gray-700/50 transition-colors text-sm"
+                  className="w-full flex items-center justify-between p-2 bg-[#1e4545] hover:bg-[#2a5555] transition-colors text-sm"
                 >
-                  <span className="font-medium text-gray-900">{guide.title}</span>
+                  <span className="font-medium text-white">{guide.title}</span>
                   {activeGuide === idx ? (
-                    <ChevronDown className="w-3 h-3 text-gray-600" />
+                    <ChevronDown className="w-3 h-3 text-[#7dd3c0]" />
                   ) : (
-                    <ChevronRight className="w-3 h-3 text-gray-600" />
+                    <ChevronRight className="w-3 h-3 text-[#7dd3c0]" />
                   )}
                 </button>
                 {activeGuide === idx && (
-                  <div className="p-2 bg-gray-900/50 border-t border-gray-700 text-xs">
+                  <div className="p-2 bg-[#0f2828] border-t border-[#2d5a5a] text-xs">
                     {guide.commands.map((cmd, cmdIdx) => (
-                      <div key={cmdIdx} className="py-1 border-b border-gray-800 last:border-0">
+                      <div key={cmdIdx} className="py-1 border-b border-[#1a3a3a] last:border-0">
                         <code className="text-green-400">{cmd.name}</code>
-                        <span className="text-gray-500 ml-2">{cmd.description}</span>
+                        <span className="text-[#9ca3af] ml-2">{cmd.description}</span>
                       </div>
                     ))}
                   </div>
@@ -1026,11 +1026,11 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
 
       {/* Crypto Tool */}
       {showCrypto && (
-        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+        <div className="bg-[#1a3a3a] rounded-xl p-4 border border-[#2d5a5a]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Lock className="w-4 h-4 text-purple-400" />
-              <span className="font-medium text-gray-900">Cifrado César</span>
+              <span className="font-medium text-white">Cifrado César</span>
             </div>
             <button
               onClick={() => setShowCrypto(false)}
@@ -1069,11 +1069,11 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
               value={encryptText}
               onChange={(e) => setEncryptText(e.target.value)}
               placeholder="Escribe tu mensaje..."
-              className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-gray-900"
+              className="w-full px-3 py-2 bg-[#0f2828] border border-[#2d5a5a] rounded-lg text-white placeholder-gray-500"
             />
             
             <div className="flex items-center gap-3">
-              <label className="text-sm text-gray-600">Desplazamiento:</label>
+              <label className="text-sm text-[#7dd3c0]">Desplazamiento:</label>
               <input
                 type="range"
                 min="1"
@@ -1082,19 +1082,19 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
                 onChange={(e) => setEncryptShift(parseInt(e.target.value))}
                 className="flex-1"
               />
-              <span className="text-gray-900 font-mono w-8">{encryptShift}</span>
+              <span className="text-white font-mono w-8">{encryptShift}</span>
             </div>
             
             <button
               onClick={handleCryptoSubmit}
-              className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-gray-900 rounded-lg transition-colors"
+              className="w-full py-2 bg-[#558C89] hover:bg-[#4a7a78] text-white rounded-lg transition-colors font-medium"
             >
               {cryptoMode === 'encrypt' ? '🔒 Encriptar' : '🔓 Desencriptar'}
             </button>
             
             {encryptedResult && (
-              <div className="p-3 bg-gray-900 rounded-lg">
-                <div className="text-xs text-gray-600 mb-1">Resultado:</div>
+              <div className="p-3 bg-[#0f2828] rounded-lg">
+                <div className="text-xs text-[#7dd3c0] mb-1">Resultado:</div>
                 <div className="text-green-400 font-mono break-all">{encryptedResult}</div>
               </div>
             )}
@@ -1104,15 +1104,15 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
 
       {/* Password Checker */}
       {showPasswordChecker && (
-        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+        <div className="bg-[#1a3a3a] rounded-xl p-4 border border-[#2d5a5a]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Key className="w-4 h-4 text-yellow-400" />
-              <span className="font-medium text-gray-900">Verificador de Contraseñas</span>
+              <span className="font-medium text-white">Verificador de Contraseñas</span>
             </div>
             <button
               onClick={() => setShowPasswordChecker(false)}
-              className="text-gray-600 hover:text-gray-900"
+              className="text-[#7dd3c0] hover:text-white"
             >
               ✕
             </button>
@@ -1129,11 +1129,11 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
                   else setPasswordStrength(null)
                 }}
                 placeholder="Escribe una contraseña para verificar..."
-                className="w-full px-3 py-2 pr-10 bg-gray-900 border border-gray-700 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 pr-10 bg-[#0f2828] border border-[#2d5a5a] rounded-lg text-white placeholder-gray-500"
               />
               <button
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#7dd3c0] hover:text-white"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -1142,7 +1142,7 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
             {passwordStrength && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-[#1e4545] rounded-full overflow-hidden">
                     <div 
                       className={`h-full transition-all ${
                         passwordStrength.score <= 2 ? 'bg-red-500' :
@@ -1163,7 +1163,7 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
                 
                 {passwordStrength.tips.length > 0 && (
                   <div className="text-sm">
-                    <div className="text-gray-600 mb-1">Sugerencias:</div>
+                    <div className="text-[#7dd3c0] mb-1">Sugerencias:</div>
                     {passwordStrength.tips.map((tip, i) => (
                       <div key={i} className="text-yellow-400 text-xs">• {tip}</div>
                     ))}
@@ -1176,7 +1176,7 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
       )}
 
       {/* Tips */}
-      <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+      <div className="bg-[#1a3a3a] border border-[#2d5a5a] rounded-lg p-3">
         <div className="flex items-start gap-2">
           <Shield className="w-4 h-4 text-green-400 mt-0.5" />
           <div className="text-sm text-green-300">
