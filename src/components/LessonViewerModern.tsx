@@ -103,10 +103,10 @@ export default function LessonViewerModern({
       .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold text-gray-900 mt-6 mb-3 flex items-center gap-2"><span class="w-1 h-6 bg-gradient-to-b ' + program.gradient + ' rounded-full"></span>$1</h2>')
       .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold text-gray-900 mt-6 mb-4">$1</h1>')
       .replace(/\*\*(.+?)\*\*/g, '<strong class="text-gray-900 font-semibold">$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em class="text-gray-300">$1</em>')
-      .replace(/^- (.+)$/gm, '<li class="flex items-start gap-2 text-gray-300 ml-4"><span class="text-' + program.color + '-400 mt-1">•</span><span>$1</span></li>')
-      .replace(/^\d+\. (.+)$/gm, '<li class="flex items-start gap-3 text-gray-300 ml-4 mb-2"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-' + program.color + '-500/20 text-' + program.color + '-400 text-sm flex items-center justify-center font-medium">$1</span></li>')
-      .replace(/\n\n/g, '</p><p class="text-gray-300 leading-relaxed mb-3">')
+      .replace(/\*(.+?)\*/g, '<em class="text-gray-600 italic">$1</em>')
+      .replace(/^- (.+)$/gm, '<li class="flex items-start gap-2 text-gray-700 ml-4"><span class="text-' + program.color + '-500 mt-1">•</span><span>$1</span></li>')
+      .replace(/^\d+\. (.+)$/gm, '<li class="flex items-start gap-3 text-gray-700 ml-4 mb-2"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-' + program.color + '-500/20 text-' + program.color + '-600 text-sm flex items-center justify-center font-medium">$1</span></li>')
+      .replace(/\n\n/g, '</p><p class="text-gray-700 leading-relaxed mb-3">')
       .replace(/\n/g, '<br/>')
   }
 
@@ -291,7 +291,7 @@ export default function LessonViewerModern({
                         <ProgramIcon className="w-12 h-12 text-gray-900" />
                       </div>
                       <h3 className="text-2xl font-bold text-gray-900 mb-2">{lesson.title}</h3>
-                      <p className="text-gray-300 mb-6">Esta lección es práctica. Lee el contenido y usa los simuladores.</p>
+                      <p className="text-gray-600 mb-6">Esta lección es práctica. Lee el contenido y usa los simuladores.</p>
                       <button 
                         onClick={() => setActiveSection('content')}
                         className={`px-6 py-3 bg-gradient-to-r ${program.gradient} rounded-xl text-gray-900 font-medium hover:opacity-90 transition-opacity`}
@@ -353,7 +353,7 @@ export default function LessonViewerModern({
                 {/* Contenido formateado */}
                 <div 
                   className="prose prose-invert max-w-none [&_img]:relative [&_img]:z-0 [&_img]:max-w-[200px] [&_img]:float-right [&_img]:ml-4 [&_img]:mb-4 [&_img]:rounded-xl [&_p]:relative [&_p]:z-10"
-                  dangerouslySetInnerHTML={{ __html: `<div class="text-gray-300 leading-relaxed space-y-3">${parseMarkdown(lesson.content || '')}</div>` }}
+                  dangerouslySetInnerHTML={{ __html: `<div class="text-gray-700 leading-relaxed space-y-3">${parseMarkdown(lesson.content || '')}</div>` }}
                 />
 
                 {/* Imágenes */}
@@ -386,7 +386,7 @@ export default function LessonViewerModern({
                     <Zap className={`w-6 h-6 text-${program.color}-400`} />
                     Hora de Practicar
                   </h3>
-                  <p className="text-gray-300 mb-6">
+                  <p className="text-gray-600 mb-6">
                     Aplica lo aprendido usando nuestros simuladores interactivos. 
                     Experimenta, equivócate y aprende haciendo.
                   </p>

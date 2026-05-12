@@ -757,7 +757,7 @@ export default function NivelPage() {
                 {/* Descripción */}
                 {'content' in lesson && lesson.content && (
                   <div className="bg-gray-100/50 rounded-xl p-4">
-                    <p className="text-gray-300 whitespace-pre-line">{lesson.content}</p>
+                    <p className="text-gray-700 whitespace-pre-line">{lesson.content}</p>
                   </div>
                 )}
                 
