@@ -1,72 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Airtable from 'airtable'
-import { cache } from '@/lib/cache'
-import { getUserFriendlyError } from '@/lib/airtable-errors'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
-
-const base = new Airtable({ 
-  apiKey: process.env.AIRTABLE_API_KEY 
-}).base(process.env.AIRTABLE_BASE_ID || '')
 
 // GET - Obtener programas (todos o filtrados por nivel)
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const levelId = searchParams.get('levelId')
-  
-  // Caché de programas - 30 minutos
-  const CACHE_KEY = `programs:${levelId || 'all'}`
 
   try {
-    // Intentar obtener del caché primero
-    const cached = cache.get<any>(CACHE_KEY)
-    if (cached) {
-      console.log('[Programs API] Usando caché para:', levelId || 'todos')
-      return NextResponse.json({ success: true, programs: cached })
+    let query = supabaseAdmin
+      .from('programs')
+      .select('*')
+      .eq('is_active', true)
+      .order('name', { ascending: true })
+
+    if (levelId) query = query.eq('level_id', levelId)
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error('[Programs] Supabase error:', error)
+      return NextResponse.json({ success: false, programs: [] })
     }
 
-    console.log('[Programs API] Consultando Airtable para:', levelId || 'todos')
-
-    let filterFormula = '{isActive} = TRUE()'
-    if (levelId) {
-      filterFormula = `AND({levelId} = '${levelId}', {isActive} = TRUE())`
-    }
-
-    const records = await base('programs')
-      .select({
-        filterByFormula: filterFormula,
-        sort: [{ field: 'name', direction: 'asc' }]
-      })
-      .all()
-
-    const programs = records.map(record => ({
-      id: record.fields.id as string,
-      name: record.fields.name as string,
-      description: record.fields.description as string,
-      levelId: record.fields.levelId as string,
-      levelName: record.fields.levelName as string,
-      type: record.fields.type as string,
-      duration: record.fields.duration as string,
-      price: record.fields.price as number,
-      isActive: record.fields.isActive as boolean
+    const programs = (data || []).map((row: any) => ({
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      levelId: row.level_id,
+      levelName: row.level_name,
+      type: row.type,
+      duration: row.duration,
+      price: row.price,
+      isActive: row.is_active,
     }))
-
-    // Guardar en caché
-    cache.set(CACHE_KEY, programs)
 
     return NextResponse.json({ success: true, programs })
   } catch (error: any) {
     console.error('Error fetching programs:', error)
-    
-    // Mensaje amigable para límite de API
-    const errorMessage = error?.message || ''
-    if (errorMessage.includes('429') || errorMessage.includes('BILLING_LIMIT')) {
-      return NextResponse.json(
-        { success: false, error: getUserFriendlyError(429, errorMessage), programs: [] },
-        { status: 429 }
-      )
-    }
-    
     return NextResponse.json({ success: false, programs: [] })
   }
 }
@@ -78,49 +50,35 @@ export async function POST(request: NextRequest) {
     const { name, description, levelId, levelName, type, duration, price } = body
 
     if (!name || !levelId || !type) {
-      return NextResponse.json(
-        { success: false, error: 'Faltan campos requeridos' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: 'Faltan campos requeridos' }, { status: 400 })
     }
 
-    // Generar ID único
     const programId = `prog-${levelId}-${type}-${Date.now()}`
 
-    const record = await base('programs').create({
+    const { error } = await supabaseAdmin.from('programs').insert({
       id: programId,
       name,
       description: description || '',
-      levelId,
-      levelName: levelName || '',
+      level_id: levelId,
+      level_name: levelName || '',
       type,
       duration: duration || '6 meses',
       price: price || 50,
-      isActive: true,
-      createdAt: new Date().toISOString()
+      is_active: true,
     })
+
+    if (error) {
+      console.error('Error creating program:', error)
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    }
 
     return NextResponse.json({
       success: true,
-      program: {
-        id: programId,
-        name,
-        description,
-        levelId,
-        levelName,
-        type,
-        duration,
-        price,
-        isActive: true
-      },
-      message: 'Programa creado exitosamente'
+      program: { id: programId, name, description, levelId, levelName, type, duration, price, isActive: true },
+      message: 'Programa creado exitosamente',
     })
   } catch (error) {
-    console.error('Error creating program:', error)
-    return NextResponse.json(
-      { success: false, error: 'Error al crear programa' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Error al crear programa' }, { status: 500 })
   }
 }
 
@@ -131,34 +89,26 @@ export async function PATCH(request: NextRequest) {
     const { programId, name, description, levelId, levelName, type, duration, price, isActive } = body
 
     if (!programId) {
-      return NextResponse.json(
-        { success: false, error: 'programId es requerido' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: 'programId es requerido' }, { status: 400 })
     }
 
-    const fields: Record<string, unknown> = {}
+    const fields: Record<string, any> = {}
     if (name !== undefined) fields.name = name
     if (description !== undefined) fields.description = description
-    if (levelId !== undefined) fields.levelId = levelId
-    if (levelName !== undefined) fields.levelName = levelName
+    if (levelId !== undefined) fields.level_id = levelId
+    if (levelName !== undefined) fields.level_name = levelName
     if (type !== undefined) fields.type = type
     if (duration !== undefined) fields.duration = duration
     if (price !== undefined) fields.price = price
-    if (isActive !== undefined) fields.isActive = isActive
+    if (isActive !== undefined) fields.is_active = isActive
 
-    await base('programs').update(programId, fields)
+    const { error } = await supabaseAdmin.from('programs').update(fields).eq('id', programId)
 
-    return NextResponse.json({
-      success: true,
-      message: 'Programa actualizado exitosamente'
-    })
+    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+
+    return NextResponse.json({ success: true, message: 'Programa actualizado exitosamente' })
   } catch (error) {
-    console.error('Error updating program:', error)
-    return NextResponse.json(
-      { success: false, error: 'Error al actualizar programa' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Error al actualizar programa' }, { status: 500 })
   }
 }
 
@@ -169,23 +119,15 @@ export async function DELETE(request: NextRequest) {
     const programId = searchParams.get('programId')
 
     if (!programId) {
-      return NextResponse.json(
-        { success: false, error: 'programId es requerido' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: 'programId es requerido' }, { status: 400 })
     }
 
-    await base('programs').destroy(programId)
+    const { error } = await supabaseAdmin.from('programs').delete().eq('id', programId)
 
-    return NextResponse.json({
-      success: true,
-      message: 'Programa eliminado exitosamente'
-    })
+    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+
+    return NextResponse.json({ success: true, message: 'Programa eliminado exitosamente' })
   } catch (error) {
-    console.error('Error deleting program:', error)
-    return NextResponse.json(
-      { success: false, error: 'Error al eliminar programa' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Error al eliminar programa' }, { status: 500 })
   }
 }

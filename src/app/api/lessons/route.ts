@@ -1,415 +1,193 @@
+/**
+ * EJEMPLO de refactor: API /lessons usando Supabase
+ * 
+ * Compara este archivo con route.ts (versión Airtable)
+ * Renombrar a route.ts cuando estés listo para migrar
+ */
 import { NextResponse } from 'next/server'
-import { cache, cacheKeys } from '@/lib/cache'
-import { getUserFriendlyError } from '@/lib/airtable-errors'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
-
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
-
-// URL base de Airtable - usa una sola tabla 'lessons' con filtro por programId
-const AIRTABLE_API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/lessons`
-
-// Función para obtener todos los registros con paginación de Airtable
-async function fetchAllRecords(baseUrl: string): Promise<any[]> {
-  const allRecords: any[] = []
-  let offset: string | undefined = undefined
-  
-  do {
-    const paginatedUrl: string = offset ? `${baseUrl}&offset=${offset}` : baseUrl
-    
-    const response: Response = await fetch(paginatedUrl, {
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Airtable lessons error:', errorText)
-      
-      if (response.status === 429) {
-        throw new Error('RATE_LIMIT')
-      }
-      
-      throw new Error('FETCH_ERROR')
-    }
-
-    const data: { records?: any[], offset?: string } = await response.json()
-    allRecords.push(...(data.records || []))
-    offset = data.offset
-    
-  } while (offset)
-  
-  return allRecords
-}
 
 function getVideoEmbedUrl(url: string): string {
   if (!url) return ''
   if (url.includes('drive.google.com')) {
     const match = url.match(/\/file\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/)
-    if (match && match[1]) {
-      return `https://drive.google.com/file/d/${match[1]}/preview`
-    }
+    if (match?.[1]) return `https://drive.google.com/file/d/${match[1]}/preview`
   }
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
-    if (match && match[1]) {
-      return `https://www.youtube.com/embed/${match[1]}`
-    }
+    if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`
   }
   return url
 }
 
+// ============================================================
+// GET /api/lessons?levelId=X&programId=Y
+// ============================================================
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const levelId = searchParams.get('levelId')
   const programId = searchParams.get('programId') || 'robotica'
-  const noCache = searchParams.get('nocache') === '1'
-
-  // Caché de lecciones - 15 minutos (incluye programa en la clave)
-  const CACHE_KEY = `lessons_${programId}_${levelId || 'all'}`
 
   try {
-    // Intentar obtener del caché primero (si no se fuerza recarga)
-    if (!noCache) {
-      const cached = cache.get<any[]>(CACHE_KEY)
-      if (cached) {
-        console.log('[Lessons API] Usando caché para:', programId, levelId || 'todos')
-        return NextResponse.json(cached)
-      }
-    } else {
-      console.log('[Lessons API] Forzando recarga sin caché')
-      cache.invalidate(CACHE_KEY)
+    let query = supabaseAdmin
+      .from('lessons')
+      .select('*')
+      .order('display_order', { ascending: true })
+
+    if (levelId) query = query.eq('level_id', levelId)
+    if (programId) query = query.eq('program_id', programId)
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error('[Lessons] Supabase error:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('[Lessons API] Consultando Airtable para:', programId, levelId || 'todos', '- v2')
-    let url = AIRTABLE_API_URL
-    
-    // Construir filtro combinando levelId y programId
-    const filters: string[] = []
-    if (levelId) {
-      filters.push(`{levelId}="${levelId}"`)
-    }
-    if (programId) {
-      filters.push(`{programId}="${programId}"`)
-    }
-    
-    if (filters.length > 0) {
-      const formula = filters.length === 1 
-        ? filters[0] 
-        : `AND(${filters.join(',')})`
-      url += `?filterByFormula=${encodeURIComponent(formula)}&sort[0][field]=order&sort[0][direction]=asc`
-    } else {
-      url += `?sort[0][field]=order&sort[0][direction]=asc`
-    }
-
-    let allRecords: any[]
-    try {
-      allRecords = await fetchAllRecords(url)
-    } catch (error: any) {
-      if (error.message === 'RATE_LIMIT') {
-        return NextResponse.json(
-          { error: getUserFriendlyError(429, 'Rate limit') },
-          { status: 429 }
-        )
-      }
-      return NextResponse.json({ error: 'Error fetching lessons' }, { status: 500 })
-    }
-
-    const data = { records: allRecords }
-    
-    const lessons = data.records.map((record: any) => {
-      const moduleName = record.fields.moduleName || ''
+    // Transformar al formato esperado por el frontend
+    const lessons = (data || []).map((row: any) => {
+      const moduleName = row.module_name || ''
       const moduleId = moduleName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'sin-modulo'
-      
-      // Obtener videoUrl original para edición
-      const videoUrlRaw = record.fields.videoUrl || ''
-      
-      // Parsear múltiples URLs (separadas por | o salto de línea) para visualización
-      const allUrls = videoUrlRaw.split(/[|\n]/).map((url: string) => url.trim()).filter((url: string) => url)
-      
-      // Separar videos de imágenes para mostrar al estudiante
+
+      const videoUrlRaw = row.video_url || ''
+      const allUrls = videoUrlRaw.split(/[|\n]/).map((u: string) => u.trim()).filter(Boolean)
       const videos: string[] = []
       const images: string[] = []
-      
-      allUrls.forEach((url: string, index: number) => {
-        // Primera URL siempre es video (para mantener compatibilidad)
-        if (index === 0) {
-          videos.push(url)
-          return
-        }
-        
-        // URLs adicionales: detectar si es imagen o video
-        const isImageExtension = /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?|$)/i.test(url)
-        const isExplicitImage = url.includes('drive.google.com/uc?id=') || isImageExtension
-        
-        if (isExplicitImage) {
-          // Es imagen explícita
+
+      allUrls.forEach((url: string, idx: number) => {
+        if (idx === 0) { videos.push(url); return }
+        const isImage = /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?|$)/i.test(url) || url.includes('drive.google.com/uc?id=')
+        if (isImage) {
           if (url.includes('drive.google.com/file/d/')) {
-            const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
-            if (match && match[1]) {
-              images.push(`https://drive.google.com/uc?id=${match[1]}`)
-            }
-          } else {
-            images.push(url)
-          }
-        } else if (url.includes('drive.google.com/file/d/') && !url.includes('/preview')) {
-          // Google Drive sin /preview - convertir a imagen
-          const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
-          if (match && match[1]) {
-            images.push(`https://drive.google.com/uc?id=${match[1]}`)
-          }
-        } else {
-          // Es video (YouTube, Vimeo, Drive con /preview)
-          videos.push(url)
-        }
+            const m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
+            if (m?.[1]) images.push(`https://drive.google.com/uc?id=${m[1]}`)
+          } else images.push(url)
+        } else videos.push(url)
       })
-      
-      // El primer video es el principal para embed
-      const mainVideoUrl = videos[0] || ''
-      
+
       return {
-        id: record.id,
-        levelId: record.fields.levelId || '',
-        programId: record.fields.programId || 'robotica',
+        id: row.id,
+        levelId: row.level_id,
+        programId: row.program_id,
         moduleId,
         moduleName,
-        title: record.fields.title || '',
-        type: record.fields.type || 'video',
-        duration: record.fields.duration || '5 min',
-        order: record.fields.order || 0,
+        title: row.title,
+        type: row.type,
+        duration: row.duration,
+        order: row.display_order,
         videoUrl: videoUrlRaw,
-        videoEmbedUrl: getVideoEmbedUrl(mainVideoUrl),
+        videoEmbedUrl: getVideoEmbedUrl(videos[0] || ''),
         videos,
-        images,
-        content: record.fields.content || '',
-        locked: record.fields.locked || false,
-        pdfUrl: record.fields.pdfUrl || '',
+        images: [...images, ...(row.images || [])],
+        content: row.content || '',
+        locked: row.locked || false,
+        pdfUrl: row.pdf_url || '',
       }
     })
-
-    // Guardar en caché
-    cache.set(CACHE_KEY, lessons)
 
     return NextResponse.json(lessons)
   } catch (error: any) {
     console.error('Error:', error)
-    
-    // Mensaje amigable para límite de API
-    const errorMessage = error?.message || ''
-    if (errorMessage.includes('429') || errorMessage.includes('BILLING_LIMIT')) {
-      return NextResponse.json(
-        { error: getUserFriendlyError(429, errorMessage) },
-        { status: 429 }
-      )
-    }
-    
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
+// ============================================================
+// POST /api/lessons - Crear lección
+// ============================================================
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    
-    // Valores válidos para campos select en Airtable
-    const VALID_TYPES = ['video', 'activity', 'tutorial', 'project']
-    const VALID_PROGRAMS = ['robotica', 'ia', 'hacking']
-    
-    // Campos básicos requeridos
-    const fields: Record<string, any> = {
-      levelId: body.levelId || '',
-      moduleName: body.moduleName || '',
-      title: body.title || '',
-      duration: body.duration || '10 min',
-      order: body.order || 0,
-    }
-    
-    // Agregar type solo si es válido
-    if (body.type && VALID_TYPES.includes(body.type)) {
-      fields.type = body.type
-    }
-    
-    // Agregar programId solo si es válido
-    if (body.programId && VALID_PROGRAMS.includes(body.programId)) {
-      fields.programId = body.programId
-    }
-    
-    // Campos opcionales
-    if (body.videoUrl) fields.videoUrl = body.videoUrl
-    if (body.content) fields.content = body.content
-    if (body.locked !== undefined) fields.locked = body.locked
-    if (body.pdfUrl) fields.pdfUrl = body.pdfUrl
-    
-    // Intentar primero sin el campo 'type' que puede causar problemas
-    let response = await fetch(AIRTABLE_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        records: [{ fields }]
+
+    const { data, error } = await supabaseAdmin
+      .from('lessons')
+      .insert({
+        level_id: body.levelId,
+        program_id: body.programId || 'robotica',
+        module_name: body.moduleName,
+        title: body.title,
+        type: body.type || 'video',
+        duration: body.duration || '10 min',
+        display_order: body.order || 0,
+        video_url: body.videoUrl,
+        pdf_url: body.pdfUrl,
+        content: body.content,
+        locked: body.locked || false,
       })
-    })
+      .select()
+      .single()
 
-    // Si falla, manejar el error
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Airtable error creating lesson:', errorText)
-      
-      // Si es error de campo desconocido (pdfUrl no existe), reintentar sin él
-      if (errorText.includes('UNKNOWN_FIELD_NAME') && errorText.includes('pdfUrl')) {
-        const retryFields = { ...fields }
-        delete retryFields.pdfUrl
-        
-        response = await fetch(AIRTABLE_API_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            records: [{ fields: retryFields }]
-          })
-        })
-        
-        if (response.ok) {
-          console.log('Nota: Campo pdfUrl no existe en Airtable. Crear el campo manualmente.')
-        }
-      }
-      
-      // Si es error de INVALID_MULTIPLE_CHOICE, el campo moduleName o type tiene un valor no permitido
-      if (!response.ok && errorText.includes('INVALID_MULTIPLE_CHOICE')) {
-        const retryFields = { ...fields }
-        delete retryFields.moduleName
-        delete retryFields.pdfUrl
-        if (body.type) delete retryFields.type
-        
-        response = await fetch(AIRTABLE_API_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            records: [{ fields: retryFields }]
-          })
-        })
-      }
-      
-      if (!response.ok) {
-        const finalError = await response.text()
-        console.error('Airtable final error:', finalError)
-        return NextResponse.json({ error: 'Error creating lesson', message: finalError }, { status: 500 })
-      }
+    if (error) {
+      console.error('Supabase create error:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    const data = await response.json()
-    return NextResponse.json({ success: true, record: data.records[0] })
+    return NextResponse.json({ success: true, record: data })
   } catch (error) {
     console.error('Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
+// ============================================================
+// PUT /api/lessons - Actualizar lección
+// ============================================================
 export async function PUT(request: Request) {
   try {
     const body = await request.json()
-    
-    if (!body.id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 })
-    }
+    const { id, ...rest } = body
 
-    const fields: Record<string, any> = {}
-    if (body.levelId) fields.levelId = body.levelId
-    if (body.moduleName) fields.moduleName = body.moduleName
-    if (body.title) fields.title = body.title
-    if (body.type) fields.type = body.type
-    if (body.duration) fields.duration = body.duration
-    if (body.order !== undefined) fields.order = body.order
-    if (body.videoUrl !== undefined) fields.videoUrl = body.videoUrl
-    if (body.content !== undefined) fields.content = body.content
-    if (body.locked !== undefined) fields.locked = body.locked
-    if (body.pdfUrl !== undefined) fields.pdfUrl = body.pdfUrl
+    if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 })
 
-    let response = await fetch(AIRTABLE_API_URL, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        records: [{
-          id: body.id,
-          fields
-        }]
-      })
-    })
+    const updates: any = {}
+    if (rest.levelId !== undefined) updates.level_id = rest.levelId
+    if (rest.programId !== undefined) updates.program_id = rest.programId
+    if (rest.moduleName !== undefined) updates.module_name = rest.moduleName
+    if (rest.title !== undefined) updates.title = rest.title
+    if (rest.type !== undefined) updates.type = rest.type
+    if (rest.duration !== undefined) updates.duration = rest.duration
+    if (rest.order !== undefined) updates.display_order = rest.order
+    if (rest.videoUrl !== undefined) updates.video_url = rest.videoUrl
+    if (rest.pdfUrl !== undefined) updates.pdf_url = rest.pdfUrl
+    if (rest.content !== undefined) updates.content = rest.content
+    if (rest.locked !== undefined) updates.locked = rest.locked
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Airtable error:', errorText)
-      
-      // Si pdfUrl no existe en Airtable, reintentar sin él
-      if (errorText.includes('UNKNOWN_FIELD_NAME') && errorText.includes('pdfUrl')) {
-        delete fields.pdfUrl
-        response = await fetch(AIRTABLE_API_URL, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            records: [{ id: body.id, fields }]
-          })
-        })
-        if (response.ok) {
-          console.log('Nota: Campo pdfUrl no existe en Airtable. Crear el campo manualmente.')
-        }
-      }
-      
-      if (!response.ok) {
-        return NextResponse.json({ error: 'Error updating lesson', message: errorText }, { status: 500 })
-      }
-    }
+    const { data, error } = await supabaseAdmin
+      .from('lessons')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
 
-    const data = await response.json()
-    return NextResponse.json({ success: true, record: data.records[0] })
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    return NextResponse.json({ success: true, record: data })
   } catch (error) {
-    console.error('Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
+// ============================================================
+// DELETE /api/lessons?id=X
+// ============================================================
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
-    
-    if (!id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 })
-    }
 
-    const response = await fetch(`${AIRTABLE_API_URL}/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-      },
-    })
+    if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Airtable error:', errorText)
-      return NextResponse.json({ error: 'Error deleting lesson' }, { status: 500 })
-    }
+    const { error } = await supabaseAdmin
+      .from('lessons')
+      .delete()
+      .eq('id', id)
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

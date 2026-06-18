@@ -1,0 +1,601 @@
+levelId,moduleName,title,type,duration,order,videoUrl,content,locked,programId,images
+sexto-egb,Módulo 1: Programación con Robots,Prueba de entrada - Robótica,activity,15 min,1,,"Antes de comenzar nuestro viaje por el mundo de la robótica, vamos a descubrir cuánto sabes.
+
+**Objetivos:**
+- Identificar conocimientos previos sobre robótica
+- Familiarizarte con conceptos básicos de programación
+- Conocer el robot Edison y EdScratch
+
+**Preguntas de ejemplo:**
+1. ¿Qué es EdScratch? (Lenguaje de programación basado en bloques)
+2. ¿Qué hace un sensor infrarrojo? (Detecta obstáculos)
+3. ¿Qué es Scratch? (Lenguaje visual creado por MIT)
+
+💡 **Tip:** No te preocupes si no conoces todas las respuestas. ¡Aprenderemos juntos!",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots,Introducción a EdScratch,video,20 min,2,,"EdScratch es un lenguaje de programación visual diseñado especialmente para el robot Edison. Funciona con bloques que se conectan como piezas de LEGO.
+
+**¿Qué aprenderás?**
+- Qué es la programación por bloques
+- Cómo funciona EdScratch
+- La interfaz del programa
+- Tus primeros bloques de código
+
+**Conceptos clave:**
+- **Bloque:** Instrucción visual que le dice al robot qué hacer
+- **Programa:** Conjunto de bloques conectados
+- **Evento:** Acción que inicia el programa
+
+🎯 **Actividad:** Ingresa a https://educatemas.com/Scb01 y explora la interfaz",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots,Conociendo el Robot Edison,video,15 min,3,,"Edison es un robot educativo compacto y versátil. ¡Vamos a conocer todas sus partes!
+
+**Componentes del Edison:**
+- **LEDs rojos:** Izquierdo y derecho, indican estado
+- **LED infrarrojo:** Emite luz invisible para detectar obstáculos
+- **Sensores de luz:** Detectan claridad/oscuridad
+- **Botón grabar:** Para cargar programas
+- **Motores:** Mueven las ruedas
+- **Altavoz:** Emite sonidos y pitidos
+
+**¿Qué es la luz infrarroja?**
+La luz infrarroja es invisible para nosotros pero los sensores la detectan. Se usa para detectar obstáculos y en controles remotos.
+
+🔬 **Experimento:** Apunta un control remoto de TV hacia la cámara de tu celular y presiona un botón. ¡Verás la luz infrarroja!",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots,Interfaz de EdScratch,tutorial,20 min,4,,"Vamos a explorar cada parte de la interfaz de EdScratch.
+
+**Áreas de la interfaz:**
+1. **Paleta de bloques:** Izquierda - todos los bloques disponibles
+2. **Área de programación:** Centro - donde armas tu código
+3. **Menú superior:** Guardar, cargar, programar Edison
+4. **Botón Program Edison:** Envía el código al robot
+
+**Categorías de bloques:**
+- 🟡 Eventos: Inicio del programa
+- 🔵 Movimiento: Avanzar, girar, detenerse
+- 🟢 Sonido: Pitidos y melodías
+- 🟣 Luz: Encender/apagar LEDs
+- 🟠 Control: Repetir, esperar, condiciones
+- 🔴 Sensores: Detectar obstáculos, luz
+
+🎯 **Práctica:** Abre EdScratch, arrastra el bloque Start, conecta un bloque beep y drive forward. ¡Tu primer programa!",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots,Primer programa con Edison,activity,25 min,5,,"¡Es hora de programar! Crearemos un programa que haga que Edison emita tres pitidos y luego avance.
+
+**Programa paso a paso:**
+1. Arrastra el bloque **Start**
+2. Agrega **repeat (3)**
+3. Dentro del repeat: **beep** y **wait 0.5 sec**
+4. Después del repeat: **turn obstacle detection beam on**
+5. Finalmente: **drive forward at speed 5**
+
+**Cargar al Edison:**
+1. Conecta el cable EdComm al Edison y a tu computador
+2. Sube el volumen de tu computador al máximo
+3. Presiona el botón redondo del Edison una vez
+4. Haz clic en Program Edison
+
+💡 **Tip:** Si el programa no carga, verifica que el volumen esté al 100%.",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots,Edison en el laberinto,activity,30 min,6,,"Programaremos a Edison para que avance hasta encontrar un obstáculo, encienda sus LEDs y emita un pitido.
+
+**Programa:**
+- Start → turn obstacle detection beam on
+- repeat until obstacle detected anywhere
+  - set both motors to drive forward at speed 5
+- stop both motors
+- turn left LED on / turn right LED on
+- beep
+
+**Conceptos nuevos:**
+- **repeat until:** Repite hasta que algo suceda
+- **obstacle detected:** El sensor detecta un obstáculo
+- **stop both motors:** Detiene el movimiento
+
+🎯 **Desafío:** Crea un laberinto con libros o cajas y prueba tu programa.",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots,Evasión de obstáculos,activity,30 min,7,,"Ahora haremos que Edison no solo detecte obstáculos, sino que los evite girando automáticamente.
+
+**Lógica del programa:**
+1. Si detecta obstáculo → para, gira 90°
+2. Si no hay obstáculo → sigue avanzando
+3. Repite infinitamente
+
+**Programa mejorado:**
+- forever loop con if obstacle detected
+- Al detectar: stop, beep, LEDs on, spin left 90°, LEDs off
+- Siempre: drive forward at speed 5
+
+🎯 **Desafío:** Modifica el ángulo de giro. ¿Qué pasa con 45°? ¿Y con 180°?",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots,Conectar Edison al computador,tutorial,15 min,8,,"Guía paso a paso para conectar tu Edison y cargar programas correctamente.
+
+**Pasos de conexión:**
+1. Conecta el cable EdComm al puerto de audio
+2. Conecta el otro extremo al Edison (puerto lateral)
+3. Sube el volumen de tu computador al 100%
+4. Presiona el botón redondo del Edison una vez
+5. En EdScratch, haz clic en Program Edison
+6. Espera Ready y haz clic en Program Edison
+
+**Solución de problemas:**
+- **No carga:** Verifica el volumen al máximo
+- **Error de conexión:** Revisa que el cable esté bien conectado
+- **Edison no responde:** Cambia las baterías
+
+💡 **Tip:** El Edison usa sonido para recibir programas. Por eso necesitas el volumen al máximo.",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots,Práctica: Carrera de evasión,project,40 min,9,,"¡Competencia en equipos! Programarán a Edison para completar una pista de obstáculos.
+
+**Materiales:**
+- Robot Edison por equipo
+- Cinta adhesiva para la pista
+- Obstáculos (cajas, bloques, botellas)
+- Cronómetro
+
+**Reglas:**
+1. El robot debe ir de inicio a meta
+2. Si choca, se penaliza con +5 segundos
+3. Gana el equipo con menor tiempo total
+
+**Procedimiento:**
+1. Diseñen la pista con curvas y rectas
+2. Coloquen obstáculos estratégicamente
+3. Programen a Edison para evadir obstáculos
+4. Practiquen y mejoren el programa
+5. ¡Compitan!
+
+**Reflexión:** ¿Qué tan eficiente fue tu programa? ¿Cómo podrías mejorarlo?",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots II,Figuras geométricas con Edison,video,20 min,10,,"En esta unidad, Edison se convertirá en un artista robótico. Aprenderemos a programarlo para dibujar figuras geométricas precisas.
+
+**¿Qué aprenderás?**
+- Relación entre ángulos y figuras
+- Programación de movimientos precisos
+- Uso de variables para modificar figuras
+
+**Figuras que dibujaremos:**
+- Cuadrado (4 lados, ángulos de 90°)
+- Triángulo equilátero (3 lados, ángulos de 120°)
+- Rectángulo (4 lados, 2 pares diferentes)
+
+**Concepto clave - Ángulo externo:**
+Fórmula: Ángulo de giro = 360° ÷ número de lados
+
+💡 **Tip:** Para un cuadrado giramos 90°, para un triángulo 120°, para un hexágono 60°.",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots II,Matemáticas y robótica,tutorial,20 min,11,,"La robótica y las matemáticas van de la mano. Aprenderemos la teoría detrás de los movimientos geométricos.
+
+**Conceptos matemáticos:**
+- **Perímetro:** Suma de todos los lados
+- **Ángulo interno:** Ángulo dentro de la figura
+- **Ángulo externo:** Ángulo de giro del robot
+
+**Tabla de ángulos:**
+- Triángulo: 3 lados → gira 120°
+- Cuadrado: 4 lados → gira 90°
+- Pentágono: 5 lados → gira 72°
+- Hexágono: 6 lados → gira 60°
+
+**Fórmula mágica:** Ángulo de giro = 360° ÷ número de lados
+
+🎯 **Ejercicio:** ¿Cuánto debe girar Edison para un octágono (8 lados)? Respuesta: 360° ÷ 8 = 45°",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots II,Programar un cuadrado,activity,25 min,12,,"Programaremos a Edison para dibujar un cuadrado perfecto.
+
+**Programa:**
+- Start
+- repeat 4
+  - drive forward for 5 cm at speed 3
+  - spin left for 90 degrees at speed 3
+- end repeat
+
+**Explicación:**
+- **repeat 4:** Un cuadrado tiene 4 lados
+- **drive forward 5 cm:** Avanza un lado
+- **spin left 90°:** Gira para el siguiente lado
+
+🎯 **Desafíos:**
+1. Haz un cuadrado más grande (10 cm por lado)
+2. Haz un cuadrado girando a la derecha
+3. Haz dos cuadrados seguidos
+
+💡 **Tip:** Si el cuadrado no cierra bien, ajusta los grados de giro (prueba 89° o 91°).",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots II,Programar un triángulo,activity,25 min,13,,"Ahora dibujaremos un triángulo equilátero (3 lados iguales).
+
+**Programa:**
+- Start
+- repeat 3
+  - drive forward for 5 cm at speed 3
+  - spin left for 120 degrees at speed 3
+- end repeat
+
+**¿Por qué 120° y no 60°?**
+El ángulo interno del triángulo es 60°, pero Edison gira por el exterior:
+- Ángulo de giro = 180° - 60° = 120°
+- O usando la fórmula: 360° ÷ 3 = 120°
+
+🎯 **Desafíos:**
+1. Dibuja un triángulo más grande
+2. Dibuja un triángulo girando a la derecha
+3. Dibuja una estrella de David (2 triángulos)",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots II,Programar un rectángulo,activity,25 min,14,,"El rectángulo tiene 2 pares de lados diferentes. Necesitamos un programa más elaborado.
+
+**Programa:**
+- Start
+- repeat 2
+  - drive forward for 8 cm at speed 3
+  - spin left for 90 degrees at speed 3
+  - drive forward for 4 cm at speed 3
+  - spin left for 90 degrees at speed 3
+- end repeat
+
+**Explicación:**
+- Lado largo: 8 cm
+- Lado corto: 4 cm
+- Repetimos 2 veces (largo-corto, largo-corto)
+
+🎯 **Desafíos:**
+1. Cambia las proporciones (10 cm x 3 cm)
+2. Dibuja una L (rectángulo incompleto)
+3. Dibuja una casa (cuadrado + triángulo)",false,robotica,
+sexto-egb,Módulo 1: Programación con Robots II,Proyecto: Artista robótico,project,45 min,15,,"¡Proyecto creativo! Diseña y programa una figura o dibujo original.
+
+**Ideas de proyectos:**
+- **Casa:** Cuadrado + triángulo
+- **Flor:** Varios triángulos desde el centro
+- **Estrella:** 5 triángulos conectados
+- **Iniciales:** Tu nombre con líneas
+- **Robot:** Figuras combinadas
+
+**Pasos del proyecto:**
+1. Diseña tu figura en papel
+2. Calcula los ángulos necesarios
+3. Escribe el programa en EdScratch
+4. Prueba y ajusta
+5. Presenta tu creación
+
+**Rúbrica de evaluación:**
+- Creatividad del diseño: 25%
+- Precisión del dibujo: 25%
+- Complejidad del programa: 25%
+- Presentación: 25%",false,robotica,
+sexto-egb,Módulo 2: EdCrane,Introducción al brazo robótico,video,20 min,16,,"EdCrane es un brazo robótico que se conecta al Edison. Aprenderemos sobre robótica industrial y automatización.
+
+**¿Qué es un brazo robótico?**
+Un brazo robótico imita los movimientos del brazo humano:
+- **Base:** Como el hombro, permite girar
+- **Brazo:** Como el codo, sube y baja
+- **Pinza:** Como la mano, agarra objetos
+
+**Aplicaciones reales:**
+- Fábricas de automóviles
+- Cirugías de precisión
+- Almacenes automatizados
+- Exploración espacial
+
+💡 **Dato curioso:** El primer brazo robótico industrial se creó en 1961 y se llamaba Unimate.",false,robotica,
+sexto-egb,Módulo 2: EdCrane,Ensamblaje de EdCrane,tutorial,30 min,17,,"Guía paso a paso para ensamblar tu brazo robótico EdCrane.
+
+**Piezas necesarias:**
+- Base del brazo
+- Segmentos del brazo (2)
+- Pinza
+- Servomotores (3)
+- Tornillos y conectores
+- Robot Edison
+
+**Pasos de ensamblaje:**
+1. Conecta la base al Edison
+2. Ensambla el primer segmento del brazo
+3. Conecta el servomotor del codo
+4. Ensambla el segundo segmento
+5. Instala la pinza
+6. Conecta los cables de los servos
+
+**Verificación:**
+- Mueve cada articulación manualmente
+- Verifica que no haya piezas sueltas
+- Conecta al Edison y prueba
+
+💡 **Tip:** No aprietes demasiado los tornillos, podrían dañar el plástico.",false,robotica,
+sexto-egb,Módulo 2: EdCrane,Programación del brazo,activity,30 min,18,,"Aprenderemos a programar los movimientos básicos del brazo robótico.
+
+**Movimientos disponibles:**
+- **Girar base:** Izquierda/derecha
+- **Subir/bajar brazo:** Arriba/abajo
+- **Abrir/cerrar pinza:** Agarrar/soltar
+
+**Programa básico:**
+- set crane arm to position 50
+- wait 1 sec
+- set crane arm to position 0
+- wait 1 sec
+- set crane gripper to open
+- wait 1 sec
+- set crane gripper to closed
+
+**Valores de posición:**
+- 0 = Posición mínima
+- 50 = Posición media
+- 100 = Posición máxima
+
+🎯 **Práctica:** Programa una secuencia de saludo con el brazo.",false,robotica,
+sexto-egb,Módulo 2: EdCrane,Control de la pinza,activity,25 min,19,,"La pinza es la mano del robot. Aprenderemos a controlarla con precisión.
+
+**Secuencia para agarrar objeto:**
+1. Abrir pinza
+2. Bajar brazo
+3. Cerrar pinza (agarrar)
+4. Subir brazo
+5. Girar base
+6. Bajar y soltar
+
+**Programa:**
+- set crane gripper to open
+- set crane arm to position 30
+- wait 1 sec
+- set crane gripper to closed
+- wait 0.5 sec
+- set crane arm to position 70
+- wait 1 sec
+- set crane base to position 50
+- set crane arm to position 30
+- set crane gripper to open
+
+💡 **Tip:** Usa objetos livianos para practicar (cubos de espuma, pelotas pequeñas).",false,robotica,
+sexto-egb,Módulo 2: EdCrane,Proyecto: Clasificador de objetos,project,45 min,20,,"Construiremos un sistema automatizado que clasifica objetos en diferentes contenedores.
+
+**Materiales:**
+- EdCrane ensamblado
+- 3 contenedores pequeños
+- Objetos para clasificar
+- Cinta para marcar posiciones
+
+**Diseño del sistema:**
+Zona de entrada → EdCrane → Contenedor A/B/C
+
+**Programa:**
+- repeat 3
+  - Recoger objeto (bajar, cerrar pinza, subir)
+  - Mover a contenedor (girar base a posición X)
+  - Soltar (bajar, abrir pinza)
+  - Volver a inicio (subir, girar a posición 0)
+- end repeat
+
+🎯 **Desafío avanzado:** Agrega un sensor para detectar el color del objeto y clasificar automáticamente.",false,robotica,
+sexto-egb,Módulo 3: Scratch,Mis primeros pasos en Scratch,video,20 min,21,,"Scratch es un lenguaje de programación visual creado por el MIT. ¡Millones de niños lo usan para crear juegos y animaciones!
+
+**¿Qué es Scratch?**
+- Creado en 2007 por MIT Media Lab
+- Gratuito y en español
+- Funciona en navegador web
+- Comunidad de millones de usuarios
+
+**Interfaz de Scratch:**
+1. **Escenario:** Donde ves tu proyecto
+2. **Sprites:** Personajes y objetos
+3. **Bloques:** Instrucciones de código
+4. **Área de código:** Donde programas
+
+**Tu primer proyecto:**
+1. Ve a https://scratch.mit.edu
+2. Haz clic en Crear
+3. ¡Ya tienes un gato listo para programar!
+
+💡 **Tip:** Crea una cuenta gratuita para guardar tus proyectos.",false,robotica,
+sexto-egb,Módulo 3: Scratch,Creando animaciones,activity,25 min,22,,"Haremos que el gato de Scratch camine, hable y cambie de apariencia.
+
+**Programa de animación:**
+- al presionar bandera verde
+- repetir 10 veces
+  - mover 10 pasos
+  - siguiente disfraz
+  - esperar 0.1 segundos
+- decir ¡Hola! por 2 segundos
+
+**Conceptos:**
+- **Disfraz:** Diferentes apariencias del sprite
+- **Mover pasos:** Desplazamiento horizontal
+- **Decir:** Muestra un globo de texto
+
+🎯 **Desafíos:**
+1. Haz que el gato camine hacia atrás
+2. Agrega un sonido al caminar
+3. Cambia el fondo del escenario",false,robotica,
+sexto-egb,Módulo 3: Scratch,Eventos y control,tutorial,20 min,23,,"Los eventos son acciones que inician el código. El control determina cómo fluye el programa.
+
+**Bloques de eventos:**
+- **Al presionar bandera verde:** Inicia el programa
+- **Al presionar tecla:** Responde al teclado
+- **Al hacer clic en sprite:** Responde al mouse
+
+**Bloques de control:**
+- **Esperar X segundos:** Pausa
+- **Repetir X veces:** Bucle finito
+- **Por siempre:** Bucle infinito
+- **Si... entonces:** Condición
+
+**Programa interactivo:**
+- al presionar tecla flecha derecha → mover 10 pasos
+- al presionar tecla flecha izquierda → mover -10 pasos
+- al presionar tecla espacio → decir ¡Salto!
+
+🎯 **Práctica:** Crea un sprite que se mueva con las 4 flechas del teclado.",false,robotica,
+sexto-egb,Módulo 3: Scratch,Variables y operadores,tutorial,25 min,24,,"Las variables guardan información que puede cambiar. Los operadores hacen cálculos.
+
+**¿Qué es una variable?**
+Una caja que guarda un valor:
+- **Puntuación:** Guarda los puntos del jugador
+- **Vidas:** Cuántas vidas quedan
+- **Velocidad:** Qué tan rápido se mueve
+
+**Crear una variable:**
+1. Ve a Variables
+2. Haz clic en Crear una variable
+3. Ponle nombre (ej: puntos)
+
+**Programa con puntuación:**
+- al presionar bandera verde → fijar puntos a 0
+- al presionar tecla espacio → cambiar puntos por 1, tocar sonido pop
+
+**Operadores:**
+- Suma: puntos + 10
+- Resta: vidas - 1
+- Comparación: puntos > 100",false,robotica,
+sexto-egb,Módulo 3: Scratch,Proyecto: Mi primer juego,project,45 min,25,,"¡Crearemos un juego completo! Un personaje que atrapa objetos que caen.
+
+**Elementos del juego:**
+1. **Jugador:** Se mueve con flechas
+2. **Objetos:** Caen desde arriba
+3. **Puntuación:** Aumenta al atrapar
+4. **Game Over:** Al perder todas las vidas
+
+**Código del jugador:**
+- al presionar bandera verde
+- ir a x: 0 y: -150
+- por siempre
+  - si tecla flecha derecha presionada → cambiar x por 10
+  - si tecla flecha izquierda presionada → cambiar x por -10
+
+**Código del objeto:**
+- por siempre
+  - ir a x: número al azar entre -200 y 200 y: 180
+  - deslizar en 2 segundos a y: -180
+  - si tocando jugador → cambiar puntos por 1",false,robotica,
+sexto-egb,Anexo: Scratch + IA,Machine Learning para niños,video,20 min,26,,"Machine Learning (ML) es cómo las computadoras aprenden de ejemplos, igual que tú aprendes de experiencias.
+
+**¿Cómo aprende una máquina?**
+1. Le muestras muchos ejemplos
+2. La máquina encuentra patrones
+3. Puede reconocer cosas nuevas
+
+**Tipos de clasificación:**
+- **Imágenes:** Reconoce fotos (perro vs gato)
+- **Audio:** Reconoce sonidos (aplausos vs silbidos)
+- **Texto:** Entiende palabras (positivo vs negativo)
+- **Poses:** Reconoce gestos (mano arriba vs abajo)
+
+**Ejemplo cotidiano:**
+- YouTube te recomienda videos → ML
+- El celular reconoce tu cara → ML
+- El correo filtra spam → ML
+
+💡 **Dato curioso:** Los asistentes como Alexa y Siri usan Machine Learning para entenderte.",false,robotica,
+sexto-egb,Anexo: Scratch + IA,Clasificación de imágenes,activity,30 min,27,,"Entrenaremos una IA para reconocer diferentes objetos usando Teachable Machine.
+
+**Pasos:**
+1. Ve a https://teachablemachine.withgoogle.com
+2. Selecciona Image Project
+3. Crea 2 clases (ej: Lápiz y Borrador)
+4. Toma 30+ fotos de cada objeto
+5. Haz clic en Train Model
+6. ¡Prueba con objetos nuevos!
+
+**Integrar con Scratch:**
+1. Exporta el modelo
+2. Usa la extensión Machine Learning for Kids
+3. Crea un proyecto que responda a lo que ve
+
+**Proyecto ejemplo:** Un sprite que dice el nombre del objeto que le muestras a la cámara.",false,robotica,
+sexto-egb,Anexo: Scratch + IA,Clasificación de audio,activity,30 min,28,,"Entrenaremos una IA para reconocer diferentes sonidos.
+
+**Pasos:**
+1. En Teachable Machine, selecciona Audio Project
+2. Crea clases: Aplauso, Silbido, Silencio
+3. Graba 20+ muestras de cada sonido
+4. Entrena el modelo
+5. Prueba haciendo los sonidos
+
+**Proyecto con Scratch:**
+Un juego controlado por sonidos:
+- Aplauso = Saltar
+- Silbido = Disparar
+- Voz = Moverse
+
+💡 **Tip:** Graba en un lugar silencioso para mejores resultados.",false,robotica,
+sexto-egb,Anexo: Scratch + IA,Proyecto: Asistente inteligente,project,45 min,29,,"Crearemos un asistente virtual que responde a comandos de voz o gestos.
+
+**Funcionalidades:**
+1. Reconoce tu voz diciendo Hola
+2. Responde con un saludo
+3. Reconoce gestos con la mano
+4. Ejecuta acciones según el gesto
+
+**Componentes:**
+- Modelo de audio entrenado
+- Modelo de imagen entrenado
+- Proyecto de Scratch que los usa
+
+**Código base:**
+- por siempre
+  - si reconoce hola → decir ¡Hola! ¿En qué te ayudo?
+  - si reconoce mano arriba → subir volumen
+  - si reconoce mano abajo → bajar volumen",false,robotica,
+sexto-egb,Anexo: Electricidad Básica,Conceptos de electricidad,video,20 min,30,,"La electricidad es la energía que hace funcionar nuestros dispositivos. Entenderemos sus conceptos básicos.
+
+**Conceptos fundamentales:**
+- **Corriente (I):** Flujo de electrones, medida en Amperios (A)
+- **Voltaje (V):** Presión eléctrica, medida en Voltios (V)
+- **Resistencia (R):** Oposición al flujo, medida en Ohmios (Ω)
+
+**Analogía del agua:**
+- Voltaje = Presión del agua
+- Corriente = Cantidad de agua que fluye
+- Resistencia = Grosor de la tubería
+
+**Tipos de circuitos:**
+- **Circuito abierto:** No hay flujo (interruptor apagado)
+- **Circuito cerrado:** Hay flujo (interruptor encendido)
+
+⚠️ **Seguridad:** Nunca toques cables pelados. No uses aparatos cerca del agua.",false,robotica,
+sexto-egb,Anexo: Electricidad Básica,Componentes electrónicos,tutorial,20 min,31,,"Conoceremos los componentes básicos que forman los circuitos.
+
+**Componentes principales:**
+- **LED:** Luz pequeña, tiene polaridad (+/-)
+- **Resistencia:** Limita la corriente, protege componentes
+- **Batería:** Fuente de energía
+- **Interruptor:** Abre/cierra el circuito
+- **Cables:** Conducen la electricidad
+
+**Polaridad del LED:**
+- Pata larga = Positivo (+)
+- Pata corta = Negativo (-)
+- Si lo conectas al revés, no enciende
+
+💡 **Tip:** Siempre usa una resistencia con el LED para no quemarlo.",false,robotica,
+sexto-egb,Anexo: Electricidad Básica,Mi primer circuito,activity,30 min,32,,"¡Manos a la obra! Armaremos un circuito básico que enciende un LED.
+
+**Materiales:**
+- 1 LED (cualquier color)
+- 1 Resistencia de 220Ω
+- 1 Batería de 9V o porta pilas
+- Cables
+- Protoboard (opcional)
+
+**Diagrama del circuito:**
+Batería (+) → Resistencia → LED (+) → LED (-) → Batería (-)
+
+**Pasos:**
+1. Conecta el cable rojo al positivo de la batería
+2. Conecta el otro extremo a la resistencia
+3. Conecta la resistencia a la pata larga del LED
+4. Conecta la pata corta del LED al cable negro
+5. Conecta el cable negro al negativo de la batería
+6. ¡El LED debe encender!
+
+**Solución de problemas:**
+- No enciende: Verifica la polaridad del LED
+- Se quema: Falta la resistencia",false,robotica,
+sexto-egb,Anexo: Electricidad Básica,Prueba de salida,activity,20 min,33,,"Evaluación final para medir todo lo aprendido durante el curso.
+
+**Temas evaluados:**
+1. Programación con EdScratch
+2. Robot Edison y sensores
+3. Figuras geométricas
+4. Brazo robótico EdCrane
+5. Scratch básico
+6. Machine Learning
+7. Electricidad básica
+
+**Formato:**
+- 20 preguntas de opción múltiple
+- 2 preguntas de desarrollo
+- 1 ejercicio práctico
+
+**Preguntas ejemplo:**
+1. ¿Cuántos grados debe girar Edison para un triángulo? (120°)
+2. ¿Qué componente limita la corriente? (Resistencia)
+3. ¿Qué es Machine Learning? (Aprendizaje automático)
+
+🎉 **¡Felicitaciones!** Has completado el curso de Robótica de Sexto Grado.",false,robotica,
