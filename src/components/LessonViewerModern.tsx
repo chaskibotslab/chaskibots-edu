@@ -113,19 +113,13 @@ export default function LessonViewerModern({
   // Obtener URL de embed del video
   const getVideoEmbedUrl = (url: string) => {
     if (!url) return ''
-    
+
     // YouTube
     const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
     if (ytMatch) {
       return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`
     }
-    
-    // Google Drive
-    const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/)
-    if (driveMatch) {
-      return `https://drive.google.com/file/d/${driveMatch[1]}/preview`
-    }
-    
+
     return url
   }
 

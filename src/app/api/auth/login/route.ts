@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateAccessCode, validateEmailPassword } from '@/lib/airtable-auth'
+import { validateAccessCode, validateEmailPassword } from '@/lib/supabase-auth'
 
 export const dynamic = 'force-dynamic'
 

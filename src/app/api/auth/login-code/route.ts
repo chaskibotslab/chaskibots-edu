@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateAccessCode } from '@/lib/airtable-auth'
+import { validateAccessCode } from '@/lib/supabase-auth'
 
 export async function POST(request: NextRequest) {
   try {

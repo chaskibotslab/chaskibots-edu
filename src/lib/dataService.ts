@@ -86,12 +86,12 @@ const INITIAL_KITS: KitData[] = [
     ],
     skills: ['Introducción a circuitos básicos', 'Reconocimiento de colores', 'Motricidad fina'],
     images: [
-      'https://drive.google.com/uc?export=view&id=1j9PC18mcxTK1iG0jKpomPItKS3W2oFta',
-      'https://drive.google.com/uc?export=view&id=1lqvCi1lTfcN-lI5X8vkq6r3Jk9QO1_lm',
-      'https://drive.google.com/uc?export=view&id=1i42AvvZQx6D4H5Nqqi5H0LRKc1Qqsh6z',
-      'https://drive.google.com/uc?export=view&id=1bj-aUrpPBqkYAukYxs7bHM-O_FovrhOz',
-      'https://drive.google.com/uc?export=view&id=1MaME0PjBkqvVsKmsamlUlNrGX2Ih8hjJ',
-      'https://drive.google.com/uc?export=view&id=1STa9iqY6p_TZR8z6CeZpcXj4qeEddpuR',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1j9PC18mcxTK1iG0jKpomPItKS3W2oFta',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1lqvCi1lTfcN-lI5X8vkq6r3Jk9QO1_lm',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1i42AvvZQx6D4H5Nqqi5H0LRKc1Qqsh6z',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1bj-aUrpPBqkYAukYxs7bHM-O_FovrhOz',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1MaME0PjBkqvVsKmsamlUlNrGX2Ih8hjJ',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1STa9iqY6p_TZR8z6CeZpcXj4qeEddpuR',
     ],
     price: 30
   },

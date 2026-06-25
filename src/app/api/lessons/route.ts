@@ -1,8 +1,5 @@
 /**
- * EJEMPLO de refactor: API /lessons usando Supabase
- * 
- * Compara este archivo con route.ts (versión Airtable)
- * Renombrar a route.ts cuando estés listo para migrar
+ * API /lessons usando Supabase
  */
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
@@ -11,10 +8,6 @@ export const dynamic = 'force-dynamic'
 
 function getVideoEmbedUrl(url: string): string {
   if (!url) return ''
-  if (url.includes('drive.google.com')) {
-    const match = url.match(/\/file\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/)
-    if (match?.[1]) return `https://drive.google.com/file/d/${match[1]}/preview`
-  }
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
     if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`
@@ -58,13 +51,12 @@ export async function GET(request: Request) {
 
       allUrls.forEach((url: string, idx: number) => {
         if (idx === 0) { videos.push(url); return }
-        const isImage = /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?|$)/i.test(url) || url.includes('drive.google.com/uc?id=')
+        const isImage = /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?|$)/i.test(url)
         if (isImage) {
-          if (url.includes('drive.google.com/file/d/')) {
-            const m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/)
-            if (m?.[1]) images.push(`https://drive.google.com/uc?id=${m[1]}`)
-          } else images.push(url)
-        } else videos.push(url)
+          images.push(url)
+        } else {
+          videos.push(url)
+        }
       })
 
       return {

@@ -394,16 +394,16 @@ export default function AdminLeccionesContent() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">URL del Video (Google Drive o YouTube)</label>
+                <label className="block text-sm text-gray-600 mb-1">URL del Video (YouTube)</label>
                 <input
                   type="text"
                   value={formData.videoUrl}
                   onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/..."
+                  placeholder="https://www.youtube.com/watch?v=..."
                   className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none font-mono text-sm"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Pega el enlace de Google Drive o YouTube. El video se mostrara embebido.
+                  Pega el enlace de YouTube. El video se mostrará embebido.
                 </p>
               </div>
 

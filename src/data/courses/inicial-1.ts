@@ -242,12 +242,12 @@ export const INICIAL_1: CourseData = {
     price: 30,
     // Imágenes del kit desde Google Drive
     images: [
-      'https://drive.google.com/uc?export=view&id=1j9PC18mcxTK1iG0jKpomPItKS3W2oFta',
-      'https://drive.google.com/uc?export=view&id=1lqvCi1lTfcN-lI5X8vkq6r3Jk9QO1_lm',
-      'https://drive.google.com/uc?export=view&id=1i42AvvZQx6D4H5Nqqi5H0LRKc1Qqsh6z',
-      'https://drive.google.com/uc?export=view&id=1bj-aUrpPBqkYAukYxs7bHM-O_FovrhOz',
-      'https://drive.google.com/uc?export=view&id=1MaME0PjBkqvVsKmsamlUlNrGX2Ih8hjJ',
-      'https://drive.google.com/uc?export=view&id=1STa9iqY6p_TZR8z6CeZpcXj4qeEddpuR',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1j9PC18mcxTK1iG0jKpomPItKS3W2oFta',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1lqvCi1lTfcN-lI5X8vkq6r3Jk9QO1_lm',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1i42AvvZQx6D4H5Nqqi5H0LRKc1Qqsh6z',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1bj-aUrpPBqkYAukYxs7bHM-O_FovrhOz',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1MaME0PjBkqvVsKmsamlUlNrGX2Ih8hjJ',
+      'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1STa9iqY6p_TZR8z6CeZpcXj4qeEddpuR',
     ],
     components: [
       'LEDs de colores (rojo, verde, amarillo, azul) - 8 unidades',
@@ -265,31 +265,31 @@ export const INICIAL_1: CourseData = {
         step: 1, 
         title: 'Abrir la caja con cuidado', 
         description: 'Pide ayuda a un adulto para abrir la caja. Saca todos los componentes y colócalos sobre la mesa.',
-        image: 'https://drive.google.com/uc?export=view&id=1j9PC18mcxTK1iG0jKpomPItKS3W2oFta'
+        image: 'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1j9PC18mcxTK1iG0jKpomPItKS3W2oFta'
       },
       { 
         step: 2, 
         title: 'Identificar cada pieza', 
         description: 'Usa las tarjetas ilustradas para identificar cada componente. ¿Puedes encontrar los LEDs de colores?',
-        image: 'https://drive.google.com/uc?export=view&id=1lqvCi1lTfcN-lI5X8vkq6r3Jk9QO1_lm'
+        image: 'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1lqvCi1lTfcN-lI5X8vkq6r3Jk9QO1_lm'
       },
       { 
         step: 3, 
         title: 'Organizar en la caja', 
         description: 'Cada pieza tiene su lugar en la caja organizadora. Coloca los LEDs juntos, los cables en otro compartimento.',
-        image: 'https://drive.google.com/uc?export=view&id=1i42AvvZQx6D4H5Nqqi5H0LRKc1Qqsh6z'
+        image: 'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1i42AvvZQx6D4H5Nqqi5H0LRKc1Qqsh6z'
       },
       { 
         step: 4, 
         title: 'Revisar la guía', 
         description: 'Lee con un adulto la guía para padres. Ahí encontrarás consejos de seguridad importantes.',
-        image: 'https://drive.google.com/uc?export=view&id=1bj-aUrpPBqkYAukYxs7bHM-O_FovrhOz'
+        image: 'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1bj-aUrpPBqkYAukYxs7bHM-O_FovrhOz'
       },
       { 
         step: 5, 
         title: '¡Listo para empezar!', 
         description: 'Ya tienes todo organizado. Ahora puedes comenzar con las lecciones del curso.',
-        image: 'https://drive.google.com/uc?export=view&id=1MaME0PjBkqvVsKmsamlUlNrGX2Ih8hjJ'
+        image: 'https://jfsyvcslzgjrvsoqleiz.supabase.co/storage/v1/object/public/lesson-images/drive-migrated/1MaME0PjBkqvVsKmsamlUlNrGX2Ih8hjJ'
       }
     ]
   },

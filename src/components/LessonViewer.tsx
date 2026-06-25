@@ -122,38 +122,17 @@ export default function LessonViewer({ lesson, programId, onClose, onNext, onPre
     return match ? match[1] : null
   }
 
-  // Extraer ID de Google Drive
-  const getGoogleDriveId = (url: string): string | null => {
-    // Formatos: /file/d/ID/view, /file/d/ID, id=ID
-    const match = url.match(/(?:\/file\/d\/|id=)([a-zA-Z0-9_-]+)/)
-    return match ? match[1] : null
-  }
-
   // Determinar tipo de video
   const getVideoEmbed = (url: string) => {
     const youtubeId = getYouTubeId(url)
     if (youtubeId) {
       return { type: 'youtube', embedUrl: `https://www.youtube.com/embed/${youtubeId}` }
     }
-    
-    const driveId = getGoogleDriveId(url)
-    if (driveId) {
-      return { type: 'drive', embedUrl: `https://drive.google.com/file/d/${driveId}/preview` }
-    }
-    
     return null
   }
 
-  // Convertir URL de imagen de Google Drive a formato embebible
   const getImageUrl = (url: string): string => {
     if (!url) return ''
-    
-    // Si es Google Drive, convertir a formato de imagen directa
-    const driveId = getGoogleDriveId(url)
-    if (driveId) {
-      return `https://drive.google.com/uc?export=view&id=${driveId}`
-    }
-    
     return url
   }
 

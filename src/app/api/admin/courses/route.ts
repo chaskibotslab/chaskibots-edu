@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createCourse, getAllCourses, getTeacherCourses, updateCourse, deleteCourse } from '@/lib/airtable-auth'
+import { createCourse, getAllCourses, getTeacherCourses, updateCourse, deleteCourse } from '@/lib/supabase-auth'
 import { cache } from '@/lib/cache'
 import { getUserFriendlyError } from '@/lib/airtable-errors'
 

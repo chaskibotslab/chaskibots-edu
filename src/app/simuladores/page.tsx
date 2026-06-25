@@ -155,73 +155,68 @@ for i in range(1, 11):
   ]
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-transparent">
       <Header />
-      
-      <main className="flex-1 py-12 px-4 relative overflow-hidden">
-        {/* Efectos de fondo animados */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-brand-purple/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-40 right-10 w-96 h-96 bg-brand-violet/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-80 h-80 bg-neon-green/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        </div>
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-brand-purple/10 border border-brand-purple/30 rounded-full px-4 py-2 mb-4">
-              <Terminal className="w-4 h-4 text-brand-purple" />
-              <span className="text-brand-purple text-sm font-medium">Aprende Programando</span>
+
+      <main className="flex-1 py-6 px-4">
+        <div className="max-w-6xl mx-auto space-y-10">
+
+          {/* Hero */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8 text-center shadow-2xl">
+            <div className="absolute top-0 left-0 w-64 h-64 bg-brand-purple/20 rounded-full blur-[100px]"></div>
+            <div className="absolute bottom-0 right-0 w-56 h-56 bg-brand-cyan/15 rounded-full blur-[90px]"></div>
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-4">
+                <Terminal className="w-4 h-4 text-brand-cyan" />
+                <span className="text-white/90 text-sm font-medium">Aprende Programando</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-black mb-3">
+                Simuladores Online
+              </h1>
+              <p className="text-white/70 max-w-2xl mx-auto text-lg">
+                Practica programación, electrónica y robótica con simuladores interactivos.
+                <span className="text-brand-cyan font-medium"> ¡Sin necesidad de registro!</span>
+              </p>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="text-gray-900">Simuladores </span>
-              <span className="bg-gradient-to-r from-brand-purple via-brand-violet to-neon-pink bg-clip-text text-transparent">Online</span>
-            </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-              Practica programación, electrónica y robótica con estos simuladores interactivos. 
-              <span className="text-neon-green font-medium"> ¡Todos sin necesidad de registro!</span>
-            </p>
           </div>
 
-          {/* Guía Básica de Python para Principiantes - Futurista */}
-          <div className="relative group mb-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-neon-green/10 to-emerald-500/10 rounded-2xl blur-xl"></div>
-            <div className="relative bg-gray-50/80 backdrop-blur-xl border border-neon-green/30 rounded-2xl p-6 overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-green to-transparent opacity-50"></div>
-              
-              <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <div className="w-10 h-10 bg-neon-green/20 rounded-xl flex items-center justify-center">
-                  <Code className="w-6 h-6 text-neon-green" />
-                </div>
-                Aprende Python desde Cero
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Python es el lenguaje más fácil para empezar a programar. Aquí tienes los conceptos básicos 
-                que necesitas. <strong className="text-neon-green">¡Copia el código y pruébalo en los simuladores de abajo!</strong>
-              </p>
+          {/* Python Guide */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
+                <Code className="w-6 h-6 text-green-500" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">Aprende Python desde Cero</h2>
+                <p className="text-slate-500 text-sm">
+                  Conceptos básicos. <strong className="text-green-600">Copia el código y pruébalo abajo.</strong>
+                </p>
+              </div>
+            </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 mt-6">
               {pythonExamples.map((example) => (
-                <div key={example.id} className="group/card bg-gray-100/50 rounded-xl overflow-hidden border border-gray-200 hover:border-neon-green/30 transition-all duration-300">
-                  <div className="p-4 border-b border-gray-200 bg-gray-50/50">
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                      <Lightbulb className="w-5 h-5 text-yellow-400" />
+                <div key={example.id} className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 hover:border-green-500/30 transition-all">
+                  <div className="p-4 border-b border-slate-200 bg-white">
+                    <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                      <Lightbulb className="w-5 h-5 text-yellow-500" />
                       {example.title}
                     </h3>
-                    <p className="text-gray-600 text-sm mt-1">{example.description}</p>
+                    <p className="text-slate-500 text-sm mt-1">{example.description}</p>
                   </div>
                   <div className="relative">
-                    <pre className="p-4 text-sm text-gray-300 overflow-x-auto bg-white/70">
+                    <pre className="p-4 text-sm text-slate-700 overflow-x-auto bg-slate-50">
                       <code>{example.code}</code>
                     </pre>
                     <button
                       onClick={() => copyCode(example.code, example.id)}
-                      className="absolute top-2 right-2 p-2.5 bg-dark-600 hover:bg-neon-green/20 border border-dark-500 hover:border-neon-green/50 rounded-lg transition-all duration-300"
+                      className="absolute top-2 right-2 p-2 bg-white hover:bg-green-50 border border-slate-200 hover:border-green-500/50 rounded-lg transition-all"
                       title="Copiar código"
                     >
                       {copiedCode === example.id ? (
-                        <Check className="w-4 h-4 text-neon-green" />
+                        <Check className="w-4 h-4 text-green-500" />
                       ) : (
-                        <Copy className="w-4 h-4 text-gray-600" />
+                        <Copy className="w-4 h-4 text-slate-500" />
                       )}
                     </button>
                   </div>
@@ -229,73 +224,58 @@ for i in range(1, 11):
               ))}
             </div>
 
-              <div className="mt-6 bg-gradient-to-r from-brand-purple/10 to-brand-purple/5 border border-brand-purple/20 rounded-xl p-4 flex items-start gap-3">
-                <div className="w-10 h-10 bg-brand-purple/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Terminal className="w-5 h-5 text-brand-purple" />
-                </div>
-                <div>
-                  <p className="text-gray-900 font-semibold">¿Dónde practicar?</p>
-                  <p className="text-gray-600 text-sm">
-                    Usa <strong className="text-brand-purple">Trinket Python</strong> o <strong className="text-brand-purple">Programiz Python</strong> 
-                    en las pestañas de abajo. ¡No necesitas crear cuenta! Solo copia el código, pégalo y presiona "Run".
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sección Educativa - Categorías Futuristas */}
-          <div className="relative mb-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/5 to-brand-violet/5 rounded-2xl blur-xl"></div>
-            <div className="relative bg-gray-50/60 backdrop-blur-xl border border-brand-purple/20 rounded-2xl p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <div className="w-10 h-10 bg-brand-purple/20 rounded-xl flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-brand-purple" />
-                </div>
-                Categorías de Simuladores
-              </h2>
-              <div className="grid md:grid-cols-4 gap-4">
-                <div className="group bg-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-brand-purple/50 transition-all duration-300">
-                  <div className="w-12 h-12 bg-brand-purple/10 rounded-xl flex items-center justify-center mb-3 group-hover:bg-brand-purple/20 transition-colors">
-                    <Code className="w-6 h-6 text-brand-purple" />
-                  </div>
-                  <h4 className="font-semibold text-brand-purple mb-2">Python</h4>
-                  <p className="text-gray-600 text-sm">Variables, bucles, funciones. El lenguaje más usado en IA.</p>
-                </div>
-                <div className="group bg-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-neon-green/50 transition-all duration-300">
-                  <div className="w-12 h-12 bg-neon-green/10 rounded-xl flex items-center justify-center mb-3 group-hover:bg-neon-green/20 transition-colors">
-                    <Terminal className="w-6 h-6 text-neon-green" />
-                  </div>
-                  <h4 className="font-semibold text-neon-green mb-2">MicroPython</h4>
-                  <p className="text-gray-600 text-sm">Python para microcontroladores ESP32 y Raspberry Pi Pico.</p>
-                </div>
-                <div className="group bg-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-brand-violet/50 transition-all duration-300">
-                  <div className="w-12 h-12 bg-brand-violet/10 rounded-xl flex items-center justify-center mb-3 group-hover:bg-brand-violet/20 transition-colors">
-                    <Lightbulb className="w-6 h-6 text-brand-violet" />
-                  </div>
-                  <h4 className="font-semibold text-brand-violet mb-2">Arduino/Electrónica</h4>
-                  <p className="text-gray-600 text-sm">Circuitos, sensores y programación de hardware.</p>
-                </div>
-                <div className="group bg-gray-100/50 rounded-xl p-5 border border-gray-200 hover:border-orange-500/50 transition-all duration-300">
-                  <div className="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center mb-3 group-hover:bg-orange-500/20 transition-colors">
-                    <BookOpen className="w-6 h-6 text-orange-400" />
-                  </div>
-                  <h4 className="font-semibold text-orange-400 mb-2">CNC/Industrial</h4>
-                  <p className="text-gray-600 text-sm">G-Code, robótica industrial y manufactura digital.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Simulador Python Propio con Exportación - Futurista */}
-          <div className="mb-10">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-neon-green/20 to-emerald-500/10 rounded-xl flex items-center justify-center border border-neon-green/30">
-                <Download className="w-6 h-6 text-neon-green" />
+            <div className="mt-6 bg-brand-purple/5 border border-brand-purple/20 rounded-xl p-4 flex items-start gap-3">
+              <div className="w-10 h-10 bg-brand-purple/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Terminal className="w-5 h-5 text-brand-purple" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Simulador Python ChaskiBots</h2>
-                <p className="text-gray-600 text-sm">Ejecuta código y exporta tu tarea (código + resultado)</p>
+                <p className="text-slate-900 font-semibold">¿Dónde practicar?</p>
+                <p className="text-slate-600 text-sm">
+                  Usa <strong className="text-brand-purple">Trinket Python</strong> o <strong className="text-brand-purple">Programiz Python</strong>
+                  {' '}en las pestañas de abajo. Solo copia, pega y presiona "Run".
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Categories */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-brand-purple" />
+              </div>
+              Categorías de Simuladores
+            </h2>
+            <div className="grid md:grid-cols-4 gap-4">
+              {[
+                { icon: Code, color: 'brand-purple', title: 'Python', description: 'Variables, bucles, funciones. El lenguaje más usado en IA.' },
+                { icon: Terminal, color: 'neon-green', title: 'MicroPython', description: 'Python para microcontroladores ESP32 y Raspberry Pi Pico.' },
+                { icon: Lightbulb, color: 'brand-violet', title: 'Arduino/Electrónica', description: 'Circuitos, sensores y programación de hardware.' },
+                { icon: BookOpen, color: 'orange-500', title: 'CNC/Industrial', description: 'G-Code, robótica industrial y manufactura digital.' }
+              ].map((cat) => {
+                const Icon = cat.icon
+                return (
+                  <div key={cat.title} className="group bg-slate-50 rounded-xl p-5 border border-slate-200 hover:border-slate-300 transition-all">
+                    <div className={`w-12 h-12 bg-${cat.color}/10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                      <Icon className={`w-6 h-6 text-${cat.color}`} />
+                    </div>
+                    <h4 className={`font-semibold text-${cat.color} mb-2`}>{cat.title}</h4>
+                    <p className="text-slate-600 text-sm">{cat.description}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Python Simulator */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center border border-green-500/20">
+                <Download className="w-6 h-6 text-green-500" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Simulador Python ChaskiBots</h2>
+                <p className="text-slate-500 text-sm">Ejecuta código y exporta tu tarea</p>
               </div>
             </div>
             <PythonSimulator />
@@ -303,24 +283,23 @@ for i in range(1, 11):
 
           <SimulatorTabs />
 
-          <div className="mt-10 relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-2xl blur-xl opacity-50"></div>
-            <div className="relative bg-gray-50/80 backdrop-blur-xl border border-yellow-500/20 rounded-2xl p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Lightbulb className="w-6 h-6 text-yellow-400" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-lg mb-2">Consejo Pro</h3>
-                  <p className="text-gray-600">
-                    Si algún simulador externo no carga correctamente, usa el botón 
-                    <span className="text-brand-purple font-medium"> "Abrir en su web"</span> para acceder directamente. 
-                    El simulador Python de ChaskiBots funciona completamente en tu navegador sin necesidad de conexión externa.
-                  </p>
-                </div>
+          {/* Tip */}
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Lightbulb className="w-6 h-6 text-amber-500" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg mb-2">Consejo Pro</h3>
+                <p className="text-slate-600">
+                  Si algún simulador externo no carga, usa el botón
+                  <span className="text-brand-purple font-medium"> "Abrir en su web"</span>.
+                  El simulador de ChaskiBots funciona completamente en tu navegador.
+                </p>
               </div>
             </div>
           </div>
+
         </div>
       </main>
 

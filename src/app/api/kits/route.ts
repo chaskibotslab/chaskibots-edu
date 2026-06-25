@@ -56,3 +56,34 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { id, levelId, name, description, components, skills, images, videoUrl, tutorialUrl, price, imageUrl } = body
+    if (!id) return NextResponse.json({ error: 'id requerido' }, { status: 400 })
+
+    const { data, error } = await supabaseAdmin
+      .from('kits')
+      .update({
+        level_id: levelId,
+        name,
+        description: description || null,
+        components: components || null,
+        skills: skills || null,
+        images: images || null,
+        video_url: videoUrl || null,
+        tutorial_url: tutorialUrl || null,
+        price: price || null,
+        image_url: imageUrl || null,
+      })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ success: true, kit: rowToKit(data) })
+  } catch (error) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}

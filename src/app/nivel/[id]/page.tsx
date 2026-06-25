@@ -728,28 +728,23 @@ export default function NivelPage() {
                   <div>
                     <p className="text-sm text-gray-600 mb-3">📷 Galería ({lesson.images.length} {lesson.images.length === 1 ? 'imagen' : 'imágenes'})</p>
                     <div className="flex gap-3 overflow-x-auto pb-2">
-                      {lesson.images.map((img: string, idx: number) => {
-                        const proxyUrl = img.includes('drive.google.com') 
-                          ? `/api/image-proxy?url=${encodeURIComponent(img)}`
-                          : img
-                        return (
-                          <div 
-                            key={idx} 
-                            className="flex-shrink-0 w-40 h-28 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-brand-purple transition-all"
-                            onClick={() => setZoomImage(proxyUrl)}
-                          >
-                            <img 
-                              src={proxyUrl} 
-                              alt={`Imagen ${idx + 1}`}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement
-                                target.src = '/placeholder.png'
-                              }}
-                            />
-                          </div>
-                        )
-                      })}
+                      {lesson.images.map((img: string, idx: number) => (
+                        <div
+                          key={idx}
+                          className="flex-shrink-0 w-40 h-28 bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-brand-purple transition-all"
+                          onClick={() => setZoomImage(img)}
+                        >
+                          <img
+                            src={img}
+                            alt={`Imagen ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.src = '/placeholder.png'
+                            }}
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}

@@ -13,10 +13,76 @@ import {
   Users, BookOpen, Settings, LogOut, Home, Bell,
   Plus, Edit, Trash2, Eye, Lock, Unlock, Search,
   ChevronRight, Clock, Shield, GraduationCap,
-  BarChart3, Activity, Key, Mail, Save, X, Package, Brain, FileText, Monitor
+  BarChart3, Activity, Key, Mail, Save, X, Package, Brain, FileText, Monitor, Zap
 } from 'lucide-react'
 
 type AdminTab = 'dashboard' | 'courses' | 'users' | 'logs' | 'settings'
+
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  color,
+  trend
+}: {
+  label: string
+  value: number
+  icon: React.ComponentType<{ className?: string }>
+  color: string
+  trend?: string
+}) {
+  return (
+    <div className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-lg transition-all duration-300`}>
+      <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
+      <div className="relative flex items-start justify-between">
+        <div className={`w-12 h-12 rounded-xl bg-${color}/10 flex items-center justify-center`}>
+          <Icon className={`w-6 h-6 text-${color}`} />
+        </div>
+        {trend && (
+          <span className={`text-xs font-bold bg-${color}/10 text-${color} px-2 py-1 rounded-lg`}>
+            {trend}
+          </span>
+        )}
+      </div>
+      <div className="relative mt-4">
+        <h3 className="text-3xl font-bold text-slate-900">{value}</h3>
+        <p className={`text-sm font-medium text-${color}`}>{label}</p>
+      </div>
+    </div>
+  )
+}
+
+function QuickAction({
+  href,
+  icon: Icon,
+  color,
+  title,
+  description
+}: {
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  color: string
+  title: string
+  description: string
+}) {
+  return (
+    <Link
+      href={href}
+      className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-${color}/50 transition-all duration-300`}
+    >
+      <div className={`absolute top-0 right-0 w-20 h-20 bg-${color}/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
+      <div className="relative flex items-center gap-4">
+        <div className={`w-12 h-12 rounded-xl bg-${color}/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+          <Icon className={`w-6 h-6 text-${color}`} />
+        </div>
+        <div>
+          <h4 className="text-slate-900 font-semibold">{title}</h4>
+          <p className="text-slate-500 text-sm">{description}</p>
+        </div>
+      </div>
+    </Link>
+  )
+}
 
 export default function AdminPage() {
   const router = useRouter()
@@ -277,112 +343,77 @@ export default function AdminPage() {
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && (
             <div className="space-y-8">
-              {/* Stats Cards con efectos futuristas */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Card Usuarios */}
-                <div className="group relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#558C89] transition-all duration-500 overflow-hidden shadow-sm hover:shadow-lg">
-                  <div className="absolute inset-0 bg-gradient-to-br from-brand-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-brand-purple/10 rounded-full blur-2xl group-hover:bg-brand-purple/20 transition-all duration-500"></div>
-                  <div className="relative">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-[#558C89]/30 to-[#558C89]/10 rounded-xl flex items-center justify-center border border-[#558C89]/30 shadow-lg shadow-[#558C89]/20">
-                        <Users className="w-7 h-7 text-[#558C89]" />
-                      </div>
-                      <span className="text-[#558C89] text-sm font-bold bg-[#558C89]/20 px-2 py-1 rounded-lg">+12%</span>
-                    </div>
-                    <h3 className="text-4xl font-bold text-gray-900 mb-1">{stats.totalUsers}</h3>
-                    <p className="text-[#558C89] font-medium">Usuarios Totales</p>
-                  </div>
-                </div>
-
-                {/* Card Cursos */}
-                <div className="group relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#74AFAD] transition-all duration-500 overflow-hidden shadow-sm hover:shadow-lg">
-                  <div className="absolute inset-0 bg-gradient-to-br from-brand-violet/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-brand-violet/10 rounded-full blur-2xl group-hover:bg-brand-violet/20 transition-all duration-500"></div>
-                  <div className="relative">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-[#74AFAD]/30 to-[#74AFAD]/10 rounded-xl flex items-center justify-center border border-[#74AFAD]/30 shadow-lg shadow-[#74AFAD]/20">
-                        <BookOpen className="w-7 h-7 text-[#74AFAD]" />
-                      </div>
-                      <span className="text-[#74AFAD] text-sm font-bold bg-[#74AFAD]/20 px-2 py-1 rounded-lg">+2</span>
-                    </div>
-                    <h3 className="text-4xl font-bold text-gray-900 mb-1">{stats.totalCourses}</h3>
-                    <p className="text-[#74AFAD] font-medium">Cursos Activos</p>
-                  </div>
-                </div>
-
-                {/* Card Niveles */}
-                <div className="group relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#D9853B] transition-all duration-500 overflow-hidden shadow-sm hover:shadow-lg">
-                  <div className="absolute inset-0 bg-gradient-to-br from-neon-pink/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-pink/10 rounded-full blur-2xl group-hover:bg-neon-pink/20 transition-all duration-500"></div>
-                  <div className="relative">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-[#D9853B]/30 to-[#D9853B]/10 rounded-xl flex items-center justify-center border border-[#D9853B]/30 shadow-lg shadow-[#D9853B]/20">
-                        <GraduationCap className="w-7 h-7 text-[#D9853B]" />
-                      </div>
-                    </div>
-                    <h3 className="text-4xl font-bold text-gray-900 mb-1">{stats.totalLevels}</h3>
-                    <p className="text-[#D9853B] font-medium">Niveles Educativos</p>
-                  </div>
-                </div>
-
-                {/* Card Accesos */}
-                <div className="group relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#558C89] transition-all duration-500 overflow-hidden shadow-sm hover:shadow-lg">
-                  <div className="absolute inset-0 bg-gradient-to-br from-neon-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-green/10 rounded-full blur-2xl group-hover:bg-neon-green/20 transition-all duration-500"></div>
-                  <div className="relative">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-[#558C89]/30 to-[#558C89]/10 rounded-xl flex items-center justify-center border border-[#558C89]/30 shadow-lg shadow-[#558C89]/20">
-                        <Activity className="w-7 h-7 text-[#558C89]" />
-                      </div>
-                    </div>
-                    <h3 className="text-4xl font-bold text-gray-900 mb-1">{stats.recentLogins}</h3>
-                    <p className="text-[#558C89] font-medium">Accesos Recientes</p>
-                  </div>
-                </div>
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard
+                  label="Usuarios Totales"
+                  value={stats.totalUsers}
+                  icon={Users}
+                  color="brand-purple"
+                  trend="+12%"
+                />
+                <StatCard
+                  label="Cursos Activos"
+                  value={stats.totalCourses}
+                  icon={BookOpen}
+                  color="brand-cyan"
+                  trend="+2"
+                />
+                <StatCard
+                  label="Niveles Educativos"
+                  value={stats.totalLevels}
+                  icon={GraduationCap}
+                  color="brand-violet"
+                />
+                <StatCard
+                  label="Accesos Recientes"
+                  value={stats.recentLogins}
+                  icon={Activity}
+                  color="neon-green"
+                />
               </div>
 
-              {/* Recent Activity con estilo futurista */}
-              <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                <div className="p-5 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-[#558C89]/5 to-transparent">
+              {/* Recent Activity */}
+              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                <div className="p-5 border-b border-slate-200 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#558C89]/20 rounded-xl flex items-center justify-center">
-                      <Activity className="w-5 h-5 text-[#558C89]" />
+                    <div className="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
+                      <Activity className="w-5 h-5 text-brand-purple" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">Actividad Reciente</h3>
+                    <h3 className="text-lg font-bold text-slate-900">Actividad Reciente</h3>
                   </div>
                   <button
                     onClick={() => setActiveTab('logs')}
-                    className="text-[#558C89] text-sm font-medium hover:text-gray-900 transition-colors px-4 py-2 rounded-lg hover:bg-[#558C89]/10"
+                    className="text-sm font-medium text-brand-purple hover:text-brand-violet transition-colors px-3 py-1.5 rounded-lg hover:bg-brand-purple/10"
                   >
                     Ver todo
                   </button>
                 </div>
                 <div className="p-4">
                   {accessLogs.length === 0 ? (
-                    <p className="text-gray-600 text-center py-8">No hay actividad reciente</p>
+                    <p className="text-slate-500 text-center py-8">No hay actividad reciente</p>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {accessLogs.slice(0, 5).map((log, idx) => (
-                        <div key={idx} className="flex items-center gap-4 p-3 bg-gray-100/50 rounded-lg">
+                        <div key={idx} className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            log.action === 'login' ? 'bg-green-500/20' : 'bg-red-500/20'
+                            log.action === 'login' ? 'bg-green-500/10' : 'bg-red-500/10'
                           }`}>
                             {log.action === 'login' ? (
-                              <Unlock className="w-5 h-5 text-green-400" />
+                              <Unlock className="w-5 h-5 text-green-500" />
                             ) : (
-                              <Lock className="w-5 h-5 text-red-400" />
+                              <Lock className="w-5 h-5 text-red-500" />
                             )}
                           </div>
-                          <div className="flex-1">
-                            <p className="text-gray-900 font-medium">{log.name}</p>
-                            <p className="text-gray-600 text-sm">{log.email}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-slate-900 font-medium truncate">{log.name}</p>
+                            <p className="text-slate-500 text-sm truncate">{log.email}</p>
                           </div>
-                          <div className="text-right">
-                            <p className={`text-sm ${log.action === 'login' ? 'text-green-400' : 'text-red-400'}`}>
+                          <div className="text-right flex-shrink-0">
+                            <p className={`text-sm font-medium ${log.action === 'login' ? 'text-green-600' : 'text-red-600'}`}>
                               {log.action === 'login' ? 'Inició sesión' : 'Cerró sesión'}
                             </p>
-                            <p className="text-gray-500 text-xs">
+                            <p className="text-slate-400 text-xs">
                               {new Date(log.timestamp).toLocaleString('es-EC')}
                             </p>
                           </div>
@@ -394,141 +425,61 @@ export default function AdminPage() {
               </div>
 
               {/* Quick Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <Link
-                  href="/admin/contenido"
-                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-neon-green/50 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-neon-green/20 rounded-lg flex items-center justify-center group-hover:bg-neon-green/30 transition-colors">
-                      <BookOpen className="w-6 h-6 text-neon-green" />
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-brand-cyan" />
+                  Herramientas de administración
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <QuickAction href="/admin/contenido" icon={BookOpen} color="green-500" title="Editar Contenido" description="Videos, imágenes, lecciones" />
+                  <QuickAction href="/admin/kits" icon={Package} color="brand-purple" title="Gestionar Kits" description="Kits, imágenes, precios" />
+                  <QuickAction href="/admin/simuladores" icon={Monitor} color="cyan-500" title="Simuladores" description="Por nivel y programa" />
+                  <QuickAction href="/admin/gestion" icon={GraduationCap} color="brand-violet" title="Niveles y Programas" description="Niveles, programas, usuarios" />
+                  <QuickAction href="/admin/ia" icon={Brain} color="pink-500" title="IA y Hacking Ético" description="Actividades de IA por nivel" />
+                  <QuickAction href="/admin/proyectos" icon={Activity} color="brand-purple" title="Proyectos Avanzados" description="Jetson, Raspberry, Digispark" />
+                  <button
+                    onClick={() => setActiveTab('courses')}
+                    className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-brand-violet/50 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-brand-violet/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Plus className="w-6 h-6 text-brand-violet" />
+                      </div>
+                      <div>
+                        <h4 className="text-slate-900 font-semibold">Agregar Curso</h4>
+                        <p className="text-slate-500 text-sm">Crear nuevo contenido</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-gray-900 font-semibold">Editar Contenido</h4>
-                      <p className="text-gray-600 text-sm">Videos, imágenes, lecciones</p>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('users')}
+                    className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-brand-violet/50 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-brand-violet/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Users className="w-6 h-6 text-brand-violet" />
+                      </div>
+                      <div>
+                        <h4 className="text-slate-900 font-semibold">Gestionar Usuarios</h4>
+                        <p className="text-slate-500 text-sm">Crear y editar usuarios</p>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/admin/kits"
-                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-brand-purple/50 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-brand-purple/20 rounded-lg flex items-center justify-center group-hover:bg-brand-purple/30 transition-colors">
-                      <Package className="w-6 h-6 text-brand-purple" />
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('settings')}
+                    className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-pink-500/50 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Settings className="w-6 h-6 text-pink-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-slate-900 font-semibold">Configuración</h4>
+                        <p className="text-slate-500 text-sm">Ajustes del sistema</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-gray-900 font-semibold">Gestionar Kits</h4>
-                      <p className="text-gray-600 text-sm">Kits, imágenes, precios</p>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/admin/simuladores"
-                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-green-500/50 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
-                      <Monitor className="w-6 h-6 text-green-400" />
-                    </div>
-                    <div>
-                      <h4 className="text-gray-900 font-semibold">Simuladores</h4>
-                      <p className="text-gray-600 text-sm">Por nivel y programa</p>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/admin/gestion"
-                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-brand-violet/50 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-brand-violet/20 rounded-lg flex items-center justify-center group-hover:bg-brand-violet/30 transition-colors">
-                      <GraduationCap className="w-6 h-6 text-brand-violet" />
-                    </div>
-                    <div>
-                      <h4 className="text-gray-900 font-semibold">Niveles y Programas</h4>
-                      <p className="text-gray-600 text-sm">Niveles, programas, usuarios</p>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/admin/ia"
-                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-neon-pink/50 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-neon-pink/20 rounded-lg flex items-center justify-center group-hover:bg-neon-pink/30 transition-colors">
-                      <Brain className="w-6 h-6 text-neon-pink" />
-                    </div>
-                    <div>
-                      <h4 className="text-gray-900 font-semibold">IA y Hacking Ético</h4>
-                      <p className="text-gray-600 text-sm">Actividades de IA por nivel</p>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/admin/proyectos"
-                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-brand-purple/50 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-brand-purple/20 rounded-lg flex items-center justify-center group-hover:bg-brand-purple/30 transition-colors">
-                      <Activity className="w-6 h-6 text-brand-purple" />
-                    </div>
-                    <div>
-                      <h4 className="text-gray-900 font-semibold">Proyectos Avanzados</h4>
-                      <p className="text-gray-600 text-sm">Jetson, Raspberry, Digispark</p>
-                    </div>
-                  </div>
-                </Link>
-
-                <button
-                  onClick={() => setActiveTab('courses')}
-                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-brand-violet/50 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-brand-violet/20 rounded-lg flex items-center justify-center group-hover:bg-brand-violet/30 transition-colors">
-                      <Plus className="w-6 h-6 text-brand-violet" />
-                    </div>
-                    <div>
-                      <h4 className="text-gray-900 font-semibold">Agregar Curso</h4>
-                      <p className="text-gray-600 text-sm">Crear nuevo contenido</p>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('users')}
-                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-brand-violet/50 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-brand-violet/20 rounded-lg flex items-center justify-center group-hover:bg-brand-violet/30 transition-colors">
-                      <Users className="w-6 h-6 text-brand-violet" />
-                    </div>
-                    <div>
-                      <h4 className="text-gray-900 font-semibold">Gestionar Usuarios</h4>
-                      <p className="text-gray-600 text-sm">Crear y editar usuarios</p>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('settings')}
-                  className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-neon-pink/50 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-neon-pink/20 rounded-lg flex items-center justify-center group-hover:bg-neon-pink/30 transition-colors">
-                      <Settings className="w-6 h-6 text-neon-pink" />
-                    </div>
-                    <div>
-                      <h4 className="text-gray-900 font-semibold">Configuración</h4>
-                      <p className="text-gray-600 text-sm">Ajustes del sistema</p>
-                    </div>
-                  </div>
-                </button>
+                  </button>
+                </div>
               </div>
             </div>
           )}

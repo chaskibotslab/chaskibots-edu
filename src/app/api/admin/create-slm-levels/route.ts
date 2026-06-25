@@ -1,13 +1,7 @@
 import { NextResponse } from 'next/server'
-import Airtable from 'airtable'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
-
-const base = new Airtable({ 
-  apiKey: process.env.AIRTABLE_API_KEY 
-}).base(process.env.AIRTABLE_BASE_ID || '')
-
-const TABLE_NAME = 'levels'
 
 // Niveles SLM que necesitan ser creados
 const SLM_LEVELS = [
@@ -130,15 +124,15 @@ export async function POST() {
   try {
     console.log('[Create SLM Levels] Iniciando creación de niveles SLM...')
 
-    // Primero obtener los niveles existentes
-    const existingRecords = await base(TABLE_NAME).select().all()
-    const existingIds = new Set(existingRecords.map((r: any) => r.fields.id))
+    const { data: existingRecords, error: fetchError } = await supabaseAdmin
+      .from('levels')
+      .select('id')
+    if (fetchError) throw fetchError
 
+    const existingIds = new Set((existingRecords || []).map((r: any) => r.id))
     console.log('[Create SLM Levels] Niveles existentes:', existingIds.size)
 
-    // Filtrar solo los que no existen
     const levelsToCreate = SLM_LEVELS.filter(level => !existingIds.has(level.id))
-
     console.log('[Create SLM Levels] Niveles a crear:', levelsToCreate.length)
 
     if (levelsToCreate.length === 0) {
@@ -149,36 +143,31 @@ export async function POST() {
       })
     }
 
-    // Crear los niveles faltantes
     const created: string[] = []
     const errors: string[] = []
 
     for (const level of levelsToCreate) {
-      try {
-        await base(TABLE_NAME).create([
-          {
-            fields: {
-              id: level.id,
-              name: level.name,
-              fullName: level.fullName,
-              category: level.category,
-              ageRange: level.ageRange,
-              gradeNumber: level.gradeNumber,
-              color: level.color,
-              neonColor: level.neonColor,
-              icon: level.icon,
-              kitPrice: level.kitPrice,
-              hasHacking: level.hasHacking,
-              hasAdvancedIA: level.hasAdvancedIA,
-            }
-          }
-        ])
-        created.push(level.id)
-        console.log(`[Create SLM Levels] Creado: ${level.id}`)
-      } catch (error) {
-        const errorMsg = `Error creando ${level.id}: ${error}`
+      const { error: insertError } = await supabaseAdmin.from('levels').insert({
+        id: level.id,
+        name: level.name,
+        full_name: level.fullName,
+        category: level.category,
+        age_range: level.ageRange,
+        grade_number: level.gradeNumber,
+        color: level.color,
+        neon_color: level.neonColor,
+        icon: level.icon,
+        kit_price: level.kitPrice,
+        has_hacking: level.hasHacking,
+        has_advanced_ia: level.hasAdvancedIA,
+      })
+      if (insertError) {
+        const errorMsg = `Error creando ${level.id}: ${insertError.message}`
         errors.push(errorMsg)
         console.error(errorMsg)
+      } else {
+        created.push(level.id)
+        console.log(`[Create SLM Levels] Creado: ${level.id}`)
       }
     }
 
@@ -201,19 +190,22 @@ export async function POST() {
 // GET - Ver qué niveles SLM faltan
 export async function GET() {
   try {
-    const existingRecords = await base(TABLE_NAME).select().all()
-    const existingIds = new Set(existingRecords.map((r: any) => r.fields.id))
+    const { data: existingRecords, error: fetchError } = await supabaseAdmin
+      .from('levels')
+      .select('id')
+    if (fetchError) throw fetchError
 
+    const existingIds = new Set((existingRecords || []).map((r: any) => r.id))
     const missingLevels = SLM_LEVELS.filter(level => !existingIds.has(level.id))
     const existingSlmLevels = SLM_LEVELS.filter(level => existingIds.has(level.id))
 
     return NextResponse.json({
       success: true,
-      totalLevelsInDb: existingRecords.length,
+      totalLevelsInDb: existingRecords?.length || 0,
       slmLevelsNeeded: SLM_LEVELS.length,
       missingLevels: missingLevels.map(l => ({ id: l.id, name: l.name })),
       existingSlmLevels: existingSlmLevels.map(l => ({ id: l.id, name: l.name })),
-      message: missingLevels.length > 0 
+      message: missingLevels.length > 0
         ? `Faltan ${missingLevels.length} niveles SLM. Usa POST para crearlos.`
         : 'Todos los niveles SLM ya existen.'
     })

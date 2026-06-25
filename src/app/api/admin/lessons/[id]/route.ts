@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID
-const AIRTABLE_TABLE_NAME = 'lessons'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function PATCH(
   request: NextRequest,
@@ -11,60 +8,37 @@ export async function PATCH(
   try {
     const { id } = params
     const body = await request.json()
-    
-    if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
+
+    const fields: Record<string, any> = {}
+    if (body.videoUrl !== undefined) fields.video_url = body.videoUrl || null
+    if (body.imageUrl !== undefined) fields.images = body.imageUrl ? [body.imageUrl] : []
+    if (body.resources !== undefined) fields.resources = body.resources || null
+    if (body.externalLinks !== undefined) fields.external_links = body.externalLinks || null
+    if (body.title !== undefined) fields.title = body.title || null
+    if (body.description !== undefined) fields.description = body.description || null
+    if (body.levelId !== undefined) fields.level_id = body.levelId || null
+    if (body.programId !== undefined) fields.program_id = body.programId || null
+    if (body.isActive !== undefined) fields.is_active = body.isActive
+
+    const { data, error } = await supabaseAdmin
+      .from('lessons')
+      .update(fields)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Supabase error updating lesson:', error)
       return NextResponse.json(
-        { error: 'Airtable configuration missing' },
+        { error: 'Failed to update lesson' },
         { status: 500 }
       )
     }
 
-    // Build fields to update
-    const fields: Record<string, any> = {}
-    
-    if (body.videoUrl !== undefined) {
-      fields.videoUrl = body.videoUrl || ''
-    }
-    
-    if (body.imageUrl !== undefined) {
-      fields.imageUrl = body.imageUrl || ''
-    }
-    
-    if (body.resources !== undefined) {
-      fields.resources = body.resources || ''
-    }
-    
-    if (body.externalLinks !== undefined) {
-      fields.externalLinks = body.externalLinks || ''
-    }
-
-    // Update in Airtable
-    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}/${id}`
-    
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ fields })
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      console.error('Airtable error:', error)
-      return NextResponse.json(
-        { error: 'Failed to update lesson in Airtable' },
-        { status: response.status }
-      )
-    }
-
-    const updatedRecord = await response.json()
-    
     return NextResponse.json({
       success: true,
-      id: updatedRecord.id,
-      fields: updatedRecord.fields
+      id: data.id,
+      fields: data
     })
 
   } catch (error) {
@@ -82,34 +56,23 @@ export async function GET(
 ) {
   try {
     const { id } = params
-    
-    if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
-      return NextResponse.json(
-        { error: 'Airtable configuration missing' },
-        { status: 500 }
-      )
-    }
 
-    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}/${id}`
-    
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`
-      }
-    })
+    const { data, error } = await supabaseAdmin
+      .from('lessons')
+      .select('*')
+      .eq('id', id)
+      .limit(1)
 
-    if (!response.ok) {
+    if (error || !data || data.length === 0) {
       return NextResponse.json(
         { error: 'Lesson not found' },
         { status: 404 }
       )
     }
 
-    const record = await response.json()
-    
     return NextResponse.json({
-      id: record.id,
-      ...record.fields
+      id: data[0].id,
+      ...data[0]
     })
 
   } catch (error) {

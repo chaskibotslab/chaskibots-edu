@@ -260,8 +260,8 @@ function safeJSON(str) {
 // ============================================================
 const migrations = [
   // Orden importa por foreign keys
-  { csv: 'programs.csv', table: 'programs' },
   { csv: 'levels.csv', table: 'levels' },
+  { csv: 'programs.csv', table: 'programs' },
   { csv: 'schools.csv', table: 'schools' },
   { csv: 'modules.csv', table: 'modules' },
   { csv: 'simulators.csv', table: 'simulators' },

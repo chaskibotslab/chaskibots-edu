@@ -1,34 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Airtable from 'airtable'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
-
-const base = new Airtable({ 
-  apiKey: process.env.AIRTABLE_API_KEY 
-}).base(process.env.AIRTABLE_BASE_ID || '')
-
-const TABLE_NAME = 'programs'
 
 // GET - Obtener todos los programas
 export async function GET() {
   try {
-    const records = await base(TABLE_NAME)
-      .select({
-        sort: [{ field: 'name', direction: 'asc' }]
-      })
-      .all()
+    const { data, error } = await supabaseAdmin
+      .from('programs')
+      .select('*')
+      .order('name', { ascending: true })
 
-    const programs = records.map((record: any) => ({
-      id: record.fields.id || record.id,
-      recordId: record.id,
-      name: record.fields.name || '',
-      description: record.fields.description || '',
-      levelId: record.fields.levelId || '',
-      levelName: record.fields.levelName || '',
-      type: record.fields.type || 'robotica',
-      duration: record.fields.duration || '',
-      price: record.fields.price || 0,
-      isActive: record.fields.isActive !== false
+    if (error) {
+      console.error('Error fetching programs:', error)
+      return NextResponse.json(
+        { success: false, error: 'Error al obtener programas', programs: [] },
+        { status: 500 }
+      )
+    }
+
+    const programs = (data || []).map((row: any) => ({
+      id: row.id,
+      recordId: row.id,
+      name: row.name || '',
+      description: row.description || '',
+      levelId: row.level_id || '',
+      levelName: row.level_name || '',
+      type: row.type || 'robotica',
+      duration: row.duration || '',
+      price: row.price || 0,
+      isActive: row.is_active !== false
     }))
 
     return NextResponse.json({ success: true, programs })
@@ -47,8 +48,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { id, name, description, levelId, levelName, type, duration, price } = body
 
-    console.log('Creating program with body:', body)
-
     if (!name || !levelId) {
       return NextResponse.json(
         { success: false, error: 'Nombre y nivel son requeridos' },
@@ -56,39 +55,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generar ID si no viene
     const programId = id || `prog-${levelId}-${type || 'robotica'}-${Date.now()}`
-
-    // Enviar campos a Airtable (todos como texto)
-    const fields: Record<string, any> = {
+    const insert: Record<string, any> = {
       id: programId,
       name: String(name),
-      levelId: String(levelId),
+      level_id: String(levelId),
     }
-    
-    // Campos opcionales
-    if (description) fields.description = String(description)
-    if (levelName) fields.levelName = String(levelName)
-    if (type) fields.type = String(type)
-    if (duration) fields.duration = String(duration)
-    if (price !== undefined && price !== '') fields.price = Number(price) || 0
+    if (description) insert.description = String(description)
+    if (levelName) insert.level_name = String(levelName)
+    if (type) insert.type = String(type)
+    if (duration) insert.duration = String(duration)
+    if (price !== undefined && price !== '') insert.price = Number(price) || 0
 
-    console.log('Sending fields to Airtable:', fields)
-
-    const result = await base(TABLE_NAME).create(fields)
-    console.log('Program created:', result.id)
+    const { error } = await supabaseAdmin.from('programs').insert(insert)
+    if (error) {
+      console.error('Error creating program:', error)
+      return NextResponse.json(
+        { success: false, error: error.message || 'Error al crear programa' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,
       message: 'Programa creado exitosamente',
       id: programId,
-      recordId: result.id
     })
   } catch (error: any) {
     console.error('Error creating program:', error)
-    const errorMessage = error?.message || error?.error?.message || 'Error al crear programa'
     return NextResponse.json(
-      { success: false, error: errorMessage, details: String(error) },
+      { success: false, error: error?.message || 'Error al crear programa', details: String(error) },
       { status: 500 }
     )
   }
@@ -99,58 +95,34 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
     const { id, recordId, ...updateData } = body
+    const searchId = id || recordId
 
-    console.log('Updating program:', { id, recordId, updateData })
-
-    if (!id && !recordId) {
+    if (!searchId) {
       return NextResponse.json(
         { success: false, error: 'ID es requerido' },
         { status: 400 }
       )
     }
 
-    let airtableRecordId = recordId
+    const fields: Record<string, any> = {}
+    if (updateData.name !== undefined) fields.name = String(updateData.name)
+    if (updateData.description !== undefined) fields.description = String(updateData.description || '')
+    if (updateData.levelId !== undefined) fields.level_id = String(updateData.levelId)
+    if (updateData.levelName !== undefined) fields.level_name = String(updateData.levelName)
+    if (updateData.type !== undefined) fields.type = String(updateData.type)
+    if (updateData.duration !== undefined) fields.duration = String(updateData.duration)
+    if (updateData.price !== undefined) fields.price = Number(updateData.price) || 0
+    if (updateData.isActive !== undefined) fields.is_active = Boolean(updateData.isActive)
+    if (updateData.id !== undefined && updateData.id !== searchId) fields.id = updateData.id
 
-    // Si no tenemos recordId, buscar por el campo id
-    if (!airtableRecordId && id) {
-      const records = await base(TABLE_NAME)
-        .select({
-          filterByFormula: `{id} = '${id}'`,
-          maxRecords: 1
-        })
-        .firstPage()
-
-      if (records.length > 0) {
-        airtableRecordId = records[0].id
-      }
-    }
-
-    // Si aún no encontramos, intentar usar id como recordId directo (formato rec...)
-    if (!airtableRecordId && id && id.startsWith('rec')) {
-      airtableRecordId = id
-    }
-
-    if (!airtableRecordId) {
+    const { error } = await supabaseAdmin.from('programs').update(fields).eq('id', searchId)
+    if (error) {
+      console.error('Error updating program:', error)
       return NextResponse.json(
-        { success: false, error: 'Programa no encontrado' },
-        { status: 404 }
+        { success: false, error: error.message || 'Error al actualizar programa' },
+        { status: 500 }
       )
     }
-
-    // Preparar campos para actualizar
-    const fields: Record<string, any> = {}
-    if (updateData.name) fields.name = String(updateData.name)
-    if (updateData.description !== undefined) fields.description = String(updateData.description || '')
-    if (updateData.levelId) fields.levelId = String(updateData.levelId)
-    if (updateData.levelName) fields.levelName = String(updateData.levelName)
-    if (updateData.type) fields.type = String(updateData.type)
-    if (updateData.duration) fields.duration = String(updateData.duration)
-    if (updateData.price !== undefined) fields.price = Number(updateData.price) || 0
-    if (updateData.isActive !== undefined) fields.isActive = Boolean(updateData.isActive)
-
-    console.log('Updating Airtable record:', airtableRecordId, 'with fields:', fields)
-
-    await base(TABLE_NAME).update(airtableRecordId, fields)
 
     return NextResponse.json({
       success: true,
@@ -178,21 +150,14 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const records = await base(TABLE_NAME)
-      .select({
-        filterByFormula: `{id} = '${id}'`,
-        maxRecords: 1
-      })
-      .firstPage()
-
-    if (records.length === 0) {
+    const { error } = await supabaseAdmin.from('programs').delete().eq('id', id)
+    if (error) {
+      console.error('Error deleting program:', error)
       return NextResponse.json(
-        { success: false, error: 'Programa no encontrado' },
-        { status: 404 }
+        { success: false, error: error.message || 'Error al eliminar programa' },
+        { status: 500 }
       )
     }
-
-    await base(TABLE_NAME).destroy(records[0].id)
 
     return NextResponse.json({
       success: true,

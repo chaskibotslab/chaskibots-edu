@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
-const USERS_TABLE = 'users'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,57 +13,52 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Buscar usuario por email en Airtable
-    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula=${encodeURIComponent(`{email}='${email}'`)}`
-    
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    })
+    // Buscar usuario por email en Supabase
+    const { data, error } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .limit(1)
 
-    if (!response.ok) {
+    if (error) {
+      console.error('Refresh error:', error.message)
       return NextResponse.json(
         { success: false, error: 'Error al buscar usuario' },
         { status: 500 }
       )
     }
 
-    const data = await response.json()
-    
-    if (!data.records || data.records.length === 0) {
+    if (!data || data.length === 0) {
       return NextResponse.json(
         { success: false, error: 'Usuario no encontrado' },
         { status: 404 }
       )
     }
 
-    const record = data.records[0]
-    const fields = record.fields
+    const row = data[0]
+    const rawRole = String(row.role || '').toLowerCase()
+    let role: 'admin' | 'teacher' | 'student' = 'student'
+    if (rawRole.includes('admin')) role = 'admin'
+    else if (rawRole.includes('teacher') || rawRole.includes('prof') || rawRole.includes('docente')) role = 'teacher'
 
-    // Normalizar rol
-    let role = 'student'
-    const rawRole = (fields.role as string || '').toLowerCase()
-    if (rawRole === 'admin' || rawRole === 'administrador') role = 'admin'
-    else if (rawRole === 'teacher' || rawRole === 'profesor' || rawRole === 'docente') role = 'teacher'
+    // Actualizar último login (best-effort)
+    supabaseAdmin.from('users').update({ last_login: new Date().toISOString() }).eq('id', row.id).then(() => {})
 
     const user = {
-      id: record.id,
-      accessCode: (fields.accessCode as string) || '',
-      name: (fields.name as string) || 'Usuario',
-      email: fields.email as string,
+      id: row.id,
+      accessCode: row.access_code || '',
+      name: row.name || 'Usuario',
+      email: row.email,
       role,
-      courseId: (fields.courseId as string) || '',
-      courseName: (fields.courseName as string) || '',
-      schoolId: (fields.schoolId as string) || '',
-      schoolName: (fields.schoolName as string) || '',
-      programId: (fields.programId as string) || '',
-      programName: (fields.programName as string) || '',
-      levelId: (fields.levelId as string) || '',
-      isActive: true,
-      createdAt: (fields.createdAt as string) || new Date().toISOString(),
+      courseId: row.course_id || '',
+      courseName: row.course_name || '',
+      schoolId: row.school_id || '',
+      schoolName: row.school_name || '',
+      programId: row.program_id || '',
+      programName: row.program_name || '',
+      levelId: row.level_id || '',
+      isActive: row.is_active !== false,
+      createdAt: row.created_at || new Date().toISOString(),
       lastLogin: new Date().toISOString(),
     }
 

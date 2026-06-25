@@ -6,7 +6,7 @@ import {
   getAllUsers,
   updateUser,
   regenerateAccessCode 
-} from '@/lib/airtable-auth'
+} from '@/lib/supabase-auth'
 import { cache } from '@/lib/cache'
 import { getUserFriendlyError } from '@/lib/airtable-errors'
 
@@ -205,35 +205,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Si es profesor y tiene curso asignado, crear entrada en teacher_courses
-    if (role === 'teacher' && finalCourseId && result.user?.accessCode) {
+    if (role === 'teacher' && finalCourseId && result.user?.id) {
       try {
-        const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
-        const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
-        const TEACHER_COURSES_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/teacher_courses`
-        
-        const assignmentId = `tc-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`
-        
-        const assignmentFields = {
-          id: assignmentId,
-          teacherId: result.user.accessCode,
-          teacherName: name,
-          courseId: finalCourseId,
-          courseName: finalCourseName,
-          levelId: levelId,
-          schoolId: schoolId || '',
-          schoolName: schoolName || '',
-          createdAt: new Date().toISOString().split('T')[0]
-        }
-        
-        await fetch(TEACHER_COURSES_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ records: [{ fields: assignmentFields }] }),
+        const { supabaseAdmin } = await import('@/lib/supabase')
+        const { error: tcError } = await supabaseAdmin.from('teacher_courses').insert({
+          teacher_id: result.user.id,
+          teacher_name: name,
+          course_id: finalCourseId,
+          course_name: finalCourseName,
+          level_id: levelId,
+          school_id: schoolId || null,
+          school_name: schoolName || null,
         })
-        console.log('[API Users] Created teacher_courses assignment for new teacher')
+        if (tcError) console.error('[API Users] teacher_courses error:', tcError.message)
+        else console.log('[API Users] Created teacher_courses assignment for new teacher')
       } catch (assignError) {
         console.error('[API Users] Error creating teacher_courses assignment:', assignError)
         // No fallar la creación del usuario por esto
@@ -378,25 +363,14 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Eliminar usuario de Airtable
-    const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
-    const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
-    
-    const response = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/users/${userId}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        },
-      }
-    )
+    // Eliminar usuario de Supabase
+    const { supabaseAdmin } = await import('@/lib/supabase')
+    const { error: deleteError } = await supabaseAdmin.from('users').delete().eq('id', userId)
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Error deleting user from Airtable:', errorText)
+    if (deleteError) {
+      console.error('Error deleting user from Supabase:', deleteError.message)
       return NextResponse.json(
-        { success: false, error: 'Error al eliminar usuario de Airtable' },
+        { success: false, error: 'Error al eliminar usuario' },
         { status: 400 }
       )
     }

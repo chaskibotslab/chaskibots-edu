@@ -435,17 +435,17 @@ export default function AdminLessonsPage() {
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                           <Video className="w-4 h-4 inline mr-2" />
-                          URL del Video (YouTube o Google Drive)
+                          URL del Video (YouTube)
                         </label>
                         <input
                           type="text"
                           value={formData.videoUrl}
                           onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
-                          placeholder="https://www.youtube.com/watch?v=... o https://drive.google.com/..."
+                          placeholder="https://www.youtube.com/watch?v=..."
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500"
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                          Soporta: YouTube, Google Drive (compartido públicamente)
+                          Soporta: YouTube y URLs de video directas
                         </p>
                       </div>
 
@@ -459,11 +459,11 @@ export default function AdminLessonsPage() {
                           type="text"
                           value={formData.imageUrl}
                           onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
-                          placeholder="https://images.unsplash.com/... o https://drive.google.com/..."
+                          placeholder="https://images.unsplash.com/..."
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500"
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                          Usa Unsplash, Google Drive (link directo), o cualquier URL de imagen
+                          Usa Unsplash, Supabase Storage o cualquier URL de imagen
                         </p>
                       </div>
 

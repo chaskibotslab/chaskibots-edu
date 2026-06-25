@@ -1,151 +1,79 @@
 import { NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
-
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || ''
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || ''
-
-interface AirtableRecord {
-  id: string
-  fields: Record<string, any>
-}
-
-// Función para obtener todos los registros de una tabla (con paginación)
-async function fetchAllRecords(tableName: string): Promise<AirtableRecord[]> {
-  const allRecords: AirtableRecord[] = []
-  let offset: string | undefined
-
-  do {
-    const url = new URL(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${tableName}`)
-    if (offset) url.searchParams.append('offset', offset)
-
-    const response = await fetch(url.toString(), {
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    })
-
-    if (!response.ok) {
-      throw new Error(`Error fetching ${tableName}: ${response.status}`)
-    }
-
-    const data = await response.json()
-    allRecords.push(...data.records)
-    offset = data.offset
-  } while (offset)
-
-  return allRecords
-}
-
-// Función para actualizar un registro
-async function updateRecord(tableName: string, recordId: string, fields: Record<string, any>): Promise<void> {
-  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${tableName}/${recordId}`
-  
-  const response = await fetch(url, {
-    method: 'PATCH',
-    headers: {
-      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ fields }),
-  })
-
-  if (!response.ok) {
-    const error = await response.text()
-    throw new Error(`Error updating record: ${error}`)
-  }
-}
 
 // POST - Sincronizar levelId en teacher_courses con los de programs/courses
 export async function POST() {
   try {
     console.log('[Sync] Iniciando sincronización de teacher_courses...')
 
-    // 1. Obtener todos los programas para crear un mapa de courseId -> levelId
-    // Nota: La tabla principal es 'programs', courses puede no existir
-    let programs: AirtableRecord[] = []
-    let courses: AirtableRecord[] = []
-    
-    try {
-      programs = await fetchAllRecords('programs')
-      console.log('[Sync] Programs obtenidos:', programs.length)
-    } catch (error) {
-      console.error('[Sync] Error obteniendo programs:', error)
-    }
-    
-    try {
-      courses = await fetchAllRecords('courses')
-      console.log('[Sync] Courses obtenidos:', courses.length)
-    } catch (error) {
-      console.log('[Sync] Tabla courses no disponible, usando solo programs')
-    }
+    // 1. Obtener programas y courses_catalog
+    const { data: programs, error: progError } = await supabaseAdmin
+      .from('programs')
+      .select('id, level_id')
+    if (progError) console.error('[Sync] Error obteniendo programs:', progError.message)
 
-    // Crear mapa de courseId/programId -> levelId correcto
+    const { data: courses, error: courseError } = await supabaseAdmin
+      .from('courses_catalog')
+      .select('id, level_id')
+    if (courseError) console.error('[Sync] Error obteniendo courses_catalog:', courseError.message)
+
+    // Mapa de courseId -> levelId
     const levelIdMap: Record<string, string> = {}
-    
-    programs.forEach(p => {
-      if (p.fields.id && p.fields.levelId) {
-        levelIdMap[p.fields.id] = p.fields.levelId
-      }
-    })
-    
-    courses.forEach(c => {
-      if (c.fields.id && c.fields.levelId) {
-        levelIdMap[c.fields.id] = c.fields.levelId
-      }
-    })
+    ;(programs || []).forEach(p => { if (p.id && p.level_id) levelIdMap[p.id] = p.level_id })
+    ;(courses || []).forEach(c => { if (c.id && c.level_id) levelIdMap[c.id] = c.level_id })
 
     console.log('[Sync] Mapa de levelId creado:', Object.keys(levelIdMap).length, 'entradas')
 
-    // 2. Obtener todas las asignaciones de teacher_courses
-    const teacherCourses = await fetchAllRecords('teacher_courses')
-    console.log('[Sync] Asignaciones encontradas:', teacherCourses.length)
+    // 2. Obtener asignaciones
+    const { data: teacherCourses, error: tcError } = await supabaseAdmin
+      .from('teacher_courses')
+      .select('*')
+    if (tcError) throw tcError
 
-    // 3. Verificar y corregir levelId inconsistentes
+    console.log('[Sync] Asignaciones encontradas:', teacherCourses?.length || 0)
+
+    // 3. Identificar correcciones
     const corrections: { recordId: string; courseId: string; oldLevelId: string; newLevelId: string }[] = []
-
-    for (const tc of teacherCourses) {
-      const courseId = tc.fields.courseId
-      const currentLevelId = tc.fields.levelId || ''
-      const correctLevelId = levelIdMap[courseId]
-
+    ;(teacherCourses || []).forEach(tc => {
+      const correctLevelId = levelIdMap[tc.course_id || '']
+      const currentLevelId = tc.level_id || ''
       if (correctLevelId && currentLevelId !== correctLevelId) {
         corrections.push({
           recordId: tc.id,
-          courseId,
+          courseId: tc.course_id || '',
           oldLevelId: currentLevelId,
           newLevelId: correctLevelId
         })
       }
-    }
+    })
 
     console.log('[Sync] Correcciones necesarias:', corrections.length)
 
     // 4. Aplicar correcciones
     let corrected = 0
     const errors: string[] = []
-
     for (const correction of corrections) {
-      try {
-        await updateRecord('teacher_courses', correction.recordId, {
-          levelId: correction.newLevelId
-        })
-        corrected++
-        console.log(`[Sync] Corregido: ${correction.courseId} - ${correction.oldLevelId} -> ${correction.newLevelId}`)
-      } catch (error) {
-        const errorMsg = `Error corrigiendo ${correction.courseId}: ${error}`
+      const { error } = await supabaseAdmin
+        .from('teacher_courses')
+        .update({ level_id: correction.newLevelId })
+        .eq('id', correction.recordId)
+      if (error) {
+        const errorMsg = `Error corrigiendo ${correction.courseId}: ${error.message}`
         errors.push(errorMsg)
         console.error(errorMsg)
+      } else {
+        corrected++
+        console.log(`[Sync] Corregido: ${correction.courseId} - ${correction.oldLevelId} -> ${correction.newLevelId}`)
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: `Sincronización completada`,
+      message: 'Sincronización completada',
       stats: {
-        totalAssignments: teacherCourses.length,
+        totalAssignments: teacherCourses?.length || 0,
         correctionsNeeded: corrections.length,
         corrected,
         errors: errors.length
@@ -166,66 +94,37 @@ export async function POST() {
 // GET - Ver estado actual sin hacer cambios
 export async function GET() {
   try {
-    // 1. Obtener todos los programas para crear un mapa de courseId -> levelId
-    let programs: AirtableRecord[] = []
-    let courses: AirtableRecord[] = []
-    
-    try {
-      programs = await fetchAllRecords('programs')
-    } catch (error) {
-      console.error('[Sync GET] Error obteniendo programs:', error)
-    }
-    
-    try {
-      courses = await fetchAllRecords('courses')
-    } catch (error) {
-      console.log('[Sync GET] Tabla courses no disponible')
-    }
+    const { data: programs } = await supabaseAdmin.from('programs').select('id, level_id')
+    const { data: courses } = await supabaseAdmin.from('courses_catalog').select('id, level_id')
+    const { data: teacherCourses, error: tcError } = await supabaseAdmin.from('teacher_courses').select('*')
+    if (tcError) throw tcError
 
-    // Crear mapa de courseId -> levelId
     const levelIdMap: Record<string, string> = {}
-    
-    programs.forEach(p => {
-      if (p.fields.id && p.fields.levelId) {
-        levelIdMap[p.fields.id] = p.fields.levelId
-      }
-    })
-    
-    courses.forEach(c => {
-      if (c.fields.id && c.fields.levelId) {
-        levelIdMap[c.fields.id] = c.fields.levelId
-      }
-    })
+    ;(programs || []).forEach(p => { if (p.id && p.level_id) levelIdMap[p.id] = p.level_id })
+    ;(courses || []).forEach(c => { if (c.id && c.level_id) levelIdMap[c.id] = c.level_id })
 
-    // 2. Obtener asignaciones
-    const teacherCourses = await fetchAllRecords('teacher_courses')
-
-    // 3. Identificar inconsistencias
     const inconsistencies: { courseId: string; courseName: string; teacherName: string; currentLevelId: string; correctLevelId: string }[] = []
-
-    for (const tc of teacherCourses) {
-      const courseId = tc.fields.courseId
-      const currentLevelId = tc.fields.levelId || ''
-      const correctLevelId = levelIdMap[courseId]
-
+    ;(teacherCourses || []).forEach(tc => {
+      const correctLevelId = levelIdMap[tc.course_id || '']
+      const currentLevelId = tc.level_id || ''
       if (correctLevelId && currentLevelId !== correctLevelId) {
         inconsistencies.push({
-          courseId,
-          courseName: tc.fields.courseName || '',
-          teacherName: tc.fields.teacherName || '',
+          courseId: tc.course_id || '',
+          courseName: tc.course_name || '',
+          teacherName: tc.teacher_name || '',
           currentLevelId,
           correctLevelId
         })
       }
-    }
+    })
 
     return NextResponse.json({
       success: true,
-      totalAssignments: teacherCourses.length,
-      totalPrograms: programs.length,
-      totalCourses: courses.length,
+      totalAssignments: teacherCourses?.length || 0,
+      totalPrograms: programs?.length || 0,
+      totalCourses: courses?.length || 0,
       inconsistencies,
-      message: inconsistencies.length > 0 
+      message: inconsistencies.length > 0
         ? `Se encontraron ${inconsistencies.length} inconsistencias. Usa POST para corregirlas.`
         : 'No hay inconsistencias. Todos los levelId están correctos.'
     })

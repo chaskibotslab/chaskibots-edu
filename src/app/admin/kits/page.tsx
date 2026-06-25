@@ -38,6 +38,7 @@ export default function KitsAdminPage() {
   const [editingKit, setEditingKit] = useState<Kit | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
   // Form state
@@ -154,7 +155,15 @@ export default function KitsAdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: editingKit?.id,
-          ...formData
+          levelId: formData.levelId,
+          name: formData.name,
+          description: formData.description,
+          price: formData.price,
+          components: formData.components,
+          skills: formData.skills,
+          images: formData.image_urls,
+          videoUrl: formData.videoUrl,
+          tutorialUrl: formData.tutorialUrl
         })
       })
 
@@ -429,29 +438,57 @@ export default function KitsAdminPage() {
                 />
               </div>
 
-              {/* URLs de Imágenes de Google Drive */}
+              {/* URLs de Imágenes */}
               <div>
                 <label className="block text-sm text-gray-600 mb-2">
                   <ImageIcon className="w-4 h-4 inline mr-2" />
-                  URLs de Imágenes (Google Drive)
+                  Imágenes del Kit
                 </label>
+                <div className="flex items-center gap-2 mb-2">
+                  <label className="flex items-center gap-2 px-3 py-2 bg-brand-purple text-dark-900 rounded-lg font-medium hover:bg-brand-purple/90 cursor-pointer text-sm">
+                    <Plus className="w-4 h-4" />
+                    {uploadingImage ? 'Subiendo...' : 'Subir imagen'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingImage}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        setUploadingImage(true)
+                        try {
+                          const uploadForm = new FormData()
+                          uploadForm.append('file', file)
+                          uploadForm.append('bucket', 'lesson-images')
+                          const res = await fetch('/api/upload', { method: 'POST', body: uploadForm })
+                          const data = await res.json()
+                          if (!res.ok || !data.url) throw new Error(data.error || 'Error subiendo imagen')
+                          const current = formData.image_urls.split(',').map(u => u.trim()).filter(Boolean)
+                          const updated = current.length > 0 ? `${current.join(',')},${data.url}` : data.url
+                          setFormData({ ...formData, image_urls: updated })
+                        } catch (err: any) {
+                          setMessage({ type: 'error', text: err.message || 'Error subiendo imagen' })
+                        } finally {
+                          setUploadingImage(false)
+                        }
+                      }}
+                    />
+                  </label>
+                  <span className="text-xs text-gray-500">O pega URLs separadas por coma</span>
+                </div>
                 <textarea
                   rows={4}
                   value={formData.image_urls}
                   onChange={(e) => setFormData({ ...formData, image_urls: e.target.value })}
-                  placeholder="Pega las URLs de Google Drive separadas por coma"
+                  placeholder="https://... separadas por coma"
                   className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none resize-none font-mono text-sm"
                 />
                 <div className="mt-2 p-3 bg-gray-100/50 rounded-lg border border-gray-200">
-                  <p className="text-xs text-brand-purple font-medium mb-1">📁 Cómo obtener la URL:</p>
-                  <ol className="text-xs text-gray-600 space-y-1 list-decimal list-inside">
-                    <li>Sube la imagen a tu carpeta en Google Drive</li>
-                    <li>Clic derecho → "Obtener enlace" → "Cualquier persona con el enlace"</li>
-                    <li>Copia el enlace (formato: https://drive.google.com/file/d/ID/view)</li>
-                    <li>Pégalo aquí (separar múltiples URLs con coma)</li>
-                  </ol>
+                  <p className="text-xs text-brand-purple font-medium mb-1">📁 Subir imagen:</p>
+                  <p className="text-xs text-gray-600">Usa el botón "Subir imagen" para guardar la imagen directamente en Supabase Storage.</p>
                 </div>
-                
+
                 {/* Preview de imágenes */}
                 {formData.image_urls && (
                   <div className="mt-3">
@@ -459,20 +496,10 @@ export default function KitsAdminPage() {
                     <div className="flex flex-wrap gap-2">
                       {formData.image_urls.split(',').filter(url => url.trim()).slice(0, 6).map((url, idx) => {
                         const cleanUrl = url.trim()
-                        let displayUrl = cleanUrl
-                        // Convertir URL de Google Drive a formato de imagen
-                        if (cleanUrl.includes('drive.google.com/file/d/')) {
-                          const match = cleanUrl.match(/\/d\/([^/]+)/)
-                          if (match) {
-                            displayUrl = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w200`
-                          }
-                        } else if (cleanUrl.includes('drive.google.com/uc')) {
-                          displayUrl = cleanUrl
-                        }
                         return (
                           <img
                             key={idx}
-                            src={displayUrl}
+                            src={cleanUrl}
                             alt={`Preview ${idx + 1}`}
                             className="w-16 h-16 object-cover rounded-lg border border-gray-200"
                             onError={(e) => {
@@ -498,7 +525,7 @@ export default function KitsAdminPage() {
                   type="url"
                   value={formData.videoUrl}
                   onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/ID/preview"
+                  placeholder="https://..."
                   className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none"
                 />
               </div>

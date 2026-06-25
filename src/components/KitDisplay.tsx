@@ -8,32 +8,8 @@ interface KitDisplayProps {
   levelId: string
 }
 
-// Función para manejar URLs de imágenes (Airtable, Google Drive o normales)
 function getImageUrl(url: string): string {
   if (!url) return ''
-  
-  // Si es una URL de Airtable, usar el proxy para evitar CORS
-  if (url.includes('airtableusercontent.com')) {
-    return `/api/image-proxy?url=${encodeURIComponent(url)}`
-  }
-  
-  // Si es una URL de Google Drive, convertirla
-  if (url.includes('drive.google.com')) {
-    let fileId = ''
-    
-    // Formato: https://drive.google.com/file/d/FILE_ID/view
-    const match1 = url.match(/\/file\/d\/([^/]+)/)
-    if (match1) fileId = match1[1]
-    
-    // Formato: https://drive.google.com/uc?export=view&id=FILE_ID
-    const match2 = url.match(/[?&]id=([^&]+)/)
-    if (match2) fileId = match2[1]
-    
-    if (fileId) {
-      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`
-    }
-  }
-  
   return url
 }
 
@@ -234,29 +210,10 @@ export default function KitDisplay({ levelId }: KitDisplayProps) {
         {kit.videoUrl && (
           <div className="mt-6 pt-6 border-t border-gray-200">
             <h4 className="text-sm font-medium text-gray-600 mb-3">🎬 Video Tutorial:</h4>
-            {kit.videoUrl.includes('drive.google.com') ? (
-              // Embeber video de Google Drive
+            {kit.videoUrl.includes('youtube.com') || kit.videoUrl.includes('youtu.be') ? (
               <div className="aspect-video bg-gray-50 rounded-lg overflow-hidden">
                 <iframe
                   src={(() => {
-                    // Extraer el ID del archivo de Google Drive
-                    const match = kit.videoUrl.match(/\/file\/d\/([^/]+)/) || kit.videoUrl.match(/[?&]id=([^&]+)/)
-                    if (match && match[1]) {
-                      return `https://drive.google.com/file/d/${match[1]}/preview`
-                    }
-                    return kit.videoUrl
-                  })()}
-                  className="w-full h-full"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                ></iframe>
-              </div>
-            ) : kit.videoUrl.includes('youtube.com') || kit.videoUrl.includes('youtu.be') ? (
-              // Embeber video de YouTube
-              <div className="aspect-video bg-gray-50 rounded-lg overflow-hidden">
-                <iframe
-                  src={(() => {
-                    // Convertir URL de YouTube a embed
                     const match = kit.videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
                     if (match && match[1]) {
                       return `https://www.youtube.com/embed/${match[1]}`
@@ -269,7 +226,6 @@ export default function KitDisplay({ levelId }: KitDisplayProps) {
                 ></iframe>
               </div>
             ) : (
-              // Enlace externo para otros videos
               <a
                 href={kit.videoUrl}
                 target="_blank"

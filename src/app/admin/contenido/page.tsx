@@ -406,7 +406,7 @@ export default function ContenidoAdminPage() {
                   type="url"
                   value={formData.pdfUrl}
                   onChange={(e) => setFormData({ ...formData, pdfUrl: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/..."
+                  placeholder="https://... (URL del PDF)"
                   className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none"
                 />
               </div>
