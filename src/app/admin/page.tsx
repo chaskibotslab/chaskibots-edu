@@ -431,12 +431,13 @@ export default function AdminPage() {
                   Herramientas de administración
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <QuickAction href="/admin/colegios" icon={GraduationCap} color="brand-violet" title="Colegios y Cursos" description="Asignar cursos a colegios" />
+                  <QuickAction href="/admin/cursos" icon={BookOpen} color="pink-500" title="Catálogo de Cursos" description="Cursos reutilizables" />
                   <QuickAction href="/admin/calificar" icon={Award} color="amber-500" title="Calificar Entregas" description="Panel realtime de calificación" />
                   <QuickAction href="/admin/lecciones" icon={BookOpen} color="brand-cyan" title="Lecciones" description="Editor con imágenes drag-drop" />
-                  <QuickAction href="/admin/contenido" icon={BookOpen} color="green-500" title="Editar Contenido" description="Videos, imágenes, lecciones" />
                   <QuickAction href="/admin/kits" icon={Package} color="brand-purple" title="Gestionar Kits" description="Kits, imágenes, precios" />
                   <QuickAction href="/admin/simuladores" icon={Monitor} color="cyan-500" title="Simuladores" description="Por nivel y programa" />
-                  <QuickAction href="/admin/gestion" icon={GraduationCap} color="brand-violet" title="Niveles y Programas" description="Niveles, programas, usuarios" />
+                  <QuickAction href="/admin/gestion" icon={Settings} color="slate-500" title="Niveles y Programas" description="Niveles, programas, usuarios" />
                   <QuickAction href="/admin/ia" icon={Brain} color="pink-500" title="IA y Hacking Ético" description="Actividades de IA por nivel" />
                   <QuickAction href="/admin/proyectos" icon={Activity} color="brand-purple" title="Proyectos Avanzados" description="Jetson, Raspberry, Digispark" />
                   <button

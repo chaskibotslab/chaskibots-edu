@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useAuth } from './AuthProvider'
 import { 
   ExternalLink, Puzzle, Cat, Gamepad2, Zap, CircuitBoard, Code, Terminal, 
-  Cpu, Bot, Cog, Eye, Box, GitBranch, Network, Joystick, Wrench, Sparkles
+  Cpu, Bot, Cog, Eye, Box, GitBranch, Network, Joystick, Wrench, Sparkles,
+  Maximize2, Minimize2
 } from 'lucide-react'
 
 // Cargar BlocklyEditor dinámicamente para evitar errores de SSR
@@ -278,12 +279,25 @@ const simulators = [
   },
 ]
 
+// Simuladores conocidos que bloquean iframes (X-Frame-Options)
+const BLOCKED_IN_IFRAME = new Set([
+  'tinkercad', 'tinkercad-3d', 'replit', 'gazebo-web', 'dobot-sim',
+  'camotics', 'scratch'
+])
+
 export default function SimulatorTabs() {
   const { user } = useAuth()
   const [activeCategory, setActiveCategory] = useState('bloques')
   const [activeSimulator, setActiveSimulator] = useState(simulators[0])
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [iframeError, setIframeError] = useState(false)
 
   const filteredSimulators = simulators.filter(sim => sim.category === activeCategory)
+  const isBlocked = BLOCKED_IN_IFRAME.has(activeSimulator.id)
+
+  useEffect(() => {
+    setIframeError(false)
+  }, [activeSimulator.id])
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -291,6 +305,7 @@ export default function SimulatorTabs() {
       <div className="flex gap-2 justify-center mb-4 flex-wrap">
         {categories.map((cat) => {
           const Icon = cat.icon
+          const active = activeCategory === cat.id
           return (
             <button
               key={cat.id}
@@ -299,10 +314,10 @@ export default function SimulatorTabs() {
                 const firstInCategory = simulators.find(s => s.category === cat.id)
                 if (firstInCategory) setActiveSimulator(firstInCategory)
               }}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all ${
-                activeCategory === cat.id 
-                  ? 'bg-[#558C89] text-white shadow-md' 
-                  : 'bg-white text-gray-700 hover:bg-[#558C89]/10 hover:text-[#558C89] border border-gray-200'
+              className={`px-4 py-2 rounded-full flex items-center gap-2 text-sm font-semibold transition-all ${
+                active
+                  ? 'bg-gradient-to-r from-brand-purple to-brand-violet text-white shadow-md scale-105'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 hover:text-brand-purple border border-slate-200'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -312,24 +327,28 @@ export default function SimulatorTabs() {
         })}
       </div>
 
-      {/* Simulator Tabs within Category */}
+      {/* Simulator pills */}
       <div className="flex gap-2 justify-center mb-6 flex-wrap">
         {filteredSimulators.map((sim) => {
           const Icon = sim.icon
+          const active = activeSimulator.id === sim.id
+          const blocked = BLOCKED_IN_IFRAME.has(sim.id)
           return (
             <button
               key={sim.id}
               onClick={() => setActiveSimulator(sim)}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-medium transition-all ${
-                activeSimulator.id === sim.id 
-                  ? 'bg-[#D9853B] text-white shadow-md border border-[#D9853B]' 
-                  : 'bg-white text-gray-700 hover:bg-[#D9853B]/10 hover:text-[#D9853B] border border-gray-200'
+              className={`px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-semibold transition-all ${
+                active
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
               }`}
             >
-              <Icon className="w-3 h-3" />
+              <Icon className="w-3.5 h-3.5" />
               {sim.name}
-              {!sim.requiresLogin && (
-                <span className="text-[10px] bg-[#558C89]/20 text-[#558C89] px-1.5 py-0.5 rounded font-medium">Sin registro</span>
+              {!blocked && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${active ? 'bg-white/20 text-white' : 'bg-green-100 text-green-700'}`}>
+                  ⚡ Embebido
+                </span>
               )}
             </button>
           )
@@ -338,48 +357,84 @@ export default function SimulatorTabs() {
 
       {/* Active Simulator Panel */}
       {activeSimulator.id === 'chaskiblocks' ? (
-        /* ChaskiBlocks - Editor interno */
         <div className="h-[700px]">
           <BlocklyEditor userId={user?.id} userName={user?.name} />
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+        <div className={`bg-white border border-slate-200 rounded-3xl shadow-lg overflow-hidden ${isFullscreen ? 'fixed inset-4 z-50' : ''}`}>
+          <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 flex-wrap gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-brand-purple/10 to-brand-violet/10 flex items-center justify-center shrink-0">
                 {(() => {
                   const Icon = activeSimulator.icon
-                  return <Icon className="w-6 h-6 text-[#558C89]" />
+                  return <Icon className="w-6 h-6 text-brand-purple" />
                 })()}
-                {activeSimulator.name}
-              </h3>
-              <p className="text-gray-600 mt-1">{activeSimulator.description}</p>
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-lg font-bold text-slate-900 truncate">{activeSimulator.name}</h3>
+                <p className="text-slate-500 text-sm truncate">{activeSimulator.description}</p>
+              </div>
             </div>
-            <a
-              href={activeSimulator.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#D9853B] text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-[#c77632] transition-colors shadow-md"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Abrir en su web
-            </a>
+            <div className="flex items-center gap-2">
+              {!isBlocked && (
+                <button
+                  onClick={() => setIsFullscreen(f => !f)}
+                  className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-all"
+                  title={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+                >
+                  {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                </button>
+              )}
+              <a
+                href={activeSimulator.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-brand-purple to-brand-violet text-white px-4 py-2 rounded-full font-semibold text-sm flex items-center gap-2 hover:shadow-lg active:scale-95 transition-all shadow-md"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span className="hidden sm:inline">Abrir externo</span>
+              </a>
+            </div>
           </div>
 
-          <div className="relative rounded-xl overflow-hidden bg-white border border-gray-200">
-            <iframe
-              src={activeSimulator.url}
-              className="w-full h-[600px] border-none"
-              title={activeSimulator.name}
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; camera; microphone"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals"
-            />
-          </div>
-
-          <p className="text-sm text-gray-500 mt-4 text-center">
-            Si el simulador no carga correctamente, usa el botón "Abrir en su web" para acceder directamente.
-          </p>
+          {isBlocked || iframeError ? (
+            <div className="p-10 text-center">
+              <div className="w-20 h-20 rounded-3xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <ExternalLink className="w-10 h-10 text-amber-600" />
+              </div>
+              <h4 className="text-xl font-bold text-slate-900 mb-2">Este simulador no permite embeberse</h4>
+              <p className="text-slate-600 max-w-md mx-auto mb-6 text-sm">
+                Por políticas de seguridad del proveedor, debes abrirlo en una pestaña nueva. La experiencia será la misma.
+              </p>
+              <a
+                href={activeSimulator.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-purple to-brand-violet text-white font-bold px-6 py-3 rounded-full shadow-xl hover:shadow-2xl active:scale-95 transition-all"
+              >
+                <ExternalLink className="w-5 h-5" />
+                Abrir {activeSimulator.name} en una nueva pestaña
+              </a>
+            </div>
+          ) : (
+            <>
+              <div className={`relative bg-white ${isFullscreen ? 'h-[calc(100vh-180px)]' : 'h-[600px]'}`}>
+                <iframe
+                  src={activeSimulator.url}
+                  className="w-full h-full border-none"
+                  title={activeSimulator.name}
+                  loading="lazy"
+                  onError={() => setIframeError(true)}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; camera; microphone"
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-downloads"
+                />
+              </div>
+              <div className="px-4 py-3 bg-gradient-to-r from-brand-purple/5 to-brand-violet/5 border-t border-slate-100 flex items-center justify-center gap-2 text-xs text-slate-600">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                Simulador embebido en ChaskiBots · ¿Problemas? Usa "Abrir externo"
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
