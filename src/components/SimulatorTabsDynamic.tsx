@@ -188,10 +188,10 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
                 const firstInCategory = simulators.find(s => (s.category || 'bloques') === cat.id)
                 if (firstInCategory) setActiveSimulator(firstInCategory)
               }}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-semibold transition-all ${
                 activeCategory === cat.id 
-                  ? 'bg-[#558C89] text-white shadow-md' 
-                  : 'bg-white text-gray-700 hover:bg-[#558C89]/10 hover:text-[#558C89] border border-gray-200'
+                  ? 'bg-brand-purple text-white shadow-md shadow-brand-purple/25' 
+                  : 'bg-white text-slate-600 hover:bg-brand-purple/10 hover:text-brand-purple border border-slate-200'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -209,10 +209,10 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
             <button
               key={sim.id}
               onClick={() => setActiveSimulator(sim)}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-semibold transition-all ${
                 activeSimulator?.id === sim.id 
-                  ? 'bg-[#D9853B] text-white shadow-md border border-[#D9853B]' 
-                  : 'bg-white text-gray-700 hover:bg-[#D9853B]/10 hover:text-[#D9853B] border border-gray-200'
+                  ? 'bg-brand-violet text-white shadow-md shadow-brand-violet/25 border border-brand-violet' 
+                  : 'bg-white text-slate-600 hover:bg-brand-violet/10 hover:text-brand-violet border border-slate-200'
               }`}
             >
               <Icon className="w-3 h-3" />
@@ -228,39 +228,38 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
           <BlocklyEditor userId={user?.id} userName={user?.name} />
         </div>
       ) : activeSimulator ? (
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
-          {/* Header del simulador - Cromática mejorada */}
-          <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-[#558C89]/10 to-[#74AFAD]/10">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#558C89] to-[#74AFAD] flex items-center justify-center shadow-md">
-                  {(() => {
-                    const Icon = getIcon(activeSimulator.icon)
-                    return <Icon className="w-6 h-6 text-white" />
-                  })()}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-800">{activeSimulator.name}</h3>
-                  <p className="text-gray-600 text-sm">{activeSimulator.description}</p>
-                </div>
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl shadow-brand-purple/5">
+          {/* Header */}
+          <div className="px-4 py-3 border-b border-slate-100 bg-gradient-to-r from-brand-purple/5 to-brand-violet/5 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-purple to-brand-violet flex items-center justify-center shadow-sm">
+                {(() => {
+                  const Icon = getIcon(activeSimulator.icon)
+                  return <Icon className="w-5 h-5 text-white" />
+                })()}
               </div>
-              <a
-                href={activeSimulator.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-[#D9853B] hover:bg-[#c77632] text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all shadow-md"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Abrir en Nueva Pestaña
-              </a>
+              <div>
+                <h3 className="text-base font-bold text-slate-800 leading-tight">{activeSimulator.name}</h3>
+                <p className="text-slate-500 text-xs">{activeSimulator.description}</p>
+              </div>
             </div>
+            <a
+              href={activeSimulator.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-500 border border-slate-200 rounded-lg hover:border-brand-purple/40 hover:text-brand-purple transition-all"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Abrir externo
+            </a>
           </div>
 
-          {/* Iframe embebido del simulador */}
-          <div className="relative bg-gray-100">
+          {/* Iframe embebido — tamaño principal */}
+          <div className="relative bg-slate-50">
             <iframe
               src={activeSimulator.url}
-              className="w-full h-[600px] border-0"
+              className="w-full border-0"
+              style={{ height: 'min(680px, 70vh)' }}
               title={activeSimulator.name}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               allowFullScreen
@@ -268,11 +267,11 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
             />
           </div>
 
-          {/* Footer con tips - Cromática mejorada */}
-          <div className="p-3 bg-gradient-to-r from-[#558C89]/5 to-[#74AFAD]/5 border-t border-gray-200">
-            <div className="flex items-center gap-3 text-sm text-gray-700">
-              <Sparkles className="w-5 h-5 text-[#D9853B]" />
-              <span><strong className="text-gray-800">Tip:</strong> Practica lo aprendido en las lecciones usando este simulador</span>
+          {/* Footer tip */}
+          <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/50">
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <Sparkles className="w-4 h-4 text-brand-purple" />
+              <span>Practica lo aprendido en las lecciones usando este simulador</span>
             </div>
           </div>
         </div>
