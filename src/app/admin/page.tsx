@@ -13,7 +13,7 @@ import {
   Users, BookOpen, Settings, LogOut, Home, Bell,
   Plus, Edit, Trash2, Eye, Lock, Unlock, Search,
   ChevronRight, Clock, Shield, GraduationCap,
-  BarChart3, Activity, Key, Mail, Save, X, Package, Brain, FileText, Monitor, Zap
+  BarChart3, Activity, Key, Mail, Save, X, Package, Brain, FileText, Monitor, Zap, Award
 } from 'lucide-react'
 
 type AdminTab = 'dashboard' | 'courses' | 'users' | 'logs' | 'settings'
@@ -431,6 +431,8 @@ export default function AdminPage() {
                   Herramientas de administración
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <QuickAction href="/admin/calificar" icon={Award} color="amber-500" title="Calificar Entregas" description="Panel realtime de calificación" />
+                  <QuickAction href="/admin/lecciones" icon={BookOpen} color="brand-cyan" title="Lecciones" description="Editor con imágenes drag-drop" />
                   <QuickAction href="/admin/contenido" icon={BookOpen} color="green-500" title="Editar Contenido" description="Videos, imágenes, lecciones" />
                   <QuickAction href="/admin/kits" icon={Package} color="brand-purple" title="Gestionar Kits" description="Kits, imágenes, precios" />
                   <QuickAction href="/admin/simuladores" icon={Monitor} color="cyan-500" title="Simuladores" description="Por nivel y programa" />
