@@ -65,14 +65,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const {
       taskId, studentName, studentEmail, levelId, lessonId, courseId, schoolId,
-      code, output, drawing, files
+      code, output, drawing, drawingUrl, files, attachmentUrls, answers
     } = body
 
     if (!studentName) {
       return NextResponse.json({ error: 'studentName es requerido' }, { status: 400 })
     }
 
-    const { data, error } = await supabaseAdmin.from('submissions').insert({
+    const insertRow: Record<string, any> = {
       task_id: taskId || null,
       student_name: studentName,
       student_email: studentEmail || null,
@@ -83,10 +83,14 @@ export async function POST(request: NextRequest) {
       code: code || null,
       output: output || null,
       drawing: drawing || null,
-      files: files || null,
+      files: files || (answers ? answers : null),
       status: 'pending',
       submitted_at: new Date().toISOString(),
-    }).select().single()
+    }
+    if (drawingUrl) insertRow.drawing_url = drawingUrl
+    if (Array.isArray(attachmentUrls) && attachmentUrls.length > 0) insertRow.attachment_urls = attachmentUrls
+
+    const { data, error } = await supabaseAdmin.from('submissions').insert(insertRow).select().single()
 
     if (error) {
       console.error('Error creating submission:', error)

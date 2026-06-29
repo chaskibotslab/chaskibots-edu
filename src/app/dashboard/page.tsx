@@ -10,7 +10,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import {
   Bot, Brain, Shield, BookOpen, ArrowRight, Play,
-  Cpu, Loader2, Sparkles, Trophy, Zap, Target, Crown
+  Cpu, Loader2, Sparkles, Trophy, Zap, Target, Crown, ClipboardList
 } from 'lucide-react'
 import BadgesDisplay from '@/components/BadgesDisplay'
 
@@ -33,10 +33,18 @@ const QUICK_ACTIONS: Action[] = [
     description: (levelName) => levelName
   },
   {
+    id: 'tareas',
+    href: () => '/tareas',
+    icon: ClipboardList,
+    color: 'brand-cyan',
+    title: 'Mis Tareas',
+    description: () => 'Entregar y ver calificaciones'
+  },
+  {
     id: 'simulators',
     href: () => '/simuladores',
     icon: Cpu,
-    color: 'brand-cyan',
+    color: 'brand-violet',
     title: 'Simuladores',
     description: () => 'Laboratorio virtual'
   },
@@ -44,7 +52,7 @@ const QUICK_ACTIONS: Action[] = [
     id: 'levels',
     href: () => '/niveles',
     icon: BookOpen,
-    color: 'brand-violet',
+    color: 'neon-green',
     title: 'Niveles',
     description: () => 'Ver todos los cursos'
   }
@@ -139,7 +147,7 @@ export default function DashboardPage() {
               <Zap className="w-5 h-5 text-brand-purple" />
               Accesos rápidos
             </h2>
-            <div className="grid sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {QUICK_ACTIONS.map((action) => {
                 const Icon = action.icon
                 const href = action.href(currentLevel.id)
