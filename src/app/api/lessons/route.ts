@@ -93,21 +93,24 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
 
+    const insertRow: Record<string, any> = {
+      level_id: body.levelId,
+      program_id: body.programId || 'robotica',
+      module_name: body.moduleName,
+      title: body.title,
+      type: body.type || 'video',
+      duration: body.duration || '10 min',
+      display_order: body.order || 0,
+      video_url: body.videoUrl,
+      pdf_url: body.pdfUrl,
+      content: body.content,
+      locked: body.locked || false,
+    }
+    if (Array.isArray(body.images)) insertRow.images = body.images
+
     const { data, error } = await supabaseAdmin
       .from('lessons')
-      .insert({
-        level_id: body.levelId,
-        program_id: body.programId || 'robotica',
-        module_name: body.moduleName,
-        title: body.title,
-        type: body.type || 'video',
-        duration: body.duration || '10 min',
-        display_order: body.order || 0,
-        video_url: body.videoUrl,
-        pdf_url: body.pdfUrl,
-        content: body.content,
-        locked: body.locked || false,
-      })
+      .insert(insertRow)
       .select()
       .single()
 
@@ -145,6 +148,7 @@ export async function PUT(request: Request) {
     if (rest.pdfUrl !== undefined) updates.pdf_url = rest.pdfUrl
     if (rest.content !== undefined) updates.content = rest.content
     if (rest.locked !== undefined) updates.locked = rest.locked
+    if (Array.isArray(rest.images)) updates.images = rest.images
 
     const { data, error } = await supabaseAdmin
       .from('lessons')
