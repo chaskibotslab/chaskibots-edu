@@ -3,15 +3,24 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
+function parseCsv(value: any): string[] {
+  if (!value) return []
+  if (Array.isArray(value)) return value.filter((v: any) => typeof v === 'string')
+  return String(value)
+    .split(/[,\n]/)
+    .map(s => s.trim())
+    .filter(Boolean)
+}
+
 function rowToKit(row: any) {
   return {
     id: row.id,
     levelId: row.level_id || '',
     name: row.name || '',
     description: row.description || '',
-    components: row.components || '',
-    skills: row.skills || '',
-    images: row.images || '',
+    components: parseCsv(row.components),
+    skills: parseCsv(row.skills),
+    images: parseCsv(row.images),
     videoUrl: row.video_url || '',
     tutorialUrl: row.tutorial_url || '',
     price: row.price || 0,
@@ -29,7 +38,9 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query
     if (error) return NextResponse.json({ kits: [] })
-    return NextResponse.json({ success: true, kits: (data || []).map(rowToKit) })
+    const kits = (data || []).map(rowToKit)
+    if (levelId) return NextResponse.json(kits[0] || null)
+    return NextResponse.json({ success: true, kits })
   } catch (error) {
     return NextResponse.json({ kits: [] })
   }
