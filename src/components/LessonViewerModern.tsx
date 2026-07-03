@@ -172,6 +172,12 @@ export default function LessonViewerModern({
       return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`
     }
 
+    // Google Drive: convertir /view o /edit a /preview para embeber sin pedir acceso
+    const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/)
+    if (driveMatch) {
+      return `https://drive.google.com/file/d/${driveMatch[1]}/preview`
+    }
+
     return url
   }
 

@@ -12,6 +12,11 @@ function getVideoEmbedUrl(url: string): string {
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
     if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`
   }
+  // Google Drive: convertir /view o /edit a /preview para embeber sin pedir acceso
+  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/)
+  if (driveMatch?.[1]) {
+    return `https://drive.google.com/file/d/${driveMatch[1]}/preview`
+  }
   return url
 }
 
