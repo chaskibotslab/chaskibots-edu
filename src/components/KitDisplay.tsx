@@ -13,6 +13,22 @@ function getImageUrl(url: string): string {
   return url
 }
 
+function getVideoEmbedUrl(url: string): string {
+  if (!url) return ''
+  // YouTube
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`
+  // Google Drive
+  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/)
+  if (driveMatch) return `https://drive.google.com/file/d/${driveMatch[1]}/preview`
+  return url
+}
+
+function isEmbeddableVideo(url: string): boolean {
+  if (!url) return false
+  return /youtube\.com|youtu\.be|drive\.google\.com/.test(url)
+}
+
 export default function KitDisplay({ levelId }: KitDisplayProps) {
   const [kit, setKit] = useState<KitData | null>(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -210,16 +226,10 @@ export default function KitDisplay({ levelId }: KitDisplayProps) {
         {kit.videoUrl && (
           <div className="mt-6 pt-6 border-t border-gray-200">
             <h4 className="text-sm font-medium text-gray-600 mb-3">🎬 Video Tutorial:</h4>
-            {kit.videoUrl.includes('youtube.com') || kit.videoUrl.includes('youtu.be') ? (
+            {isEmbeddableVideo(kit.videoUrl) ? (
               <div className="aspect-video bg-gray-50 rounded-lg overflow-hidden">
                 <iframe
-                  src={(() => {
-                    const match = kit.videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
-                    if (match && match[1]) {
-                      return `https://www.youtube.com/embed/${match[1]}`
-                    }
-                    return kit.videoUrl
-                  })()}
+                  src={getVideoEmbedUrl(kit.videoUrl)}
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
