@@ -18,14 +18,26 @@ interface Kit {
   name: string
   description: string
   price: number
-  components: string
-  skills: string
-  images: string // CSV
+  components: string | string[]
+  skills: string | string[]
+  images: string | string[] // CSV
   videoUrl: string
   tutorialUrl: string
 }
 
-const BLANK: Omit<Kit, 'id'> = {
+interface KitForm {
+  levelId: string
+  name: string
+  description: string
+  price: number
+  components: string
+  skills: string
+  images: string
+  videoUrl: string
+  tutorialUrl: string
+}
+
+const BLANK: KitForm = {
   levelId: '',
   name: '',
   description: '',
@@ -35,6 +47,12 @@ const BLANK: Omit<Kit, 'id'> = {
   images: '',
   videoUrl: '',
   tutorialUrl: '',
+}
+
+function normalizeCsv(value: string | string[] | undefined): string {
+  if (!value) return ''
+  if (Array.isArray(value)) return value.join(', ')
+  return value
 }
 
 export default function KitsAdminPage() {
@@ -47,7 +65,7 @@ export default function KitsAdminPage() {
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
-  const [form, setForm] = useState({ ...BLANK })
+  const [form, setForm] = useState<KitForm>({ ...BLANK })
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -61,7 +79,13 @@ export default function KitsAdminPage() {
     try {
       const res = await fetch('/api/kits')
       const data = await res.json()
-      setKits(data.kits || [])
+      const rawKits = data.kits || []
+      setKits(rawKits.map((k: any) => ({
+        ...k,
+        components: normalizeCsv(k.components),
+        skills: normalizeCsv(k.skills),
+        images: normalizeCsv(k.images),
+      })))
     } catch (e) { console.error(e) }
     setLoading(false)
   }, [])
@@ -82,9 +106,9 @@ export default function KitsAdminPage() {
         name: k.name,
         description: k.description,
         price: k.price,
-        components: k.components,
-        skills: k.skills,
-        images: k.images || '',
+        components: normalizeCsv(k.components),
+        skills: normalizeCsv(k.skills),
+        images: normalizeCsv(k.images),
         videoUrl: k.videoUrl || '',
         tutorialUrl: k.tutorialUrl || '',
       })
@@ -303,7 +327,7 @@ export default function KitsAdminPage() {
 }
 
 function KitItem({ kit, active, onClick }: { kit: Kit; active: boolean; onClick: () => void }) {
-  const firstImage = kit.images?.split(/[,\n]/)[0]?.trim()
+  const firstImage = normalizeCsv(kit.images).split(/[,\n]/)[0]?.trim()
   return (
     <button
       onClick={onClick}
