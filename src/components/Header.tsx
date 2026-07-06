@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-brand-purple/20">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Back Button + Logo */}
@@ -63,6 +63,30 @@ export default function Header() {
                 </div>
               </Link>
             </div>
+
+            {/* Desktop Nav - estilo iOS segmented tabs */}
+            {isAuthenticated && (
+              <nav className="hidden lg:flex items-center gap-1 bg-slate-100 rounded-full p-1">
+                {menuItems.map((item) => {
+                  const Icon = item.icon
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        isActive
+                          ? 'bg-white text-brand-purple shadow-sm'
+                          : 'text-slate-500 hover:text-slate-900'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {item.label}
+                    </Link>
+                  )
+                })}
+              </nav>
+            )}
 
             {/* User Menu */}
             <div className="flex items-center gap-2">
@@ -120,9 +144,9 @@ export default function Header() {
         />
         
         {/* Panel del menú */}
-        <div className={`absolute right-0 top-0 h-full w-72 bg-white border-l border-brand-purple/20 shadow-2xl transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className={`absolute right-0 top-0 h-full w-72 bg-white border-l border-slate-200 shadow-2xl transition-transform duration-300 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           {/* Header del menú */}
-          <div className="p-4 border-b border-dark-700">
+          <div className="p-4 border-b border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-purple/20 to-brand-violet/20 flex items-center justify-center border border-brand-purple/30">
                 <User className="w-6 h-6 text-brand-purple" />
@@ -173,7 +197,7 @@ export default function Header() {
           </nav>
 
           {/* Cerrar sesión */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-dark-700">
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200">
             <button
               onClick={() => {
                 logout()

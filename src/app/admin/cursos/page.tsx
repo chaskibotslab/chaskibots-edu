@@ -28,7 +28,7 @@ interface Course {
 const BLANK: Omit<Course, 'id'> = {
   name: '', description: '', levelId: '', programId: 'robotica',
   durationHours: 40, modality: 'presencial', icon: '📚',
-  color: '#7C3AED', coverImage: '', isActive: true,
+  color: '#007AFF', coverImage: '', isActive: true,
 }
 
 const PROGRAMS = [

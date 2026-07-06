@@ -31,6 +31,7 @@ interface Submission {
   gradedBy?: string
   drawing?: string
   files?: string
+  attachmentUrls?: string[]
 }
 
 interface TeacherCourseAssignment {
@@ -386,6 +387,12 @@ function EntregasContent() {
                                 {submission.grade}/100
                               </span>
                             )}
+                            {(submission.attachmentUrls?.length || submission.drawing || submission.files) && (
+                              <span className="flex items-center gap-1 text-blue-500 font-medium">
+                                <Paperclip className="w-4 h-4" />
+                                {submission.attachmentUrls?.length || 1} archivo{(submission.attachmentUrls?.length || 1) > 1 ? 's' : ''}
+                              </span>
+                            )}
                           </div>
 
                           {/* Code Preview */}
@@ -481,13 +488,49 @@ function EntregasContent() {
               </div>
 
               {/* Adjuntos - Dibujo y Archivos */}
-              {(selectedSubmission.drawing || selectedSubmission.files || 
+              {(selectedSubmission.attachmentUrls?.length || selectedSubmission.drawing || selectedSubmission.files || 
                 selectedSubmission.output?.includes('📁 ADJUNTOS')) && (
                 <div className="mt-4 p-4 bg-gray-100 rounded-lg border border-gray-200">
                   <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
                     <Paperclip className="w-4 h-4 text-green-400" />
                     Archivos Adjuntos del Estudiante
                   </h4>
+
+                  {/* Archivos subidos vía /api/upload (attachmentUrls) */}
+                  {selectedSubmission.attachmentUrls && selectedSubmission.attachmentUrls.length > 0 && (
+                    <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {selectedSubmission.attachmentUrls.map((url, idx) => {
+                        const isImg = /\.(jpg|jpeg|png|gif|webp)/i.test(url)
+                        const fileName = url.split('/').pop()?.split('?')[0] || `archivo-${idx + 1}`
+                        return isImg ? (
+                          <a
+                            key={idx}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group relative block rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-colors"
+                          >
+                            <img src={url} alt={fileName} className="w-full h-24 object-cover" />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-colors">
+                              <Download className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                          </a>
+                        ) : (
+                          <a
+                            key={idx}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                            className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/30"
+                          >
+                            <Download className="w-5 h-5 text-blue-500 shrink-0" />
+                            <span className="text-sm text-blue-700 truncate flex-1">{fileName}</span>
+                          </a>
+                        )
+                      })}
+                    </div>
+                  )}
                   
                   {/* Mostrar dibujo como imagen */}
                   {selectedSubmission.drawing && (

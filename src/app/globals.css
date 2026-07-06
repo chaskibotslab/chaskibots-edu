@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --primary: #7c3aed;
-  --secondary: #8b5cf6;
-  --accent: #6d28d9;
-  --neon-cyan: #7c3aed;
-  --neon-purple: #7c3aed;
+  --primary: #007AFF;
+  --secondary: #339DFF;
+  --accent: #0051D5;
+  --neon-cyan: #007AFF;
+  --neon-purple: #007AFF;
   --neon-green: #10b981;
   --neon-pink: #ec4899;
   --neon-blue: #3b82f6;
@@ -58,9 +58,9 @@ body {
   font-weight: 600;
   border-radius: 0.75rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  background: linear-gradient(135deg, #007AFF, #0051D5);
   color: white;
-  border: 1px solid rgba(124, 58, 237, 0.4);
+  border: 1px solid rgba(0, 122, 255, 0.4);
   position: relative;
   overflow: hidden;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -82,7 +82,7 @@ body {
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4), 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 20px rgba(0, 122, 255, 0.4), 0 4px 20px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
@@ -96,14 +96,14 @@ body {
   border-radius: 0.75rem;
   transition: all 0.3s;
   background: #f1f5f9;
-  color: #7c3aed;
-  border: 1px solid rgba(124, 58, 237, 0.25);
+  color: #007AFF;
+  border: 1px solid rgba(0, 122, 255, 0.25);
 }
 
 .btn-secondary:hover {
   background: var(--dark-600);
-  border-color: rgba(124, 58, 237, 0.4);
-  color: #6d28d9;
+  border-color: rgba(0, 122, 255, 0.4);
+  color: #0051D5;
 }
 
 /* Cards Futuristas */
@@ -126,7 +126,7 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 122, 255, 0.08), transparent);
   transition: left 0.6s;
 }
 
@@ -135,8 +135,8 @@ body {
 }
 
 .card:hover {
-  border-color: rgba(124, 58, 237, 0.4);
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+  border-color: rgba(0, 122, 255, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.12);
   transform: translateY(-4px);
 }
 
@@ -152,15 +152,15 @@ body {
 }
 
 .tab-btn:hover {
-  border-color: rgba(124, 58, 237, 0.25);
-  color: #7c3aed;
+  border-color: rgba(0, 122, 255, 0.25);
+  color: #007AFF;
 }
 
 .tab-btn.active {
   background: #ffffff;
-  color: #7c3aed;
-  border-color: rgba(124, 58, 237, 0.3);
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15);
+  color: #007AFF;
+  border-color: rgba(0, 122, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
 }
 
 /* Level Cards */
@@ -179,8 +179,8 @@ body {
 
 .level-card:hover {
   transform: scale(1.03);
-  border-color: rgba(124, 58, 237, 0.4);
-  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.15);
+  border-color: rgba(0, 122, 255, 0.4);
+  box-shadow: 0 12px 32px rgba(0, 122, 255, 0.15);
 }
 
 /* Badges */
@@ -201,9 +201,9 @@ body {
 }
 
 .badge-purple {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(51, 157, 255, 0.1);
   color: var(--primary);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(51, 157, 255, 0.3);
 }
 
 .badge-green {
@@ -242,8 +242,8 @@ body {
 .input-cyber:focus {
   outline: none;
   background: #ffffff;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+  border-color: #007AFF;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.12);
 }
 
 /* Glassmorphism */
@@ -285,7 +285,7 @@ body {
   border: none;
   border-radius: 12px;
   background: var(--dark-800);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  border: 1px solid rgba(0, 122, 255, 0.2);
 }
 
 /* Scrollbar styling - Futurista */
@@ -354,15 +354,15 @@ body {
 
 /* Hero Gradient */
 .hero-gradient {
-  background: radial-gradient(ellipse at top, rgba(124,58,237,0.08) 0%, transparent 50%),
-              radial-gradient(ellipse at bottom right, rgba(109,40,217,0.06) 0%, transparent 50%),
+  background: radial-gradient(ellipse at top, rgba(0,122,255,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at bottom right, rgba(0,81,213,0.06) 0%, transparent 50%),
               #F8F9FA;
 }
 
 /* Section Divider */
 .section-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(124,58,237,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,122,255,0.4), transparent);
   opacity: 0.3;
 }
 
@@ -533,11 +533,11 @@ body {
 }
 
 .blocklyTreeRow:hover {
-  background: rgba(124, 58, 237, 0.1) !important;
+  background: rgba(0, 122, 255, 0.1) !important;
 }
 
 .blocklyTreeSelected {
-  background: rgba(124, 58, 237, 0.2) !important;
+  background: rgba(0, 122, 255, 0.2) !important;
 }
 
 /* Flyout de Blockly */

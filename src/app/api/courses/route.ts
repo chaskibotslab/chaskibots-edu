@@ -13,7 +13,7 @@ function row(r: any) {
     durationHours: r.duration_hours || 0,
     modality: r.modality || 'presencial',
     icon: r.icon || '📚',
-    color: r.color || '#7C3AED',
+    color: r.color || '#007AFF',
     coverImage: r.cover_image || '',
     isActive: r.is_active !== false,
     createdAt: r.created_at,
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       duration_hours: durationHours || null,
       modality: modality || 'presencial',
       icon: icon || '📚',
-      color: color || '#7C3AED',
+      color: color || '#007AFF',
       cover_image: coverImage || null,
       is_active: isActive !== false,
     }).select().single()
@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest) {
       duration_hours: durationHours || null,
       modality: modality || 'presencial',
       icon: icon || '📚',
-      color: color || '#7C3AED',
+      color: color || '#007AFF',
       cover_image: coverImage || null,
       is_active: isActive !== false,
     }).eq('id', id).select().single()
