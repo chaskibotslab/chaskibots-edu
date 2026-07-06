@@ -35,11 +35,13 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
   background: var(--bg-main);
   color: var(--text-dark);
-  font-family: 'Inter', system-ui, sans-serif;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Grid Background */
@@ -138,15 +140,15 @@ body {
   transform: translateY(-4px);
 }
 
-/* Tabs */
+/* Tabs - estilo iOS segmented control */
 .tab-btn {
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   font-weight: 600;
-  transition: all 0.2s;
-  background: var(--dark-700);
-  color: #9ca3af;
-  border: 1px solid var(--dark-600);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
 }
 
 .tab-btn:hover {
@@ -155,9 +157,10 @@ body {
 }
 
 .tab-btn.active {
-  background: rgba(124, 58, 237, 0.1);
+  background: #ffffff;
   color: #7c3aed;
-  border-color: rgba(124, 58, 237, 0.4);
+  border-color: rgba(124, 58, 237, 0.3);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15);
 }
 
 /* Level Cards */
@@ -221,25 +224,26 @@ body {
   border: 1px solid rgba(255, 107, 0, 0.3);
 }
 
-/* Input Fields */
+/* Input Fields - estilo iOS */
 .input-cyber {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  background: var(--dark-700);
-  border: 1px solid #252532;
-  color: white;
-  transition: all 0.2s;
+  padding: 0.85rem 1rem;
+  border-radius: 0.9rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  color: #0f172a;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .input-cyber::placeholder {
-  color: #6b7280;
+  color: #94a3b8;
 }
 
 .input-cyber:focus {
   outline: none;
-  border-color: rgba(124, 58, 237, 0.5);
-  box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
+  background: #ffffff;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
 }
 
 /* Glassmorphism */

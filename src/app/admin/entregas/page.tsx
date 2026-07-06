@@ -123,8 +123,8 @@ function EntregasContent() {
     if (!selectedSubmission) return
     
     const grade = parseFloat(gradeInput)
-    if (isNaN(grade) || grade < 0 || grade > 10) {
-      alert('La calificación debe ser un número entre 0 y 10')
+    if (isNaN(grade) || grade < 0 || grade > 100) {
+      alert('La calificación debe ser un número entre 0 y 100')
       return
     }
 
@@ -134,12 +134,11 @@ function EntregasContent() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: selectedSubmission.id,
+          submissionId: selectedSubmission.id,
           grade,
           feedback: feedbackInput,
           status: 'graded',
-          gradedBy: user?.name || 'Profesor',
-          gradedAt: new Date().toISOString()
+          gradedBy: user?.name || 'Profesor'
         })
       })
 
@@ -384,7 +383,7 @@ function EntregasContent() {
                             {submission.grade !== undefined && (
                               <span className="flex items-center gap-1 text-green-400">
                                 <Star className="w-4 h-4" />
-                                {submission.grade}/10
+                                {submission.grade}/100
                               </span>
                             )}
                           </div>
@@ -595,17 +594,17 @@ function EntregasContent() {
               <div className="mt-4 grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Calificación (0-10)
+                    Calificación (0-100)
                   </label>
                   <input
                     type="number"
                     min="0"
-                    max="10"
-                    step="0.5"
+                    max="100"
+                    step="1"
                     value={gradeInput}
                     onChange={(e) => setGradeInput(e.target.value)}
                     className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-purple-500"
-                    placeholder="Ej: 8.5"
+                    placeholder="Ej: 85"
                   />
                 </div>
                 <div>
