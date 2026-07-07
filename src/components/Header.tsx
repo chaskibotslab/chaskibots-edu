@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
@@ -12,6 +12,8 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
+  const navRef = useRef<HTMLDivElement>(null)
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, opacity: 0 })
 
   const isHomePage = pathname === '/' || pathname === '/dashboard'
   const isLoginPage = pathname === '/login'
@@ -32,6 +34,17 @@ export default function Header() {
     { href: '/ia', label: 'IA', icon: Brain },
   ]
 
+  useEffect(() => {
+    const nav = navRef.current
+    if (!nav) return
+    const activeEl = nav.querySelector<HTMLElement>('[data-active="true"]')
+    if (activeEl) {
+      setIndicator({ left: activeEl.offsetLeft, width: activeEl.offsetWidth, opacity: 1 })
+    } else {
+      setIndicator((prev) => ({ ...prev, opacity: 0 }))
+    }
+  }, [pathname])
+
   return (
     <>
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
@@ -50,13 +63,16 @@ export default function Header() {
               )}
               
               <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-3 group">
-                <Image 
-                  src="/chaski.png" 
-                  alt="ChaskiBots Logo" 
-                  width={40} 
-                  height={40}
-                  className="rounded-xl shadow-lg group-hover:scale-105 transition-transform duration-300"
-                />
+                <div className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-[#007AFF] to-[#0051D5] p-[2px] group-hover:scale-105 transition-transform duration-300">
+                  <div className="relative w-full h-full rounded-[10px] overflow-hidden bg-white">
+                    <Image 
+                      src="/chaski.png" 
+                      alt="ChaskiBots Logo" 
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
                 <div className="hidden sm:flex flex-col">
                   <span className="font-bold text-xl text-gray-900">ChaskiBots</span>
                   <span className="text-[10px] text-brand-purple tracking-widest">EDUCATION PLATFORM</span>
@@ -64,9 +80,13 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Desktop Nav - estilo iOS segmented tabs */}
+            {/* Desktop Nav - estilo iOS segmented tabs con indicador deslizante */}
             {isAuthenticated && (
-              <nav className="hidden lg:flex items-center gap-1 bg-slate-100 rounded-full p-1">
+              <nav ref={navRef} className="hidden lg:flex items-center gap-1 bg-slate-100 rounded-full p-1 relative">
+                <div
+                  className="absolute top-1 bottom-1 bg-white rounded-full shadow-sm transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                  style={{ left: indicator.left, width: indicator.width, opacity: indicator.opacity }}
+                />
                 {menuItems.map((item) => {
                   const Icon = item.icon
                   const isActive = pathname === item.href
@@ -74,9 +94,10 @@ export default function Header() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+                      data-active={isActive}
+                      className={`relative z-10 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors duration-300 ${
                         isActive
-                          ? 'bg-white text-brand-purple shadow-sm'
+                          ? 'text-brand-purple'
                           : 'text-slate-500 hover:text-slate-900'
                       }`}
                     >
@@ -160,7 +181,7 @@ export default function Header() {
 
           {/* Links del menú */}
           <nav className="p-4 space-y-2">
-            {menuItems.map((item) => {
+            {menuItems.map((item, i) => {
               const Icon = item.icon
               const isActive = pathname === item.href
               return (
@@ -168,11 +189,14 @@ export default function Header() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
+                    menuOpen ? 'animate-reveal-up opacity-0' : ''
+                  } ${
                     isActive 
                       ? 'bg-brand-purple/20 text-brand-purple border border-brand-purple/30' 
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
+                  style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'forwards' }}
                 >
                   <Icon className="w-5 h-5" />
                   <span className="font-medium">{item.label}</span>

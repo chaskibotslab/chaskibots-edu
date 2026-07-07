@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Reveal from '@/components/Reveal'
 import { Bot, Brain, Shield, Rocket, Users, Award, Play, ArrowRight, Zap, Cpu, Code, Sparkles, GraduationCap, Building2, UserCheck, Calendar, Camera } from 'lucide-react'
 
 export default function HomePage() {
@@ -16,6 +17,17 @@ export default function HomePage() {
   const [count4, setCount4] = useState(0)
   const [experiencias, setExperiencias] = useState<any[]>([])
   const [loadingExp, setLoadingExp] = useState(true)
+  const [parallax, setParallax] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const handleMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2
+      const y = (e.clientY / window.innerHeight - 0.5) * 2
+      setParallax({ x, y })
+    }
+    window.addEventListener('mousemove', handleMove)
+    return () => window.removeEventListener('mousemove', handleMove)
+  }, [])
 
   // Cargar experiencias desde Airtable
   useEffect(() => {
@@ -73,11 +85,15 @@ export default function HomePage() {
         {/* Hero Section - Futurista con Logo Grande */}
         <section className="relative overflow-hidden hero-gradient py-20 md:py-28 px-4">
           {/* Grid Background */}
-          <div className="absolute inset-0 bg-cyber-grid opacity-30"></div>
+          <div className="absolute inset-0 bg-cyber-grid opacity-40"></div>
           {/* Glow Effects Animados */}
-          <div className="absolute top-20 left-1/4 w-96 h-96 bg-brand-purple/20 rounded-full blur-[120px] animate-pulse"></div>
-          <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-brand-violet/20 rounded-full blur-[120px] animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-purple/10 rounded-full blur-[150px] animate-pulse" style={{animationDelay: '0.5s'}}></div>
+          <div className="absolute top-20 left-1/4 w-96 h-96 bg-brand-purple/35 rounded-full blur-[110px] animate-pulse-slow"></div>
+          <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-brand-violet/35 rounded-full blur-[110px] animate-pulse-slow" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-cyan/20 rounded-full blur-[140px] animate-pulse-slow" style={{animationDelay: '0.5s'}}></div>
+          {/* Orbes flotantes decorativos */}
+          <div className="absolute top-10 right-10 w-4 h-4 bg-brand-purple rounded-full animate-bounce opacity-70" style={{ animationDelay: '0.3s' }}></div>
+          <div className="absolute bottom-24 left-16 w-3 h-3 bg-brand-cyan rounded-full animate-bounce opacity-70" style={{ animationDelay: '0.9s' }}></div>
+          <div className="absolute top-1/3 right-1/3 w-2.5 h-2.5 bg-neon-pink rounded-full animate-ping opacity-50"></div>
           
           <div className="max-w-6xl mx-auto relative z-10">
             <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -109,7 +125,13 @@ export default function HomePage() {
               
               {/* Logo Grande y Animado */}
               <div className="order-1 md:order-2 flex justify-center">
-                <div className="relative group">
+                <div
+                  className="relative group"
+                  style={{
+                    transform: `translate(${parallax.x * 10}px, ${parallax.y * 10}px)`,
+                    transition: 'transform 0.3s ease-out',
+                  }}
+                >
                   {/* Efecto de brillo detrás del logo */}
                   <div className="absolute inset-0 bg-gradient-to-r from-[#558C89]/30 via-[#74AFAD]/30 to-[#D9853B]/30 rounded-full blur-3xl animate-pulse scale-110"></div>
                   <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/20 to-brand-violet/20 rounded-full blur-2xl animate-spin-slow"></div>
@@ -128,6 +150,16 @@ export default function HomePage() {
                     <div className="absolute -top-4 -right-4 w-8 h-8 bg-brand-purple rounded-full animate-bounce opacity-80"></div>
                     <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-brand-violet rounded-full animate-bounce opacity-80" style={{animationDelay: '0.5s'}}></div>
                     <div className="absolute top-1/2 -right-6 w-4 h-4 bg-neon-pink rounded-full animate-ping opacity-60"></div>
+
+                    {/* Badges flotantes de áreas */}
+                    <div className="absolute -top-6 -left-10 hidden sm:flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg border border-brand-purple/20 animate-float" style={{ animationDelay: '0.2s' }}>
+                      <Cpu className="w-3.5 h-3.5 text-brand-purple" />
+                      <span className="text-xs font-semibold text-slate-700">Robótica</span>
+                    </div>
+                    <div className="absolute -bottom-8 -right-8 hidden sm:flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg border border-brand-cyan/20 animate-float" style={{ animationDelay: '0.8s' }}>
+                      <Brain className="w-3.5 h-3.5 text-brand-cyan" />
+                      <span className="text-xs font-semibold text-slate-700">IA</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -139,7 +171,7 @@ export default function HomePage() {
         <section className="py-16 bg-gray-50 border-y border-gray-200 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/5 via-transparent to-brand-violet/5"></div>
           <div className="max-w-6xl mx-auto px-4 relative z-10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <Reveal className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div className="group hover:scale-110 transition-transform duration-300">
                 <div className="text-4xl md:text-5xl font-bold text-brand-purple group-hover:text-glow-cyan transition-all">
                   {count1}+
@@ -164,22 +196,24 @@ export default function HomePage() {
                 </div>
                 <p className="text-gray-600 mt-2">Simuladores</p>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* Experiencias ChaskiBots */}
         <section className="py-20 px-4 bg-transparent">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
-              Nuestras <span className="text-brand-cyan">Experiencias</span>
-            </h2>
-            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-              ChaskiBots ha llevado robótica educativa a instituciones de todo el país. 
-              Conoce nuestro impacto en la educación STEM.
-            </p>
+            <Reveal>
+              <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+                Nuestras <span className="text-brand-cyan">Experiencias</span>
+              </h2>
+              <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                ChaskiBots ha llevado robótica educativa a instituciones de todo el país. 
+                Conoce nuestro impacto en la educación STEM.
+              </p>
+            </Reveal>
             
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <Reveal delay={100} className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="card group hover:border-brand-cyan/50 hover:scale-105 transition-all duration-300 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 bg-brand-cyan/10 rounded-2xl flex items-center justify-center group-hover:bg-brand-cyan/20 transition-colors">
                   <Building2 className="w-8 h-8 text-brand-cyan" />
@@ -210,10 +244,10 @@ export default function HomePage() {
                 </p>
                 <div className="text-brand-violet font-semibold">+50 eventos</div>
               </div>
-            </div>
+            </Reveal>
 
             {/* Galería de Experiencias desde Airtable */}
-            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+            <Reveal delay={150} className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
               <h3 className="text-xl font-bold text-gray-900 mb-4 text-center flex items-center justify-center gap-2">
                 <Camera className="w-5 h-5 text-gray-600" /> Galería de Experiencias
               </h3>
@@ -279,21 +313,23 @@ export default function HomePage() {
               <p className="text-center text-gray-500 text-sm mt-4">
                 {experiencias.length > 0 ? `${experiencias.length} experiencias en instituciones educativas` : 'Agrega fotos desde Airtable para mostrar aquí'}
               </p>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* Subject Areas - Cards Interactivas */}
         <section className="py-20 px-4 bg-gray-50">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
-              Áreas de <span className="text-brand-purple">Aprendizaje</span>
-            </h2>
-            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-              Contenido especializado y progresivo para cada área, adaptado a la edad y nivel de cada estudiante.
-            </p>
+            <Reveal>
+              <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+                Áreas de <span className="text-brand-purple">Aprendizaje</span>
+              </h2>
+              <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                Contenido especializado y progresivo para cada área, adaptado a la edad y nivel de cada estudiante.
+              </p>
+            </Reveal>
             
-            <div className="grid md:grid-cols-3 gap-6">
+            <Reveal delay={100} className="grid md:grid-cols-3 gap-6">
               {/* Robótica */}
               <div className="card group hover:border-brand-purple/50 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => router.push('/login')}>
                 <div className="w-16 h-16 bg-gradient-to-br from-brand-purple/20 to-neon-blue/20 rounded-2xl flex items-center justify-center mb-4 group-hover:shadow-brand-purple transition-all group-hover:animate-pulse">
@@ -347,7 +383,7 @@ export default function HomePage() {
                   Acceder <ArrowRight className="w-4 h-4 ml-1" />
                 </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
@@ -355,15 +391,17 @@ export default function HomePage() {
         <section className="py-20 px-4 bg-gray-50 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-violet/5 to-transparent"></div>
           <div className="max-w-6xl mx-auto relative z-10">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
-              Niveles <span className="text-brand-violet">Educativos</span>
-            </h2>
-            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-              Desde Inicial 2 hasta 3° de Bachillerato. Contenido y kits adaptados para cada edad.
-            </p>
+            <Reveal>
+              <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+                Niveles <span className="text-brand-violet">Educativos</span>
+              </h2>
+              <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                Desde Inicial 2 hasta 3° de Bachillerato. Contenido y kits adaptados para cada edad.
+              </p>
+            </Reveal>
             
             {/* Cards de niveles resumidos */}
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <Reveal delay={100} className="grid md:grid-cols-3 gap-6 mb-12">
               <div className="card group hover:border-brand-purple/50 hover:scale-105 transition-all duration-300 text-center">
                 <div className="text-4xl mb-4">🎒</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Inicial y Elemental</h3>
@@ -382,7 +420,7 @@ export default function HomePage() {
                 <p className="text-gray-600 text-sm mb-4">1° a 3° Bachillerato</p>
                 <div className="text-neon-green font-semibold">3 niveles</div>
               </div>
-            </div>
+            </Reveal>
             
             <div className="text-center">
               <Link href="/login" className="px-8 py-4 bg-gradient-to-r from-brand-violet to-neon-pink text-gray-900 font-bold rounded-xl hover:shadow-brand-violet hover:scale-105 transition-all duration-300 inline-flex items-center gap-2">
@@ -397,11 +435,13 @@ export default function HomePage() {
         {/* Features - Futurista */}
         <section className="py-20 px-4 bg-transparent">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-              ¿Por qué <span className="text-brand-purple">ChaskiBots</span> EDU?
-            </h2>
+            <Reveal>
+              <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+                ¿Por qué <span className="text-brand-purple">ChaskiBots</span> EDU?
+              </h2>
+            </Reveal>
             
-            <div className="grid md:grid-cols-3 gap-8">
+            <Reveal delay={100} className="grid md:grid-cols-3 gap-8">
               <div className="card text-center">
                 <div className="w-16 h-16 bg-brand-purple/10 border border-brand-purple/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-brand-purple" />
@@ -429,7 +469,7 @@ export default function HomePage() {
                   Practica con Wokwi, Tinkercad, Scratch y más simuladores integrados.
                 </p>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
@@ -437,7 +477,7 @@ export default function HomePage() {
         <section className="py-20 px-4 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/10 via-brand-violet/10 to-neon-pink/10"></div>
           <div className="absolute inset-0 bg-cyber-grid opacity-20"></div>
-          <div className="max-w-4xl mx-auto text-center relative z-10">
+          <Reveal direction="scale" className="max-w-4xl mx-auto text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               ¿Listo para comenzar tu viaje en <span className="text-brand-purple">tecnología</span>?
             </h2>
@@ -451,7 +491,7 @@ export default function HomePage() {
                 Comenzar Ahora
               </Link>
             </div>
-          </div>
+          </Reveal>
         </section>
       </main>
 

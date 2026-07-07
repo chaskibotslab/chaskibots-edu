@@ -65,6 +65,7 @@ const config: Config = {
       },
       backgroundImage: {
         'grid-pattern': 'linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px)',
+        'gradient-conic': 'conic-gradient(var(--tw-gradient-stops))',
       },
       animation: {
         'glow': 'glow 2s ease-in-out infinite alternate',
