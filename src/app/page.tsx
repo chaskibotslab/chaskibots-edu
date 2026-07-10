@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Reveal from '@/components/Reveal'
-import { Bot, Brain, Shield, Rocket, Users, Award, Play, ArrowRight, Zap, Cpu, Code, Sparkles, GraduationCap, Building2, UserCheck, Calendar, Camera } from 'lucide-react'
+import { Bot, Brain, Shield, Rocket, Users, Award, Play, ArrowRight, Cpu, Sparkles, GraduationCap, Building2, UserCheck, Calendar, Camera } from 'lucide-react'
 
 export default function HomePage() {
   const router = useRouter()
@@ -17,13 +17,12 @@ export default function HomePage() {
   const [count4, setCount4] = useState(0)
   const [experiencias, setExperiencias] = useState<any[]>([])
   const [loadingExp, setLoadingExp] = useState(true)
-  const [parallax, setParallax] = useState({ x: 0, y: 0 })
+  const [mouse, setMouse] = useState({ x: 0, y: 0 })
+  const heroRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2
-      const y = (e.clientY / window.innerHeight - 0.5) * 2
-      setParallax({ x, y })
+      setMouse({ x: e.clientX, y: e.clientY })
     }
     window.addEventListener('mousemove', handleMove)
     return () => window.removeEventListener('mousemove', handleMove)
@@ -77,125 +76,124 @@ export default function HomePage() {
     return () => clearTimeout(timeout)
   }, [])
 
+  const px = (mouse.x / (typeof window !== 'undefined' ? window.innerWidth : 1) - 0.5) * 2
+  const py = (mouse.y / (typeof window !== 'undefined' ? window.innerHeight : 1) - 0.5) * 2
+
   return (
-    <div className="min-h-screen flex flex-col bg-transparent">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       
       <main className="flex-1">
-        {/* Hero Section - Futurista con Logo Grande */}
-        <section className="relative overflow-hidden hero-gradient py-20 md:py-28 px-4">
-          {/* Grid Background */}
-          <div className="absolute inset-0 bg-cyber-grid opacity-40"></div>
-          {/* Glow Effects Animados */}
-          <div className="absolute top-20 left-1/4 w-96 h-96 bg-brand-purple/35 rounded-full blur-[110px] animate-pulse-slow"></div>
-          <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-brand-violet/35 rounded-full blur-[110px] animate-pulse-slow" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-cyan/20 rounded-full blur-[140px] animate-pulse-slow" style={{animationDelay: '0.5s'}}></div>
-          {/* Orbes flotantes decorativos */}
-          <div className="absolute top-10 right-10 w-4 h-4 bg-brand-purple rounded-full animate-bounce opacity-70" style={{ animationDelay: '0.3s' }}></div>
-          <div className="absolute bottom-24 left-16 w-3 h-3 bg-brand-cyan rounded-full animate-bounce opacity-70" style={{ animationDelay: '0.9s' }}></div>
-          <div className="absolute top-1/3 right-1/3 w-2.5 h-2.5 bg-neon-pink rounded-full animate-ping opacity-50"></div>
+        {/* Hero Section - Mesh Gradient Moderno */}
+        <section ref={heroRef} className="relative overflow-hidden min-h-[92vh] flex items-center px-4">
+          {/* Animated Mesh Gradient Background */}
+          <div className="absolute inset-0 bg-[#f0f4ff]" />
+          <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] rounded-full bg-gradient-to-br from-[#007AFF]/40 to-[#5E5CE6]/30 blur-[100px] animate-mesh-1" />
+          <div className="absolute bottom-[-15%] right-[-5%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tl from-[#30B0C7]/35 to-[#10b981]/20 blur-[100px] animate-mesh-2" />
+          <div className="absolute top-[20%] right-[15%] w-[35vw] h-[35vw] max-w-[450px] max-h-[450px] rounded-full bg-gradient-to-bl from-[#ec4899]/20 to-[#f59e0b]/15 blur-[100px] animate-mesh-3" />
           
-          <div className="max-w-6xl mx-auto relative z-10">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="max-w-6xl mx-auto relative z-10 w-full">
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              {/* Left - Text */}
               <div className="order-2 md:order-1">
-                <div className="inline-flex items-center gap-2 bg-gray-100/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-brand-purple/30 animate-fade-in">
-                  <span className="animate-pulse w-2 h-2 bg-neon-green rounded-full"></span>
-                  <span className="text-sm text-gray-600">Plataforma Educativa Activa</span>
+                <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-[#007AFF]/20 shadow-sm animate-fade-in">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-sm font-medium text-slate-600">Plataforma Educativa Activa</span>
                 </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-gray-900 animate-slide-up">
+
+                <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold mb-6 leading-[1.1] text-slate-900 animate-slide-up">
                   Aprende{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-neon-blue animate-gradient">Robótica</span>,{' '}
+                  <span className="relative inline-block">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#007AFF] to-[#339DFF]">Robótica</span>
+                    <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-[#007AFF] to-[#339DFF] rounded-full animate-expand-width" />
+                  </span>,{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D9853B] to-[#e9a55b]">IA</span> y{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-green to-emerald-400">Hacking Ético</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-400">Hacking Ético</span>
                 </h1>
-                <p className="text-lg text-gray-600 mb-8 max-w-lg animate-fade-in" style={{animationDelay: '0.3s'}}>
+
+                <p className="text-lg text-slate-500 mb-8 max-w-lg leading-relaxed animate-fade-in" style={{animationDelay: '0.3s'}}>
                   Plataforma educativa completa desde Inicial hasta Bachillerato. 
                   Videos, tutoriales, simuladores y proyectos prácticos con kits reales.
                 </p>
-                <div className="flex flex-wrap gap-4 animate-fade-in" style={{animationDelay: '0.5s'}}>
-                  <Link href="/login" className="px-8 py-4 bg-gradient-to-r from-brand-purple to-neon-blue text-dark-900 font-bold rounded-xl hover:shadow-brand-purple hover:scale-105 transition-all duration-300 flex items-center gap-2">
-                    <Play className="w-5 h-5" />
+
+                <div className="flex flex-wrap gap-3 animate-fade-in" style={{animationDelay: '0.5s'}}>
+                  <Link href="/login" className="group px-7 py-3.5 bg-[#007AFF] text-white font-semibold rounded-2xl hover:bg-[#0066DD] hover:shadow-xl hover:shadow-[#007AFF]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center gap-2">
+                    <Play className="w-4 h-4" />
                     Comenzar Ahora
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
-                  <Link href="/login" className="px-8 py-4 bg-gray-100 border border-brand-purple/30 text-brand-purple font-semibold rounded-xl hover:bg-gray-200 hover:border-brand-purple/60 hover:scale-105 transition-all duration-300">
+                  <Link href="/login" className="px-7 py-3.5 bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-700 font-semibold rounded-2xl hover:bg-white hover:border-[#007AFF]/40 hover:text-[#007AFF] hover:-translate-y-0.5 transition-all duration-300">
                     Iniciar Sesión
                   </Link>
                 </div>
               </div>
               
-              {/* Logo Grande y Animado */}
+              {/* Right - Logo with floating elements */}
               <div className="order-1 md:order-2 flex justify-center">
                 <div
-                  className="relative group"
+                  className="relative"
                   style={{
-                    transform: `translate(${parallax.x * 10}px, ${parallax.y * 10}px)`,
-                    transition: 'transform 0.3s ease-out',
+                    transform: `translate(${px * 12}px, ${py * 12}px)`,
+                    transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
                   }}
                 >
-                  {/* Efecto de brillo detrás del logo */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#558C89]/30 via-[#74AFAD]/30 to-[#D9853B]/30 rounded-full blur-3xl animate-pulse scale-110"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/20 to-brand-violet/20 rounded-full blur-2xl animate-spin-slow"></div>
+                  {/* Glow ring behind logo */}
+                  <div className="absolute -inset-6 bg-gradient-to-r from-[#007AFF]/20 via-[#5E5CE6]/15 to-[#30B0C7]/20 rounded-full blur-2xl animate-pulse-slow scale-110" />
                   
                   {/* Logo */}
-                  <div className="relative">
-                    <Image 
-                      src="/chaski.png" 
-                      alt="ChaskiBots Logo" 
-                      width={280} 
-                      height={280}
-                      className="rounded-3xl shadow-2xl group-hover:scale-105 transition-transform duration-500 animate-float"
-                      priority
-                    />
-                    {/* Partículas decorativas */}
-                    <div className="absolute -top-4 -right-4 w-8 h-8 bg-brand-purple rounded-full animate-bounce opacity-80"></div>
-                    <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-brand-violet rounded-full animate-bounce opacity-80" style={{animationDelay: '0.5s'}}></div>
-                    <div className="absolute top-1/2 -right-6 w-4 h-4 bg-neon-pink rounded-full animate-ping opacity-60"></div>
+                  <Image 
+                    src="/chaski.png" 
+                    alt="ChaskiBots Logo" 
+                    width={260} 
+                    height={260}
+                    className="relative rounded-3xl drop-shadow-2xl animate-card-float"
+                    priority
+                  />
 
-                    {/* Badges flotantes de áreas */}
-                    <div className="absolute -top-6 -left-10 hidden sm:flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg border border-brand-purple/20 animate-float" style={{ animationDelay: '0.2s' }}>
-                      <Cpu className="w-3.5 h-3.5 text-brand-purple" />
-                      <span className="text-xs font-semibold text-slate-700">Robótica</span>
-                    </div>
-                    <div className="absolute -bottom-8 -right-8 hidden sm:flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg border border-brand-cyan/20 animate-float" style={{ animationDelay: '0.8s' }}>
-                      <Brain className="w-3.5 h-3.5 text-brand-cyan" />
-                      <span className="text-xs font-semibold text-slate-700">IA</span>
-                    </div>
+                  {/* Floating badges */}
+                  <div className="absolute -top-4 -left-8 flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg shadow-slate-200/50 border border-slate-100 animate-card-float" style={{ animationDelay: '0.5s' }}>
+                    <Cpu className="w-3.5 h-3.5 text-[#007AFF]" />
+                    <span className="text-xs font-semibold text-slate-700">Robótica</span>
                   </div>
+                  <div className="absolute -bottom-4 -right-6 flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg shadow-slate-200/50 border border-slate-100 animate-card-float" style={{ animationDelay: '1.2s' }}>
+                    <Brain className="w-3.5 h-3.5 text-[#5E5CE6]" />
+                    <span className="text-xs font-semibold text-slate-700">IA</span>
+                  </div>
+                  <div className="absolute top-1/2 -right-10 hidden sm:flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg shadow-slate-200/50 border border-slate-100 animate-card-float" style={{ animationDelay: '1.8s' }}>
+                    <Shield className="w-3.5 h-3.5 text-emerald-500" />
+                    <span className="text-xs font-semibold text-slate-700">Hacking</span>
+                  </div>
+
+                  {/* Small decorative dots */}
+                  <div className="absolute -top-3 right-8 w-3 h-3 rounded-full bg-[#007AFF] animate-ping opacity-60" />
+                  <div className="absolute bottom-8 -left-4 w-2 h-2 rounded-full bg-[#5E5CE6] animate-bounce" style={{ animationDelay: '0.7s' }} />
+                  <div className="absolute top-12 -right-3 w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '1.3s' }} />
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Stats Section - Animada */}
-        <section className="py-16 bg-gray-50 border-y border-gray-200 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/5 via-transparent to-brand-violet/5"></div>
+        {/* Stats Section */}
+        <section className="py-16 bg-white border-y border-slate-100 relative overflow-hidden">
           <div className="max-w-6xl mx-auto px-4 relative z-10">
             <Reveal className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="group hover:scale-110 transition-transform duration-300">
-                <div className="text-4xl md:text-5xl font-bold text-brand-purple group-hover:text-glow-cyan transition-all">
-                  {count1}+
+              {[
+                { value: count1, suffix: '+', label: 'Niveles Educativos', color: 'text-[#007AFF]' },
+                { value: count2, suffix: '+', label: 'Áreas', color: 'text-[#5E5CE6]' },
+                { value: count3, suffix: '', label: 'Kits', color: 'text-emerald-500' },
+                { value: count4, suffix: '+', label: 'Simuladores', color: 'text-[#30B0C7]' },
+              ].map((stat, i) => (
+                <div key={i} className="group hover:scale-105 transition-transform duration-300 cursor-default">
+                  <div className={`text-4xl md:text-5xl font-extrabold ${stat.color} transition-all`}>
+                    {stat.value}{stat.suffix}
+                  </div>
+                  <p className="text-slate-500 mt-2 text-sm font-medium">{stat.label}</p>
                 </div>
-                <p className="text-gray-600 mt-2">Niveles Educativos</p>
-              </div>
-              <div className="group hover:scale-110 transition-transform duration-300">
-                <div className="text-4xl md:text-5xl font-bold text-brand-violet group-hover:text-glow-purple transition-all">
-                  {count2}+
-                </div>
-                <p className="text-gray-600 mt-2">Áreas</p>
-              </div>
-              <div className="group hover:scale-110 transition-transform duration-300">
-                <div className="text-4xl md:text-5xl font-bold text-neon-green group-hover:text-glow-green transition-all">
-                  {count3}
-                </div>
-                <p className="text-gray-600 mt-2">Kits</p>
-              </div>
-              <div className="group hover:scale-110 transition-transform duration-300">
-                <div className="text-4xl md:text-5xl font-bold text-brand-cyan group-hover:text-glow-orange transition-all">
-                  {count4}+
-                </div>
-                <p className="text-gray-600 mt-2">Simuladores</p>
-              </div>
+              ))}
             </Reveal>
           </div>
         </section>

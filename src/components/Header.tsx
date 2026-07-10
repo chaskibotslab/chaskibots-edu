@@ -62,20 +62,18 @@ export default function Header() {
                 </button>
               )}
               
-              <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-3 group">
-                <div className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-[#007AFF] to-[#0051D5] p-[2px] group-hover:scale-105 transition-transform duration-300">
-                  <div className="relative w-full h-full rounded-[10px] overflow-hidden bg-white">
-                    <Image 
-                      src="/chaski.png" 
-                      alt="ChaskiBots Logo" 
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </div>
+              <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-2.5 group">
+                <Image 
+                  src="/chaski.png" 
+                  alt="ChaskiBots Logo" 
+                  width={38} 
+                  height={38}
+                  className="rounded-xl group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_2px_8px_rgba(0,122,255,0.3)]"
+                  priority
+                />
                 <div className="hidden sm:flex flex-col">
-                  <span className="font-bold text-xl text-gray-900">ChaskiBots</span>
-                  <span className="text-[10px] text-brand-purple tracking-widest">EDUCATION PLATFORM</span>
+                  <span className="font-bold text-lg text-gray-900 leading-tight">ChaskiBots</span>
+                  <span className="text-[9px] text-brand-purple tracking-[0.2em] font-medium">EDUCATION</span>
                 </div>
               </Link>
             </div>
