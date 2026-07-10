@@ -423,12 +423,20 @@ body {
   to { transform: scaleX(1); }
 }
 
+@keyframes spin-border {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .animate-mesh-1 { animation: mesh-move-1 15s ease-in-out infinite; }
 .animate-mesh-2 { animation: mesh-move-2 18s ease-in-out infinite; }
 .animate-mesh-3 { animation: mesh-move-3 20s ease-in-out infinite; }
 .animate-expand-width {
   animation: expand-width 0.8s ease-out 0.4s both;
   transform-origin: left;
+}
+.animate-spin-border {
+  animation: spin-border 8s linear infinite;
 }
 
 .animate-float {

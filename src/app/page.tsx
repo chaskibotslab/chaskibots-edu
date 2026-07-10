@@ -92,6 +92,14 @@ export default function HomePage() {
           <div className="absolute bottom-[-15%] right-[-5%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tl from-[#30B0C7]/35 to-[#10b981]/20 blur-[100px] animate-mesh-2" />
           <div className="absolute top-[20%] right-[15%] w-[35vw] h-[35vw] max-w-[450px] max-h-[450px] rounded-full bg-gradient-to-bl from-[#ec4899]/20 to-[#f59e0b]/15 blur-[100px] animate-mesh-3" />
           
+          {/* Floating geometric shapes */}
+          <div className="absolute top-20 left-[8%] w-20 h-20 border border-[#007AFF]/15 rounded-2xl animate-spin-slow opacity-60" />
+          <div className="absolute bottom-32 right-[10%] w-14 h-14 border border-[#5E5CE6]/15 rounded-full animate-float opacity-50" />
+          <div className="absolute top-[30%] left-[5%] w-10 h-10 bg-[#007AFF]/8 rounded-xl rotate-12 animate-bounce opacity-60" style={{ animationDelay: '1s' }} />
+          <div className="absolute bottom-[20%] left-[15%] w-6 h-6 bg-emerald-500/10 rounded-full animate-ping opacity-40" />
+          <div className="absolute top-[15%] right-[25%] w-24 h-24 border border-[#30B0C7]/10 rounded-3xl rotate-45 animate-float" style={{ animationDelay: '3s' }} />
+          <div className="absolute bottom-[40%] right-[5%] w-4 h-4 bg-[#ec4899]/15 rounded-full animate-bounce opacity-50" style={{ animationDelay: '2s' }} />
+
           <div className="max-w-6xl mx-auto relative z-10 w-full">
             <div className="grid md:grid-cols-2 gap-10 items-center">
               {/* Left - Text */}
@@ -141,15 +149,16 @@ export default function HomePage() {
                   }}
                 >
                   {/* Glow ring behind logo */}
-                  <div className="absolute -inset-6 bg-gradient-to-r from-[#007AFF]/20 via-[#5E5CE6]/15 to-[#30B0C7]/20 rounded-full blur-2xl animate-pulse-slow scale-110" />
+                  <div className="absolute -inset-8 bg-gradient-to-r from-[#007AFF]/25 via-[#5E5CE6]/20 to-[#30B0C7]/25 rounded-full blur-3xl animate-pulse-slow scale-110" />
+                  <div className="absolute -inset-2 bg-gradient-to-r from-[#007AFF] via-[#5E5CE6] to-[#30B0C7] rounded-3xl animate-spin-border opacity-40" />
                   
                   {/* Logo */}
                   <Image 
                     src="/chaski.png" 
                     alt="ChaskiBots Logo" 
-                    width={260} 
-                    height={260}
-                    className="relative rounded-3xl drop-shadow-2xl animate-card-float"
+                    width={300} 
+                    height={300}
+                    className="relative rounded-3xl drop-shadow-2xl animate-card-float border-2 border-white/50 shadow-2xl shadow-[#007AFF]/20"
                     priority
                   />
 

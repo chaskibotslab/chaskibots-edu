@@ -80,10 +80,13 @@ export default function LoginPage() {
       <div className="absolute bottom-[-10%] right-[-5%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px] rounded-full bg-gradient-to-tl from-[#30B0C7]/25 to-[#10b981]/15 blur-[120px] animate-mesh-2" />
       <div className="absolute top-[30%] right-[10%] w-[30vw] h-[30vw] max-w-[350px] max-h-[350px] rounded-full bg-gradient-to-bl from-[#ec4899]/15 to-[#5E5CE6]/10 blur-[100px] animate-mesh-3" />
 
-      {/* Decorative dots */}
-      <div className="absolute top-20 left-20 w-2 h-2 rounded-full bg-[#007AFF] animate-bounce opacity-50" />
-      <div className="absolute bottom-32 right-24 w-3 h-3 rounded-full bg-[#5E5CE6] animate-bounce opacity-40" style={{ animationDelay: '0.5s' }} />
-      <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-40" />
+      {/* Floating geometric shapes */}
+      <div className="absolute top-16 left-16 w-16 h-16 border border-[#007AFF]/20 rounded-xl animate-spin-slow opacity-60" />
+      <div className="absolute bottom-24 right-20 w-12 h-12 border border-[#5E5CE6]/20 rounded-full animate-float opacity-50" />
+      <div className="absolute top-1/4 right-[15%] w-8 h-8 bg-[#007AFF]/10 rounded-lg animate-bounce opacity-60" style={{ animationDelay: '0.5s' }} />
+      <div className="absolute bottom-1/3 left-[12%] w-6 h-6 bg-[#5E5CE6]/10 rounded-full animate-ping opacity-40" />
+      <div className="absolute top-[60%] right-[8%] w-3 h-3 bg-emerald-500/40 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-[15%] left-[40%] w-20 h-20 border border-[#30B0C7]/10 rounded-2xl rotate-45 animate-float" style={{ animationDelay: '2s' }} />
 
       {/* Card */}
       <div className={`relative z-10 w-full max-w-[380px] transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
@@ -101,13 +104,15 @@ export default function LoginPage() {
             <div className="bg-white/80 backdrop-blur-2xl rounded-3xl shadow-xl shadow-slate-200/50 p-6 border border-white/60">
               {/* Logo + Title */}
               <div className="text-center mb-5">
-                <div className="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-[#007AFF] to-[#5E5CE6] p-[3px] shadow-lg shadow-[#007AFF]/20 mb-3">
-                  <div className="w-full h-full rounded-[13px] overflow-hidden">
+                <div className="relative mx-auto w-24 h-24 mb-4">
+                  <div className="absolute -inset-2 bg-gradient-to-r from-[#007AFF] via-[#5E5CE6] to-[#30B0C7] rounded-3xl opacity-50 blur-lg animate-pulse-slow" />
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#007AFF] via-[#5E5CE6] to-[#30B0C7] rounded-2xl animate-spin-border opacity-70" />
+                  <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white shadow-2xl shadow-[#007AFF]/30">
                     <Image
                       src="/chaski.png"
                       alt="ChaskiBots"
-                      width={80}
-                      height={80}
+                      width={96}
+                      height={96}
                       className="w-full h-full object-cover"
                       priority
                     />
