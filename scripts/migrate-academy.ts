@@ -36,7 +36,7 @@ async function runSQL(sql: string, label: string) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': supabaseKey,
+        'apikey': supabaseKey as string,
         'Authorization': `Bearer ${supabaseKey}`,
       },
       body: JSON.stringify({ sql_text: sql }),
