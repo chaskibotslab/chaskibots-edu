@@ -4,7 +4,7 @@ import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { Code, Copy, Check, Terminal, Lightbulb, BookOpen, Download, Loader2 } from 'lucide-react'
+import { Code, Copy, Check, Terminal, Lightbulb, BookOpen, Download, Loader2, Brain } from 'lucide-react'
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
@@ -24,6 +24,11 @@ const PythonSimulator = dynamic(() => import('@/components/PythonSimulator'), {
 })
 
 const PythonIDE = dynamic(() => import('@/components/PythonIDE'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
+const AILab = dynamic(() => import('@/components/AILab'), {
   loading: () => <LoadingSpinner />,
   ssr: false
 })
@@ -284,6 +289,20 @@ for i in range(1, 11):
               </div>
             </div>
             <PythonIDE />
+          </div>
+
+          {/* AI Lab */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center border border-purple-500/20">
+                <Brain className="w-6 h-6 text-purple-500" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Laboratorio de IA Visual</h2>
+                <p className="text-slate-500 text-sm">Anotador de imágenes, segmentación por color y desafío contra la IA</p>
+              </div>
+            </div>
+            <AILab />
           </div>
 
           <SimulatorTabs />

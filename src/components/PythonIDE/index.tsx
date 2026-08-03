@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import {
   Play, Square, RotateCcw, Copy, Check, Download, Upload,
   FolderOpen, File, Plus, Trash2, ChevronRight, ChevronDown,
   Terminal as TerminalIcon, BookOpen, Code, Lightbulb, Send,
-  Loader2, Package, Maximize2, Minimize2, X,
-  GraduationCap, Trophy, Star, CheckCircle2, Circle,
-  Rocket, Brain, Zap, Database, Globe, Cpu, Eye
+  Loader2, Package, Maximize2, Minimize2, X, FileArchive,
+  GraduationCap, Trophy, Star, CheckCircle2, Circle, ClipboardCheck,
+  Rocket, Brain, Zap, Database, Globe, Cpu, Eye, AlertTriangle, Save
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { CURRICULUM, type ModuleData, type LessonData } from './curriculum'
@@ -218,8 +219,10 @@ sys.stderr = StringIO()
           
           if (results.length > 0) {
             setOutput(prev => [...prev, ...results])
+            setLastRunOutput(results)
           } else {
             setOutput(prev => [...prev, '✓ Ejecución exitosa (sin salida de print)'])
+            setLastRunOutput([])
           }
           setOutput(prev => [...prev, `─ Completado en ${(Math.random() * 50 + 10).toFixed(0)}ms`])
         } catch (pyErr: any) {
@@ -292,19 +295,105 @@ sys.stderr = sys.__stderr__
     URL.revokeObjectURL(url)
   }
 
+  // ─── EXPORT / IMPORT PROJECT ────────────────────────────────
+  const exportProject = () => {
+    const project = {
+      name: 'ChaskiBots Python Project',
+      version: '2.0',
+      exportedAt: new Date().toISOString(),
+      student: studentName || 'Anónimo',
+      files: files,
+      completedLessons: Array.from(completedLessons),
+      installedPackages: installedPackages,
+    }
+    const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `proyecto-python-${studentName || 'chaski'}-${new Date().toISOString().slice(0, 10)}.chaskiproject`
+    a.click()
+    URL.revokeObjectURL(url)
+    setOutput(prev => [...prev, '📦 Proyecto exportado correctamente'])
+  }
+
+  const importProject = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.chaskiproject,.json'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+      const reader = new FileReader()
+      reader.onload = (ev) => {
+        try {
+          const project = JSON.parse(ev.target?.result as string)
+          if (project.files && Array.isArray(project.files)) {
+            setFiles(project.files)
+            setActiveFile(0)
+            if (project.completedLessons) setCompletedLessons(new Set(project.completedLessons))
+            if (project.student) setStudentName(project.student)
+            setOutput(prev => [...prev, 
+              '', '📂 Proyecto importado correctamente',
+              `   Archivos: ${project.files.length}`,
+              `   Estudiante: ${project.student || 'N/A'}`,
+              `   Exportado: ${project.exportedAt || 'N/A'}`,
+            ])
+          } else {
+            setOutput(prev => [...prev, '❌ Formato de proyecto inválido'])
+          }
+        } catch {
+          setOutput(prev => [...prev, '❌ Error al leer el archivo de proyecto'])
+        }
+      }
+      reader.readAsText(file)
+    }
+    input.click()
+  }
+
+  // ─── TASK VALIDATION ────────────────────────────────────────
+  const [lastRunOutput, setLastRunOutput] = useState<string[]>([])
+  const [taskResult, setTaskResult] = useState<'pass' | 'fail' | null>(null)
+
+  const validateTask = useCallback(() => {
+    if (!activeLesson?.expectedOutput || !activeLesson.isTask) return
+    
+    const expected = activeLesson.expectedOutput
+    const actual = lastRunOutput.filter(l => l.trim() && !l.startsWith('─') && !l.startsWith('[') && !l.startsWith('▶'))
+    
+    let passed = true
+    for (const exp of expected) {
+      if (!actual.some(line => line.includes(exp))) {
+        passed = false
+        break
+      }
+    }
+    
+    setTaskResult(passed ? 'pass' : 'fail')
+    
+    if (passed) {
+      setOutput(prev => [...prev, '', '✅ ═══ ¡TAREA APROBADA! ═══', '🎉 Tu código produce la salida esperada', '⭐ +1 lección completada'])
+      markLessonComplete()
+    } else {
+      setOutput(prev => [...prev, '', '❌ ═══ TAREA NO APROBADA ═══', '🔍 La salida no coincide con lo esperado:', ...expected.map(e => `   esperado: "${e}"`), '', '💡 Revisa tu código e intenta de nuevo'])
+    }
+  }, [activeLesson, lastRunOutput])
+
   // ─── CURRICULUM ───────────────────────────────────────────
   const loadLesson = (lesson: LessonData) => {
     setActiveLesson(lesson)
     setShowLessonPanel(true)
+    setTaskResult(null)
+    setLastRunOutput([])
     const newFiles = [...files]
     newFiles[0] = { name: `${lesson.id}.py`, content: lesson.starterCode }
     setFiles(newFiles)
     setActiveFile(0)
     setOutput(prev => [
       ...prev, '',
-      `📚 ═══ Lección: ${lesson.title} ═══`,
+      `📚 ═══ ${lesson.isTask ? '📋 TAREA' : 'Lección'}: ${lesson.title} ═══`,
       `📝 ${lesson.description}`,
       `🎯 Dificultad: ${lesson.difficulty}`,
+      ...(lesson.isTask ? ['🔔 Esta es una tarea evaluable — ejecuta tu código y presiona "Validar Tarea"'] : []),
       '',
       '💡 Presiona ▶ Ejecutar para ver el resultado',
     ])
@@ -356,7 +445,7 @@ sys.stderr = sys.__stderr__
   return (
     <div className={`flex flex-col bg-[#1e1e2e] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[750px]'}`}>
       {/* ═══ TOP BAR ═══ */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#181825] border-b border-gray-700/50">
+      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#181825] via-[#1a1a2e] to-[#181825] border-b border-gray-700/50">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:brightness-125" onClick={() => setIsFullscreen(false)} />
@@ -364,15 +453,30 @@ sys.stderr = sys.__stderr__
             <div className="w-3 h-3 rounded-full bg-green-500 cursor-pointer hover:brightness-125" onClick={() => setIsFullscreen(!isFullscreen)} />
           </div>
           <div className="flex items-center gap-2">
-            <Code className="w-4 h-4 text-blue-400" />
-            <span className="text-gray-300 text-sm font-semibold">Python IDE Professional</span>
+            <Image src="/chaski.png" alt="ChaskiBots" width={24} height={24} className="rounded-md" />
+            <div className="flex flex-col">
+              <span className="text-gray-200 text-sm font-bold leading-tight">Python IDE</span>
+              <span className="text-[9px] text-gray-500 leading-tight">by ChaskiBots Lab</span>
+            </div>
           </div>
-          <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${pyodideReady ? 'bg-green-500/20 text-green-400 border border-green-500/30' : pyodideLoading ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-gray-700 text-gray-400'}`}>
+          <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${pyodideReady ? 'bg-green-500/20 text-green-400 border border-green-500/30' : pyodideLoading ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 animate-pulse' : 'bg-gray-700 text-gray-400'}`}>
             {pyodideReady ? '● Python 3.11 Listo' : pyodideLoading ? '◌ Cargando...' : '○ Desconectado'}
           </span>
+          {activeLesson?.isTask && (
+            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center gap-1">
+              <ClipboardCheck className="w-3 h-3" /> TAREA
+            </span>
+          )}
         </div>
         
         <div className="flex items-center gap-1">
+          <button onClick={exportProject} className="p-2 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors" title="Exportar Proyecto">
+            <Download className="w-4 h-4" />
+          </button>
+          <button onClick={importProject} className="p-2 text-gray-500 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-colors" title="Importar Proyecto">
+            <Upload className="w-4 h-4" />
+          </button>
+          <div className="w-px h-5 bg-gray-700/50 mx-0.5" />
           <button onClick={() => setShowCurriculum(!showCurriculum)} className={`p-2 rounded-lg transition-colors ${showCurriculum ? 'bg-blue-500/20 text-blue-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Curriculum">
             <GraduationCap className="w-4 h-4" />
           </button>
@@ -441,12 +545,14 @@ sys.stderr = sys.__stderr__
                             >
                               {isComplete ? (
                                 <CheckCircle2 className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
+                              ) : lesson.isTask ? (
+                                <ClipboardCheck className="w-3.5 h-3.5 text-orange-400 flex-shrink-0" />
                               ) : (
                                 <Circle className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
                               )}
                               <div className="flex-1 min-w-0">
                                 <div className={`text-[11px] truncate ${isActive ? 'text-blue-300 font-medium' : 'text-gray-400'}`}>
-                                  {lesson.title}
+                                  {lesson.isTask ? '📋 ' : ''}{lesson.title}
                                 </div>
                               </div>
                               <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
@@ -579,9 +685,24 @@ sys.stderr = sys.__stderr__
               {activeLesson && (
                 <>
                   <div className="w-px h-5 bg-gray-700 mx-1" />
-                  <button onClick={markLessonComplete} className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/80 hover:bg-purple-500 text-white rounded-lg text-xs font-medium transition-colors">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Completar
-                  </button>
+                  {activeLesson.isTask && activeLesson.expectedOutput ? (
+                    <button 
+                      onClick={validateTask} 
+                      disabled={lastRunOutput.length === 0}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        taskResult === 'pass' ? 'bg-green-600 text-white' :
+                        taskResult === 'fail' ? 'bg-red-600/80 hover:bg-red-500 text-white' :
+                        'bg-orange-600/80 hover:bg-orange-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white'
+                      }`}
+                    >
+                      <ClipboardCheck className="w-3.5 h-3.5" />
+                      {taskResult === 'pass' ? '✓ Aprobada' : taskResult === 'fail' ? 'Reintentar' : 'Validar Tarea'}
+                    </button>
+                  ) : (
+                    <button onClick={markLessonComplete} className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/80 hover:bg-purple-500 text-white rounded-lg text-xs font-medium transition-colors">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Completar
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -693,6 +814,31 @@ sys.stderr = sys.__stderr__
                   ))}
                 </ul>
               </div>
+
+              {/* Task Instructions */}
+              {activeLesson.isTask && activeLesson.taskInstructions && (
+                <div className="p-3 border-t border-gray-700/30">
+                  <h4 className="text-orange-300 text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <ClipboardCheck className="w-3 h-3 text-orange-400" /> Instrucciones de Tarea
+                  </h4>
+                  <p className="text-orange-200/80 text-[11px] leading-relaxed bg-orange-500/5 border border-orange-500/20 rounded-lg p-2">{activeLesson.taskInstructions}</p>
+                  {activeLesson.expectedOutput && (
+                    <div className="mt-2">
+                      <p className="text-[10px] text-gray-500 mb-1">Salida esperada (debe incluir):</p>
+                      {activeLesson.expectedOutput.map((out, i) => (
+                        <div key={i} className="text-[10px] text-green-400/70 font-mono bg-green-500/5 px-2 py-0.5 rounded mt-0.5">
+                          {out}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {taskResult && (
+                    <div className={`mt-2 p-2 rounded-lg text-[11px] font-medium ${taskResult === 'pass' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                      {taskResult === 'pass' ? '✅ ¡Tarea aprobada!' : '❌ Revisa tu código e intenta de nuevo'}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Challenge */}
               {activeLesson.challenge && (

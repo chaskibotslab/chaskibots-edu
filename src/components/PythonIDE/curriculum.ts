@@ -17,6 +17,10 @@ export interface LessonData {
   hints: string[]
   expectedConcepts: string[]
   challenge?: string
+  // Task evaluation
+  expectedOutput?: string[]
+  taskInstructions?: string
+  isTask?: boolean
 }
 
 export interface ModuleData {
@@ -186,6 +190,39 @@ print(f"  [::-1]  = {palabra[::-1]}")
         ],
         expectedConcepts: ['strings', 'metodos', 'formato', 'slicing'],
         challenge: 'Crea un programa que cuente vocales, consonantes y espacios de un texto'
+      },
+      {
+        id: 'tarea-fundamentos',
+        title: 'Tarea: Calculadora Escolar',
+        description: 'Completa el código para crear una calculadora con operaciones básicas',
+        difficulty: 'principiante',
+        isTask: true,
+        taskInstructions: 'Completa las variables y operaciones. Tu programa debe imprimir los resultados de suma, resta, multiplicación y división de los números 15 y 4.',
+        expectedOutput: ['Suma: 19', 'Resta: 11', 'Multiplicación: 60', 'División: 3.75'],
+        theory: 'Usa las operaciones +, -, *, / para completar los cálculos.',
+        starterCode: `# ═══ TAREA: CALCULADORA ESCOLAR ═══
+# Completa el código para que funcione correctamente
+
+a = 15
+b = 4
+
+# TODO: Completa las operaciones
+suma = ___
+resta = ___
+multiplicacion = ___
+division = ___
+
+print(f"Suma: {suma}")
+print(f"Resta: {resta}")
+print(f"Multiplicación: {multiplicacion}")
+print(f"División: {division}")
+`,
+        hints: [
+          'suma = a + b',
+          'Para la división usa / (resultado decimal)',
+          'Reemplaza ___ con la operación correcta',
+        ],
+        expectedConcepts: ['variables', 'aritmetica', 'print']
       }
     ]
   },
@@ -383,6 +420,32 @@ while fila <= 5:
         ],
         expectedConcepts: ['while', 'break', 'continue', 'for-else'],
         challenge: 'Implementa búsqueda binaria para adivinar un número del 1 al 1000'
+      },
+      {
+        id: 'tarea-control-flujo',
+        title: 'Tarea: Tabla de Multiplicar',
+        description: 'Crea un programa que imprima la tabla de multiplicar del 7',
+        difficulty: 'principiante',
+        isTask: true,
+        taskInstructions: 'Usa un bucle for con range(1, 11) para imprimir la tabla del 7. Cada línea debe seguir el formato: "7 x N = resultado"',
+        expectedOutput: ['7 x 1 = 7', '7 x 2 = 14', '7 x 3 = 21', '7 x 5 = 35', '7 x 10 = 70'],
+        theory: 'Un bucle for con range(inicio, fin) repite el bloque para cada número.',
+        starterCode: `# ═══ TAREA: TABLA DE MULTIPLICAR ═══
+# Imprime la tabla de multiplicar del 7
+
+numero = 7
+
+# TODO: Usa un bucle for para imprimir la tabla
+# Formato esperado: "7 x 1 = 7", "7 x 2 = 14", etc.
+
+
+`,
+        hints: [
+          'Usa for i in range(1, 11):',
+          'Dentro del bucle: print(f"{numero} x {i} = {numero * i}")',
+          'range(1, 11) genera números del 1 al 10',
+        ],
+        expectedConcepts: ['for', 'range', 'print', 'multiplicacion']
       }
     ]
   },
@@ -538,6 +601,42 @@ saludar()
         ],
         expectedConcepts: ['args', 'kwargs', 'decoradores', 'generadores', 'recursion', 'lru_cache'],
         challenge: 'Crea un decorador @retry(n) que reintente una función n veces si falla'
+      },
+      {
+        id: 'tarea-funciones',
+        title: 'Tarea: Funciones Matemáticas',
+        description: 'Crea funciones para calcular factorial, potencia y verificar si un número es primo',
+        difficulty: 'intermedio',
+        isTask: true,
+        taskInstructions: 'Define 3 funciones: factorial(n), potencia(base, exp) y es_primo(n). Luego imprime los resultados indicados.',
+        expectedOutput: ['factorial(5) = 120', 'potencia(2, 10) = 1024', 'es_primo(17) = True', 'es_primo(15) = False'],
+        theory: 'Las funciones se definen con def nombre(parametros): y retornan valores con return.',
+        starterCode: `# ═══ TAREA: FUNCIONES MATEMÁTICAS ═══
+
+# TODO: Define la función factorial(n) que retorne el factorial
+def factorial(n):
+    pass  # Reemplaza esto
+
+# TODO: Define la función potencia(base, exp) que retorne base^exp
+def potencia(base, exp):
+    pass  # Reemplaza esto
+
+# TODO: Define la función es_primo(n) que retorne True/False
+def es_primo(n):
+    pass  # Reemplaza esto
+
+# Pruebas (NO modificar)
+print(f"factorial(5) = {factorial(5)}")
+print(f"potencia(2, 10) = {potencia(2, 10)}")
+print(f"es_primo(17) = {es_primo(17)}")
+print(f"es_primo(15) = {es_primo(15)}")
+`,
+        hints: [
+          'factorial: if n <= 1 return 1, else return n * factorial(n-1)',
+          'potencia: usa ** o un bucle',
+          'es_primo: verifica divisibilidad desde 2 hasta sqrt(n)',
+        ],
+        expectedConcepts: ['def', 'return', 'recursion', 'condicionales']
       }
     ]
   },
