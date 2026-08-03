@@ -23,6 +23,11 @@ const PythonSimulator = dynamic(() => import('@/components/PythonSimulator'), {
   ssr: false
 })
 
+const PythonIDE = dynamic(() => import('@/components/PythonIDE'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
 export default function SimuladoresPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
 
@@ -267,18 +272,18 @@ for i in range(1, 11):
             </div>
           </div>
 
-          {/* Python Simulator */}
+          {/* Python IDE Professional */}
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center border border-green-500/20">
-                <Download className="w-6 h-6 text-green-500" />
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl flex items-center justify-center border border-blue-500/20">
+                <Code className="w-6 h-6 text-blue-500" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Simulador Python ChaskiBots</h2>
-                <p className="text-slate-500 text-sm">Ejecuta código y exporta tu tarea</p>
+                <h2 className="text-xl font-bold text-slate-900">Python IDE Professional</h2>
+                <p className="text-slate-500 text-sm">Editor profesional con curriculum completo, terminal y ejecución real</p>
               </div>
             </div>
-            <PythonSimulator />
+            <PythonIDE />
           </div>
 
           <SimulatorTabs />

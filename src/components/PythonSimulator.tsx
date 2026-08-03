@@ -6,7 +6,7 @@ import QRCode from 'qrcode'
 
 declare global {
   interface Window {
-    loadPyodide: (config?: { indexURL?: string }) => Promise<any>
+    loadPyodide: any
     pyodide: any
   }
 }
