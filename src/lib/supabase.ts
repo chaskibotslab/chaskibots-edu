@@ -12,10 +12,15 @@ if (supabaseUrl.includes('dummy')) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Cliente admin (solo para servidor - bypassa RLS)
+// `global.fetch` fuerza cache: 'no-store' porque Next.js parchea fetch() globalmente
+// y puede cachear las llamadas internas de supabase-js aunque la ruta sea force-dynamic.
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
+  },
+  global: {
+    fetch: (input, init) => fetch(input, { ...init, cache: 'no-store' }),
   },
 })
 
