@@ -37,8 +37,9 @@ export default function TeachableMachine() {
       knnRef.current = knnModule.create()
       setModelReady(true)
       return true
-    } catch {
-      setError('No se pudo cargar el modelo base (MobileNet)')
+    } catch (err) {
+      console.error('[TeachableMachine] model load failed', err)
+      setError('No se pudo cargar el modelo base (MobileNet). Revisa tu conexión e intenta de nuevo.')
       return false
     } finally {
       setModelLoading(false)
@@ -57,8 +58,9 @@ export default function TeachableMachine() {
           setCameraActive(true)
         }
       }
-    } catch {
-      setError('No se pudo acceder a la cámara')
+    } catch (err) {
+      console.error('[TeachableMachine] camera access failed', err)
+      setError('No se pudo acceder a la cámara. Revisa los permisos del sitio.')
     }
   }
 
@@ -87,11 +89,17 @@ export default function TeachableMachine() {
   }
 
   const captureOnce = useCallback((classIdx: number) => {
-    if (!videoRef.current || !mobilenetRef.current || !knnRef.current) return
-    const activation = mobilenetRef.current.infer(videoRef.current, true)
-    knnRef.current.addExample(activation, classIdx)
-    activation.dispose?.()
-    setClasses(prev => prev.map((c, i) => (i === classIdx ? { ...c, count: c.count + 1 } : c)))
+    const video = videoRef.current
+    if (!video || !mobilenetRef.current || !knnRef.current) return
+    if (video.readyState < 2 || video.videoWidth === 0) return // camera frame not ready yet
+    try {
+      const activation = mobilenetRef.current.infer(video, true)
+      knnRef.current.addExample(activation, classIdx)
+      activation.dispose?.()
+      setClasses(prev => prev.map((c, i) => (i === classIdx ? { ...c, count: c.count + 1 } : c)))
+    } catch (err) {
+      console.error('[TeachableMachine] capture failed', err)
+    }
   }, [])
 
   const startCapturing = (classIdx: number) => {
@@ -116,13 +124,18 @@ export default function TeachableMachine() {
   const startPredicting = () => {
     setIsPredicting(true)
     const loop = async () => {
-      if (videoRef.current && mobilenetRef.current && knnRef.current && knnRef.current.getNumClasses() > 0) {
-        const activation = mobilenetRef.current.infer(videoRef.current, true)
-        const result = await knnRef.current.predictClass(activation, 10)
-        activation.dispose?.()
-        const classIdx = Number(result.label)
-        const confidence = result.confidences[result.label]
-        setPrediction({ label: classes[classIdx]?.name || '?', confidence })
+      const video = videoRef.current
+      if (video && video.readyState >= 2 && video.videoWidth > 0 && mobilenetRef.current && knnRef.current && knnRef.current.getNumClasses() > 0) {
+        try {
+          const activation = mobilenetRef.current.infer(video, true)
+          const result = await knnRef.current.predictClass(activation, 10)
+          activation.dispose?.()
+          const classIdx = Number(result.label)
+          const confidence = result.confidences[result.label]
+          setPrediction({ label: classes[classIdx]?.name || '?', confidence })
+        } catch (err) {
+          console.error('[TeachableMachine] predict failed', err)
+        }
       }
       predictAnimRef.current = requestAnimationFrame(loop)
     }

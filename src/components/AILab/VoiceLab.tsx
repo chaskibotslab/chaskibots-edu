@@ -22,8 +22,23 @@ export default function VoiceLab() {
   const [interim, setInterim] = useState('')
   const [transcribeError, setTranscribeError] = useState<string | null>(null)
   const recognitionRef = useRef<any>(null)
+  const shouldKeepListeningRef = useRef(false)
+  const localeAttemptRef = useRef(0)
 
-  const startTranscribe = () => {
+  const ERROR_MESSAGES: Record<string, string> = {
+    'not-allowed': 'Permiso de micrófono denegado. Revisa los permisos del sitio en tu navegador.',
+    'no-speech': 'No se detectó voz. Intenta hablar más cerca del micrófono.',
+    'audio-capture': 'No se encontró un micrófono disponible.',
+    'network': 'Error de red durante el reconocimiento de voz.',
+    'language-not-supported': 'Este navegador no soporta el idioma configurado.',
+    'aborted': '',
+  }
+
+  // Chrome's speech engine doesn't reliably support every regional locale (es-EC
+  // specifically is inconsistent) — try a couple of fallbacks before giving up.
+  const LOCALES = ['es-419', 'es-ES', 'es-US']
+
+  const startRecognition = (localeIdx: number) => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRecognition) {
       setTranscribeError('Tu navegador no soporta reconocimiento de voz. Prueba con Google Chrome.')
@@ -31,7 +46,7 @@ export default function VoiceLab() {
     }
     setTranscribeError(null)
     const recognition = new SpeechRecognition()
-    recognition.lang = 'es-EC'
+    recognition.lang = LOCALES[localeIdx] || 'es-ES'
     recognition.continuous = true
     recognition.interimResults = true
 
@@ -46,15 +61,53 @@ export default function VoiceLab() {
       if (finalText) setTranscript(prev => prev + finalText + ' ')
       setInterim(interimText)
     }
-    recognition.onerror = () => setTranscribeError('Error de reconocimiento de voz. Verifica el permiso del micrófono.')
-    recognition.onend = () => setListening(false)
+
+    recognition.onerror = (event: any) => {
+      console.error('[VoiceLab] recognition error', event.error)
+      if (event.error === 'language-not-supported' && localeIdx < LOCALES.length - 1) {
+        localeAttemptRef.current = localeIdx + 1
+        return // onend will fire next and retry with the next locale
+      }
+      if (event.error !== 'aborted') {
+        setTranscribeError(ERROR_MESSAGES[event.error] || `Error de reconocimiento de voz (${event.error}).`)
+      }
+      if (event.error === 'not-allowed' || event.error === 'audio-capture') {
+        shouldKeepListeningRef.current = false
+      }
+    }
+
+    // continuous mode still auto-stops after a silence gap in most browsers —
+    // restart automatically unless the user explicitly pressed stop.
+    recognition.onend = () => {
+      if (shouldKeepListeningRef.current) {
+        try {
+          startRecognition(localeAttemptRef.current)
+        } catch {
+          setListening(false)
+        }
+      } else {
+        setListening(false)
+      }
+    }
 
     recognitionRef.current = recognition
-    recognition.start()
-    setListening(true)
+    try {
+      recognition.start()
+      setListening(true)
+    } catch (err) {
+      console.error('[VoiceLab] start() failed', err)
+      setTranscribeError('No se pudo iniciar el micrófono. Intenta de nuevo.')
+    }
+  }
+
+  const startTranscribe = () => {
+    localeAttemptRef.current = 0
+    shouldKeepListeningRef.current = true
+    startRecognition(0)
   }
 
   const stopTranscribe = () => {
+    shouldKeepListeningRef.current = false
     recognitionRef.current?.stop()
     setListening(false)
     setInterim('')
@@ -72,13 +125,15 @@ export default function VoiceLab() {
     if (!recognizerRef.current) {
       setKwLoading(true)
       try {
+        const tf = await import('@tensorflow/tfjs')
+        await tf.ready()
         const speechCommands = await import('@tensorflow-models/speech-commands')
-        await import('@tensorflow/tfjs')
         const recognizer = speechCommands.create('BROWSER_FFT')
         await recognizer.ensureModelLoaded()
         recognizerRef.current = recognizer
-      } catch {
-        setKwError('No se pudo cargar el modelo de palabras clave')
+      } catch (err) {
+        console.error('[VoiceLab] keyword model load failed', err)
+        setKwError('No se pudo cargar el modelo de palabras clave. Revisa tu conexión e intenta de nuevo.')
         setKwLoading(false)
         return
       }
@@ -100,8 +155,9 @@ export default function VoiceLab() {
         { includeSpectrogram: false, probabilityThreshold: 0.75, invokeCallbackOnNoiseAndUnknown: false, overlapFactor: 0.5 }
       )
       setKwListening(true)
-    } catch {
-      setKwError('No se pudo acceder al micrófono')
+    } catch (err) {
+      console.error('[VoiceLab] listen() failed', err)
+      setKwError('No se pudo acceder al micrófono. Revisa los permisos del sitio.')
     }
   }
 
