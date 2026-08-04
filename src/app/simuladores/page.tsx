@@ -299,7 +299,7 @@ for i in range(1, 11):
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900">Laboratorio de IA Visual</h2>
-                <p className="text-slate-500 text-sm">Anotador de imágenes, segmentación por color y desafío contra la IA</p>
+                <p className="text-slate-500 text-sm">Anotador, segmentación, desafío IA, cámara en vivo y modelos reales en la nube</p>
               </div>
             </div>
             <AILab />
