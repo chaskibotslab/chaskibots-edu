@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { BookOpen, ChevronRight, Clock, Zap, Lock, CheckCircle2, Loader2, ArrowLeft, Code, Shield } from 'lucide-react'
+import { BookOpen, ChevronRight, Clock, Zap, Lock, CheckCircle2, Loader2, ArrowLeft, Code, Shield, Sparkles } from 'lucide-react'
+import { useAuth } from '@/components/AuthProvider'
 
 interface Lesson {
   id: string
@@ -25,6 +26,7 @@ interface Module {
   icon: string
   sort_order: number
   lessons: Lesson[]
+  level_id?: string | null
 }
 
 interface Course {
@@ -39,10 +41,12 @@ interface Course {
 export default function CoursePage() {
   const params = useParams()
   const courseSlug = params.courseSlug as string
+  const { user } = useAuth()
   const [course, setCourse] = useState<Course | null>(null)
   const [modules, setModules] = useState<Module[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedModule, setExpandedModule] = useState<string | null>(null)
+  const [myLevelModuleId, setMyLevelModuleId] = useState<string | null>(null)
 
   useEffect(() => {
     fetch(`/api/academy?course=${courseSlug}`)
@@ -50,13 +54,20 @@ export default function CoursePage() {
       .then(data => {
         setCourse(data.course)
         setModules(data.modules || [])
-        if (data.modules?.length > 0) {
+        // Auto-highlight/expand the module matching the student's own grade
+        const myModule = user?.levelId
+          ? data.modules?.find((m: Module) => m.level_id === user.levelId)
+          : null
+        if (myModule) {
+          setExpandedModule(myModule.id)
+          setMyLevelModuleId(myModule.id)
+        } else if (data.modules?.length > 0) {
           setExpandedModule(data.modules[0].id)
         }
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [courseSlug])
+  }, [courseSlug, user?.levelId])
 
   const difficultyColor = (d: string) => {
     switch (d) {
@@ -134,7 +145,7 @@ export default function CoursePage() {
           {/* Modules accordion */}
           <div className="space-y-3">
             {modules.map((module, moduleIdx) => (
-              <div key={module.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+              <div key={module.id} className={`bg-white rounded-xl border overflow-hidden shadow-sm ${module.id === myLevelModuleId ? 'border-purple-300 ring-2 ring-purple-100' : 'border-slate-200'}`}>
                 {/* Module header */}
                 <button
                   onClick={() => setExpandedModule(expandedModule === module.id ? null : module.id)}
@@ -147,6 +158,11 @@ export default function CoursePage() {
                     <h3 className="font-bold text-slate-900 flex items-center gap-2">
                       <span>{module.icon}</span>
                       {module.title}
+                      {module.id === myLevelModuleId && (
+                        <span className="text-[10px] px-2 py-0.5 bg-purple-100 text-purple-600 rounded-full font-bold flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" /> Tu nivel
+                        </span>
+                      )}
                     </h3>
                     <p className="text-sm text-slate-500 truncate">{module.description}</p>
                   </div>

@@ -75,8 +75,13 @@ const CHALLENGE_IMAGES = [
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-export default function AILab() {
-  const [mode, setMode] = useState<LabMode>('annotator')
+interface AILabProps {
+  initialMode?: LabMode
+  hideTabs?: boolean
+}
+
+export default function AILab({ initialMode = 'annotator', hideTabs = false }: AILabProps = {}) {
+  const [mode, setMode] = useState<LabMode>(initialMode)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -571,7 +576,7 @@ export default function AILab() {
       </div>
 
       {/* ═══ TAB BAR ═══ */}
-      <div className="flex bg-[#181825] border-b border-gray-700/50 overflow-x-auto">
+      {!hideTabs && <div className="flex bg-[#181825] border-b border-gray-700/50 overflow-x-auto">
         {tabs.map(tab => {
           const Icon = tab.icon
           return (
@@ -592,7 +597,7 @@ export default function AILab() {
             </button>
           )
         })}
-      </div>
+      </div>}
 
       {/* ═══ CONTENT ═══ */}
       <div className="p-5">

@@ -3,14 +3,17 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { 
-  BookOpen, Code, Play, ChevronRight, ChevronLeft, Copy, Check, 
-  Lightbulb, Terminal, ArrowLeft, Loader2, RotateCcw, Zap, 
-  CheckCircle2, ChevronDown, Eye, EyeOff
+import {
+  BookOpen, Code, Play, ChevronRight, ChevronLeft, Copy, Check,
+  Lightbulb, Terminal, ArrowLeft, Loader2, RotateCcw, Zap,
+  CheckCircle2, ChevronDown, Eye, EyeOff, Brain
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
+
+const AILab = dynamic(() => import('@/components/AILab'), { ssr: false })
 
 interface Example {
   title: string
@@ -36,6 +39,7 @@ interface Lesson {
   challenges: Challenge[]
   difficulty: string
   estimated_minutes: number
+  activity_type?: string | null
 }
 
 interface Module {
@@ -280,6 +284,57 @@ export default function LessonPage() {
   }
 
   const courseGradient = courseSlug === 'python' ? 'from-blue-500 to-indigo-600' : 'from-emerald-500 to-teal-600'
+
+  // ═══ IA lessons: embed the AILab activity instead of the Python code editor ═══
+  if (lesson.activity_type) {
+    const challenge = lesson.challenges?.[0]
+    return (
+      <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+        <Header />
+        <main className="flex-1 py-4 px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-2 text-sm text-slate-500 mb-4 flex-wrap">
+              <Link href="/academy" className="hover:text-slate-700">Academy</Link>
+              <ChevronRight className="w-3 h-3" />
+              <Link href={`/academy/${courseSlug}`} className="hover:text-slate-700">{course?.title}</Link>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-slate-400">{module?.title}</span>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-slate-900 font-medium">{lesson.title}</span>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-5 mb-4 shadow-sm text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Brain className="w-5 h-5" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold">{lesson.title}</h1>
+                  <p className="text-white/80 text-sm">{lesson.description}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-slate-200 p-6 mb-4 shadow-sm prose-slate max-w-none">
+              {renderTheory(lesson.theory)}
+            </div>
+
+            {challenge && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                <h3 className="font-bold text-amber-900 text-sm flex items-center gap-2 mb-1">
+                  <Zap className="w-4 h-4" /> {challenge.title}
+                </h3>
+                <p className="text-amber-800 text-sm">{challenge.description}</p>
+              </div>
+            )}
+
+            <AILab initialMode={lesson.activity_type as any} hideTabs />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8fafc]">
