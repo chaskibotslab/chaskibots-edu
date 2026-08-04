@@ -10,8 +10,9 @@ import {
   RotateCcw, Download, Sliders, Type, Palette,
   ChevronRight, Info, Sparkles, Brain, Cpu,
   Layers, Plus, Trash2, Move, ZoomIn, Sun, Moon,
-  Cog, Wrench, Loader2
+  Cog, Wrench, Loader2, AlertTriangle
 } from 'lucide-react'
+import RaymarchSDF from './RaymarchSDF'
 
 // ============================================================
 // TYPES
@@ -319,13 +320,16 @@ export default function CADLab() {
   // Text-to-3D state
   const [textInput, setTextInput] = useState('')
   const [generatedShapes, setGeneratedShapes] = useState<ShapeConfig[]>([])
+  const [aiGlsl, setAiGlsl] = useState<string | null>(null)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState<string | null>(null)
   const [textExamples] = useState([
-    'una esfera roja grande y un cubo azul metálico',
-    'un robot con un engranaje al lado',
-    'tres cilindros verdes pequeños y un cono amarillo gigante',
-    'un torus dorado brillante que gira, más una caja negra mate',
-    'un brazo robótico con una rueda',
-    'esfera de cristal, cubo de madera, cilindro metálico',
+    'un robot simple: cabeza cúbica, cuerpo cilíndrico y dos brazos',
+    'un engranaje mecánico con un agujero en el centro',
+    'una silla con cuatro patas',
+    'una taza con asa',
+    'una casa simple: cubo con techo en forma de pirámide',
+    'una mancuerna: dos esferas conectadas por un cilindro',
   ])
 
   // Current scene shapes
@@ -361,11 +365,31 @@ export default function CADLab() {
     setBuilderShapes(prev => prev.map((s, i) => i === idx ? { ...s, ...updates } : s))
   }
 
-  // Generate from text
-  const generateFromText = () => {
+  // Generate from text — instant offline preview, then replace with a real
+  // AI-generated model (actual composed SDF geometry, not just one primitive
+  // per keyword).
+  const generateFromText = async () => {
     if (!textInput.trim()) return
-    const parsed = parseText(textInput)
-    setGeneratedShapes(parsed)
+    setGeneratedShapes(parseText(textInput)) // instant fallback while AI loads
+    setAiGlsl(null)
+    setAiError(null)
+    setAiLoading(true)
+    try {
+      const res = await fetch('/api/cad-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: textInput.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setAiError(data.error || 'No se pudo generar el modelo 3D')
+      } else {
+        setAiGlsl(data.glsl)
+      }
+    } catch {
+      setAiError('Error de conexión al generar el modelo 3D')
+    }
+    setAiLoading(false)
   }
 
   // Export scene as JSON
@@ -445,7 +469,16 @@ export default function CADLab() {
             style={{ background: darkMode ? '#0f0f1a' : '#e2e8f0' }}
           >
             <Suspense fallback={null}>
-              <Scene shapes={currentShapes} darkMode={darkMode} />
+              {tab === 'text2cad' && aiGlsl ? (
+                <>
+                  <ambientLight intensity={darkMode ? 0.3 : 0.5} />
+                  <directionalLight position={[5, 8, 5]} intensity={0.8} />
+                  <RaymarchSDF glsl={aiGlsl} accentColor={darkMode ? '#22D3EE' : '#3B82F6'} bgColor={darkMode ? '#0f0f1a' : '#e2e8f0'} />
+                  <OrbitControls enablePan enableZoom enableRotate minDistance={2} maxDistance={12} />
+                </>
+              ) : (
+                <Scene shapes={currentShapes} darkMode={darkMode} />
+              )}
             </Suspense>
           </Canvas>
           {/* Overlay hints */}
@@ -453,7 +486,14 @@ export default function CADLab() {
             <span className="flex items-center gap-1"><Move className="w-3 h-3" /> Arrastrar para rotar</span>
             <span className="flex items-center gap-1"><ZoomIn className="w-3 h-3" /> Scroll para zoom</span>
           </div>
-          {currentShapes.length === 0 && (
+          {tab === 'text2cad' && aiLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
+              <div className="flex items-center gap-2 text-white text-sm bg-black/60 px-4 py-2 rounded-xl">
+                <Loader2 className="w-4 h-4 animate-spin" /> Generando modelo 3D real con IA...
+              </div>
+            </div>
+          )}
+          {!(tab === 'text2cad' && aiGlsl) && currentShapes.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <p className="text-gray-500 text-sm">Escena vacía — agrega figuras</p>
             </div>
@@ -665,8 +705,8 @@ export default function CADLab() {
                   <div>
                     <h4 className="text-green-300 text-[10px] font-bold">¿Cómo funciona?</h4>
                     <p className="text-gray-400 text-[10px] leading-relaxed mt-0.5">
-                      Escribe una descripción en español y el parser genera las figuras 3D automáticamente. 
-                      Puedes usar colores, tamaños, materiales y formas combinadas.
+                      Una IA real interpreta tu descripción en español y compone geometría 3D genuina —
+                      no solo una figura por palabra, sino formas combinadas con uniones y recortes reales.
                     </p>
                   </div>
                 </div>
@@ -676,17 +716,30 @@ export default function CADLab() {
                   <textarea
                     value={textInput}
                     onChange={(e) => setTextInput(e.target.value)}
-                    placeholder="Ej: una esfera roja grande y un cubo azul metálico..."
+                    placeholder="Ej: un robot con cabeza cúbica, cuerpo cilíndrico y dos brazos..."
                     rows={3}
                     className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-xs text-white placeholder:text-gray-500 focus:border-green-500/50 focus:outline-none resize-none"
                   />
                   <button
                     onClick={generateFromText}
-                    disabled={!textInput.trim()}
+                    disabled={!textInput.trim() || aiLoading}
                     className="mt-2 w-full px-3 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 justify-center"
                   >
-                    <Sparkles className="w-3.5 h-3.5" /> Generar 3D
+                    {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                    {aiLoading ? 'Generando...' : 'Generar 3D con IA'}
                   </button>
+                  {aiError && (
+                    <div className="mt-2 bg-red-500/10 border border-red-500/20 rounded-lg p-2 flex items-start gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <p className="text-red-300 text-[10px]">{aiError} (mostrando vista previa básica mientras tanto)</p>
+                    </div>
+                  )}
+                  {aiGlsl && !aiLoading && !aiError && (
+                    <div className="mt-2 bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-2 flex items-start gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                      <p className="text-cyan-300 text-[10px]">Modelo generado con geometría real (raymarching SDF)</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Examples */}
@@ -716,15 +769,12 @@ export default function CADLab() {
                   </div>
                 )}
 
-                {/* Supported vocabulary */}
+                {/* How the AI works */}
                 <div className="bg-gray-700/10 rounded-lg p-2.5">
-                  <h5 className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-1">Vocabulario Soportado</h5>
+                  <h5 className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-1">Geometría real, no solo primitivas sueltas</h5>
                   <div className="text-[9px] text-gray-600 space-y-1">
-                    <div><span className="text-gray-400">Formas:</span> cubo, esfera, cilindro, cono, torus, robot, engranaje, brazo, rueda</div>
-                    <div><span className="text-gray-400">Colores:</span> rojo, azul, verde, amarillo, morado, naranja, dorado, plateado...</div>
-                    <div><span className="text-gray-400">Tamaños:</span> pequeño, mediano, grande, enorme, gigante</div>
-                    <div><span className="text-gray-400">Material:</span> metálico, brillante, mate, cristal, madera, plástico</div>
-                    <div><span className="text-gray-400">Acción:</span> girar, rotar, animar</div>
+                    <div>La IA combina esferas, cajas, cilindros, conos, toros y cápsulas con operaciones booleanas reales: unión, resta e intersección — igual que un motor CAD de verdad.</div>
+                    <div>Describe formas compuestas: &quot;una silla&quot;, &quot;un engranaje con agujero&quot;, &quot;un robot con brazos&quot; — la IA decide cómo combinar las piezas.</div>
                   </div>
                 </div>
               </>
