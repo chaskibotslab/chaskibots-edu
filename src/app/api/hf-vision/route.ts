@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 // Hugging Face Inference API — real cloud AI models, no client-side download needed.
-// task: 'detect' (YOLO-family object detection), 'classify' (image classification),
-//       'caption' (describe the image in words)
+// task: 'detect' (transformer object detection, DETR), 'classify' (image classification)
+// NOTE: yolos-tiny, BLIP/GIT captioning, and CLIP zero-shot are currently NOT available
+// on HF's free "hf-inference" serverless provider (verified directly) — only these two
+// models responded successfully as of this integration.
 const MODELS = {
-  detect: 'hustvl/yolos-tiny',
+  detect: 'facebook/detr-resnet-50',
   classify: 'google/vit-base-patch16-224',
-  caption: 'Salesforce/blip-image-captioning-base',
 }
 
 const TRANSLATIONS: Record<string, string> = {
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/octet-stream',
+        'Content-Type': 'image/jpeg',
       },
       body: bytes,
       signal: AbortSignal.timeout(30000),
@@ -87,11 +88,6 @@ export async function POST(req: NextRequest) {
         .slice(0, 5)
         .map((p: any) => ({ label: translate(p.label.split(',')[0]), score: p.score }))
       return NextResponse.json({ task, predictions })
-    }
-
-    if (task === 'caption') {
-      const caption = Array.isArray(data) ? data[0]?.generated_text : data?.generated_text
-      return NextResponse.json({ task, caption: caption || 'No se pudo generar una descripción.' })
     }
 
     return NextResponse.json({ task, raw: data })

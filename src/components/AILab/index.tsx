@@ -8,7 +8,7 @@ import {
   CheckCircle2, X, Sparkles, Brain, Cpu, ChevronRight,
   Square, MousePointer2, Layers, Crosshair, ImageIcon,
   Timer, Star, Zap, Award, Info, Video, VideoOff, Cloud,
-  ScanSearch, MessageSquareText, AlertTriangle
+  ScanSearch, AlertTriangle
 } from 'lucide-react'
 
 // ============================================================
@@ -48,7 +48,7 @@ function translateLabel(label: string) {
   return TRANSLATIONS[key] || label
 }
 
-type CloudTask = 'detect' | 'classify' | 'caption'
+type CloudTask = 'detect' | 'classify'
 interface CloudDetection { label: string; score: number; box: { xmin: number; ymin: number; xmax: number; ymax: number } }
 
 // ============================================================
@@ -210,7 +210,6 @@ export default function AILab() {
   const [cloudError, setCloudError] = useState<string | null>(null)
   const [cloudDetections, setCloudDetections] = useState<CloudDetection[]>([])
   const [cloudPredictions, setCloudPredictions] = useState<{ label: string; score: number }[]>([])
-  const [cloudCaption, setCloudCaption] = useState<string | null>(null)
   const cloudFileInputRef = useRef<HTMLInputElement>(null)
   const cloudImgRef = useRef<HTMLImageElement | null>(null)
   const cloudCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -220,7 +219,6 @@ export default function AILab() {
     setCloudError(null)
     setCloudDetections([])
     setCloudPredictions([])
-    setCloudCaption(null)
     try {
       const res = await fetch('/api/hf-vision', {
         method: 'POST',
@@ -234,7 +232,6 @@ export default function AILab() {
       }
       if (task === 'detect') setCloudDetections(data.detections || [])
       if (task === 'classify') setCloudPredictions(data.predictions || [])
-      if (task === 'caption') setCloudCaption(data.caption || null)
     } catch {
       setCloudError('Error de conexión con el servidor')
     }
@@ -1069,8 +1066,8 @@ export default function AILab() {
               <div>
                 <h3 className="text-orange-300 text-sm font-bold">IA en la nube — Hugging Face</h3>
                 <p className="text-gray-400 text-xs mt-1">
-                  Sube una foto y elige qué quieres que la IA haga: detectarla con un modelo YOLO real, clasificarla,
-                  o describirla con palabras. Estos modelos corren en servidores especializados, no en tu navegador.
+                  Sube una foto y elige qué quieres que la IA haga: detectar objetos con un modelo transformer real (DETR)
+                  o clasificarla entre miles de categorías (ViT). Estos modelos corren en servidores especializados, no en tu navegador.
                 </p>
               </div>
             </div>
@@ -1078,9 +1075,8 @@ export default function AILab() {
             {/* Task selector */}
             <div className="flex gap-2 justify-center">
               {[
-                { id: 'detect' as CloudTask, label: 'Detectar (YOLO)', icon: ScanSearch },
+                { id: 'detect' as CloudTask, label: 'Detectar Objetos', icon: ScanSearch },
                 { id: 'classify' as CloudTask, label: 'Clasificar', icon: Tag },
-                { id: 'caption' as CloudTask, label: 'Describir', icon: MessageSquareText },
               ].map(t => {
                 const Icon = t.icon
                 return (
@@ -1157,12 +1153,6 @@ export default function AILab() {
                         <span className="text-gray-500 text-xs w-10">{Math.round(p.score * 100)}%</span>
                       </div>
                     ))}
-                  </div>
-                )}
-
-                {!cloudLoading && cloudTask === 'caption' && cloudCaption && (
-                  <div className="max-w-md mx-auto bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 text-center">
-                    <p className="text-orange-200 text-sm italic">"{cloudCaption}"</p>
                   </div>
                 )}
               </div>
