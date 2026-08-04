@@ -96,6 +96,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ task, raw: data })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Error inesperado' }, { status: 500 })
+    const detail = err?.cause?.message || err?.cause?.code || err?.message || 'Error inesperado'
+    console.error('[hf-vision]', err)
+    return NextResponse.json({ error: detail }, { status: 500 })
   }
 }
