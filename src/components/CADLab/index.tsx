@@ -1,23 +1,20 @@
 'use client'
 
-import { useState, useRef, useMemo, Suspense } from 'react'
+import { useState, useRef, useMemo, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, Grid, Center } from '@react-three/drei'
 import * as THREE from 'three'
 import {
-  Box, Cylinder, Triangle, Circle, Hexagon, Eye,
-  RotateCcw, Download, Sliders, Type, Palette,
-  ChevronRight, Info, Sparkles, Brain, Cpu,
-  Layers, Plus, Trash2, Move, ZoomIn, Sun, Moon,
-  Cog, Wrench, Loader2, AlertTriangle
+  Eye, RotateCcw, Download, Sliders,
+  Info, Trash2, Move, ZoomIn, Sun, Moon,
+  Cog, Loader2
 } from 'lucide-react'
-import RaymarchSDF from './RaymarchSDF'
 
 // ============================================================
 // TYPES
 // ============================================================
-type LabTab = 'viewer' | 'builder' | 'text2cad'
+type LabTab = 'viewer' | 'builder'
 
 interface ShapeConfig {
   id: string
@@ -28,7 +25,6 @@ interface ShapeConfig {
   position: [number, number, number]
   rotation: [number, number, number]
   scale: [number, number, number]
-  // Type-specific params
   width?: number
   height?: number
   depth?: number
@@ -36,6 +32,15 @@ interface ShapeConfig {
   tubeRadius?: number
   radialSegments?: number
   animate?: boolean
+}
+
+interface CadPreset {
+  id: string
+  slug: string
+  name: string
+  emoji: string
+  description: string
+  shapes: ShapeConfig[]
 }
 
 // ============================================================
@@ -47,182 +52,12 @@ const SHAPE_COLORS = [
   '#14B8A6', '#E11D48'
 ]
 
-const PRESET_MODELS: { name: string; emoji: string; desc: string; shapes: ShapeConfig[] }[] = [
-  {
-    name: 'Brazo Robótico',
-    emoji: '🦾',
-    desc: 'Brazo articulado con 3 segmentos',
-    shapes: [
-      { id: 'base', type: 'cylinder', color: '#6366F1', metalness: 0.8, roughness: 0.2, position: [0, -1.2, 0], rotation: [0, 0, 0], scale: [1, 1, 1], radius: 1.2, height: 0.4, radialSegments: 32 },
-      { id: 'joint1', type: 'sphere', color: '#8B5CF6', metalness: 0.7, roughness: 0.3, position: [0, -0.8, 0], rotation: [0, 0, 0], scale: [0.5, 0.5, 0.5], radius: 1 },
-      { id: 'arm1', type: 'box', color: '#A78BFA', metalness: 0.6, roughness: 0.3, position: [0, 0, 0], rotation: [0, 0, 0], scale: [0.4, 1.6, 0.4], width: 1, height: 1, depth: 1 },
-      { id: 'joint2', type: 'sphere', color: '#8B5CF6', metalness: 0.7, roughness: 0.3, position: [0, 0.9, 0], rotation: [0, 0, 0], scale: [0.4, 0.4, 0.4], radius: 1 },
-      { id: 'arm2', type: 'box', color: '#C4B5FD', metalness: 0.5, roughness: 0.3, position: [0.7, 1.2, 0], rotation: [0, 0, -0.8], scale: [0.3, 1.2, 0.3], width: 1, height: 1, depth: 1 },
-      { id: 'gripper', type: 'cone', color: '#EF4444', metalness: 0.6, roughness: 0.2, position: [1.3, 1.8, 0], rotation: [0, 0, -1.2], scale: [0.3, 0.6, 0.3], radius: 1, height: 1 },
-    ]
-  },
-  {
-    name: 'Engranaje',
-    emoji: '⚙️',
-    desc: 'Engranaje mecánico con dientes',
-    shapes: [
-      { id: 'gear-body', type: 'cylinder', color: '#F59E0B', metalness: 0.9, roughness: 0.1, position: [0, 0, 0], rotation: [Math.PI / 2, 0, 0], scale: [1, 1, 1], radius: 1.5, height: 0.3, radialSegments: 24, animate: true },
-      { id: 'gear-hole', type: 'cylinder', color: '#1e1e2e', metalness: 0, roughness: 1, position: [0, 0, 0], rotation: [Math.PI / 2, 0, 0], scale: [1, 1, 1], radius: 0.4, height: 0.35, radialSegments: 6 },
-      { id: 'tooth1', type: 'box', color: '#FCD34D', metalness: 0.85, roughness: 0.15, position: [1.7, 0, 0], rotation: [0, 0, 0], scale: [0.3, 0.3, 0.3] },
-      { id: 'tooth2', type: 'box', color: '#FCD34D', metalness: 0.85, roughness: 0.15, position: [-1.7, 0, 0], rotation: [0, 0, 0], scale: [0.3, 0.3, 0.3] },
-      { id: 'tooth3', type: 'box', color: '#FCD34D', metalness: 0.85, roughness: 0.15, position: [0, 0, 1.7], rotation: [0, 0, 0], scale: [0.3, 0.3, 0.3] },
-      { id: 'tooth4', type: 'box', color: '#FCD34D', metalness: 0.85, roughness: 0.15, position: [0, 0, -1.7], rotation: [0, 0, 0], scale: [0.3, 0.3, 0.3] },
-      { id: 'tooth5', type: 'box', color: '#FCD34D', metalness: 0.85, roughness: 0.15, position: [1.2, 0, 1.2], rotation: [0, Math.PI / 4, 0], scale: [0.3, 0.3, 0.3] },
-      { id: 'tooth6', type: 'box', color: '#FCD34D', metalness: 0.85, roughness: 0.15, position: [-1.2, 0, -1.2], rotation: [0, Math.PI / 4, 0], scale: [0.3, 0.3, 0.3] },
-      { id: 'tooth7', type: 'box', color: '#FCD34D', metalness: 0.85, roughness: 0.15, position: [-1.2, 0, 1.2], rotation: [0, -Math.PI / 4, 0], scale: [0.3, 0.3, 0.3] },
-      { id: 'tooth8', type: 'box', color: '#FCD34D', metalness: 0.85, roughness: 0.15, position: [1.2, 0, -1.2], rotation: [0, -Math.PI / 4, 0], scale: [0.3, 0.3, 0.3] },
-    ]
-  },
-  {
-    name: 'Robot Simple',
-    emoji: '🤖',
-    desc: 'Robot educativo con cabeza y cuerpo',
-    shapes: [
-      { id: 'body', type: 'box', color: '#3B82F6', metalness: 0.6, roughness: 0.3, position: [0, 0, 0], rotation: [0, 0, 0], scale: [1.2, 1.6, 0.8] },
-      { id: 'head', type: 'box', color: '#60A5FA', metalness: 0.5, roughness: 0.4, position: [0, 1.3, 0], rotation: [0, 0, 0], scale: [0.9, 0.9, 0.9] },
-      { id: 'eye-l', type: 'sphere', color: '#EF4444', metalness: 0.3, roughness: 0.5, position: [-0.25, 1.4, 0.45], rotation: [0, 0, 0], scale: [0.15, 0.15, 0.15], radius: 1 },
-      { id: 'eye-r', type: 'sphere', color: '#EF4444', metalness: 0.3, roughness: 0.5, position: [0.25, 1.4, 0.45], rotation: [0, 0, 0], scale: [0.15, 0.15, 0.15], radius: 1 },
-      { id: 'antenna', type: 'cylinder', color: '#F59E0B', metalness: 0.7, roughness: 0.2, position: [0, 2.0, 0], rotation: [0, 0, 0], scale: [1, 1, 1], radius: 0.05, height: 0.6, radialSegments: 8 },
-      { id: 'ant-tip', type: 'sphere', color: '#F59E0B', metalness: 0.8, roughness: 0.1, position: [0, 2.35, 0], rotation: [0, 0, 0], scale: [0.12, 0.12, 0.12], radius: 1 },
-      { id: 'arm-l', type: 'box', color: '#2563EB', metalness: 0.5, roughness: 0.3, position: [-0.9, 0.1, 0], rotation: [0, 0, 0.2], scale: [0.25, 1.2, 0.25] },
-      { id: 'arm-r', type: 'box', color: '#2563EB', metalness: 0.5, roughness: 0.3, position: [0.9, 0.1, 0], rotation: [0, 0, -0.2], scale: [0.25, 1.2, 0.25] },
-      { id: 'leg-l', type: 'box', color: '#1D4ED8', metalness: 0.5, roughness: 0.3, position: [-0.35, -1.3, 0], rotation: [0, 0, 0], scale: [0.3, 1, 0.35] },
-      { id: 'leg-r', type: 'box', color: '#1D4ED8', metalness: 0.5, roughness: 0.3, position: [0.35, -1.3, 0], rotation: [0, 0, 0], scale: [0.3, 1, 0.35] },
-    ]
-  },
-  {
-    name: 'Rueda con Eje',
-    emoji: '🛞',
-    desc: 'Componente mecánico básico',
-    shapes: [
-      { id: 'wheel', type: 'torus', color: '#1e293b', metalness: 0.3, roughness: 0.8, position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1], radius: 1.2, tubeRadius: 0.35, radialSegments: 24, animate: true },
-      { id: 'hub', type: 'cylinder', color: '#94A3B8', metalness: 0.8, roughness: 0.2, position: [0, 0, 0], rotation: [Math.PI / 2, 0, 0], scale: [1, 1, 1], radius: 0.5, height: 0.4, radialSegments: 16 },
-      { id: 'axle', type: 'cylinder', color: '#CBD5E1', metalness: 0.9, roughness: 0.1, position: [0, 0, 0], rotation: [Math.PI / 2, 0, 0], scale: [1, 1, 1], radius: 0.1, height: 2.5, radialSegments: 12, animate: true },
-    ]
-  },
-]
-
-// ============================================================
-// TEXT-TO-3D PARSER (Spanish → ShapeConfig[])
-// ============================================================
-function parseText(input: string): ShapeConfig[] {
-  const text = input.toLowerCase().trim()
-  const shapes: ShapeConfig[] = []
-  let xOffset = 0
-
-  // Detect color
-  const colorMap: Record<string, string> = {
-    rojo: '#EF4444', azul: '#3B82F6', verde: '#10B981', amarillo: '#F59E0B',
-    morado: '#8B5CF6', rosado: '#EC4899', naranja: '#F97316', cyan: '#06B6D4',
-    blanco: '#F1F5F9', negro: '#1e293b', gris: '#6B7280', dorado: '#FCD34D',
-    plateado: '#CBD5E1', violeta: '#7C3AED', rosa: '#F472B6', turquesa: '#2DD4BF',
-  }
-  const sizeMap: Record<string, number> = {
-    'muy pequeño': 0.3, pequeño: 0.5, mediano: 1, grande: 1.5, 'muy grande': 2, enorme: 2.5, gigante: 3,
-  }
-  const materialMap: Record<string, { metalness: number; roughness: number }> = {
-    'metálico': { metalness: 0.9, roughness: 0.1 }, metal: { metalness: 0.9, roughness: 0.1 },
-    brillante: { metalness: 0.7, roughness: 0.2 }, mate: { metalness: 0.1, roughness: 0.9 },
-    cristal: { metalness: 0.2, roughness: 0.05 }, madera: { metalness: 0, roughness: 0.95 },
-    plástico: { metalness: 0.1, roughness: 0.6 },
-  }
-
-  // Split by common connectors
-  const parts = text.split(/(?:,|\sy\s|\scon\s|\smás\s|\s\+\s|\ssobre\s|\sal lado de\s)/g).filter(Boolean)
-
-  for (const part of parts) {
-    const p = part.trim()
-    if (!p) continue
-
-    // Determine type
-    let type: ShapeConfig['type'] = 'box'
-    if (/esfera|bola|pelota|balón|planeta|órbita/.test(p)) type = 'sphere'
-    else if (/cilindro|tubo|pilar|columna|palo/.test(p)) type = 'cylinder'
-    else if (/cono|pirámide|triángulo|punta/.test(p)) type = 'cone'
-    else if (/torus|anillo|dona|rosquilla|aro|rueda|llanta/.test(p)) type = 'torus'
-    else if (/cápsula|pastilla|óvalo/.test(p)) type = 'capsule'
-    else if (/cubo|caja|bloque|ladrillo|rectángulo/.test(p)) type = 'box'
-    // Compound objects
-    else if (/robot/.test(p)) {
-      shapes.push(...PRESET_MODELS[2].shapes.map(s => ({ ...s, id: `${s.id}-${Date.now()}`, position: [s.position[0] + xOffset, s.position[1], s.position[2]] as [number, number, number] })))
-      xOffset += 3
-      continue
-    } else if (/engranaje|gear/.test(p)) {
-      shapes.push(...PRESET_MODELS[1].shapes.map(s => ({ ...s, id: `${s.id}-${Date.now()}`, position: [s.position[0] + xOffset, s.position[1], s.position[2]] as [number, number, number] })))
-      xOffset += 4
-      continue
-    } else if (/brazo/.test(p)) {
-      shapes.push(...PRESET_MODELS[0].shapes.map(s => ({ ...s, id: `${s.id}-${Date.now()}`, position: [s.position[0] + xOffset, s.position[1], s.position[2]] as [number, number, number] })))
-      xOffset += 3
-      continue
-    } else if (/rueda|llanta/.test(p)) {
-      shapes.push(...PRESET_MODELS[3].shapes.map(s => ({ ...s, id: `${s.id}-${Date.now()}`, position: [s.position[0] + xOffset, s.position[1], s.position[2]] as [number, number, number] })))
-      xOffset += 3
-      continue
-    }
-
-    // Find color
-    let color = SHAPE_COLORS[shapes.length % SHAPE_COLORS.length]
-    for (const [name, hex] of Object.entries(colorMap)) {
-      if (p.includes(name)) { color = hex; break }
-    }
-
-    // Find size
-    let size = 1
-    for (const [name, s] of Object.entries(sizeMap)) {
-      if (p.includes(name)) { size = s; break }
-    }
-
-    // Find material
-    let metalness = 0.4, roughness = 0.5
-    for (const [name, mat] of Object.entries(materialMap)) {
-      if (p.includes(name)) { metalness = mat.metalness; roughness = mat.roughness; break }
-    }
-
-    // Animate?
-    const animate = /girar|rotar|animar|movimiento|gira|rota/.test(p)
-
-    shapes.push({
-      id: `shape-${Date.now()}-${shapes.length}`,
-      type,
-      color,
-      metalness,
-      roughness,
-      position: [xOffset, 0, 0],
-      rotation: [0, 0, 0],
-      scale: [size, size, size],
-      radius: 1,
-      height: 1,
-      tubeRadius: 0.35,
-      radialSegments: 32,
-      animate,
-    })
-    xOffset += size * 2.5
-  }
-
-  return shapes.length > 0 ? shapes : [{
-    id: 'default',
-    type: 'box',
-    color: '#3B82F6',
-    metalness: 0.4,
-    roughness: 0.5,
-    position: [0, 0, 0],
-    rotation: [0, 0, 0],
-    scale: [1, 1, 1],
-  }]
-}
-
 // ============================================================
 // 3D SHAPE COMPONENT
 // ============================================================
 function Shape3D({ config }: { config: ShapeConfig }) {
   const meshRef = useRef<THREE.Mesh>(null!)
-  
+
   useFrame((_, delta) => {
     if (config.animate && meshRef.current) {
       meshRef.current.rotation.y += delta * 0.5
@@ -308,8 +143,18 @@ export default function CADLab() {
   const [tab, setTab] = useState<LabTab>('viewer')
   const [darkMode, setDarkMode] = useState(true)
 
-  // Viewer state
+  // Viewer state — presets loaded from Supabase (admin-editable, no redeploy needed)
+  const [presets, setPresets] = useState<CadPreset[]>([])
+  const [presetsLoading, setPresetsLoading] = useState(true)
   const [selectedPreset, setSelectedPreset] = useState(0)
+
+  useEffect(() => {
+    fetch('/api/cad-presets')
+      .then(r => r.json())
+      .then(data => setPresets(data.presets || []))
+      .catch(() => setPresets([]))
+      .finally(() => setPresetsLoading(false))
+  }, [])
 
   // Builder state
   const [builderShapes, setBuilderShapes] = useState<ShapeConfig[]>([
@@ -317,25 +162,8 @@ export default function CADLab() {
   ])
   const [selectedShapeIdx, setSelectedShapeIdx] = useState(0)
 
-  // Text-to-3D state
-  const [textInput, setTextInput] = useState('')
-  const [generatedShapes, setGeneratedShapes] = useState<ShapeConfig[]>([])
-  const [aiGlsl, setAiGlsl] = useState<string | null>(null)
-  const [aiLoading, setAiLoading] = useState(false)
-  const [aiError, setAiError] = useState<string | null>(null)
-  const [textExamples] = useState([
-    'un robot simple: cabeza cúbica, cuerpo cilíndrico y dos brazos',
-    'un engranaje mecánico con un agujero en el centro',
-    'una silla con cuatro patas',
-    'una taza con asa',
-    'una casa simple: cubo con techo en forma de pirámide',
-    'una mancuerna: dos esferas conectadas por un cilindro',
-  ])
-
   // Current scene shapes
-  const currentShapes = tab === 'viewer' ? PRESET_MODELS[selectedPreset].shapes
-    : tab === 'builder' ? builderShapes
-    : generatedShapes
+  const currentShapes = tab === 'viewer' ? (presets[selectedPreset]?.shapes || []) : builderShapes
 
   // Builder: add shape
   const addShape = (type: ShapeConfig['type']) => {
@@ -365,33 +193,6 @@ export default function CADLab() {
     setBuilderShapes(prev => prev.map((s, i) => i === idx ? { ...s, ...updates } : s))
   }
 
-  // Generate from text — instant offline preview, then replace with a real
-  // AI-generated model (actual composed SDF geometry, not just one primitive
-  // per keyword).
-  const generateFromText = async () => {
-    if (!textInput.trim()) return
-    setGeneratedShapes(parseText(textInput)) // instant fallback while AI loads
-    setAiGlsl(null)
-    setAiError(null)
-    setAiLoading(true)
-    try {
-      const res = await fetch('/api/cad-generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: textInput.trim() }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setAiError(data.error || 'No se pudo generar el modelo 3D')
-      } else {
-        setAiGlsl(data.glsl)
-      }
-    } catch {
-      setAiError('Error de conexión al generar el modelo 3D')
-    }
-    setAiLoading(false)
-  }
-
   // Export scene as JSON
   const exportScene = () => {
     const data = { shapes: currentShapes, exportedAt: new Date().toISOString() }
@@ -409,7 +210,6 @@ export default function CADLab() {
   const tabs = [
     { id: 'viewer' as LabTab, label: 'Visor 3D', icon: Eye, desc: 'Explora modelos prediseñados' },
     { id: 'builder' as LabTab, label: 'Constructor', icon: Sliders, desc: 'Crea figuras con parámetros' },
-    { id: 'text2cad' as LabTab, label: 'Texto → 3D', icon: Type, desc: 'Describe y genera en 3D' },
   ]
 
   return (
@@ -469,16 +269,7 @@ export default function CADLab() {
             style={{ background: darkMode ? '#0f0f1a' : '#e2e8f0' }}
           >
             <Suspense fallback={null}>
-              {tab === 'text2cad' && aiGlsl ? (
-                <>
-                  <ambientLight intensity={darkMode ? 0.3 : 0.5} />
-                  <directionalLight position={[5, 8, 5]} intensity={0.8} />
-                  <RaymarchSDF glsl={aiGlsl} accentColor={darkMode ? '#22D3EE' : '#3B82F6'} bgColor={darkMode ? '#0f0f1a' : '#e2e8f0'} />
-                  <OrbitControls enablePan enableZoom enableRotate minDistance={2} maxDistance={12} />
-                </>
-              ) : (
-                <Scene shapes={currentShapes} darkMode={darkMode} />
-              )}
+              <Scene shapes={currentShapes} darkMode={darkMode} />
             </Suspense>
           </Canvas>
           {/* Overlay hints */}
@@ -486,14 +277,12 @@ export default function CADLab() {
             <span className="flex items-center gap-1"><Move className="w-3 h-3" /> Arrastrar para rotar</span>
             <span className="flex items-center gap-1"><ZoomIn className="w-3 h-3" /> Scroll para zoom</span>
           </div>
-          {tab === 'text2cad' && aiLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
-              <div className="flex items-center gap-2 text-white text-sm bg-black/60 px-4 py-2 rounded-xl">
-                <Loader2 className="w-4 h-4 animate-spin" /> Generando modelo 3D real con IA...
-              </div>
+          {tab === 'viewer' && presetsLoading && (
+            <div className="absolute inset-0 flex items-center justify-center gap-2 text-gray-400 text-sm pointer-events-none">
+              <Loader2 className="w-4 h-4 animate-spin" /> Cargando modelos...
             </div>
           )}
-          {!(tab === 'text2cad' && aiGlsl) && currentShapes.length === 0 && (
+          {!presetsLoading && currentShapes.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <p className="text-gray-500 text-sm">Escena vacía — agrega figuras</p>
             </div>
@@ -515,9 +304,9 @@ export default function CADLab() {
                 </div>
                 <h4 className="text-white text-xs font-bold">Modelos Disponibles</h4>
                 <div className="space-y-1.5">
-                  {PRESET_MODELS.map((model, idx) => (
+                  {presets.map((model, idx) => (
                     <button
-                      key={idx}
+                      key={model.id}
                       onClick={() => setSelectedPreset(idx)}
                       className={`w-full text-left px-3 py-2.5 rounded-lg transition-all ${
                         selectedPreset === idx
@@ -529,21 +318,23 @@ export default function CADLab() {
                         <span className="text-lg">{model.emoji}</span>
                         <div>
                           <div className="text-gray-200 text-xs font-medium">{model.name}</div>
-                          <div className="text-gray-500 text-[10px]">{model.desc}</div>
+                          <div className="text-gray-500 text-[10px]">{model.description}</div>
                         </div>
                       </div>
                       <div className="text-[9px] text-gray-600 mt-1">{model.shapes.length} piezas</div>
                     </button>
                   ))}
                 </div>
-                <div className="bg-gray-700/20 rounded-lg p-2.5">
-                  <h5 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Info del modelo</h5>
-                  <div className="text-[10px] text-gray-500 space-y-0.5">
-                    <div>Piezas: <span className="text-white">{PRESET_MODELS[selectedPreset].shapes.length}</span></div>
-                    <div>Tipos: <span className="text-white">{new Set(PRESET_MODELS[selectedPreset].shapes.map(s => s.type)).size}</span></div>
-                    <div>Animadas: <span className="text-white">{PRESET_MODELS[selectedPreset].shapes.filter(s => s.animate).length}</span></div>
+                {presets[selectedPreset] && (
+                  <div className="bg-gray-700/20 rounded-lg p-2.5">
+                    <h5 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Info del modelo</h5>
+                    <div className="text-[10px] text-gray-500 space-y-0.5">
+                      <div>Piezas: <span className="text-white">{presets[selectedPreset].shapes.length}</span></div>
+                      <div>Tipos: <span className="text-white">{new Set(presets[selectedPreset].shapes.map(s => s.type)).size}</span></div>
+                      <div>Animadas: <span className="text-white">{presets[selectedPreset].shapes.filter(s => s.animate).length}</span></div>
+                    </div>
                   </div>
-                </div>
+                )}
               </>
             )}
 
@@ -694,89 +485,6 @@ export default function CADLab() {
                 <button onClick={() => setBuilderShapes([])} className="w-full text-[10px] px-2.5 py-1.5 bg-gray-700/30 hover:bg-gray-700/50 text-gray-500 rounded-lg transition-colors flex items-center gap-1 justify-center">
                   <RotateCcw className="w-3 h-3" /> Limpiar escena
                 </button>
-              </>
-            )}
-
-            {/* ── TEXT-TO-3D TAB PANEL ── */}
-            {tab === 'text2cad' && (
-              <>
-                <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-2.5 flex items-start gap-2">
-                  <Info className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="text-green-300 text-[10px] font-bold">¿Cómo funciona?</h4>
-                    <p className="text-gray-400 text-[10px] leading-relaxed mt-0.5">
-                      Una IA real interpreta tu descripción en español y compone geometría 3D genuina —
-                      no solo una figura por palabra, sino formas combinadas con uniones y recortes reales.
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-gray-300 text-[10px] font-bold uppercase tracking-wider mb-1 block">Describe tu modelo</label>
-                  <textarea
-                    value={textInput}
-                    onChange={(e) => setTextInput(e.target.value)}
-                    placeholder="Ej: un robot con cabeza cúbica, cuerpo cilíndrico y dos brazos..."
-                    rows={3}
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-xs text-white placeholder:text-gray-500 focus:border-green-500/50 focus:outline-none resize-none"
-                  />
-                  <button
-                    onClick={generateFromText}
-                    disabled={!textInput.trim() || aiLoading}
-                    className="mt-2 w-full px-3 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 justify-center"
-                  >
-                    {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                    {aiLoading ? 'Generando...' : 'Generar 3D con IA'}
-                  </button>
-                  {aiError && (
-                    <div className="mt-2 bg-red-500/10 border border-red-500/20 rounded-lg p-2 flex items-start gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-400 flex-shrink-0 mt-0.5" />
-                      <p className="text-red-300 text-[10px]">{aiError} (mostrando vista previa básica mientras tanto)</p>
-                    </div>
-                  )}
-                  {aiGlsl && !aiLoading && !aiError && (
-                    <div className="mt-2 bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-2 flex items-start gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0 mt-0.5" />
-                      <p className="text-cyan-300 text-[10px]">Modelo generado con geometría real (raymarching SDF)</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Examples */}
-                <div>
-                  <h4 className="text-gray-300 text-[10px] font-bold uppercase tracking-wider mb-1.5">Ejemplos</h4>
-                  <div className="space-y-1">
-                    {textExamples.map((ex, i) => (
-                      <button
-                        key={i}
-                        onClick={() => { setTextInput(ex); }}
-                        className="w-full text-left px-2.5 py-1.5 bg-gray-700/20 hover:bg-gray-700/40 text-gray-400 hover:text-gray-300 rounded-lg text-[10px] transition-colors"
-                      >
-                        &quot;{ex}&quot;
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Generated info */}
-                {generatedShapes.length > 0 && (
-                  <div className="bg-gray-700/20 rounded-lg p-2.5">
-                    <h5 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Resultado</h5>
-                    <div className="text-[10px] text-gray-500 space-y-0.5">
-                      <div>Figuras generadas: <span className="text-white">{generatedShapes.length}</span></div>
-                      <div>Tipos: <span className="text-white">{Array.from(new Set(generatedShapes.map(s => s.type))).join(', ')}</span></div>
-                    </div>
-                  </div>
-                )}
-
-                {/* How the AI works */}
-                <div className="bg-gray-700/10 rounded-lg p-2.5">
-                  <h5 className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-1">Geometría real, no solo primitivas sueltas</h5>
-                  <div className="text-[9px] text-gray-600 space-y-1">
-                    <div>La IA combina esferas, cajas, cilindros, conos, toros y cápsulas con operaciones booleanas reales: unión, resta e intersección — igual que un motor CAD de verdad.</div>
-                    <div>Describe formas compuestas: &quot;una silla&quot;, &quot;un engranaje con agujero&quot;, &quot;un robot con brazos&quot; — la IA decide cómo combinar las piezas.</div>
-                  </div>
-                </div>
               </>
             )}
 

@@ -8,7 +8,7 @@ import {
   CheckCircle2, X, Sparkles, Brain, Cpu, ChevronRight,
   Square, MousePointer2, Layers, Crosshair, ImageIcon,
   Timer, Star, Zap, Award, Info, Video, VideoOff, Cloud,
-  ScanSearch, AlertTriangle, GraduationCap, PersonStanding, Mic, Crosshair as YoloIcon
+  ScanSearch, AlertTriangle, GraduationCap, PersonStanding, Mic, Crosshair as YoloIcon, Box
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
@@ -16,6 +16,7 @@ const TeachableMachine = dynamic(() => import('./TeachableMachine'), { ssr: fals
 const PoseGame = dynamic(() => import('./PoseGame'), { ssr: false })
 const VoiceLab = dynamic(() => import('./VoiceLab'), { ssr: false })
 const YoloLive = dynamic(() => import('./YoloLive'), { ssr: false })
+const CadGenerator = dynamic(() => import('./CadGenerator'), { ssr: false })
 
 // ============================================================
 // TYPES
@@ -37,7 +38,7 @@ interface SegmentResult {
   percentage: number
 }
 
-type LabMode = 'annotator' | 'segmentation' | 'challenge' | 'live' | 'cloud' | 'teach' | 'pose' | 'voice' | 'yolo'
+type LabMode = 'annotator' | 'segmentation' | 'challenge' | 'live' | 'cloud' | 'teach' | 'pose' | 'voice' | 'yolo' | 'cad'
 
 const TRANSLATIONS: Record<string, string> = {
   person: 'persona', bicycle: 'bicicleta', car: 'carro', motorcycle: 'motocicleta',
@@ -562,6 +563,7 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
     { id: 'teach' as LabMode, label: 'Entrena tu IA', icon: GraduationCap, color: 'text-emerald-400', desc: 'Enseña tus propias categorías' },
     { id: 'pose' as LabMode, label: 'Postura Corporal', icon: PersonStanding, color: 'text-violet-400', desc: 'Detección de movimiento en vivo' },
     { id: 'voice' as LabMode, label: 'IA de Voz', icon: Mic, color: 'text-pink-400', desc: 'Transcripción y palabras clave' },
+    { id: 'cad' as LabMode, label: 'Texto → 3D', icon: Box, color: 'text-rose-400', desc: 'Genera modelos 3D reales con IA' },
   ]
 
   return (
@@ -580,7 +582,7 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 font-medium flex items-center gap-1">
-            <Sparkles className="w-3 h-3" /> 9 Actividades
+            <Sparkles className="w-3 h-3" /> 10 Actividades
           </span>
         </div>
       </div>
@@ -1188,6 +1190,9 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
 
         {/* ─── VOICE LAB MODE ─── */}
         {mode === 'voice' && <VoiceLab />}
+
+        {/* ─── CAD GENERATOR MODE ─── */}
+        {mode === 'cad' && <CadGenerator />}
       </div>
 
       {/* Hidden file input */}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ALLOWED_CALLS } from '@/components/CADLab/sdfShaderLib'
+import { ALLOWED_CALLS } from '@/components/AILab/sdfShaderLib'
 
 export const dynamic = 'force-dynamic'
 
