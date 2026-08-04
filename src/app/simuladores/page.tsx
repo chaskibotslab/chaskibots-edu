@@ -4,7 +4,7 @@ import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { Code, Copy, Check, Terminal, Lightbulb, BookOpen, Download, Loader2, Brain } from 'lucide-react'
+import { Code, Copy, Check, Terminal, Lightbulb, BookOpen, Download, Loader2, Brain, Cog } from 'lucide-react'
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
@@ -29,6 +29,11 @@ const PythonIDE = dynamic(() => import('@/components/PythonIDE'), {
 })
 
 const AILab = dynamic(() => import('@/components/AILab'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
+const CADLab = dynamic(() => import('@/components/CADLab'), {
   loading: () => <LoadingSpinner />,
   ssr: false
 })
@@ -303,6 +308,20 @@ for i in range(1, 11):
               </div>
             </div>
             <AILab />
+          </div>
+
+          {/* CAD Lab 3D */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-cyan-500/20">
+                <Cog className="w-6 h-6 text-cyan-500" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Laboratorio CAD 3D</h2>
+                <p className="text-slate-500 text-sm">Visor 3D interactivo, constructor paramétrico y texto a 3D</p>
+              </div>
+            </div>
+            <CADLab />
           </div>
 
           <SimulatorTabs />
