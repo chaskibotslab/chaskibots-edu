@@ -63,8 +63,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: isLoading
-            ? 'El modelo se está iniciando en Hugging Face (primera llamada tarda ~20s). Intenta de nuevo en unos segundos.'
-            : `Error de Hugging Face: ${text.slice(0, 200)}`,
+            ? 'El modelo de IA se está iniciando (primera llamada tarda ~20s). Intenta de nuevo en unos segundos.'
+            : 'El modelo de IA no pudo procesar la imagen. Intenta con otra foto.',
         },
         { status: isLoading ? 503 : 502 }
       )

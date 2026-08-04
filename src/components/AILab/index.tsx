@@ -227,7 +227,7 @@ export default function AILab() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setCloudError(data.error || 'Error consultando Hugging Face')
+        setCloudError(data.error || 'Error consultando el modelo de IA')
         return
       }
       if (task === 'detect') setCloudDetections(data.detections || [])
@@ -546,7 +546,7 @@ export default function AILab() {
     { id: 'segmentation' as LabMode, label: 'Segmentación', icon: Layers, color: 'text-purple-400', desc: 'Segmentación por color' },
     { id: 'challenge' as LabMode, label: 'Desafío IA', icon: Trophy, color: 'text-yellow-400', desc: 'Compite contra la IA' },
     { id: 'live' as LabMode, label: 'Visión en Vivo', icon: Video, color: 'text-cyan-400', desc: 'Detección real con tu cámara' },
-    { id: 'cloud' as LabMode, label: 'IA en la Nube', icon: Cloud, color: 'text-orange-400', desc: 'Modelos reales de Hugging Face' },
+    { id: 'cloud' as LabMode, label: 'IA en la Nube', icon: Cloud, color: 'text-orange-400', desc: 'Modelos de IA reales en la nube' },
   ]
 
   return (
@@ -1064,7 +1064,7 @@ export default function AILab() {
             <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 flex items-start gap-3">
               <Info className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-orange-300 text-sm font-bold">IA en la nube — Hugging Face</h3>
+                <h3 className="text-orange-300 text-sm font-bold">IA en la Nube — ChaskiBots</h3>
                 <p className="text-gray-400 text-xs mt-1">
                   Sube una foto y elige qué quieres que la IA haga: detectar objetos con un modelo transformer real (DETR)
                   o clasificarla entre miles de categorías (ViT). Estos modelos corren en servidores especializados, no en tu navegador.
@@ -1115,7 +1115,7 @@ export default function AILab() {
                   {cloudLoading && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/60">
                       <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
-                      <p className="text-gray-300 text-xs">Consultando modelo en Hugging Face...</p>
+                      <p className="text-gray-300 text-xs">Consultando modelo de IA en la nube...</p>
                     </div>
                   )}
                 </div>
