@@ -47,6 +47,39 @@ float sdCapsule(vec3 p, vec3 a, vec3 b, float radius) {
   return length(pa - ba * h) - radius;
 }
 
+float sdEllipsoid(vec3 p, vec3 center, vec3 radii) {
+  vec3 q = (p - center) / radii;
+  float k0 = length(q);
+  float k1 = length(q / radii);
+  return k0 * (k0 - 1.0) / max(k1, 0.0001);
+}
+
+float sdOctahedron(vec3 p, vec3 center, float s) {
+  vec3 q = abs(p - center);
+  float m = q.x + q.y + q.z - s;
+  vec3 r;
+  if (3.0 * q.x < m) r = q;
+  else if (3.0 * q.y < m) r = q.yzx;
+  else if (3.0 * q.z < m) r = q.zxy;
+  else return m * 0.57735027;
+  float k = clamp(0.5 * (r.z - r.y + s), 0.0, s);
+  return length(vec3(r.x, r.y - s + k, r.z - k));
+}
+
+float sdHexPrism(vec3 p, vec3 center, float radius, float height) {
+  vec3 q = abs(p - center);
+  const vec3 k = vec3(-0.8660254, 0.5, 0.57735);
+  vec2 qxy = q.xy - 2.0 * min(dot(k.xy, q.xy), 0.0) * k.xy;
+  vec2 d = vec2(
+    length(qxy - vec2(clamp(qxy.x, -k.z * radius, k.z * radius), radius)) * sign(qxy.y - radius),
+    q.z - height * 0.5
+  );
+  return min(max(d.x, d.y), 0.0) + length(max(d, 0.0));
+}
+
+float opRound(float d, float r) { return d - r; }
+float opOnion(float d, float thickness) { return abs(d) - thickness; }
+
 float opUnion(float d1, float d2) { return min(d1, d2); }
 float opSubtract(float base, float cutter) { return max(base, -cutter); }
 float opIntersect(float d1, float d2) { return max(d1, d2); }
@@ -146,6 +179,11 @@ void main() {
 // server-side safety check before this text is ever compiled as a shader.
 export const ALLOWED_CALLS = [
   'sdSphere', 'sdBox', 'sdRoundBox', 'sdCylinder', 'sdCone', 'sdTorus', 'sdCapsule',
-  'opUnion', 'opSubtract', 'opIntersect', 'opSmoothUnion', 'opSmoothSubtract',
+  'sdEllipsoid', 'sdOctahedron', 'sdHexPrism',
+  'opUnion', 'opSubtract', 'opIntersect', 'opSmoothUnion', 'opSmoothSubtract', 'opRound', 'opOnion',
   'rotateX', 'rotateY', 'rotateZ',
 ]
+
+// GLSL language keywords/control-flow that the call-site scanner must not
+// mistake for unknown function names (e.g. "for (" looks like a call).
+export const GLSL_KEYWORDS = ['for', 'if', 'else', 'while', 'return', 'true', 'false']

@@ -19,6 +19,7 @@ const EXAMPLES = [
 export default function CadGenerator() {
   const [textInput, setTextInput] = useState('')
   const [glsl, setGlsl] = useState<string | null>(null)
+  const [glslPrompt, setGlslPrompt] = useState<string | null>(null) // what description produced `glsl`
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -37,6 +38,7 @@ export default function CadGenerator() {
         setError(data.error || 'No se pudo generar el modelo 3D')
       } else {
         setGlsl(data.glsl)
+        setGlslPrompt(textInput.trim())
       }
     } catch {
       setError('Error de conexión al generar el modelo 3D')
@@ -84,6 +86,12 @@ export default function CadGenerator() {
               </div>
             )}
           </div>
+          {glsl && !loading && (
+            <p className="text-gray-500 text-[10px] mt-1.5">
+              Mostrando: <span className="text-gray-400">&quot;{glslPrompt}&quot;</span>
+              {error && <span className="text-amber-400"> — este es el último resultado válido, tu último intento falló (ver error)</span>}
+            </p>
+          )}
         </div>
 
         {/* Controls */}
