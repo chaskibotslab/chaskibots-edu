@@ -17,6 +17,14 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    // Some browser-only ML packages (@tensorflow-models/speech-commands) reference
+    // Node built-ins in unused code paths; stub them out for the client bundle.
+    if (!isServer) {
+      config.resolve.fallback = { ...config.resolve.fallback, fs: false, path: false, crypto: false }
+    }
+    return config
+  },
   async headers() {
     return [
       {

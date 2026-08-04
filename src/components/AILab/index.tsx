@@ -8,8 +8,14 @@ import {
   CheckCircle2, X, Sparkles, Brain, Cpu, ChevronRight,
   Square, MousePointer2, Layers, Crosshair, ImageIcon,
   Timer, Star, Zap, Award, Info, Video, VideoOff, Cloud,
-  ScanSearch, AlertTriangle
+  ScanSearch, AlertTriangle, GraduationCap, PersonStanding, Mic, Crosshair as YoloIcon
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+const TeachableMachine = dynamic(() => import('./TeachableMachine'), { ssr: false })
+const PoseGame = dynamic(() => import('./PoseGame'), { ssr: false })
+const VoiceLab = dynamic(() => import('./VoiceLab'), { ssr: false })
+const YoloLive = dynamic(() => import('./YoloLive'), { ssr: false })
 
 // ============================================================
 // TYPES
@@ -31,7 +37,7 @@ interface SegmentResult {
   percentage: number
 }
 
-type LabMode = 'annotator' | 'segmentation' | 'challenge' | 'live' | 'cloud'
+type LabMode = 'annotator' | 'segmentation' | 'challenge' | 'live' | 'cloud' | 'teach' | 'pose' | 'voice' | 'yolo'
 
 const TRANSLATIONS: Record<string, string> = {
   person: 'persona', bicycle: 'bicicleta', car: 'carro', motorcycle: 'motocicleta',
@@ -552,6 +558,10 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
     { id: 'challenge' as LabMode, label: 'Desafío IA', icon: Trophy, color: 'text-yellow-400', desc: 'Compite contra la IA' },
     { id: 'live' as LabMode, label: 'Visión en Vivo', icon: Video, color: 'text-cyan-400', desc: 'Detección real con tu cámara' },
     { id: 'cloud' as LabMode, label: 'IA en la Nube', icon: Cloud, color: 'text-orange-400', desc: 'Modelos de IA reales en la nube' },
+    { id: 'yolo' as LabMode, label: 'YOLO en Vivo', icon: YoloIcon, color: 'text-rose-400', desc: 'Detección YOLO real en tu navegador' },
+    { id: 'teach' as LabMode, label: 'Entrena tu IA', icon: GraduationCap, color: 'text-emerald-400', desc: 'Enseña tus propias categorías' },
+    { id: 'pose' as LabMode, label: 'Postura Corporal', icon: PersonStanding, color: 'text-violet-400', desc: 'Detección de movimiento en vivo' },
+    { id: 'voice' as LabMode, label: 'IA de Voz', icon: Mic, color: 'text-pink-400', desc: 'Transcripción y palabras clave' },
   ]
 
   return (
@@ -570,7 +580,7 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 font-medium flex items-center gap-1">
-            <Sparkles className="w-3 h-3" /> 5 Actividades
+            <Sparkles className="w-3 h-3" /> 9 Actividades
           </span>
         </div>
       </div>
@@ -1166,6 +1176,18 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
             <input ref={cloudFileInputRef} type="file" accept="image/*" onChange={handleCloudUpload} className="hidden" />
           </div>
         )}
+
+        {/* ─── YOLO LIVE MODE ─── */}
+        {mode === 'yolo' && <YoloLive />}
+
+        {/* ─── TEACHABLE MACHINE MODE ─── */}
+        {mode === 'teach' && <TeachableMachine />}
+
+        {/* ─── POSE GAME MODE ─── */}
+        {mode === 'pose' && <PoseGame />}
+
+        {/* ─── VOICE LAB MODE ─── */}
+        {mode === 'voice' && <VoiceLab />}
       </div>
 
       {/* Hidden file input */}
