@@ -13,12 +13,7 @@ const LoadingSpinner = () => (
   </div>
 )
 
-const SimulatorTabs = dynamic(() => import('@/components/SimulatorTabs'), {
-  loading: () => <LoadingSpinner />,
-  ssr: false
-})
-
-const PythonSimulator = dynamic(() => import('@/components/PythonSimulator'), {
+const SimulatorTabsDynamic = dynamic(() => import('@/components/SimulatorTabsDynamic'), {
   loading: () => <LoadingSpinner />,
   ssr: false
 })
@@ -324,7 +319,7 @@ for i in range(1, 11):
             <CADLab />
           </div>
 
-          <SimulatorTabs />
+          <SimulatorTabsDynamic />
 
           {/* Tip */}
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">

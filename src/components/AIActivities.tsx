@@ -6,12 +6,12 @@ import {
   BookOpen, Zap, Shield, Brain, Camera, Pencil, Upload, Eye
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import PythonSimulator from './activities/PythonSimulator'
 import RobloxEditor from './activities/RobloxEditor'
 import HackingTerminal from './activities/HackingTerminal'
 
-// AIVision cargado dinámicamente para evitar problemas con TensorFlow en SSR
-const AIVision = dynamic(() => import('./AIVision'), { ssr: false })
+// Cargados dinámicamente: son pesados (Monaco+Pyodide, TensorFlow) y no deben entrar al bundle SSR
+const PythonIDE = dynamic(() => import('./PythonIDE'), { ssr: false })
+const AILab = dynamic(() => import('./AILab'), { ssr: false })
 
 interface AIActivitiesProps {
   levelId: string
@@ -121,9 +121,9 @@ export default function AIActivities({ levelId }: AIActivitiesProps) {
   const renderActivity = () => {
     switch (activeActivity) {
       case 'ai-vision':
-        return <AIVision levelId={levelId} />
+        return <AILab />
       case 'python':
-        return <PythonSimulator levelId={levelId} />
+        return <PythonIDE />
       case 'roblox':
         return <RobloxEditor levelId={levelId} />
       case 'hacking':

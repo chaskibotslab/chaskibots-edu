@@ -8,9 +8,11 @@ import {
   CheckCircle2, X, Sparkles, Brain, Cpu, ChevronRight,
   Square, MousePointer2, Layers, Crosshair, ImageIcon,
   Timer, Star, Zap, Award, Info, Video, VideoOff, Cloud,
-  ScanSearch, AlertTriangle, GraduationCap, PersonStanding, Mic, Crosshair as YoloIcon, Box
+  ScanSearch, AlertTriangle, GraduationCap, PersonStanding, Mic, Crosshair as YoloIcon, Box, Lock
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { useUserGrade } from '@/hooks/useUserGrade'
+import { isProgramAvailable, minGradeLabel } from '@/lib/programGating'
 
 const TeachableMachine = dynamic(() => import('./TeachableMachine'), { ssr: false })
 const PoseGame = dynamic(() => import('./PoseGame'), { ssr: false })
@@ -91,6 +93,8 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
   const [mode, setMode] = useState<LabMode>(initialMode)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { gradeNumber, isAdmin } = useUserGrade()
+  const cadLocked = !isAdmin && !isProgramAvailable('diseno_ia', gradeNumber)
 
   // ─── ANNOTATOR STATE ────────────────────────────────────
   const [annotations, setAnnotations] = useState<Annotation[]>([])
@@ -553,23 +557,25 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
   }, [mode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── RENDER ─────────────────────────────────────────────
+  // Paleta reducida y rotada (azul de marca + cyan/violeta de apoyo + un
+  // acento cálido) en vez de un color arbitrario distinto por pestaña.
   const tabs = [
     { id: 'annotator' as LabMode, label: 'Anotador', icon: Tag, color: 'text-blue-400', desc: 'Etiqueta objetos en imágenes' },
-    { id: 'segmentation' as LabMode, label: 'Segmentación', icon: Layers, color: 'text-purple-400', desc: 'Segmentación por color' },
-    { id: 'challenge' as LabMode, label: 'Desafío IA', icon: Trophy, color: 'text-yellow-400', desc: 'Compite contra la IA' },
-    { id: 'live' as LabMode, label: 'Visión en Vivo', icon: Video, color: 'text-cyan-400', desc: 'Detección real con tu cámara' },
-    { id: 'cloud' as LabMode, label: 'IA en la Nube', icon: Cloud, color: 'text-orange-400', desc: 'Modelos de IA reales en la nube' },
-    { id: 'yolo' as LabMode, label: 'YOLO en Vivo', icon: YoloIcon, color: 'text-rose-400', desc: 'Detección YOLO real en tu navegador' },
-    { id: 'teach' as LabMode, label: 'Entrena tu IA', icon: GraduationCap, color: 'text-emerald-400', desc: 'Enseña tus propias categorías' },
+    { id: 'segmentation' as LabMode, label: 'Segmentación', icon: Layers, color: 'text-cyan-400', desc: 'Segmentación por color' },
+    { id: 'challenge' as LabMode, label: 'Desafío IA', icon: Trophy, color: 'text-amber-400', desc: 'Compite contra la IA' },
+    { id: 'live' as LabMode, label: 'Visión en Vivo', icon: Video, color: 'text-violet-400', desc: 'Detección real con tu cámara' },
+    { id: 'cloud' as LabMode, label: 'IA en la Nube', icon: Cloud, color: 'text-blue-400', desc: 'Modelos de IA reales en la nube' },
+    { id: 'yolo' as LabMode, label: 'YOLO en Vivo', icon: YoloIcon, color: 'text-cyan-400', desc: 'Detección YOLO real en tu navegador' },
+    { id: 'teach' as LabMode, label: 'Entrena tu IA', icon: GraduationCap, color: 'text-amber-400', desc: 'Enseña tus propias categorías' },
     { id: 'pose' as LabMode, label: 'Postura Corporal', icon: PersonStanding, color: 'text-violet-400', desc: 'Detección de movimiento en vivo' },
-    { id: 'voice' as LabMode, label: 'IA de Voz', icon: Mic, color: 'text-pink-400', desc: 'Transcripción y palabras clave' },
-    { id: 'cad' as LabMode, label: 'Texto → 3D', icon: Box, color: 'text-rose-400', desc: 'Genera modelos 3D reales con IA' },
+    { id: 'voice' as LabMode, label: 'IA de Voz', icon: Mic, color: 'text-blue-400', desc: 'Transcripción y palabras clave' },
+    { id: 'cad' as LabMode, label: 'Texto → 3D', icon: Box, color: 'text-cyan-400', desc: 'Genera modelos 3D reales con IA' },
   ]
 
   return (
-    <div className="bg-[#1e1e2e] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
+    <div className="bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
       {/* ═══ HEADER ═══ */}
-      <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-[#181825] via-[#1a1a2e] to-[#181825] border-b border-gray-700/50">
+      <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-labdark-bg via-labdark-bg2 to-labdark-bg border-b border-gray-700/50">
         <div className="flex items-center gap-3">
           <Image src="/chaski.png" alt="ChaskiBots" width={28} height={28} className="rounded-lg" />
           <div>
@@ -588,9 +594,10 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
       </div>
 
       {/* ═══ TAB BAR ═══ */}
-      {!hideTabs && <div className="flex bg-[#181825] border-b border-gray-700/50 overflow-x-auto">
+      {!hideTabs && <div className="flex bg-labdark-bg border-b border-gray-700/50 overflow-x-auto">
         {tabs.map(tab => {
           const Icon = tab.icon
+          const locked = tab.id === 'cad' && cadLocked
           return (
             <button
               key={tab.id}
@@ -598,13 +605,15 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
               className={`flex items-center gap-2 px-5 py-3 text-xs font-medium transition-all border-b-2 whitespace-nowrap ${
                 mode === tab.id
                   ? `${tab.color} border-current bg-white/5`
-                  : 'text-gray-500 border-transparent hover:text-gray-300 hover:bg-white/5'
+                  : locked
+                    ? 'text-gray-600 border-transparent hover:text-gray-500 hover:bg-white/5'
+                    : 'text-gray-500 border-transparent hover:text-gray-300 hover:bg-white/5'
               }`}
             >
-              <Icon className="w-4 h-4" />
+              {locked ? <Lock className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
               <div className="text-left">
                 <div>{tab.label}</div>
-                <div className="text-[9px] opacity-60">{tab.desc}</div>
+                <div className="text-[9px] opacity-60">{locked ? `Disponible desde ${minGradeLabel('diseno_ia')}` : tab.desc}</div>
               </div>
             </button>
           )
@@ -677,7 +686,7 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
                 </div>
 
                 {/* Annotations Panel */}
-                <div className="w-64 bg-[#181825] rounded-xl p-3 space-y-3 flex-shrink-0">
+                <div className="w-64 bg-labdark-bg rounded-xl p-3 space-y-3 flex-shrink-0">
                   <h4 className="text-white text-xs font-bold flex items-center gap-1.5">
                     <Tag className="w-3.5 h-3.5 text-blue-400" />
                     Anotaciones ({annotations.length})
@@ -803,7 +812,7 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
                 </div>
 
                 {/* Segments Panel */}
-                <div className="w-64 bg-[#181825] rounded-xl p-3 space-y-3 flex-shrink-0">
+                <div className="w-64 bg-labdark-bg rounded-xl p-3 space-y-3 flex-shrink-0">
                   <h4 className="text-white text-xs font-bold flex items-center gap-1.5">
                     <Palette className="w-3.5 h-3.5 text-purple-400" />
                     Segmentos ({segments.length})
@@ -884,7 +893,7 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
             </div>
 
             {/* Challenge Area */}
-            <div className="bg-[#181825] rounded-xl p-6 min-h-[350px] flex flex-col items-center justify-center">
+            <div className="bg-labdark-bg rounded-xl p-6 min-h-[350px] flex flex-col items-center justify-center">
               {challengeStep === 'ready' && (
                 <div className="text-center space-y-4">
                   <Target className="w-16 h-16 text-yellow-500/50 mx-auto" />
@@ -1192,7 +1201,18 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
         {mode === 'voice' && <VoiceLab />}
 
         {/* ─── CAD GENERATOR MODE ─── */}
-        {mode === 'cad' && <CadGenerator />}
+        {mode === 'cad' && (cadLocked ? (
+          <div className="flex flex-col items-center justify-center text-center py-16 px-6">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
+              <Lock className="w-6 h-6 text-amber-400" />
+            </div>
+            <h3 className="text-white font-bold mb-1">Disponible desde {minGradeLabel('diseno_ia')}</h3>
+            <p className="text-gray-500 text-sm max-w-sm">
+              Generar modelos 3D describiéndolos en texto requiere más práctica previa con formas y composición espacial.
+              Sigue explorando las demás actividades del laboratorio mientras avanzas de grado.
+            </p>
+          </div>
+        ) : <CadGenerator />)}
       </div>
 
       {/* Hidden file input */}

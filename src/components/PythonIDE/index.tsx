@@ -571,9 +571,9 @@ sys.stderr = sys.__stderr__
 
   // ─── RENDER ───────────────────────────────────────────────
   return (
-    <div className={`flex flex-col bg-[#1e1e2e] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[750px]'}`}>
+    <div className={`flex flex-col bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[750px]'}`}>
       {/* ═══ TOP BAR ═══ */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#181825] via-[#1a1a2e] to-[#181825] border-b border-gray-700/50">
+      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-labdark-bg via-labdark-bg2 to-labdark-bg border-b border-gray-700/50">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:brightness-125" onClick={() => setIsFullscreen(false)} />
@@ -622,7 +622,7 @@ sys.stderr = sys.__stderr__
         
         {/* ─── LEFT: CURRICULUM SIDEBAR ─── */}
         {showCurriculum && (
-          <div className="w-72 bg-[#181825] border-r border-gray-700/50 flex flex-col overflow-hidden">
+          <div className="w-72 bg-labdark-bg border-r border-gray-700/50 flex flex-col overflow-hidden">
             {/* Progress Header */}
             <div className="p-3 border-b border-gray-700/50">
               <div className="flex items-center justify-between mb-2">
@@ -744,8 +744,8 @@ sys.stderr = sys.__stderr__
                 onClick={() => setActiveFile(idx)}
                 className={`group flex items-center gap-1.5 px-4 py-2 text-xs border-r border-gray-700/30 min-w-0 transition-colors ${
                   idx === activeFile 
-                    ? 'bg-[#1e1e2e] text-white border-t-2 border-t-blue-500' 
-                    : 'text-gray-500 hover:text-gray-300 hover:bg-[#1e1e2e]/50'
+                    ? 'bg-labdark-surface text-white border-t-2 border-t-blue-500' 
+                    : 'text-gray-500 hover:text-gray-300 hover:bg-labdark-surface/50'
                 }`}
               >
                 <File className="w-3 h-3 text-blue-400 flex-shrink-0" />
@@ -794,7 +794,7 @@ sys.stderr = sys.__stderr__
           </div>
 
           {/* Action Bar */}
-          <div className="flex items-center justify-between px-4 py-2.5 bg-[#181825] border-t border-gray-700/50">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-labdark-bg border-t border-gray-700/50">
             <div className="flex items-center gap-2">
               <button
                 onClick={runCode}
@@ -869,7 +869,7 @@ sys.stderr = sys.__stderr__
           {/* Terminal */}
           {showTerminal && (
             <div className="h-52 border-t border-gray-700/50 flex flex-col">
-              <div className="flex items-center justify-between px-4 py-1.5 bg-[#181825] border-b border-gray-700/30">
+              <div className="flex items-center justify-between px-4 py-1.5 bg-labdark-bg border-b border-gray-700/30">
                 <div className="flex items-center gap-2">
                   <TerminalIcon className="w-3.5 h-3.5 text-green-400" />
                   <span className="text-[11px] text-gray-400 font-medium">Terminal — Python 3.11</span>
@@ -906,7 +906,7 @@ sys.stderr = sys.__stderr__
 
         {/* ─── RIGHT: LESSON PANEL ─── */}
         {showLessonPanel && (activeLesson || lessonLoading) && (
-          <div className="w-80 bg-[#181825] border-l border-gray-700/50 flex flex-col overflow-hidden">
+          <div className="w-80 bg-labdark-bg border-l border-gray-700/50 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between p-3 border-b border-gray-700/50">
               <h3 className="text-white text-sm font-bold truncate">{activeLesson?.title || 'Cargando...'}</h3>
               <button onClick={() => setShowLessonPanel(false)} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50">

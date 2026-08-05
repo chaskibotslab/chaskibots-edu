@@ -57,6 +57,14 @@ const config: Config = {
           media: '#42a5f5',
           superior: '#ab47bc',
           bachillerato: '#ef5350',
+        },
+        // Dark chrome shared by the interactive lab tools (AILab, CADLab,
+        // PythonIDE) — blue-slate tinted to match chaski.dark instead of
+        // the unrelated purple-gray each tool picked independently before.
+        labdark: {
+          surface: '#161B2E',
+          bg: '#10131F',
+          bg2: '#141829',
         }
       },
       fontFamily: {

@@ -8,11 +8,11 @@ import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
 import { Brain, Camera, Upload, Mic, Lightbulb, Loader2, Sparkles } from 'lucide-react'
 
-const AIModule = dynamic(() => import('@/components/AIModule'), {
+const AILab = dynamic(() => import('@/components/AILab'), {
   loading: () => (
     <div className="flex items-center justify-center p-12 bg-white rounded-2xl border border-slate-200">
       <Loader2 className="w-8 h-8 animate-spin text-brand-violet" />
-      <span className="ml-2 text-slate-600">Cargando módulo de IA...</span>
+      <span className="ml-2 text-slate-600">Cargando laboratorio de IA...</span>
     </div>
   ),
   ssr: false
@@ -89,8 +89,8 @@ export default function IAPage() {
             })}
           </div>
 
-          {/* AI Module */}
-          <AIModule />
+          {/* AI Lab */}
+          <AILab />
 
           {/* Tips */}
           <div>

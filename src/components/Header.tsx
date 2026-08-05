@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from './AuthProvider'
-import { Menu, X, User, LogOut, Settings, ChevronLeft, Home, BookOpen, Bot, Brain, Shield, GraduationCap } from 'lucide-react'
+import { Menu, X, User, LogOut, Settings, ChevronLeft, Home, BookOpen, Bot, Brain, Shield, GraduationCap, Box } from 'lucide-react'
 
 export default function Header() {
   const { user, logout, isAuthenticated, isAdmin } = useAuth()
@@ -33,6 +33,7 @@ export default function Header() {
     { href: '/robotica', label: 'Robótica', icon: Bot },
     { href: '/hacking', label: 'Hacking Ético', icon: Shield },
     { href: '/ia', label: 'IA', icon: Brain },
+    { href: '/diseno', label: 'Diseño 3D', icon: Box },
   ]
 
   useEffect(() => {

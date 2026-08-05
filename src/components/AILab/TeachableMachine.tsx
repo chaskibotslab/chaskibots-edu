@@ -217,7 +217,7 @@ export default function TeachableMachine() {
 
           {/* Classes + controls */}
           <div className="space-y-3">
-            <div className="bg-[#181825] rounded-xl p-3 space-y-2">
+            <div className="bg-labdark-bg rounded-xl p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="text-white text-xs font-bold">Tus categorías</h4>
                 {classes.length < 5 && (

@@ -213,9 +213,9 @@ export default function CADLab() {
   ]
 
   return (
-    <div className="bg-[#1e1e2e] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
+    <div className="bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
       {/* HEADER */}
-      <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-[#181825] via-[#1a1a2e] to-[#181825] border-b border-gray-700/50">
+      <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-labdark-bg via-labdark-bg2 to-labdark-bg border-b border-gray-700/50">
         <div className="flex items-center gap-3">
           <Image src="/chaski.png" alt="ChaskiBots" width={28} height={28} className="rounded-lg" />
           <div>
@@ -237,7 +237,7 @@ export default function CADLab() {
       </div>
 
       {/* TAB BAR */}
-      <div className="flex bg-[#181825] border-b border-gray-700/50">
+      <div className="flex bg-labdark-bg border-b border-gray-700/50">
         {tabs.map(t => {
           const Icon = t.icon
           return (
@@ -290,7 +290,7 @@ export default function CADLab() {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-72 bg-[#181825] border-l border-gray-700/50 flex flex-col overflow-hidden">
+        <div className="w-72 bg-labdark-bg border-l border-gray-700/50 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-3 space-y-3">
 
             {/* ── VIEWER TAB PANEL ── */}

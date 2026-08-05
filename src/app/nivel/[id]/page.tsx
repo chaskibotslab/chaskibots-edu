@@ -24,11 +24,6 @@ const LoadingSpinner = () => (
   </div>
 )
 
-const AIModule = dynamic(() => import('@/components/AIModule'), {
-  loading: () => <LoadingSpinner />,
-  ssr: false
-})
-
 const AIActivities = dynamic(() => import('@/components/AIActivities'), {
   loading: () => <LoadingSpinner />,
   ssr: false
@@ -167,18 +162,19 @@ export default function NivelPage() {
     loadLessons()
   }, [levelId, selectedProgram])
 
-  // Cargar plan del año desde API
+  // Cargar plan del año desde API (filtrado por programa seleccionado)
   useEffect(() => {
     async function loadYearPlan() {
       setYearPlanLoading(true)
       try {
-        const response = await fetch(`/api/year-plans?levelId=${levelId}`)
+        const response = await fetch(`/api/year-plans?levelId=${levelId}&programId=${selectedProgram}`)
         if (response.ok) {
           const data = await response.json()
-          if (Array.isArray(data) && data.length > 0) {
-            setYearPlan(data)
+          const plans = Array.isArray(data.plans) ? data.plans : []
+          if (plans.length > 0) {
+            setYearPlan(plans)
           } else {
-            // Fallback a datos locales si no hay datos en Airtable
+            // Fallback a datos locales si no hay datos cargados para este nivel/programa
             setYearPlan(courseData.yearPlan || [])
           }
         } else {
@@ -191,7 +187,7 @@ export default function NivelPage() {
       setYearPlanLoading(false)
     }
     loadYearPlan()
-  }, [levelId, courseData.yearPlan])
+  }, [levelId, selectedProgram, courseData.yearPlan])
 
   // Agrupar lecciones de API por módulo
   const groupedApiLessons = apiLessons.reduce((acc, lesson) => {

@@ -48,10 +48,10 @@ export default function CadGenerator() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 flex items-start gap-3">
-        <Info className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
+      <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4 flex items-start gap-3">
+        <Info className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
         <div>
-          <h3 className="text-rose-300 text-sm font-bold">Texto → Modelo 3D real</h3>
+          <h3 className="text-cyan-300 text-sm font-bold">Texto → Modelo 3D real</h3>
           <p className="text-gray-400 text-xs mt-1">
             Una IA (DeepSeek-V3) interpreta tu descripción en español y compone geometría 3D genuina —
             combina esferas, cajas, cilindros, conos, toros y cápsulas con uniones y recortes booleanos reales,
@@ -68,7 +68,7 @@ export default function CadGenerator() {
               <Canvas camera={{ position: [4, 3, 6], fov: 50 }}>
                 <ambientLight intensity={0.3} />
                 <directionalLight position={[5, 8, 5]} intensity={0.8} />
-                <RaymarchSDF glsl={glsl} accentColor="#F43F5E" bgColor="#0f0f1a" />
+                <RaymarchSDF glsl={glsl} accentColor="#22D3EE" bgColor="#0f0f1a" />
                 <OrbitControls enablePan enableZoom enableRotate minDistance={2} maxDistance={12} />
               </Canvas>
             ) : (
@@ -103,12 +103,12 @@ export default function CadGenerator() {
               onChange={(e) => setTextInput(e.target.value)}
               placeholder="Ej: un robot con cabeza cúbica y dos brazos..."
               rows={3}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-xs text-white placeholder:text-gray-500 focus:border-rose-500/50 focus:outline-none resize-none"
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-xs text-white placeholder:text-gray-500 focus:border-cyan-500/50 focus:outline-none resize-none"
             />
             <button
               onClick={generate}
               disabled={!textInput.trim() || loading}
-              className="mt-2 w-full px-3 py-2 bg-rose-600 hover:bg-rose-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 justify-center"
+              className="mt-2 w-full px-3 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 justify-center"
             >
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
               {loading ? 'Generando...' : 'Generar 3D con IA'}

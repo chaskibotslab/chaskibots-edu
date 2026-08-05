@@ -5,12 +5,14 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
+import { isProgramAvailable, minGradeLabel } from '@/lib/programGating'
 import { Shield, Lock, Eye, Key, ArrowRight, Sparkles, AlertTriangle } from 'lucide-react'
 
 interface Level {
   id: string
   name: string
   ageRange?: string
+  gradeNumber?: number
 }
 
 export default function HackingPage() {
@@ -94,12 +96,19 @@ export default function HackingPage() {
   }, [user, userCourses, allLevels])
 
   const isAdmin = user?.role === 'admin'
-  
+
   // Filtrar niveles que el usuario puede ver
   const visibleLevels = useMemo(() => {
     if (isAdmin) return allLevels
     return allLevels.filter(level => allowedLevelIds.includes(level.id))
   }, [allLevels, allowedLevelIds, isAdmin])
+
+  const myGrade = useMemo(() => {
+    if (!user?.levelId) return null
+    return allLevels.find(l => l.id === user.levelId)?.gradeNumber ?? null
+  }, [allLevels, user?.levelId])
+
+  const isUnlocked = isAdmin || isProgramAvailable('hacking', myGrade)
 
 const FEATURES = [
   { icon: Lock, color: 'neon-green', title: 'Seguridad', description: 'Contraseñas y privacidad' },
@@ -156,27 +165,40 @@ const TOOLS = ['CrypTool', 'Wireshark', 'Nmap', 'OWASP', 'Kali Linux', 'HackTheB
           </div>
 
           {/* Levels */}
-          <div>
-            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-green-500" />
-              Selecciona tu Nivel
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {visibleLevels.map((level) => (
-                <Link
-                  key={level.id}
-                  href={`/nivel/${level.id}?area=hacking`}
-                  className="group flex items-center justify-between rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:border-green-500/50 hover:shadow-md transition-all"
-                >
-                  <div>
-                    <h3 className="font-semibold text-slate-900 text-sm mb-0.5">{level.name}</h3>
-                    <p className="text-slate-500 text-xs">{level.ageRange}</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-green-500 group-hover:translate-x-1 transition-all" />
-                </Link>
-              ))}
+          {!isUnlocked ? (
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-10 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-6 h-6 text-amber-500" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Disponible desde {minGradeLabel('hacking')}</h2>
+              <p className="text-slate-500 max-w-md mx-auto">
+                El hacking ético requiere razonar sobre riesgo y responsabilidad, algo que se introduce a partir de {minGradeLabel('hacking')}.
+                Mientras tanto, sigue avanzando en Robótica e IA, disponibles para todos los grados.
+              </p>
             </div>
-          </div>
+          ) : (
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-green-500" />
+                Selecciona tu Nivel
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {visibleLevels.map((level) => (
+                  <Link
+                    key={level.id}
+                    href={`/nivel/${level.id}?area=hacking`}
+                    className="group flex items-center justify-between rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:border-green-500/50 hover:shadow-md transition-all"
+                  >
+                    <div>
+                      <h3 className="font-semibold text-slate-900 text-sm mb-0.5">{level.name}</h3>
+                      <p className="text-slate-500 text-xs">{level.ageRange}</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-green-500 group-hover:translate-x-1 transition-all" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Tools */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">

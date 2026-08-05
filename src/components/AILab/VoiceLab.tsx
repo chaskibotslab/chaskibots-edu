@@ -209,7 +209,7 @@ export default function VoiceLab() {
               <AlertTriangle className="w-4 h-4 flex-shrink-0" /> {transcribeError}
             </div>
           )}
-          <div className="bg-[#181825] rounded-xl p-5 min-h-[160px]">
+          <div className="bg-labdark-bg rounded-xl p-5 min-h-[160px]">
             <p className="text-gray-200 text-sm leading-relaxed">
               {transcript || <span className="text-gray-600">Presiona el micrófono y habla en español...</span>}
               <span className="text-gray-500 italic">{interim}</span>
@@ -245,7 +245,7 @@ export default function VoiceLab() {
               <AlertTriangle className="w-4 h-4 flex-shrink-0" /> {kwError}
             </div>
           )}
-          <div className="bg-[#181825] rounded-xl p-8 min-h-[160px] flex flex-col items-center justify-center gap-3">
+          <div className="bg-labdark-bg rounded-xl p-8 min-h-[160px] flex flex-col items-center justify-center gap-3">
             {detectedWord ? (
               <>
                 <Volume2 className="w-10 h-10 text-pink-400" />

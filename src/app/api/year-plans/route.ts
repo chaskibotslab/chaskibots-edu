@@ -7,6 +7,7 @@ function rowToPlan(row: any) {
   return {
     id: row.id,
     levelId: row.level_id || '',
+    programId: row.program_id || '',
     month: row.month || '',
     topic: row.topic || '',
     project: row.project || '',
@@ -18,9 +19,11 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const levelId = searchParams.get('levelId')
+    const programId = searchParams.get('programId')
 
     let query = supabaseAdmin.from('year_plans').select('*').order('display_order')
     if (levelId) query = query.eq('level_id', levelId)
+    if (programId) query = query.eq('program_id', programId)
 
     const { data, error } = await query
     if (error) return NextResponse.json({ plans: [] })
