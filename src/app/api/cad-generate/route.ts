@@ -36,6 +36,7 @@ Reglas:
 - Termina SIEMPRE con "return <expresion>;"
 - No declares la firma "float sdf(vec3 p) {", solo el cuerpo interno.
 - No uses NINGUNA función que no esté en la lista de arriba (ni siquiera si existe en GLSL estándar, como sdPlane, sdCross, opRepeat, etc. — si no está en la lista, no existe para ti). Si la descripción necesita algo que no puedes representar exactamente, aproxímalo combinando las formas disponibles.
+- No existen variables de tiempo/animación. NUNCA uses iTime, time, u_time, iResolution, iMouse, ni ninguna variable que no hayas declarado tú mismo con "float" o "vec3" en el propio cuerpo. Todo debe ser estático (sin animación).
 
 Ejemplo de salida válida para "una esfera con una caja encima":
 float d1 = sdSphere(p, vec3(0.0, -0.5, 0.0), 1.0);
@@ -45,6 +46,11 @@ return opUnion(d1, d2);`
 const FORBIDDEN_TOKENS = [
   'texture', 'discard', 'while', '#include', 'sampler', 'gl_', 'uniform ', 'varying ',
   'main(', 'import', 'require(', '```',
+  // Common Shadertoy-style globals the model sometimes hallucinates —
+  // none of these are declared in our shader, so referencing them is a
+  // compile error the regex-based call-site check below can't catch
+  // (they're bare identifiers, not function calls).
+  'itime', 'iresolution', 'imouse', 'iframe', 'ichannel', 'u_time', 'u_resolution',
 ]
 
 const GLSL_BUILTINS = new Set([
