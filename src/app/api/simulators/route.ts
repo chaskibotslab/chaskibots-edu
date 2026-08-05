@@ -21,8 +21,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const levelId = searchParams.get('levelId')
     const programId = searchParams.get('programId')
+    const all = searchParams.get('all') // admin: incluye deshabilitados
 
-    let query = supabaseAdmin.from('simulators').select('*').eq('enabled', true).order('name')
+    let query = supabaseAdmin.from('simulators').select('*').order('name')
+    if (!all) query = query.eq('enabled', true)
 
     const { data, error } = await query
     if (error) {

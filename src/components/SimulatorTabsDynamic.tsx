@@ -9,7 +9,7 @@ import {
   Loader2, AlertCircle, RefreshCw
 } from 'lucide-react'
 
-const BlocklyEditor = dynamic(() => import('./BlocklyEditor'), { 
+const BlocklyEditor = dynamic(() => import('./BlocklyEditor'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-xl">
@@ -20,6 +20,15 @@ const BlocklyEditor = dynamic(() => import('./BlocklyEditor'), {
     </div>
   )
 })
+
+// Herramientas internas del sitio, asignables por nivel/programa igual que
+// cualquier simulador externo (a diferencia de ChaskiBlocks, que es fijo).
+const PythonIDE = dynamic(() => import('./PythonIDE'), { ssr: false })
+const HackingTerminal = dynamic(() => import('./activities/HackingTerminal'), { ssr: false })
+const LinuxTerminal = dynamic(() => import('./activities/LinuxTerminal'), { ssr: false })
+const RobloxEditor = dynamic(() => import('./activities/RobloxEditor'), { ssr: false })
+
+const INTERNAL_TOOL_IDS = ['python-ide', 'hacking-terminal', 'linux-terminal', 'roblox-editor']
 
 interface Simulator {
   id: string
@@ -120,9 +129,8 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
       if (!response.ok) throw new Error('Error cargando simuladores')
       
       const data = await response.json()
-      const enabledSimulators = Array.isArray(data) 
-        ? data.filter((s: Simulator) => s.enabled)
-        : []
+      const list = Array.isArray(data) ? data : (Array.isArray(data.simulators) ? data.simulators : [])
+      const enabledSimulators = list.filter((s: Simulator) => s.enabled)
       
       // Agregar ChaskiBlocks al inicio
       setSimulators([chaskiBlocks, ...enabledSimulators])
@@ -226,6 +234,13 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
       {activeSimulator?.id === 'chaskiblocks' ? (
         <div className="h-[700px]">
           <BlocklyEditor userId={user?.id} userName={user?.name} />
+        </div>
+      ) : activeSimulator && INTERNAL_TOOL_IDS.includes(activeSimulator.id) ? (
+        <div>
+          {activeSimulator.id === 'python-ide' && <PythonIDE />}
+          {activeSimulator.id === 'hacking-terminal' && <HackingTerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} />}
+          {activeSimulator.id === 'linux-terminal' && <LinuxTerminal levelId={levelId || ''} />}
+          {activeSimulator.id === 'roblox-editor' && <RobloxEditor levelId={levelId || ''} />}
         </div>
       ) : activeSimulator ? (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl shadow-brand-purple/5">

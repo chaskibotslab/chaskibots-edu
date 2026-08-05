@@ -32,7 +32,8 @@ interface Level {
 const PROGRAMS = [
   { id: 'robotica', name: 'Robótica', color: 'bg-blue-500' },
   { id: 'ia', name: 'Inteligencia Artificial', color: 'bg-purple-500' },
-  { id: 'hacking', name: 'Hacking / Ciberseguridad', color: 'bg-red-500' }
+  { id: 'hacking', name: 'Hacking / Ciberseguridad', color: 'bg-red-500' },
+  { id: 'diseno', name: 'Diseño 3D', color: 'bg-cyan-500' }
 ]
 
 const ICON_OPTIONS = [
@@ -87,10 +88,10 @@ export default function SimuladoresAdminPage() {
   const loadSimulators = async () => {
     setLoadingSimulators(true)
     try {
-      const response = await fetch('/api/simulators')
+      const response = await fetch('/api/simulators?all=1')
       if (response.ok) {
         const data = await response.json()
-        setSimulators(Array.isArray(data) ? data : [])
+        setSimulators(Array.isArray(data.simulators) ? data.simulators : [])
       }
     } catch (error) {
       console.error('Error loading simulators:', error)
@@ -186,8 +187,8 @@ export default function SimuladoresAdminPage() {
   }
 
   const handleSave = async () => {
-    if (!formData.id || !formData.name || !formData.url) {
-      setMessage({ type: 'error', text: 'ID, nombre y URL son requeridos' })
+    if (!formData.id || !formData.name) {
+      setMessage({ type: 'error', text: 'ID y nombre son requeridos' })
       return
     }
 
@@ -195,13 +196,12 @@ export default function SimuladoresAdminPage() {
     setMessage(null)
 
     try {
-      const method = isCreating ? 'POST' : 'PUT'
-      const body = isCreating ? formData : { ...formData, recordId: editingSimulator?.recordId }
-      
+      const method = isCreating ? 'POST' : 'PATCH'
+
       const response = await fetch('/api/simulators', {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify(formData)
       })
 
       if (response.ok) {
@@ -212,7 +212,7 @@ export default function SimuladoresAdminPage() {
         }, 1500)
       } else {
         const error = await response.json()
-        setMessage({ type: 'error', text: error.message || 'Error al guardar' })
+        setMessage({ type: 'error', text: error.error || 'Error al guardar' })
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Error de conexión' })
@@ -226,7 +226,7 @@ export default function SimuladoresAdminPage() {
 
     setDeleting(simulator.id)
     try {
-      const response = await fetch(`/api/simulators?id=${simulator.recordId}`, {
+      const response = await fetch(`/api/simulators?id=${simulator.id}`, {
         method: 'DELETE'
       })
 
@@ -361,15 +361,19 @@ export default function SimuladoresAdminPage() {
                       </div>
                       <div>
                         <h3 className="text-gray-900 font-semibold">{simulator.name}</h3>
-                        <a 
-                          href={simulator.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-xs text-gray-500 hover:text-brand-purple flex items-center gap-1"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          Abrir
-                        </a>
+                        {simulator.url ? (
+                          <a
+                            href={simulator.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-gray-500 hover:text-brand-purple flex items-center gap-1"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            Abrir
+                          </a>
+                        ) : (
+                          <span className="text-xs text-brand-purple/70">Herramienta interna</span>
+                        )}
                       </div>
                     </div>
                     <span className={`px-2 py-0.5 rounded text-xs ${simulator.enabled ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
@@ -488,13 +492,13 @@ export default function SimuladoresAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">URL</label>
+                <label className="block text-sm text-gray-600 mb-1">URL (dejar vacío si es una herramienta interna del sitio, ej. python-ide)</label>
                 <input
                   type="url"
                   value={formData.url}
                   onChange={e => setFormData({ ...formData, url: e.target.value })}
                   className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
-                  placeholder="https://scratch.mit.edu/projects/editor/"
+                  placeholder="https://scratch.mit.edu/projects/editor/ (o vacío)"
                 />
               </div>
 

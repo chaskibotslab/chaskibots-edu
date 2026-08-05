@@ -24,7 +24,7 @@ const LoadingSpinner = () => (
   </div>
 )
 
-const AIActivities = dynamic(() => import('@/components/AIActivities'), {
+const AILab = dynamic(() => import('@/components/AILab'), {
   loading: () => <LoadingSpinner />,
   ssr: false
 })
@@ -641,7 +641,7 @@ export default function NivelPage() {
                   <p className="text-gray-600">Aprende IA de forma interactiva</p>
                 </div>
               </div>
-              <AIActivities levelId={levelId} />
+              <AILab />
             </div>
           )}
 

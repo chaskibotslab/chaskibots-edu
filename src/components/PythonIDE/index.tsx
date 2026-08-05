@@ -209,6 +209,7 @@ export default function PythonIDE() {
   const [sendSuccess, setSendSuccess] = useState(false)
   
   const outputRef = useRef<HTMLDivElement>(null)
+  const runShortcutRef = useRef<() => void>(() => {})
 
   // ─── PYODIDE ENGINE ───────────────────────────────────────
   const loadPyodideEngine = useCallback(async () => {
@@ -323,6 +324,14 @@ sys.stderr = sys.__stderr__
     }
     setIsRunning(false)
   }
+
+  // Mantiene la referencia usada por el atajo Ctrl/Cmd+Enter del editor
+  // siempre apuntando a la versión más reciente de runCode con sus guards.
+  useEffect(() => {
+    runShortcutRef.current = () => {
+      if (!isRunning && pyodideReady) runCode()
+    }
+  })
 
   // ─── INSTALL PACKAGE ──────────────────────────────────────
   const installPackage = async (pkg: string) => {
@@ -737,7 +746,7 @@ sys.stderr = sys.__stderr__
         {/* ─── CENTER: EDITOR ─── */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* File Tabs */}
-          <div className="flex items-center bg-[#252535] border-b border-gray-700/50 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center bg-labdark-tab border-b border-gray-700/50 overflow-x-auto scrollbar-hide">
             {files.map((file, idx) => (
               <button
                 key={idx}
@@ -770,6 +779,9 @@ sys.stderr = sys.__stderr__
               theme="vs-dark"
               value={files[activeFile]?.content || ''}
               onChange={updateFileContent}
+              onMount={(editor, monaco) => {
+                editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => runShortcutRef.current())
+              }}
               options={{
                 fontSize: 14,
                 fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
@@ -803,6 +815,7 @@ sys.stderr = sys.__stderr__
               >
                 {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                 {isRunning ? 'Ejecutando...' : 'Ejecutar'}
+                {!isRunning && <span className="hidden sm:inline text-[9px] font-normal opacity-70 ml-0.5">⌘/Ctrl+Enter</span>}
               </button>
               {isRunning && (
                 <button onClick={() => setIsRunning(false)} className="flex items-center gap-1 px-3 py-1.5 bg-red-600/80 hover:bg-red-500 text-white rounded-lg text-xs transition-colors">
@@ -883,7 +896,7 @@ sys.stderr = sys.__stderr__
                   </button>
                 </div>
               </div>
-              <div ref={outputRef} className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[12px] leading-relaxed bg-[#0d0d15]">
+              <div ref={outputRef} className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[12px] leading-relaxed bg-labdark-void">
                 {output.map((line, idx) => (
                   <div key={idx} className={`${
                     line.startsWith('❌') ? 'text-red-400' :

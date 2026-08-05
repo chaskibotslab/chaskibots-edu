@@ -903,285 +903,290 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2">
-          <Terminal className="w-5 h-5 text-green-400" />
-          <h3 className="font-bold text-gray-900">Terminal Hacking Ético</h3>
+    <div className="bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
+      {/* ═══ TOP BAR ═══ */}
+      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-labdark-bg via-labdark-bg2 to-labdark-bg border-b border-gray-700/50">
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <div className="w-3 h-3 rounded-full bg-green-500" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Terminal className="w-4 h-4 text-green-400" />
+            <span className="text-gray-200 text-sm font-bold">Terminal Hacking Ético</span>
+          </div>
+          <span className="text-[11px] px-2 py-0.5 rounded-full font-mono text-green-400 bg-green-500/10 border border-green-500/20">
+            {currentDir}
+          </span>
           {isSudo && (
-            <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded animate-pulse">
+            <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-[10px] font-bold rounded-full animate-pulse">
               ROOT
             </span>
           )}
         </div>
         <button
           onClick={() => setShowGuides(!showGuides)}
-          className="flex items-center gap-1 px-3 py-1 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors text-sm"
+          className="flex items-center gap-1.5 px-3 py-1 text-gray-400 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors text-xs"
         >
-          <BookOpen className="w-4 h-4" />
-          {showGuides ? 'Ocultar' : 'Mostrar'} Guías
+          <BookOpen className="w-3.5 h-3.5" />
+          {showGuides ? 'Ocultar' : 'Mostrar'} guías
         </button>
       </div>
 
-      {/* Guides */}
-      {showGuides && (
-        <div className="bg-[#1a3a3a] rounded-xl p-4 border border-[#2d5a5a] max-h-64 overflow-y-auto">
-          <div className="flex items-center gap-2 mb-3">
-            <Lightbulb className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm text-[#7dd3c0]">Guía de Comandos</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {TERMINAL_GUIDES.map((guide, idx) => (
-              <div key={idx} className="border border-[#2d5a5a] rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setActiveGuide(activeGuide === idx ? null : idx)}
-                  className="w-full flex items-center justify-between p-2 bg-[#1e4545] hover:bg-[#2a5555] transition-colors text-sm"
-                >
-                  <span className="font-medium text-white">{guide.title}</span>
-                  {activeGuide === idx ? (
-                    <ChevronDown className="w-3 h-3 text-[#7dd3c0]" />
-                  ) : (
-                    <ChevronRight className="w-3 h-3 text-[#7dd3c0]" />
+      <div className="p-4 space-y-4">
+        {/* Guides */}
+        {showGuides && (
+          <div className="bg-labdark-bg rounded-xl p-4 border border-gray-700/50 max-h-64 overflow-y-auto">
+            <div className="flex items-center gap-2 mb-3">
+              <Lightbulb className="w-4 h-4 text-yellow-400" />
+              <span className="text-sm text-green-400 font-medium">Guía de Comandos</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              {TERMINAL_GUIDES.map((guide, idx) => (
+                <div key={idx} className="border border-gray-700/50 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setActiveGuide(activeGuide === idx ? null : idx)}
+                    className="w-full flex items-center justify-between p-2 bg-labdark-surface hover:bg-green-500/10 transition-colors text-sm"
+                  >
+                    <span className="font-medium text-gray-200">{guide.title}</span>
+                    {activeGuide === idx ? (
+                      <ChevronDown className="w-3 h-3 text-green-400" />
+                    ) : (
+                      <ChevronRight className="w-3 h-3 text-green-400" />
+                    )}
+                  </button>
+                  {activeGuide === idx && (
+                    <div className="p-2 bg-labdark-void border-t border-gray-700/50 text-xs">
+                      {guide.commands.map((cmd, cmdIdx) => (
+                        <div key={cmdIdx} className="py-1 border-b border-gray-800 last:border-0">
+                          <code className="text-green-400">{cmd.name}</code>
+                          <span className="text-gray-500 ml-2">{cmd.description}</span>
+                        </div>
+                      ))}
+                    </div>
                   )}
-                </button>
-                {activeGuide === idx && (
-                  <div className="p-2 bg-[#0f2828] border-t border-[#2d5a5a] text-xs">
-                    {guide.commands.map((cmd, cmdIdx) => (
-                      <div key={cmdIdx} className="py-1 border-b border-[#1a3a3a] last:border-0">
-                        <code className="text-green-400">{cmd.name}</code>
-                        <span className="text-[#9ca3af] ml-2">{cmd.description}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Terminal */}
+        <div
+          className="bg-labdark-void rounded-xl overflow-hidden border border-green-900/40"
+          onClick={() => inputRef.current?.focus()}
+        >
+          <div className="flex items-center justify-between px-4 py-2 bg-labdark-bg border-b border-green-900/30">
+            <span className="text-xs text-gray-500 font-mono">bash — {currentDir}</span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setShowCrypto(!showCrypto)}
+                className="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                title="Cifrado César"
+              >
+                <Lock className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setShowPasswordChecker(!showPasswordChecker)}
+                className="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                title="Verificar contraseña"
+              >
+                <Key className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setTerminalOutput([])}
+                className="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                title="Limpiar"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          <div
+            ref={terminalRef}
+            className="h-64 p-4 overflow-y-auto font-mono text-sm"
+          >
+            {terminalOutput.map((line, idx) => (
+              <div key={idx} className="text-green-400 whitespace-pre-wrap">
+                {line}
               </div>
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Terminal */}
-      <div 
-        className="bg-black rounded-xl overflow-hidden border border-green-900"
-        onClick={() => inputRef.current?.focus()}
-      >
-        <div className="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-green-900">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
-            <span className="ml-2 text-sm text-green-400 font-mono">
-              {currentDir}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowCrypto(!showCrypto)}
-              className="p-1.5 hover:bg-gray-800 rounded transition-colors"
-              title="Cifrado César"
-            >
-              <Lock className="w-4 h-4 text-green-400" />
-            </button>
-            <button
-              onClick={() => setShowPasswordChecker(!showPasswordChecker)}
-              className="p-1.5 hover:bg-gray-800 rounded transition-colors"
-              title="Verificar contraseña"
-            >
-              <Key className="w-4 h-4 text-green-400" />
-            </button>
-            <button
-              onClick={() => setTerminalOutput([])}
-              className="p-1.5 hover:bg-gray-800 rounded transition-colors"
-              title="Limpiar"
-            >
-              <RefreshCw className="w-4 h-4 text-green-400" />
-            </button>
-          </div>
-        </div>
-        
-        <div 
-          ref={terminalRef}
-          className="h-64 p-4 overflow-y-auto font-mono text-sm"
-        >
-          {terminalOutput.map((line, idx) => (
-            <div key={idx} className="text-green-400 whitespace-pre-wrap">
-              {line}
-            </div>
-          ))}
-          <div className="flex items-center text-green-400">
-            <span>{isSudo ? '# ' : '$ '}</span>
-            <input
-              ref={inputRef}
-              type="text"
-              value={terminalInput}
-              onChange={(e) => setTerminalInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent outline-none ml-1"
-              autoFocus
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Crypto Tool */}
-      {showCrypto && (
-        <div className="bg-[#1a3a3a] rounded-xl p-4 border border-[#2d5a5a]">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-purple-400" />
-              <span className="font-medium text-white">Cifrado César</span>
-            </div>
-            <button
-              onClick={() => setShowCrypto(false)}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              ✕
-            </button>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCryptoMode('encrypt')}
-                className={`flex-1 py-2 rounded-lg transition-colors ${
-                  cryptoMode === 'encrypt' 
-                    ? 'bg-purple-600 text-gray-900' 
-                    : 'bg-gray-700 text-gray-300'
-                }`}
-              >
-                Encriptar
-              </button>
-              <button
-                onClick={() => setCryptoMode('decrypt')}
-                className={`flex-1 py-2 rounded-lg transition-colors ${
-                  cryptoMode === 'decrypt' 
-                    ? 'bg-purple-600 text-gray-900' 
-                    : 'bg-gray-700 text-gray-300'
-                }`}
-              >
-                Desencriptar
-              </button>
-            </div>
-            
-            <input
-              type="text"
-              value={encryptText}
-              onChange={(e) => setEncryptText(e.target.value)}
-              placeholder="Escribe tu mensaje..."
-              className="w-full px-3 py-2 bg-[#0f2828] border border-[#2d5a5a] rounded-lg text-white placeholder-gray-500"
-            />
-            
-            <div className="flex items-center gap-3">
-              <label className="text-sm text-[#7dd3c0]">Desplazamiento:</label>
+            <div className="flex items-center text-green-400">
+              <span>{isSudo ? '# ' : '$ '}</span>
               <input
-                type="range"
-                min="1"
-                max="25"
-                value={encryptShift}
-                onChange={(e) => setEncryptShift(parseInt(e.target.value))}
-                className="flex-1"
+                ref={inputRef}
+                type="text"
+                value={terminalInput}
+                onChange={(e) => setTerminalInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="flex-1 bg-transparent outline-none ml-1"
+                autoFocus
               />
-              <span className="text-white font-mono w-8">{encryptShift}</span>
             </div>
-            
-            <button
-              onClick={handleCryptoSubmit}
-              className="w-full py-2 bg-[#558C89] hover:bg-[#4a7a78] text-white rounded-lg transition-colors font-medium"
-            >
-              {cryptoMode === 'encrypt' ? '🔒 Encriptar' : '🔓 Desencriptar'}
-            </button>
-            
-            {encryptedResult && (
-              <div className="p-3 bg-[#0f2828] rounded-lg">
-                <div className="text-xs text-[#7dd3c0] mb-1">Resultado:</div>
-                <div className="text-green-400 font-mono break-all">{encryptedResult}</div>
+          </div>
+        </div>
+
+        {/* Crypto Tool */}
+        {showCrypto && (
+          <div className="bg-labdark-bg rounded-xl p-4 border border-gray-700/50">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-violet-400" />
+                <span className="font-medium text-gray-200">Cifrado César</span>
               </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Password Checker */}
-      {showPasswordChecker && (
-        <div className="bg-[#1a3a3a] rounded-xl p-4 border border-[#2d5a5a]">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Key className="w-4 h-4 text-yellow-400" />
-              <span className="font-medium text-white">Verificador de Contraseñas</span>
-            </div>
-            <button
-              onClick={() => setShowPasswordChecker(false)}
-              className="text-[#7dd3c0] hover:text-white"
-            >
-              ✕
-            </button>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={passwordToCheck}
-                onChange={(e) => {
-                  setPasswordToCheck(e.target.value)
-                  if (e.target.value) checkPasswordStrength(e.target.value)
-                  else setPasswordStrength(null)
-                }}
-                placeholder="Escribe una contraseña para verificar..."
-                className="w-full px-3 py-2 pr-10 bg-[#0f2828] border border-[#2d5a5a] rounded-lg text-white placeholder-gray-500"
-              />
               <button
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#7dd3c0] hover:text-white"
+                onClick={() => setShowCrypto(false)}
+                className="text-gray-500 hover:text-gray-300"
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                ✕
               </button>
             </div>
-            
-            {passwordStrength && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 h-2 bg-[#1e4545] rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full transition-all ${
-                        passwordStrength.score <= 2 ? 'bg-red-500' :
-                        passwordStrength.score <= 4 ? 'bg-yellow-500' :
-                        'bg-green-500'
-                      }`}
-                      style={{ width: `${(passwordStrength.score / 7) * 100}%` }}
-                    />
-                  </div>
-                  <span className={`text-sm font-medium ${
-                    passwordStrength.score <= 2 ? 'text-red-400' :
-                    passwordStrength.score <= 4 ? 'text-yellow-400' :
-                    'text-green-400'
-                  }`}>
-                    {passwordStrength.label}
-                  </span>
+
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCryptoMode('encrypt')}
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    cryptoMode === 'encrypt'
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-labdark-surface text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Encriptar
+                </button>
+                <button
+                  onClick={() => setCryptoMode('decrypt')}
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    cryptoMode === 'decrypt'
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-labdark-surface text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Desencriptar
+                </button>
+              </div>
+
+              <input
+                type="text"
+                value={encryptText}
+                onChange={(e) => setEncryptText(e.target.value)}
+                placeholder="Escribe tu mensaje..."
+                className="w-full px-3 py-2 bg-labdark-void border border-gray-700/50 rounded-lg text-gray-200 placeholder-gray-600 text-sm focus:border-violet-500/50 focus:outline-none"
+              />
+
+              <div className="flex items-center gap-3">
+                <label className="text-xs text-gray-400">Desplazamiento:</label>
+                <input
+                  type="range"
+                  min="1"
+                  max="25"
+                  value={encryptShift}
+                  onChange={(e) => setEncryptShift(parseInt(e.target.value))}
+                  className="flex-1 accent-violet-500"
+                />
+                <span className="text-gray-200 font-mono text-xs w-8">{encryptShift}</span>
+              </div>
+
+              <button
+                onClick={handleCryptoSubmit}
+                className="w-full py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors text-sm font-bold"
+              >
+                {cryptoMode === 'encrypt' ? '🔒 Encriptar' : '🔓 Desencriptar'}
+              </button>
+
+              {encryptedResult && (
+                <div className="p-3 bg-labdark-void rounded-lg">
+                  <div className="text-xs text-gray-500 mb-1">Resultado:</div>
+                  <div className="text-green-400 font-mono text-sm break-all">{encryptedResult}</div>
                 </div>
-                
-                {passwordStrength.tips.length > 0 && (
-                  <div className="text-sm">
-                    <div className="text-[#7dd3c0] mb-1">Sugerencias:</div>
-                    {passwordStrength.tips.map((tip, i) => (
-                      <div key={i} className="text-yellow-400 text-xs">• {tip}</div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Tips */}
-      <div className="bg-[#1a3a3a] border border-[#2d5a5a] rounded-lg p-3">
-        <div className="flex items-start gap-2">
-          <Shield className="w-4 h-4 text-green-400 mt-0.5" />
-          <div className="text-sm text-green-300">
-            <strong>Hacking Ético:</strong> Usa estos conocimientos solo para aprender y proteger sistemas. 
-            Nunca intentes acceder a sistemas sin autorización. ¡Sé un hacker del bien! 🛡️
+        {/* Password Checker */}
+        {showPasswordChecker && (
+          <div className="bg-labdark-bg rounded-xl p-4 border border-gray-700/50">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Key className="w-4 h-4 text-amber-400" />
+                <span className="font-medium text-gray-200">Verificador de Contraseñas</span>
+              </div>
+              <button
+                onClick={() => setShowPasswordChecker(false)}
+                className="text-gray-500 hover:text-gray-300"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={passwordToCheck}
+                  onChange={(e) => {
+                    setPasswordToCheck(e.target.value)
+                    if (e.target.value) checkPasswordStrength(e.target.value)
+                    else setPasswordStrength(null)
+                  }}
+                  placeholder="Escribe una contraseña para verificar..."
+                  className="w-full px-3 py-2 pr-10 bg-labdark-void border border-gray-700/50 rounded-lg text-gray-200 placeholder-gray-600 text-sm focus:border-amber-500/50 focus:outline-none"
+                />
+                <button
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {passwordStrength && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2 bg-labdark-surface rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all ${
+                          passwordStrength.score <= 2 ? 'bg-red-500' :
+                          passwordStrength.score <= 4 ? 'bg-yellow-500' :
+                          'bg-green-500'
+                        }`}
+                        style={{ width: `${(passwordStrength.score / 7) * 100}%` }}
+                      />
+                    </div>
+                    <span className={`text-sm font-medium ${
+                      passwordStrength.score <= 2 ? 'text-red-400' :
+                      passwordStrength.score <= 4 ? 'text-yellow-400' :
+                      'text-green-400'
+                    }`}>
+                      {passwordStrength.label}
+                    </span>
+                  </div>
+
+                  {passwordStrength.tips.length > 0 && (
+                    <div className="text-sm">
+                      <div className="text-gray-500 mb-1 text-xs">Sugerencias:</div>
+                      {passwordStrength.tips.map((tip, i) => (
+                        <div key={i} className="text-amber-400 text-xs">• {tip}</div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Tips */}
+        <div className="bg-green-500/5 border border-green-500/20 rounded-lg p-3">
+          <div className="flex items-start gap-2">
+            <Shield className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-green-300/90">
+              <strong className="text-green-300">Hacking Ético:</strong> Usa estos conocimientos solo para aprender y proteger sistemas.
+              Nunca intentes acceder a sistemas sin autorización. ¡Sé un hacker del bien! 🛡️
+            </div>
           </div>
         </div>
       </div>

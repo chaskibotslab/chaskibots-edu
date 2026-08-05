@@ -65,6 +65,8 @@ const config: Config = {
           surface: '#161B2E',
           bg: '#10131F',
           bg2: '#141829',
+          tab: '#1C2340',
+          void: '#0D0F1A',
         }
       },
       fontFamily: {
