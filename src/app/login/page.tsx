@@ -73,24 +73,62 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8">
-      {/* Mesh gradient background - light & modern */}
-      <div className="absolute inset-0 bg-[#f0f4ff]" />
-      <div className="absolute top-[-15%] left-[-10%] w-[55vw] h-[55vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-br from-[#007AFF]/30 to-[#5E5CE6]/25 blur-[120px] animate-mesh-1" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px] rounded-full bg-gradient-to-tl from-[#30B0C7]/25 to-[#10b981]/15 blur-[120px] animate-mesh-2" />
-      <div className="absolute top-[30%] right-[10%] w-[30vw] h-[30vw] max-w-[350px] max-h-[350px] rounded-full bg-gradient-to-bl from-[#ec4899]/15 to-[#5E5CE6]/10 blur-[100px] animate-mesh-3" />
+    <div className="min-h-screen flex relative overflow-hidden">
+      {/* ─── LEFT: Brand panel (desktop) ─── */}
+      <div className="hidden lg:flex flex-col justify-between w-[45%] relative bg-chaski-dark p-12 overflow-hidden">
+        {/* Ambient background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-[-20%] right-[-20%] w-[70%] h-[70%] rounded-full bg-chaski-primary/20 blur-[130px]" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-chaski-gold/10 blur-[110px]" />
+          {/* Circuit-like grid */}
+          <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+        </div>
 
-      {/* Floating geometric shapes */}
-      <div className="absolute top-16 left-16 w-16 h-16 border border-[#007AFF]/20 rounded-xl animate-spin-slow opacity-60" />
-      <div className="absolute bottom-24 right-20 w-12 h-12 border border-[#5E5CE6]/20 rounded-full animate-float opacity-50" />
-      <div className="absolute top-1/4 right-[15%] w-8 h-8 bg-[#007AFF]/10 rounded-lg animate-bounce opacity-60" style={{ animationDelay: '0.5s' }} />
-      <div className="absolute bottom-1/3 left-[12%] w-6 h-6 bg-[#5E5CE6]/10 rounded-full animate-ping opacity-40" />
-      <div className="absolute top-[60%] right-[8%] w-3 h-3 bg-emerald-500/40 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
-      <div className="absolute top-[15%] left-[40%] w-20 h-20 border border-[#30B0C7]/10 rounded-2xl rotate-45 animate-float" style={{ animationDelay: '2s' }} />
+        {/* Logo */}
+        <div className="relative flex items-center gap-3 animate-slide-in-left">
+          <div className="w-11 h-11 rounded-xl overflow-hidden ring-1 ring-white/20">
+            <Image src="/chaski.png" alt="ChaskiBots" width={44} height={44} className="w-full h-full object-cover" priority />
+          </div>
+          <div>
+            <p className="text-white font-bold text-lg leading-tight">ChaskiBots</p>
+            <p className="text-white/40 text-[11px] tracking-[0.2em] uppercase">Edu Platform</p>
+          </div>
+        </div>
+
+        {/* Message */}
+        <div className="relative space-y-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-chaski-gold/15 border border-chaski-gold/30 animate-fade-in">
+            <span className="w-1.5 h-1.5 rounded-full bg-chaski-gold animate-pulse" />
+            <span className="text-chaski-gold text-xs font-semibold tracking-wide">Robótica · IA · Programación</span>
+          </div>
+          <h2 className="text-white text-4xl font-bold leading-tight">
+            El futuro se<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-gold via-amber-300 to-chaski-gold">construye</span> aquí
+          </h2>
+          <p className="text-white/50 text-sm leading-relaxed max-w-sm">
+            Aprende robótica, inteligencia artificial y programación con laboratorios interactivos, simuladores 3D y proyectos reales.
+          </p>
+          {/* Feature chips */}
+          <div className="flex flex-wrap gap-2">
+            {['Python IDE', 'Lab de IA', 'CAD 3D', 'Simuladores'].map((f, i) => (
+              <span key={f} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-medium animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
+                {f}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <p className="relative text-white/30 text-[11px]">© {new Date().getFullYear()} ChaskiBots EDU — Educación del Futuro</p>
+      </div>
+
+      {/* ─── RIGHT: Form ─── */}
+      <div className="flex-1 flex items-center justify-center relative bg-chaski-light px-4 py-8">
+        {/* Subtle ambient */}
+        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-chaski-primary/8 blur-[100px] pointer-events-none" />
 
       {/* Card */}
-      <div className={`relative z-10 w-full max-w-[380px] transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="animate-card-float" style={{ perspective: '1200px' }}>
+      <div className={`relative z-10 w-full max-w-[400px] transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div>
           <div
             ref={cardRef}
             onMouseMove={handleCardMouseMove}
@@ -101,25 +139,16 @@ export default function LoginPage() {
               transformStyle: 'preserve-3d',
             }}
           >
-            <div className="bg-white/80 backdrop-blur-2xl rounded-3xl shadow-xl shadow-slate-200/50 p-6 border border-white/60">
+            <div className="bg-white rounded-3xl shadow-xl shadow-slate-300/40 p-7 border border-slate-100">
               {/* Logo + Title */}
-              <div className="text-center mb-5">
-                <div className="relative mx-auto w-24 h-24 mb-4">
-                  <div className="absolute -inset-2 bg-gradient-to-r from-[#007AFF] via-[#5E5CE6] to-[#30B0C7] rounded-3xl opacity-50 blur-lg animate-pulse-slow" />
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#007AFF] via-[#5E5CE6] to-[#30B0C7] rounded-2xl animate-spin-border opacity-70" />
-                  <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white shadow-2xl shadow-[#007AFF]/30">
-                    <Image
-                      src="/chaski.png"
-                      alt="ChaskiBots"
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-cover"
-                      priority
-                    />
+              <div className="text-center mb-6">
+                <div className="lg:hidden relative mx-auto w-16 h-16 mb-3">
+                  <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white shadow-lg shadow-chaski-primary/20">
+                    <Image src="/chaski.png" alt="ChaskiBots" width={64} height={64} className="w-full h-full object-cover" priority />
                   </div>
                 </div>
-                <h1 className="text-xl font-bold text-slate-900">ChaskiBots</h1>
-                <p className="text-slate-400 text-xs mt-0.5">Educación del Futuro</p>
+                <h1 className="text-2xl font-bold text-chaski-dark">Bienvenido</h1>
+                <p className="text-slate-400 text-sm mt-1">Ingresa a tu cuenta para continuar</p>
               </div>
 
               {/* Tabs */}
@@ -132,7 +161,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setLoginMode('code')}
                   className={`relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-300 ${
-                    loginMode === 'code' ? 'text-[#007AFF]' : 'text-slate-400 hover:text-slate-600'
+                    loginMode === 'code' ? 'text-chaski-primary' : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
                   <Key className="w-3.5 h-3.5" />
@@ -142,7 +171,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setLoginMode('email')}
                   className={`relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-300 ${
-                    loginMode === 'email' ? 'text-[#007AFF]' : 'text-slate-400 hover:text-slate-600'
+                    loginMode === 'email' ? 'text-chaski-primary' : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
                   <Mail className="w-3.5 h-3.5" />
@@ -165,7 +194,7 @@ export default function LoginPage() {
                       type="text"
                       value={accessCode}
                       onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                      className="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 transition-all placeholder:text-slate-300 font-mono text-lg tracking-[0.15em] text-center text-slate-900 uppercase"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all placeholder:text-slate-300 font-mono text-lg tracking-[0.15em] text-center text-slate-900 uppercase"
                       placeholder="ABCD1234"
                       maxLength={10}
                       autoFocus
@@ -185,7 +214,7 @@ export default function LoginPage() {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 transition-all placeholder:text-slate-300 text-slate-900 text-sm"
+                          className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all placeholder:text-slate-300 text-slate-900 text-sm"
                           placeholder="tu@email.com"
                           autoFocus
                           required
@@ -200,7 +229,7 @@ export default function LoginPage() {
                           type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="w-full pl-10 pr-10 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 transition-all placeholder:text-slate-300 text-slate-900 text-sm"
+                          className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all placeholder:text-slate-300 text-slate-900 text-sm"
                           placeholder="••••••••"
                           required
                         />
@@ -219,7 +248,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="relative w-full py-3 bg-[#007AFF] text-white font-semibold rounded-xl hover:bg-[#0066DD] hover:shadow-lg hover:shadow-[#007AFF]/20 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group disabled:opacity-60 overflow-hidden"
+                  className="relative w-full py-3 bg-gradient-to-r from-chaski-primary to-chaski-accent text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-chaski-primary/25 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group disabled:opacity-60 overflow-hidden"
                 >
                   <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                   {isLoading ? (
@@ -235,15 +264,16 @@ export default function LoginPage() {
 
               {/* Footer */}
               <div className="mt-4 pt-3 border-t border-slate-100 text-center">
-                <p className="text-slate-400 text-[11px]">¿Necesitas ayuda? <a href="tel:+593968653593" className="text-[#007AFF] font-medium hover:underline">0968653593</a></p>
+                <p className="text-slate-400 text-[11px]">¿Necesitas ayuda? <a href="tel:+593968653593" className="text-chaski-primary font-medium hover:underline">0968653593</a></p>
               </div>
             </div>
           </div>
         </div>
 
-        <p className="text-center text-slate-400 text-[11px] mt-5">
+        <p className="lg:hidden text-center text-slate-400 text-[11px] mt-5">
           © {new Date().getFullYear()} ChaskiBots EDU
         </p>
+      </div>
       </div>
     </div>
   )
