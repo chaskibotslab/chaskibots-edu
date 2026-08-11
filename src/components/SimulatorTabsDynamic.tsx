@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useAuth } from './AuthProvider'
-import { 
-  ExternalLink, Puzzle, Cat, Gamepad2, Zap, CircuitBoard, Code, Terminal, 
+import {
+  ExternalLink, Puzzle, Cat, Gamepad2, Zap, CircuitBoard, Code, Terminal,
   Cpu, Bot, Cog, Eye, Box, GitBranch, Network, Joystick, Wrench, Sparkles,
-  Loader2, AlertCircle, RefreshCw
+  Loader2, AlertCircle, RefreshCw, Shield
 } from 'lucide-react'
 
 const BlocklyEditor = dynamic(() => import('./BlocklyEditor'), {
@@ -48,6 +48,9 @@ const categories = [
   { id: 'micropython', name: 'MicroPython', icon: Cpu },
   { id: 'electronica', name: 'Electrónica', icon: Zap },
   { id: 'robotica', name: 'Robótica', icon: Bot },
+  { id: 'ia', name: 'Inteligencia Artificial', icon: Eye },
+  { id: 'hacking', name: 'Hacking', icon: Shield },
+  { id: 'roblox', name: 'Roblox', icon: Gamepad2 },
   { id: 'cnc', name: 'CNC/Industrial', icon: Cog },
   { id: '3d', name: 'Diseño 3D', icon: Box },
   { id: 'logica', name: 'Lógica Digital', icon: GitBranch },

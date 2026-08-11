@@ -140,206 +140,62 @@ export default function AdminPage() {
     return null
   }
 
+  const TABS: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'courses', label: 'Cursos', icon: BookOpen },
+    { id: 'users', label: 'Usuarios', icon: Users },
+    { id: 'logs', label: 'Actividad', icon: Activity },
+    { id: 'settings', label: 'Configuración', icon: Settings },
+  ]
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex relative overflow-hidden">
-      {/* Fondo futurista con efectos */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#558C89]/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#74AFAD]/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-[#D9853B]/8 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+    <div className="min-h-full">
+      {/* Page header */}
+      <div className="px-6 pt-6 pb-0">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div className="animate-slide-in-left">
+            <h1 className="text-xl font-bold text-slate-900">
+              {activeTab === 'dashboard' && 'Dashboard'}
+              {activeTab === 'courses' && 'Gestión de Cursos'}
+              {activeTab === 'users' && 'Gestión de Usuarios'}
+              {activeTab === 'logs' && 'Registro de Actividad'}
+              {activeTab === 'settings' && 'Configuración'}
+            </h1>
+            <p className="text-sm text-slate-400">Resumen general de la plataforma</p>
+          </div>
+        </div>
+
+        {/* Tab pills */}
+        <div className="flex gap-1 border-b border-slate-200 -mb-px overflow-x-auto">
+          {TABS.map(t => {
+            const Icon = t.icon
+            const active = activeTab === t.id
+            return (
+              <button
+                key={t.id}
+                onClick={() => setActiveTab(t.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 text-[13px] font-medium border-b-2 transition-all whitespace-nowrap ${
+                  active
+                    ? 'border-chaski-primary text-chaski-primary'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {t.label}
+                {t.id === 'logs' && accessLogs.length > 0 && (
+                  <span className="bg-chaski-primary/10 text-chaski-primary text-[10px] px-1.5 py-0.5 rounded-full font-bold">
+                    {accessLogs.length}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
       </div>
-      
-      {/* Sidebar */}
-      <aside className="w-64 bg-gray-50/80 backdrop-blur-xl border-r border-brand-purple/10 flex flex-col relative z-10">
-        {/* Logo Header con efecto glow */}
-        <div className="p-4 border-b border-brand-purple/20 bg-gradient-to-r from-brand-purple/5 to-brand-violet/5">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-brand-purple/30 rounded-xl blur-md group-hover:bg-brand-purple/50 transition-all"></div>
-              <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-brand-purple/50 group-hover:border-brand-purple transition-all">
-                <Image 
-                  src="/chaski.png" 
-                  alt="ChaskiBots" 
-                  width={48} 
-                  height={48}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-gray-900 font-bold text-lg tracking-wide">ChaskiBots</h1>
-              <p className="text-xs text-brand-purple font-medium tracking-widest uppercase">Panel Admin</p>
-            </div>
-          </Link>
-        </div>
 
-        <nav className="flex-1 p-4 space-y-2">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-              activeTab === 'dashboard'
-                ? 'bg-gradient-to-r from-brand-purple/20 to-brand-purple/10 text-brand-purple border border-brand-purple/40 shadow-lg shadow-brand-purple/20'
-                : 'text-gray-600 hover:bg-gray-100/50 hover:text-gray-900 hover:border-white/10 border border-transparent'
-            }`}
-          >
-            <BarChart3 className="w-5 h-5" />
-            <span className="font-medium">Dashboard</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('courses')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-              activeTab === 'courses'
-                ? 'bg-gradient-to-r from-brand-violet/20 to-brand-violet/10 text-brand-violet border border-brand-violet/40 shadow-lg shadow-brand-violet/20'
-                : 'text-gray-600 hover:bg-gray-100/50 hover:text-gray-900 hover:border-white/10 border border-transparent'
-            }`}
-          >
-            <BookOpen className="w-5 h-5" />
-            <span className="font-medium">Cursos</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('users')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-              activeTab === 'users'
-                ? 'bg-gradient-to-r from-neon-pink/20 to-neon-pink/10 text-neon-pink border border-neon-pink/40 shadow-lg shadow-neon-pink/20'
-                : 'text-gray-600 hover:bg-gray-100/50 hover:text-gray-900 hover:border-white/10 border border-transparent'
-            }`}
-          >
-            <Users className="w-5 h-5" />
-            <span className="font-medium">Usuarios</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('logs')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-              activeTab === 'logs'
-                ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/10 text-neon-green border border-neon-green/40 shadow-lg shadow-neon-green/20'
-                : 'text-gray-600 hover:bg-gray-100/50 hover:text-gray-900 hover:border-white/10 border border-transparent'
-            }`}
-          >
-            <Activity className="w-5 h-5" />
-            <span className="font-medium">Actividad</span>
-            {accessLogs.length > 0 && (
-              <span className="ml-auto bg-neon-green/30 text-neon-green text-xs px-2 py-0.5 rounded-full font-bold animate-pulse">
-                {accessLogs.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-              activeTab === 'settings'
-                ? 'bg-gradient-to-r from-orange-500/20 to-orange-500/10 text-orange-400 border border-orange-500/40 shadow-lg shadow-orange-500/20'
-                : 'text-gray-600 hover:bg-gray-100/50 hover:text-gray-900 hover:border-white/10 border border-transparent'
-            }`}
-          >
-            <Settings className="w-5 h-5" />
-            <span className="font-medium">Configuración</span>
-          </button>
-
-          <div className="mt-4 pt-4 border-t border-brand-purple/10">
-            <p className="text-xs text-brand-purple/60 mb-3 px-4 font-semibold tracking-wider uppercase">Herramientas</p>
-            <Link
-              href="/admin/colegios"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-blue-500/10 hover:text-blue-400 transition-all duration-300 border border-transparent hover:border-blue-500/30 group"
-            >
-              <Shield className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
-              <span className="font-medium">Colegios</span>
-              <span className="ml-auto text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">Nuevo</span>
-            </Link>
-            <Link
-              href="/admin/calificaciones"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-neon-green/10 hover:text-neon-green transition-all duration-300 border border-transparent hover:border-neon-green/30 group"
-            >
-              <GraduationCap className="w-5 h-5 text-neon-green group-hover:scale-110 transition-transform" />
-              <span className="font-medium">Calificaciones</span>
-            </Link>
-            <Link
-              href="/admin/entregas"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-purple-500/10 hover:text-purple-400 transition-all duration-300 border border-transparent hover:border-purple-500/30 group"
-            >
-              <FileText className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
-              <span className="font-medium">Entregas</span>
-            </Link>
-            <Link
-              href="/admin/tareas"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-yellow-500/10 hover:text-yellow-400 transition-all duration-300 border border-transparent hover:border-yellow-500/30 group"
-            >
-              <BookOpen className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform" />
-              <span className="font-medium">Gestión de Tareas</span>
-            </Link>
-            <Link
-              href="/admin/contenido"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-brand-purple/10 hover:text-brand-purple transition-all duration-300 border border-transparent hover:border-brand-purple/30 group"
-            >
-              <Brain className="w-5 h-5 text-brand-purple group-hover:scale-110 transition-transform" />
-              <span className="font-medium">Contenido</span>
-            </Link>
-          </div>
-        </nav>
-
-        {/* Footer del sidebar con usuario y logo pequeño */}
-        <div className="p-4 border-t border-gray-200 bg-gradient-to-r from-gray-100/50 to-gray-50/50">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-brand-violet/30 rounded-full blur-sm"></div>
-              <div className="relative w-10 h-10 bg-gradient-to-br from-brand-violet to-neon-pink rounded-full flex items-center justify-center border border-brand-violet/50">
-                <span className="text-gray-900 font-bold">{user?.name?.charAt(0) || 'A'}</span>
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-gray-900 text-sm font-semibold truncate">{user?.name}</p>
-              <p className="text-brand-purple/60 text-xs truncate">{user?.email}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              logout()
-              router.push('/')
-            }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500/20 to-red-600/20 text-red-400 rounded-xl hover:from-red-500/30 hover:to-red-600/30 transition-all duration-300 border border-red-500/30 hover:border-red-500/50 font-medium"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Cerrar Sesión</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto relative z-10">
-        {/* Header futurista */}
-        <header className="h-20 bg-gray-50/60 backdrop-blur-xl border-b border-brand-purple/10 flex items-center justify-between px-8">
-          <div className="flex items-center gap-4">
-            {/* Logo pequeño en header */}
-            <div className="w-10 h-10 rounded-lg overflow-hidden border border-brand-purple/30 hidden lg:block">
-              <Image src="/chaski.png" alt="ChaskiBots" width={40} height={40} className="w-full h-full object-cover" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 tracking-wide">
-                {activeTab === 'dashboard' && 'Dashboard'}
-                {activeTab === 'courses' && 'Gestión de Cursos'}
-                {activeTab === 'users' && 'Gestión de Usuarios'}
-                {activeTab === 'logs' && 'Registro de Actividad'}
-                {activeTab === 'settings' && 'Configuración'}
-              </h2>
-              <p className="text-brand-purple/60 text-sm">Panel de Administración ChaskiBots</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-purple/10 to-brand-violet/10 text-brand-purple hover:text-gray-900 transition-all duration-300 rounded-xl border border-brand-purple/30 hover:border-brand-purple/60 font-medium"
-            >
-              <Home className="w-4 h-4" />
-              <span>Ver Sitio</span>
-            </Link>
-          </div>
-        </header>
-
-        {/* Content */}
-        <div className="p-6">
+      {/* Content */}
+      <main>
+        <div className="p-6 animate-fade-in" key={activeTab}>
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && (
             <div className="space-y-8">

@@ -12,6 +12,7 @@ function rowToSimulator(row: any) {
     url: row.url || '',
     levels: row.levels || [],
     programs: row.programs || ['robotica', 'ia', 'hacking'],
+    category: row.category || 'bloques',
     enabled: row.enabled !== false,
   }
 }
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, name, description, icon, url, levels, programs } = body
+    const { id, name, description, icon, url, levels, programs, category } = body
 
     if (!id || !name) {
       return NextResponse.json({ error: 'id y name son requeridos' }, { status: 400 })
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
       url: url || '',
       levels: Array.isArray(levels) ? levels : (typeof levels === 'string' ? levels.split(',').map((s: string) => s.trim()) : []),
       programs: Array.isArray(programs) ? programs : ['robotica', 'ia', 'hacking'],
+      category: category || 'bloques',
       enabled: true,
     }).select().single()
 
@@ -87,6 +89,7 @@ export async function PATCH(request: NextRequest) {
     if (updates.url !== undefined) fields.url = updates.url
     if (updates.levels !== undefined) fields.levels = Array.isArray(updates.levels) ? updates.levels : []
     if (updates.programs !== undefined) fields.programs = Array.isArray(updates.programs) ? updates.programs : []
+    if (updates.category !== undefined) fields.category = updates.category || 'bloques'
     if (updates.enabled !== undefined) fields.enabled = Boolean(updates.enabled)
 
     const { error } = await supabaseAdmin.from('simulators').update(fields).eq('id', id)

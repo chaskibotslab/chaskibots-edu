@@ -82,6 +82,15 @@ const config: Config = {
         'float': 'float 3s ease-in-out infinite',
         'fade-in': 'fadeIn 0.2s ease-out',
         'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        'pop': 'pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'bounce-soft': 'bounceSoft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'wiggle': 'wiggle 0.5s ease-in-out',
+        'slide-in-left': 'slideInLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+        'slide-in-right': 'slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+        'scale-in': 'scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        'shimmer': 'shimmer 2s linear infinite',
+        'robot-bob': 'robotBob 2.5s ease-in-out infinite',
+        'matrix-fall': 'matrixFall 3s linear infinite',
       },
       keyframes: {
         glow: {
@@ -99,6 +108,45 @@ const config: Config = {
         slideUp: {
           '0%': { transform: 'translateY(100%)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        pop: {
+          '0%': { transform: 'scale(0.9)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        bounceSoft: {
+          '0%': { transform: 'scale(0.95) translateY(6px)', opacity: '0' },
+          '60%': { transform: 'scale(1.02) translateY(-2px)', opacity: '1' },
+          '100%': { transform: 'scale(1) translateY(0)' },
+        },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-4deg)' },
+          '75%': { transform: 'rotate(4deg)' },
+        },
+        slideInLeft: {
+          '0%': { transform: 'translateX(-16px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        slideInRight: {
+          '0%': { transform: 'translateX(16px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.97)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        robotBob: {
+          '0%, 100%': { transform: 'translateY(0) rotate(-1deg)' },
+          '50%': { transform: 'translateY(-8px) rotate(1deg)' },
+        },
+        matrixFall: {
+          '0%': { transform: 'translateY(-100%)', opacity: '0' },
+          '10%': { opacity: '1' },
+          '100%': { transform: 'translateY(100vh)', opacity: '0' },
         },
       },
       boxShadow: {
