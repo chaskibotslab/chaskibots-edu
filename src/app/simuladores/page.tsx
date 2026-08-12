@@ -8,8 +8,8 @@ import { Code, Copy, Check, Terminal, Lightbulb, BookOpen, Download, Loader2, Br
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
-    <Loader2 className="w-8 h-8 animate-spin text-brand-purple" />
-    <span className="ml-2 text-gray-600">Cargando simulador...</span>
+    <Loader2 className="w-8 h-8 animate-spin text-chaski-primary" />
+    <span className="ml-2 text-slate-600">Cargando simulador...</span>
   </div>
 )
 
@@ -172,26 +172,27 @@ for i in range(1, 11):
         <div className="max-w-6xl mx-auto space-y-10">
 
           {/* Hero */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8 text-center shadow-2xl">
-            <div className="absolute top-0 left-0 w-64 h-64 bg-brand-purple/20 rounded-full blur-[100px]"></div>
-            <div className="absolute bottom-0 right-0 w-56 h-56 bg-brand-cyan/15 rounded-full blur-[90px]"></div>
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8 text-center shadow-2xl animate-fade-in">
+            <div className="absolute top-0 left-0 w-64 h-64 bg-chaski-primary/20 rounded-full blur-[100px]"></div>
+            <div className="absolute bottom-0 right-0 w-56 h-56 bg-chaski-gold/15 rounded-full blur-[90px]"></div>
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-4">
-                <Terminal className="w-4 h-4 text-brand-cyan" />
+              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-4 animate-slide-up">
+                <span className="w-1.5 h-1.5 rounded-full bg-chaski-gold animate-pulse" />
+                <Terminal className="w-4 h-4 text-chaski-gold" />
                 <span className="text-white/90 text-sm font-medium">Aprende Programando</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-black mb-3">
+              <h1 className="text-3xl md:text-4xl font-black mb-3 animate-slide-up" style={{ animationDelay: '0.05s' }}>
                 Simuladores Online
               </h1>
-              <p className="text-white/70 max-w-2xl mx-auto text-lg">
+              <p className="text-white/70 max-w-2xl mx-auto text-lg animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 Practica programación, electrónica y robótica con simuladores interactivos.
-                <span className="text-brand-cyan font-medium"> ¡Sin necesidad de registro!</span>
+                <span className="text-chaski-gold font-medium"> ¡Sin necesidad de registro!</span>
               </p>
             </div>
           </div>
 
           {/* Python Guide */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8 animate-fade-in" style={{ animationDelay: '0.05s' }}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
                 <Code className="w-6 h-6 text-green-500" />
@@ -205,8 +206,8 @@ for i in range(1, 11):
             </div>
 
             <div className="space-y-6 mt-6">
-              {pythonExamples.map((example) => (
-                <div key={example.id} className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 hover:border-green-500/30 transition-all">
+              {pythonExamples.map((example, i) => (
+                <div key={example.id} className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 hover:border-green-500/30 hover:shadow-md transition-all duration-300 animate-slide-up" style={{ animationDelay: `${i * 0.05}s` }}>
                   <div className="p-4 border-b border-slate-200 bg-white">
                     <h3 className="font-bold text-slate-900 flex items-center gap-2">
                       <Lightbulb className="w-5 h-5 text-yellow-500" />
@@ -220,7 +221,7 @@ for i in range(1, 11):
                     </pre>
                     <button
                       onClick={() => copyCode(example.code, example.id)}
-                      className="absolute top-2 right-2 p-2 bg-white hover:bg-green-50 border border-slate-200 hover:border-green-500/50 rounded-lg transition-all"
+                      className="absolute top-2 right-2 p-2 bg-white hover:bg-green-50 border border-slate-200 hover:border-green-500/50 rounded-lg active:scale-[0.98] transition-all"
                       title="Copiar código"
                     >
                       {copiedCode === example.id ? (
@@ -234,14 +235,14 @@ for i in range(1, 11):
               ))}
             </div>
 
-            <div className="mt-6 bg-brand-purple/5 border border-brand-purple/20 rounded-xl p-4 flex items-start gap-3">
-              <div className="w-10 h-10 bg-brand-purple/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Terminal className="w-5 h-5 text-brand-purple" />
+            <div className="mt-6 bg-chaski-primary/5 border border-chaski-primary/20 rounded-xl p-4 flex items-start gap-3">
+              <div className="w-10 h-10 bg-chaski-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Terminal className="w-5 h-5 text-chaski-primary" />
               </div>
               <div>
                 <p className="text-slate-900 font-semibold">¿Dónde practicar?</p>
                 <p className="text-slate-600 text-sm">
-                  Usa <strong className="text-brand-purple">Trinket Python</strong> o <strong className="text-brand-purple">Programiz Python</strong>
+                  Usa <strong className="text-chaski-primary">Trinket Python</strong> o <strong className="text-chaski-primary">Programiz Python</strong>
                   {' '}en las pestañas de abajo. Solo copia, pega y presiona "Run".
                 </p>
               </div>
@@ -249,10 +250,10 @@ for i in range(1, 11):
           </div>
 
           {/* Categories */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-brand-purple" />
+              <div className="w-10 h-10 bg-chaski-primary/10 rounded-xl flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-chaski-primary" />
               </div>
               Categorías de Simuladores
             </h2>
@@ -262,10 +263,10 @@ for i in range(1, 11):
                 { icon: Terminal, color: 'neon-green', title: 'MicroPython', description: 'Python para microcontroladores ESP32 y Raspberry Pi Pico.' },
                 { icon: Lightbulb, color: 'brand-violet', title: 'Arduino/Electrónica', description: 'Circuitos, sensores y programación de hardware.' },
                 { icon: BookOpen, color: 'orange-500', title: 'CNC/Industrial', description: 'G-Code, robótica industrial y manufactura digital.' }
-              ].map((cat) => {
+              ].map((cat, i) => {
                 const Icon = cat.icon
                 return (
-                  <div key={cat.title} className="group bg-slate-50 rounded-xl p-5 border border-slate-200 hover:border-slate-300 transition-all">
+                  <div key={cat.title} className="group bg-slate-50 rounded-xl p-5 border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-300 animate-scale-in" style={{ animationDelay: `${i * 0.05}s` }}>
                     <div className={`w-12 h-12 bg-${cat.color}/10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                       <Icon className={`w-6 h-6 text-${cat.color}`} />
                     </div>
@@ -278,7 +279,7 @@ for i in range(1, 11):
           </div>
 
           {/* Python IDE Professional */}
-          <div>
+          <div className="animate-fade-in" style={{ animationDelay: '0.15s' }}>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl flex items-center justify-center border border-blue-500/20">
                 <Code className="w-6 h-6 text-blue-500" />
@@ -292,7 +293,7 @@ for i in range(1, 11):
           </div>
 
           {/* AI Lab */}
-          <div>
+          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center border border-purple-500/20">
                 <Brain className="w-6 h-6 text-purple-500" />
@@ -306,7 +307,7 @@ for i in range(1, 11):
           </div>
 
           {/* CAD Lab 3D */}
-          <div>
+          <div className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-cyan-500/20">
                 <Cog className="w-6 h-6 text-cyan-500" />
@@ -331,7 +332,7 @@ for i in range(1, 11):
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Consejo Pro</h3>
                 <p className="text-slate-600">
                   Si algún simulador externo no carga, usa el botón
-                  <span className="text-brand-purple font-medium"> "Abrir en su web"</span>.
+                  <span className="text-chaski-primary font-medium"> "Abrir en su web"</span>.
                   El simulador de ChaskiBots funciona completamente en tu navegador.
                 </p>
               </div>

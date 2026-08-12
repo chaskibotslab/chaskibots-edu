@@ -16,16 +16,16 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-12">
       {/* Fondo */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-purple/20 rounded-full blur-[140px] animate-pulse"></div>
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-chaski-primary/20 rounded-full blur-[140px] animate-pulse"></div>
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-brand-cyan/15 rounded-full blur-[140px] animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      <div className="relative z-10 w-full max-w-md">
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl shadow-brand-purple/10 p-8 text-center border border-white/20">
+      <div className="relative z-10 w-full max-w-md animate-scale-in">
+        <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl shadow-chaski-primary/10 p-8 text-center border border-white/20">
           {/* Logo */}
           <div className="flex justify-center mb-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-brand-purple to-brand-cyan rounded-2xl blur-lg opacity-60"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-chaski-primary to-brand-cyan rounded-2xl blur-lg opacity-60"></div>
               <Image
                 src="/chaski.png"
                 alt="ChaskiBots Logo"
@@ -37,7 +37,7 @@ export default function RegisterPage() {
           </div>
 
           <h1 className="text-2xl font-black text-slate-900 mb-1 flex items-center justify-center gap-2">
-            <Bot className="w-6 h-6 text-brand-purple" />
+            <Bot className="w-6 h-6 text-chaski-primary" />
             ¡Únete a ChaskiBots!
           </h1>
           <p className="text-slate-500 text-sm mb-6 flex items-center justify-center gap-1">
@@ -57,7 +57,7 @@ export default function RegisterPage() {
 
             <a
               href="tel:+593968653593"
-              className="flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl mb-3 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
+              className="flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl mb-3 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
             >
               <Phone className="w-5 h-5" />
               <span className="text-lg">0968653593</span>
@@ -67,7 +67,7 @@ export default function RegisterPage() {
               href="https://wa.me/593968653593?text=Hola,%20me%20interesa%20inscribirme%20en%20ChaskiBots%20EDU"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 px-6 rounded-xl mb-4 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
+              className="flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 px-6 rounded-xl mb-4 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
             >
               <MessageCircle className="w-5 h-5" />
               <span>Escríbenos por WhatsApp</span>
@@ -84,7 +84,7 @@ export default function RegisterPage() {
             <h3 className="font-bold text-slate-900 mb-3">¿Qué aprenderás?</h3>
             <ul className="space-y-2 text-sm text-slate-600">
               {FEATURES.map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-2">
+                <li key={idx} className="flex items-center gap-2 animate-slide-up" style={{ animationDelay: `${idx * 0.05}s` }}>
                   <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
                   {feature}
                 </li>
@@ -94,7 +94,7 @@ export default function RegisterPage() {
 
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 text-brand-purple hover:text-brand-violet font-semibold transition-colors"
+            className="inline-flex items-center gap-2 text-chaski-primary hover:text-chaski-accent font-semibold transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Volver al inicio de sesión

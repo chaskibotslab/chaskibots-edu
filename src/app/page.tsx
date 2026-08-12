@@ -87,24 +87,24 @@ export default function HomePage() {
         {/* Hero Section - Mesh Gradient Moderno */}
         <section ref={heroRef} className="relative overflow-hidden min-h-[92vh] flex items-center px-4">
           {/* Animated Mesh Gradient Background */}
-          <div className="absolute inset-0 bg-[#f0f4ff]" />
-          <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] rounded-full bg-gradient-to-br from-[#007AFF]/40 to-[#5E5CE6]/30 blur-[100px] animate-mesh-1" />
-          <div className="absolute bottom-[-15%] right-[-5%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tl from-[#30B0C7]/35 to-[#10b981]/20 blur-[100px] animate-mesh-2" />
-          <div className="absolute top-[20%] right-[15%] w-[35vw] h-[35vw] max-w-[450px] max-h-[450px] rounded-full bg-gradient-to-bl from-[#ec4899]/20 to-[#f59e0b]/15 blur-[100px] animate-mesh-3" />
-          
+          <div className="absolute inset-0 bg-chaski-light" />
+          <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] rounded-full bg-gradient-to-br from-chaski-primary/40 to-chaski-secondary/30 blur-[100px] animate-mesh-1" />
+          <div className="absolute bottom-[-15%] right-[-5%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tl from-chaski-accent/35 to-chaski-gold/20 blur-[100px] animate-mesh-2" />
+          <div className="absolute top-[20%] right-[15%] w-[35vw] h-[35vw] max-w-[450px] max-h-[450px] rounded-full bg-gradient-to-bl from-chaski-gold/20 to-chaski-primary/15 blur-[100px] animate-mesh-3" />
+
           {/* Floating geometric shapes */}
-          <div className="absolute top-20 left-[8%] w-20 h-20 border border-[#007AFF]/15 rounded-2xl animate-spin-slow opacity-60" />
-          <div className="absolute bottom-32 right-[10%] w-14 h-14 border border-[#5E5CE6]/15 rounded-full animate-float opacity-50" />
-          <div className="absolute top-[30%] left-[5%] w-10 h-10 bg-[#007AFF]/8 rounded-xl rotate-12 animate-bounce opacity-60" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-20 left-[8%] w-20 h-20 border border-chaski-primary/15 rounded-2xl animate-spin-slow opacity-60" />
+          <div className="absolute bottom-32 right-[10%] w-14 h-14 border border-chaski-secondary/15 rounded-full animate-float opacity-50" />
+          <div className="absolute top-[30%] left-[5%] w-10 h-10 bg-chaski-primary/8 rounded-xl rotate-12 animate-bounce opacity-60" style={{ animationDelay: '1s' }} />
           <div className="absolute bottom-[20%] left-[15%] w-6 h-6 bg-emerald-500/10 rounded-full animate-ping opacity-40" />
-          <div className="absolute top-[15%] right-[25%] w-24 h-24 border border-[#30B0C7]/10 rounded-3xl rotate-45 animate-float" style={{ animationDelay: '3s' }} />
-          <div className="absolute bottom-[40%] right-[5%] w-4 h-4 bg-[#ec4899]/15 rounded-full animate-bounce opacity-50" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-[15%] right-[25%] w-24 h-24 border border-chaski-accent/10 rounded-3xl rotate-45 animate-float" style={{ animationDelay: '3s' }} />
+          <div className="absolute bottom-[40%] right-[5%] w-4 h-4 bg-chaski-gold/15 rounded-full animate-bounce opacity-50" style={{ animationDelay: '2s' }} />
 
           <div className="max-w-6xl mx-auto relative z-10 w-full">
             <div className="grid md:grid-cols-2 gap-10 items-center">
               {/* Left - Text */}
               <div className="order-2 md:order-1">
-                <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-[#007AFF]/20 shadow-sm animate-fade-in">
+                <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-chaski-primary/20 shadow-sm animate-fade-in">
                   <span className="relative flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
@@ -115,25 +115,25 @@ export default function HomePage() {
                 <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold mb-6 leading-[1.1] text-slate-900 animate-slide-up">
                   Aprende{' '}
                   <span className="relative inline-block">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#007AFF] to-[#339DFF]">Robótica</span>
-                    <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-[#007AFF] to-[#339DFF] rounded-full animate-expand-width" />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-primary to-chaski-secondary">Robótica</span>
+                    <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-chaski-primary to-chaski-secondary rounded-full animate-expand-width" />
                   </span>,{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D9853B] to-[#e9a55b]">IA</span> y{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-gold via-amber-400 to-chaski-gold">IA</span> y{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-400">Hacking Ético</span>
                 </h1>
 
                 <p className="text-lg text-slate-500 mb-8 max-w-lg leading-relaxed animate-fade-in" style={{animationDelay: '0.3s'}}>
-                  Plataforma educativa completa desde Inicial hasta Bachillerato. 
+                  Plataforma educativa completa desde Inicial hasta Bachillerato.
                   Videos, tutoriales, simuladores y proyectos prácticos con kits reales.
                 </p>
 
                 <div className="flex flex-wrap gap-3 animate-fade-in" style={{animationDelay: '0.5s'}}>
-                  <Link href="/login" className="group px-7 py-3.5 bg-[#007AFF] text-white font-semibold rounded-2xl hover:bg-[#0066DD] hover:shadow-xl hover:shadow-[#007AFF]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center gap-2">
+                  <Link href="/login" className="group px-7 py-3.5 bg-gradient-to-r from-chaski-primary to-chaski-accent text-white font-semibold rounded-2xl hover:shadow-xl hover:shadow-chaski-primary/25 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 transition-all duration-300 flex items-center gap-2">
                     <Play className="w-4 h-4" />
                     Comenzar Ahora
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
-                  <Link href="/login" className="px-7 py-3.5 bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-700 font-semibold rounded-2xl hover:bg-white hover:border-[#007AFF]/40 hover:text-[#007AFF] hover:-translate-y-0.5 transition-all duration-300">
+                  <Link href="/login" className="px-7 py-3.5 bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-700 font-semibold rounded-2xl hover:bg-white hover:border-chaski-primary/40 hover:text-chaski-primary hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300">
                     Iniciar Sesión
                   </Link>
                 </div>
@@ -149,26 +149,26 @@ export default function HomePage() {
                   }}
                 >
                   {/* Glow ring behind logo */}
-                  <div className="absolute -inset-8 bg-gradient-to-r from-[#007AFF]/25 via-[#5E5CE6]/20 to-[#30B0C7]/25 rounded-full blur-3xl animate-pulse-slow scale-110" />
-                  <div className="absolute -inset-2 bg-gradient-to-r from-[#007AFF] via-[#5E5CE6] to-[#30B0C7] rounded-3xl animate-spin-border opacity-40" />
-                  
+                  <div className="absolute -inset-8 bg-gradient-to-r from-chaski-primary/25 via-chaski-secondary/20 to-chaski-gold/25 rounded-full blur-3xl animate-pulse-slow scale-110" />
+                  <div className="absolute -inset-2 bg-gradient-to-r from-chaski-primary via-chaski-secondary to-chaski-gold rounded-3xl animate-spin-border opacity-40" />
+
                   {/* Logo */}
-                  <Image 
-                    src="/chaski.png" 
-                    alt="ChaskiBots Logo" 
-                    width={300} 
+                  <Image
+                    src="/chaski.png"
+                    alt="ChaskiBots Logo"
+                    width={300}
                     height={300}
-                    className="relative rounded-3xl drop-shadow-2xl animate-card-float border-2 border-white/50 shadow-2xl shadow-[#007AFF]/20"
+                    className="relative rounded-3xl drop-shadow-2xl animate-card-float border-2 border-white/50 shadow-2xl shadow-chaski-primary/20"
                     priority
                   />
 
                   {/* Floating badges */}
                   <div className="absolute -top-4 -left-8 flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg shadow-slate-200/50 border border-slate-100 animate-card-float" style={{ animationDelay: '0.5s' }}>
-                    <Cpu className="w-3.5 h-3.5 text-[#007AFF]" />
+                    <Cpu className="w-3.5 h-3.5 text-chaski-primary" />
                     <span className="text-xs font-semibold text-slate-700">Robótica</span>
                   </div>
                   <div className="absolute -bottom-4 -right-6 flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg shadow-slate-200/50 border border-slate-100 animate-card-float" style={{ animationDelay: '1.2s' }}>
-                    <Brain className="w-3.5 h-3.5 text-[#5E5CE6]" />
+                    <Brain className="w-3.5 h-3.5 text-chaski-secondary" />
                     <span className="text-xs font-semibold text-slate-700">IA</span>
                   </div>
                   <div className="absolute top-1/2 -right-10 hidden sm:flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg shadow-slate-200/50 border border-slate-100 animate-card-float" style={{ animationDelay: '1.8s' }}>
@@ -177,8 +177,8 @@ export default function HomePage() {
                   </div>
 
                   {/* Small decorative dots */}
-                  <div className="absolute -top-3 right-8 w-3 h-3 rounded-full bg-[#007AFF] animate-ping opacity-60" />
-                  <div className="absolute bottom-8 -left-4 w-2 h-2 rounded-full bg-[#5E5CE6] animate-bounce" style={{ animationDelay: '0.7s' }} />
+                  <div className="absolute -top-3 right-8 w-3 h-3 rounded-full bg-chaski-primary animate-ping opacity-60" />
+                  <div className="absolute bottom-8 -left-4 w-2 h-2 rounded-full bg-chaski-secondary animate-bounce" style={{ animationDelay: '0.7s' }} />
                   <div className="absolute top-12 -right-3 w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '1.3s' }} />
                 </div>
               </div>
@@ -191,12 +191,12 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto px-4 relative z-10">
             <Reveal className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {[
-                { value: count1, suffix: '+', label: 'Niveles Educativos', color: 'text-[#007AFF]' },
-                { value: count2, suffix: '+', label: 'Áreas', color: 'text-[#5E5CE6]' },
-                { value: count3, suffix: '', label: 'Kits', color: 'text-emerald-500' },
-                { value: count4, suffix: '+', label: 'Simuladores', color: 'text-[#30B0C7]' },
+                { value: count1, suffix: '+', label: 'Niveles Educativos', color: 'text-chaski-primary' },
+                { value: count2, suffix: '+', label: 'Áreas', color: 'text-chaski-secondary' },
+                { value: count3, suffix: '', label: 'Kits', color: 'text-chaski-gold' },
+                { value: count4, suffix: '+', label: 'Simuladores', color: 'text-chaski-accent' },
               ].map((stat, i) => (
-                <div key={i} className="group hover:scale-105 transition-transform duration-300 cursor-default">
+                <div key={i} className="group hover:scale-105 transition-transform duration-300 cursor-default animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
                   <div className={`text-4xl md:text-5xl font-extrabold ${stat.color} transition-all`}>
                     {stat.value}{stat.suffix}
                   </div>
@@ -211,92 +211,93 @@ export default function HomePage() {
         <section className="py-20 px-4 bg-transparent">
           <div className="max-w-6xl mx-auto">
             <Reveal>
-              <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
-                Nuestras <span className="text-brand-cyan">Experiencias</span>
+              <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
+                Nuestras <span className="text-chaski-primary">Experiencias</span>
               </h2>
-              <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-                ChaskiBots ha llevado robótica educativa a instituciones de todo el país. 
+              <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+                ChaskiBots ha llevado robótica educativa a instituciones de todo el país.
                 Conoce nuestro impacto en la educación STEM.
               </p>
             </Reveal>
-            
+
             <Reveal delay={100} className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="card group hover:border-brand-cyan/50 hover:scale-105 transition-all duration-300 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-brand-cyan/10 rounded-2xl flex items-center justify-center group-hover:bg-brand-cyan/20 transition-colors">
-                  <Building2 className="w-8 h-8 text-brand-cyan" />
+              <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0s' }}>
+                <div className="w-16 h-16 mx-auto mb-4 bg-chaski-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-chaski-primary/20 group-hover:scale-110 transition-all">
+                  <Building2 className="w-8 h-8 text-chaski-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Instituciones Educativas</h3>
-                <p className="text-gray-600 text-sm mb-4">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Instituciones Educativas</h3>
+                <p className="text-slate-600 text-sm mb-4">
                   Trabajamos con escuelas, colegios y universidades implementando programas de robótica adaptados a cada nivel.
                 </p>
-                <div className="text-brand-cyan font-semibold">+20 instituciones</div>
+                <div className="text-chaski-primary font-semibold">+20 instituciones</div>
               </div>
-              <div className="card group hover:border-brand-purple/50 hover:scale-105 transition-all duration-300 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-brand-purple/10 rounded-2xl flex items-center justify-center group-hover:bg-brand-purple/20 transition-colors">
-                  <UserCheck className="w-8 h-8 text-brand-purple" />
+              <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.05s' }}>
+                <div className="w-16 h-16 mx-auto mb-4 bg-chaski-secondary/10 rounded-2xl flex items-center justify-center group-hover:bg-chaski-secondary/20 group-hover:scale-110 transition-all">
+                  <UserCheck className="w-8 h-8 text-chaski-secondary" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Capacitación Docente</h3>
-                <p className="text-gray-600 text-sm mb-4">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Capacitación Docente</h3>
+                <p className="text-slate-600 text-sm mb-4">
                   Formamos a profesores en metodologías STEM para que puedan guiar a sus estudiantes en el mundo de la tecnología.
                 </p>
-                <div className="text-brand-purple font-semibold">+100 docentes</div>
+                <div className="text-chaski-secondary font-semibold">+100 docentes</div>
               </div>
-              <div className="card group hover:border-brand-violet/50 hover:scale-105 transition-all duration-300 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-brand-violet/10 rounded-2xl flex items-center justify-center group-hover:bg-brand-violet/20 transition-colors">
-                  <Calendar className="w-8 h-8 text-brand-violet" />
+              <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                <div className="w-16 h-16 mx-auto mb-4 bg-chaski-gold/10 rounded-2xl flex items-center justify-center group-hover:bg-chaski-gold/20 group-hover:scale-110 transition-all">
+                  <Calendar className="w-8 h-8 text-chaski-gold" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Talleres y Eventos</h3>
-                <p className="text-gray-600 text-sm mb-4">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Talleres y Eventos</h3>
+                <p className="text-slate-600 text-sm mb-4">
                   Organizamos talleres prácticos, competencias de robótica y eventos tecnológicos para estudiantes de todas las edades.
                 </p>
-                <div className="text-brand-violet font-semibold">+50 eventos</div>
+                <div className="text-chaski-gold font-semibold">+50 eventos</div>
               </div>
             </Reveal>
 
             {/* Galería de Experiencias desde Airtable */}
-            <Reveal delay={150} className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center flex items-center justify-center gap-2">
-                <Camera className="w-5 h-5 text-gray-600" /> Galería de Experiencias
+            <Reveal delay={150} className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+              <h3 className="text-xl font-bold text-slate-900 mb-4 text-center flex items-center justify-center gap-2">
+                <Camera className="w-5 h-5 text-slate-600" /> Galería de Experiencias
               </h3>
               {loadingExp ? (
                 <div className="flex justify-center py-8">
-                  <div className="w-8 h-8 border-2 border-brand-purple border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-8 h-8 border-2 border-chaski-primary border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : experiencias.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {experiencias.slice(0, 8).map((exp, index) => (
-                    <div 
-                      key={exp.id} 
-                      className={`group relative aspect-video rounded-xl overflow-hidden border hover:scale-105 transition-all duration-300 cursor-pointer ${
-                        index % 4 === 0 ? 'border-brand-purple/30 hover:border-brand-purple' :
-                        index % 4 === 1 ? 'border-brand-violet/30 hover:border-brand-violet' :
-                        index % 4 === 2 ? 'border-neon-green/30 hover:border-neon-green' :
-                        'border-brand-cyan/30 hover:border-brand-cyan'
+                    <div
+                      key={exp.id}
+                      className={`group relative aspect-video rounded-xl overflow-hidden border hover:scale-105 transition-all duration-300 cursor-pointer animate-fade-in ${
+                        index % 4 === 0 ? 'border-chaski-primary/30 hover:border-chaski-primary' :
+                        index % 4 === 1 ? 'border-chaski-secondary/30 hover:border-chaski-secondary' :
+                        index % 4 === 2 ? 'border-emerald-500/30 hover:border-emerald-500' :
+                        'border-chaski-gold/30 hover:border-chaski-gold'
                       }`}
+                      style={{ animationDelay: `${(index % 4) * 0.05}s` }}
                     >
                       {exp.url ? (
-                        <Image 
-                          src={exp.url} 
+                        <Image
+                          src={exp.url}
                           alt={exp.titulo}
                           fill
                           className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       ) : (
                         <div className={`absolute inset-0 bg-gradient-to-br ${
-                          index % 4 === 0 ? 'from-brand-purple/20 to-neon-blue/20' :
-                          index % 4 === 1 ? 'from-brand-violet/20 to-neon-pink/20' :
-                          index % 4 === 2 ? 'from-neon-green/20 to-emerald-500/20' :
-                          'from-brand-cyan/20 to-amber-500/20'
+                          index % 4 === 0 ? 'from-chaski-primary/20 to-chaski-secondary/20' :
+                          index % 4 === 1 ? 'from-chaski-secondary/20 to-chaski-accent/20' :
+                          index % 4 === 2 ? 'from-emerald-500/20 to-emerald-400/20' :
+                          'from-chaski-gold/20 to-amber-400/20'
                         }`}></div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div className="absolute bottom-0 left-0 right-0 p-3">
-                          <p className="text-gray-900 text-sm font-semibold truncate">{exp.titulo}</p>
-                          <p className="text-gray-300 text-xs truncate">{exp.institucion}</p>
+                          <p className="text-white text-sm font-semibold truncate">{exp.titulo}</p>
+                          <p className="text-slate-300 text-xs truncate">{exp.institucion}</p>
                         </div>
                       </div>
                       {exp.tipo === 'video' && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-gray-900 text-xs px-2 py-1 rounded-full">
+                        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                           Video
                         </div>
                       )}
@@ -306,18 +307,18 @@ export default function HomePage() {
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[0,1,2,3].map((i) => (
-                    <div key={i} className={`aspect-video rounded-xl flex items-center justify-center border ${
-                      i === 0 ? 'bg-gradient-to-br from-brand-purple/20 to-neon-blue/20 border-brand-purple/30' :
-                      i === 1 ? 'bg-gradient-to-br from-brand-violet/20 to-neon-pink/20 border-brand-violet/30' :
-                      i === 2 ? 'bg-gradient-to-br from-neon-green/20 to-emerald-500/20 border-neon-green/30' :
-                      'bg-gradient-to-br from-brand-cyan/20 to-amber-500/20 border-brand-cyan/30'
-                    } hover:scale-105 transition-transform cursor-pointer`}>
-                      <span className="text-gray-500 text-sm">Próximamente</span>
+                    <div key={i} className={`aspect-video rounded-xl flex items-center justify-center border animate-fade-in ${
+                      i === 0 ? 'bg-gradient-to-br from-chaski-primary/20 to-chaski-secondary/20 border-chaski-primary/30' :
+                      i === 1 ? 'bg-gradient-to-br from-chaski-secondary/20 to-chaski-accent/20 border-chaski-secondary/30' :
+                      i === 2 ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-400/20 border-emerald-500/30' :
+                      'bg-gradient-to-br from-chaski-gold/20 to-amber-400/20 border-chaski-gold/30'
+                    } hover:scale-105 transition-transform cursor-pointer`} style={{ animationDelay: `${i * 0.05}s` }}>
+                      <span className="text-slate-500 text-sm">Próximamente</span>
                     </div>
                   ))}
                 </div>
               )}
-              <p className="text-center text-gray-500 text-sm mt-4">
+              <p className="text-center text-slate-500 text-sm mt-4">
                 {experiencias.length > 0 ? `${experiencias.length} experiencias en instituciones educativas` : 'Agrega fotos desde Airtable para mostrar aquí'}
               </p>
             </Reveal>
@@ -325,68 +326,68 @@ export default function HomePage() {
         </section>
 
         {/* Subject Areas - Cards Interactivas */}
-        <section className="py-20 px-4 bg-gray-50">
+        <section className="py-20 px-4 bg-slate-50">
           <div className="max-w-6xl mx-auto">
             <Reveal>
-              <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
-                Áreas de <span className="text-brand-purple">Aprendizaje</span>
+              <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
+                Áreas de <span className="text-chaski-primary">Aprendizaje</span>
               </h2>
-              <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+              <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
                 Contenido especializado y progresivo para cada área, adaptado a la edad y nivel de cada estudiante.
               </p>
             </Reveal>
-            
+
             <Reveal delay={100} className="grid md:grid-cols-3 gap-6">
               {/* Robótica */}
-              <div className="card group hover:border-brand-purple/50 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => router.push('/login')}>
-                <div className="w-16 h-16 bg-gradient-to-br from-brand-purple/20 to-neon-blue/20 rounded-2xl flex items-center justify-center mb-4 group-hover:shadow-brand-purple transition-all group-hover:animate-pulse">
-                  <Bot className="w-8 h-8 text-brand-purple" />
+              <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:scale-105 transition-all duration-300 p-6 cursor-pointer animate-fade-in" style={{ animationDelay: '0s' }} onClick={() => router.push('/login')}>
+                <div className="w-16 h-16 bg-gradient-to-br from-chaski-primary/20 to-chaski-secondary/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all group-hover:animate-pulse">
+                  <Bot className="w-8 h-8 text-chaski-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Robótica</h3>
-                <p className="text-gray-600 mb-4">Programación, diseño y electrónica con kits reales para cada nivel.</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Robótica</h3>
+                <p className="text-slate-600 mb-4">Programación, diseño y electrónica con kits reales para cada nivel.</p>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="badge badge-cyan">Arduino</span>
-                  <span className="badge badge-cyan">ESP32</span>
-                  <span className="badge badge-cyan">Sensores</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30">Arduino</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30">ESP32</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30">Sensores</span>
                 </div>
-                <div className="flex items-center text-brand-purple font-semibold group-hover:gap-2 transition-all">
+                <div className="flex items-center text-chaski-primary font-semibold group-hover:gap-2 transition-all">
                   Acceder <ArrowRight className="w-4 h-4 ml-1" />
                 </div>
               </div>
 
               {/* IA */}
-              <div className="card group hover:border-brand-violet/50 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => router.push('/login')}>
-                <div className="w-16 h-16 bg-gradient-to-br from-brand-violet/20 to-neon-pink/20 rounded-2xl flex items-center justify-center mb-4 group-hover:shadow-brand-violet transition-all group-hover:animate-pulse">
-                  <Brain className="w-8 h-8 text-brand-violet" />
+              <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:scale-105 transition-all duration-300 p-6 cursor-pointer animate-fade-in" style={{ animationDelay: '0.05s' }} onClick={() => router.push('/login')}>
+                <div className="w-16 h-16 bg-gradient-to-br from-chaski-secondary/20 to-chaski-accent/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all group-hover:animate-pulse">
+                  <Brain className="w-8 h-8 text-chaski-secondary" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Inteligencia Artificial</h3>
-                <p className="text-gray-600 mb-4">Reconocimiento de imágenes, voz y machine learning en el navegador.</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Inteligencia Artificial</h3>
+                <p className="text-slate-600 mb-4">Reconocimiento de imágenes, voz y machine learning en el navegador.</p>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="badge badge-purple">COCO-SSD</span>
-                  <span className="badge badge-purple">MobileNet</span>
-                  <span className="badge badge-purple">PoseNet</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-secondary/10 text-chaski-secondary border border-chaski-secondary/30">COCO-SSD</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-secondary/10 text-chaski-secondary border border-chaski-secondary/30">MobileNet</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-secondary/10 text-chaski-secondary border border-chaski-secondary/30">PoseNet</span>
                 </div>
-                <div className="flex items-center text-brand-violet font-semibold group-hover:gap-2 transition-all">
+                <div className="flex items-center text-chaski-secondary font-semibold group-hover:gap-2 transition-all">
                   Acceder <ArrowRight className="w-4 h-4 ml-1" />
                 </div>
               </div>
 
               {/* Hacking */}
-              <div className="card group hover:border-neon-green/50 hover:scale-105 transition-all duration-300 relative overflow-hidden cursor-pointer" onClick={() => router.push('/login')}>
-                <div className="absolute top-3 right-3 px-2 py-1 bg-brand-cyan/20 border border-brand-cyan/40 rounded text-xs text-brand-cyan">
+              <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:scale-105 transition-all duration-300 p-6 relative overflow-hidden cursor-pointer animate-fade-in" style={{ animationDelay: '0.1s' }} onClick={() => router.push('/login')}>
+                <div className="absolute top-3 right-3 px-2 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded text-xs text-emerald-600">
                   Desde 8° EGB
                 </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-neon-green/20 to-emerald-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:shadow-neon-green transition-all group-hover:animate-pulse">
-                  <Shield className="w-8 h-8 text-neon-green" />
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-emerald-400/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all group-hover:animate-pulse">
+                  <Shield className="w-8 h-8 text-emerald-500" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Hacking Ético</h3>
-                <p className="text-gray-600 mb-4">Seguridad informática y ciberseguridad de forma responsable.</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Hacking Ético</h3>
+                <p className="text-slate-600 mb-4">Seguridad informática y ciberseguridad de forma responsable.</p>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="badge badge-green">Pentesting</span>
-                  <span className="badge badge-green">Redes</span>
-                  <span className="badge badge-green">Crypto</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-600 border border-emerald-500/30">Pentesting</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-600 border border-emerald-500/30">Redes</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-emerald-500/10 text-emerald-600 border border-emerald-500/30">Crypto</span>
                 </div>
-                <div className="flex items-center text-neon-green font-semibold group-hover:gap-2 transition-all">
+                <div className="flex items-center text-emerald-600 font-semibold group-hover:gap-2 transition-all">
                   Acceder <ArrowRight className="w-4 h-4 ml-1" />
                 </div>
               </div>
@@ -395,42 +396,42 @@ export default function HomePage() {
         </section>
 
         {/* Education Levels Preview - Simplificado */}
-        <section className="py-20 px-4 bg-gray-50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-violet/5 to-transparent"></div>
+        <section className="py-20 px-4 bg-slate-50 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-chaski-secondary/5 to-transparent"></div>
           <div className="max-w-6xl mx-auto relative z-10">
             <Reveal>
-              <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
-                Niveles <span className="text-brand-violet">Educativos</span>
+              <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
+                Niveles <span className="text-chaski-primary">Educativos</span>
               </h2>
-              <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+              <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
                 Desde Inicial 2 hasta 3° de Bachillerato. Contenido y kits adaptados para cada edad.
               </p>
             </Reveal>
-            
+
             {/* Cards de niveles resumidos */}
             <Reveal delay={100} className="grid md:grid-cols-3 gap-6 mb-12">
-              <div className="card group hover:border-brand-purple/50 hover:scale-105 transition-all duration-300 text-center">
+              <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0s' }}>
                 <div className="text-4xl mb-4">🎒</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Inicial y Elemental</h3>
-                <p className="text-gray-600 text-sm mb-4">Inicial 2 hasta 4° EGB</p>
-                <div className="text-brand-purple font-semibold">5 niveles</div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Inicial y Elemental</h3>
+                <p className="text-slate-600 text-sm mb-4">Inicial 2 hasta 4° EGB</p>
+                <div className="text-chaski-primary font-semibold">5 niveles</div>
               </div>
-              <div className="card group hover:border-brand-violet/50 hover:scale-105 transition-all duration-300 text-center">
+              <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.05s' }}>
                 <div className="text-4xl mb-4">📚</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Media y Superior</h3>
-                <p className="text-gray-600 text-sm mb-4">5° EGB hasta 10° EGB</p>
-                <div className="text-brand-violet font-semibold">6 niveles</div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Media y Superior</h3>
+                <p className="text-slate-600 text-sm mb-4">5° EGB hasta 10° EGB</p>
+                <div className="text-chaski-secondary font-semibold">6 niveles</div>
               </div>
-              <div className="card group hover:border-neon-green/50 hover:scale-105 transition-all duration-300 text-center">
+              <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
                 <div className="text-4xl mb-4">🎓</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Bachillerato</h3>
-                <p className="text-gray-600 text-sm mb-4">1° a 3° Bachillerato</p>
-                <div className="text-neon-green font-semibold">3 niveles</div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Bachillerato</h3>
+                <p className="text-slate-600 text-sm mb-4">1° a 3° Bachillerato</p>
+                <div className="text-emerald-600 font-semibold">3 niveles</div>
               </div>
             </Reveal>
-            
+
             <div className="text-center">
-              <Link href="/login" className="px-8 py-4 bg-gradient-to-r from-brand-violet to-neon-pink text-gray-900 font-bold rounded-xl hover:shadow-brand-violet hover:scale-105 transition-all duration-300 inline-flex items-center gap-2">
+              <Link href="/login" className="px-8 py-4 bg-chaski-primary text-white font-bold rounded-xl hover:bg-chaski-primary/90 hover:scale-105 active:scale-[0.98] transition-all duration-300 inline-flex items-center gap-2">
                 <GraduationCap className="w-5 h-5" />
                 Acceder a los Cursos
                 <ArrowRight className="w-4 h-4" />
@@ -443,27 +444,27 @@ export default function HomePage() {
         <section className="py-20 px-4 bg-transparent">
           <div className="max-w-6xl mx-auto">
             <Reveal>
-              <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-                ¿Por qué <span className="text-brand-purple">ChaskiBots</span> EDU?
+              <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">
+                ¿Por qué <span className="text-chaski-primary">ChaskiBots</span> EDU?
               </h2>
             </Reveal>
             
             <Reveal delay={100} className="grid md:grid-cols-3 gap-8">
               <div className="card text-center">
-                <div className="w-16 h-16 bg-brand-purple/10 border border-brand-purple/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-brand-purple" />
+                <div className="w-16 h-16 bg-chaski-primary/10 border border-chaski-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-chaski-primary" />
                 </div>
-                <h3 className="font-bold text-lg text-gray-900 mb-2">Aprendizaje Progresivo</h3>
-                <p className="text-gray-600">
+                <h3 className="font-bold text-lg text-slate-900 mb-2">Aprendizaje Progresivo</h3>
+                <p className="text-slate-600">
                   Contenido adaptado a cada nivel educativo, desde los 4 años hasta bachillerato.
                 </p>
               </div>
               <div className="card text-center">
-                <div className="w-16 h-16 bg-brand-violet/10 border border-brand-violet/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Rocket className="w-8 h-8 text-brand-violet" />
+                <div className="w-16 h-16 bg-chaski-accent/10 border border-chaski-accent/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Rocket className="w-8 h-8 text-chaski-accent" />
                 </div>
-                <h3 className="font-bold text-lg text-gray-900 mb-2">Kits Reales</h3>
-                <p className="text-gray-600">
+                <h3 className="font-bold text-lg text-slate-900 mb-2">Kits Reales</h3>
+                <p className="text-slate-600">
                   Aprende con kits físicos de robótica diseñados para cada nivel educativo.
                 </p>
               </div>
@@ -471,8 +472,8 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-neon-green/10 border border-neon-green/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Award className="w-8 h-8 text-neon-green" />
                 </div>
-                <h3 className="font-bold text-lg text-gray-900 mb-2">Simuladores Online</h3>
-                <p className="text-gray-600">
+                <h3 className="font-bold text-lg text-slate-900 mb-2">Simuladores Online</h3>
+                <p className="text-slate-600">
                   Practica con Wokwi, Tinkercad, Scratch y más simuladores integrados.
                 </p>
               </div>
@@ -482,18 +483,18 @@ export default function HomePage() {
 
         {/* CTA Section - Futurista */}
         <section className="py-20 px-4 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/10 via-brand-violet/10 to-neon-pink/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-chaski-primary/10 via-chaski-accent/10 to-neon-pink/10"></div>
           <div className="absolute inset-0 bg-cyber-grid opacity-20"></div>
           <Reveal direction="scale" className="max-w-4xl mx-auto text-center relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              ¿Listo para comenzar tu viaje en <span className="text-brand-purple">tecnología</span>?
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              ¿Listo para comenzar tu viaje en <span className="text-chaski-primary">tecnología</span>?
             </h2>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-slate-600 mb-8">
               Únete a ChaskiBots EDU y descubre el fascinante mundo de la robótica, 
               inteligencia artificial y ciberseguridad.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/login" className="px-8 py-4 bg-gradient-to-r from-brand-purple to-neon-blue text-dark-900 font-bold rounded-xl hover:shadow-brand-purple hover:scale-105 transition-all duration-300 flex items-center gap-2">
+              <Link href="/login" className="px-8 py-4 bg-gradient-to-r from-chaski-primary to-chaski-accent text-white font-bold rounded-xl hover:shadow-glow-lg active:scale-[0.98] hover:scale-105 transition-all duration-300 flex items-center gap-2">
                 <Sparkles className="w-5 h-5" />
                 Comenzar Ahora
               </Link>

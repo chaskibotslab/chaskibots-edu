@@ -96,7 +96,7 @@ export default function CoursePage() {
       <div className="min-h-screen flex flex-col bg-[#f8fafc]">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+          <Loader2 className="w-8 h-8 animate-spin text-chaski-primary" />
         </div>
       </div>
     )
@@ -117,7 +117,7 @@ export default function CoursePage() {
     <div className="min-h-screen flex flex-col bg-[#f8fafc]">
       <Header />
       <main className="flex-1 py-6 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto animate-fade-in">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
             <Link href="/academy" className="hover:text-slate-700 flex items-center gap-1">
@@ -145,13 +145,17 @@ export default function CoursePage() {
           {/* Modules accordion */}
           <div className="space-y-3">
             {modules.map((module, moduleIdx) => (
-              <div key={module.id} className={`bg-white rounded-xl border overflow-hidden shadow-sm ${module.id === myLevelModuleId ? 'border-purple-300 ring-2 ring-purple-100' : 'border-slate-200'}`}>
+              <div
+                key={module.id}
+                className={`bg-white rounded-xl border overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 animate-slide-up ${module.id === myLevelModuleId ? 'border-chaski-gold/40 ring-2 ring-chaski-gold/10' : 'border-slate-200 hover:border-chaski-primary/30'}`}
+                style={{ animationDelay: `${moduleIdx * 0.05}s` }}
+              >
                 {/* Module header */}
                 <button
                   onClick={() => setExpandedModule(expandedModule === module.id ? null : module.id)}
-                  className="w-full flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors text-left"
+                  className="w-full flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors text-left group"
                 >
-                  <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-lg font-bold text-slate-400">
+                  <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-lg font-bold text-slate-400 group-hover:scale-110 transition-transform">
                     {moduleIdx + 1}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -159,7 +163,7 @@ export default function CoursePage() {
                       <span>{module.icon}</span>
                       {module.title}
                       {module.id === myLevelModuleId && (
-                        <span className="text-[10px] px-2 py-0.5 bg-purple-100 text-purple-600 rounded-full font-bold flex items-center gap-1">
+                        <span className="text-[10px] px-2 py-0.5 bg-chaski-gold/10 text-chaski-gold rounded-full font-bold flex items-center gap-1">
                           <Sparkles className="w-3 h-3" /> Tu nivel
                         </span>
                       )}
@@ -179,13 +183,13 @@ export default function CoursePage() {
                       <Link
                         key={lesson.id}
                         href={`/academy/${courseSlug}/${module.slug}/${lesson.slug}`}
-                        className="flex items-center gap-4 px-5 py-3.5 hover:bg-blue-50/50 transition-colors border-b border-slate-100 last:border-b-0 group"
+                        className="flex items-center gap-4 px-5 py-3.5 hover:bg-chaski-primary/5 transition-colors border-b border-slate-100 last:border-b-0 group"
                       >
-                        <div className="w-7 h-7 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-xs font-bold text-slate-400 group-hover:border-blue-300 group-hover:text-blue-500 transition-colors">
+                        <div className="w-7 h-7 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-xs font-bold text-slate-400 group-hover:border-chaski-primary/30 group-hover:text-chaski-primary group-hover:scale-110 transition-all">
                           {lessonIdx + 1}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-slate-800 text-sm group-hover:text-blue-700 transition-colors">{lesson.title}</h4>
+                          <h4 className="font-medium text-slate-800 text-sm group-hover:text-chaski-primary transition-colors">{lesson.title}</h4>
                           <p className="text-xs text-slate-400 truncate">{lesson.description}</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
@@ -196,7 +200,7 @@ export default function CoursePage() {
                             <Clock className="w-3 h-3" />
                             {lesson.estimated_minutes}m
                           </span>
-                          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" />
+                          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-chaski-primary group-hover:translate-x-0.5 transition-all" />
                         </div>
                       </Link>
                     ))}

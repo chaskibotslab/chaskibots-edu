@@ -258,7 +258,7 @@ export default function LessonPage() {
       <div className="min-h-screen flex flex-col bg-[#f8fafc]">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+          <Loader2 className="w-8 h-8 animate-spin text-chaski-primary" />
         </div>
       </div>
     )
@@ -270,7 +270,7 @@ export default function LessonPage() {
         <Header />
         <div className="flex-1 flex items-center justify-center flex-col gap-4">
           <p className="text-slate-500">Lección no encontrada</p>
-          <Link href={`/academy/${courseSlug}`} className="text-blue-600 hover:underline text-sm">
+          <Link href={`/academy/${courseSlug}`} className="text-chaski-primary hover:underline text-sm">
             ← Volver al curso
           </Link>
         </div>
@@ -308,7 +308,7 @@ export default function LessonPage() {
     // Bold
     text = text.replace(/\*\*(.+?)\*\*/g, '<strong class="text-slate-900">$1</strong>')
     // Inline code
-    text = text.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 bg-slate-100 text-indigo-700 rounded text-sm font-mono">$1</code>')
+    text = text.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 bg-slate-100 text-chaski-primary rounded text-sm font-mono">$1</code>')
     return <span dangerouslySetInnerHTML={{ __html: text }} />
   }
 
@@ -321,7 +321,7 @@ export default function LessonPage() {
       <div className="min-h-screen flex flex-col bg-[#f8fafc]">
         <Header />
         <main className="flex-1 py-4 px-4">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-5xl mx-auto animate-fade-in">
             <div className="flex items-center gap-2 text-sm text-slate-500 mb-4 flex-wrap">
               <Link href="/academy" className="hover:text-slate-700">Academy</Link>
               <ChevronRight className="w-3 h-3" />
@@ -332,7 +332,7 @@ export default function LessonPage() {
               <span className="text-slate-900 font-medium">{lesson.title}</span>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-5 mb-4 shadow-sm text-white">
+            <div className="bg-gradient-to-r from-chaski-primary to-chaski-accent rounded-xl p-5 mb-4 shadow-sm text-white">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                   <Brain className="w-5 h-5" />
@@ -369,7 +369,7 @@ export default function LessonPage() {
     <div className="min-h-screen flex flex-col bg-[#f8fafc]">
       <Header />
       <main className="flex-1 py-4 px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto animate-fade-in">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-slate-500 mb-4 flex-wrap">
             <Link href="/academy" className="hover:text-slate-700">Academy</Link>
@@ -396,7 +396,7 @@ export default function LessonPage() {
                   <button
                     onClick={markComplete}
                     disabled={lessonCompleted}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all disabled:cursor-default ${
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all active:scale-[0.98] disabled:cursor-default ${
                       lessonCompleted
                         ? 'bg-green-100 text-green-700'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -420,7 +420,7 @@ export default function LessonPage() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all active:scale-[0.98] ${
                   activeTab === tab.key
                     ? 'bg-gradient-to-r ' + courseGradient + ' text-white shadow-sm'
                     : 'text-slate-600 hover:bg-slate-50'
@@ -454,7 +454,7 @@ export default function LessonPage() {
                   <div
                     key={idx}
                     className={`bg-white rounded-xl border p-4 cursor-pointer transition-all hover:shadow-sm ${
-                      code === ex.code ? 'border-blue-300 bg-blue-50/30' : 'border-slate-200'
+                      code === ex.code ? 'border-chaski-primary/40 bg-chaski-primary/5' : 'border-slate-200'
                     }`}
                     onClick={() => loadExample(idx)}
                   >
@@ -462,7 +462,7 @@ export default function LessonPage() {
                       <h4 className="font-medium text-slate-900 text-sm">{ex.title}</h4>
                       <button
                         onClick={(e) => { e.stopPropagation(); copyCode(ex.code, idx) }}
-                        className="p-1.5 hover:bg-slate-100 rounded-lg"
+                        className="p-1.5 hover:bg-slate-100 rounded-lg transition-all active:scale-[0.98]"
                       >
                         {copied === idx ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                       </button>
@@ -479,7 +479,7 @@ export default function LessonPage() {
                   <button
                     onClick={handleRun}
                     disabled={isRunning}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-[0.98] ${
                       isRunning ? 'bg-slate-100 text-slate-400' : 'bg-gradient-to-r ' + courseGradient + ' text-white hover:shadow-md'
                     }`}
                   >
@@ -537,9 +537,9 @@ export default function LessonPage() {
                         setChallengeOutput([])
                         setShowHints(false)
                       }}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        activeChallenge === idx 
-                          ? 'bg-gradient-to-r ' + courseGradient + ' text-white' 
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-[0.98] ${
+                        activeChallenge === idx
+                          ? 'bg-gradient-to-r ' + courseGradient + ' text-white'
                           : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                       }`}
                     >
@@ -573,7 +573,7 @@ export default function LessonPage() {
                   <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
                     <button
                       onClick={() => setShowHints(!showHints)}
-                      className="flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700"
+                      className="flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 transition-all active:scale-[0.98]"
                     >
                       <Lightbulb className="w-4 h-4" />
                       {showHints ? 'Ocultar pistas' : 'Ver pistas'}
@@ -599,14 +599,14 @@ export default function LessonPage() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => { setChallengeCode(lesson.challenges[activeChallenge].starter_code); setChallengeOutput([]) }}
-                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all active:scale-[0.98]"
                       >
                         <RotateCcw className="w-3 h-3" /> Reset
                       </button>
                       <button
                         onClick={handleRunChallenge}
                         disabled={isRunning}
-                        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-all active:scale-[0.98] ${
                           isRunning ? 'bg-slate-100 text-slate-400' : 'bg-gradient-to-r ' + courseGradient + ' text-white hover:shadow-md'
                         }`}
                       >

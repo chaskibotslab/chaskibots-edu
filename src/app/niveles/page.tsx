@@ -105,7 +105,7 @@ export default function NivelesPage() {
       <div className="min-h-screen flex flex-col bg-transparent">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+          <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
         </main>
         <Footer />
       </div>
@@ -121,9 +121,9 @@ export default function NivelesPage() {
 
           {/* Header */}
           <div className="text-center py-6">
-            <div className="inline-flex items-center gap-2 bg-brand-purple/10 rounded-full px-4 py-2 mb-4 border border-brand-purple/20">
-              <Sparkles className="w-4 h-4 text-brand-purple" />
-              <span className="text-sm font-medium text-brand-purple">Plataforma Educativa</span>
+            <div className="inline-flex items-center gap-2 bg-chaski-primary/10 rounded-full px-4 py-2 mb-4 border border-chaski-primary/20">
+              <Sparkles className="w-4 h-4 text-chaski-primary" />
+              <span className="text-sm font-medium text-chaski-primary">Plataforma Educativa</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-3">
               Niveles Educativos
@@ -142,7 +142,7 @@ export default function NivelesPage() {
             if (levels.length === 0) return null
 
             return (
-              <section key={category.id}>
+              <section key={category.id} className="animate-slide-up">
                 <div className="flex items-center gap-4 mb-6">
                   <div className={`w-12 h-12 ${styles.bg} rounded-2xl flex items-center justify-center border ${styles.border}`}>
                     <CatIcon className={`w-6 h-6 ${styles.icon}`} />
@@ -154,7 +154,7 @@ export default function NivelesPage() {
                 </div>
 
                 <div className={`grid ${category.columns} gap-4`}>
-                  {levels.map((level) => {
+                  {levels.map((level, levelIdx) => {
                     const IconComponent = (level.icon && ICON_MAP[level.icon]) || Bot
                     const hasAccess = canAccessLevel(level.id)
                     if (!hasAccess && !isAdmin) return null
@@ -163,11 +163,12 @@ export default function NivelesPage() {
                       <Link
                         key={level.id}
                         href={`/nivel/${level.id}`}
-                        className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm transition-all duration-300 ${styles.hover}`}
+                        className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md transition-all duration-300 animate-scale-in ${styles.hover}`}
+                        style={{ animationDelay: `${levelIdx * 0.05}s` }}
                       >
                         <div className={`absolute top-0 right-0 w-20 h-20 ${styles.light} rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
                         <div className="relative flex items-center gap-4">
-                          <div className={`w-12 h-12 ${styles.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                          <div className={`w-12 h-12 ${styles.bg} rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
                             <IconComponent className={`w-6 h-6 ${styles.icon}`} />
                           </div>
                           <div className="flex-1 min-w-0">

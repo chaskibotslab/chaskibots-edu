@@ -57,10 +57,10 @@ export default function Header() {
               {!isHomePage && !isLoginPage && (
                 <button
                   onClick={handleBack}
-                  className="p-2 rounded-lg bg-gray-50 border border-gray-200 hover:border-brand-purple/50 hover:bg-gray-100 transition-all duration-200 group"
+                  className="p-2 rounded-lg bg-slate-50 border border-slate-200 hover:border-chaski-primary/50 hover:bg-slate-100 transition-all duration-200 group"
                   title="Volver"
                 >
-                  <ChevronLeft className="w-5 h-5 text-gray-600 group-hover:text-brand-purple transition-colors" />
+                  <ChevronLeft className="w-5 h-5 text-slate-600 group-hover:text-chaski-primary transition-colors" />
                 </button>
               )}
               
@@ -74,8 +74,8 @@ export default function Header() {
                   priority
                 />
                 <div className="hidden sm:flex flex-col">
-                  <span className="font-bold text-lg text-gray-900 leading-tight">ChaskiBots</span>
-                  <span className="text-[9px] text-brand-purple tracking-[0.2em] font-medium">EDUCATION</span>
+                  <span className="font-bold text-lg text-slate-900 leading-tight">ChaskiBots</span>
+                  <span className="text-[9px] text-chaski-primary tracking-[0.2em] font-medium">EDUCATION</span>
                 </div>
               </Link>
             </div>
@@ -97,7 +97,7 @@ export default function Header() {
                       data-active={isActive}
                       className={`relative z-10 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors duration-300 ${
                         isActive
-                          ? 'text-brand-purple'
+                          ? 'text-chaski-primary'
                           : 'text-slate-500 hover:text-slate-900'
                       }`}
                     >
@@ -116,19 +116,19 @@ export default function Header() {
                   {isAdmin && (
                     <Link 
                       href="/admin" 
-                      className="hidden sm:flex items-center gap-2 px-3 py-2 bg-brand-violet/20 border border-brand-violet/30 rounded-lg hover:border-brand-violet/60 hover:bg-brand-violet/30 transition-all"
+                      className="hidden sm:flex items-center gap-2 px-3 py-2 bg-chaski-accent/20 border border-chaski-accent/30 rounded-lg hover:border-chaski-accent/60 hover:bg-chaski-accent/30 transition-all"
                     >
-                      <Settings className="w-4 h-4 text-brand-violet" />
-                      <span className="text-sm font-medium text-brand-violet">Admin</span>
+                      <Settings className="w-4 h-4 text-chaski-accent" />
+                      <span className="text-sm font-medium text-chaski-accent">Admin</span>
                     </Link>
                   )}
-                  <Link href="/dashboard" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-100 border border-brand-purple/30 rounded-lg hover:border-brand-purple/60 transition-all">
-                    <User className="w-4 h-4 text-brand-purple" />
-                    <span className="text-sm font-medium text-gray-900">{user?.name}</span>
+                  <Link href="/dashboard" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-100 border border-chaski-primary/30 rounded-lg hover:border-chaski-primary/60 transition-all">
+                    <User className="w-4 h-4 text-chaski-primary" />
+                    <span className="text-sm font-medium text-slate-900">{user?.name}</span>
                   </Link>
                   <button
                     onClick={logout}
-                    className="hidden sm:block p-2 text-gray-500 hover:text-neon-pink transition-colors"
+                    className="hidden sm:block p-2 text-slate-500 hover:text-red-500 transition-colors"
                     title="Cerrar sesión"
                   >
                     <LogOut className="w-5 h-5" />
@@ -137,17 +137,17 @@ export default function Header() {
                   {/* Menú hamburguesa móvil */}
                   <button
                     onClick={() => setMenuOpen(!menuOpen)}
-                    className="sm:hidden p-2 rounded-lg bg-gray-50 border border-gray-200 hover:border-brand-purple/50 transition-all"
+                    className="sm:hidden p-2 rounded-lg bg-slate-50 border border-slate-200 hover:border-chaski-primary/50 transition-all"
                   >
                     {menuOpen ? (
-                      <X className="w-6 h-6 text-brand-purple" />
+                      <X className="w-6 h-6 text-chaski-primary" />
                     ) : (
-                      <Menu className="w-6 h-6 text-gray-600" />
+                      <Menu className="w-6 h-6 text-slate-600" />
                     )}
                   </button>
                 </>
               ) : (
-                <Link href="/login" className="px-5 py-2 bg-gradient-to-r from-brand-purple to-neon-blue text-dark-900 font-semibold rounded-lg hover:shadow-brand-purple transition-all duration-300 text-sm">
+                <Link href="/login" className="px-5 py-2 bg-gradient-to-r from-chaski-primary to-chaski-accent text-white font-semibold rounded-lg hover:shadow-glow-lg active:scale-[0.98] transition-all duration-300 text-sm">
                   Iniciar Sesión
                 </Link>
               )}
@@ -169,12 +169,12 @@ export default function Header() {
           {/* Header del menú */}
           <div className="p-4 border-b border-slate-200">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-purple/20 to-brand-violet/20 flex items-center justify-center border border-brand-purple/30">
-                <User className="w-6 h-6 text-brand-purple" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-chaski-primary/20 to-chaski-accent/20 flex items-center justify-center border border-chaski-primary/30">
+                <User className="w-6 h-6 text-chaski-primary" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500">{user?.role === 'admin' ? 'Administrador' : user?.role === 'teacher' ? 'Profesor' : 'Estudiante'}</p>
+                <p className="font-semibold text-slate-900">{user?.name}</p>
+                <p className="text-xs text-slate-500">{user?.role === 'admin' ? 'Administrador' : user?.role === 'teacher' ? 'Profesor' : 'Estudiante'}</p>
               </div>
             </div>
           </div>
@@ -193,8 +193,8 @@ export default function Header() {
                     menuOpen ? 'animate-reveal-up opacity-0' : ''
                   } ${
                     isActive 
-                      ? 'bg-brand-purple/20 text-brand-purple border border-brand-purple/30' 
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-chaski-primary/20 text-chaski-primary border border-chaski-primary/30' 
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
                   style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'forwards' }}
                 >
@@ -210,8 +210,8 @@ export default function Header() {
                 onClick={() => setMenuOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                   pathname === '/admin' 
-                    ? 'bg-brand-violet/20 text-brand-violet border border-brand-violet/30' 
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-brand-violet'
+                    ? 'bg-chaski-accent/20 text-chaski-accent border border-chaski-accent/30' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-chaski-accent'
                 }`}
               >
                 <Settings className="w-5 h-5" />
@@ -227,7 +227,7 @@ export default function Header() {
                 logout()
                 setMenuOpen(false)
               }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-all"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-600 rounded-xl hover:bg-red-500/20 active:scale-[0.98] transition-all"
             >
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Cerrar Sesión</span>

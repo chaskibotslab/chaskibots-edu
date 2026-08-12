@@ -47,7 +47,7 @@ interface UploadedFile {
 type FilterStatus = 'all' | 'pending' | 'submitted' | 'graded'
 
 const FILTERS: { id: FilterStatus; label: string; icon: any; color: string }[] = [
-  { id: 'all', label: 'Todas', icon: ClipboardList, color: 'brand-purple' },
+  { id: 'all', label: 'Todas', icon: ClipboardList, color: 'chaski-primary' },
   { id: 'pending', label: 'Pendientes', icon: Clock, color: 'amber-500' },
   { id: 'submitted', label: 'Enviadas', icon: Send, color: 'brand-cyan' },
   { id: 'graded', label: 'Calificadas', icon: Award, color: 'green-500' }
@@ -153,7 +153,7 @@ export default function TareasPage() {
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-transparent">
-        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
   }
@@ -163,10 +163,10 @@ export default function TareasPage() {
       <Header />
 
       <main className="flex-1 py-6 px-4 pb-24">
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
           {/* Hero */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 md:p-8 shadow-2xl">
-            <div className="absolute top-0 left-0 w-64 h-64 bg-brand-purple/20 rounded-full blur-[100px]"></div>
+            <div className="absolute top-0 left-0 w-64 h-64 bg-chaski-primary/20 rounded-full blur-[100px]"></div>
             <div className="absolute bottom-0 right-0 w-56 h-56 bg-brand-cyan/15 rounded-full blur-[90px]"></div>
             <div className="relative z-10 flex items-start justify-between gap-4 flex-wrap">
               <div>
@@ -178,9 +178,15 @@ export default function TareasPage() {
                 <p className="text-white/70 text-sm">Organiza y entrega tu trabajo</p>
               </div>
               <div className="flex gap-3">
-                <StatChip label="Pendientes" value={stats.pending} color="amber-300" />
-                <StatChip label="Calificadas" value={stats.graded} color="green-300" />
-                <StatChip label="Puntos" value={`${stats.earnedPoints}/${stats.totalPoints}`} color="brand-cyan" />
+                <div className="animate-slide-up" style={{ animationDelay: '0s' }}>
+                  <StatChip label="Pendientes" value={stats.pending} color="amber-300" />
+                </div>
+                <div className="animate-slide-up" style={{ animationDelay: '0.05s' }}>
+                  <StatChip label="Calificadas" value={stats.graded} color="green-300" />
+                </div>
+                <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                  <StatChip label="Puntos" value={`${stats.earnedPoints}/${stats.totalPoints}`} color="brand-cyan" />
+                </div>
               </div>
             </div>
           </div>
@@ -194,7 +200,7 @@ export default function TareasPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar tarea..."
-                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all"
+                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
               />
             </div>
           </div>
@@ -208,9 +214,9 @@ export default function TareasPage() {
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all active:scale-[0.98] border ${
                     isActive
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                      ? 'bg-chaski-primary text-white border-chaski-primary shadow-md'
                       : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -224,19 +230,20 @@ export default function TareasPage() {
           {/* Lista */}
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+              <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
             </div>
           ) : filteredTasks.length === 0 ? (
             <EmptyState filter={filter} hasLevelId={!!user.levelId} />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  submission={submissionByTaskId.get(task.id)}
-                  onClick={() => setSelectedTask(task)}
-                />
+              {filteredTasks.map((task, idx) => (
+                <div key={task.id} className="animate-slide-up" style={{ animationDelay: `${idx * 0.05}s` }}>
+                  <TaskCard
+                    task={task}
+                    submission={submissionByTaskId.get(task.id)}
+                    onClick={() => setSelectedTask(task)}
+                  />
+                </div>
               ))}
             </div>
           )}
@@ -302,9 +309,9 @@ function EmptyState({ filter, hasLevelId }: { filter: FilterStatus; hasLevelId: 
 function TaskCard({ task, submission, onClick }: { task: Task; submission?: Submission; onClick: () => void }) {
   const status = submission?.status === 'graded' ? 'graded' : submission ? 'submitted' : 'pending'
   const statusConfig = {
-    pending: { label: 'Pendiente', color: 'amber-600', bg: 'bg-amber-50 border-amber-200', icon: Clock },
+    pending: { label: 'Pendiente', color: 'amber-600', bg: 'bg-amber-500/10 border-amber-500/20', icon: Clock },
     submitted: { label: 'Enviada', color: 'brand-cyan', bg: 'bg-cyan-50 border-cyan-200', icon: Send },
-    graded: { label: 'Calificada', color: 'green-600', bg: 'bg-green-50 border-green-200', icon: CheckCircle2 }
+    graded: { label: 'Calificada', color: 'green-600', bg: 'bg-green-500/10 border-green-500/20', icon: CheckCircle2 }
   }[status]
   const StatusIcon = statusConfig.icon
   const emoji = CATEGORY_EMOJI[task.category] || '📚'
@@ -315,17 +322,17 @@ function TaskCard({ task, submission, onClick }: { task: Task; submission?: Subm
   return (
     <button
       onClick={onClick}
-      className="group text-left bg-white rounded-3xl border border-slate-200 p-5 shadow-sm hover:shadow-xl hover:border-brand-purple/40 transition-all duration-300 active:scale-[0.98]"
+      className="group text-left bg-white rounded-3xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-chaski-primary/30 transition-all duration-300 active:scale-[0.98]"
     >
       <div className="flex items-start gap-3 mb-3">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center text-2xl shrink-0">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
           {emoji}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-slate-900 truncate">{task.title}</h3>
           <p className="text-slate-500 text-sm line-clamp-1">{task.description}</p>
         </div>
-        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-brand-purple group-hover:translate-x-1 transition-all shrink-0 mt-1" />
+        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-chaski-primary group-hover:translate-x-1 transition-all shrink-0 mt-1" />
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
@@ -336,17 +343,17 @@ function TaskCard({ task, submission, onClick }: { task: Task; submission?: Subm
         <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${DIFFICULTY_STYLES[task.difficulty] || 'bg-slate-100 text-slate-700 border-slate-200'}`}>
           {task.difficulty}
         </span>
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border border-brand-purple/20 bg-brand-purple/5 text-brand-purple">
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border border-chaski-primary/20 bg-chaski-primary/5 text-chaski-primary">
           <Star className="w-3 h-3" />
           {task.points} pts
         </span>
         {status === 'graded' && submission?.grade != null && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border border-green-200 bg-green-50 text-green-700">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border border-green-500/20 bg-green-500/10 text-green-600">
             {submission.grade}/100
           </span>
         )}
         {dueText && status === 'pending' && (
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${isOverdue ? 'border-red-200 bg-red-50 text-red-600' : 'border-slate-200 bg-slate-50 text-slate-600'}`}>
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${isOverdue ? 'border-red-500/20 bg-red-500/10 text-red-600' : 'border-slate-200 bg-slate-50 text-slate-600'}`}>
             <Calendar className="w-3 h-3" />
             {dueText}
           </span>
@@ -459,7 +466,7 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors shrink-0"
+            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors active:scale-[0.98] shrink-0"
           >
             <X className="w-5 h-5 text-slate-600" />
           </button>
@@ -476,11 +483,11 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
               href={task.attachmentUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 p-4 bg-brand-purple/5 border border-brand-purple/20 rounded-2xl hover:bg-brand-purple/10 transition-colors"
+              className="flex items-center gap-3 p-4 bg-chaski-primary/5 border border-chaski-primary/20 rounded-2xl hover:bg-chaski-primary/10 transition-colors"
             >
-              <Paperclip className="w-5 h-5 text-brand-purple" />
-              <span className="font-medium text-brand-purple flex-1">Material adjunto</span>
-              <ExternalLink className="w-4 h-4 text-brand-purple" />
+              <Paperclip className="w-5 h-5 text-chaski-primary" />
+              <span className="font-medium text-chaski-primary flex-1">Material adjunto</span>
+              <ExternalLink className="w-4 h-4 text-chaski-primary" />
             </a>
           )}
 
@@ -522,7 +529,7 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
               {task.questions.length > 0 && (
                 <div className="space-y-4">
                   <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-brand-purple" />
+                    <FileText className="w-4 h-4 text-chaski-primary" />
                     Preguntas
                   </h3>
                   {task.questions.map((q, i) => (
@@ -535,7 +542,7 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
                         onChange={(e) => setAnswers(prev => ({ ...prev, [i]: e.target.value }))}
                         rows={3}
                         placeholder="Escribe tu respuesta..."
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all resize-none"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all resize-none"
                       />
                     </div>
                   ))}
@@ -550,7 +557,7 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
                   <span className="text-slate-400 text-xs font-normal">(opcional)</span>
                 </h3>
                 <label className={`flex items-center justify-center gap-2 w-full p-6 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
-                  uploading ? 'border-slate-300 bg-slate-50' : 'border-slate-300 hover:border-brand-purple hover:bg-brand-purple/5'
+                  uploading ? 'border-slate-300 bg-slate-50' : 'border-slate-300 hover:border-chaski-primary hover:bg-chaski-primary/5'
                 }`}>
                   {uploading ? (
                     <>
@@ -579,7 +586,7 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
                     {files.map((file, idx) => (
                       <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                         {file.type.startsWith('image/') ? (
-                          <ImageIcon className="w-5 h-5 text-brand-purple shrink-0" />
+                          <ImageIcon className="w-5 h-5 text-chaski-primary shrink-0" />
                         ) : (
                           <FileText className="w-5 h-5 text-brand-cyan shrink-0" />
                         )}
@@ -615,7 +622,7 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
             <button
               onClick={handleSubmit}
               disabled={submitting || uploading}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-purple to-brand-violet hover:from-brand-violet hover:to-brand-purple text-white font-bold py-4 rounded-2xl shadow-lg shadow-brand-purple/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-chaski-primary to-chaski-accent hover:shadow-lg hover:shadow-chaski-primary/30 text-white font-bold py-4 rounded-2xl shadow-lg shadow-chaski-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
             >
               {submitting ? (
                 <>

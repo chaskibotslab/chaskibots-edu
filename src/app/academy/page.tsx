@@ -46,16 +46,16 @@ export default function AcademyPage() {
     <div className="min-h-screen flex flex-col bg-[#f8fafc]">
       <Header />
       <main className="flex-1 py-8 px-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto animate-fade-in">
           {/* Hero */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-4 py-2 rounded-full mb-4">
-              <GraduationCap className="w-4 h-4 text-indigo-600" />
-              <span className="text-sm font-semibold text-indigo-700">Plataforma Profesional</span>
+            <div className="inline-flex items-center gap-2 bg-chaski-primary/10 border border-chaski-primary/20 px-4 py-2 rounded-full mb-4">
+              <GraduationCap className="w-4 h-4 text-chaski-primary" />
+              <span className="text-sm font-semibold text-chaski-primary">Plataforma Profesional</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
               Academy
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"> ChaskiBots</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-primary to-chaski-accent"> ChaskiBots</span>
             </h1>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto">
               Cursos profesionales con teoría completa, ejemplos prácticos y desafíos interactivos.
@@ -66,7 +66,7 @@ export default function AcademyPage() {
           {/* Courses Grid */}
           {loading ? (
             <div className="flex justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+              <Loader2 className="w-8 h-8 animate-spin text-chaski-primary" />
             </div>
           ) : courses.length === 0 ? (
             <div className="text-center py-20">
@@ -76,17 +76,18 @@ export default function AcademyPage() {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-6">
-              {courses.map((course) => (
+              {courses.map((course, i) => (
                 <Link
                   key={course.id}
                   href={`/academy/${course.slug}`}
-                  className="group relative overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 hover:-translate-y-1"
+                  className="group relative overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-chaski-primary/30 transition-all duration-300 hover:-translate-y-1 animate-scale-in"
+                  style={{ animationDelay: `${i * 0.05}s` }}
                 >
                   {/* Gradient header */}
                   <div className={`bg-gradient-to-r ${courseColors[course.slug] || 'from-slate-500 to-slate-600'} p-6 text-white`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                           {courseIcons[course.slug] || <BookOpen className="w-8 h-8" />}
                         </div>
                         <div>
@@ -120,12 +121,16 @@ export default function AcademyPage() {
           {/* Features */}
           <div className="mt-16 grid md:grid-cols-3 gap-6">
             {[
-              { icon: <BookOpen className="w-6 h-6 text-blue-600" />, title: 'Teoría Completa', desc: 'Explicaciones claras con ejemplos detallados' },
+              { icon: <BookOpen className="w-6 h-6 text-chaski-primary" />, title: 'Teoría Completa', desc: 'Explicaciones claras con ejemplos detallados' },
               { icon: <Terminal className="w-6 h-6 text-emerald-600" />, title: 'Práctica Interactiva', desc: 'Ejecuta código directamente en el navegador' },
-              { icon: <Sparkles className="w-6 h-6 text-purple-600" />, title: 'Desafíos Reales', desc: 'Problemas progresivos para afianzar conceptos' },
+              { icon: <Sparkles className="w-6 h-6 text-chaski-gold" />, title: 'Desafíos Reales', desc: 'Problemas progresivos para afianzar conceptos' },
             ].map((f, i) => (
-              <div key={i} className="bg-white rounded-xl border border-slate-200 p-5 text-center">
-                <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <div
+                key={i}
+                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 transition-all duration-300 p-5 text-center animate-slide-up"
+                style={{ animationDelay: `${i * 0.05}s` }}
+              >
+                <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                   {f.icon}
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1">{f.title}</h3>

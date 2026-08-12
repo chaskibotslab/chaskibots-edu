@@ -28,7 +28,7 @@ const QUICK_ACTIONS: Action[] = [
     id: 'continue',
     href: (levelId) => `/nivel/${levelId}`,
     icon: Play,
-    color: 'brand-purple',
+    color: 'chaski-primary',
     title: 'Continuar',
     description: (levelName) => levelName
   },
@@ -44,7 +44,7 @@ const QUICK_ACTIONS: Action[] = [
     id: 'simulators',
     href: () => '/simuladores',
     icon: Cpu,
-    color: 'brand-violet',
+    color: 'chaski-accent',
     title: 'Simuladores',
     description: () => 'Laboratorio virtual'
   },
@@ -59,8 +59,8 @@ const QUICK_ACTIONS: Action[] = [
 ]
 
 const STUDY_AREAS = [
-  { id: 'robotica', href: '/robotica', icon: Bot, color: 'brand-purple', title: 'Robótica', description: 'Programación y electrónica' },
-  { id: 'ia', href: '/ia', icon: Brain, color: 'brand-violet', title: 'Inteligencia Artificial', description: 'Machine learning' },
+  { id: 'robotica', href: '/robotica', icon: Bot, color: 'chaski-primary', title: 'Robótica', description: 'Programación y electrónica' },
+  { id: 'ia', href: '/ia', icon: Brain, color: 'chaski-accent', title: 'Inteligencia Artificial', description: 'Machine learning' },
   { id: 'hacking', href: '/hacking', icon: Shield, color: 'neon-green', title: 'Hacking Ético', description: 'Ciberseguridad' }
 ]
 
@@ -82,7 +82,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
   }
@@ -99,11 +99,11 @@ export default function DashboardPage() {
       <Header />
 
       <main className="flex-1 py-6 px-4">
-        <div className="max-w-5xl mx-auto space-y-8">
+        <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
 
           {/* Hero Welcome */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 sm:p-8 shadow-2xl">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-purple/20 rounded-full blur-[100px]"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-chaski-primary/20 rounded-full blur-[100px]"></div>
             <div className="absolute bottom-0 left-0 w-56 h-56 bg-brand-cyan/15 rounded-full blur-[90px]"></div>
             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="flex items-center gap-5">
@@ -120,7 +120,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-white/10 backdrop-blur rounded-2xl p-4 border border-white/10">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-purple to-brand-violet flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-chaski-primary to-chaski-accent flex items-center justify-center">
                   <Trophy className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -134,7 +134,7 @@ export default function DashboardPage() {
             <div className="relative z-10 mt-6">
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-brand-cyan to-brand-purple rounded-full transition-all duration-1000"
+                  className="h-full bg-gradient-to-r from-brand-cyan to-chaski-primary rounded-full transition-all duration-1000"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -144,18 +144,19 @@ export default function DashboardPage() {
           {/* Quick Actions */}
           <div>
             <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-brand-purple" />
+              <Zap className="w-5 h-5 text-chaski-primary" />
               Accesos rápidos
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {QUICK_ACTIONS.map((action) => {
+              {QUICK_ACTIONS.map((action, idx) => {
                 const Icon = action.icon
                 const href = action.href(currentLevel.id)
                 return (
                   <Link
                     key={action.id}
                     href={href}
-                    className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-xl hover:shadow-${action.color}/10 hover:border-${action.color}/40 transition-all duration-300`}
+                    className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-xl hover:shadow-${action.color}/10 hover:border-${action.color}/40 transition-all duration-300 active:scale-[0.98] animate-slide-up`}
+                    style={{ animationDelay: `${idx * 0.05}s` }}
                   >
                     <div className={`absolute top-0 right-0 w-24 h-24 bg-${action.color}/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
                     <div className={`relative w-12 h-12 rounded-xl bg-${action.color}/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
@@ -180,13 +181,14 @@ export default function DashboardPage() {
               Áreas de estudio
             </h2>
             <div className="grid sm:grid-cols-3 gap-4">
-              {STUDY_AREAS.map((area) => {
+              {STUDY_AREAS.map((area, idx) => {
                 const Icon = area.icon
                 return (
                   <Link
                     key={area.id}
                     href={area.href}
-                    className={`group flex items-center gap-4 rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-lg hover:border-${area.color}/40 transition-all duration-300`}
+                    className={`group flex items-center gap-4 rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-lg hover:border-${area.color}/40 transition-all duration-300 active:scale-[0.98] animate-slide-up`}
+                    style={{ animationDelay: `${idx * 0.05}s` }}
                   >
                     <div className={`w-14 h-14 rounded-xl bg-${area.color}/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
                       <Icon className={`w-7 h-7 text-${area.color}`} />
@@ -210,9 +212,9 @@ export default function DashboardPage() {
           />
 
           {/* Motivational footer card */}
-          <div className="rounded-2xl bg-gradient-to-r from-brand-purple/10 to-brand-cyan/10 border border-brand-purple/20 p-5 flex items-center gap-4">
+          <div className="rounded-2xl bg-gradient-to-r from-chaski-primary/10 to-brand-cyan/10 border border-chaski-primary/20 p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm">
-              <Crown className="w-6 h-6 text-brand-purple" />
+              <Crown className="w-6 h-6 text-chaski-primary" />
             </div>
             <div>
               <h3 className="font-semibold text-slate-900">Sigue aprendiendo</h3>
