@@ -104,12 +104,12 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 gap-10 items-center">
               {/* Left - Text */}
               <div className="order-2 md:order-1">
-                <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-chaski-primary/20 shadow-sm animate-fade-in">
+                <div className="inline-flex items-center gap-2 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-hack-green/30 shadow-sm animate-fade-in">
                   <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-hack-green opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-hack-green"></span>
                   </span>
-                  <span className="text-sm font-medium text-slate-600">Plataforma Educativa Activa</span>
+                  <span className="text-sm font-mono font-medium text-slate-600">$ platform --status=<span className="text-hack-green font-semibold">online</span></span>
                 </div>
 
                 <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold mb-6 leading-[1.1] text-slate-900 animate-slide-up">

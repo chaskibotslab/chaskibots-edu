@@ -49,7 +49,8 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 relative">
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-hack-green/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Back Button + Logo */}
@@ -63,19 +64,22 @@ export default function Header() {
                   <ChevronLeft className="w-5 h-5 text-slate-600 group-hover:text-chaski-primary transition-colors" />
                 </button>
               )}
-              
+
               <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-2.5 group">
-                <Image 
-                  src="/chaski.png" 
-                  alt="ChaskiBots Logo" 
-                  width={38} 
-                  height={38}
-                  className="rounded-xl group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_2px_8px_rgba(0,122,255,0.3)]"
-                  priority
-                />
+                <div className="relative">
+                  <Image
+                    src="/chaski.png"
+                    alt="ChaskiBots Logo"
+                    width={38}
+                    height={38}
+                    className="rounded-xl group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_2px_8px_rgba(124,58,237,0.3)]"
+                    priority
+                  />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-hack-green ring-2 ring-white animate-pulse" />
+                </div>
                 <div className="hidden sm:flex flex-col">
                   <span className="font-bold text-lg text-slate-900 leading-tight">ChaskiBots</span>
-                  <span className="text-[9px] text-chaski-primary tracking-[0.2em] font-medium">EDUCATION</span>
+                  <span className="text-[9px] text-hack-green tracking-[0.2em] font-mono font-medium">&gt; EDUCATION</span>
                 </div>
               </Link>
             </div>
@@ -84,7 +88,7 @@ export default function Header() {
             {isAuthenticated && (
               <nav ref={navRef} className="hidden lg:flex items-center gap-1 bg-slate-100 rounded-full p-1 relative">
                 <div
-                  className="absolute top-1 bottom-1 bg-white rounded-full shadow-sm transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                  className="absolute top-1 bottom-1 bg-white rounded-full shadow-sm ring-1 ring-hack-green/30 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                   style={{ left: indicator.left, width: indicator.width, opacity: indicator.opacity }}
                 />
                 {menuItems.map((item) => {

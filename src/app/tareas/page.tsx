@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
+import MatrixRain from '@/components/MatrixRain'
 import {
   ClipboardList, Clock, CheckCircle2, Award, Search,
   Loader2, AlertCircle, X, Upload, Paperclip,
@@ -166,6 +167,8 @@ export default function TareasPage() {
         <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
           {/* Hero */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 md:p-8 shadow-2xl">
+            <MatrixRain count={10} className="opacity-30" />
+            <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(57,255,20,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.5) 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
             <div className="absolute top-0 left-0 w-64 h-64 bg-chaski-primary/20 rounded-full blur-[100px]"></div>
             <div className="absolute bottom-0 right-0 w-56 h-56 bg-brand-cyan/15 rounded-full blur-[90px]"></div>
             <div className="relative z-10 flex items-start justify-between gap-4 flex-wrap">
