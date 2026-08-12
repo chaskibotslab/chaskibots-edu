@@ -199,7 +199,7 @@ export default function KitsAdminPage() {
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
   }
@@ -207,7 +207,7 @@ export default function KitsAdminPage() {
   const hasSelection = isCreating || selectedId
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
+    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden animate-fade-in">
       {/* Top bar */}
       <header className="shrink-0 bg-white/80 backdrop-blur-xl border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -221,7 +221,7 @@ export default function KitsAdminPage() {
         </div>
         <button
           onClick={handleNew}
-          className="flex items-center gap-1.5 bg-gradient-to-r from-brand-purple to-brand-violet text-white font-semibold px-4 py-2 rounded-full shadow-md text-sm hover:shadow-lg active:scale-95 transition-all"
+          className="flex items-center gap-1.5 bg-chaski-primary text-white font-semibold px-4 py-2 rounded-full shadow-md text-sm hover:bg-chaski-primary/90 hover:shadow-lg active:scale-[0.98] transition-all"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">Nuevo kit</span>
@@ -239,7 +239,7 @@ export default function KitsAdminPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar kit..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-brand-purple"
+                className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
               />
             </div>
           </div>
@@ -247,7 +247,7 @@ export default function KitsAdminPage() {
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="w-6 h-6 text-brand-purple animate-spin" />
+                <Loader2 className="w-6 h-6 text-chaski-primary animate-spin" />
               </div>
             ) : filteredKits.length === 0 ? (
               <div className="px-6 py-12 text-center">
@@ -259,10 +259,11 @@ export default function KitsAdminPage() {
               </div>
             ) : (
               <div className="py-2">
-                {filteredKits.map(kit => (
+                {filteredKits.map((kit, i) => (
                   <KitItem
                     key={kit.id}
                     kit={kit}
+                    index={i}
                     active={selectedId === kit.id}
                     onClick={() => { setSelectedId(kit.id); setIsCreating(false) }}
                   />
@@ -276,9 +277,9 @@ export default function KitsAdminPage() {
         <main className={`${hasSelection ? 'flex' : 'hidden md:flex'} flex-1 flex-col overflow-hidden`}>
           {!hasSelection ? (
             <div className="flex-1 flex items-center justify-center p-8">
-              <div className="text-center max-w-sm">
-                <div className="w-20 h-20 bg-gradient-to-br from-brand-purple/20 to-brand-violet/20 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                  <Package className="w-10 h-10 text-brand-purple" />
+              <div className="text-center max-w-sm animate-fade-in">
+                <div className="w-20 h-20 bg-gradient-to-br from-chaski-primary/20 to-chaski-accent/20 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                  <Package className="w-10 h-10 text-chaski-primary" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900 mb-2">Selecciona un kit</h2>
                 <p className="text-slate-500 text-sm mb-5">
@@ -286,7 +287,7 @@ export default function KitsAdminPage() {
                 </p>
                 <button
                   onClick={handleNew}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-purple to-brand-violet text-white font-semibold px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-chaski-primary to-chaski-accent text-white font-semibold px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:shadow-chaski-primary/25 active:scale-[0.98] transition-all duration-300"
                 >
                   <Plus className="w-4 h-4" />
                   Crear nuevo kit
@@ -326,13 +327,14 @@ export default function KitsAdminPage() {
   )
 }
 
-function KitItem({ kit, active, onClick }: { kit: Kit; active: boolean; onClick: () => void }) {
+function KitItem({ kit, active, onClick, index }: { kit: Kit; active: boolean; onClick: () => void; index?: number }) {
   const firstImage = normalizeCsv(kit.images).split(/[,\n]/)[0]?.trim()
   return (
     <button
       onClick={onClick}
-      className={`w-full px-3 py-2.5 flex items-center gap-3 transition-colors text-left ${
-        active ? 'bg-brand-purple/10 border-r-2 border-brand-purple' : 'hover:bg-slate-50'
+      style={index !== undefined ? { animationDelay: `${index * 0.03}s` } : undefined}
+      className={`w-full px-3 py-2.5 flex items-center gap-3 transition-colors text-left animate-fade-in ${
+        active ? 'bg-chaski-primary/10 border-r-2 border-chaski-primary' : 'hover:bg-slate-50'
       }`}
     >
       <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0">
@@ -343,7 +345,7 @@ function KitItem({ kit, active, onClick }: { kit: Kit; active: boolean; onClick:
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`font-semibold text-sm truncate ${active ? 'text-brand-purple' : 'text-slate-900'}`}>{kit.name}</p>
+        <p className={`font-semibold text-sm truncate ${active ? 'text-chaski-primary' : 'text-slate-900'}`}>{kit.name}</p>
         <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
           <span className="truncate">{kit.levelId || 'sin nivel'}</span>
           {kit.price > 0 && <span className="font-semibold">${kit.price}</span>}
@@ -364,7 +366,7 @@ function KitEditor({ form, setField, dirty, saving, isCreating, allLevels, image
           <ArrowLeft className="w-4 h-4 text-slate-700" />
         </button>
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <Package className="w-5 h-5 text-brand-purple shrink-0" />
+          <Package className="w-5 h-5 text-chaski-primary shrink-0" />
           <h2 className="font-bold text-slate-900 truncate">
             {isCreating ? 'Nuevo kit' : form.name || 'Editando...'}
           </h2>
@@ -382,7 +384,7 @@ function KitEditor({ form, setField, dirty, saving, isCreating, allLevels, image
           <button
             onClick={onSave}
             disabled={saving}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-brand-purple to-brand-violet text-white font-semibold px-4 py-2 rounded-full text-sm shadow-md disabled:opacity-50 active:scale-95"
+            className="flex items-center gap-1.5 bg-chaski-primary text-white font-semibold px-4 py-2 rounded-full text-sm shadow-md hover:bg-chaski-primary/90 disabled:opacity-50 active:scale-[0.98] transition-all"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {isCreating ? 'Crear' : 'Guardar'}
@@ -397,7 +399,7 @@ function KitEditor({ form, setField, dirty, saving, isCreating, allLevels, image
             value={form.name}
             onChange={(e) => setField('name', e.target.value)}
             placeholder="Nombre del kit"
-            className="w-full text-2xl sm:text-3xl font-black bg-transparent text-slate-900 placeholder-slate-300 border-none focus:outline-none"
+            className="w-full text-2xl sm:text-3xl font-black bg-transparent text-slate-900 placeholder-slate-300 border-b-2 border-transparent focus:outline-none focus:border-chaski-primary transition-all"
           />
 
           <div className="grid grid-cols-2 gap-3">
@@ -533,22 +535,22 @@ function ImageUploaderBlock({ imageUrls, onAdd, onRemove }: { imageUrls: string[
         onDragLeave={() => setDrag(false)}
         onDrop={onDrop}
         className={`relative block w-full p-8 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
-          drag ? 'border-brand-purple bg-brand-purple/5 scale-[1.01]' : 'border-slate-300 hover:border-brand-purple hover:bg-brand-purple/5'
+          drag ? 'border-chaski-primary bg-chaski-primary/5 scale-[1.01]' : 'border-slate-300 hover:border-chaski-primary hover:bg-chaski-primary/5'
         } ${uploading ? 'pointer-events-none' : ''}`}
       >
         <div className="flex flex-col items-center text-center gap-2">
           {uploading ? (
             <>
-              <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+              <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
               <p className="font-semibold text-slate-700">Subiendo {progress}%</p>
               <div className="w-48 h-1 bg-slate-200 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-purple transition-all" style={{ width: `${progress}%` }} />
+                <div className="h-full bg-chaski-primary transition-all" style={{ width: `${progress}%` }} />
               </div>
             </>
           ) : (
             <>
-              <div className="w-12 h-12 bg-brand-purple/10 rounded-2xl flex items-center justify-center">
-                <Upload className="w-6 h-6 text-brand-purple" />
+              <div className="w-12 h-12 bg-chaski-primary/10 rounded-2xl flex items-center justify-center">
+                <Upload className="w-6 h-6 text-chaski-primary" />
               </div>
               <p className="font-bold text-slate-900">Arrastra imágenes o haz clic</p>
               <p className="text-sm text-slate-400">PNG, JPG, WebP · máx 10MB</p>
@@ -574,7 +576,7 @@ function ImageUploaderBlock({ imageUrls, onAdd, onRemove }: { imageUrls: string[
       {imageUrls.length > 0 && (
         <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {imageUrls.map((url, idx) => (
-            <div key={idx} className="group relative aspect-square rounded-2xl overflow-hidden border border-slate-200 bg-slate-50">
+            <div key={idx} className="group relative aspect-square rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 animate-scale-in" style={{ animationDelay: `${idx * 0.05}s` }}>
               <img src={url} alt="" className="w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.opacity = '0.3')} />
               <button
                 onClick={() => onRemove(idx)}
@@ -604,9 +606,9 @@ function FieldCompact({ label, children }: { label: string; children: React.Reac
 
 function FieldBlock({ label, icon: Icon, children }: { label: string; icon?: any; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-5">
       <div className="flex items-center gap-2 mb-3">
-        {Icon && <Icon className="w-4 h-4 text-brand-purple" />}
+        {Icon && <Icon className="w-4 h-4 text-chaski-primary" />}
         <h3 className="font-bold text-slate-900 text-sm">{label}</h3>
       </div>
       {children}
@@ -614,5 +616,5 @@ function FieldBlock({ label, icon: Icon, children }: { label: string; icon?: any
   )
 }
 
-const inputClass = 'w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all'
-const selectClass = 'w-full px-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple'
+const inputClass = 'w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all'
+const selectClass = 'w-full px-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 focus:outline-none focus:bg-white focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all'

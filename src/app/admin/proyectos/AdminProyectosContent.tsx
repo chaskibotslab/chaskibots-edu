@@ -186,34 +186,37 @@ export default function AdminProyectosContent() {
 
   const getDifficultyColor = (difficulty: string) => {
     const diff = DIFFICULTY_LEVELS.find(d => d.value === difficulty)
-    return diff?.color || 'gray'
+    return diff?.color || 'slate'
   }
 
   if (isLoading || !isAdmin) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-purple"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-chaski-primary"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+    <div className="min-h-screen bg-white animate-fade-in">
+      <header className="bg-slate-50 border-b border-slate-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-gray-600 hover:text-gray-900">
+            <Link href="/admin" className="text-slate-600 hover:text-slate-900">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <Zap className="w-6 h-6 text-brand-purple" />
+              <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Zap className="w-6 h-6 text-chaski-primary" />
                 Proyectos Avanzados
               </h1>
-              <p className="text-sm text-gray-600">Jetson Nano, Raspberry Pi, ESP32-CAM, Digispark</p>
+              <p className="text-sm text-slate-600">Jetson Nano, Raspberry Pi, ESP32-CAM, Digispark</p>
             </div>
           </div>
-          <button onClick={openCreateModal} className="btn-primary flex items-center gap-2">
+          <button
+            onClick={openCreateModal}
+            className="flex items-center gap-2 bg-chaski-primary text-white font-medium px-4 py-2.5 rounded-xl hover:bg-chaski-primary/90 active:scale-[0.98] transition-all"
+          >
             <Plus className="w-4 h-4" />
             Nuevo Proyecto
           </button>
@@ -223,27 +226,27 @@ export default function AdminProyectosContent() {
       <div className="p-6">
         <div className="mb-6 flex flex-wrap gap-4">
           <div>
-            <label className="block text-sm text-gray-600 mb-2">Nivel:</label>
+            <label className="block text-sm text-slate-600 mb-2">Nivel:</label>
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none min-w-[180px]"
+              className="bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none min-w-[180px]"
             >
               <option value="">Todos los niveles</option>
-              {EDUCATION_LEVELS.filter(l => 
+              {EDUCATION_LEVELS.filter(l =>
                 ['octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'].includes(l.id)
               ).map(level => (
                 <option key={level.id} value={level.id}>{level.name}</option>
               ))}
             </select>
           </div>
-          
+
           <div>
-            <label className="block text-sm text-gray-600 mb-2">Categoria:</label>
+            <label className="block text-sm text-slate-600 mb-2">Categoria:</label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none min-w-[180px]"
+              className="bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none min-w-[180px]"
             >
               <option value="">Todas</option>
               {CATEGORIES.map(cat => (
@@ -255,62 +258,66 @@ export default function AdminProyectosContent() {
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-purple"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-chaski-primary"></div>
           </div>
         ) : projects.length === 0 ? (
           <div className="text-center py-12">
-            <Cpu className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-600">No hay proyectos</p>
-            <button onClick={openCreateModal} className="mt-4 text-brand-purple hover:underline">
+            <Cpu className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <p className="text-slate-600">No hay proyectos</p>
+            <button onClick={openCreateModal} className="mt-4 text-chaski-primary hover:underline">
               Crear primer proyecto
             </button>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {projects.map(project => {
+            {projects.map((project, idx) => {
               const catInfo = getCategoryInfo(project.category)
               const CatIcon = catInfo.icon
               return (
-                <div key={project.id} className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden hover:border-brand-purple/30 transition-colors">
-                  <div className={'px-4 py-3 border-b border-gray-200 bg-' + catInfo.color + '/10'}>
+                <div
+                  key={project.id}
+                  className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 transition-all duration-300 overflow-hidden animate-scale-in"
+                  style={{ animationDelay: `${idx * 0.05}s` }}
+                >
+                  <div className={'px-4 py-3 border-b border-slate-200 bg-' + catInfo.color + '/10'}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <CatIcon className={'w-5 h-5 text-' + catInfo.color} />
-                        <span className="text-sm text-gray-600">{catInfo.label}</span>
+                        <CatIcon className={'w-5 h-5 text-' + catInfo.color + ' group-hover:scale-110 transition-transform'} />
+                        <span className="text-sm text-slate-600">{catInfo.label}</span>
                       </div>
-                      <span className={'text-xs px-2 py-1 rounded-full bg-' + getDifficultyColor(project.difficulty) + '-500/20 text-' + getDifficultyColor(project.difficulty) + '-400'}>
+                      <span className={'text-xs px-2 py-1 rounded-full bg-' + getDifficultyColor(project.difficulty) + '-500/10 text-' + getDifficultyColor(project.difficulty) + '-600'}>
                         {project.difficulty}
                       </span>
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="text-gray-900 font-semibold mb-2">{project.projectName}</h3>
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">{project.description}</p>
-                    
+                    <h3 className="text-slate-900 font-semibold mb-2">{project.projectName}</h3>
+                    <p className="text-slate-600 text-sm mb-3 line-clamp-2">{project.description}</p>
+
                     <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2 text-gray-500">
+                      <div className="flex items-center gap-2 text-slate-500">
                         <Wrench className="w-4 h-4" />
                         <span className="truncate">{project.hardware}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-500">
+                      <div className="flex items-center gap-2 text-slate-500">
                         <Clock className="w-4 h-4" />
                         <span>{project.duration}</span>
                       </div>
                     </div>
-                    
+
                     {project.tutorialUrl && (
-                      <a href={project.tutorialUrl} target="_blank" rel="noopener noreferrer" 
-                         className="mt-3 flex items-center gap-1 text-brand-purple text-sm hover:underline">
+                      <a href={project.tutorialUrl} target="_blank" rel="noopener noreferrer"
+                         className="mt-3 flex items-center gap-1 text-chaski-primary text-sm hover:underline">
                         <ExternalLink className="w-3 h-3" />
                         Ver tutorial
                       </a>
                     )}
                   </div>
-                  <div className="px-4 py-3 border-t border-gray-200 flex justify-end gap-2">
-                    <button onClick={() => openEditModal(project)} className="p-2 text-gray-600 hover:text-brand-purple">
+                  <div className="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+                    <button onClick={() => openEditModal(project)} className="p-2 text-slate-600 hover:text-chaski-primary transition-colors">
                       <Edit2 className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(project.id)} className="p-2 text-gray-600 hover:text-red-500">
+                    <button onClick={() => handleDelete(project.id)} className="p-2 text-slate-600 hover:text-red-500 transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -322,33 +329,33 @@ export default function AdminProyectosContent() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-50 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-gray-50 border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-scale-in">
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-900">
                 {isCreating ? 'Nuevo Proyecto' : 'Editar Proyecto'}
               </h2>
-              <button onClick={closeModal} className="text-gray-600 hover:text-gray-900">
+              <button onClick={closeModal} className="text-slate-600 hover:text-slate-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-6 space-y-4">
               {message && (
-                <div className={'p-3 rounded-lg ' + (message.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400')}>
+                <div className={'p-3 rounded-lg ' + (message.type === 'success' ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600')}>
                   {message.text}
                 </div>
               )}
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Nivel Educativo *</label>
+                <label className="block text-sm text-slate-600 mb-1">Nivel Educativo *</label>
                 <select
                   value={formData.levelId}
                   onChange={(e) => setFormData({ ...formData, levelId: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none"
                 >
                   <option value="">Seleccionar nivel</option>
-                  {EDUCATION_LEVELS.filter(l => 
+                  {EDUCATION_LEVELS.filter(l =>
                     ['octavo-egb', 'noveno-egb', 'decimo-egb', 'primero-bach', 'segundo-bach', 'tercero-bach'].includes(l.id)
                   ).map(level => (
                     <option key={level.id} value={level.id}>{level.name}</option>
@@ -357,23 +364,23 @@ export default function AdminProyectosContent() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Nombre del Proyecto *</label>
+                <label className="block text-sm text-slate-600 mb-1">Nombre del Proyecto *</label>
                 <input
                   type="text"
                   value={formData.projectName}
                   onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
                   placeholder="Ej: BadUSB con Digispark"
-                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Categoria</label>
+                  <label className="block text-sm text-slate-600 mb-1">Categoria</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value as Project['category'] })}
-                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
+                    className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none"
                   >
                     {CATEGORIES.map(cat => (
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -382,11 +389,11 @@ export default function AdminProyectosContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Dificultad</label>
+                  <label className="block text-sm text-slate-600 mb-1">Dificultad</label>
                   <select
                     value={formData.difficulty}
                     onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as Project['difficulty'] })}
-                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
+                    className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none"
                   >
                     {DIFFICULTY_LEVELS.map(diff => (
                       <option key={diff.value} value={diff.value}>{diff.label}</option>
@@ -396,81 +403,81 @@ export default function AdminProyectosContent() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Descripcion</label>
+                <label className="block text-sm text-slate-600 mb-1">Descripcion</label>
                 <textarea
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Describe el proyecto..."
-                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none resize-none"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Hardware</label>
+                  <label className="block text-sm text-slate-600 mb-1">Hardware</label>
                   <input
                     type="text"
                     value={formData.hardware}
                     onChange={(e) => setFormData({ ...formData, hardware: e.target.value })}
                     placeholder="Ej: Digispark ATtiny85"
-                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
+                    className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Duracion</label>
+                  <label className="block text-sm text-slate-600 mb-1">Duracion</label>
                   <input
                     type="text"
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                     placeholder="Ej: 3 horas"
-                    className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
+                    className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">URL Video Tutorial</label>
+                <label className="block text-sm text-slate-600 mb-1">URL Video Tutorial</label>
                 <input
                   type="text"
                   value={formData.videoUrl}
                   onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                   placeholder="https://..."
-                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">URL Documentacion/GitHub</label>
+                <label className="block text-sm text-slate-600 mb-1">URL Documentacion/GitHub</label>
                 <input
                   type="text"
                   value={formData.tutorialUrl}
                   onChange={(e) => setFormData({ ...formData, tutorialUrl: e.target.value })}
                   placeholder="https://github.com/..."
-                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Recursos Necesarios</label>
+                <label className="block text-sm text-slate-600 mb-1">Recursos Necesarios</label>
                 <input
                   type="text"
                   value={formData.resources}
                   onChange={(e) => setFormData({ ...formData, resources: e.target.value })}
                   placeholder="Ej: Arduino IDE, Python, etc."
-                  className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:border-brand-purple focus:outline-none"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none"
                 />
               </div>
             </div>
 
-            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
-              <button onClick={closeModal} className="px-4 py-2 text-gray-600 hover:text-gray-900">
+            <div className="sticky bottom-0 bg-white border-t border-slate-200 px-6 py-4 flex justify-end gap-3">
+              <button onClick={closeModal} className="px-4 py-2 text-slate-600 hover:text-slate-900 active:scale-[0.98] transition-all">
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving || !formData.projectName || !formData.levelId}
-                className="btn-primary flex items-center gap-2 disabled:opacity-50"
+                className="flex items-center gap-2 bg-chaski-primary text-white font-medium px-4 py-2 rounded-lg hover:bg-chaski-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 {saving ? 'Guardando...' : 'Guardar'}

@@ -356,46 +356,55 @@ export default function AdminPage() {
 
           {/* Logs Tab */}
           {activeTab === 'logs' && (
-            <div className="bg-gray-50 rounded-xl border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Registro de Actividad</h3>
-                <p className="text-gray-600 text-sm">Historial de accesos al sistema</p>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-fade-in">
+              <div className="p-5 border-b border-slate-200 flex items-center gap-3">
+                <div className="w-10 h-10 bg-chaski-primary/10 rounded-xl flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-chaski-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Registro de Actividad</h3>
+                  <p className="text-slate-400 text-sm">Historial de accesos al sistema</p>
+                </div>
               </div>
               <div className="p-4">
                 {accessLogs.length === 0 ? (
-                  <p className="text-gray-600 text-center py-12">No hay registros de actividad</p>
+                  <p className="text-slate-500 text-center py-12">No hay registros de actividad</p>
                 ) : (
                   <div className="space-y-2">
                     {accessLogs.map((log, idx) => (
-                      <div key={idx} className="flex items-center gap-4 p-4 bg-gray-100/50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors animate-slide-up"
+                        style={{ animationDelay: `${idx * 0.03}s` }}
+                      >
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          log.action === 'login' ? 'bg-green-500/20' : log.action === 'logout' ? 'bg-red-500/20' : 'bg-blue-500/20'
+                          log.action === 'login' ? 'bg-green-500/10' : log.action === 'logout' ? 'bg-red-500/10' : 'bg-chaski-primary/10'
                         }`}>
                           {log.action === 'login' ? (
-                            <Unlock className="w-5 h-5 text-green-400" />
+                            <Unlock className="w-5 h-5 text-green-600" />
                           ) : log.action === 'logout' ? (
-                            <Lock className="w-5 h-5 text-red-400" />
+                            <Lock className="w-5 h-5 text-red-500" />
                           ) : (
-                            <Eye className="w-5 h-5 text-blue-400" />
+                            <Eye className="w-5 h-5 text-chaski-primary" />
                           )}
                         </div>
-                        <div className="flex-1">
-                          <p className="text-gray-900 font-medium">{log.name}</p>
-                          <p className="text-gray-600 text-sm">{log.email}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-slate-900 font-medium truncate">{log.name}</p>
+                          <p className="text-slate-500 text-sm truncate">{log.email}</p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex-shrink-0">
                           <p className={`text-sm font-medium ${
-                            log.action === 'login' ? 'text-green-400' : 
-                            log.action === 'logout' ? 'text-red-400' : 'text-blue-400'
+                            log.action === 'login' ? 'text-green-600' :
+                            log.action === 'logout' ? 'text-red-500' : 'text-chaski-primary'
                           }`}>
-                            {log.action === 'login' ? 'Inició sesión' : 
+                            {log.action === 'login' ? 'Inició sesión' :
                              log.action === 'logout' ? 'Cerró sesión' : 'Visitó página'}
                           </p>
-                          <p className="text-gray-500 text-xs">
+                          <p className="text-slate-400 text-xs">
                             {new Date(log.timestamp).toLocaleString('es-EC')}
                           </p>
                           {log.details && (
-                            <p className="text-gray-500 text-xs">{log.details}</p>
+                            <p className="text-slate-400 text-xs">{log.details}</p>
                           )}
                         </div>
                       </div>
@@ -408,66 +417,66 @@ export default function AdminPage() {
 
           {/* Settings Tab */}
           {activeTab === 'settings' && (
-            <div className="space-y-6">
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Configuración General</h3>
+            <div className="space-y-6 animate-fade-in">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Configuración General</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-gray-600 text-sm mb-2">Nombre de la Plataforma</label>
+                    <label className="block text-slate-600 text-sm mb-2">Nombre de la Plataforma</label>
                     <input
                       type="text"
                       defaultValue="ChaskiBots EDU"
-                      className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-600 text-sm mb-2">Email de Notificaciones</label>
+                    <label className="block text-slate-600 text-sm mb-2">Email de Notificaciones</label>
                     <input
                       type="email"
                       defaultValue="admin@chaskibots.com"
-                      className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:border-brand-purple focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
                     />
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-100/50 rounded-lg">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
                     <div>
-                      <p className="text-gray-900 font-medium">Notificaciones de Acceso</p>
-                      <p className="text-gray-600 text-sm">Recibir email cuando alguien inicia sesión</p>
+                      <p className="text-slate-900 font-medium">Notificaciones de Acceso</p>
+                      <p className="text-slate-500 text-sm">Recibir email cuando alguien inicia sesión</p>
                     </div>
-                    <button className="w-12 h-6 bg-brand-purple rounded-full relative">
+                    <button className="w-12 h-6 bg-chaski-primary rounded-full relative transition-colors">
                       <span className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
                     </button>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Credenciales de Prueba</h3>
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Credenciales de Prueba</h3>
                 <div className="space-y-3">
-                  <div className="p-4 bg-gray-100/50 rounded-lg">
+                  <div className="p-4 bg-slate-50 rounded-xl">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-900 font-medium">Administrador</p>
-                        <p className="text-gray-600 text-sm">admin@chaskibots.com</p>
+                        <p className="text-slate-900 font-medium">Administrador</p>
+                        <p className="text-slate-500 text-sm">admin@chaskibots.com</p>
                       </div>
-                      <code className="bg-dark-600 px-3 py-1 rounded text-brand-purple text-sm">admin2024</code>
+                      <code className="bg-chaski-primary/10 px-3 py-1 rounded-lg text-chaski-primary text-sm font-semibold">admin2024</code>
                     </div>
                   </div>
-                  <div className="p-4 bg-gray-100/50 rounded-lg">
+                  <div className="p-4 bg-slate-50 rounded-xl">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-900 font-medium">Profesor</p>
-                        <p className="text-gray-600 text-sm">profesor@chaskibots.com</p>
+                        <p className="text-slate-900 font-medium">Profesor</p>
+                        <p className="text-slate-500 text-sm">profesor@chaskibots.com</p>
                       </div>
-                      <code className="bg-dark-600 px-3 py-1 rounded text-brand-violet text-sm">profe123</code>
+                      <code className="bg-brand-violet/10 px-3 py-1 rounded-lg text-brand-violet text-sm font-semibold">profe123</code>
                     </div>
                   </div>
-                  <div className="p-4 bg-gray-100/50 rounded-lg">
+                  <div className="p-4 bg-slate-50 rounded-xl">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-900 font-medium">Estudiante</p>
-                        <p className="text-gray-600 text-sm">estudiante@chaskibots.com</p>
+                        <p className="text-slate-900 font-medium">Estudiante</p>
+                        <p className="text-slate-500 text-sm">estudiante@chaskibots.com</p>
                       </div>
-                      <code className="bg-dark-600 px-3 py-1 rounded text-neon-pink text-sm">estudiante123</code>
+                      <code className="bg-chaski-gold/10 px-3 py-1 rounded-lg text-chaski-gold text-sm font-semibold">estudiante123</code>
                     </div>
                   </div>
                 </div>
@@ -608,25 +617,25 @@ function CoursesManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-purple"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-chaski-primary"></div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             placeholder="Buscar cursos..."
-            className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:border-brand-purple focus:outline-none w-64"
+            className="pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all w-64"
           />
         </div>
-        <button 
+        <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-purple text-dark-900 rounded-lg font-medium hover:bg-brand-purple/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-chaski-primary text-white rounded-xl font-medium hover:bg-chaski-primary/90 active:scale-[0.98] transition-all"
         >
           {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           <span>{showForm ? 'Cancelar' : 'Nuevo Curso'}</span>
@@ -635,27 +644,27 @@ function CoursesManager() {
 
       {/* Formulario */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl border border-gray-200 p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4 animate-scale-in">
+          <h3 className="text-lg font-bold text-slate-900 mb-4">
             {editingCourse ? 'Editar Curso' : 'Nuevo Curso'}
           </h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Nombre del Curso</label>
+              <label className="block text-sm text-slate-600 mb-1">Nombre del Curso</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Nivel</label>
+              <label className="block text-sm text-slate-600 mb-1">Nivel</label>
               <select
                 value={formData.levelId}
                 onChange={(e) => setFormData({...formData, levelId: e.target.value})}
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
                 required
               >
                 <option value="">Seleccionar...</option>
@@ -665,20 +674,20 @@ function CoursesManager() {
               </select>
             </div>
             <div className="col-span-2">
-              <label className="block text-sm text-gray-600 mb-1">Descripción</label>
+              <label className="block text-sm text-slate-600 mb-1">Descripción</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
                 rows={2}
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Profesor</label>
+              <label className="block text-sm text-slate-600 mb-1">Profesor</label>
               <select
                 value={formData.teacherName}
                 onChange={(e) => setFormData({...formData, teacherName: e.target.value})}
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
               >
                 <option value="">Seleccionar profesor...</option>
                 {teachers.map((teacher) => (
@@ -689,25 +698,25 @@ function CoursesManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Máx. Estudiantes</label>
+              <label className="block text-sm text-slate-600 mb-1">Máx. Estudiantes</label>
               <input
                 type="number"
                 value={formData.maxStudents}
                 onChange={(e) => setFormData({...formData, maxStudents: parseInt(e.target.value)})}
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
               />
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <button type="button" onClick={resetForm} className="px-4 py-2 text-gray-600 hover:text-gray-900">
+            <button type="button" onClick={resetForm} className="px-4 py-2 text-slate-500 hover:text-slate-900 transition-colors">
               Cancelar
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-2 bg-neon-green text-dark-900 font-semibold rounded-lg hover:bg-neon-green/90 disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-chaski-primary text-white font-semibold rounded-xl hover:bg-chaski-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
             >
-              {saving ? <div className="w-4 h-4 border-2 border-dark-900 border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
               {editingCourse ? 'Actualizar' : 'Crear'} Curso
             </button>
           </div>
@@ -717,44 +726,48 @@ function CoursesManager() {
       {/* Lista de cursos */}
       <div className="grid gap-4">
         {courses.length === 0 ? (
-          <div className="bg-gray-50/50 border-2 border-dashed border-gray-200 rounded-xl p-8 text-center">
-            <Plus className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-            <h4 className="text-gray-900 font-medium mb-2">No hay cursos</h4>
-            <p className="text-gray-600 text-sm">Crea tu primer curso usando el botón "Nuevo Curso"</p>
+          <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center">
+            <Plus className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <h4 className="text-slate-900 font-medium mb-2">No hay cursos</h4>
+            <p className="text-slate-500 text-sm">Crea tu primer curso usando el botón "Nuevo Curso"</p>
           </div>
         ) : (
-          courses.map((course) => (
-            <div key={course.id} className="bg-gray-50 rounded-xl border border-gray-200 p-6 hover:border-brand-purple/30 transition-colors">
+          courses.map((course, idx) => (
+            <div
+              key={course.id}
+              className="group bg-white rounded-2xl border border-slate-200 shadow-sm p-6 hover:border-chaski-primary/30 hover:shadow-md transition-all duration-300 animate-slide-up"
+              style={{ animationDelay: `${idx * 0.05}s` }}
+            >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{course.name}</h3>
-                  <p className="text-gray-600 mb-4">{course.description || 'Sin descripción'}</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">{course.name}</h3>
+                  <p className="text-slate-500 mb-4">{course.description || 'Sin descripción'}</p>
                   <div className="flex items-center gap-6 text-sm">
-                    <span className="text-gray-600">
+                    <span className="text-slate-500">
                       <GraduationCap className="w-4 h-4 inline mr-1" />
                       {course.levelId}
                     </span>
-                    <span className="text-gray-600">
+                    <span className="text-slate-500">
                       <Users className="w-4 h-4 inline mr-1" />
                       {course.currentStudents || 0}/{course.maxStudents || 30} estudiantes
                     </span>
                     {course.teacherName && (
-                      <span className="text-brand-purple">
+                      <span className="text-chaski-primary font-medium">
                         👨‍🏫 {course.teacherName}
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button 
+                  <button
                     onClick={() => handleEdit(course)}
-                    className="p-2 text-gray-600 hover:text-brand-purple hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-2 text-slate-400 hover:text-chaski-primary hover:bg-chaski-primary/10 rounded-lg transition-colors"
                   >
                     <Edit className="w-5 h-5" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDelete(course.id)}
-                    className="p-2 text-gray-600 hover:text-red-400 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>

@@ -152,7 +152,7 @@ export default function CursosCatalogoPage() {
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
   }
@@ -160,7 +160,7 @@ export default function CursosCatalogoPage() {
   const hasSelection = isCreating || selectedId
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
+    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden animate-fade-in">
       <header className="shrink-0 bg-white/80 backdrop-blur-xl border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Link href="/admin/colegios" className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center shrink-0">
@@ -173,7 +173,7 @@ export default function CursosCatalogoPage() {
         </div>
         <button
           onClick={() => { setIsCreating(true); setSelectedId(null) }}
-          className="flex items-center gap-1.5 bg-gradient-to-r from-brand-purple to-brand-violet text-white font-semibold px-4 py-2 rounded-full shadow-md text-sm hover:shadow-lg active:scale-95 transition-all"
+          className="flex items-center gap-1.5 bg-chaski-primary hover:bg-chaski-primary/90 text-white font-semibold px-4 py-2 rounded-full shadow-md text-sm active:scale-[0.98] transition-all"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">Nuevo curso</span>
@@ -190,7 +190,7 @@ export default function CursosCatalogoPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar curso..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-brand-purple"
+                className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
               />
             </div>
             <div className="flex gap-1 overflow-x-auto">
@@ -215,7 +215,7 @@ export default function CursosCatalogoPage() {
           <div className="flex-1 overflow-y-auto py-2">
             {loading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="w-6 h-6 text-brand-purple animate-spin" />
+                <Loader2 className="w-6 h-6 text-chaski-primary animate-spin" />
               </div>
             ) : filteredCourses.length === 0 ? (
               <div className="px-6 py-12 text-center">
@@ -224,11 +224,12 @@ export default function CursosCatalogoPage() {
                 <p className="text-slate-500 text-sm">Crea tu primer curso</p>
               </div>
             ) : (
-              filteredCourses.map(c => (
+              filteredCourses.map((c, i) => (
                 <CourseItem
                   key={c.id}
                   course={c}
                   active={selectedId === c.id}
+                  index={i}
                   onClick={() => { setSelectedId(c.id); setIsCreating(false) }}
                 />
               ))
@@ -240,8 +241,8 @@ export default function CursosCatalogoPage() {
           {!hasSelection ? (
             <div className="flex-1 flex items-center justify-center p-8">
               <div className="text-center max-w-sm">
-                <div className="w-20 h-20 bg-gradient-to-br from-brand-purple/20 to-brand-violet/20 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                  <BookMarked className="w-10 h-10 text-brand-purple" />
+                <div className="w-20 h-20 bg-chaski-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                  <BookMarked className="w-10 h-10 text-chaski-primary" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900 mb-2">Catálogo de cursos</h2>
                 <p className="text-slate-500 text-sm">
@@ -279,20 +280,21 @@ export default function CursosCatalogoPage() {
   )
 }
 
-function CourseItem({ course, active, onClick }: { course: Course; active: boolean; onClick: () => void }) {
+function CourseItem({ course, active, onClick, index = 0 }: { course: Course; active: boolean; onClick: () => void; index?: number }) {
   const program = PROGRAMS.find(p => p.id === course.programId) || PROGRAMS[0]
   return (
     <button
       onClick={onClick}
-      className={`w-full px-3 py-2.5 flex items-center gap-3 transition-colors text-left ${
-        active ? 'bg-brand-purple/10 border-r-2 border-brand-purple' : 'hover:bg-slate-50'
+      style={{ animationDelay: `${index * 0.05}s` }}
+      className={`group w-full px-3 py-2.5 flex items-center gap-3 transition-colors text-left animate-slide-up ${
+        active ? 'bg-chaski-primary/10 border-r-2 border-chaski-primary' : 'hover:bg-slate-50'
       }`}
     >
-      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${program.color} flex items-center justify-center text-xl shrink-0 shadow-md`}>
+      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${program.color} flex items-center justify-center text-xl shrink-0 shadow-md group-hover:scale-110 transition-transform`}>
         {course.icon || program.emoji}
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`font-semibold text-sm truncate ${active ? 'text-brand-purple' : 'text-slate-900'}`}>{course.name}</p>
+        <p className={`font-semibold text-sm truncate ${active ? 'text-chaski-primary' : 'text-slate-900'}`}>{course.name}</p>
         <p className="text-xs text-slate-500 truncate">{course.description || program.label}</p>
       </div>
     </button>
@@ -307,7 +309,7 @@ function CourseEditor({ form, setField, dirty, saving, isCreating, allLevels, on
           <ArrowLeft className="w-4 h-4 text-slate-700" />
         </button>
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <BookMarked className="w-5 h-5 text-brand-purple shrink-0" />
+          <BookMarked className="w-5 h-5 text-chaski-primary shrink-0" />
           <h2 className="font-bold text-slate-900 truncate">
             {isCreating ? 'Nuevo curso' : form.name || 'Editando...'}
           </h2>
@@ -322,7 +324,7 @@ function CourseEditor({ form, setField, dirty, saving, isCreating, allLevels, on
           <button
             onClick={onSave}
             disabled={saving}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-brand-purple to-brand-violet text-white font-semibold px-4 py-2 rounded-full text-sm shadow-md disabled:opacity-50 active:scale-95"
+            className="flex items-center gap-1.5 bg-chaski-primary hover:bg-chaski-primary/90 text-white font-semibold px-4 py-2 rounded-full text-sm shadow-md disabled:opacity-50 active:scale-[0.98] transition-all"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {isCreating ? 'Crear' : 'Guardar'}
@@ -396,7 +398,7 @@ function CourseEditor({ form, setField, dirty, saving, isCreating, allLevels, on
                   key={ic}
                   onClick={() => setField('icon', ic)}
                   className={`aspect-square text-2xl rounded-xl flex items-center justify-center transition-all ${
-                    form.icon === ic ? 'bg-brand-purple text-white scale-110 shadow-lg' : 'bg-slate-100 hover:bg-slate-200'
+                    form.icon === ic ? 'bg-chaski-primary text-white scale-110 shadow-lg' : 'bg-slate-100 hover:bg-slate-200'
                   }`}
                 >
                   {ic}
@@ -421,9 +423,9 @@ function FieldCompact({ label, children }: { label: string; children: React.Reac
 
 function FieldBlock({ label, icon: Icon, children }: { label: string; icon?: any; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-5">
       <div className="flex items-center gap-2 mb-3">
-        {Icon && <Icon className="w-4 h-4 text-brand-purple" />}
+        {Icon && <Icon className="w-4 h-4 text-chaski-primary" />}
         <h3 className="font-bold text-slate-900 text-sm">{label}</h3>
       </div>
       {children}
@@ -431,4 +433,4 @@ function FieldBlock({ label, icon: Icon, children }: { label: string; icon?: any
   )
 }
 
-const selectClass = 'w-full px-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple'
+const selectClass = 'w-full px-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 focus:outline-none focus:bg-white focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all'

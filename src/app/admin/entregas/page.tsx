@@ -122,7 +122,7 @@ function EntregasContent() {
 
   const handleGrade = async () => {
     if (!selectedSubmission) return
-    
+
     const grade = parseFloat(gradeInput)
     if (isNaN(grade) || grade < 0 || grade > 100) {
       alert('La calificación debe ser un número entre 0 y 100')
@@ -174,8 +174,8 @@ function EntregasContent() {
 
   // Niveles permitidos para el profesor
   const levels = dynamicLevels.length > 0 ? dynamicLevels : EDUCATION_LEVELS
-  const allowedLevelIds = isAdmin 
-    ? levels.map(l => l.id) 
+  const allowedLevelIds = isAdmin
+    ? levels.map(l => l.id)
     : teacherCourses.map(tc => tc.levelId)
 
   const filteredSubmissions = submissions.filter(sub => {
@@ -204,42 +204,42 @@ function EntregasContent() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded-full flex items-center gap-1"><Clock className="w-3 h-3" /> Pendiente</span>
+        return <span className="px-2 py-1 bg-amber-500/10 text-amber-600 text-xs rounded-full flex items-center gap-1"><Clock className="w-3 h-3" /> Pendiente</span>
       case 'graded':
-        return <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full flex items-center gap-1"><Check className="w-3 h-3" /> Calificado</span>
+        return <span className="px-2 py-1 bg-green-500/10 text-green-600 text-xs rounded-full flex items-center gap-1"><Check className="w-3 h-3" /> Calificado</span>
       case 'returned':
-        return <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full flex items-center gap-1"><MessageSquare className="w-3 h-3" /> Devuelto</span>
+        return <span className="px-2 py-1 bg-blue-500/10 text-blue-600 text-xs rounded-full flex items-center gap-1"><MessageSquare className="w-3 h-3" /> Devuelto</span>
       default:
-        return <span className="px-2 py-1 bg-gray-500/20 text-gray-600 text-xs rounded-full">{status}</span>
+        return <span className="px-2 py-1 bg-slate-500/10 text-slate-600 text-xs rounded-full">{status}</span>
     }
   }
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white animate-fade-in">
       {/* Header */}
-      <header className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+      <header className="bg-white/90 backdrop-blur-xl border-b border-slate-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href={isAdmin ? "/admin" : "/dashboard"}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-100 rounded-lg transition-all active:scale-[0.98]"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5 text-slate-600" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-purple-400" />
+              <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <FileText className="w-6 h-6 text-chaski-primary" />
                 Entregas de Estudiantes
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-600">
                 {submissions.length} entregas totales • {submissions.filter(s => s.status === 'pending').length} pendientes
               </p>
             </div>
@@ -247,22 +247,22 @@ function EntregasContent() {
           {activeTab === 'tareas' && (
             <button
               onClick={loadSubmissions}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg transition-colors"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg transition-all active:scale-[0.98]"
             >
               Actualizar
             </button>
           )}
         </div>
-        
+
         {/* Tabs */}
         <div className="max-w-7xl mx-auto mt-4">
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('tareas')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all active:scale-[0.98] ${
                 activeTab === 'tareas'
-                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
               <FileText className="w-4 h-4" />
@@ -270,10 +270,10 @@ function EntregasContent() {
             </button>
             <button
               onClick={() => setActiveTab('simulador')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all active:scale-[0.98] ${
                 activeTab === 'simulador'
-                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
               <Gamepad2 className="w-4 h-4" />
@@ -293,24 +293,24 @@ function EntregasContent() {
         {activeTab === 'tareas' && (
           <>
             {/* Filters */}
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-6">
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex-1 min-w-[200px]">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Buscar por nombre, código..."
-                      className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                      className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
                     />
                   </div>
                 </div>
                 <select
                   value={selectedLevel}
                   onChange={(e) => setSelectedLevel(e.target.value)}
-                  className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                  className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
                 >
                   <option value="">Todos los niveles</option>
                   {(isAdmin ? levels : levels.filter(l => allowedLevelIds.includes(l.id))).map(level => (
@@ -320,7 +320,7 @@ function EntregasContent() {
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                  className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
                 >
                   <option value="">Todos los estados</option>
                   <option value="pending">Pendientes</option>
@@ -333,13 +333,13 @@ function EntregasContent() {
             {/* Submissions List */}
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+                <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
               </div>
             ) : filteredSubmissions.length === 0 ? (
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-12 text-center">
-                <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No hay entregas</h3>
-                <p className="text-gray-600">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center animate-fade-in">
+                <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-slate-900 mb-2">No hay entregas</h3>
+                <p className="text-slate-600">
                   {searchTerm || selectedLevel || selectedStatus
                     ? 'No se encontraron entregas con los filtros seleccionados'
                     : 'Aún no hay entregas de estudiantes'}
@@ -347,26 +347,27 @@ function EntregasContent() {
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredSubmissions.map(submission => (
+                {filteredSubmissions.map((submission, i) => (
                   <div
                     key={submission.id}
-                    className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden hover:border-purple-500/30 transition-colors"
+                    className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 transition-all duration-300 overflow-hidden animate-slide-up"
+                    style={{ animationDelay: `${i * 0.05}s` }}
                   >
                     <div className="p-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
-                              <User className="w-5 h-5 text-purple-400" />
+                            <div className="w-10 h-10 bg-chaski-primary/10 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-chaski-primary" />
                             </div>
                             <div>
-                              <h3 className="font-bold text-gray-900">{submission.studentName}</h3>
-                              <p className="text-sm text-gray-600">{submission.taskId}</p>
+                              <h3 className="font-bold text-slate-900">{submission.studentName}</h3>
+                              <p className="text-sm text-slate-600">{submission.taskId}</p>
                             </div>
                             {getStatusBadge(submission.status)}
                           </div>
-                          
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
+
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 mb-3">
                             <span className="flex items-center gap-1">
                               <GraduationCap className="w-4 h-4" />
                               {getLevelName(submission.levelId)}
@@ -382,13 +383,13 @@ function EntregasContent() {
                               })}
                             </span>
                             {submission.grade !== undefined && (
-                              <span className="flex items-center gap-1 text-green-400">
+                              <span className="flex items-center gap-1 text-green-600">
                                 <Star className="w-4 h-4" />
                                 {submission.grade}/100
                               </span>
                             )}
                             {(submission.attachmentUrls?.length || submission.drawing || submission.files) && (
-                              <span className="flex items-center gap-1 text-blue-500 font-medium">
+                              <span className="flex items-center gap-1 text-blue-600 font-medium">
                                 <Paperclip className="w-4 h-4" />
                                 {submission.attachmentUrls?.length || 1} archivo{(submission.attachmentUrls?.length || 1) > 1 ? 's' : ''}
                               </span>
@@ -396,8 +397,8 @@ function EntregasContent() {
                           </div>
 
                           {/* Code Preview */}
-                          <div className="bg-white rounded-lg p-3 max-h-32 overflow-hidden">
-                            <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
+                          <div className="bg-slate-900 rounded-lg p-3 max-h-32 overflow-hidden">
+                            <pre className="text-xs text-slate-100 font-mono whitespace-pre-wrap">
                               {submission.code.slice(0, 300)}
                               {submission.code.length > 300 && '...'}
                             </pre>
@@ -411,10 +412,10 @@ function EntregasContent() {
                               setGradeInput(submission.grade?.toString() || '')
                               setFeedbackInput(submission.feedback || '')
                             }}
-                            className={`p-2 rounded-lg transition-colors ${
+                            className={`p-2 rounded-lg transition-all active:scale-[0.98] ${
                               submission.status === 'graded'
-                                ? 'bg-green-500/20 hover:bg-green-500/30 text-green-400'
-                                : 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-400'
+                                ? 'bg-green-500/10 hover:bg-green-500/20 text-green-600'
+                                : 'bg-chaski-primary/10 hover:bg-chaski-primary/20 text-chaski-primary'
                             }`}
                             title={submission.status === 'graded' ? 'Editar calificación' : 'Calificar'}
                           >
@@ -426,7 +427,7 @@ function EntregasContent() {
                           </button>
                           <button
                             onClick={() => handleDelete(submission.id)}
-                            className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+                            className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 rounded-lg transition-all active:scale-[0.98]"
                             title="Eliminar"
                           >
                             <Trash2 className="w-5 h-5" />
@@ -444,20 +445,20 @@ function EntregasContent() {
 
       {/* Grade Modal */}
       {selectedSubmission && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-50 border border-gray-200 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-scale-in">
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-gray-900">Calificar Entrega</h3>
-                <p className="text-sm text-gray-600">
+                <h3 className="text-lg font-bold text-slate-900">Calificar Entrega</h3>
+                <p className="text-sm text-slate-600">
                   {selectedSubmission.studentName} • {selectedSubmission.taskId}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedSubmission(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 rounded-lg transition-all active:scale-[0.98]"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
 
@@ -465,12 +466,12 @@ function EntregasContent() {
               <div className="grid md:grid-cols-2 gap-4">
                 {/* Code */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                    <Code className="w-4 h-4 text-purple-400" />
+                  <h4 className="text-sm font-medium text-slate-900 mb-2 flex items-center gap-2">
+                    <Code className="w-4 h-4 text-chaski-primary" />
                     Código / Respuestas
                   </h4>
-                  <div className="bg-white rounded-lg p-4 h-64 overflow-auto">
-                    <pre className="text-sm text-gray-300 font-mono whitespace-pre-wrap">
+                  <div className="bg-slate-900 rounded-lg p-4 h-64 overflow-auto">
+                    <pre className="text-sm text-slate-100 font-mono whitespace-pre-wrap">
                       {selectedSubmission.code.replace(/\[DIBUJO_ADJUNTO_BASE64\]/g, '').replace(/\[ARCHIVOS:[^\]]+\]/g, '')}
                     </pre>
                   </div>
@@ -478,8 +479,8 @@ function EntregasContent() {
 
                 {/* Output */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Salida / Info</h4>
-                  <div className="bg-white rounded-lg p-4 h-64 overflow-auto">
+                  <h4 className="text-sm font-medium text-slate-900 mb-2">Salida / Info</h4>
+                  <div className="bg-slate-900 rounded-lg p-4 h-64 overflow-auto">
                     <pre className="text-sm text-green-400 font-mono whitespace-pre-wrap">
                       {selectedSubmission.output || 'Sin salida'}
                     </pre>
@@ -488,11 +489,11 @@ function EntregasContent() {
               </div>
 
               {/* Adjuntos - Dibujo y Archivos */}
-              {(selectedSubmission.attachmentUrls?.length || selectedSubmission.drawing || selectedSubmission.files || 
+              {(selectedSubmission.attachmentUrls?.length || selectedSubmission.drawing || selectedSubmission.files ||
                 selectedSubmission.output?.includes('📁 ADJUNTOS')) && (
-                <div className="mt-4 p-4 bg-gray-100 rounded-lg border border-gray-200">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-                    <Paperclip className="w-4 h-4 text-green-400" />
+                <div className="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                  <h4 className="text-sm font-medium text-slate-900 mb-3 flex items-center gap-2">
+                    <Paperclip className="w-4 h-4 text-green-600" />
                     Archivos Adjuntos del Estudiante
                   </h4>
 
@@ -508,7 +509,7 @@ function EntregasContent() {
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group relative block rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-colors"
+                            className="group relative block rounded-lg overflow-hidden border border-slate-200 hover:border-blue-400 transition-colors"
                           >
                             <img src={url} alt={fileName} className="w-full h-24 object-cover" />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-colors">
@@ -531,17 +532,17 @@ function EntregasContent() {
                       })}
                     </div>
                   )}
-                  
+
                   {/* Mostrar dibujo como imagen */}
                   {selectedSubmission.drawing && (
                     <div className="mb-4">
-                      <p className="text-sm text-purple-300 mb-2 flex items-center gap-2">
+                      <p className="text-sm text-chaski-primary mb-2 flex items-center gap-2">
                         <Image className="w-4 h-4" />
                         🎨 Dibujo del estudiante:
                       </p>
-                      <div className="bg-white rounded-lg p-2 inline-block">
-                        <img 
-                          src={selectedSubmission.drawing} 
+                      <div className="bg-white border border-slate-200 rounded-lg p-2 inline-block">
+                        <img
+                          src={selectedSubmission.drawing}
                           alt="Dibujo del estudiante"
                           className="max-w-full max-h-64 rounded"
                         />
@@ -549,22 +550,22 @@ function EntregasContent() {
                       <a
                         href={selectedSubmission.drawing}
                         download={`dibujo_${selectedSubmission.studentName}.png`}
-                        className="mt-2 flex items-center gap-2 p-2 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg transition-colors w-fit"
+                        className="mt-2 flex items-center gap-2 p-2 bg-chaski-primary/10 hover:bg-chaski-primary/20 rounded-lg transition-all active:scale-[0.98] w-fit"
                       >
-                        <Download className="w-4 h-4 text-purple-400" />
-                        <span className="text-sm text-purple-300">Descargar dibujo</span>
+                        <Download className="w-4 h-4 text-chaski-primary" />
+                        <span className="text-sm text-chaski-primary">Descargar dibujo</span>
                       </a>
                     </div>
                   )}
-                  
+
                   {/* Mostrar archivos */}
                   {selectedSubmission.files && (() => {
                     try {
                       const filesArray = JSON.parse(selectedSubmission.files)
-                      
+
                       return (
                         <div className="space-y-2">
-                          <p className="text-sm text-blue-300 flex items-center gap-2">
+                          <p className="text-sm text-blue-600 flex items-center gap-2">
                             <FileText className="w-4 h-4" />
                             📎 Archivos adjuntos ({filesArray.length}):
                           </p>
@@ -579,16 +580,16 @@ function EntregasContent() {
                                   rel="noopener noreferrer"
                                   className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/30"
                                 >
-                                  <Download className="w-5 h-5 text-blue-400" />
-                                  <span className="text-sm text-blue-300 flex-1">{file.name}</span>
-                                  <span className="text-xs text-gray-600">Ver en Google Drive →</span>
+                                  <Download className="w-5 h-5 text-blue-500" />
+                                  <span className="text-sm text-blue-700 flex-1">{file.name}</span>
+                                  <span className="text-xs text-slate-500">Ver en Google Drive →</span>
                                 </a>
                               )
                             }
                             // Si tiene datos base64
                             if (file.data) {
-                              const dataUrl = file.data.startsWith('data:') 
-                                ? file.data 
+                              const dataUrl = file.data.startsWith('data:')
+                                ? file.data
                                 : `data:${file.type || 'application/octet-stream'};base64,${file.data}`
                               return (
                                 <a
@@ -597,9 +598,9 @@ function EntregasContent() {
                                   download={file.name}
                                   className="flex items-center gap-2 p-3 bg-green-500/10 hover:bg-green-500/20 rounded-lg transition-colors border border-green-500/30"
                                 >
-                                  <Download className="w-5 h-5 text-green-400" />
-                                  <span className="text-sm text-green-300 flex-1">{file.name}</span>
-                                  <span className="text-xs text-gray-600">Descargar archivo</span>
+                                  <Download className="w-5 h-5 text-green-600" />
+                                  <span className="text-sm text-green-700 flex-1">{file.name}</span>
+                                  <span className="text-xs text-slate-500">Descargar archivo</span>
                                 </a>
                               )
                             }
@@ -607,11 +608,11 @@ function EntregasContent() {
                             return (
                               <div
                                 key={idx}
-                                className="flex items-center gap-2 p-3 bg-gray-500/10 rounded-lg border border-gray-500/30"
+                                className="flex items-center gap-2 p-3 bg-slate-100 rounded-lg border border-slate-200"
                               >
-                                <FileText className="w-5 h-5 text-gray-600" />
-                                <span className="text-sm text-gray-300 flex-1">{file.name}</span>
-                                <span className="text-xs text-gray-500">({file.type || 'archivo'})</span>
+                                <FileText className="w-5 h-5 text-slate-500" />
+                                <span className="text-sm text-slate-700 flex-1">{file.name}</span>
+                                <span className="text-xs text-slate-500">({file.type || 'archivo'})</span>
                               </div>
                             )
                           })}
@@ -621,11 +622,11 @@ function EntregasContent() {
                       return null
                     }
                   })()}
-                  
+
                   {/* Fallback si no hay datos pero hay indicadores en output */}
-                  {!selectedSubmission.drawing && !selectedSubmission.files && 
+                  {!selectedSubmission.drawing && !selectedSubmission.files &&
                    selectedSubmission.output?.includes('📁 ADJUNTOS') && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-600">
                       Los archivos fueron enviados pero no se pudieron guardar en la base de datos.
                       Por favor, crea los campos "drawing" y "files" en tu tabla de Airtable.
                     </p>
@@ -636,7 +637,7 @@ function EntregasContent() {
               {/* Grading Form */}
               <div className="mt-4 grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                  <label className="block text-sm font-medium text-slate-900 mb-2">
                     Calificación (0-100)
                   </label>
                   <input
@@ -646,36 +647,36 @@ function EntregasContent() {
                     step="1"
                     value={gradeInput}
                     onChange={(e) => setGradeInput(e.target.value)}
-                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
                     placeholder="Ej: 85"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                  <label className="block text-sm font-medium text-slate-900 mb-2">
                     Retroalimentación
                   </label>
                   <textarea
                     value={feedbackInput}
                     onChange={(e) => setFeedbackInput(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 resize-none focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 resize-none focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
                     placeholder="Comentarios para el estudiante..."
                   />
                 </div>
               </div>
             </div>
 
-            <div className="p-4 border-t border-gray-200 flex justify-end gap-3">
+            <div className="p-4 border-t border-slate-200 flex justify-end gap-3">
               <button
                 onClick={() => setSelectedSubmission(null)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg transition-colors"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg transition-all active:scale-[0.98]"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleGrade}
                 disabled={saving || !gradeInput}
-                className="px-6 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-gray-900 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="px-6 py-2 bg-chaski-primary hover:bg-chaski-primary/90 disabled:bg-slate-300 disabled:text-slate-500 text-white rounded-lg font-medium flex items-center gap-2 transition-all active:scale-[0.98]"
               >
                 {saving ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Guardando...</>
@@ -696,7 +697,7 @@ export default function EntregasPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     }>
       <EntregasContent />

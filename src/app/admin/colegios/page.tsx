@@ -203,7 +203,7 @@ export default function ColegiosPage() {
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
   }
@@ -211,7 +211,7 @@ export default function ColegiosPage() {
   const hasSelection = isCreating || selectedSchoolId
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
+    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden animate-fade-in">
       {/* Top bar */}
       <header className="shrink-0 bg-white/80 backdrop-blur-xl border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -233,7 +233,7 @@ export default function ColegiosPage() {
           </Link>
           <button
             onClick={() => { setIsCreating(true); setSelectedSchoolId(null) }}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-brand-purple to-brand-violet text-white font-semibold px-4 py-2 rounded-full shadow-md text-sm hover:shadow-lg active:scale-95 transition-all"
+            className="flex items-center gap-1.5 bg-chaski-primary hover:bg-chaski-primary/90 text-white font-semibold px-4 py-2 rounded-full shadow-md text-sm active:scale-[0.98] transition-all"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Nuevo colegio</span>
@@ -252,7 +252,7 @@ export default function ColegiosPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar colegio o ciudad..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-brand-purple"
+                className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
               />
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function ColegiosPage() {
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="w-6 h-6 text-brand-purple animate-spin" />
+                <Loader2 className="w-6 h-6 text-chaski-primary animate-spin" />
               </div>
             ) : filteredSchools.length === 0 ? (
               <div className="px-6 py-12 text-center">
@@ -272,7 +272,7 @@ export default function ColegiosPage() {
               </div>
             ) : (
               <div className="py-2">
-                {filteredSchools.map(s => {
+                {filteredSchools.map((s, i) => {
                   const courseCount = schoolCourses.filter(sc => sc.schoolId === s.id).length
                   return (
                     <SchoolItem
@@ -280,6 +280,7 @@ export default function ColegiosPage() {
                       school={s}
                       courseCount={courseCount}
                       active={selectedSchoolId === s.id}
+                      index={i}
                       onClick={() => { setSelectedSchoolId(s.id); setIsCreating(false) }}
                     />
                   )
@@ -294,8 +295,8 @@ export default function ColegiosPage() {
           {!hasSelection ? (
             <div className="flex-1 flex items-center justify-center p-8">
               <div className="text-center max-w-sm">
-                <div className="w-20 h-20 bg-gradient-to-br from-brand-purple/20 to-brand-violet/20 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                  <Building2 className="w-10 h-10 text-brand-purple" />
+                <div className="w-20 h-20 bg-chaski-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                  <Building2 className="w-10 h-10 text-chaski-primary" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900 mb-2">Selecciona un colegio</h2>
                 <p className="text-slate-500 text-sm mb-5">
@@ -355,21 +356,22 @@ export default function ColegiosPage() {
   )
 }
 
-function SchoolItem({ school, courseCount, active, onClick }: { school: School; courseCount: number; active: boolean; onClick: () => void }) {
+function SchoolItem({ school, courseCount, active, onClick, index = 0 }: { school: School; courseCount: number; active: boolean; onClick: () => void; index?: number }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full px-3 py-3 flex items-center gap-3 transition-colors text-left ${
-        active ? 'bg-brand-purple/10 border-r-2 border-brand-purple' : 'hover:bg-slate-50'
+      style={{ animationDelay: `${index * 0.05}s` }}
+      className={`group w-full px-3 py-3 flex items-center gap-3 transition-colors text-left animate-slide-up ${
+        active ? 'bg-chaski-primary/10 border-r-2 border-chaski-primary' : 'hover:bg-slate-50'
       }`}
     >
-      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-        active ? 'bg-gradient-to-br from-brand-purple to-brand-violet text-white' : 'bg-slate-100 text-slate-600'
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform ${
+        active ? 'bg-chaski-primary text-white' : 'bg-slate-100 text-slate-600'
       }`}>
         <Building2 className="w-5 h-5" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`font-semibold text-sm truncate ${active ? 'text-brand-purple' : 'text-slate-900'}`}>{school.name}</p>
+        <p className={`font-semibold text-sm truncate ${active ? 'text-chaski-primary' : 'text-slate-900'}`}>{school.name}</p>
         <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
           {school.city && (
             <span className="flex items-center gap-0.5 truncate">
@@ -378,7 +380,7 @@ function SchoolItem({ school, courseCount, active, onClick }: { school: School; 
             </span>
           )}
           {courseCount > 0 && (
-            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-brand-purple/10 text-brand-purple font-bold">
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-chaski-primary/10 text-chaski-primary font-bold">
               <BookMarked className="w-3 h-3" />
               {courseCount}
             </span>
@@ -397,7 +399,7 @@ function SchoolEditor({ form, setField, dirty, saving, isCreating, school, assig
           <ArrowLeft className="w-4 h-4 text-slate-700" />
         </button>
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <Building2 className="w-5 h-5 text-brand-purple shrink-0" />
+          <Building2 className="w-5 h-5 text-chaski-primary shrink-0" />
           <h2 className="font-bold text-slate-900 truncate">
             {isCreating ? 'Nuevo colegio' : form.name || 'Editando...'}
           </h2>
@@ -412,7 +414,7 @@ function SchoolEditor({ form, setField, dirty, saving, isCreating, school, assig
           <button
             onClick={onSave}
             disabled={saving}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-brand-purple to-brand-violet text-white font-semibold px-4 py-2 rounded-full text-sm shadow-md disabled:opacity-50 active:scale-95"
+            className="flex items-center gap-1.5 bg-chaski-primary hover:bg-chaski-primary/90 text-white font-semibold px-4 py-2 rounded-full text-sm shadow-md disabled:opacity-50 active:scale-[0.98] transition-all"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {isCreating ? 'Crear' : 'Guardar'}
@@ -451,15 +453,15 @@ function SchoolEditor({ form, setField, dirty, saving, isCreating, school, assig
 
           {/* Cursos asignados (solo en modo edición) */}
           {!isCreating && (
-            <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <BookMarked className="w-4 h-4 text-brand-purple" />
+                  <BookMarked className="w-4 h-4 text-chaski-primary" />
                   <h3 className="font-bold text-slate-900 text-sm">Cursos asignados ({assignedCourses.length})</h3>
                 </div>
                 <button
                   onClick={onAssignClick}
-                  className="flex items-center gap-1.5 bg-brand-purple text-white text-sm font-semibold px-3 py-1.5 rounded-full hover:bg-brand-purple/90 active:scale-95 transition-all"
+                  className="flex items-center gap-1.5 bg-chaski-primary text-white text-sm font-semibold px-3 py-1.5 rounded-full hover:bg-chaski-primary/90 active:scale-[0.98] transition-all"
                 >
                   <PlusIcon className="w-4 h-4" />
                   Asignar curso
@@ -472,17 +474,18 @@ function SchoolEditor({ form, setField, dirty, saving, isCreating, school, assig
                   <p className="text-slate-500 text-sm">Este colegio aún no tiene cursos asignados</p>
                   <button
                     onClick={onAssignClick}
-                    className="mt-3 text-brand-purple text-sm font-semibold hover:underline"
+                    className="mt-3 text-chaski-primary text-sm font-semibold hover:underline"
                   >
                     Asignar el primer curso
                   </button>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {assignedCourses.map((sc: SchoolCourse) => (
+                  {assignedCourses.map((sc: SchoolCourse, i: number) => (
                     <AssignedCourseRow
                       key={sc.id}
                       assignment={sc}
+                      index={i}
                       onUnassign={() => onUnassign(sc.id)}
                     />
                   ))}
@@ -496,7 +499,7 @@ function SchoolEditor({ form, setField, dirty, saving, isCreating, school, assig
   )
 }
 
-function AssignedCourseRow({ assignment, onUnassign }: { assignment: SchoolCourse; onUnassign: () => void }) {
+function AssignedCourseRow({ assignment, onUnassign, index = 0 }: { assignment: SchoolCourse; onUnassign: () => void; index?: number }) {
   const c = assignment.course
   const icon = c?.icon || '📚'
   const programId = c?.program_id || ''
@@ -504,8 +507,11 @@ function AssignedCourseRow({ assignment, onUnassign }: { assignment: SchoolCours
   const courseName = assignment.customName || c?.name || 'Curso'
 
   return (
-    <div className="group flex items-center gap-3 p-3 rounded-2xl border border-slate-200 hover:border-brand-purple/40 hover:bg-slate-50 transition-all">
-      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center text-xl shrink-0 shadow-md`}>
+    <div
+      style={{ animationDelay: `${index * 0.05}s` }}
+      className="group flex items-center gap-3 p-3 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 hover:bg-slate-50 transition-all duration-300 animate-slide-up"
+    >
+      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center text-xl shrink-0 shadow-md group-hover:scale-110 transition-transform`}>
         {icon}
       </div>
       <div className="flex-1 min-w-0">
@@ -592,7 +598,7 @@ function AssignCourseModal({ schoolId, schoolName, courses, existingAssignments,
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-in" onClick={onClose} />
 
       <div className="relative w-full sm:max-w-2xl max-h-[94vh] bg-white sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden flex flex-col animate-slide-up">
         <div className="sm:hidden flex justify-center pt-2 pb-1">
@@ -621,7 +627,7 @@ function AssignCourseModal({ schoolId, schoolName, courses, existingAssignments,
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Buscar curso..."
-                  className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-brand-purple"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
                 />
               </div>
             </div>
@@ -629,23 +635,24 @@ function AssignCourseModal({ schoolId, schoolName, courses, existingAssignments,
             <div className="flex-1 overflow-y-auto px-6 py-3">
               {filteredCourses.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-slate-500 text-sm">No hay cursos en el catálogo. <Link href="/admin/cursos" className="text-brand-purple font-semibold">Crear cursos</Link></p>
+                  <p className="text-slate-500 text-sm">No hay cursos en el catálogo. <Link href="/admin/cursos" className="text-chaski-primary font-semibold">Crear cursos</Link></p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {filteredCourses.map((c: Course) => {
+                  {filteredCourses.map((c: Course, i: number) => {
                     const alreadyAssigned = existingAssignments.some((sc: SchoolCourse) => sc.courseId === c.id)
                     return (
                       <button
                         key={c.id}
                         onClick={() => { setPickedCourseId(c.id); setStep('details') }}
-                        className={`w-full flex items-center gap-3 p-3 rounded-2xl border transition-all text-left ${
+                        style={{ animationDelay: `${i * 0.05}s` }}
+                        className={`group w-full flex items-center gap-3 p-3 rounded-2xl border transition-all text-left animate-slide-up ${
                           pickedCourseId === c.id
-                            ? 'border-brand-purple bg-brand-purple/5'
-                            : 'border-slate-200 hover:border-brand-purple/40'
+                            ? 'border-chaski-primary bg-chaski-primary/5'
+                            : 'border-slate-200 hover:border-chaski-primary/30'
                         }`}
                       >
-                        <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${PROGRAM_COLORS[c.programId] || 'from-slate-400 to-slate-500'} flex items-center justify-center text-xl shrink-0`}>
+                        <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${PROGRAM_COLORS[c.programId] || 'from-slate-400 to-slate-500'} flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform`}>
                           {c.icon}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -702,7 +709,7 @@ function AssignCourseModal({ schoolId, schoolName, courses, existingAssignments,
               <button
                 onClick={handleAssign}
                 disabled={saving}
-                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-brand-purple to-brand-violet text-white font-bold py-3 rounded-2xl shadow-lg disabled:opacity-50 active:scale-[0.98]"
+                className="flex-1 flex items-center justify-center gap-2 bg-chaski-primary hover:bg-chaski-primary/90 text-white font-bold py-3 rounded-2xl shadow-lg disabled:opacity-50 active:scale-[0.98] transition-all"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
                 Asignar curso
@@ -726,9 +733,9 @@ function FieldCompact({ label, children }: { label: string; children: React.Reac
 
 function FieldBlock({ label, icon: Icon, children }: { label: string; icon?: any; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-5">
       <div className="flex items-center gap-2 mb-3">
-        {Icon && <Icon className="w-4 h-4 text-brand-purple" />}
+        {Icon && <Icon className="w-4 h-4 text-chaski-primary" />}
         <h3 className="font-bold text-slate-900 text-sm">{label}</h3>
       </div>
       {children}
@@ -736,5 +743,5 @@ function FieldBlock({ label, icon: Icon, children }: { label: string; icon?: any
   )
 }
 
-const inputClass = 'w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all'
-const selectClass = 'w-full px-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple'
+const inputClass = 'w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all'
+const selectClass = 'w-full px-3 py-2 bg-slate-100 border border-transparent rounded-xl text-sm text-slate-900 focus:outline-none focus:bg-white focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all'
