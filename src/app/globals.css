@@ -3,18 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --primary: #007AFF;
-  --secondary: #339DFF;
-  --accent: #0051D5;
-  --neon-cyan: #007AFF;
-  --neon-purple: #007AFF;
-  --neon-green: #10b981;
-  --neon-pink: #ec4899;
-  --neon-blue: #3b82f6;
-  --gold: #f59e0b;
-  --light: #f8f7ff;
+  --primary: #6366F1;
+  --secondary: #818CF8;
+  --accent: #F43F5E;
+  --neon-cyan: #22D3EE;
+  --neon-purple: #A78BFA;
+  --neon-green: #34D399;
+  --neon-pink: #F43F5E;
+  --neon-blue: #60A5FA;
+  --gold: #F59E0B;
+  --light: #F8FAFC;
   --white: #FFFFFF;
-  --bg-main: #0A0E14;
+  --bg-main: #030712;
   --bg-card: #FFFFFF;
   --text-dark: #E2E8F0;
   --text-muted: #94A3B8;
@@ -58,9 +58,9 @@ body {
   font-weight: 600;
   border-radius: 0.75rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, #007AFF, #0051D5);
+  background: linear-gradient(135deg, #6366F1, #4338CA);
   color: white;
-  border: 1px solid rgba(0, 122, 255, 0.4);
+  border: 1px solid rgba(99, 102, 241, 0.4);
   position: relative;
   overflow: hidden;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -82,7 +82,7 @@ body {
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 20px rgba(0, 122, 255, 0.4), 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4), 0 4px 20px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
@@ -96,14 +96,14 @@ body {
   border-radius: 0.75rem;
   transition: all 0.3s;
   background: #f1f5f9;
-  color: #007AFF;
-  border: 1px solid rgba(0, 122, 255, 0.25);
+  color: #6366F1;
+  border: 1px solid rgba(99, 102, 241, 0.25);
 }
 
 .btn-secondary:hover {
   background: var(--dark-600);
-  border-color: rgba(0, 122, 255, 0.4);
-  color: #0051D5;
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #4338CA;
 }
 
 /* Cards Futuristas */
@@ -126,7 +126,7 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 122, 255, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.08), transparent);
   transition: left 0.6s;
 }
 
@@ -135,8 +135,8 @@ body {
 }
 
 .card:hover {
-  border-color: rgba(0, 122, 255, 0.4);
-  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.12);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
   transform: translateY(-4px);
 }
 
@@ -152,15 +152,15 @@ body {
 }
 
 .tab-btn:hover {
-  border-color: rgba(0, 122, 255, 0.25);
-  color: #007AFF;
+  border-color: rgba(99, 102, 241, 0.25);
+  color: #6366F1;
 }
 
 .tab-btn.active {
   background: #ffffff;
-  color: #007AFF;
-  border-color: rgba(0, 122, 255, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
+  color: #6366F1;
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
 }
 
 /* Level Cards */
@@ -179,8 +179,8 @@ body {
 
 .level-card:hover {
   transform: scale(1.03);
-  border-color: rgba(0, 122, 255, 0.4);
-  box-shadow: 0 12px 32px rgba(0, 122, 255, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.15);
 }
 
 /* Badges */
@@ -242,8 +242,8 @@ body {
 .input-cyber:focus {
   outline: none;
   background: #ffffff;
-  border-color: #007AFF;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.12);
+  border-color: #6366F1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
 }
 
 /* Glassmorphism */
@@ -268,7 +268,7 @@ body {
   display: inline-block;
   border-radius: 12px;
   overflow: hidden;
-  border: 2px solid rgba(0, 245, 255, 0.3);
+  border: 2px solid rgba(99, 102, 241, 0.3);
 }
 
 .ai-overlay {
@@ -285,7 +285,7 @@ body {
   border: none;
   border-radius: 12px;
   background: var(--dark-800);
-  border: 1px solid rgba(0, 122, 255, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 /* Scrollbar styling - Futurista */
@@ -300,12 +300,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  background: linear-gradient(180deg, #6366F1, #818CF8);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: #6366F1;
 }
 
 /* Animations */
@@ -354,10 +354,10 @@ body {
 
 /* Hero Gradient */
 .hero-gradient {
-  background: radial-gradient(ellipse at top, rgba(0,122,255,0.16) 0%, transparent 55%),
-              radial-gradient(ellipse at bottom right, rgba(94,92,230,0.14) 0%, transparent 55%),
-              radial-gradient(ellipse at bottom left, rgba(48,176,199,0.12) 0%, transparent 50%),
-              #F8F9FA;
+  background: radial-gradient(ellipse at top, rgba(99,102,241,0.16) 0%, transparent 55%),
+              radial-gradient(ellipse at bottom right, rgba(129,140,248,0.14) 0%, transparent 55%),
+              radial-gradient(ellipse at bottom left, rgba(244,63,94,0.10) 0%, transparent 50%),
+              #F8FAFC;
   background-size: 200% 200%;
   animation: hero-shift 12s ease-in-out infinite;
 }
@@ -370,7 +370,7 @@ body {
 /* Section Divider */
 .section-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,122,255,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent);
   opacity: 0.3;
 }
 
@@ -580,11 +580,11 @@ body {
 }
 
 .blocklyTreeRow:hover {
-  background: rgba(0, 122, 255, 0.1) !important;
+  background: rgba(99, 102, 241, 0.1) !important;
 }
 
 .blocklyTreeSelected {
-  background: rgba(0, 122, 255, 0.2) !important;
+  background: rgba(99, 102, 241, 0.2) !important;
 }
 
 /* Flyout de Blockly */

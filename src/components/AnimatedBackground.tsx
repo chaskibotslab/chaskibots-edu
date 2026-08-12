@@ -19,13 +19,13 @@ export default function AnimatedBackground() {
     resize()
     window.addEventListener('resize', resize)
 
-    // Colores claros con paleta de marca (iOS blue)
+    // Paleta oscura hacker/terminal (verde-cian)
     const colors = {
-      bg: '#FAFAFA',
-      grid: 'rgba(0, 122, 255, 0.05)',
-      gear: ['#007AFF', '#339DFF', '#0051D5', '#5E5CE6'],
-      particle: ['#007AFF', '#339DFF', '#0051D5', '#8ec7ff'],
-      robot: '#007AFF'
+      bg: '#0A0E14',
+      grid: 'rgba(16, 185, 129, 0.06)',
+      gear: ['#10B981', '#34D399', '#06B6D4', '#39FF14'],
+      particle: ['#10B981', '#34D399', '#06B6D4', '#39FF14'],
+      robot: '#10B981'
     }
 
     // Engranajes con colores suaves
@@ -339,7 +339,7 @@ export default function AnimatedBackground() {
       ctx.globalAlpha = 1
 
       // Conectar partículas cercanas
-      ctx.strokeStyle = 'rgba(0, 122, 255, 0.05)'
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.08)'
       ctx.lineWidth = 1
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -374,9 +374,9 @@ export default function AnimatedBackground() {
       />
       
       {/* Orbes de luz suaves con paleta de marca */}
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#007AFF]/5 rounded-full blur-[200px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#339DFF]/5 rounded-full blur-[180px]" />
-      <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-[#0051D5]/5 rounded-full blur-[150px]" />
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#10B981]/10 rounded-full blur-[200px]" />
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#06B6D4]/10 rounded-full blur-[180px]" />
+      <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-[#39FF14]/5 rounded-full blur-[150px]" />
     </div>
   )
 }
