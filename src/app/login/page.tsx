@@ -4,7 +4,26 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useAuth } from '@/components/AuthProvider'
-import { Mail, Lock, Eye, EyeOff, Loader2, Key, ArrowRight } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Loader2, Key, ArrowRight, Terminal } from 'lucide-react'
+
+const MATRIX_CHARS = '01アカサタナハマヤラワ<>/{}[]#$%01アイウエオ'
+
+function useMatrixColumns(count: number) {
+  const [columns, setColumns] = useState<{ left: number; delay: number; duration: number; chars: string[] }[]>([])
+  useEffect(() => {
+    setColumns(
+      Array.from({ length: count }).map(() => ({
+        left: Math.random() * 100,
+        delay: Math.random() * 4,
+        duration: 3 + Math.random() * 3,
+        chars: Array.from({ length: 14 + Math.floor(Math.random() * 10) }).map(
+          () => MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)]
+        ),
+      }))
+    )
+  }, [count])
+  return columns
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -19,6 +38,7 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const matrixColumns = useMatrixColumns(16)
 
   useEffect(() => {
     setMounted(true)
@@ -74,51 +94,86 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex relative overflow-hidden">
-      {/* ─── LEFT: Brand panel (desktop) ─── */}
-      <div className="hidden lg:flex flex-col justify-between w-[45%] relative bg-chaski-dark p-12 overflow-hidden">
-        {/* Ambient background */}
+      {/* ─── LEFT: Hacker terminal panel (desktop) ─── */}
+      <div className="hidden lg:flex flex-col justify-between w-[45%] relative bg-black p-12 overflow-hidden">
+        {/* Ambient glow */}
         <div className="absolute inset-0">
-          <div className="absolute top-[-20%] right-[-20%] w-[70%] h-[70%] rounded-full bg-chaski-primary/20 blur-[130px]" />
-          <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-chaski-gold/10 blur-[110px]" />
+          <div className="absolute top-[-20%] right-[-20%] w-[70%] h-[70%] rounded-full bg-chaski-primary/25 blur-[130px]" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-hack-green/10 blur-[110px]" />
           {/* Circuit-like grid */}
-          <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+          <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'linear-gradient(rgba(57,255,20,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         </div>
+
+        {/* Matrix code rain */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {matrixColumns.map((col, i) => (
+            <div
+              key={i}
+              className="absolute top-0 flex flex-col items-center font-mono text-hack-green/70 text-xs leading-4 animate-matrix-fall"
+              style={{ left: `${col.left}%`, animationDelay: `${col.delay}s`, animationDuration: `${col.duration}s` }}
+            >
+              {col.chars.map((c, j) => (
+                <span key={j} style={{ opacity: 1 - j / col.chars.length }}>{c}</span>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Scanline sweep */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+          <div className="absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-hack-green/40 to-transparent animate-scan-line" />
+        </div>
+        {/* CRT scanline texture */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.06]" style={{ backgroundImage: 'repeating-linear-gradient(0deg, #fff 0px, transparent 1px, transparent 2px, #fff 3px)' }} />
 
         {/* Logo */}
         <div className="relative flex items-center gap-3 animate-slide-in-left">
-          <div className="w-11 h-11 rounded-xl overflow-hidden ring-1 ring-white/20">
+          <div className="w-11 h-11 rounded-xl overflow-hidden ring-1 ring-hack-green/30">
             <Image src="/chaski.png" alt="ChaskiBots" width={44} height={44} className="w-full h-full object-cover" priority />
           </div>
           <div>
-            <p className="text-white font-bold text-lg leading-tight">ChaskiBots</p>
-            <p className="text-white/40 text-[11px] tracking-[0.2em] uppercase">Edu Platform</p>
+            <p className="text-white font-bold text-lg leading-tight font-mono">ChaskiBots</p>
+            <p className="text-hack-green/60 text-[11px] tracking-[0.2em] uppercase font-mono">root@edu-platform</p>
           </div>
         </div>
 
         {/* Message */}
         <div className="relative space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-chaski-gold/15 border border-chaski-gold/30 animate-fade-in">
-            <span className="w-1.5 h-1.5 rounded-full bg-chaski-gold animate-pulse" />
-            <span className="text-chaski-gold text-xs font-semibold tracking-wide">Robótica · IA · Programación</span>
+          {/* Terminal window chrome */}
+          <div className="rounded-xl bg-black/60 border border-hack-green/25 backdrop-blur-sm overflow-hidden shadow-hack-green animate-fade-in">
+            <div className="flex items-center gap-1.5 px-3 py-2 border-b border-hack-green/20 bg-white/[0.02]">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-hack-amber/70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-hack-green/70" />
+              <span className="ml-2 flex items-center gap-1.5 text-hack-green/50 text-[10px] font-mono">
+                <Terminal className="w-3 h-3" /> access.sh
+              </span>
+            </div>
+            <div className="px-4 py-3 font-mono text-xs space-y-1">
+              <p className="text-hack-green/80"><span className="text-hack-green">$</span> whoami</p>
+              <p className="text-white/70">estudiante_chaskibots</p>
+              <p className="text-hack-green/80"><span className="text-hack-green">$</span> access --level=full<span className="inline-block w-1.5 h-3.5 bg-hack-green ml-1 animate-cursor-blink align-middle" /></p>
+            </div>
           </div>
+
           <h2 className="text-white text-4xl font-bold leading-tight">
             El futuro se<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-gold via-amber-300 to-chaski-gold">construye</span> aquí
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-hack-green via-emerald-300 to-chaski-primary animate-glitch">construye</span> aquí
           </h2>
           <p className="text-white/50 text-sm leading-relaxed max-w-sm">
-            Aprende robótica, inteligencia artificial y programación con laboratorios interactivos, simuladores 3D y proyectos reales.
+            Aprende robótica, inteligencia artificial y hacking ético con laboratorios interactivos, simuladores 3D y proyectos reales.
           </p>
           {/* Feature chips */}
           <div className="flex flex-wrap gap-2">
-            {['Python IDE', 'Lab de IA', 'CAD 3D', 'Simuladores'].map((f, i) => (
-              <span key={f} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-medium animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
+            {['Python IDE', 'Lab de IA', 'CAD 3D', 'Terminal Linux'].map((f, i) => (
+              <span key={f} className="px-3 py-1.5 rounded-lg bg-hack-green/5 border border-hack-green/20 text-hack-green/70 text-xs font-mono font-medium animate-fade-in hover:bg-hack-green/10 hover:border-hack-green/40 transition-colors" style={{ animationDelay: `${i * 0.1}s` }}>
                 {f}
               </span>
             ))}
           </div>
         </div>
 
-        <p className="relative text-white/30 text-[11px]">© {new Date().getFullYear()} ChaskiBots EDU — Educación del Futuro</p>
+        <p className="relative text-white/30 text-[11px] font-mono">© {new Date().getFullYear()} ChaskiBots EDU — Educación del Futuro</p>
       </div>
 
       {/* ─── RIGHT: Form ─── */}
@@ -146,6 +201,10 @@ export default function LoginPage() {
                   <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white shadow-lg shadow-chaski-primary/20">
                     <Image src="/chaski.png" alt="ChaskiBots" width={64} height={64} className="w-full h-full object-cover" priority />
                   </div>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-hack-green/10 border border-hack-green/25 mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-hack-green animate-pulse" />
+                  <span className="text-hack-green text-[10px] font-mono font-semibold tracking-wide">SYSTEM ONLINE</span>
                 </div>
                 <h1 className="text-2xl font-bold text-chaski-dark">Bienvenido</h1>
                 <p className="text-slate-400 text-sm mt-1">Ingresa a tu cuenta para continuar</p>
