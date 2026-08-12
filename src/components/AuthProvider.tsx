@@ -44,6 +44,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// Debe coincidir con SESSION_MAX_AGE_SECONDS en src/lib/session.ts (7 días)
+const SESSION_CLIENT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -89,17 +92,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('chaskibots_user')
+    const savedExp = localStorage.getItem('chaskibots_session_exp')
     const savedLogs = localStorage.getItem('chaskibots_access_logs')
-    
-    if (savedUser) {
+
+    // La sesión real (cookie httpOnly firmada) la gestiona el servidor.
+    // Este `exp` es solo para que el cliente no siga mostrando un usuario
+    // "logueado" en la UI (ej. el botón Admin) más allá de la duración de
+    // esa cookie server-side — antes localStorage no expiraba nunca, así
+    // que en una computadora compartida el siguiente visitante heredaba
+    // visualmente la sesión del usuario anterior.
+    const isExpired = !savedExp || Number(savedExp) < Date.now()
+
+    if (savedUser && !isExpired) {
       try {
         const parsedUser = JSON.parse(savedUser)
         setUser(parsedUser)
-        
-        // Sincronizar cookie de sesión para el middleware (protección server-side)
-        const sessionData = btoa(JSON.stringify({ id: parsedUser.id, role: parsedUser.role, email: parsedUser.email }))
-        document.cookie = `chaskibots_session=${sessionData}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
-        
+
         // Refrescar datos del usuario desde Airtable
         if (parsedUser.accessCode) {
           refreshUserData({ accessCode: parsedUser.accessCode })
@@ -108,13 +116,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch {
         localStorage.removeItem('chaskibots_user')
-        document.cookie = 'chaskibots_session=; path=/; max-age=0'
+        localStorage.removeItem('chaskibots_session_exp')
       }
-    } else {
-      // No hay usuario, asegurar que no haya cookie
-      document.cookie = 'chaskibots_session=; path=/; max-age=0'
+    } else if (savedUser) {
+      // Había un usuario guardado pero la sesión ya venció
+      localStorage.removeItem('chaskibots_user')
+      localStorage.removeItem('chaskibots_session_exp')
     }
-    
+
     if (savedLogs) {
       try {
         setAccessLogs(JSON.parse(savedLogs))
@@ -122,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('chaskibots_access_logs')
       }
     }
-    
+
     setIsLoading(false)
   }, [])
 
@@ -177,11 +186,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setUser(loggedUser)
       localStorage.setItem('chaskibots_user', JSON.stringify(loggedUser))
-      
-      // Guardar sesión en cookie para el middleware (protección server-side)
-      const sessionData = btoa(JSON.stringify({ id: loggedUser.id, role: loggedUser.role, email: loggedUser.email }))
-      document.cookie = `chaskibots_session=${sessionData}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
-      
+      // La cookie de sesión (httpOnly, firmada) ya la puso el servidor en la
+      // respuesta de /api/auth/login. Solo guardamos su vencimiento para que
+      // el cliente deje de mostrar al usuario "logueado" cuando expire.
+      localStorage.setItem('chaskibots_session_exp', String(Date.now() + SESSION_CLIENT_MAX_AGE_MS))
+
       // Registrar acceso
       const loginLog: AccessLog = {
         userId: loggedUser.id,
@@ -219,8 +228,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setUser(null)
     localStorage.removeItem('chaskibots_user')
-    // Eliminar cookie de sesión
-    document.cookie = 'chaskibots_session=; path=/; max-age=0'
+    localStorage.removeItem('chaskibots_session_exp')
+    // Borrar la cookie httpOnly de sesión (el cliente no puede tocarla directamente)
+    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
   }
 
   return (

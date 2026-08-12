@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateAccessCode } from '@/lib/supabase-auth'
+import { createSessionCookie, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from '@/lib/session'
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,11 +38,26 @@ export async function POST(request: NextRequest) {
       lastLogin: new Date().toISOString()
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       user,
       message: 'Acceso exitoso'
     })
+
+    const cookieValue = await createSessionCookie({
+      id: result.user!.id,
+      role: result.user!.role,
+      email: result.user!.email,
+    })
+    response.cookies.set(SESSION_COOKIE_NAME, cookieValue, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: SESSION_MAX_AGE_SECONDS,
+    })
+
+    return response
 
   } catch (error) {
     console.error('Error in login-code:', error)

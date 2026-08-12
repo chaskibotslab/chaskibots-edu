@@ -76,21 +76,21 @@ export default function ModuleAccordion({
   const completedCount = 0 // TODO: implementar progreso real
 
   return (
-    <div className={`rounded-2xl border ${colors.border} overflow-hidden transition-all duration-300 ${isOpen ? `shadow-lg ${colors.glow}` : ''}`}>
+    <div className={`rounded-2xl border ${colors.border} bg-white/[0.03] overflow-hidden transition-all duration-300 ${isOpen ? `shadow-lg ${colors.glow}` : ''}`}>
       {/* Header del módulo */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center gap-4 p-5 ${colors.bg} hover:brightness-110 transition-all`}
+        className={`w-full flex items-center gap-4 p-5 ${colors.bg} hover:brightness-125 transition-all`}
       >
         {/* Número del módulo */}
-        <div className={`w-12 h-12 ${colors.accent} rounded-xl flex items-center justify-center text-gray-900 font-bold text-lg shadow-lg`}>
+        <div className={`w-12 h-12 ${colors.accent} rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
           {moduleIndex}
         </div>
 
         {/* Info del módulo */}
         <div className="flex-1 text-left">
-          <h3 className="font-bold text-gray-900 text-lg">{moduleName}</h3>
-          <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+          <h3 className="font-bold text-white text-lg">{moduleName}</h3>
+          <div className="flex items-center gap-4 mt-1 text-sm text-slate-400">
             <span className="flex items-center gap-1">
               <BookOpen className="w-4 h-4" />
               {lessons.length} lecciones
@@ -110,8 +110,8 @@ export default function ModuleAccordion({
 
         {/* Barra de progreso mini */}
         <div className="hidden sm:block w-24">
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div 
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <div
               className={`h-full ${colors.accent} rounded-full transition-all`}
               style={{ width: `${(completedCount / lessons.length) * 100}%` }}
             />
@@ -119,12 +119,12 @@ export default function ModuleAccordion({
         </div>
 
         {/* Flecha */}
-        <ChevronDown className={`w-6 h-6 text-gray-600 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-6 h-6 ${colors.text} transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Contenido expandible */}
       <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
-        <div className="p-4 space-y-3 bg-white/50">
+        <div className="p-4 space-y-3 bg-black/20">
           {sortedLessons.map((lesson, idx) => (
             <LessonCard
               key={lesson.id}

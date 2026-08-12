@@ -11,6 +11,7 @@ import {
   Maximize2, Minimize2, Lightbulb, Eye, Gauge, Send
 } from 'lucide-react'
 import Image from 'next/image'
+import { useAuth } from '@/components/AuthProvider'
 
 // Tipos
 interface RobotState {
@@ -1501,6 +1502,7 @@ export default function RobotSimulator3D({
   courseId = '',
   schoolId = ''
 }: RobotSimulator3DProps) {
+  const { user } = useAuth()
   const [isRunning, setIsRunning] = useState(false)
   const [programCommands, setProgramCommands] = useState<SimulatorCommand[]>([])
   const runningRef = useRef(false)
@@ -1713,6 +1715,7 @@ export default function RobotSimulator3D({
     const finalStudentEmail = studentEmail || localStorage.getItem('studentEmail') || ''
     const finalCourseId = courseId || localStorage.getItem('courseId') || ''
     const finalSchoolId = schoolId || localStorage.getItem('schoolId') || ''
+    const finalLevelId = user?.levelId || ''
     
     if (!finalStudentName) {
       const name = prompt('Por favor ingresa tu nombre para registrar el reto:')
@@ -1738,7 +1741,8 @@ export default function RobotSimulator3D({
           studentName: finalStudentName || localStorage.getItem('studentName'),
           studentEmail: finalStudentEmail,
           courseId: finalCourseId,
-          schoolId: finalSchoolId
+          schoolId: finalSchoolId,
+          levelId: finalLevelId
         })
       })
       

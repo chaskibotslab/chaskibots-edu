@@ -261,8 +261,9 @@ export default function PythonIDE() {
       if (saved) setCompletedLessons(new Set(JSON.parse(saved)))
       const savedName = localStorage.getItem('python-ide-student')
       if (savedName) setStudentName(savedName)
+      else if (user?.name) setStudentName(user.name)
     } catch {}
-  }, [])
+  }, [user?.name])
 
   useEffect(() => {
     try {
@@ -559,9 +560,13 @@ sys.stderr = sys.__stderr__
         body: JSON.stringify({
           taskId: `PY-${Date.now().toString(36).toUpperCase()}`,
           studentName,
+          studentEmail: user?.email || undefined,
           code: files[activeFile].content,
           output: output.slice(-20).join('\n'),
-          levelId: activeLesson?.difficulty || 'intermedio'
+          levelId: user?.levelId || undefined,
+          lessonId: activeLesson?.id || undefined,
+          courseId: user?.courseId || undefined,
+          schoolId: user?.schoolId || undefined,
         })
       })
       if (res.ok) {

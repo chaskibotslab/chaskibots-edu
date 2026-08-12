@@ -71,6 +71,8 @@ export default function LoginPage() {
         result = await response.json()
         if (result.success && result.user) {
           localStorage.setItem('chaskibots_user', JSON.stringify(result.user))
+          // Debe coincidir con la duración de la cookie httpOnly que puso el servidor (7 días)
+          localStorage.setItem('chaskibots_session_exp', String(Date.now() + 7 * 24 * 60 * 60 * 1000))
           window.location.href = '/niveles'
           return
         }

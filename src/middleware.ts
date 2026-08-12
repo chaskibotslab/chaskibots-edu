@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { verifySessionCookie, SESSION_COOKIE_NAME } from '@/lib/session'
 
 // Rutas que requieren autenticación de admin
 const ADMIN_ROUTES = ['/admin']
@@ -7,51 +8,38 @@ const ADMIN_ROUTES = ['/admin']
 // Rutas que requieren autenticación (cualquier usuario)
 const PROTECTED_ROUTES = ['/dashboard', '/curso', '/tareas']
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
+
   // Verificar si es ruta de admin
   const isAdminRoute = ADMIN_ROUTES.some(route => pathname.startsWith(route))
-  
+
   // Verificar si es ruta protegida
   const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname.startsWith(route))
-  
+
   if (isAdminRoute || isProtectedRoute) {
-    // Obtener la cookie de sesión
-    const userCookie = request.cookies.get('chaskibots_session')
-    
-    if (!userCookie?.value) {
-      // No hay sesión, redirigir a login
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(loginUrl)
-    }
-    
-    try {
-      // Decodificar la sesión
-      const sessionData = JSON.parse(atob(userCookie.value))
-      
-      // Si es ruta de admin, verificar rol
-      if (isAdminRoute) {
-        if (sessionData.role !== 'admin' && sessionData.role !== 'teacher') {
-          // No es admin ni teacher, redirigir a home
-          return NextResponse.redirect(new URL('/', request.url))
-        }
-      }
-      
-      // Usuario autenticado y autorizado
-      return NextResponse.next()
-    } catch {
-      // Cookie inválida, redirigir a login
+    const userCookie = request.cookies.get(SESSION_COOKIE_NAME)
+
+    // Verifica la firma HMAC de la cookie (no confía en el contenido crudo:
+    // antes cualquiera podía escribir document.cookie con role:"admin" y
+    // el middleware lo aceptaba sin comprobar nada).
+    const session = await verifySessionCookie(userCookie?.value)
+
+    if (!session) {
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirect', pathname)
       const response = NextResponse.redirect(loginUrl)
-      // Limpiar cookie inválida
-      response.cookies.delete('chaskibots_session')
+      response.cookies.delete(SESSION_COOKIE_NAME)
       return response
     }
+
+    if (isAdminRoute && session.role !== 'admin' && session.role !== 'teacher') {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    return NextResponse.next()
   }
-  
+
   return NextResponse.next()
 }
 

@@ -147,7 +147,10 @@ export async function validateEmailPassword(email: string, password: string): Pr
 
     const row = data[0]
     const stored = row.password || row.access_code || ''
-    if (stored !== password) {
+    // Si la cuenta no tiene password ni access_code configurados, no hay
+    // credencial válida contra la cual comparar: antes esto dejaba pasar
+    // un login con contraseña vacía porque '' === '' era true.
+    if (!stored || !password || stored !== password) {
       return { success: false, error: 'Contraseña incorrecta' }
     }
 
