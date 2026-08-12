@@ -146,8 +146,8 @@ export default function DashboardPage() {
 
           {/* Quick Actions */}
           <div>
-            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-chaski-primary" />
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-hack-green" />
               Accesos rápidos
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -179,7 +179,7 @@ export default function DashboardPage() {
 
           {/* Study Areas */}
           <div>
-            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Target className="w-5 h-5 text-brand-cyan" />
               Áreas de estudio
             </h2>
@@ -215,13 +215,13 @@ export default function DashboardPage() {
           />
 
           {/* Motivational footer card */}
-          <div className="rounded-2xl bg-gradient-to-r from-chaski-primary/10 to-brand-cyan/10 border border-chaski-primary/20 p-5 flex items-center gap-4">
+          <div className="rounded-2xl bg-gradient-to-r from-chaski-primary/10 to-brand-cyan/10 border border-hack-green/20 p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm">
               <Crown className="w-6 h-6 text-chaski-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900">Sigue aprendiendo</h3>
-              <p className="text-sm text-slate-600">
+              <h3 className="font-semibold text-white">Sigue aprendiendo</h3>
+              <p className="text-sm text-white/60">
                 Completa más lecciones para ganar insignias y desbloquear nuevos desafíos.
               </p>
             </div>

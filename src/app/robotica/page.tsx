@@ -74,8 +74,8 @@ export default function RoboticaPage() {
 
           {/* Levels */}
           <div>
-            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-chaski-primary" />
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-hack-green" />
               Selecciona tu Nivel
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">

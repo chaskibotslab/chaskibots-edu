@@ -288,8 +288,8 @@ for i in range(1, 11):
                 <Code className="w-6 h-6 text-blue-500" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Python IDE Professional</h2>
-                <p className="text-slate-500 text-sm">Editor profesional con curriculum completo, terminal y ejecución real</p>
+                <h2 className="text-xl font-bold text-white">Python IDE Professional</h2>
+                <p className="text-white/50 text-sm">Editor profesional con curriculum completo, terminal y ejecución real</p>
               </div>
             </div>
             <PythonIDE />
@@ -302,8 +302,8 @@ for i in range(1, 11):
                 <Brain className="w-6 h-6 text-purple-500" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Laboratorio de IA Visual</h2>
-                <p className="text-slate-500 text-sm">Anotador, segmentación, desafío IA, cámara en vivo y modelos reales en la nube</p>
+                <h2 className="text-xl font-bold text-white">Laboratorio de IA Visual</h2>
+                <p className="text-white/50 text-sm">Anotador, segmentación, desafío IA, cámara en vivo y modelos reales en la nube</p>
               </div>
             </div>
             <AILab />
@@ -316,8 +316,8 @@ for i in range(1, 11):
                 <Cog className="w-6 h-6 text-cyan-500" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Laboratorio CAD 3D</h2>
-                <p className="text-slate-500 text-sm">Visor 3D interactivo, constructor paramétrico y texto a 3D</p>
+                <h2 className="text-xl font-bold text-white">Laboratorio CAD 3D</h2>
+                <p className="text-white/50 text-sm">Visor 3D interactivo, constructor paramétrico y texto a 3D</p>
               </div>
             </div>
             <CADLab />

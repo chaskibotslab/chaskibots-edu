@@ -121,14 +121,14 @@ export default function NivelesPage() {
 
           {/* Header */}
           <div className="text-center py-6">
-            <div className="inline-flex items-center gap-2 bg-chaski-primary/10 rounded-full px-4 py-2 mb-4 border border-chaski-primary/20">
-              <Sparkles className="w-4 h-4 text-chaski-primary" />
-              <span className="text-sm font-medium text-chaski-primary">Plataforma Educativa</span>
+            <div className="inline-flex items-center gap-2 bg-hack-green/10 rounded-full px-4 py-2 mb-4 border border-hack-green/25">
+              <Sparkles className="w-4 h-4 text-hack-green" />
+              <span className="text-sm font-mono font-medium text-hack-green">Plataforma Educativa</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-3">
+            <h1 className="text-3xl md:text-4xl font-black text-white mb-3">
               Niveles Educativos
             </h1>
-            <p className="text-slate-500 max-w-xl mx-auto">
+            <p className="text-white/50 max-w-xl mx-auto">
               Selecciona tu nivel para acceder a contenido de Robótica, IA y Hacking Ético
             </p>
           </div>
@@ -148,8 +148,8 @@ export default function NivelesPage() {
                     <CatIcon className={`w-6 h-6 ${styles.icon}`} />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-slate-900">{category.title}</h2>
-                    <p className="text-slate-500 text-sm">{category.subtitle}</p>
+                    <h2 className="text-2xl font-bold text-white">{category.title}</h2>
+                    <p className="text-white/50 text-sm">{category.subtitle}</p>
                   </div>
                 </div>
 

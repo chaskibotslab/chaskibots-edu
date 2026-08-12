@@ -218,7 +218,7 @@ export default function NivelPage() {
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center animate-fade-in">
           <div className="w-8 h-8 border-2 border-chaski-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Cargando nivel...</p>
+          <p className="text-white/60">Cargando nivel...</p>
         </div>
       </div>
     )
@@ -228,7 +228,7 @@ export default function NivelPage() {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center animate-fade-in">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Nivel no encontrado</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">Nivel no encontrado</h1>
           <Link href="/niveles" className="btn-primary active:scale-[0.98] transition-all">
             Ver todos los niveles
           </Link>
@@ -382,7 +382,7 @@ export default function NivelPage() {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
           {/* Lecciones Tab */}
           {activeTab === 'lessons' && (
             <div className="max-w-4xl mx-auto animate-slide-up" key="lessons">
@@ -811,7 +811,7 @@ export default function NivelPage() {
           onClick={() => setZoomImage(null)}
         >
           <button
-            className="absolute top-4 right-4 text-slate-900 hover:text-brand-purple p-2 z-10 active:scale-[0.98] transition-all"
+            className="absolute top-4 right-4 text-white hover:text-hack-green p-2 z-10 active:scale-[0.98] transition-all"
             onClick={() => setZoomImage(null)}
           >
             <X className="w-8 h-8" />

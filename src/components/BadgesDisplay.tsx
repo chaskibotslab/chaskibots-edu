@@ -156,7 +156,7 @@ export default function BadgesDisplay({
   const unlockedCount = badges.filter(b => b.unlocked).length
 
   return (
-    <div className="bg-gray-50/80 backdrop-blur rounded-2xl p-6 border border-gray-200">
+    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-brand-purple/20 flex items-center justify-center">

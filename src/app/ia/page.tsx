@@ -103,8 +103,8 @@ export default function IAPage() {
 
           {/* Tips */}
           <div>
-            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-chaski-accent" />
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-hack-green" />
               Modelos disponibles
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
