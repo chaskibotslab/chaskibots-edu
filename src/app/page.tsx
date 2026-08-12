@@ -94,20 +94,24 @@ export default function HomePage() {
           </div>
 
           {/* Grid pattern overlay */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(99,102,241,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.8) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+          <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(rgba(57,255,20,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.4) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+          {/* Scanline */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
+            <div className="absolute inset-x-0 h-32 bg-gradient-to-b from-transparent via-hack-green/30 to-transparent animate-scan-line" />
+          </div>
 
           {/* Floating geometric shapes */}
-          <div className="absolute top-20 left-[8%] w-20 h-20 border border-chaski-primary/20 rounded-2xl animate-spin-slow opacity-60" />
+          <div className="absolute top-20 left-[8%] w-20 h-20 border border-hack-green/15 rounded-2xl animate-spin-slow opacity-60" />
           <div className="absolute bottom-32 right-[10%] w-14 h-14 border border-chaski-secondary/20 rounded-full animate-float opacity-50" />
-          <div className="absolute top-[30%] left-[5%] w-10 h-10 bg-chaski-primary/10 rounded-xl rotate-12 animate-bounce opacity-60" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-[20%] left-[15%] w-6 h-6 bg-chaski-accent/15 rounded-full animate-ping opacity-40" />
-          <div className="absolute top-[15%] right-[25%] w-24 h-24 border border-chaski-accent/10 rounded-3xl rotate-45 animate-float" style={{ animationDelay: '3s' }} />
+          <div className="absolute top-[30%] left-[5%] w-10 h-10 bg-hack-green/8 rounded-xl rotate-12 animate-bounce opacity-60" style={{ animationDelay: '1s' }} />
+          <div className="absolute bottom-[20%] left-[15%] w-6 h-6 bg-hack-green/15 rounded-full animate-ping opacity-40" />
+          <div className="absolute top-[15%] right-[25%] w-24 h-24 border border-chaski-primary/10 rounded-3xl rotate-45 animate-float" style={{ animationDelay: '3s' }} />
 
           <div className="max-w-6xl mx-auto relative z-10 w-full">
             <div className="grid md:grid-cols-2 gap-10 items-center">
               {/* Left - Text */}
               <div className="order-2 md:order-1">
-                <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-chaski-primary/30 animate-fade-in">
+                <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-hack-green/30 animate-fade-in">
                   <span className="relative flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-hack-green opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-hack-green"></span>
@@ -115,7 +119,7 @@ export default function HomePage() {
                   <span className="text-sm font-mono font-medium text-slate-400">$ platform --status=<span className="text-hack-green font-semibold">online</span></span>
                 </div>
 
-                <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold mb-6 leading-[1.1] text-white animate-slide-up">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-[1.08] text-white animate-slide-up">
                   Aprende{' '}
                   <span className="relative inline-block">
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-primary to-chaski-secondary">Robótica</span>
@@ -125,10 +129,16 @@ export default function HomePage() {
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-hack-green to-emerald-400">Hacking Ético</span>
                 </h1>
 
-                <p className="text-lg text-slate-400 mb-8 max-w-lg leading-relaxed animate-fade-in" style={{animationDelay: '0.3s'}}>
-                  Plataforma educativa completa desde Inicial hasta Bachillerato.
-                  Videos, tutoriales, simuladores y proyectos prácticos con kits reales.
+                <p className="text-lg text-slate-400 mb-4 max-w-lg leading-relaxed animate-fade-in" style={{animationDelay: '0.3s'}}>
+                  La plataforma educativa que transforma cómo aprenden tecnología 
+                  los estudiantes de Ecuador. Desde Inicial hasta Bachillerato.
                 </p>
+
+                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 mb-8 animate-fade-in" style={{animationDelay: '0.4s'}}>
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-chaski-primary" />14 kits físicos</span>
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-chaski-gold" />+30 simuladores</span>
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-hack-green" />Proyectos reales</span>
+                </div>
 
                 <div className="flex flex-wrap gap-3 animate-fade-in" style={{animationDelay: '0.5s'}}>
                   <Link href="/login" className="group px-7 py-3.5 bg-gradient-to-r from-chaski-primary to-chaski-secondary text-white font-semibold rounded-2xl hover:shadow-xl hover:shadow-chaski-primary/30 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 transition-all duration-300 flex items-center gap-2">
@@ -136,8 +146,8 @@ export default function HomePage() {
                     Comenzar Ahora
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
-                  <Link href="/login" className="px-7 py-3.5 bg-white/5 backdrop-blur-sm border border-white/15 text-white font-semibold rounded-2xl hover:bg-white/10 hover:border-chaski-primary/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300">
-                    Iniciar Sesión
+                  <Link href="/simuladores" className="px-7 py-3.5 bg-white/5 backdrop-blur-sm border border-white/15 text-white font-semibold rounded-2xl hover:bg-white/10 hover:border-chaski-primary/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300">
+                    Ver Simuladores
                   </Link>
                 </div>
               </div>
@@ -191,19 +201,20 @@ export default function HomePage() {
 
         {/* Stats Section */}
         <section className="py-16 bg-chaski-dark border-y border-white/5 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-chaski-primary/5 via-transparent to-chaski-accent/5" />
           <div className="max-w-6xl mx-auto px-4 relative z-10">
-            <Reveal className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <Reveal className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
-                { value: count1, suffix: '+', label: 'Niveles Educativos', color: 'text-chaski-primary' },
-                { value: count2, suffix: '+', label: 'Áreas', color: 'text-chaski-secondary' },
-                { value: count3, suffix: '', label: 'Kits', color: 'text-chaski-gold' },
-                { value: count4, suffix: '+', label: 'Simuladores', color: 'text-chaski-accent' },
+                { value: count1, suffix: '+', label: 'Niveles Educativos', color: 'text-chaski-primary', bg: 'bg-chaski-primary/10 border-chaski-primary/20' },
+                { value: count2, suffix: '+', label: 'Áreas STEM', color: 'text-chaski-secondary', bg: 'bg-chaski-secondary/10 border-chaski-secondary/20' },
+                { value: count3, suffix: '', label: 'Kits Físicos', color: 'text-chaski-gold', bg: 'bg-chaski-gold/10 border-chaski-gold/20' },
+                { value: count4, suffix: '+', label: 'Simuladores', color: 'text-chaski-accent', bg: 'bg-chaski-accent/10 border-chaski-accent/20' },
               ].map((stat, i) => (
-                <div key={i} className="group hover:scale-105 transition-transform duration-300 cursor-default animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
-                  <div className={`text-4xl md:text-5xl font-extrabold ${stat.color} transition-all`}>
+                <div key={i} className={`group hover:scale-105 transition-all duration-300 cursor-default animate-fade-in rounded-2xl ${stat.bg} border p-5`} style={{ animationDelay: `${i * 0.05}s` }}>
+                  <div className={`text-3xl md:text-4xl font-extrabold ${stat.color} transition-all`}>
                     {stat.value}{stat.suffix}
                   </div>
-                  <p className="text-slate-400 mt-2 text-sm font-medium">{stat.label}</p>
+                  <p className="text-slate-400 mt-1 text-sm font-medium">{stat.label}</p>
                 </div>
               ))}
             </Reveal>

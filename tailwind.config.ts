@@ -104,6 +104,10 @@ const config: Config = {
         'cursor-blink': 'cursorBlink 1s step-end infinite',
         'scan-line': 'scanLine 4s linear infinite',
         'glitch': 'glitch 2.5s ease-in-out infinite',
+        'login-enter': 'loginEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'login-card': 'loginCard 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'stagger-in': 'staggerIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'glow-pulse': 'glowPulse 3s ease-in-out infinite',
       },
       keyframes: {
         glow: {
@@ -174,6 +178,23 @@ const config: Config = {
           '93%': { transform: 'translate(-2px,1px)', textShadow: '2px 0 #39FF14, -2px 0 #06B6D4' },
           '95%': { transform: 'translate(2px,-1px)', textShadow: '-2px 0 #39FF14, 2px 0 #06B6D4' },
           '97%': { transform: 'translate(0,0)', textShadow: 'none' },
+        },
+        loginEnter: {
+          '0%': { transform: 'translateY(40px) scale(0.95)', opacity: '0', filter: 'blur(4px)' },
+          '100%': { transform: 'translateY(0) scale(1)', opacity: '1', filter: 'blur(0)' },
+        },
+        loginCard: {
+          '0%': { transform: 'translateY(60px) scale(0.92) rotateX(8deg)', opacity: '0' },
+          '60%': { transform: 'translateY(-4px) scale(1.01) rotateX(-1deg)', opacity: '1' },
+          '100%': { transform: 'translateY(0) scale(1) rotateX(0deg)', opacity: '1' },
+        },
+        staggerIn: {
+          '0%': { transform: 'translateX(-12px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        glowPulse: {
+          '0%, 100%': { boxShadow: '0 0 15px rgba(57,255,20,0.15), inset 0 0 15px rgba(57,255,20,0.03)' },
+          '50%': { boxShadow: '0 0 25px rgba(57,255,20,0.3), inset 0 0 25px rgba(57,255,20,0.06)' },
         },
       },
       boxShadow: {

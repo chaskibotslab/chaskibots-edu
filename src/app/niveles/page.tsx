@@ -58,32 +58,32 @@ const CATEGORIES = [
 
 const COLOR_STYLES: Record<string, { icon: string; bg: string; border: string; hover: string; light: string }> = {
   pink: {
-    icon: 'text-pink-500',
+    icon: 'text-pink-400',
     bg: 'bg-pink-500/10',
     border: 'border-pink-500/20',
-    hover: 'hover:border-pink-500/50 hover:bg-pink-50/50',
+    hover: 'hover:border-pink-500/40 hover:bg-pink-500/5',
     light: 'bg-pink-500/5'
   },
   cyan: {
-    icon: 'text-cyan-500',
+    icon: 'text-cyan-400',
     bg: 'bg-cyan-500/10',
     border: 'border-cyan-500/20',
-    hover: 'hover:border-cyan-500/50 hover:bg-cyan-50/50',
+    hover: 'hover:border-cyan-500/40 hover:bg-cyan-500/5',
     light: 'bg-cyan-500/5'
   },
   violet: {
-    icon: 'text-violet-500',
+    icon: 'text-violet-400',
     bg: 'bg-violet-500/10',
     border: 'border-violet-500/20',
-    hover: 'hover:border-violet-500/50 hover:bg-violet-50/50',
+    hover: 'hover:border-violet-500/40 hover:bg-violet-500/5',
     light: 'bg-violet-500/5'
   },
   green: {
-    icon: 'text-green-500',
-    bg: 'bg-green-500/10',
-    border: 'border-green-500/20',
-    hover: 'hover:border-green-500/50 hover:bg-green-50/50',
-    light: 'bg-green-500/5'
+    icon: 'text-hack-green',
+    bg: 'bg-hack-green/10',
+    border: 'border-hack-green/20',
+    hover: 'hover:border-hack-green/40 hover:bg-hack-green/5',
+    light: 'bg-hack-green/5'
   }
 }
 
@@ -102,10 +102,10 @@ export default function NivelesPage() {
 
   if (levelsLoading || coursesLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-transparent">
+      <div className="min-h-screen flex flex-col bg-chaski-dark">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
+          <Loader2 className="w-8 h-8 text-hack-green animate-spin" />
         </main>
         <Footer />
       </div>
@@ -113,7 +113,7 @@ export default function NivelesPage() {
   }
 
   return (
-    <div className={`min-h-screen flex flex-col bg-transparent transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen flex flex-col bg-chaski-dark transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       <Header />
 
       <main className="flex-1 py-6 px-4">
@@ -163,22 +163,22 @@ export default function NivelesPage() {
                       <Link
                         key={level.id}
                         href={`/nivel/${level.id}`}
-                        className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md transition-all duration-300 animate-scale-in ${styles.hover}`}
+                        className={`group relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 p-5 transition-all duration-300 animate-scale-in hover:shadow-lg hover:shadow-white/5 ${styles.hover}`}
                         style={{ animationDelay: `${levelIdx * 0.05}s` }}
                       >
                         <div className={`absolute top-0 right-0 w-20 h-20 ${styles.light} rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
                         <div className="relative flex items-center gap-4">
-                          <div className={`w-12 h-12 ${styles.bg} rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                          <div className={`w-12 h-12 ${styles.bg} rounded-xl flex items-center justify-center flex-shrink-0 border ${styles.border} group-hover:scale-110 transition-transform`}>
                             <IconComponent className={`w-6 h-6 ${styles.icon}`} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-slate-900 text-sm leading-tight">{level.name}</h3>
+                            <h3 className="font-semibold text-white text-sm leading-tight">{level.name}</h3>
                             <p className="text-slate-500 text-xs mt-0.5">{level.ageRange}</p>
                           </div>
                           {hasAccess ? (
                             <ArrowRight className={`w-5 h-5 ${styles.icon} group-hover:translate-x-1 transition-transform flex-shrink-0`} />
                           ) : (
-                            <Lock className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                            <Lock className="w-4 h-4 text-slate-600 flex-shrink-0" />
                           )}
                         </div>
                       </Link>

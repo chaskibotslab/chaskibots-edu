@@ -23,7 +23,7 @@ interface ModuleAccordionProps {
   selectedLesson: string | null
   onSelectLesson: (id: string) => void
   defaultOpen?: boolean
-  programColor: 'blue' | 'purple' | 'red'
+  programColor: 'blue' | 'purple' | 'red' | 'green'
 }
 
 const colorConfig = {
@@ -47,6 +47,13 @@ const colorConfig = {
     text: 'text-red-400',
     accent: 'bg-red-500',
     glow: 'shadow-red-500/20'
+  },
+  green: {
+    bg: 'bg-hack-green/10',
+    border: 'border-hack-green/30',
+    text: 'text-hack-green',
+    accent: 'bg-hack-green',
+    glow: 'shadow-hack-green/20'
   }
 }
 
