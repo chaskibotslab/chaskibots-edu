@@ -293,6 +293,7 @@ export default function AdminPage() {
                   <QuickAction href="/admin/lecciones" icon={BookOpen} color="brand-cyan" title="Lecciones" description="Editor con imágenes drag-drop" />
                   <QuickAction href="/admin/kits" icon={Package} color="brand-purple" title="Gestionar Kits" description="Kits, imágenes, precios" />
                   <QuickAction href="/admin/simuladores" icon={Monitor} color="cyan-500" title="Simuladores" description="Por nivel y programa" />
+                  <QuickAction href="/admin/academy" icon={GraduationCap} color="brand-purple" title="Academia" description="Cursos, módulos y lecciones (Python, Hacking, IA)" />
                   <QuickAction href="/admin/gestion" icon={Settings} color="slate-500" title="Niveles y Programas" description="Niveles, programas, usuarios" />
                   <QuickAction href="/admin/ia" icon={Brain} color="pink-500" title="IA y Hacking Ético" description="Actividades de IA por nivel" />
                   <QuickAction href="/admin/proyectos" icon={Activity} color="brand-purple" title="Proyectos Avanzados" description="Jetson, Raspberry, Digispark" />

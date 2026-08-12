@@ -9,7 +9,7 @@ import Footer from '@/components/Footer'
 import {
   BookOpen, Code, Play, ChevronRight, ChevronLeft, Copy, Check,
   Lightbulb, Terminal, ArrowLeft, Loader2, RotateCcw, Zap,
-  CheckCircle2, ChevronDown, Eye, EyeOff, Brain
+  CheckCircle2, ChevronDown, Eye, EyeOff, Brain, Circle
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
 
@@ -74,7 +74,8 @@ export default function LessonPage() {
   const [showHints, setShowHints] = useState(false)
   const [challengeCode, setChallengeCode] = useState('')
   const [challengeOutput, setChallengeOutput] = useState<string[]>([])
-  
+  const [lessonCompleted, setLessonCompleted] = useState(false)
+
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -100,6 +101,34 @@ export default function LessonPage() {
       })
       .catch(() => setLoading(false))
   }, [courseSlug, moduleSlug, lessonSlug])
+
+  // Progreso: refleja si esta lección ya fue marcada como completada por el usuario
+  useEffect(() => {
+    if (!user?.id) return
+    fetch(`/api/academy/progress?userId=${user.id}&courseSlug=${courseSlug}`)
+      .then(r => r.json())
+      .then(data => {
+        const done = (data.progress || []).some((p: any) => p.completed && p.lesson?.slug === lessonSlug)
+        setLessonCompleted(done)
+      })
+      .catch(() => {})
+  }, [user?.id, courseSlug, lessonSlug])
+
+  const markComplete = () => {
+    if (!lesson || !user?.id) return
+    setLessonCompleted(true)
+    fetch('/api/academy/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: user.id,
+        lessonId: lesson.id,
+        completed: true,
+        score: 100,
+        codeSubmitted: challengeCode || code || '',
+      }),
+    }).catch(() => {})
+  }
 
   // Simple Python simulator
   const runPython = (sourceCode: string): string[] => {
@@ -363,6 +392,20 @@ export default function LessonPage() {
                 <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
                   ⏱ {lesson.estimated_minutes} min
                 </span>
+                {user?.id && (
+                  <button
+                    onClick={markComplete}
+                    disabled={lessonCompleted}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all disabled:cursor-default ${
+                      lessonCompleted
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {lessonCompleted ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
+                    {lessonCompleted ? 'Completada' : 'Marcar como completada'}
+                  </button>
+                )}
               </div>
             </div>
           </div>

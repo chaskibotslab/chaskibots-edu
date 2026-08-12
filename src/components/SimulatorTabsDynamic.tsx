@@ -242,7 +242,7 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
         <div>
           {activeSimulator.id === 'python-ide' && <PythonIDE />}
           {activeSimulator.id === 'hacking-terminal' && <HackingTerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} />}
-          {activeSimulator.id === 'linux-terminal' && <LinuxTerminal levelId={levelId || ''} />}
+          {activeSimulator.id === 'linux-terminal' && <LinuxTerminal levelId={levelId || ''} userId={user?.id} />}
           {activeSimulator.id === 'roblox-editor' && <RobloxEditor levelId={levelId || ''} />}
         </div>
       ) : activeSimulator ? (

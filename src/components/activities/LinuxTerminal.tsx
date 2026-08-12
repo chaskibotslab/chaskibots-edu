@@ -3,11 +3,68 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   Terminal, BookOpen, ChevronRight, ChevronDown, Lightbulb,
-  RefreshCw, FolderTree
+  RefreshCw, FolderTree, GraduationCap, CheckCircle2, Circle,
+  Loader2, AlertCircle, PlayCircle
 } from 'lucide-react'
 
 interface LinuxTerminalProps {
   levelId?: string
+  userId?: string
+}
+
+// ============================================================
+// ACADEMY API TYPES (backed by Supabase: simulator_courses/modules/lessons)
+// Mismo contrato que consume PythonIDE vía /api/academy.
+// ============================================================
+interface ApiExample {
+  title: string
+  code: string
+  explanation: string
+}
+
+interface ApiChallenge {
+  title: string
+  description: string
+  starter_code: string
+  expected_output: string
+  hints: string[]
+}
+
+interface ApiLesson {
+  id: string
+  slug: string
+  title: string
+  description: string
+  theory: string
+  examples: ApiExample[]
+  challenges: ApiChallenge[]
+  difficulty: 'easy' | 'medium' | 'hard'
+  estimated_minutes: number
+}
+
+const DIFFICULTY_LABEL: Record<string, string> = { easy: 'fácil', medium: 'medio', hard: 'difícil' }
+const DIFFICULTY_COLOR: Record<string, string> = {
+  easy: 'bg-green-500/15 text-green-400 border border-green-500/30',
+  medium: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/30',
+  hard: 'bg-red-500/15 text-red-400 border border-red-500/30',
+}
+
+// Mini renderizador markdown (headers, bold, código inline) — sin dependencias externas
+export function renderTheory(text: string) {
+  const formatInline = (s: string) => {
+    s = s.replace(/\*\*(.+?)\*\*/g, '<strong class="text-gray-100">$1</strong>')
+    s = s.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 bg-gray-700/50 text-cyan-300 rounded text-[10px] font-mono">$1</code>')
+    return <span dangerouslySetInnerHTML={{ __html: s }} />
+  }
+  return text.split('\n').map((line, i) => {
+    if (line.startsWith('```') || line.startsWith('|')) return null
+    if (line.startsWith('# ')) return <h1 key={i} className="text-gray-100 text-sm font-bold mt-3 mb-1.5">{line.slice(2)}</h1>
+    if (line.startsWith('## ')) return <h2 key={i} className="text-gray-200 text-[13px] font-bold mt-3 mb-1">{line.slice(3)}</h2>
+    if (line.startsWith('### ')) return <h3 key={i} className="text-gray-300 text-xs font-semibold mt-2 mb-1">{line.slice(4)}</h3>
+    if (line.startsWith('- ')) return <li key={i} className="text-gray-400 text-[11px] ml-3 mb-0.5 list-disc">{formatInline(line.slice(2))}</li>
+    if (line.trim() === '') return <div key={i} className="h-1.5" />
+    return <p key={i} className="text-gray-400 text-[11px] leading-relaxed mb-1">{formatInline(line)}</p>
+  })
 }
 
 interface Command {
@@ -104,7 +161,7 @@ const INITIAL_FS: Record<string, FsNode> = {
 
 const HOME = '/home/estudiante'
 
-export default function LinuxTerminal({ levelId }: LinuxTerminalProps) {
+export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
   const [fs, setFs] = useState<Record<string, FsNode>>(INITIAL_FS)
   const [terminalOutput, setTerminalOutput] = useState<string[]>([
     '╔══════════════════════════════════════════════════════════╗',
@@ -117,9 +174,18 @@ export default function LinuxTerminal({ levelId }: LinuxTerminalProps) {
   const [currentDir, setCurrentDir] = useState(HOME)
   const [commandHistory, setCommandHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
-  const [showGuides, setShowGuides] = useState(true)
+  const [showGuides, setShowGuides] = useState(false)
   const [activeGuide, setActiveGuide] = useState<number | null>(null)
   const [showTree, setShowTree] = useState(false)
+
+  // Lecciones (Academy: curso hacking-etico / módulo linux-basico)
+  const [showLessons, setShowLessons] = useState(true)
+  const [lessons, setLessons] = useState<ApiLesson[]>([])
+  const [lessonsLoading, setLessonsLoading] = useState(true)
+  const [lessonsError, setLessonsError] = useState(false)
+  const [expandedLesson, setExpandedLesson] = useState<string | null>(null)
+  const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set())
+  const [revealedHints, setRevealedHints] = useState<Record<string, number>>({})
 
   const terminalRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -127,6 +193,37 @@ export default function LinuxTerminal({ levelId }: LinuxTerminalProps) {
   useEffect(() => {
     terminalRef.current?.scrollTo({ top: terminalRef.current.scrollHeight })
   }, [terminalOutput])
+
+  useEffect(() => {
+    let cancelled = false
+    setLessonsLoading(true)
+    setLessonsError(false)
+    fetch('/api/academy?course=hacking-etico&module=linux-basico')
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return
+        const loaded: ApiLesson[] = data.lessons || []
+        setLessons(loaded)
+        if (loaded[0]) setExpandedLesson(loaded[0].id)
+      })
+      .catch(() => { if (!cancelled) setLessonsError(true) })
+      .finally(() => { if (!cancelled) setLessonsLoading(false) })
+
+    if (userId) {
+      fetch(`/api/academy/progress?userId=${userId}&courseSlug=hacking-etico`)
+        .then(r => r.json())
+        .then(data => {
+          if (cancelled) return
+          const done = (data.progress || [])
+            .filter((p: any) => p.completed && p.lesson?.module?.slug === 'linux-basico')
+            .map((p: any) => p.lesson.id)
+          setCompletedLessonIds(new Set(done))
+        })
+        .catch(() => {})
+    }
+
+    return () => { cancelled = true }
+  }, [userId])
 
   const resolvePath = (path: string): string => {
     if (!path) return currentDir
@@ -359,6 +456,30 @@ export default function LinuxTerminal({ levelId }: LinuxTerminalProps) {
     return out
   }
 
+  // Ejecuta un bloque de código de un ejemplo/reto de Academy línea por línea,
+  // como si el estudiante lo hubiera tecleado, para conectar teoría con la terminal real.
+  const runInTerminal = (code: string) => {
+    const lines = code.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'))
+    const appended: string[] = []
+    lines.forEach(line => {
+      const result = processCommand(line)
+      appended.push(`estudiante@chaskios:${currentDir}$ ${line}`, ...result)
+    })
+    setTerminalOutput(prev => [...prev, ...appended])
+    setCommandHistory(prev => [...prev, ...lines])
+    setHistoryIndex(-1)
+  }
+
+  const markLessonComplete = (lessonId: string) => {
+    setCompletedLessonIds(prev => new Set(prev).add(lessonId))
+    if (!userId) return
+    fetch('/api/academy/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, lessonId, completed: true, score: 100 }),
+    }).catch(() => {})
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       const input = terminalInput
@@ -406,6 +527,12 @@ export default function LinuxTerminal({ levelId }: LinuxTerminalProps) {
         </div>
         <div className="flex items-center gap-1">
           <button
+            onClick={() => setShowLessons(!showLessons)}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors text-xs ${showLessons ? 'text-cyan-400 bg-cyan-500/10' : 'text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10'}`}
+          >
+            <GraduationCap className="w-3.5 h-3.5" /> Lecciones
+          </button>
+          <button
             onClick={() => setShowTree(!showTree)}
             className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors text-xs ${showTree ? 'text-cyan-400 bg-cyan-500/10' : 'text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10'}`}
           >
@@ -422,6 +549,124 @@ export default function LinuxTerminal({ levelId }: LinuxTerminalProps) {
       </div>
 
       <div className="p-4 space-y-4">
+        {/* Lecciones (Academy) */}
+        {showLessons && (
+          <div className="bg-labdark-bg rounded-xl p-4 border border-gray-700/50 max-h-[28rem] overflow-y-auto">
+            <div className="flex items-center gap-2 mb-3">
+              <GraduationCap className="w-4 h-4 text-cyan-400" />
+              <span className="text-sm text-cyan-400 font-medium">Fundamentos de Linux — Lecciones</span>
+            </div>
+
+            {lessonsLoading && (
+              <div className="flex items-center gap-2 text-gray-500 text-xs py-4 justify-center">
+                <Loader2 className="w-4 h-4 animate-spin" /> Cargando lecciones...
+              </div>
+            )}
+
+            {!lessonsLoading && lessonsError && (
+              <div className="flex items-center gap-2 text-red-400 text-xs py-4 justify-center">
+                <AlertCircle className="w-4 h-4" /> No se pudieron cargar las lecciones.
+              </div>
+            )}
+
+            {!lessonsLoading && !lessonsError && lessons.length === 0 && (
+              <p className="text-gray-500 text-xs py-2">Todavía no hay lecciones para este módulo.</p>
+            )}
+
+            <div className="space-y-2">
+              {lessons.map((lesson, idx) => {
+                const isDone = completedLessonIds.has(lesson.id)
+                const isOpen = expandedLesson === lesson.id
+                return (
+                  <div key={lesson.id} className="border border-gray-700/50 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => setExpandedLesson(isOpen ? null : lesson.id)}
+                      className="w-full flex items-center justify-between gap-2 p-2.5 bg-labdark-surface hover:bg-cyan-500/10 transition-colors text-left"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        {isDone ? <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" /> : <Circle className="w-4 h-4 text-gray-600 shrink-0" />}
+                        <span className="text-sm font-medium text-gray-200 truncate">{idx + 1}. {lesson.title}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded shrink-0 ${DIFFICULTY_COLOR[lesson.difficulty] || ''}`}>
+                          {DIFFICULTY_LABEL[lesson.difficulty] || lesson.difficulty}
+                        </span>
+                      </div>
+                      {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-cyan-400 shrink-0" /> : <ChevronRight className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
+                    </button>
+
+                    {isOpen && (
+                      <div className="p-3 bg-labdark-void border-t border-gray-700/50 space-y-4">
+                        <p className="text-xs text-gray-400">{lesson.description}</p>
+
+                        {/* Teoría */}
+                        <div>{renderTheory(lesson.theory || '')}</div>
+
+                        {/* Ejemplos */}
+                        {lesson.examples?.map((ex, exIdx) => (
+                          <div key={exIdx} className="bg-labdark-bg rounded-lg border border-gray-700/40 overflow-hidden">
+                            <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-700/40">
+                              <span className="text-[11px] text-gray-300 font-medium">{ex.title}</span>
+                              <button
+                                onClick={() => runInTerminal(ex.code)}
+                                className="flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-300"
+                              >
+                                <PlayCircle className="w-3 h-3" /> Probar en terminal
+                              </button>
+                            </div>
+                            <pre className="p-2.5 text-[11px] text-cyan-300 font-mono whitespace-pre-wrap overflow-x-auto">{ex.code}</pre>
+                            <p className="px-2.5 pb-2 text-[11px] text-gray-500">{ex.explanation}</p>
+                          </div>
+                        ))}
+
+                        {/* Retos */}
+                        {lesson.challenges?.map((ch, chIdx) => {
+                          const hintKey = `${lesson.id}-${chIdx}`
+                          const revealed = revealedHints[hintKey] || 0
+                          return (
+                            <div key={chIdx} className="bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-3 space-y-2">
+                              <p className="text-xs font-semibold text-cyan-300">🎯 Reto: {ch.title}</p>
+                              <p className="text-[11px] text-gray-400 whitespace-pre-wrap">{ch.description}</p>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => runInTerminal(ch.starter_code)}
+                                  className="flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-300"
+                                >
+                                  <PlayCircle className="w-3 h-3" /> Empezar en terminal
+                                </button>
+                                {ch.hints?.length > 0 && (
+                                  <button
+                                    onClick={() => setRevealedHints(prev => ({ ...prev, [hintKey]: Math.min((prev[hintKey] || 0) + 1, ch.hints.length) }))}
+                                    className="flex items-center gap-1 text-[10px] text-yellow-400 hover:text-yellow-300"
+                                  >
+                                    <Lightbulb className="w-3 h-3" /> Pista ({revealed}/{ch.hints.length})
+                                  </button>
+                                )}
+                              </div>
+                              {revealed > 0 && (
+                                <ul className="text-[11px] text-yellow-400/90 space-y-0.5 pl-4 list-disc">
+                                  {ch.hints.slice(0, revealed).map((h, hIdx) => <li key={hIdx}>{h}</li>)}
+                                </ul>
+                              )}
+                            </div>
+                          )
+                        })}
+
+                        <button
+                          onClick={() => markLessonComplete(lesson.id)}
+                          disabled={isDone}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/30 hover:bg-green-500/25 disabled:opacity-50 disabled:cursor-default"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          {isDone ? 'Lección completada' : 'Marcar como completada'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Guides */}
         {showGuides && (
           <div className="bg-labdark-bg rounded-xl p-4 border border-gray-700/50 max-h-64 overflow-y-auto">
