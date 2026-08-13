@@ -61,9 +61,8 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error in login-code:', error)
-    // TODO: quitar el detalle del error de la respuesta una vez diagnosticado el 500 en prod
     return NextResponse.json(
-      { success: false, error: 'Error al validar código', detail: error instanceof Error ? error.message : String(error) },
+      { success: false, error: 'Error al validar código' },
       { status: 500 }
     )
   }

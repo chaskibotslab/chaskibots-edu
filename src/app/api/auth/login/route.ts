@@ -66,9 +66,8 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Login error:', error)
-    // TODO: quitar el detalle del error de la respuesta una vez diagnosticado el 500 en prod
     return NextResponse.json(
-      { success: false, error: 'Error interno del servidor', detail: error instanceof Error ? error.message : String(error) },
+      { success: false, error: 'Error interno del servidor' },
       { status: 500 }
     )
   }
