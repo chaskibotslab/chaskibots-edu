@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         user: result.user,
         message: 'Login exitoso'
       })
-      return withSessionCookie(response, { id: result.user!.id, role: result.user!.role, email: result.user!.email })
+      return await withSessionCookie(response, { id: result.user!.id, role: result.user!.role, email: result.user!.email })
     }
 
     // Modo 2: Login con email/password (Airtable)
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         user: result.user,
         message: 'Login exitoso'
       })
-      return withSessionCookie(response, { id: result.user!.id, role: result.user!.role, email: result.user!.email })
+      return await withSessionCookie(response, { id: result.user!.id, role: result.user!.role, email: result.user!.email })
     }
 
     return NextResponse.json(
@@ -66,8 +66,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Login error:', error)
+    // TODO: quitar el detalle del error de la respuesta una vez diagnosticado el 500 en prod
     return NextResponse.json(
-      { success: false, error: 'Error interno del servidor' },
+      { success: false, error: 'Error interno del servidor', detail: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
   }
