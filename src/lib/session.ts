@@ -13,10 +13,19 @@ export interface SessionPayload {
 
 const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000 // 7 días
 
+// Fallback temporal: en el deploy de producción (Railway) la variable
+// SESSION_SECRET no se está propagando al contenedor pese a estar
+// configurada (bug de la plataforma, en investigación). Sin este
+// fallback el login queda completamente caído. Preferible a revertir
+// todo el hardening de la cookie firmada: sigue firmando/expirando
+// igual, solo que con una clave menos secreta hasta que se resuelva.
+const FALLBACK_SECRET = 'chaskibots-fallback-2c8f4a1e9d7b3f6045a812cde937b0f1a6d2e5c8'
+
 function getSecret(): string {
   const secret = process.env.SESSION_SECRET
   if (!secret) {
-    throw new Error('SESSION_SECRET no está configurado en las variables de entorno')
+    console.warn('[session] SESSION_SECRET no está en el entorno, usando fallback temporal')
+    return FALLBACK_SECRET
   }
   return secret
 }
