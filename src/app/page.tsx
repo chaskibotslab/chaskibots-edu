@@ -104,12 +104,9 @@ export default function HomePage() {
             <div className="absolute top-[20%] right-[15%] w-[35vw] h-[35vw] max-w-[450px] max-h-[450px] rounded-full bg-hack-green/8 blur-[120px] animate-mesh-3" />
           </div>
 
-          {/* Formas geométricas flotantes, tenues sobre fondo claro */}
-          <div className="absolute top-20 left-[8%] w-20 h-20 border border-chaski-primary/10 rounded-2xl animate-spin-slow opacity-70" />
-          <div className="absolute bottom-32 right-[10%] w-14 h-14 border border-chaski-secondary/15 rounded-full animate-float opacity-60" />
-          <div className="absolute top-[30%] left-[5%] w-10 h-10 bg-hack-green/10 rounded-xl rotate-12 animate-bounce opacity-50" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-[20%] left-[15%] w-6 h-6 bg-hack-green/15 rounded-full animate-ping opacity-30" />
-          <div className="absolute top-[15%] right-[25%] w-24 h-24 border border-chaski-primary/10 rounded-3xl rotate-45 animate-float" style={{ animationDelay: '3s' }} />
+          {/* Formas geométricas flotantes, estilo línea, tenues sobre fondo claro */}
+          <div className="absolute top-24 left-[8%] w-16 h-16 border-2 border-chaski-primary/20 rounded-2xl animate-spin-slow" />
+          <div className="absolute bottom-32 left-[12%] w-10 h-10 border-2 border-chaski-secondary/20 rounded-full animate-float" />
 
           <div className="max-w-6xl mx-auto relative z-10 w-full">
             <div className="grid md:grid-cols-2 gap-10 items-center">
@@ -129,8 +126,8 @@ export default function HomePage() {
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-primary to-chaski-secondary">Robótica</span>
                     <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-chaski-primary to-chaski-secondary rounded-full animate-expand-width" />
                   </span>,{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-gold via-amber-500 to-chaski-gold">IA</span> y{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-hack-green to-chaski-gold">Hacking Ético</span>
+                  <span className="text-chaski-gold">IA</span> y{' '}
+                  <span className="text-hack-green">Hacking Ético</span>
                 </h1>
 
                 <p className="text-lg text-slate-600 mb-4 max-w-lg leading-relaxed animate-fade-in" style={{animationDelay: '0.3s'}}>
@@ -166,37 +163,34 @@ export default function HomePage() {
                       transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
                     }}
                   >
-                    {/* Glow ambiental detrás del logo */}
-                    <div className="absolute -inset-10 bg-gradient-to-r from-chaski-primary/20 via-chaski-gold/15 to-hack-green/15 rounded-full blur-3xl animate-pulse-slow scale-110" />
+                    {/* Glow ambiental muy sutil detrás de la tarjeta */}
+                    <div className="absolute -inset-4 bg-gradient-to-br from-chaski-primary/15 to-chaski-gold/10 rounded-[2.5rem] blur-2xl animate-pulse-slow" />
 
-                    {/* Logo oficial Chaski Bots LAB */}
-                    <Image
-                      src="/logo.jpg"
-                      alt="Chaski Bots LAB"
-                      width={340}
-                      height={340}
-                      className="relative rounded-3xl drop-shadow-2xl animate-card-float w-[260px] sm:w-[320px] h-auto"
-                      priority
-                    />
+                    {/* Tarjeta blanca que enmarca el logo oficial */}
+                    <div className="relative bg-white rounded-[2rem] shadow-xl border border-border-soft p-6 sm:p-7 animate-card-float">
+                      <Image
+                        src="/logo.jpg"
+                        alt="Chaski Bots LAB"
+                        width={280}
+                        height={280}
+                        className="w-[190px] sm:w-[220px] h-auto"
+                        priority
+                      />
+                    </div>
 
                     {/* Floating badges */}
-                    <div className="absolute -top-4 -left-8 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-lg border border-border-soft animate-card-float" style={{ animationDelay: '0.5s' }}>
+                    <div className="absolute -top-4 -left-10 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-lg border border-border-soft animate-card-float" style={{ animationDelay: '0.5s' }}>
                       <Cpu className="w-3.5 h-3.5 text-chaski-primary" />
                       <span className="text-xs font-semibold text-chaski-dark/80">Robótica</span>
                     </div>
-                    <div className="absolute -bottom-4 -right-6 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-lg border border-border-soft animate-card-float" style={{ animationDelay: '1.2s' }}>
+                    <div className="absolute -bottom-4 -right-8 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-lg border border-border-soft animate-card-float" style={{ animationDelay: '1.2s' }}>
                       <Brain className="w-3.5 h-3.5 text-chaski-gold" />
                       <span className="text-xs font-semibold text-chaski-dark/80">IA</span>
                     </div>
-                    <div className="absolute top-1/2 -right-10 hidden sm:flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-lg border border-border-soft animate-card-float" style={{ animationDelay: '1.8s' }}>
+                    <div className="absolute top-1/2 -right-14 hidden sm:flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-lg border border-border-soft animate-card-float" style={{ animationDelay: '1.8s' }}>
                       <Shield className="w-3.5 h-3.5 text-hack-green" />
                       <span className="text-xs font-semibold text-chaski-dark/80">Hacking</span>
                     </div>
-
-                    {/* Small decorative dots */}
-                    <div className="absolute -top-3 right-8 w-3 h-3 rounded-full bg-chaski-primary animate-ping opacity-60" />
-                    <div className="absolute bottom-8 -left-4 w-2 h-2 rounded-full bg-chaski-gold animate-bounce" style={{ animationDelay: '0.7s' }} />
-                    <div className="absolute top-12 -right-3 w-2.5 h-2.5 rounded-full bg-hack-green animate-bounce" style={{ animationDelay: '1.3s' }} />
                   </div>
                 </div>
               </div>

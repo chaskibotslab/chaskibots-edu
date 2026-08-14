@@ -75,7 +75,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-chaski-light flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen relative bg-chaski-light flex items-start justify-center px-4 pt-10 pb-10">
       {/* Fondo suave con acentos coral */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-chaski-primary/15 blur-[130px] animate-mesh-1" />
@@ -88,18 +88,19 @@ export default function LoginPage() {
       <div className={`relative z-10 w-full max-w-md flex flex-col items-center ${mounted ? 'animate-login-enter' : 'opacity-0'}`}>
 
         {/* Logo oficial Chaski Bots LAB */}
-        <div className="relative mb-3 animate-float" style={{ animationDelay: '0.1s' }}>
-          <div className="absolute -inset-8 bg-gradient-to-r from-chaski-primary/30 via-chaski-gold/20 to-hack-green/25 rounded-full blur-3xl animate-pulse-slow scale-110" />
-          <div className="absolute -inset-3 rounded-full border-2 border-dashed border-chaski-primary/30 animate-spin-slow" />
-          <Image
-            src="/logo.jpg"
-            alt="Chaski Bots LAB"
-            width={200}
-            height={200}
-            className="relative w-[150px] sm:w-[170px] h-auto rounded-2xl shadow-xl animate-card-float"
-            priority
-          />
-          <div className="absolute -bottom-1 -right-1 flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-md ring-2 ring-white">
+        <div className="relative mb-4 animate-float" style={{ animationDelay: '0.1s' }}>
+          <div className="absolute -inset-3 bg-gradient-to-br from-chaski-primary/25 to-chaski-gold/15 rounded-[1.75rem] blur-xl animate-pulse-slow" />
+          <div className="relative bg-white rounded-2xl shadow-xl border border-border-soft p-3 animate-card-float">
+            <Image
+              src="/logo.jpg"
+              alt="Chaski Bots LAB"
+              width={170}
+              height={170}
+              className="w-[110px] sm:w-[125px] h-auto"
+              priority
+            />
+          </div>
+          <div className="absolute -bottom-2 -right-2 flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-md ring-2 ring-white">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-hack-green opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-hack-green" />
