@@ -46,9 +46,9 @@ interface Task {
 
 const CATEGORIES = [
   { id: 'robotica', name: 'Robótica', icon: Bot, color: 'text-chaski-primary' },
-  { id: 'electronica', name: 'Electrónica', icon: CircuitBoard, color: 'text-yellow-400' },
-  { id: 'programacion', name: 'Programación', icon: Code, color: 'text-neon-green' },
-  { id: 'ia', name: 'Inteligencia Artificial', icon: Lightbulb, color: 'text-neon-pink' },
+  { id: 'electronica', name: 'Electrónica', icon: CircuitBoard, color: 'text-amber-500' },
+  { id: 'programacion', name: 'Programación', icon: Code, color: 'text-hack-green' },
+  { id: 'ia', name: 'Inteligencia Artificial', icon: Lightbulb, color: 'text-purple-500' },
   { id: 'general', name: 'General', icon: BookOpen, color: 'text-slate-600' },
 ]
 

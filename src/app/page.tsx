@@ -93,13 +93,6 @@ export default function HomePage() {
             <div className="absolute top-[20%] right-[15%] w-[35vw] h-[35vw] max-w-[450px] max-h-[450px] rounded-full bg-chaski-secondary/10 blur-[120px] animate-mesh-3" />
           </div>
 
-          {/* Grid pattern overlay */}
-          <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(rgba(57,255,20,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.4) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
-          {/* Scanline */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
-            <div className="absolute inset-x-0 h-32 bg-gradient-to-b from-transparent via-hack-green/30 to-transparent animate-scan-line" />
-          </div>
-
           {/* Floating geometric shapes */}
           <div className="absolute top-20 left-[8%] w-20 h-20 border border-hack-green/15 rounded-2xl animate-spin-slow opacity-60" />
           <div className="absolute bottom-32 right-[10%] w-14 h-14 border border-chaski-secondary/20 rounded-full animate-float opacity-50" />
@@ -126,7 +119,7 @@ export default function HomePage() {
                     <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-chaski-primary to-chaski-secondary rounded-full animate-expand-width" />
                   </span>,{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-gold via-amber-400 to-chaski-gold">IA</span> y{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-hack-green to-emerald-400">Hacking Ético</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-hack-green to-chaski-gold">Hacking Ético</span>
                 </h1>
 
                 <p className="text-lg text-slate-400 mb-4 max-w-lg leading-relaxed animate-fade-in" style={{animationDelay: '0.3s'}}>
@@ -284,7 +277,7 @@ export default function HomePage() {
                       className={`group relative aspect-video rounded-xl overflow-hidden border hover:scale-105 transition-all duration-300 cursor-pointer animate-fade-in ${
                         index % 4 === 0 ? 'border-chaski-primary/30 hover:border-chaski-primary' :
                         index % 4 === 1 ? 'border-chaski-secondary/30 hover:border-chaski-secondary' :
-                        index % 4 === 2 ? 'border-emerald-500/30 hover:border-emerald-500' :
+                        index % 4 === 2 ? 'border-hack-green/30 hover:border-hack-green' :
                         'border-chaski-gold/30 hover:border-chaski-gold'
                       }`}
                       style={{ animationDelay: `${(index % 4) * 0.05}s` }}
@@ -300,7 +293,7 @@ export default function HomePage() {
                         <div className={`absolute inset-0 bg-gradient-to-br ${
                           index % 4 === 0 ? 'from-chaski-primary/20 to-chaski-secondary/20' :
                           index % 4 === 1 ? 'from-chaski-secondary/20 to-chaski-accent/20' :
-                          index % 4 === 2 ? 'from-emerald-500/20 to-emerald-400/20' :
+                          index % 4 === 2 ? 'from-hack-green/20 to-hack-green/10' :
                           'from-chaski-gold/20 to-amber-400/20'
                         }`}></div>
                       )}
@@ -324,7 +317,7 @@ export default function HomePage() {
                     <div key={i} className={`aspect-video rounded-xl flex items-center justify-center border animate-fade-in cursor-pointer ${
                       i === 0 ? 'bg-gradient-to-br from-chaski-primary/20 to-chaski-secondary/20 border-chaski-primary/30' :
                       i === 1 ? 'bg-gradient-to-br from-chaski-secondary/20 to-chaski-accent/20 border-chaski-secondary/30' :
-                      i === 2 ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-400/20 border-emerald-500/30' :
+                      i === 2 ? 'bg-gradient-to-br from-hack-green/20 to-hack-green/10 border-hack-green/30' :
                       'bg-gradient-to-br from-chaski-gold/20 to-amber-400/20 border-chaski-gold/30'
                     } hover:scale-105 transition-transform`} style={{ animationDelay: `${i * 0.05}s` }}>
                       <span className="text-slate-400 text-sm">Próximamente</span>
@@ -392,7 +385,7 @@ export default function HomePage() {
                 <div className="absolute top-3 right-3 px-2 py-1 bg-hack-green/10 border border-hack-green/30 rounded text-xs text-hack-green">
                   Desde 8° EGB
                 </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-hack-green/15 to-emerald-400/15 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all group-hover:animate-pulse">
+                <div className="w-16 h-16 bg-hack-green/15 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all group-hover:animate-pulse">
                   <Shield className="w-8 h-8 text-hack-green" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Hacking Ético</h3>
@@ -483,9 +476,9 @@ export default function HomePage() {
                   Aprende con kits físicos de robótica diseñados para cada nivel educativo.
                 </p>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center hover:border-neon-green/30 transition-all">
-                <div className="w-16 h-16 bg-neon-green/10 border border-neon-green/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Award className="w-8 h-8 text-neon-green" />
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center hover:border-hack-green/30 transition-all">
+                <div className="w-16 h-16 bg-hack-green/10 border border-hack-green/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Award className="w-8 h-8 text-hack-green" />
                 </div>
                 <h3 className="font-bold text-lg text-white mb-2">Simuladores Online</h3>
                 <p className="text-slate-400">
@@ -499,7 +492,6 @@ export default function HomePage() {
         {/* CTA Section - Futurista */}
         <section className="py-20 px-4 relative overflow-hidden bg-chaski-dark">
           <div className="absolute inset-0 bg-gradient-to-r from-chaski-primary/10 via-chaski-accent/5 to-chaski-secondary/10"></div>
-          <div className="absolute inset-0 bg-cyber-grid opacity-10"></div>
           <Reveal direction="scale" className="max-w-4xl mx-auto text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               ¿Listo para comenzar tu viaje en <span className="text-chaski-primary">tecnología</span>?

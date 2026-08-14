@@ -26,7 +26,7 @@ const CATEGORIES = [
     title: 'Educación Inicial',
     subtitle: '3-5 años • Primeros pasos en tecnología',
     icon: Baby,
-    color: 'pink',
+    color: 'coral',
     columns: 'grid-cols-2 md:grid-cols-3'
   },
   {
@@ -34,7 +34,7 @@ const CATEGORIES = [
     title: 'Educación Básica Elemental',
     subtitle: '5-9 años • Fundamentos de programación',
     icon: BookOpen,
-    color: 'cyan',
+    color: 'gold',
     columns: 'grid-cols-2 md:grid-cols-4'
   },
   {
@@ -42,7 +42,7 @@ const CATEGORIES = [
     title: 'Educación Básica Media y Superior',
     subtitle: '9-15 años • Proyectos avanzados',
     icon: Code,
-    color: 'violet',
+    color: 'slate',
     columns: 'grid-cols-2 md:grid-cols-3',
     filter: (l: { category: string }) => l.category === 'media' || l.category === 'superior'
   },
@@ -57,26 +57,26 @@ const CATEGORIES = [
 ]
 
 const COLOR_STYLES: Record<string, { icon: string; bg: string; border: string; hover: string; light: string }> = {
-  pink: {
-    icon: 'text-pink-400',
-    bg: 'bg-pink-500/10',
-    border: 'border-pink-500/20',
-    hover: 'hover:border-pink-500/40 hover:bg-pink-500/5',
-    light: 'bg-pink-500/5'
+  coral: {
+    icon: 'text-chaski-primary',
+    bg: 'bg-chaski-primary/10',
+    border: 'border-chaski-primary/20',
+    hover: 'hover:border-chaski-primary/40 hover:bg-chaski-primary/5',
+    light: 'bg-chaski-primary/5'
   },
-  cyan: {
-    icon: 'text-cyan-400',
-    bg: 'bg-cyan-500/10',
-    border: 'border-cyan-500/20',
-    hover: 'hover:border-cyan-500/40 hover:bg-cyan-500/5',
-    light: 'bg-cyan-500/5'
+  gold: {
+    icon: 'text-chaski-gold',
+    bg: 'bg-chaski-gold/10',
+    border: 'border-chaski-gold/20',
+    hover: 'hover:border-chaski-gold/40 hover:bg-chaski-gold/5',
+    light: 'bg-chaski-gold/5'
   },
-  violet: {
-    icon: 'text-violet-400',
-    bg: 'bg-violet-500/10',
-    border: 'border-violet-500/20',
-    hover: 'hover:border-violet-500/40 hover:bg-violet-500/5',
-    light: 'bg-violet-500/5'
+  slate: {
+    icon: 'text-slate-300',
+    bg: 'bg-slate-400/10',
+    border: 'border-slate-400/20',
+    hover: 'hover:border-slate-400/40 hover:bg-slate-400/5',
+    light: 'bg-slate-400/5'
   },
   green: {
     icon: 'text-hack-green',
@@ -105,7 +105,7 @@ export default function NivelesPage() {
       <div className="min-h-screen flex flex-col bg-chaski-dark">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-hack-green animate-spin" />
+          <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
         </main>
         <Footer />
       </div>
@@ -121,9 +121,9 @@ export default function NivelesPage() {
 
           {/* Header */}
           <div className="text-center py-6">
-            <div className="inline-flex items-center gap-2 bg-hack-green/10 rounded-full px-4 py-2 mb-4 border border-hack-green/25">
-              <Sparkles className="w-4 h-4 text-hack-green" />
-              <span className="text-sm font-mono font-medium text-hack-green">Plataforma Educativa</span>
+            <div className="inline-flex items-center gap-2 bg-chaski-primary/10 rounded-full px-4 py-2 mb-4 border border-chaski-primary/25">
+              <Sparkles className="w-4 h-4 text-chaski-primary" />
+              <span className="text-sm font-medium text-chaski-primary">Plataforma Educativa</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-black text-white mb-3">
               Niveles Educativos

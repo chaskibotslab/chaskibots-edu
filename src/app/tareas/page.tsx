@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
-import MatrixRain from '@/components/MatrixRain'
 import {
   ClipboardList, Clock, CheckCircle2, Award, Search,
   Loader2, AlertCircle, X, Upload, Paperclip,
@@ -47,12 +46,20 @@ interface UploadedFile {
 
 type FilterStatus = 'all' | 'pending' | 'submitted' | 'graded'
 
-const FILTERS: { id: FilterStatus; label: string; icon: any; color: string }[] = [
-  { id: 'all', label: 'Todas', icon: ClipboardList, color: 'chaski-primary' },
-  { id: 'pending', label: 'Pendientes', icon: Clock, color: 'amber-500' },
-  { id: 'submitted', label: 'Enviadas', icon: Send, color: 'brand-cyan' },
-  { id: 'graded', label: 'Calificadas', icon: Award, color: 'green-500' }
+const FILTERS: { id: FilterStatus; label: string; icon: any }[] = [
+  { id: 'all', label: 'Todas', icon: ClipboardList },
+  { id: 'pending', label: 'Pendientes', icon: Clock },
+  { id: 'submitted', label: 'Enviadas', icon: Send },
+  { id: 'graded', label: 'Calificadas', icon: Award }
 ]
+
+type StatColorKey = 'amber' | 'gold' | 'green'
+
+const STAT_COLOR_TEXT: Record<StatColorKey, string> = {
+  amber: 'text-amber-300',
+  gold: 'text-chaski-gold',
+  green: 'text-hack-green',
+}
 
 const DIFFICULTY_STYLES: Record<string, string> = {
   basico: 'bg-green-100 text-green-700 border-green-200',
@@ -166,15 +173,13 @@ export default function TareasPage() {
       <main className="flex-1 py-6 px-4 pb-24">
         <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
           {/* Hero */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 md:p-8 shadow-2xl">
-            <MatrixRain count={10} className="opacity-30" />
-            <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(57,255,20,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.5) 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
+          <div className="relative overflow-hidden rounded-3xl bg-chaski-dark text-white p-6 md:p-8 shadow-2xl">
             <div className="absolute top-0 left-0 w-64 h-64 bg-chaski-primary/20 rounded-full blur-[100px]"></div>
-            <div className="absolute bottom-0 right-0 w-56 h-56 bg-brand-cyan/15 rounded-full blur-[90px]"></div>
+            <div className="absolute bottom-0 right-0 w-56 h-56 bg-chaski-gold/15 rounded-full blur-[90px]"></div>
             <div className="relative z-10 flex items-start justify-between gap-4 flex-wrap">
               <div>
                 <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1 mb-3">
-                  <Sparkles className="w-3.5 h-3.5 text-brand-cyan" />
+                  <Sparkles className="w-3.5 h-3.5 text-chaski-gold" />
                   <span className="text-white/90 text-xs font-medium">Hola, {user.name.split(' ')[0]}</span>
                 </div>
                 <h1 className="text-3xl md:text-4xl font-black mb-1">Mis Tareas</h1>
@@ -182,13 +187,13 @@ export default function TareasPage() {
               </div>
               <div className="flex gap-3">
                 <div className="animate-slide-up" style={{ animationDelay: '0s' }}>
-                  <StatChip label="Pendientes" value={stats.pending} color="amber-300" />
+                  <StatChip label="Pendientes" value={stats.pending} color="amber" />
                 </div>
                 <div className="animate-slide-up" style={{ animationDelay: '0.05s' }}>
-                  <StatChip label="Calificadas" value={stats.graded} color="green-300" />
+                  <StatChip label="Calificadas" value={stats.graded} color="green" />
                 </div>
                 <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                  <StatChip label="Puntos" value={`${stats.earnedPoints}/${stats.totalPoints}`} color="brand-cyan" />
+                  <StatChip label="Puntos" value={`${stats.earnedPoints}/${stats.totalPoints}`} color="gold" />
                 </div>
               </div>
             </div>
@@ -272,11 +277,11 @@ export default function TareasPage() {
   )
 }
 
-function StatChip({ label, value, color }: { label: string; value: number | string; color: string }) {
+function StatChip({ label, value, color }: { label: string; value: number | string; color: StatColorKey }) {
   return (
     <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 py-2.5">
       <p className="text-white/60 text-xs">{label}</p>
-      <p className={`text-${color} font-bold text-lg leading-tight`}>{value}</p>
+      <p className={`${STAT_COLOR_TEXT[color]} font-bold text-lg leading-tight`}>{value}</p>
     </div>
   )
 }
@@ -312,9 +317,9 @@ function EmptyState({ filter, hasLevelId }: { filter: FilterStatus; hasLevelId: 
 function TaskCard({ task, submission, onClick }: { task: Task; submission?: Submission; onClick: () => void }) {
   const status = submission?.status === 'graded' ? 'graded' : submission ? 'submitted' : 'pending'
   const statusConfig = {
-    pending: { label: 'Pendiente', color: 'amber-600', bg: 'bg-amber-500/10 border-amber-500/20', icon: Clock },
-    submitted: { label: 'Enviada', color: 'brand-cyan', bg: 'bg-cyan-50 border-cyan-200', icon: Send },
-    graded: { label: 'Calificada', color: 'green-600', bg: 'bg-green-500/10 border-green-500/20', icon: CheckCircle2 }
+    pending: { label: 'Pendiente', text: 'text-amber-600', bg: 'bg-amber-500/10 border-amber-500/20', icon: Clock },
+    submitted: { label: 'Enviada', text: 'text-chaski-gold', bg: 'bg-chaski-gold/10 border-chaski-gold/20', icon: Send },
+    graded: { label: 'Calificada', text: 'text-hack-green', bg: 'bg-hack-green/10 border-hack-green/20', icon: CheckCircle2 }
   }[status]
   const StatusIcon = statusConfig.icon
   const emoji = CATEGORY_EMOJI[task.category] || '📚'
@@ -339,7 +344,7 @@ function TaskCard({ task, submission, onClick }: { task: Task; submission?: Subm
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${statusConfig.bg} text-${statusConfig.color}`}>
+        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${statusConfig.bg} ${statusConfig.text}`}>
           <StatusIcon className="w-3 h-3" />
           {statusConfig.label}
         </span>
@@ -351,7 +356,7 @@ function TaskCard({ task, submission, onClick }: { task: Task; submission?: Subm
           {task.points} pts
         </span>
         {status === 'graded' && submission?.grade != null && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border border-green-500/20 bg-green-500/10 text-green-600">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border border-hack-green/20 bg-hack-green/10 text-hack-green">
             {submission.grade}/100
           </span>
         )}
@@ -496,13 +501,13 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
 
           {/* Graded feedback */}
           {isGraded && submission && (
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-5">
+            <div className="bg-hack-green/5 border border-hack-green/20 rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-2">
-                <Award className="w-5 h-5 text-green-600" />
+                <Award className="w-5 h-5 text-hack-green" />
                 <h3 className="font-bold text-slate-900">Tu calificación</h3>
               </div>
               <div className="flex items-baseline gap-2 mb-3">
-                <span className="text-4xl font-black text-green-600">{submission.grade}</span>
+                <span className="text-4xl font-black text-hack-green">{submission.grade}</span>
                 <span className="text-slate-500 font-medium">/100</span>
               </div>
               {submission.feedback && (
@@ -516,8 +521,8 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
 
           {/* Already submitted */}
           {alreadySubmitted && !isGraded && (
-            <div className="bg-cyan-50 border border-cyan-200 rounded-2xl p-5 flex items-center gap-3">
-              <Send className="w-6 h-6 text-brand-cyan shrink-0" />
+            <div className="bg-chaski-gold/10 border border-chaski-gold/20 rounded-2xl p-5 flex items-center gap-3">
+              <Send className="w-6 h-6 text-chaski-gold shrink-0" />
               <div>
                 <p className="font-semibold text-slate-900">Entrega recibida</p>
                 <p className="text-slate-600 text-sm">Esperando revisión del profesor</p>
@@ -555,7 +560,7 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
               {/* File upload */}
               <div>
                 <h3 className="font-bold text-slate-900 flex items-center gap-2 mb-3">
-                  <Upload className="w-4 h-4 text-brand-cyan" />
+                  <Upload className="w-4 h-4 text-chaski-primary" />
                   Archivos
                   <span className="text-slate-400 text-xs font-normal">(opcional)</span>
                 </h3>
@@ -591,7 +596,7 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
                         {file.type.startsWith('image/') ? (
                           <ImageIcon className="w-5 h-5 text-chaski-primary shrink-0" />
                         ) : (
-                          <FileText className="w-5 h-5 text-brand-cyan shrink-0" />
+                          <FileText className="w-5 h-5 text-chaski-primary shrink-0" />
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-slate-900 truncate text-sm">{file.name}</p>
@@ -625,7 +630,7 @@ function TaskSheet({ task, submission, user, onClose, onSubmitted }: {
             <button
               onClick={handleSubmit}
               disabled={submitting || uploading}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-chaski-primary to-chaski-accent hover:shadow-lg hover:shadow-chaski-primary/30 text-white font-bold py-4 rounded-2xl shadow-lg shadow-chaski-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-chaski-primary to-chaski-secondary hover:shadow-lg hover:shadow-chaski-primary/30 text-white font-bold py-4 rounded-2xl shadow-lg shadow-chaski-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
             >
               {submitting ? (
                 <>

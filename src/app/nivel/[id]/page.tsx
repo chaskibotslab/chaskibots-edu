@@ -252,7 +252,7 @@ export default function NivelPage() {
     <CourseAuthGuard levelId={levelId} levelName={level.name}>
       <div className="min-h-screen bg-chaski-dark flex animate-fade-in">
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-[#0a0f1a] backdrop-blur-sm border-r border-white/10 transition-all duration-300 overflow-hidden flex-shrink-0`}>
+      <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-chaski-dark backdrop-blur-sm border-r border-white/10 transition-all duration-300 overflow-hidden flex-shrink-0`}>
         <div className="h-full flex flex-col">
           {/* Header del Sidebar */}
           <div className="p-4 border-b border-white/10">
@@ -365,7 +365,7 @@ export default function NivelPage() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Top Bar */}
-        <header className="h-14 bg-[#0a0f1a]/80 backdrop-blur border-b border-white/10 flex items-center px-4 gap-4">
+        <header className="h-14 bg-chaski-dark/80 backdrop-blur border-b border-white/10 flex items-center px-4 gap-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 text-slate-400 hover:text-white transition-colors active:scale-[0.98]"
@@ -690,8 +690,8 @@ export default function NivelPage() {
               {/* Header */}
               <div className="sticky top-0 bg-slate-50 border-b border-slate-200 p-4 flex items-center justify-between z-10">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-brand-purple/20 rounded-lg flex items-center justify-center">
-                    <Play className="w-5 h-5 text-brand-purple" />
+                  <div className="w-10 h-10 bg-chaski-primary/20 rounded-lg flex items-center justify-center">
+                    <Play className="w-5 h-5 text-chaski-primary" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-slate-900">{lesson.title}</h3>
@@ -728,7 +728,7 @@ export default function NivelPage() {
                       {lesson.images.map((img: string, idx: number) => (
                         <div
                           key={idx}
-                          className="flex-shrink-0 w-40 h-28 bg-slate-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-brand-purple transition-all animate-scale-in"
+                          className="flex-shrink-0 w-40 h-28 bg-slate-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-chaski-primary transition-all animate-scale-in"
                           style={{ animationDelay: `${idx * 0.05}s` }}
                           onClick={() => setZoomImage(img)}
                         >

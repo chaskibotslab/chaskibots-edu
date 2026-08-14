@@ -159,8 +159,8 @@ export default function BadgesDisplay({
     <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-brand-purple/20 flex items-center justify-center">
-            <Award className="w-5 h-5 text-brand-purple" />
+          <div className="w-10 h-10 rounded-xl bg-chaski-primary/15 flex items-center justify-center">
+            <Award className="w-5 h-5 text-chaski-primary" />
           </div>
           <div>
             <h3 className="font-bold text-gray-900">Mis Insignias</h3>
@@ -184,7 +184,7 @@ export default function BadgesDisplay({
             >
               <div className="flex flex-col items-center gap-2">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  badge.unlocked ? badge.bgColor : 'bg-dark-600'
+                  badge.unlocked ? badge.bgColor : 'bg-slate-200'
                 }`}>
                   {badge.unlocked ? (
                     <Icon className={`w-5 h-5 ${badge.color}`} />
@@ -202,7 +202,7 @@ export default function BadgesDisplay({
               {/* Progress bar for badges with progress */}
               {badge.maxProgress && !badge.unlocked && (
                 <div className="absolute bottom-1 left-2 right-2">
-                  <div className="h-1 bg-dark-600 rounded-full overflow-hidden">
+                  <div className="h-1 bg-slate-200 rounded-full overflow-hidden">
                     <div 
                       className={`h-full ${badge.bgColor.replace('/20', '')}`}
                       style={{ width: `${((badge.progress || 0) / badge.maxProgress) * 100}%` }}

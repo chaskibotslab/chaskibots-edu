@@ -4,26 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useAuth } from '@/components/AuthProvider'
-import { Mail, Lock, Eye, EyeOff, Loader2, Key, ArrowRight, Terminal, Bot } from 'lucide-react'
-
-const MATRIX_CHARS = '01アカサタナハマヤラワ<>/{}[]#$%01アイウエオ'
-
-function useMatrixColumns(count: number) {
-  const [columns, setColumns] = useState<{ left: number; delay: number; duration: number; chars: string[] }[]>([])
-  useEffect(() => {
-    setColumns(
-      Array.from({ length: count }).map(() => ({
-        left: Math.random() * 100,
-        delay: Math.random() * 4,
-        duration: 3 + Math.random() * 3,
-        chars: Array.from({ length: 14 + Math.floor(Math.random() * 10) }).map(
-          () => MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)]
-        ),
-      }))
-    )
-  }, [count])
-  return columns
-}
+import { Mail, Lock, Eye, EyeOff, Loader2, GraduationCap, Building2, ArrowRight } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -32,13 +13,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [loginMode, setLoginMode] = useState<'email' | 'code'>('code')
+  const [loginMode, setLoginMode] = useState<'code' | 'email'>('code')
   const { login } = useAuth()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
-  const matrixColumns = useMatrixColumns(28)
 
   useEffect(() => {
     setMounted(true)
@@ -50,7 +30,7 @@ export default function LoginPage() {
     const rect = el.getBoundingClientRect()
     const x = (e.clientX - rect.left) / rect.width - 0.5
     const y = (e.clientY - rect.top) / rect.height - 0.5
-    setTilt({ x: y * -5, y: x * 6 })
+    setTilt({ x: y * -2, y: x * 3 })
   }
 
   const handleCardMouseLeave = () => setTilt({ x: 0, y: 0 })
@@ -95,77 +75,37 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-black flex items-center justify-center px-4 py-4">
-      {/* ─── Fondo hacker a pantalla completa ─── */}
-      <div className="absolute inset-0">
-        <div className="absolute top-[-15%] left-[-10%] w-[60%] h-[60%] rounded-full bg-chaski-primary/20 blur-[150px]" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[55%] h-[55%] rounded-full bg-hack-green/10 blur-[140px]" />
-        <div className="absolute top-[30%] right-[10%] w-[30%] h-[30%] rounded-full bg-chaski-accent/10 blur-[120px]" />
-        <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'linear-gradient(rgba(57,255,20,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.5) 1px, transparent 1px)', backgroundSize: '42px 42px' }} />
+    <div className="min-h-screen relative overflow-hidden bg-chaski-light flex items-center justify-center px-4 py-8">
+      {/* Fondo suave con acentos coral */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-chaski-primary/10 blur-[130px]" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[50%] h-[50%] rounded-full bg-chaski-secondary/15 blur-[120px]" />
       </div>
 
-      {/* Matrix code rain, pantalla completa */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {matrixColumns.map((col, i) => (
-          <div
-            key={i}
-            className="absolute top-0 flex flex-col items-center font-mono text-hack-green/60 text-xs leading-4 animate-matrix-fall"
-            style={{ left: `${col.left}%`, animationDelay: `${col.delay}s`, animationDuration: `${col.duration}s` }}
-          >
-            {col.chars.map((c, j) => (
-              <span key={j} style={{ opacity: 1 - j / col.chars.length }}>{c}</span>
-            ))}
-          </div>
-        ))}
-      </div>
-
-      {/* Scanline sweep + textura CRT */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-        <div className="absolute inset-x-0 h-32 bg-gradient-to-b from-transparent via-hack-green/40 to-transparent animate-scan-line" />
-      </div>
-      <div className="absolute inset-0 pointer-events-none opacity-[0.05]" style={{ backgroundImage: 'repeating-linear-gradient(0deg, #fff 0px, transparent 1px, transparent 2px, #fff 3px)' }} />
-
-      {/* ─── Contenido centrado ─── */}
+      {/* Contenido centrado */}
       <div className={`relative z-10 w-full max-w-md flex flex-col items-center ${mounted ? 'animate-login-enter' : 'opacity-0'}`}>
 
-        {/* Robot mascota animado */}
-        <div className="relative mb-3 animate-float" style={{ animationDelay: '0.1s' }}>
-          <div className="absolute inset-0 rounded-full border-2 border-dashed border-hack-green/30 animate-spin-slow" style={{ width: '68px', height: '68px', left: '-4px', top: '-4px' }} />
-          <div className="absolute -inset-2 rounded-full bg-hack-green/20 blur-xl animate-pulse" />
-          <div className="relative w-[60px] h-[60px] rounded-full overflow-hidden ring-2 ring-hack-green/50 shadow-hack-green bg-black">
-            <Image src="/chaski.png" alt="ChaskiBots Bot" width={60} height={60} className="w-full h-full object-cover" priority />
+        {/* Robot mascota */}
+        <div className="relative mb-4 animate-float" style={{ animationDelay: '0.1s' }}>
+          <div className="relative w-16 h-16 rounded-full overflow-hidden ring-4 ring-white shadow-lg bg-chaski-dark">
+            <Image src="/chaski.png" alt="ChaskiBots Bot" width={64} height={64} className="w-full h-full object-cover" priority />
           </div>
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-hack-green flex items-center justify-center ring-3 ring-black">
-            <Bot className="w-3 h-3 text-black" />
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-hack-green flex items-center justify-center ring-4 ring-chaski-light">
+            <span className="w-2 h-2 rounded-full bg-white" />
           </div>
         </div>
 
-        {/* Terminal strip compacto */}
-        <div className={`w-full rounded-lg bg-black/60 border border-hack-green/25 backdrop-blur-sm overflow-hidden mb-3 ${mounted ? 'animate-stagger-in' : 'opacity-0'}`} style={{ animationDelay: '0.2s' }}>
-          <div className="flex items-center gap-1.5 px-3 py-1 border-b border-hack-green/20 bg-white/[0.02]">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500/70" />
-            <span className="w-1.5 h-1.5 rounded-full bg-hack-amber/70" />
-            <span className="w-1.5 h-1.5 rounded-full bg-hack-green/70" />
-            <span className="ml-2 flex items-center gap-1 text-hack-green/50 text-[10px] font-mono">
-              <Terminal className="w-3 h-3" /> access.sh
-            </span>
-          </div>
-          <div className="px-3 py-1.5 font-mono text-[11px]">
-            <p className="text-hack-green/80"><span className="text-hack-green">$</span> access --level=full<span className="inline-block w-1.5 h-3 bg-hack-green ml-1 animate-cursor-blink align-middle" /></p>
-          </div>
-        </div>
-
-        {/* Título con glitch */}
-        <h1 className={`text-white text-2xl sm:text-3xl font-black leading-tight text-center mb-1 ${mounted ? 'animate-stagger-in' : 'opacity-0'}`} style={{ animationDelay: '0.3s' }}>
+        {/* Título */}
+        <h1 className={`text-chaski-dark text-2xl sm:text-3xl font-black leading-tight text-center mb-1 ${mounted ? 'animate-stagger-in' : 'opacity-0'}`} style={{ animationDelay: '0.2s' }}>
           El futuro se{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-hack-green via-emerald-300 to-chaski-primary animate-glitch">construye</span>{' '}
+          <span className="text-chaski-primary">construye</span>{' '}
           aquí
         </h1>
-        <p className={`text-white/50 text-xs text-center max-w-sm mb-4 ${mounted ? 'animate-stagger-in' : 'opacity-0'}`} style={{ animationDelay: '0.4s' }}>
+        <p className={`text-slate-500 text-sm text-center max-w-sm mb-6 ${mounted ? 'animate-stagger-in' : 'opacity-0'}`} style={{ animationDelay: '0.3s' }}>
           Robótica, inteligencia artificial y hacking ético con laboratorios interactivos y proyectos reales.
         </p>
 
-        {/* ─── Card de login, oscura y centrada ─── */}
+        {/* Card de login */}
         <div
           ref={cardRef}
           onMouseMove={handleCardMouseMove}
@@ -174,158 +114,144 @@ export default function LoginPage() {
             transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
             transition: 'transform 0.2s ease-out',
             transformStyle: 'preserve-3d',
-            animationDelay: '0.5s',
+            animationDelay: '0.4s',
           }}
           className={`w-full ${mounted ? 'animate-login-card' : 'opacity-0'}`}
         >
-          <div className="relative w-full bg-black/50 backdrop-blur-xl rounded-2xl shadow-2xl shadow-hack-green/10 p-5 border border-hack-green/20 overflow-hidden animate-glow-pulse">
-            {/* Borde animado sutil */}
-            <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ background: 'conic-gradient(from 0deg, transparent, rgba(57,255,20,0.4), transparent 30%)' }} />
+          <div className="w-full bg-white rounded-2xl shadow-xl p-6 border border-border-soft">
+            <div className="text-center mb-5">
+              <h2 className="text-lg font-bold text-chaski-dark">Bienvenido</h2>
+              <p className="text-slate-500 text-sm mt-0.5">Elige tu perfil para continuar</p>
+            </div>
 
-            <div className="relative">
-              {/* Status badge */}
-              <div className="flex justify-center mb-3">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-hack-green/10 border border-hack-green/25">
-                  <span className="w-1.5 h-1.5 rounded-full bg-hack-green animate-pulse" />
-                  <span className="text-hack-green text-[10px] font-mono font-semibold tracking-wide">SYSTEM ONLINE</span>
+            {/* Selector de perfil */}
+            <div className="relative flex p-1 bg-chaski-light border border-border-soft rounded-xl mb-5">
+              <div
+                className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white shadow-sm rounded-lg transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                style={{ transform: loginMode === 'code' ? 'translateX(0%)' : 'translateX(calc(100% + 8px))' }}
+              />
+              <button
+                type="button"
+                onClick={() => setLoginMode('code')}
+                className={`relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-semibold transition-colors duration-300 ${
+                  loginMode === 'code' ? 'text-chaski-primary' : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <GraduationCap className="w-4 h-4" />
+                Estudiante
+              </button>
+              <button
+                type="button"
+                onClick={() => setLoginMode('email')}
+                className={`relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-semibold transition-colors duration-300 ${
+                  loginMode === 'email' ? 'text-chaski-primary' : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <Building2 className="w-4 h-4" />
+                Instructor · Institución
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2.5 rounded-xl text-sm text-center animate-scale-in">
+                  {error}
                 </div>
-              </div>
+              )}
 
-              <div className="text-center mb-3">
-                <h2 className="text-lg font-bold text-white">Bienvenido</h2>
-                <p className="text-white/40 text-xs mt-0.5">Ingresa a tu cuenta para continuar</p>
-              </div>
-
-              {/* Tabs */}
-              <div className="relative flex p-1 bg-white/5 border border-white/10 rounded-xl mb-4">
-                <div
-                  className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-hack-green/15 border border-hack-green/30 rounded-lg transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                  style={{ transform: loginMode === 'code' ? 'translateX(0%)' : 'translateX(calc(100% + 8px))' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setLoginMode('code')}
-                  className={`relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-300 ${
-                    loginMode === 'code' ? 'text-hack-green' : 'text-white/40 hover:text-white/70'
-                  }`}
-                >
-                  <Key className="w-3.5 h-3.5" />
-                  Código
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLoginMode('email')}
-                  className={`relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-300 ${
-                    loginMode === 'email' ? 'text-hack-green' : 'text-white/40 hover:text-white/70'
-                  }`}
-                >
-                  <Mail className="w-3.5 h-3.5" />
-                  Email
-                </button>
-              </div>
-
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-3">
-                {error && (
-                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-2.5 rounded-xl text-sm text-center animate-scale-in">
-                    {error}
-                  </div>
-                )}
-
-                {loginMode === 'code' ? (
+              {loginMode === 'code' ? (
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1.5">Código de acceso</label>
+                  <input
+                    type="text"
+                    value={accessCode}
+                    onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
+                    className="w-full px-4 py-3 bg-white border border-border-soft rounded-xl focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/15 focus:outline-none transition-all placeholder:text-slate-300 font-mono text-base tracking-[0.15em] text-center text-chaski-dark uppercase"
+                    placeholder="ABCD1234"
+                    maxLength={10}
+                    autoFocus
+                    required
+                  />
+                  <p className="text-xs text-slate-400 mt-2 text-center">
+                    Pide el código a tu profesor
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-medium text-white/50 mb-1">Código de acceso</label>
-                    <input
-                      type="text"
-                      value={accessCode}
-                      onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/15 rounded-xl focus:border-hack-green focus:ring-2 focus:ring-hack-green/20 focus:outline-none transition-all placeholder:text-white/20 font-mono text-base tracking-[0.15em] text-center text-white uppercase"
-                      placeholder="ABCD1234"
-                      maxLength={10}
-                      autoFocus
-                      required
-                    />
-                    <p className="text-[11px] text-white/30 mt-1.5 text-center">
-                      Pide el código a tu profesor
-                    </p>
+                    <label className="block text-xs font-medium text-slate-500 mb-1.5">Correo electrónico</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-border-soft rounded-xl focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/15 focus:outline-none transition-all placeholder:text-slate-300 text-chaski-dark text-sm"
+                        placeholder="tu@email.com"
+                        autoFocus
+                        required
+                      />
+                    </div>
                   </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1.5">Contraseña</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full pl-10 pr-10 py-3 bg-white border border-border-soft rounded-xl focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/15 focus:outline-none transition-all placeholder:text-slate-300 text-chaski-dark text-sm"
+                        placeholder="••••••••"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-chaski-light text-slate-400 hover:text-chaski-primary transition-all active:scale-90"
+                        title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 bg-chaski-primary text-white font-bold rounded-xl hover:bg-chaski-secondary hover:shadow-glow active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group disabled:opacity-60 text-sm"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-medium text-white/50 mb-1">Correo electrónico</label>
-                      <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
-                        <input
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/15 rounded-xl focus:border-hack-green focus:ring-2 focus:ring-hack-green/20 focus:outline-none transition-all placeholder:text-white/20 text-white text-sm"
-                          placeholder="tu@email.com"
-                          autoFocus
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-white/50 mb-1">Contraseña</label>
-                      <div className="relative">
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/15 rounded-xl focus:border-hack-green focus:ring-2 focus:ring-hack-green/20 focus:outline-none transition-all placeholder:text-white/20 text-white text-sm"
-                          placeholder="••••••••"
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-white/5 hover:bg-hack-green/15 border border-transparent hover:border-hack-green/30 text-white/40 hover:text-hack-green transition-all duration-200 active:scale-90"
-                          title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                        >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <>
+                    Entrar
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </>
                 )}
+              </button>
+            </form>
 
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="relative w-full py-2.5 bg-gradient-to-r from-chaski-primary via-chaski-secondary to-hack-green text-white font-bold rounded-xl hover:shadow-glow-lg active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group disabled:opacity-60 overflow-hidden text-sm"
-                >
-                  <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                  {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      Entrar
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              {/* Footer */}
-              <div className="mt-3 pt-2 border-t border-white/10 text-center">
-                <p className="text-white/30 text-[11px]">¿Necesitas ayuda? <a href="tel:+593968653593" className="text-hack-green font-medium hover:underline">0968653593</a></p>
-              </div>
+            {/* Footer */}
+            <div className="mt-4 pt-4 border-t border-border-soft text-center">
+              <p className="text-slate-400 text-xs">¿Necesitas ayuda? <a href="tel:+593968653593" className="text-chaski-primary font-medium hover:underline">0968653593</a></p>
             </div>
           </div>
         </div>
 
         {/* Feature chips */}
-        <div className="flex flex-wrap justify-center gap-1.5 mt-4">
+        <div className="flex flex-wrap justify-center gap-2 mt-5">
           {['Python IDE', 'Lab de IA', 'CAD 3D', 'Terminal Linux'].map((f, i) => (
-            <span key={f} className={`px-2.5 py-1 rounded-md bg-hack-green/5 border border-hack-green/20 text-hack-green/70 text-[10px] font-mono font-medium hover:bg-hack-green/10 hover:border-hack-green/40 hover:scale-105 transition-all ${mounted ? 'animate-stagger-in' : 'opacity-0'}`} style={{ animationDelay: `${0.8 + i * 0.1}s` }}>
+            <span key={f} className={`px-3 py-1.5 rounded-lg bg-white border border-border-soft text-slate-500 text-xs font-medium hover:border-chaski-primary/40 hover:text-chaski-primary transition-all ${mounted ? 'animate-stagger-in' : 'opacity-0'}`} style={{ animationDelay: `${0.6 + i * 0.1}s` }}>
               {f}
             </span>
           ))}
         </div>
 
-        <p className="text-center text-white/25 text-[10px] mt-3 font-mono">© {new Date().getFullYear()} ChaskiBots EDU</p>
+        <p className="text-center text-slate-400 text-xs mt-4">© {new Date().getFullYear()} ChaskiBots EDU</p>
       </div>
     </div>
   )

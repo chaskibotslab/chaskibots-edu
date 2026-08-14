@@ -18,6 +18,17 @@ import {
 
 type AdminTab = 'dashboard' | 'courses' | 'users' | 'logs' | 'settings'
 
+// Lookup estático de clases Tailwind completas y literales por color —
+// nunca interpolar `bg-${color}` en runtime, Tailwind JIT no lo compila.
+type ColorKey = 'coral' | 'gold' | 'green' | 'slate'
+
+const COLOR_STYLES: Record<ColorKey, { bg10: string; bg5: string; text: string; borderHover: string }> = {
+  coral: { bg10: 'bg-chaski-primary/10', bg5: 'bg-chaski-primary/5', text: 'text-chaski-primary', borderHover: 'hover:border-chaski-primary/50' },
+  gold: { bg10: 'bg-chaski-gold/10', bg5: 'bg-chaski-gold/5', text: 'text-chaski-gold', borderHover: 'hover:border-chaski-gold/50' },
+  green: { bg10: 'bg-hack-green/10', bg5: 'bg-hack-green/5', text: 'text-hack-green', borderHover: 'hover:border-hack-green/50' },
+  slate: { bg10: 'bg-slate-500/10', bg5: 'bg-slate-500/5', text: 'text-slate-600', borderHover: 'hover:border-slate-400/50' },
+}
+
 function StatCard({
   label,
   value,
@@ -28,25 +39,26 @@ function StatCard({
   label: string
   value: number
   icon: React.ComponentType<{ className?: string }>
-  color: string
+  color: ColorKey
   trend?: string
 }) {
+  const c = COLOR_STYLES[color]
   return (
     <div className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-lg transition-all duration-300`}>
-      <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
+      <div className={`absolute top-0 right-0 w-24 h-24 ${c.bg10} rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
       <div className="relative flex items-start justify-between">
-        <div className={`w-12 h-12 rounded-xl bg-${color}/10 flex items-center justify-center`}>
-          <Icon className={`w-6 h-6 text-${color}`} />
+        <div className={`w-12 h-12 rounded-xl ${c.bg10} flex items-center justify-center`}>
+          <Icon className={`w-6 h-6 ${c.text}`} />
         </div>
         {trend && (
-          <span className={`text-xs font-bold bg-${color}/10 text-${color} px-2 py-1 rounded-lg`}>
+          <span className={`text-xs font-bold ${c.bg10} ${c.text} px-2 py-1 rounded-lg`}>
             {trend}
           </span>
         )}
       </div>
       <div className="relative mt-4">
         <h3 className="text-3xl font-bold text-slate-900">{value}</h3>
-        <p className={`text-sm font-medium text-${color}`}>{label}</p>
+        <p className={`text-sm font-medium ${c.text}`}>{label}</p>
       </div>
     </div>
   )
@@ -61,19 +73,20 @@ function QuickAction({
 }: {
   href: string
   icon: React.ComponentType<{ className?: string }>
-  color: string
+  color: ColorKey
   title: string
   description: string
 }) {
+  const c = COLOR_STYLES[color]
   return (
     <Link
       href={href}
-      className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-${color}/50 transition-all duration-300`}
+      className={`group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md ${c.borderHover} transition-all duration-300`}
     >
-      <div className={`absolute top-0 right-0 w-20 h-20 bg-${color}/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
+      <div className={`absolute top-0 right-0 w-20 h-20 ${c.bg5} rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
       <div className="relative flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl bg-${color}/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-          <Icon className={`w-6 h-6 text-${color}`} />
+        <div className={`w-12 h-12 rounded-xl ${c.bg10} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+          <Icon className={`w-6 h-6 ${c.text}`} />
         </div>
         <div>
           <h4 className="text-slate-900 font-semibold">{title}</h4>
@@ -131,7 +144,7 @@ export default function AdminPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-purple"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-chaski-primary"></div>
       </div>
     )
   }
@@ -205,27 +218,27 @@ export default function AdminPage() {
                   label="Usuarios Totales"
                   value={stats.totalUsers}
                   icon={Users}
-                  color="brand-purple"
+                  color="coral"
                   trend="+12%"
                 />
                 <StatCard
                   label="Cursos Activos"
                   value={stats.totalCourses}
                   icon={BookOpen}
-                  color="brand-cyan"
+                  color="gold"
                   trend="+2"
                 />
                 <StatCard
                   label="Niveles Educativos"
                   value={stats.totalLevels}
                   icon={GraduationCap}
-                  color="brand-violet"
+                  color="slate"
                 />
                 <StatCard
                   label="Accesos Recientes"
                   value={stats.recentLogins}
                   icon={Activity}
-                  color="neon-green"
+                  color="green"
                 />
               </div>
 
@@ -233,14 +246,14 @@ export default function AdminPage() {
               <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                 <div className="p-5 border-b border-slate-200 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
-                      <Activity className="w-5 h-5 text-brand-purple" />
+                    <div className="w-10 h-10 bg-chaski-primary/10 rounded-xl flex items-center justify-center">
+                      <Activity className="w-5 h-5 text-chaski-primary" />
                     </div>
                     <h3 className="text-lg font-bold text-slate-900">Actividad Reciente</h3>
                   </div>
                   <button
                     onClick={() => setActiveTab('logs')}
-                    className="text-sm font-medium text-brand-purple hover:text-brand-violet transition-colors px-3 py-1.5 rounded-lg hover:bg-brand-purple/10"
+                    className="text-sm font-medium text-chaski-primary hover:text-chaski-secondary transition-colors px-3 py-1.5 rounded-lg hover:bg-chaski-primary/10"
                   >
                     Ver todo
                   </button>
@@ -256,9 +269,9 @@ export default function AdminPage() {
                             log.action === 'login' ? 'bg-green-500/10' : 'bg-red-500/10'
                           }`}>
                             {log.action === 'login' ? (
-                              <Unlock className="w-5 h-5 text-green-500" />
+                              <Unlock className="w-5 h-5 text-green-600" />
                             ) : (
-                              <Lock className="w-5 h-5 text-red-500" />
+                              <Lock className="w-5 h-5 text-red-600" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -283,27 +296,27 @@ export default function AdminPage() {
               {/* Quick Actions */}
               <div>
                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-brand-cyan" />
+                  <Zap className="w-5 h-5 text-chaski-primary" />
                   Herramientas de administración
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <QuickAction href="/admin/colegios" icon={GraduationCap} color="brand-violet" title="Colegios y Cursos" description="Asignar cursos a colegios" />
-                  <QuickAction href="/admin/cursos" icon={BookOpen} color="pink-500" title="Catálogo de Cursos" description="Cursos reutilizables" />
-                  <QuickAction href="/admin/calificar" icon={Award} color="amber-500" title="Calificar Entregas" description="Panel realtime de calificación" />
-                  <QuickAction href="/admin/lecciones" icon={BookOpen} color="brand-cyan" title="Lecciones" description="Editor con imágenes drag-drop" />
-                  <QuickAction href="/admin/kits" icon={Package} color="brand-purple" title="Gestionar Kits" description="Kits, imágenes, precios" />
-                  <QuickAction href="/admin/simuladores" icon={Monitor} color="cyan-500" title="Simuladores" description="Por nivel y programa" />
-                  <QuickAction href="/admin/academy" icon={GraduationCap} color="brand-purple" title="Academia" description="Cursos, módulos y lecciones (Python, Hacking, IA)" />
-                  <QuickAction href="/admin/gestion" icon={Settings} color="slate-500" title="Niveles y Programas" description="Niveles, programas, usuarios" />
-                  <QuickAction href="/admin/ia" icon={Brain} color="pink-500" title="IA y Hacking Ético" description="Actividades de IA por nivel" />
-                  <QuickAction href="/admin/proyectos" icon={Activity} color="brand-purple" title="Proyectos Avanzados" description="Jetson, Raspberry, Digispark" />
+                  <QuickAction href="/admin/colegios" icon={GraduationCap} color="coral" title="Colegios y Cursos" description="Asignar cursos a colegios" />
+                  <QuickAction href="/admin/cursos" icon={BookOpen} color="slate" title="Catálogo de Cursos" description="Cursos reutilizables" />
+                  <QuickAction href="/admin/calificar" icon={Award} color="gold" title="Calificar Entregas" description="Panel realtime de calificación" />
+                  <QuickAction href="/admin/lecciones" icon={BookOpen} color="coral" title="Lecciones" description="Editor con imágenes drag-drop" />
+                  <QuickAction href="/admin/kits" icon={Package} color="green" title="Gestionar Kits" description="Kits, imágenes, precios" />
+                  <QuickAction href="/admin/simuladores" icon={Monitor} color="coral" title="Simuladores" description="Por nivel y programa" />
+                  <QuickAction href="/admin/academy" icon={GraduationCap} color="gold" title="Academia" description="Cursos, módulos y lecciones (Python, Hacking, IA)" />
+                  <QuickAction href="/admin/gestion" icon={Settings} color="slate" title="Niveles y Programas" description="Niveles, programas, usuarios" />
+                  <QuickAction href="/admin/ia" icon={Brain} color="green" title="IA y Hacking Ético" description="Actividades de IA por nivel" />
+                  <QuickAction href="/admin/proyectos" icon={Activity} color="coral" title="Proyectos Avanzados" description="Jetson, Raspberry, Digispark" />
                   <button
                     onClick={() => setActiveTab('courses')}
-                    className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-brand-violet/50 hover:shadow-md transition-all"
+                    className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-chaski-primary/50 hover:shadow-md transition-all"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-brand-violet/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Plus className="w-6 h-6 text-brand-violet" />
+                      <div className="w-12 h-12 rounded-xl bg-chaski-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Plus className="w-6 h-6 text-chaski-primary" />
                       </div>
                       <div>
                         <h4 className="text-slate-900 font-semibold">Agregar Curso</h4>
@@ -313,11 +326,11 @@ export default function AdminPage() {
                   </button>
                   <button
                     onClick={() => setActiveTab('users')}
-                    className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-brand-violet/50 hover:shadow-md transition-all"
+                    className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-slate-400/50 hover:shadow-md transition-all"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-brand-violet/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Users className="w-6 h-6 text-brand-violet" />
+                      <div className="w-12 h-12 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Users className="w-6 h-6 text-slate-600" />
                       </div>
                       <div>
                         <h4 className="text-slate-900 font-semibold">Gestionar Usuarios</h4>
@@ -327,11 +340,11 @@ export default function AdminPage() {
                   </button>
                   <button
                     onClick={() => setActiveTab('settings')}
-                    className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-pink-500/50 hover:shadow-md transition-all"
+                    className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-slate-400/50 hover:shadow-md transition-all"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Settings className="w-6 h-6 text-pink-500" />
+                      <div className="w-12 h-12 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Settings className="w-6 h-6 text-slate-600" />
                       </div>
                       <div>
                         <h4 className="text-slate-900 font-semibold">Configuración</h4>
@@ -383,7 +396,7 @@ export default function AdminPage() {
                           {log.action === 'login' ? (
                             <Unlock className="w-5 h-5 text-green-600" />
                           ) : log.action === 'logout' ? (
-                            <Lock className="w-5 h-5 text-red-500" />
+                            <Lock className="w-5 h-5 text-red-600" />
                           ) : (
                             <Eye className="w-5 h-5 text-chaski-primary" />
                           )}
@@ -395,7 +408,7 @@ export default function AdminPage() {
                         <div className="text-right flex-shrink-0">
                           <p className={`text-sm font-medium ${
                             log.action === 'login' ? 'text-green-600' :
-                            log.action === 'logout' ? 'text-red-500' : 'text-chaski-primary'
+                            log.action === 'logout' ? 'text-red-600' : 'text-chaski-primary'
                           }`}>
                             {log.action === 'login' ? 'Inició sesión' :
                              log.action === 'logout' ? 'Cerró sesión' : 'Visitó página'}
@@ -467,7 +480,7 @@ export default function AdminPage() {
                         <p className="text-slate-900 font-medium">Profesor</p>
                         <p className="text-slate-500 text-sm">profesor@chaskibots.com</p>
                       </div>
-                      <code className="bg-brand-violet/10 px-3 py-1 rounded-lg text-brand-violet text-sm font-semibold">profe123</code>
+                      <code className="bg-hack-green/10 px-3 py-1 rounded-lg text-hack-green text-sm font-semibold">profe123</code>
                     </div>
                   </div>
                   <div className="p-4 bg-slate-50 rounded-xl">

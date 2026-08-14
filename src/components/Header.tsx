@@ -72,10 +72,10 @@ export default function Header() {
                     alt="ChaskiBots Logo"
                     width={38}
                     height={38}
-                    className="rounded-xl group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_2px_8px_rgba(124,58,237,0.3)]"
+                    className="rounded-xl group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_2px_8px_rgba(229,115,97,0.3)]"
                     priority
                   />
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-hack-green ring-2 ring-white animate-pulse" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-hack-green ring-2 ring-white/90 animate-pulse" />
                 </div>
                 <div className="hidden sm:flex flex-col">
                   <span className="font-bold text-lg text-white leading-tight">ChaskiBots</span>

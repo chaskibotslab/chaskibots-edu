@@ -39,6 +39,15 @@ interface Task {
 
 type Filter = 'pending' | 'graded' | 'all'
 
+type StatColor = 'amber' | 'green' | 'coral' | 'slate'
+
+const STAT_COLOR_STYLES: Record<StatColor, { bg: string; text: string }> = {
+  amber: { bg: 'bg-amber-500/10', text: 'text-amber-500' },
+  green: { bg: 'bg-green-500/10', text: 'text-green-500' },
+  coral: { bg: 'bg-chaski-primary/10', text: 'text-chaski-primary' },
+  slate: { bg: 'bg-slate-500/10', text: 'text-slate-500' },
+}
+
 const FILTERS: { id: Filter; label: string; icon: any }[] = [
   { id: 'pending', label: 'Pendientes', icon: Clock },
   { id: 'graded', label: 'Calificadas', icon: CheckCircle2 },
@@ -192,10 +201,10 @@ export default function CalificarPage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard icon={Clock} label="Pendientes" value={stats.pending} color="amber-500" />
-          <StatCard icon={CheckCircle2} label="Calificadas" value={stats.graded} color="green-500" />
-          <StatCard icon={Calendar} label="Hoy" value={stats.today} color="chaski-primary" />
-          <StatCard icon={FileText} label="Total" value={stats.total} color="brand-cyan" />
+          <StatCard icon={Clock} label="Pendientes" value={stats.pending} color="amber" />
+          <StatCard icon={CheckCircle2} label="Calificadas" value={stats.graded} color="green" />
+          <StatCard icon={Calendar} label="Hoy" value={stats.today} color="coral" />
+          <StatCard icon={FileText} label="Total" value={stats.total} color="slate" />
         </div>
 
         {/* Filters */}
@@ -284,11 +293,12 @@ export default function CalificarPage() {
   )
 }
 
-function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: number; color: string }) {
+function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: number; color: StatColor }) {
+  const styles = STAT_COLOR_STYLES[color]
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all duration-300">
-      <div className={`w-10 h-10 rounded-xl bg-${color}/10 flex items-center justify-center mb-2`}>
-        <Icon className={`w-5 h-5 text-${color}`} />
+      <div className={`w-10 h-10 rounded-xl ${styles.bg} flex items-center justify-center mb-2`}>
+        <Icon className={`w-5 h-5 ${styles.text}`} />
       </div>
       <p className="text-slate-500 text-xs font-medium">{label}</p>
       <p className="text-slate-900 text-2xl font-black">{value}</p>
@@ -320,7 +330,7 @@ function SubmissionRow({ submission, task, onClick, style }: { submission: Submi
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <p className="font-bold text-slate-900 truncate">{submission.studentName || 'Sin nombre'}</p>
             {isGraded && submission.grade != null && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-green-500/10 text-green-600 border border-green-500/20">
                 {submission.grade}/100
               </span>
             )}
@@ -334,7 +344,7 @@ function SubmissionRow({ submission, task, onClick, style }: { submission: Submi
               {timeAgo}
             </span>
             {hasAttachments && (
-              <span className="flex items-center gap-1 text-brand-cyan">
+              <span className="flex items-center gap-1 text-blue-500">
                 <ImageIcon className="w-3 h-3" />
                 {submission.attachmentUrls.length} archivo{submission.attachmentUrls.length > 1 ? 's' : ''}
               </span>
@@ -346,7 +356,7 @@ function SubmissionRow({ submission, task, onClick, style }: { submission: Submi
               </span>
             )}
             {!isGraded && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20">
                 <Clock className="w-3 h-3" />
                 Pendiente
               </span>

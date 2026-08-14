@@ -48,9 +48,9 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-slate-400">
               <li><Link href="/niveles" className="hover:text-chaski-primary transition-colors">Niveles Educativos</Link></li>
               <li><Link href="/robotica" className="hover:text-chaski-primary transition-colors">Robótica</Link></li>
-              <li><Link href="/ia" className="hover:text-brand-violet transition-colors">Inteligencia Artificial</Link></li>
-              <li><Link href="/hacking" className="hover:text-neon-green transition-colors">Hacking Ético</Link></li>
-              <li><Link href="/simuladores" className="hover:text-brand-cyan transition-colors">Simuladores</Link></li>
+              <li><Link href="/ia" className="hover:text-chaski-primary transition-colors">Inteligencia Artificial</Link></li>
+              <li><Link href="/hacking" className="hover:text-chaski-primary transition-colors">Hacking Ético</Link></li>
+              <li><Link href="/simuladores" className="hover:text-chaski-primary transition-colors">Simuladores</Link></li>
             </ul>
           </div>
 
@@ -72,9 +72,9 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-neon-green" />
+                <Phone className="w-4 h-4 text-hack-green" />
                 <a href="https://wa.me/593968653593" target="_blank" rel="noopener noreferrer"
-                   className="hover:text-neon-green transition-colors">
+                   className="hover:text-hack-green transition-colors">
                   0968653593
                 </a>
               </li>
@@ -84,7 +84,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center text-sm text-slate-500">
           <p>© {new Date().getFullYear()} ChaskiBots. Todos los derechos reservados.</p>
-          <p className="mt-1">Hecho con <span className="text-neon-pink">❤️</span> en Ecuador 🇪🇨</p>
+          <p className="mt-1">Hecho con <span className="text-chaski-primary">❤️</span> en Ecuador 🇪🇨</p>
         </div>
       </div>
     </footer>

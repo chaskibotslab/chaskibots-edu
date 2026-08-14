@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { Code, Copy, Check, Terminal, Lightbulb, BookOpen, Download, Loader2, Brain, Cog, ChevronDown, Hash, PlayCircle } from 'lucide-react'
-import MatrixRain from '@/components/MatrixRain'
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
@@ -184,9 +183,7 @@ export default function SimuladoresPage() {
         <div className="max-w-6xl mx-auto space-y-10">
 
           {/* Hero */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-chaski-dark via-slate-900 to-chaski-dark text-white p-8 text-center shadow-2xl animate-fade-in border border-white/5">
-            <MatrixRain count={10} className="opacity-20" />
-            <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(99,102,241,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.5) 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
+          <div className="relative overflow-hidden rounded-3xl bg-chaski-dark text-white p-8 text-center shadow-2xl animate-fade-in border border-white/5">
             <div className="absolute top-0 left-0 w-64 h-64 bg-chaski-primary/15 rounded-full blur-[100px]"></div>
             <div className="absolute bottom-0 right-0 w-56 h-56 bg-chaski-gold/10 rounded-full blur-[90px]"></div>
             <div className="relative z-10">
@@ -209,18 +206,18 @@ export default function SimuladoresPage() {
           <div className="animate-fade-in" style={{ animationDelay: '0.05s' }}>
             {/* Book header */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center border border-green-500/20">
-                <BookOpen className="w-7 h-7 text-green-400" />
+              <div className="w-14 h-14 bg-hack-green/10 rounded-2xl flex items-center justify-center border border-hack-green/20">
+                <BookOpen className="w-7 h-7 text-hack-green" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white">Libro de Python</h2>
                 <p className="text-slate-400 text-sm">
-                  6 capítulos · Desde cero · <span className="text-green-400 font-medium">Copia el código y pruébalo abajo</span>
+                  6 capítulos · Desde cero · <span className="text-hack-green font-medium">Copia el código y pruébalo abajo</span>
                 </p>
               </div>
               <div className="ml-auto hidden md:flex items-center gap-2 text-xs text-slate-500">
                 <div className="w-24 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full" style={{ width: '100%' }} />
+                  <div className="h-full bg-hack-green rounded-full" style={{ width: '100%' }} />
                 </div>
                 6/6 lecciones
               </div>
@@ -231,22 +228,22 @@ export default function SimuladoresPage() {
               {pythonChapters.map((ch, i) => {
                 const isOpen = openChapter === ch.id
                 return (
-                  <div key={ch.id} className={`rounded-xl border transition-all duration-300 overflow-hidden ${isOpen ? 'bg-white/[0.04] border-green-500/30 shadow-lg shadow-green-500/5' : 'bg-white/[0.02] border-white/10 hover:border-white/20'}`}>
+                  <div key={ch.id} className={`rounded-xl border transition-all duration-300 overflow-hidden ${isOpen ? 'bg-white/[0.04] border-hack-green/30 shadow-lg shadow-hack-green/5' : 'bg-white/[0.02] border-white/10 hover:border-white/20'}`}>
                     {/* Chapter header - clickable */}
                     <button
                       onClick={() => toggleChapter(ch.id)}
                       className="w-full flex items-center gap-4 px-5 py-4 text-left group"
                     >
-                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm transition-all shrink-0 ${isOpen ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-white/5 text-slate-500 border border-white/10 group-hover:text-white'}`}>
+                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm transition-all shrink-0 ${isOpen ? 'bg-hack-green/20 text-hack-green border border-hack-green/30' : 'bg-white/5 text-slate-500 border border-white/10 group-hover:text-white'}`}>
                         {ch.chapter}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className={`font-semibold text-sm transition-colors ${isOpen ? 'text-green-400' : 'text-white/80 group-hover:text-white'}`}>
+                        <h3 className={`font-semibold text-sm transition-colors ${isOpen ? 'text-hack-green' : 'text-white/80 group-hover:text-white'}`}>
                           {ch.title}
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5 truncate">{ch.description}</p>
                       </div>
-                      <ChevronDown className={`w-4 h-4 text-slate-500 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-green-400' : ''}`} />
+                      <ChevronDown className={`w-4 h-4 text-slate-500 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-hack-green' : ''}`} />
                     </button>
 
                     {/* Chapter content - collapsible */}
@@ -265,11 +262,11 @@ export default function SimuladoresPage() {
                             </div>
                             <button
                               onClick={() => copyCode(ch.code, ch.id)}
-                              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 hover:bg-green-500/15 border border-white/10 hover:border-green-500/30 text-xs text-slate-400 hover:text-green-400 transition-all active:scale-95"
+                              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 hover:bg-hack-green/15 border border-white/10 hover:border-hack-green/30 text-xs text-slate-400 hover:text-hack-green transition-all active:scale-95"
                               title="Copiar código"
                             >
                               {copiedCode === ch.id ? (
-                                <><Check className="w-3.5 h-3.5 text-green-400" /> Copiado</>
+                                <><Check className="w-3.5 h-3.5 text-hack-green" /> Copiado</>
                               ) : (
                                 <><Copy className="w-3.5 h-3.5" /> Copiar</>
                               )}
@@ -281,7 +278,7 @@ export default function SimuladoresPage() {
                           </pre>
                         </div>
                         <p className="text-xs text-slate-500 mt-3 flex items-center gap-1.5">
-                          <PlayCircle className="w-3.5 h-3.5 text-green-400" />
+                          <PlayCircle className="w-3.5 h-3.5 text-hack-green" />
                           Copia el código y ejecútalo en el IDE de abajo o en las pestañas de Trinket/Programiz
                         </p>
                       </div>
@@ -316,7 +313,7 @@ export default function SimuladoresPage() {
             </h2>
             <div className="grid md:grid-cols-4 gap-4">
               {[
-                { icon: Code, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20', title: 'Python', description: 'Variables, bucles, funciones. El lenguaje más usado en IA.' },
+                { icon: Code, color: 'text-hack-green', bg: 'bg-hack-green/10 border-hack-green/20', title: 'Python', description: 'Variables, bucles, funciones. El lenguaje más usado en IA.' },
                 { icon: Terminal, color: 'text-hack-green', bg: 'bg-hack-green/10 border-hack-green/20', title: 'MicroPython', description: 'Python para microcontroladores ESP32 y Raspberry Pi Pico.' },
                 { icon: Lightbulb, color: 'text-chaski-primary', bg: 'bg-chaski-primary/10 border-chaski-primary/20', title: 'Arduino/Electrónica', description: 'Circuitos, sensores y programación de hardware.' },
                 { icon: BookOpen, color: 'text-chaski-gold', bg: 'bg-chaski-gold/10 border-chaski-gold/20', title: 'CNC/Industrial', description: 'G-Code, robótica industrial y manufactura digital.' }
@@ -338,8 +335,8 @@ export default function SimuladoresPage() {
           {/* Python IDE Professional */}
           <div className="animate-fade-in" style={{ animationDelay: '0.15s' }}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl flex items-center justify-center border border-blue-500/20">
-                <Code className="w-6 h-6 text-blue-500" />
+              <div className="w-12 h-12 bg-hack-green/10 rounded-xl flex items-center justify-center border border-hack-green/20">
+                <Code className="w-6 h-6 text-hack-green" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Python IDE Professional</h2>
@@ -352,8 +349,8 @@ export default function SimuladoresPage() {
           {/* AI Lab */}
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center border border-purple-500/20">
-                <Brain className="w-6 h-6 text-purple-500" />
+              <div className="w-12 h-12 bg-chaski-gold/10 rounded-xl flex items-center justify-center border border-chaski-gold/20">
+                <Brain className="w-6 h-6 text-chaski-gold" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Laboratorio de IA Visual</h2>
@@ -366,8 +363,8 @@ export default function SimuladoresPage() {
           {/* CAD Lab 3D */}
           <div className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-cyan-500/20">
-                <Cog className="w-6 h-6 text-cyan-500" />
+              <div className="w-12 h-12 bg-chaski-primary/10 rounded-xl flex items-center justify-center border border-chaski-primary/20">
+                <Cog className="w-6 h-6 text-chaski-primary" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Laboratorio CAD 3D</h2>

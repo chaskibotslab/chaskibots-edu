@@ -30,12 +30,21 @@ interface Level {
   ageRange?: string
 }
 
-const PROGRAMS = [
-  { id: 'robotica', name: 'Robótica', color: 'bg-blue-500' },
-  { id: 'ia', name: 'Inteligencia Artificial', color: 'bg-purple-500' },
-  { id: 'hacking', name: 'Hacking / Ciberseguridad', color: 'bg-red-500' },
-  { id: 'diseno', name: 'Diseño 3D', color: 'bg-cyan-500' }
+type ProgramColorKey = 'coral' | 'gold' | 'green' | 'slate'
+
+const PROGRAMS: { id: string; name: string; color: ProgramColorKey }[] = [
+  { id: 'robotica', name: 'Robótica', color: 'coral' },
+  { id: 'ia', name: 'Inteligencia Artificial', color: 'gold' },
+  { id: 'hacking', name: 'Hacking / Ciberseguridad', color: 'green' },
+  { id: 'diseno', name: 'Diseño 3D', color: 'slate' }
 ]
+
+const PROGRAM_COLOR_STYLES: Record<ProgramColorKey, { active: string; chip: string }> = {
+  coral: { active: 'bg-chaski-primary/15 text-chaski-primary border-chaski-primary/30', chip: 'bg-chaski-primary/10 text-chaski-primary' },
+  gold: { active: 'bg-chaski-gold/15 text-chaski-gold border-chaski-gold/30', chip: 'bg-chaski-gold/10 text-chaski-gold' },
+  green: { active: 'bg-hack-green/15 text-hack-green border-hack-green/30', chip: 'bg-hack-green/10 text-hack-green' },
+  slate: { active: 'bg-slate-500/15 text-slate-700 border-slate-400/40', chip: 'bg-slate-500/10 text-slate-600' },
+}
 
 const CATEGORIES = [
   { id: 'bloques', name: 'Bloques' },
@@ -332,10 +341,10 @@ export default function SimuladoresAdminPage() {
               <button
                 key={prog.id}
                 onClick={() => setFilterProgram(prog.id)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all active:scale-[0.98] ${
+                className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${
                   filterProgram === prog.id
-                    ? `${prog.color} text-white`
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ? PROGRAM_COLOR_STYLES[prog.color].active
+                    : 'bg-slate-100 text-slate-700 border-transparent hover:bg-slate-200'
                 }`}
               >
                 {prog.name} ({simulators.filter(s => s.programs.includes(prog.id)).length})
@@ -411,10 +420,10 @@ export default function SimuladoresAdminPage() {
                     {PROGRAMS.map(prog => (
                       <span
                         key={prog.id}
-                        className={`px-2 py-0.5 rounded text-xs ${
+                        className={`px-2 py-0.5 rounded text-xs font-medium ${
                           simulator.programs.includes(prog.id)
-                            ? `${prog.color} text-white`
-                            : 'bg-slate-100 text-slate-500'
+                            ? PROGRAM_COLOR_STYLES[prog.color].chip
+                            : 'bg-slate-100 text-slate-400'
                         }`}
                       >
                         {prog.name.split(' ')[0]}
@@ -476,7 +485,7 @@ export default function SimuladoresAdminPage() {
               <h2 className="text-lg font-bold text-slate-900">
                 {isCreating ? 'Nuevo Simulador' : 'Editar Simulador'}
               </h2>
-              <button onClick={closeModal} className="text-slate-600 hover:text-slate-900">
+              <button onClick={closeModal} className="text-slate-600 hover:text-slate-900 active:scale-[0.98] transition-all">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -543,7 +552,7 @@ export default function SimuladoresAdminPage() {
                       key={opt.id}
                       type="button"
                       onClick={() => setFormData({ ...formData, icon: opt.id })}
-                      className={`p-2 rounded-lg border transition-all ${
+                      className={`p-2 rounded-lg border transition-all active:scale-[0.98] ${
                         formData.icon === opt.id
                           ? 'border-chaski-primary bg-chaski-primary/10 text-chaski-primary'
                           : 'border-slate-200 bg-slate-100 text-slate-600 hover:border-slate-300'
@@ -565,10 +574,10 @@ export default function SimuladoresAdminPage() {
                       key={prog.id}
                       type="button"
                       onClick={() => toggleProgram(prog.id)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all active:scale-[0.98] ${
+                      className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all active:scale-[0.98] ${
                         formData.programs.includes(prog.id)
-                          ? `${prog.color} text-white`
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          ? PROGRAM_COLOR_STYLES[prog.color].active
+                          : 'bg-slate-100 text-slate-600 border-transparent hover:bg-slate-200'
                       }`}
                     >
                       {formData.programs.includes(prog.id) && <Check className="w-3 h-3 inline mr-1" />}
@@ -627,10 +636,10 @@ export default function SimuladoresAdminPage() {
                       key={level.id}
                       type="button"
                       onClick={() => toggleLevel(level.id)}
-                      className={`px-2 py-1.5 rounded text-xs text-left transition-all ${
+                      className={`px-2 py-1.5 rounded text-xs text-left border transition-all active:scale-[0.98] ${
                         formData.levels.includes(level.id)
-                          ? 'bg-chaski-primary/20 text-chaski-primary border border-chaski-primary/50'
-                          : 'bg-slate-300 text-slate-600 hover:bg-slate-400'
+                          ? 'bg-chaski-primary/20 text-chaski-primary border-chaski-primary/50'
+                          : 'bg-white text-slate-600 border-slate-200 hover:border-chaski-primary/30 hover:bg-slate-50'
                       }`}
                     >
                       {formData.levels.includes(level.id) && <Check className="w-3 h-3 inline mr-1" />}
@@ -645,7 +654,7 @@ export default function SimuladoresAdminPage() {
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, enabled: !formData.enabled })}
-                  className={`w-12 h-6 rounded-full transition-all ${formData.enabled ? 'bg-chaski-primary' : 'bg-slate-300'}`}
+                  className={`w-12 h-6 rounded-full transition-all active:scale-[0.97] ${formData.enabled ? 'bg-chaski-primary' : 'bg-slate-300'}`}
                 >
                   <div className={`w-5 h-5 rounded-full bg-white transition-all ${formData.enabled ? 'ml-6' : 'ml-0.5'}`} />
                 </button>

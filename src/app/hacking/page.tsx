@@ -7,7 +7,14 @@ import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
 import { isProgramAvailable, minGradeLabel } from '@/lib/programGating'
 import { Shield, Lock, Eye, Key, ArrowRight, Sparkles, AlertTriangle } from 'lucide-react'
-import MatrixRain from '@/components/MatrixRain'
+
+type ColorKey = 'green' | 'slate' | 'coral'
+
+const COLOR_STYLES: Record<ColorKey, { bg: string; text: string }> = {
+  green: { bg: 'bg-hack-green/10', text: 'text-hack-green' },
+  slate: { bg: 'bg-slate-400/10', text: 'text-slate-500' },
+  coral: { bg: 'bg-chaski-primary/10', text: 'text-chaski-primary' },
+}
 
 interface Level {
   id: string
@@ -111,10 +118,10 @@ export default function HackingPage() {
 
   const isUnlocked = isAdmin || isProgramAvailable('hacking', myGrade)
 
-const FEATURES = [
-  { icon: Lock, color: 'neon-green', title: 'Seguridad', description: 'Contraseñas y privacidad' },
-  { icon: Eye, color: 'brand-purple', title: 'Análisis', description: 'Vulnerabilidades' },
-  { icon: Key, color: 'brand-violet', title: 'Criptografía', description: 'Cifrado de datos' }
+const FEATURES: { icon: React.ComponentType<{ className?: string }>; color: ColorKey; title: string; description: string }[] = [
+  { icon: Lock, color: 'green', title: 'Seguridad', description: 'Contraseñas y privacidad' },
+  { icon: Eye, color: 'slate', title: 'Análisis', description: 'Vulnerabilidades' },
+  { icon: Key, color: 'coral', title: 'Criptografía', description: 'Cifrado de datos' }
 ]
 
 const TOOLS = ['CrypTool', 'Wireshark', 'Nmap', 'OWASP', 'Kali Linux', 'HackTheBox']
@@ -127,18 +134,16 @@ const TOOLS = ['CrypTool', 'Wireshark', 'Nmap', 'OWASP', 'Kali Linux', 'HackTheB
         <div className="max-w-5xl mx-auto space-y-8">
 
           {/* Hero */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8 text-center shadow-2xl animate-fade-in">
-            <MatrixRain count={10} className="opacity-30" />
-            <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(57,255,20,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.5) 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
-            <div className="absolute top-0 left-0 w-64 h-64 bg-green-500/20 rounded-full blur-[100px]"></div>
+          <div className="relative overflow-hidden rounded-3xl bg-chaski-dark text-white p-8 text-center shadow-2xl animate-fade-in">
+            <div className="absolute top-0 left-0 w-64 h-64 bg-hack-green/20 rounded-full blur-[100px]"></div>
             <div className="absolute bottom-0 right-0 w-56 h-56 bg-chaski-gold/15 rounded-full blur-[90px]"></div>
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-4 animate-slide-up">
-                <span className="w-1.5 h-1.5 rounded-full bg-chaski-gold animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-hack-green animate-pulse" />
                 <span className="text-white/90 text-xs font-semibold tracking-wide">Ciberseguridad responsable</span>
               </div>
               <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20 animate-scale-in">
-                <Shield className="w-8 h-8 text-green-400" />
+                <Shield className="w-8 h-8 text-hack-green" />
               </div>
               <h1 className="text-3xl md:text-4xl font-black mb-2 animate-slide-up" style={{ animationDelay: '0.05s' }}>Hacking Ético</h1>
               <p className="text-white/70 max-w-lg mx-auto animate-slide-up" style={{ animationDelay: '0.1s' }}>
@@ -153,8 +158,8 @@ const TOOLS = ['CrypTool', 'Wireshark', 'Nmap', 'OWASP', 'Kali Linux', 'HackTheB
               const Icon = feature.icon
               return (
                 <div key={feature.title} className="group bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 transition-all duration-300 text-center animate-scale-in" style={{ animationDelay: `${i * 0.05}s` }}>
-                  <div className={`w-12 h-12 bg-${feature.color}/10 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
-                    <Icon className={`w-6 h-6 text-${feature.color}`} />
+                  <div className={`w-12 h-12 ${COLOR_STYLES[feature.color].bg} rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                    <Icon className={`w-6 h-6 ${COLOR_STYLES[feature.color].text}`} />
                   </div>
                   <h3 className="font-semibold text-slate-900 mb-1">{feature.title}</h3>
                   <p className="text-slate-500 text-sm">{feature.description}</p>
@@ -194,14 +199,14 @@ const TOOLS = ['CrypTool', 'Wireshark', 'Nmap', 'OWASP', 'Kali Linux', 'HackTheB
                   <Link
                     key={level.id}
                     href={`/nivel/${level.id}?area=hacking`}
-                    className="group flex items-center justify-between rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:border-green-500/50 hover:shadow-md active:scale-[0.98] transition-all animate-scale-in"
+                    className="group flex items-center justify-between rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:border-hack-green/50 hover:shadow-md active:scale-[0.98] transition-all animate-scale-in"
                     style={{ animationDelay: `${i * 0.05}s` }}
                   >
                     <div>
                       <h3 className="font-semibold text-slate-900 text-sm mb-0.5">{level.name}</h3>
                       <p className="text-slate-500 text-xs">{level.ageRange}</p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-green-500 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-hack-green group-hover:translate-x-1 transition-all" />
                   </Link>
                 ))}
               </div>
@@ -213,7 +218,7 @@ const TOOLS = ['CrypTool', 'Wireshark', 'Nmap', 'OWASP', 'Kali Linux', 'HackTheB
             <h3 className="font-bold text-slate-900 mb-4 text-center">Herramientas</h3>
             <div className="flex flex-wrap justify-center gap-2">
               {TOOLS.map((tool) => (
-                <span key={tool} className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-sm border border-slate-200 hover:border-green-500/30 hover:text-green-600 transition-colors cursor-default">
+                <span key={tool} className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-sm border border-slate-200 hover:border-hack-green/30 hover:text-hack-green transition-colors cursor-default">
                   {tool}
                 </span>
               ))}

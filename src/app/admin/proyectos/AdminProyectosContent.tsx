@@ -25,18 +25,35 @@ interface Project {
   resources: string
 }
 
-const CATEGORIES = [
-  { value: 'ia', label: 'Inteligencia Artificial', icon: Brain, color: 'neon-pink' },
-  { value: 'hacking', label: 'Hacking Etico', icon: Shield, color: 'brand-cyan' },
-  { value: 'iot', label: 'IoT / Domotica', icon: Wifi, color: 'brand-purple' },
-  { value: 'robotics', label: 'Robotica', icon: Cpu, color: 'brand-violet' },
+type AccentKey = 'coral' | 'gold' | 'green' | 'slate'
+
+// Clases completas y literales (Tailwind JIT no compila strings armados en runtime)
+const ACCENT_STYLES: Record<AccentKey, { sectionBg: string; icon: string }> = {
+  coral: { sectionBg: 'bg-chaski-primary/10', icon: 'text-chaski-primary' },
+  gold: { sectionBg: 'bg-chaski-gold/10', icon: 'text-chaski-gold' },
+  green: { sectionBg: 'bg-hack-green/10', icon: 'text-hack-green' },
+  slate: { sectionBg: 'bg-slate-100', icon: 'text-slate-500' },
+}
+
+const CATEGORIES: { value: Project['category']; label: string; icon: typeof Brain; accent: AccentKey }[] = [
+  { value: 'ia', label: 'Inteligencia Artificial', icon: Brain, accent: 'coral' },
+  { value: 'hacking', label: 'Hacking Etico', icon: Shield, accent: 'slate' },
+  { value: 'iot', label: 'IoT / Domotica', icon: Wifi, accent: 'gold' },
+  { value: 'robotics', label: 'Robotica', icon: Cpu, accent: 'green' },
 ]
 
+const DIFFICULTY_STYLES: Record<Project['difficulty'], string> = {
+  facil: 'bg-green-500/10 text-green-600',
+  medio: 'bg-amber-500/10 text-amber-600',
+  avanzado: 'bg-orange-500/10 text-orange-600',
+  experto: 'bg-red-500/10 text-red-600',
+}
+
 const DIFFICULTY_LEVELS = [
-  { value: 'facil', label: 'Facil', color: 'green' },
-  { value: 'medio', label: 'Medio', color: 'yellow' },
-  { value: 'avanzado', label: 'Avanzado', color: 'orange' },
-  { value: 'experto', label: 'Experto', color: 'red' },
+  { value: 'facil', label: 'Facil' },
+  { value: 'medio', label: 'Medio' },
+  { value: 'avanzado', label: 'Avanzado' },
+  { value: 'experto', label: 'Experto' },
 ]
 
 export default function AdminProyectosContent() {
@@ -184,9 +201,8 @@ export default function AdminProyectosContent() {
     return CATEGORIES.find(c => c.value === category) || CATEGORIES[0]
   }
 
-  const getDifficultyColor = (difficulty: string) => {
-    const diff = DIFFICULTY_LEVELS.find(d => d.value === difficulty)
-    return diff?.color || 'slate'
+  const getDifficultyStyle = (difficulty: string) => {
+    return DIFFICULTY_STYLES[difficulty as Project['difficulty']] || 'bg-slate-500/10 text-slate-600'
   }
 
   if (isLoading || !isAdmin) {
@@ -279,13 +295,13 @@ export default function AdminProyectosContent() {
                   className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 transition-all duration-300 overflow-hidden animate-scale-in"
                   style={{ animationDelay: `${idx * 0.05}s` }}
                 >
-                  <div className={'px-4 py-3 border-b border-slate-200 bg-' + catInfo.color + '/10'}>
+                  <div className={`px-4 py-3 border-b border-slate-200 ${ACCENT_STYLES[catInfo.accent].sectionBg}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <CatIcon className={'w-5 h-5 text-' + catInfo.color + ' group-hover:scale-110 transition-transform'} />
+                        <CatIcon className={`w-5 h-5 group-hover:scale-110 transition-transform ${ACCENT_STYLES[catInfo.accent].icon}`} />
                         <span className="text-sm text-slate-600">{catInfo.label}</span>
                       </div>
-                      <span className={'text-xs px-2 py-1 rounded-full bg-' + getDifficultyColor(project.difficulty) + '-500/10 text-' + getDifficultyColor(project.difficulty) + '-600'}>
+                      <span className={`text-xs px-2 py-1 rounded-full ${getDifficultyStyle(project.difficulty)}`}>
                         {project.difficulty}
                       </span>
                     </div>

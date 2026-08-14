@@ -120,6 +120,17 @@ entre cada una sin dejar el sitio en un estado visualmente mixto por mucho tiemp
 
 Cada fase toca solo `className`/JSX, sin agregar dependencias ni cambiar `fetch`/estado/props.
 
+## Hallazgos durante la ejecución
+
+Varias páginas armaban clases Tailwind por interpolación de variable en runtime (p. ej.
+`` `bg-${color}/10` ``, `` `text-${program.color}-400` ``). Tailwind JIT solo genera CSS para clases
+que aparecen completas como texto literal en el archivo fuente; estos patrones nunca compilaban y
+dejaban el elemento sin color en producción — bugs preexistentes, no introducidos por este
+rebranding. Se corrigieron en cada archivo donde aparecieron (`dashboard/page.tsx`, `tareas/page.tsx`,
+`LessonViewerModern.tsx`, entre otros) reemplazándolos por objetos de lookup estático con strings de
+clase completos y literales. Se recomienda tenerlo presente si aparecen más casos en fases futuras o
+en código nuevo.
+
 ## Testing
 
 No hay tests automatizados de estilos visuales. Verificación por fase: `tsc --noEmit` (tipado no se

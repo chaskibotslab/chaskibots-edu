@@ -255,7 +255,7 @@ export default function LessonPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+      <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-chaski-primary" />
@@ -266,7 +266,7 @@ export default function LessonPage() {
 
   if (!lesson) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+      <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <div className="flex-1 flex items-center justify-center flex-col gap-4">
           <p className="text-slate-500">Lección no encontrada</p>
@@ -318,7 +318,7 @@ export default function LessonPage() {
   if (lesson.activity_type) {
     const challenge = lesson.challenges?.[0]
     return (
-      <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+      <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <main className="flex-1 py-4 px-4">
           <div className="max-w-5xl mx-auto animate-fade-in">
@@ -366,7 +366,7 @@ export default function LessonPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1 py-4 px-4">
         <div className="max-w-6xl mx-auto animate-fade-in">

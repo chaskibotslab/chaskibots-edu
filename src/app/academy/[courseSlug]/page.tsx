@@ -93,7 +93,7 @@ export default function CoursePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+      <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-chaski-primary" />
@@ -104,7 +104,7 @@ export default function CoursePage() {
 
   if (!course) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+      <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <div className="flex-1 flex items-center justify-center">
           <p className="text-slate-500">Curso no encontrado</p>
@@ -114,7 +114,7 @@ export default function CoursePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1 py-6 px-4">
         <div className="max-w-4xl mx-auto animate-fade-in">

@@ -45,10 +45,10 @@ export default function GestionPage() {
   }
 
   const tabs = [
-    { id: 'levels' as GestionTab, label: 'Niveles', icon: GraduationCap, color: 'brand-purple' },
-    { id: 'programs' as GestionTab, label: 'Programas', icon: FolderOpen, color: 'brand-violet' },
-    { id: 'users' as GestionTab, label: 'Usuarios', icon: Users, color: 'neon-green' },
-    { id: 'assignments' as GestionTab, label: 'Asignaciones', icon: BookOpen, color: 'brand-cyan' }
+    { id: 'levels' as GestionTab, label: 'Niveles', icon: GraduationCap },
+    { id: 'programs' as GestionTab, label: 'Programas', icon: FolderOpen },
+    { id: 'users' as GestionTab, label: 'Usuarios', icon: Users },
+    { id: 'assignments' as GestionTab, label: 'Asignaciones', icon: BookOpen }
   ]
 
   return (
@@ -57,12 +57,12 @@ export default function GestionPage() {
       <aside className="w-64 bg-slate-50 border-r border-slate-200 flex flex-col">
         <div className="p-4 border-b border-slate-200">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-brand-purple to-brand-violet rounded-lg flex items-center justify-center">
-              <Shield className="w-6 h-6 text-slate-900" />
+            <div className="w-10 h-10 bg-gradient-to-br from-chaski-primary to-chaski-accent rounded-lg flex items-center justify-center">
+              <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
               <h1 className="text-slate-900 font-bold">ChaskiBots</h1>
-              <p className="text-xs text-brand-purple">Gestión Admin</p>
+              <p className="text-xs text-chaski-primary">Gestión Admin</p>
             </div>
           </Link>
         </div>
@@ -84,9 +84,9 @@ export default function GestionPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all active:scale-[0.98] ${
                 activeTab === tab.id
-                  ? `bg-${tab.color}/20 text-${tab.color} border border-${tab.color}/30`
+                  ? 'bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
@@ -98,8 +98,8 @@ export default function GestionPage() {
 
         <div className="p-4 border-t border-slate-200">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-brand-violet to-neon-pink rounded-full flex items-center justify-center">
-              <span className="text-slate-900 font-bold">{user?.name?.charAt(0) || 'A'}</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-chaski-primary to-chaski-accent rounded-full flex items-center justify-center">
+              <span className="text-white font-bold">{user?.name?.charAt(0) || 'A'}</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-slate-900 text-sm font-medium truncate">{user?.name}</p>

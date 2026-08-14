@@ -13,13 +13,21 @@ import {
   Cpu, Loader2, Sparkles, Trophy, Zap, Target, Crown, ClipboardList
 } from 'lucide-react'
 import BadgesDisplay from '@/components/BadgesDisplay'
-import MatrixRain from '@/components/MatrixRain'
+
+type ColorKey = 'coral' | 'gold' | 'green' | 'slate'
+
+const COLOR_STYLES: Record<ColorKey, { bg: string; border: string; borderHover: string; text: string; textGroupHover: string; glow: string }> = {
+  coral: { bg: 'bg-chaski-primary/10', border: 'border-chaski-primary/20', borderHover: 'hover:border-chaski-primary/40', text: 'text-chaski-primary', textGroupHover: 'group-hover:text-chaski-primary', glow: 'hover:shadow-chaski-primary/10' },
+  gold: { bg: 'bg-chaski-gold/10', border: 'border-chaski-gold/20', borderHover: 'hover:border-chaski-gold/40', text: 'text-chaski-gold', textGroupHover: 'group-hover:text-chaski-gold', glow: 'hover:shadow-chaski-gold/10' },
+  green: { bg: 'bg-hack-green/10', border: 'border-hack-green/20', borderHover: 'hover:border-hack-green/40', text: 'text-hack-green', textGroupHover: 'group-hover:text-hack-green', glow: 'hover:shadow-hack-green/10' },
+  slate: { bg: 'bg-slate-400/10', border: 'border-slate-400/20', borderHover: 'hover:border-slate-400/40', text: 'text-slate-300', textGroupHover: 'group-hover:text-slate-300', glow: 'hover:shadow-slate-400/10' },
+}
 
 type Action = {
   id: string
   href: (levelId?: string) => string
   icon: React.ComponentType<{ className?: string }>
-  color: string
+  color: ColorKey
   title: string
   description: (levelName: string) => string
 }
@@ -29,7 +37,7 @@ const QUICK_ACTIONS: Action[] = [
     id: 'continue',
     href: (levelId) => `/nivel/${levelId}`,
     icon: Play,
-    color: 'chaski-primary',
+    color: 'coral',
     title: 'Continuar',
     description: (levelName) => levelName
   },
@@ -37,7 +45,7 @@ const QUICK_ACTIONS: Action[] = [
     id: 'tareas',
     href: () => '/tareas',
     icon: ClipboardList,
-    color: 'brand-cyan',
+    color: 'slate',
     title: 'Mis Tareas',
     description: () => 'Entregar y ver calificaciones'
   },
@@ -45,7 +53,7 @@ const QUICK_ACTIONS: Action[] = [
     id: 'simulators',
     href: () => '/simuladores',
     icon: Cpu,
-    color: 'chaski-accent',
+    color: 'gold',
     title: 'Simuladores',
     description: () => 'Laboratorio virtual'
   },
@@ -53,16 +61,16 @@ const QUICK_ACTIONS: Action[] = [
     id: 'levels',
     href: () => '/niveles',
     icon: BookOpen,
-    color: 'neon-green',
+    color: 'green',
     title: 'Niveles',
     description: () => 'Ver todos los cursos'
   }
 ]
 
-const STUDY_AREAS = [
-  { id: 'robotica', href: '/robotica', icon: Bot, color: 'chaski-primary', title: 'Robótica', description: 'Programación y electrónica' },
-  { id: 'ia', href: '/ia', icon: Brain, color: 'chaski-accent', title: 'Inteligencia Artificial', description: 'Machine learning' },
-  { id: 'hacking', href: '/hacking', icon: Shield, color: 'neon-green', title: 'Hacking Ético', description: 'Ciberseguridad' }
+const STUDY_AREAS: { id: string; href: string; icon: React.ComponentType<{ className?: string }>; color: ColorKey; title: string; description: string }[] = [
+  { id: 'robotica', href: '/robotica', icon: Bot, color: 'coral', title: 'Robótica', description: 'Programación y electrónica' },
+  { id: 'ia', href: '/ia', icon: Brain, color: 'gold', title: 'Inteligencia Artificial', description: 'Machine learning' },
+  { id: 'hacking', href: '/hacking', icon: Shield, color: 'green', title: 'Hacking Ético', description: 'Ciberseguridad' }
 ]
 
 export default function DashboardPage() {
@@ -83,7 +91,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-chaski-dark flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-hack-green animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
   }
@@ -103,11 +111,9 @@ export default function DashboardPage() {
         <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
 
           {/* Hero Welcome */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 sm:p-8 shadow-2xl">
-            <MatrixRain count={10} className="opacity-30" />
-            <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(57,255,20,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.5) 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
-            <div className="absolute top-0 right-0 w-64 h-64 bg-chaski-primary/20 rounded-full blur-[100px]"></div>
-            <div className="absolute bottom-0 left-0 w-56 h-56 bg-brand-cyan/15 rounded-full blur-[90px]"></div>
+          <div className="relative overflow-hidden rounded-3xl bg-chaski-dark text-white p-6 sm:p-8 shadow-xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-chaski-primary/25 rounded-full blur-[100px]"></div>
+            <div className="absolute bottom-0 left-0 w-56 h-56 bg-chaski-secondary/15 rounded-full blur-[90px]"></div>
             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="flex items-center gap-5">
                 <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-4 border-white/20 shadow-lg">
@@ -116,14 +122,14 @@ export default function DashboardPage() {
                 <div>
                   <p className="text-white/70 text-sm font-medium mb-1">Bienvenido de vuelta</p>
                   <h1 className="text-2xl sm:text-3xl font-black tracking-tight">{user?.name}</h1>
-                  <p className="text-brand-cyan text-sm font-medium flex items-center gap-1 mt-1">
+                  <p className="text-chaski-primary text-sm font-medium flex items-center gap-1 mt-1">
                     <Sparkles className="w-4 h-4" />
                     {currentLevel.name}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-white/10 backdrop-blur rounded-2xl p-4 border border-white/10">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-chaski-primary to-chaski-accent flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-chaski-primary flex items-center justify-center">
                   <Trophy className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -137,7 +143,7 @@ export default function DashboardPage() {
             <div className="relative z-10 mt-6">
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-brand-cyan to-chaski-primary rounded-full transition-all duration-1000"
+                  className="h-full bg-chaski-primary rounded-full transition-all duration-1000"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -147,27 +153,28 @@ export default function DashboardPage() {
           {/* Quick Actions */}
           <div>
             <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-hack-green" />
+              <Zap className="w-5 h-5 text-chaski-primary" />
               Accesos rápidos
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {QUICK_ACTIONS.map((action, idx) => {
                 const Icon = action.icon
                 const href = action.href(currentLevel.id)
+                const c = COLOR_STYLES[action.color]
                 return (
                   <Link
                     key={action.id}
                     href={href}
-                    className={`group relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 p-5 hover:shadow-xl hover:shadow-${action.color}/10 hover:border-${action.color}/40 transition-all duration-300 active:scale-[0.98] animate-slide-up`}
+                    className={`group relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 p-5 hover:shadow-xl ${c.glow} ${c.borderHover} transition-all duration-300 active:scale-[0.98] animate-slide-up`}
                     style={{ animationDelay: `${idx * 0.05}s` }}
                   >
-                    <div className={`absolute top-0 right-0 w-24 h-24 bg-${action.color}/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
-                    <div className={`relative w-12 h-12 rounded-xl bg-${action.color}/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-${action.color}/20`}>
-                      <Icon className={`w-6 h-6 text-${action.color}`} />
+                    <div className={`absolute top-0 right-0 w-24 h-24 ${c.bg} rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
+                    <div className={`relative w-12 h-12 rounded-xl ${c.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border ${c.border}`}>
+                      <Icon className={`w-6 h-6 ${c.text}`} />
                     </div>
                     <h3 className="font-semibold text-white mb-1">{action.title}</h3>
                     <p className="text-sm text-slate-500 mb-3">{action.description(currentLevel.name)}</p>
-                    <span className={`text-sm font-medium text-${action.color} flex items-center gap-2 group-hover:gap-3 transition-all`}>
+                    <span className={`text-sm font-medium ${c.text} flex items-center gap-2 group-hover:gap-3 transition-all`}>
                       {action.id === 'continue' ? 'Ir al curso' : action.id === 'simulators' ? 'Explorar' : 'Ver más'}
                       <ArrowRight className="w-4 h-4" />
                     </span>
@@ -180,27 +187,28 @@ export default function DashboardPage() {
           {/* Study Areas */}
           <div>
             <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <Target className="w-5 h-5 text-brand-cyan" />
+              <Target className="w-5 h-5 text-chaski-primary" />
               Áreas de estudio
             </h2>
             <div className="grid sm:grid-cols-3 gap-4">
               {STUDY_AREAS.map((area, idx) => {
                 const Icon = area.icon
+                const c = COLOR_STYLES[area.color]
                 return (
                   <Link
                     key={area.id}
                     href={area.href}
-                    className={`group flex items-center gap-4 rounded-2xl bg-white/[0.03] border border-white/10 p-5 hover:shadow-lg hover:border-${area.color}/40 transition-all duration-300 active:scale-[0.98] animate-slide-up`}
+                    className={`group flex items-center gap-4 rounded-2xl bg-white/[0.03] border border-white/10 p-5 hover:shadow-lg ${c.borderHover} transition-all duration-300 active:scale-[0.98] animate-slide-up`}
                     style={{ animationDelay: `${idx * 0.05}s` }}
                   >
-                    <div className={`w-14 h-14 rounded-xl bg-${area.color}/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform border border-${area.color}/20`}>
-                      <Icon className={`w-7 h-7 text-${area.color}`} />
+                    <div className={`w-14 h-14 rounded-xl ${c.bg} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform border ${c.border}`}>
+                      <Icon className={`w-7 h-7 ${c.text}`} />
                     </div>
                     <div>
                       <h3 className="font-semibold text-white">{area.title}</h3>
                       <p className="text-sm text-slate-500">{area.description}</p>
                     </div>
-                    <ArrowRight className={`w-5 h-5 text-slate-600 group-hover:text-${area.color} ml-auto transition-colors`} />
+                    <ArrowRight className={`w-5 h-5 text-slate-600 ${c.textGroupHover} ml-auto transition-colors`} />
                   </Link>
                 )
               })}
@@ -215,9 +223,9 @@ export default function DashboardPage() {
           />
 
           {/* Motivational footer card */}
-          <div className="rounded-2xl bg-gradient-to-r from-chaski-primary/10 to-hack-green/10 border border-hack-green/20 p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/5 border border-hack-green/20 flex items-center justify-center">
-              <Crown className="w-6 h-6 text-hack-green" />
+          <div className="rounded-2xl bg-chaski-primary/10 border border-chaski-primary/20 p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-white/5 border border-chaski-primary/20 flex items-center justify-center">
+              <Crown className="w-6 h-6 text-chaski-primary" />
             </div>
             <div>
               <h3 className="font-semibold text-white">Sigue aprendiendo</h3>

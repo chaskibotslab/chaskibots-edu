@@ -40,28 +40,43 @@ interface LessonViewerModernProps {
 
 const programConfig = {
   robotica: {
-    color: 'cyan',
-    gradient: 'from-cyan-500 to-blue-600',
-    lightGradient: 'from-cyan-500/20 to-blue-600/20',
     icon: Bot,
     name: 'Robótica',
-    accent: '#00d4ff'
+    accent: '#E57361',
+    gradient: 'from-chaski-primary to-chaski-secondary',
+    lightGradient: 'from-chaski-primary/20 to-chaski-secondary/20',
+    text: 'text-chaski-primary',
+    border: 'border-chaski-primary',
+    border30: 'border-chaski-primary/30',
+    bg: 'bg-chaski-primary',
+    bgHover: 'hover:bg-chaski-secondary',
+    bg20: 'bg-chaski-primary/20',
   },
   ia: {
-    color: 'purple',
-    gradient: 'from-purple-500 to-pink-600',
-    lightGradient: 'from-purple-500/20 to-pink-600/20',
     icon: Brain,
     name: 'Inteligencia Artificial',
-    accent: '#a855f7'
+    accent: '#F59E0B',
+    gradient: 'from-chaski-gold to-amber-400',
+    lightGradient: 'from-chaski-gold/20 to-amber-400/20',
+    text: 'text-chaski-gold',
+    border: 'border-chaski-gold',
+    border30: 'border-chaski-gold/30',
+    bg: 'bg-chaski-gold',
+    bgHover: 'hover:bg-amber-400',
+    bg20: 'bg-chaski-gold/20',
   },
   hacking: {
-    color: 'emerald',
-    gradient: 'from-emerald-500 to-teal-600',
-    lightGradient: 'from-emerald-500/20 to-teal-600/20',
     icon: Shield,
     name: 'Ciberseguridad',
-    accent: '#10b981'
+    accent: '#22C55E',
+    gradient: 'from-hack-green to-emerald-400',
+    lightGradient: 'from-hack-green/20 to-emerald-400/20',
+    text: 'text-hack-green',
+    border: 'border-hack-green',
+    border30: 'border-hack-green/30',
+    bg: 'bg-hack-green',
+    bgHover: 'hover:bg-emerald-400',
+    bg20: 'bg-hack-green/20',
   }
 }
 
@@ -84,8 +99,8 @@ function PracticeSimulators() {
             onClick={() => setActive(sim)}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
               active.id === sim.id
-                ? 'bg-brand-purple text-white shadow-md'
-                : 'bg-white text-slate-600 border border-slate-200 hover:border-brand-purple/40'
+                ? 'bg-chaski-primary text-white shadow-md'
+                : 'bg-white text-slate-600 border border-slate-200 hover:border-chaski-primary/40'
             }`}
           >
             <Code className="w-3.5 h-3.5" />
@@ -96,7 +111,7 @@ function PracticeSimulators() {
           href={active.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-auto flex items-center gap-1.5 px-3 py-2 text-xs text-slate-400 border border-slate-200 rounded-xl hover:text-brand-purple hover:border-brand-purple/40 transition-all whitespace-nowrap"
+          className="ml-auto flex items-center gap-1.5 px-3 py-2 text-xs text-slate-400 border border-slate-200 rounded-xl hover:text-chaski-primary hover:border-chaski-primary/40 transition-all whitespace-nowrap"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           Pantalla completa
@@ -156,8 +171,8 @@ export default function LessonViewerModern({
       .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold text-gray-900 mt-6 mb-4">$1</h1>')
       .replace(/\*\*(.+?)\*\*/g, '<strong class="text-gray-900 font-semibold">$1</strong>')
       .replace(/\*(.+?)\*/g, '<em class="text-gray-600 italic">$1</em>')
-      .replace(/^- (.+)$/gm, '<li class="flex items-start gap-2 text-gray-700 ml-4"><span class="text-' + program.color + '-500 mt-1">•</span><span>$1</span></li>')
-      .replace(/^\d+\. (.+)$/gm, '<li class="flex items-start gap-3 text-gray-700 ml-4 mb-2"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-' + program.color + '-500/20 text-' + program.color + '-600 text-sm flex items-center justify-center font-medium">$1</span></li>')
+      .replace(/^- (.+)$/gm, '<li class="flex items-start gap-2 text-gray-700 ml-4"><span class="' + program.text + ' mt-1">•</span><span>$1</span></li>')
+      .replace(/^\d+\. (.+)$/gm, '<li class="flex items-start gap-3 text-gray-700 ml-4 mb-2"><span class="flex-shrink-0 w-6 h-6 rounded-full ' + program.bg20 + ' ' + program.text + ' text-sm flex items-center justify-center font-medium">$1</span></li>')
       .replace(/\n\n/g, '</p><p class="text-gray-700 leading-relaxed mb-3">')
       .replace(/\n/g, '<br/>')
   }
@@ -217,7 +232,7 @@ export default function LessonViewerModern({
   return (
     <div className="fixed inset-0 z-50 bg-gray-50/95 backdrop-blur-sm overflow-hidden">
       {/* Header con progreso estilo Duolingo */}
-      <div className="bg-white border-b border-dark-700">
+      <div className="bg-white border-b border-border-soft">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Botón cerrar */}
@@ -264,7 +279,7 @@ export default function LessonViewerModern({
         {/* Panel izquierdo - Video/Contenido principal */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Tabs de navegación */}
-          <div className="bg-gray-50 border-b border-dark-700 px-4">
+          <div className="bg-gray-50 border-b border-border-soft px-4">
             <div className="flex gap-1">
               {[
                 { id: 'video', label: 'Video', icon: Play },
@@ -276,7 +291,7 @@ export default function LessonViewerModern({
                   onClick={() => setActiveSection(tab.id as any)}
                   className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 ${
                     activeSection === tab.id
-                      ? `text-${program.color}-400 border-${program.color}-400`
+                      ? `${program.text} ${program.border}`
                       : 'text-gray-600 border-transparent hover:text-gray-900'
                   }`}
                 >
@@ -322,12 +337,12 @@ export default function LessonViewerModern({
                         )}
                         <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center">
                           <div className={`w-20 h-20 rounded-full bg-gradient-to-r ${program.gradient} flex items-center justify-center mb-4 cursor-pointer hover:scale-110 transition-transform`} onClick={openVideoExternal}>
-                            <ExternalLink className="w-8 h-8 text-gray-900" />
+                            <ExternalLink className="w-8 h-8 text-white" />
                           </div>
-                          <p className="text-gray-900 font-medium mb-2">Video no disponible en embed</p>
-                          <button 
+                          <p className="text-white font-medium mb-2">Video no disponible en embed</p>
+                          <button
                             onClick={openVideoExternal}
-                            className={`px-6 py-2 bg-gradient-to-r ${program.gradient} rounded-full text-gray-900 font-medium hover:opacity-90 transition-opacity`}
+                            className={`px-6 py-2 bg-gradient-to-r ${program.gradient} rounded-full text-white font-medium hover:opacity-90 transition-opacity`}
                           >
                             Ver en YouTube →
                           </button>
@@ -337,16 +352,16 @@ export default function LessonViewerModern({
                   </div>
                 ) : (
                   /* Sin video - mostrar contenido visual alternativo */
-                  <div className={`aspect-video bg-gradient-to-br ${program.lightGradient} rounded-2xl flex items-center justify-center border border-${program.color}-500/30`}>
+                  <div className={`aspect-video bg-gradient-to-br ${program.lightGradient} rounded-2xl flex items-center justify-center border ${program.border30}`}>
                     <div className="text-center p-8">
                       <div className={`w-24 h-24 rounded-full bg-gradient-to-r ${program.gradient} flex items-center justify-center mx-auto mb-6`}>
-                        <ProgramIcon className="w-12 h-12 text-gray-900" />
+                        <ProgramIcon className="w-12 h-12 text-white" />
                       </div>
                       <h3 className="text-2xl font-bold text-gray-900 mb-2">{lesson.title}</h3>
                       <p className="text-gray-600 mb-6">Esta lección es práctica. Lee el contenido y usa los simuladores.</p>
-                      <button 
+                      <button
                         onClick={() => setActiveSection('content')}
-                        className={`px-6 py-3 bg-gradient-to-r ${program.gradient} rounded-xl text-gray-900 font-medium hover:opacity-90 transition-opacity`}
+                        className={`px-6 py-3 bg-gradient-to-r ${program.gradient} rounded-xl text-white font-medium hover:opacity-90 transition-opacity`}
                       >
                         Ver Contenido →
                       </button>
@@ -412,12 +427,12 @@ export default function LessonViewerModern({
                 {lesson.images && lesson.images.length > 0 && (
                   <div className="mt-8">
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <ImageIcon className="w-5 h-5 text-cyan-400" />
+                      <ImageIcon className="w-5 h-5 text-chaski-primary" />
                       Diagramas y Referencias
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {lesson.images.map((img, idx) => (
-                        <div key={idx} className="rounded-xl overflow-hidden border border-gray-200 hover:border-cyan-500/50 transition-colors">
+                        <div key={idx} className="rounded-xl overflow-hidden border border-gray-200 hover:border-chaski-primary/50 transition-colors">
                           <img 
                             src={img} 
                             alt={`Imagen ${idx + 1}`}
@@ -442,15 +457,15 @@ export default function LessonViewerModern({
                     Tips para esta lección
                   </h3>
                   <ul className="space-y-2">
-                    <li className="flex items-start gap-2 text-gray-300">
+                    <li className="flex items-start gap-2 text-gray-600">
                       <span className="text-amber-400 mt-1">•</span>
                       <span>Toma notas mientras ves el video</span>
                     </li>
-                    <li className="flex items-start gap-2 text-gray-300">
+                    <li className="flex items-start gap-2 text-gray-600">
                       <span className="text-amber-400 mt-1">•</span>
                       <span>Pausa y practica cada concepto nuevo</span>
                     </li>
-                    <li className="flex items-start gap-2 text-gray-300">
+                    <li className="flex items-start gap-2 text-gray-600">
                       <span className="text-amber-400 mt-1">•</span>
                       <span>No tengas miedo de experimentar</span>
                     </li>
@@ -462,7 +477,7 @@ export default function LessonViewerModern({
         </div>
 
         {/* Panel derecho - Sidebar con info adicional */}
-        <div className="w-80 bg-gray-50 border-l border-dark-700 overflow-y-auto hidden lg:block">
+        <div className="w-80 bg-gray-50 border-l border-border-soft overflow-y-auto hidden lg:block">
           <div className="p-4 space-y-4">
             {/* Progreso de la lección */}
             <div className="bg-white rounded-xl p-4">
@@ -470,7 +485,7 @@ export default function LessonViewerModern({
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${completed ? 'bg-green-500' : 'bg-gray-100'}`}>
-                    {completed ? <CheckCircle className="w-5 h-5 text-gray-900" /> : <Play className="w-4 h-4 text-gray-600" />}
+                    {completed ? <CheckCircle className="w-5 h-5 text-white" /> : <Play className="w-4 h-4 text-gray-600" />}
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-gray-900">Ver el video</p>
@@ -505,23 +520,23 @@ export default function LessonViewerModern({
                 className="w-full flex items-center justify-between text-gray-900"
               >
                 <span className="flex items-center gap-2 font-medium">
-                  <Target className={`w-5 h-5 text-${program.color}-400`} />
+                  <Target className={`w-5 h-5 ${program.text}`} />
                   Objetivos
                 </span>
                 {expandedSections.includes('objectives') ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
               {expandedSections.includes('objectives') && (
                 <ul className="mt-3 space-y-2">
-                  <li className="flex items-start gap-2 text-sm text-gray-300">
-                    <CheckCircle className={`w-4 h-4 text-${program.color}-400 mt-0.5 flex-shrink-0`} />
+                  <li className="flex items-start gap-2 text-sm text-gray-600">
+                    <CheckCircle className={`w-4 h-4 ${program.text} mt-0.5 flex-shrink-0`} />
                     <span>Comprender los conceptos clave</span>
                   </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-300">
-                    <CheckCircle className={`w-4 h-4 text-${program.color}-400 mt-0.5 flex-shrink-0`} />
+                  <li className="flex items-start gap-2 text-sm text-gray-600">
+                    <CheckCircle className={`w-4 h-4 ${program.text} mt-0.5 flex-shrink-0`} />
                     <span>Aplicar en práctica</span>
                   </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-300">
-                    <CheckCircle className={`w-4 h-4 text-${program.color}-400 mt-0.5 flex-shrink-0`} />
+                  <li className="flex items-start gap-2 text-sm text-gray-600">
+                    <CheckCircle className={`w-4 h-4 ${program.text} mt-0.5 flex-shrink-0`} />
                     <span>Completar el ejercicio</span>
                   </li>
                 </ul>
@@ -529,15 +544,15 @@ export default function LessonViewerModern({
             </div>
 
             {/* Reto extra */}
-            <div className={`bg-gradient-to-br ${program.lightGradient} rounded-xl p-4 border border-${program.color}-500/30`}>
+            <div className={`bg-gradient-to-br ${program.lightGradient} rounded-xl p-4 border ${program.border30}`}>
               <div className="flex items-center gap-2 mb-2">
-                <Gift className={`w-5 h-5 text-${program.color}-400`} />
+                <Gift className={`w-5 h-5 ${program.text}`} />
                 <span className="font-bold text-gray-900">Reto Extra</span>
               </div>
-              <p className="text-sm text-gray-300 mb-3">
+              <p className="text-sm text-gray-600 mb-3">
                 ¿Puedes modificar lo aprendido para crear algo nuevo? ¡Intenta agregar tu toque personal!
               </p>
-              <button className={`w-full py-2 bg-${program.color}-500 hover:bg-${program.color}-400 text-gray-900 rounded-lg font-medium transition-colors`}>
+              <button className={`w-full py-2 ${program.bg} ${program.bgHover} text-white rounded-lg font-medium transition-colors`}>
                 Aceptar Reto
               </button>
             </div>
@@ -565,7 +580,7 @@ export default function LessonViewerModern({
       </div>
 
       {/* Footer con navegación */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-dark-700 p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-border-soft p-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <button
             onClick={onPrev}
@@ -580,9 +595,9 @@ export default function LessonViewerModern({
             onClick={handleComplete}
             disabled={completed}
             className={`px-8 py-3 rounded-xl font-bold transition-all ${
-              completed 
-                ? 'bg-green-500 text-gray-900'
-                : `bg-gradient-to-r ${program.gradient} text-gray-900 hover:opacity-90`
+              completed
+                ? 'bg-green-500 text-white'
+                : `bg-gradient-to-r ${program.gradient} text-white hover:opacity-90`
             }`}
           >
             {completed ? (
@@ -599,8 +614,8 @@ export default function LessonViewerModern({
             onClick={onNext}
             disabled={!onNext}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
-              onNext 
-                ? `bg-gradient-to-r ${program.gradient} text-gray-900 hover:opacity-90`
+              onNext
+                ? `bg-gradient-to-r ${program.gradient} text-white hover:opacity-90`
                 : 'text-gray-600 opacity-50 cursor-not-allowed'
             }`}
           >

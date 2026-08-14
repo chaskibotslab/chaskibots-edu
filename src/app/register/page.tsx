@@ -13,35 +13,32 @@ const FEATURES = [
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-12 bg-chaski-light">
       {/* Fondo */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-chaski-primary/20 rounded-full blur-[140px] animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-brand-cyan/15 rounded-full blur-[140px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-chaski-primary/15 rounded-full blur-[140px]"></div>
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-chaski-secondary/15 rounded-full blur-[140px]"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md animate-scale-in">
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl shadow-chaski-primary/10 p-8 text-center border border-white/20">
+        <div className="bg-white rounded-3xl shadow-xl p-8 text-center border border-border-soft">
           {/* Logo */}
           <div className="flex justify-center mb-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-chaski-primary to-brand-cyan rounded-2xl blur-lg opacity-60"></div>
-              <Image
-                src="/chaski.png"
-                alt="ChaskiBots Logo"
-                width={80}
-                height={80}
-                className="relative rounded-2xl border-4 border-white shadow-xl"
-              />
-            </div>
+            <Image
+              src="/chaski.png"
+              alt="ChaskiBots Logo"
+              width={80}
+              height={80}
+              className="rounded-2xl border-4 border-white shadow-lg"
+            />
           </div>
 
-          <h1 className="text-2xl font-black text-slate-900 mb-1 flex items-center justify-center gap-2">
+          <h1 className="text-2xl font-black text-chaski-dark mb-1 flex items-center justify-center gap-2">
             <Bot className="w-6 h-6 text-chaski-primary" />
             ¡Únete a ChaskiBots!
           </h1>
           <p className="text-slate-500 text-sm mb-6 flex items-center justify-center gap-1">
-            <Sparkles className="w-4 h-4 text-brand-cyan" />
+            <Sparkles className="w-4 h-4 text-chaski-primary" />
             Educación del Futuro
           </p>
 
@@ -51,7 +48,7 @@ export default function RegisterPage() {
 
           {/* Contacto */}
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 mb-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">
+            <h2 className="text-lg font-bold text-chaski-dark mb-4">
               Contáctanos para inscribirte
             </h2>
 
@@ -81,7 +78,7 @@ export default function RegisterPage() {
 
           {/* Qué ofrecemos */}
           <div className="text-left bg-slate-50 rounded-2xl p-5 mb-6">
-            <h3 className="font-bold text-slate-900 mb-3">¿Qué aprenderás?</h3>
+            <h3 className="font-bold text-chaski-dark mb-3">¿Qué aprenderás?</h3>
             <ul className="space-y-2 text-sm text-slate-600">
               {FEATURES.map((feature, idx) => (
                 <li key={idx} className="flex items-center gap-2 animate-slide-up" style={{ animationDelay: `${idx * 0.05}s` }}>
@@ -101,7 +98,7 @@ export default function RegisterPage() {
           </Link>
         </div>
 
-        <p className="text-center text-white/40 text-xs mt-6">
+        <p className="text-center text-slate-400 text-xs mt-6">
           © {new Date().getFullYear()} ChaskiBots. Todos los derechos reservados.
         </p>
       </div>

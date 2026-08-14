@@ -7,12 +7,19 @@ import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
 import { useLevels, useUserCourses } from '@/hooks'
 import { Bot, Cpu, Wrench, Lightbulb, ArrowRight, Sparkles } from 'lucide-react'
-import MatrixRain from '@/components/MatrixRain'
 
-const FEATURES = [
-  { icon: Cpu, color: 'chaski-primary', title: 'Programación', description: 'Scratch, Python, C++' },
-  { icon: Wrench, color: 'neon-green', title: 'Electrónica', description: 'Circuitos y sensores' },
-  { icon: Lightbulb, color: 'chaski-accent', title: 'Diseño 3D', description: 'Modelado e impresión' }
+type ColorKey = 'coral' | 'green' | 'gold'
+
+const COLOR_STYLES: Record<ColorKey, { bg: string; text: string }> = {
+  coral: { bg: 'bg-chaski-primary/10', text: 'text-chaski-primary' },
+  green: { bg: 'bg-hack-green/10', text: 'text-hack-green' },
+  gold: { bg: 'bg-chaski-gold/10', text: 'text-chaski-gold' },
+}
+
+const FEATURES: { icon: React.ComponentType<{ className?: string }>; color: ColorKey; title: string; description: string }[] = [
+  { icon: Cpu, color: 'coral', title: 'Programación', description: 'Scratch, Python, C++' },
+  { icon: Wrench, color: 'green', title: 'Electrónica', description: 'Circuitos y sensores' },
+  { icon: Lightbulb, color: 'gold', title: 'Diseño 3D', description: 'Modelado e impresión' }
 ]
 
 const TOOLS = ['Scratch', 'Blockly', 'Arduino', 'ESP32', 'micro:bit', 'Tinkercad', 'Wokwi', 'Python', 'C++']
@@ -36,11 +43,9 @@ export default function RoboticaPage() {
         <div className="max-w-5xl mx-auto space-y-8">
 
           {/* Hero */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8 text-center shadow-2xl animate-fade-in">
-            <MatrixRain count={10} className="opacity-30" />
-            <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(57,255,20,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.5) 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
+          <div className="relative overflow-hidden rounded-3xl bg-chaski-dark text-white p-8 text-center shadow-2xl animate-fade-in">
             <div className="absolute top-0 left-0 w-64 h-64 bg-chaski-primary/20 rounded-full blur-[100px]"></div>
-            <div className="absolute bottom-0 right-0 w-56 h-56 bg-brand-cyan/15 rounded-full blur-[90px]"></div>
+            <div className="absolute bottom-0 right-0 w-56 h-56 bg-chaski-secondary/15 rounded-full blur-[90px]"></div>
             <div className="relative z-10">
               <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
                 <Bot className="w-8 h-8 text-chaski-primary" />
@@ -62,8 +67,8 @@ export default function RoboticaPage() {
                   className="group bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-chaski-primary/30 transition-all duration-300 text-center animate-scale-in"
                   style={{ animationDelay: `${idx * 0.05}s` }}
                 >
-                  <div className={`w-12 h-12 bg-${feature.color}/10 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
-                    <Icon className={`w-6 h-6 text-${feature.color}`} />
+                  <div className={`w-12 h-12 ${COLOR_STYLES[feature.color].bg} rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                    <Icon className={`w-6 h-6 ${COLOR_STYLES[feature.color].text}`} />
                   </div>
                   <h3 className="font-semibold text-slate-900 mb-1">{feature.title}</h3>
                   <p className="text-slate-500 text-sm">{feature.description}</p>
@@ -75,7 +80,7 @@ export default function RoboticaPage() {
           {/* Levels */}
           <div>
             <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-hack-green" />
+              <Sparkles className="w-5 h-5 text-chaski-primary" />
               Selecciona tu Nivel
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">

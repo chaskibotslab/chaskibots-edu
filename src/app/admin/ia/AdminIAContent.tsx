@@ -22,18 +22,35 @@ interface AIActivity {
   enabled: boolean
 }
 
-const ACTIVITY_TYPES = [
-  { value: 'camera', label: 'Cámara / Visión', icon: Camera, color: 'brand-purple' },
-  { value: 'upload', label: 'Clasificación de Imágenes', icon: Upload, color: 'brand-violet' },
-  { value: 'voice', label: 'Voz / Audio', icon: Mic, color: 'neon-green' },
-  { value: 'hacking', label: 'Hacking Ético', icon: Shield, color: 'brand-cyan' },
+type AccentKey = 'coral' | 'gold' | 'green' | 'slate'
+
+// Clases completas y literales (Tailwind JIT no compila strings armados en runtime)
+const ACCENT_STYLES: Record<AccentKey, { chip: string; icon: string; sectionBg: string; iconBoxBg: string }> = {
+  coral: { chip: 'bg-chaski-primary/10 border-chaski-primary/30', icon: 'text-chaski-primary', sectionBg: 'bg-chaski-primary/10', iconBoxBg: 'bg-chaski-primary/20' },
+  gold: { chip: 'bg-chaski-gold/10 border-chaski-gold/30', icon: 'text-chaski-gold', sectionBg: 'bg-chaski-gold/10', iconBoxBg: 'bg-chaski-gold/20' },
+  green: { chip: 'bg-hack-green/10 border-hack-green/30', icon: 'text-hack-green', sectionBg: 'bg-hack-green/10', iconBoxBg: 'bg-hack-green/20' },
+  slate: { chip: 'bg-slate-400/10 border-slate-400/30', icon: 'text-slate-500', sectionBg: 'bg-slate-100', iconBoxBg: 'bg-slate-200' },
+}
+
+const ACTIVITY_TYPES: { value: AIActivity['activityType']; label: string; icon: typeof Camera; accent: AccentKey }[] = [
+  { value: 'camera', label: 'Cámara / Visión', icon: Camera, accent: 'coral' },
+  { value: 'upload', label: 'Clasificación de Imágenes', icon: Upload, accent: 'gold' },
+  { value: 'voice', label: 'Voz / Audio', icon: Mic, accent: 'green' },
+  { value: 'hacking', label: 'Hacking Ético', icon: Shield, accent: 'slate' },
 ]
 
+const DIFFICULTY_STYLES: Record<AIActivity['difficulty'], string> = {
+  facil: 'bg-green-500/10 text-green-600',
+  medio: 'bg-amber-500/10 text-amber-600',
+  avanzado: 'bg-orange-500/10 text-orange-600',
+  experto: 'bg-red-500/10 text-red-600',
+}
+
 const DIFFICULTY_LEVELS = [
-  { value: 'facil', label: 'Fácil', color: 'green' },
-  { value: 'medio', label: 'Medio', color: 'yellow' },
-  { value: 'avanzado', label: 'Avanzado', color: 'orange' },
-  { value: 'experto', label: 'Experto', color: 'red' },
+  { value: 'facil', label: 'Fácil' },
+  { value: 'medio', label: 'Medio' },
+  { value: 'avanzado', label: 'Avanzado' },
+  { value: 'experto', label: 'Experto' },
 ]
 
 export default function AdminIAContent() {
@@ -194,14 +211,8 @@ export default function AdminIAContent() {
     return <Brain className="w-5 h-5" />
   }
 
-  const getTypeColor = (type: string) => {
-    const typeInfo = ACTIVITY_TYPES.find(t => t.value === type)
-    return typeInfo?.color || 'slate'
-  }
-
-  const getDifficultyColor = (difficulty: string) => {
-    const diff = DIFFICULTY_LEVELS.find(d => d.value === difficulty)
-    return diff?.color || 'slate'
+  const getDifficultyStyle = (difficulty: string) => {
+    return DIFFICULTY_STYLES[difficulty as AIActivity['difficulty']] || 'bg-slate-500/10 text-slate-600'
   }
 
   const groupedActivities = activities.reduce((acc, activity) => {
@@ -229,7 +240,7 @@ export default function AdminIAContent() {
             </Link>
             <div>
               <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Brain className="w-6 h-6 text-neon-pink" />
+                <Brain className="w-6 h-6 text-chaski-primary" />
                 Gestión de Actividades IA
               </h1>
               <p className="text-sm text-slate-600">Configura las actividades de IA y Hacking Ético por nivel</p>
@@ -265,8 +276,8 @@ export default function AdminIAContent() {
 
           <div className="flex flex-wrap gap-3 ml-auto">
             {ACTIVITY_TYPES.map(type => (
-              <div key={type.value} className={`flex items-center gap-2 px-3 py-1 bg-${type.color}/10 border border-${type.color}/30 rounded-full`}>
-                <type.icon className={`w-4 h-4 text-${type.color}`} />
+              <div key={type.value} className={`flex items-center gap-2 px-3 py-1 border rounded-full ${ACCENT_STYLES[type.accent].chip}`}>
+                <type.icon className={`w-4 h-4 ${ACCENT_STYLES[type.accent].icon}`} />
                 <span className="text-sm text-slate-600">{type.label}</span>
               </div>
             ))}
@@ -297,15 +308,15 @@ export default function AdminIAContent() {
                   className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden animate-slide-up"
                   style={{ animationDelay: `${typeIdx * 0.05}s` }}
                 >
-                  <div className={`bg-${type.color}/10 px-4 py-3 border-b border-slate-200 flex items-center gap-3`}>
-                    <type.icon className={`w-5 h-5 text-${type.color}`} />
+                  <div className={`px-4 py-3 border-b border-slate-200 flex items-center gap-3 ${ACCENT_STYLES[type.accent].sectionBg}`}>
+                    <type.icon className={`w-5 h-5 ${ACCENT_STYLES[type.accent].icon}`} />
                     <h3 className="font-semibold text-slate-900">{type.label}</h3>
                     <span className="text-sm text-slate-600">({typeActivities.length} actividades)</span>
                   </div>
                   <div className="divide-y divide-slate-200">
                     {typeActivities.map(activity => (
                       <div key={activity.id} className={`px-4 py-3 flex items-center gap-4 hover:bg-slate-50 transition-colors ${!activity.enabled ? 'opacity-50' : ''}`}>
-                        <div className={`w-10 h-10 bg-${type.color}/20 rounded-lg flex items-center justify-center`}>
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${ACCENT_STYLES[type.accent].iconBoxBg}`}>
                           {getTypeIcon(activity.activityType)}
                         </div>
                         <div className="flex-1">
@@ -318,7 +329,7 @@ export default function AdminIAContent() {
                             <span className="text-xs text-slate-600">
                               Nivel: {EDUCATION_LEVELS.find(l => l.id === activity.levelId)?.name || activity.levelId}
                             </span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full bg-${getDifficultyColor(activity.difficulty)}-500/10 text-${getDifficultyColor(activity.difficulty)}-600`}>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${getDifficultyStyle(activity.difficulty)}`}>
                               {activity.difficulty}
                             </span>
                           </div>

@@ -43,7 +43,7 @@ export default function AcademyPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1 py-8 px-4">
         <div className="max-w-5xl mx-auto animate-fade-in">
