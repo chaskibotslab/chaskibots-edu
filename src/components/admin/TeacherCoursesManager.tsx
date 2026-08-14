@@ -298,7 +298,7 @@ export default function TeacherCoursesManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
   }
@@ -308,8 +308,8 @@ export default function TeacherCoursesManager() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h3 className="text-lg font-bold text-gray-900">Asignación de Cursos a Profesores</h3>
-          <p className="text-sm text-gray-600">
+          <h3 className="text-lg font-bold text-slate-900">Asignación de Cursos a Profesores</h3>
+          <p className="text-sm text-slate-600">
             {assignments.length} asignaciones · {teachers.length} profesores · {courses.length} cursos
           </p>
         </div>
@@ -317,7 +317,7 @@ export default function TeacherCoursesManager() {
           <button
             onClick={handleSyncLevelIds}
             disabled={syncing}
-            className="flex items-center gap-2 px-3 py-2 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-3 py-2 bg-chaski-primary/10 text-chaski-primary rounded-lg hover:bg-chaski-primary/20 active:scale-[0.98] transition-all disabled:opacity-50"
             title="Sincronizar levelId de asignaciones con programas/cursos"
           >
             {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
@@ -325,7 +325,7 @@ export default function TeacherCoursesManager() {
           </button>
           <button
             onClick={loadData}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 active:scale-[0.98] transition-all"
           >
             <RefreshCw className="w-4 h-4" />
             Actualizar
@@ -338,7 +338,7 @@ export default function TeacherCoursesManager() {
                 setSelectedCourses([])
               }
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-brand-purple/20 text-brand-purple rounded-lg hover:bg-brand-purple/30 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-chaski-primary text-white rounded-lg hover:bg-chaski-primary/90 active:scale-[0.98] transition-all"
           >
             {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showForm ? 'Cancelar' : 'Asignar Cursos'}
@@ -351,7 +351,7 @@ export default function TeacherCoursesManager() {
         <select
           value={filterSchool}
           onChange={(e) => setFilterSchool(e.target.value)}
-          className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
+          className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
         >
           <option value="all">Todos los colegios</option>
           {schools.map(school => (
@@ -361,7 +361,7 @@ export default function TeacherCoursesManager() {
         <select
           value={filterTeacher}
           onChange={(e) => setFilterTeacher(e.target.value)}
-          className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 text-sm"
+          className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
         >
           <option value="all">Todos los profesores</option>
           {teachers
@@ -374,19 +374,19 @@ export default function TeacherCoursesManager() {
 
       {/* Formulario de asignación */}
       {showForm && (
-        <div className="bg-gray-50 rounded-xl p-6 border border-brand-purple/30 space-y-4">
-          <h4 className="text-gray-900 font-semibold flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-brand-purple" />
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-4">
+          <h4 className="text-slate-900 font-semibold flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-chaski-primary" />
             Asignar Cursos a Profesor
           </h4>
-          
+
           {/* Selector de profesor */}
           <div>
-            <label className="block text-sm text-gray-600 mb-2">Seleccionar Profesor</label>
+            <label className="block text-sm text-slate-600 mb-2">Seleccionar Profesor</label>
             <select
               value={selectedTeacher}
               onChange={(e) => handleTeacherSelect(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
             >
               <option value="">-- Seleccionar profesor --</option>
               {teachers
@@ -402,12 +402,12 @@ export default function TeacherCoursesManager() {
           {/* Multi-select de cursos */}
           {selectedTeacher && (
             <div>
-              <label className="block text-sm text-gray-600 mb-2">
+              <label className="block text-sm text-slate-600 mb-2">
                 Seleccionar Cursos (click para marcar/desmarcar)
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-gray-100 rounded-lg border border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-slate-50 rounded-lg border border-slate-200">
                 {courses.length === 0 ? (
-                  <p className="text-gray-500 col-span-full text-center py-4">No hay cursos disponibles</p>
+                  <p className="text-slate-500 col-span-full text-center py-4">No hay cursos disponibles</p>
                 ) : (
                   courses.map(course => {
                     const isSelected = selectedCourses.includes(course.id)
@@ -416,16 +416,16 @@ export default function TeacherCoursesManager() {
                         key={course.id}
                         type="button"
                         onClick={() => toggleCourse(course.id)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] ${
                           isSelected
-                            ? 'bg-neon-green/20 border border-neon-green/50 text-neon-green'
-                            : 'bg-dark-600 border border-dark-500 text-gray-300 hover:bg-dark-500'
+                            ? 'bg-hack-green/20 border border-hack-green/50 text-hack-green'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:border-chaski-primary/30'
                         }`}
                       >
                         <div className={`w-5 h-5 rounded border flex items-center justify-center ${
-                          isSelected ? 'bg-neon-green border-neon-green' : 'border-gray-500'
+                          isSelected ? 'bg-hack-green border-hack-green' : 'border-slate-300'
                         }`}>
-                          {isSelected && <Check className="w-3 h-3 text-dark-900" />}
+                          {isSelected && <Check className="w-3 h-3 text-white" />}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{course.name}</p>
@@ -436,7 +436,7 @@ export default function TeacherCoursesManager() {
                   })
                 )}
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-slate-500 mt-2">
                 {selectedCourses.length} curso(s) seleccionado(s)
               </p>
             </div>
@@ -444,7 +444,7 @@ export default function TeacherCoursesManager() {
 
           {/* Botón guardar */}
           {selectedTeacher && (
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
               <button
                 type="button"
                 onClick={() => {
@@ -452,14 +452,14 @@ export default function TeacherCoursesManager() {
                   setSelectedTeacher('')
                   setSelectedCourses([])
                 }}
-                className="px-4 py-2 bg-dark-600 text-gray-300 rounded-lg hover:bg-dark-500 transition-colors"
+                className="px-4 py-2 text-slate-600 hover:text-slate-900 active:scale-[0.98] transition-all"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSaveAssignments}
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 bg-neon-green/20 text-neon-green rounded-lg hover:bg-neon-green/30 transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-chaski-primary text-white font-semibold rounded-lg hover:bg-chaski-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Guardar Asignaciones
@@ -472,29 +472,29 @@ export default function TeacherCoursesManager() {
       {/* Lista de asignaciones agrupadas por profesor */}
       <div className="space-y-4">
         {Object.keys(groupedByTeacher).length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
-            <Users className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-600">No hay asignaciones de cursos</p>
-            <p className="text-sm text-gray-500 mt-1">
+          <div className="text-center py-12 bg-white rounded-xl border border-slate-200 shadow-sm">
+            <Users className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <p className="text-slate-600">No hay asignaciones de cursos</p>
+            <p className="text-sm text-slate-500 mt-1">
               Usa el botón "Asignar Cursos" para comenzar
             </p>
           </div>
         ) : (
           Object.values(groupedByTeacher).map(group => (
-            <div key={group.teacherId} className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+            <div key={group.teacherId} className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
               {/* Header del profesor */}
-              <div className="px-4 py-3 bg-gray-100 flex items-center justify-between">
+              <div className="px-4 py-3 bg-slate-50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-brand-violet to-neon-pink rounded-full flex items-center justify-center">
-                    <span className="text-gray-900 font-bold">{group.teacherName.charAt(0)}</span>
+                  <div className="w-10 h-10 bg-gradient-to-br from-chaski-primary to-chaski-accent rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold">{group.teacherName.charAt(0)}</span>
                   </div>
                   <div>
-                    <p className="text-gray-900 font-medium">{group.teacherName}</p>
-                    <p className="text-xs text-gray-600 flex items-center gap-1">
+                    <p className="text-slate-900 font-medium">{group.teacherName}</p>
+                    <p className="text-xs text-slate-600 flex items-center gap-1">
                       <School className="w-3 h-3" />
                       {group.schoolName || 'Sin colegio'}
                       <span className="mx-1">·</span>
-                      <span className="text-brand-purple">{group.courses.length} curso(s)</span>
+                      <span className="text-chaski-primary">{group.courses.length} curso(s)</span>
                     </p>
                   </div>
                 </div>
@@ -503,28 +503,28 @@ export default function TeacherCoursesManager() {
                     handleTeacherSelect(group.teacherId)
                     setShowForm(true)
                   }}
-                  className="px-3 py-1 text-sm bg-dark-600 text-gray-300 rounded-lg hover:bg-dark-500 transition-colors"
+                  className="px-3 py-1 text-sm bg-chaski-primary/10 text-chaski-primary rounded-lg hover:bg-chaski-primary/20 active:scale-[0.98] transition-all"
                 >
                   Editar
                 </button>
               </div>
-              
+
               {/* Lista de cursos */}
               <div className="p-4">
                 <div className="flex flex-wrap gap-2">
                   {group.courses.map(assignment => (
                     <div
                       key={assignment.id}
-                      className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg border border-gray-200"
+                      className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-200"
                     >
-                      <GraduationCap className="w-4 h-4 text-brand-purple" />
+                      <GraduationCap className="w-4 h-4 text-chaski-primary" />
                       <div>
-                        <p className="text-sm text-gray-900">{assignment.courseName}</p>
-                        <p className="text-xs text-gray-500">{getLevelName(assignment.levelId)}</p>
+                        <p className="text-sm text-slate-900">{assignment.courseName}</p>
+                        <p className="text-xs text-slate-500">{getLevelName(assignment.levelId)}</p>
                       </div>
                       <button
                         onClick={() => handleDeleteAssignment(assignment)}
-                        className="ml-2 p-1 text-red-400 hover:bg-red-500/20 rounded transition-colors"
+                        className="ml-2 p-1 text-red-500 hover:bg-red-500/10 hover:text-red-600 rounded active:scale-[0.98] transition-all"
                         title="Eliminar asignación"
                       >
                         <Trash2 className="w-3 h-3" />

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { 
-  Plus, Edit, Trash2, Save, X, GraduationCap, 
+import {
+  Plus, Edit, Trash2, Save, X, GraduationCap,
   ChevronDown, ChevronUp, Loader2
 } from 'lucide-react'
 
@@ -80,10 +80,10 @@ export default function LevelsManager() {
     try {
       const method = editingId ? 'PUT' : 'POST'
       // Si estamos editando, enviar el ID original para buscar el registro
-      const dataToSend = editingId 
+      const dataToSend = editingId
         ? { ...formData, originalId: editingId }
         : formData
-      
+
       const res = await fetch('/api/admin/levels', {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -142,7 +142,7 @@ export default function LevelsManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 text-brand-purple animate-spin" />
+        <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
   }
@@ -152,12 +152,12 @@ export default function LevelsManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-bold text-gray-900">Niveles Educativos</h3>
-          <p className="text-sm text-gray-600">{levels.length} niveles configurados</p>
+          <h3 className="text-lg font-bold text-slate-900">Niveles Educativos</h3>
+          <p className="text-sm text-slate-600">{levels.length} niveles configurados</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-purple/20 text-brand-purple rounded-lg hover:bg-brand-purple/30 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-chaski-primary text-white font-semibold rounded-full shadow-md hover:bg-chaski-primary/90 active:scale-[0.98] transition-all"
         >
           {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           {showForm ? 'Cancelar' : 'Nuevo Nivel'}
@@ -166,38 +166,38 @@ export default function LevelsManager() {
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl p-6 border border-gray-200 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-slate-50 rounded-xl p-6 border border-slate-200 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">ID (único)</label>
+              <label className="block text-sm text-slate-600 mb-1">ID (único)</label>
               <input
                 type="text"
                 value={formData.id || ''}
                 onChange={(e) => setFormData({ ...formData, id: e.target.value.toLowerCase().replace(/\s/g, '-') })}
                 placeholder="ej: cuarto-bach"
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Nombre Corto</label>
+              <label className="block text-sm text-slate-600 mb-1">Nombre Corto</label>
               <input
                 type="text"
                 value={formData.name || ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="ej: 4° BGU"
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Nombre Completo</label>
+              <label className="block text-sm text-slate-600 mb-1">Nombre Completo</label>
               <input
                 type="text"
                 value={formData.fullName || ''}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 placeholder="ej: Cuarto de Bachillerato"
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
                 required
               />
             </div>
@@ -205,11 +205,11 @@ export default function LevelsManager() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Categoría</label>
+              <label className="block text-sm text-slate-600 mb-1">Categoría</label>
               <select
                 value={formData.category || 'elemental'}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
               >
                 {categories.map(cat => (
                   <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -217,38 +217,38 @@ export default function LevelsManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Rango de Edad</label>
+              <label className="block text-sm text-slate-600 mb-1">Rango de Edad</label>
               <input
                 type="text"
                 value={formData.ageRange || ''}
                 onChange={(e) => setFormData({ ...formData, ageRange: e.target.value })}
                 placeholder="ej: 18-19 años"
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Número de Grado</label>
+              <label className="block text-sm text-slate-600 mb-1">Número de Grado</label>
               <input
                 type="number"
                 value={formData.gradeNumber || 1}
                 onChange={(e) => setFormData({ ...formData, gradeNumber: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Precio Kit ($)</label>
+              <label className="block text-sm text-slate-600 mb-1">Precio Kit ($)</label>
               <input
                 type="number"
                 value={formData.kitPrice || 50}
                 onChange={(e) => setFormData({ ...formData, kitPrice: parseInt(e.target.value) })}
-                className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Icono</label>
+              <label className="block text-sm text-slate-600 mb-1">Icono</label>
               <div className="flex flex-wrap gap-1">
                 {icons.map(icon => (
                   <button
@@ -256,7 +256,7 @@ export default function LevelsManager() {
                     type="button"
                     onClick={() => setFormData({ ...formData, icon })}
                     className={`w-8 h-8 rounded flex items-center justify-center text-lg ${
-                      formData.icon === icon ? 'bg-brand-purple/30 ring-2 ring-brand-purple' : 'bg-gray-100 hover:bg-gray-200'
+                      formData.icon === icon ? 'bg-chaski-primary/20 ring-2 ring-chaski-primary' : 'bg-slate-100 hover:bg-slate-200'
                     }`}
                   >
                     {icon}
@@ -265,12 +265,12 @@ export default function LevelsManager() {
               </div>
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Color Neon</label>
+              <label className="block text-sm text-slate-600 mb-1">Color Neon</label>
               <input
                 type="color"
                 value={formData.neonColor || '#00d4ff'}
                 onChange={(e) => setFormData({ ...formData, neonColor: e.target.value })}
-                className="w-full h-10 bg-gray-100 border border-gray-200 rounded-lg cursor-pointer"
+                className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer"
               />
             </div>
             <div className="flex items-center gap-4">
@@ -281,7 +281,7 @@ export default function LevelsManager() {
                   onChange={(e) => setFormData({ ...formData, hasHacking: e.target.checked })}
                   className="w-4 h-4 rounded"
                 />
-                <span className="text-sm text-gray-300">Hacking</span>
+                <span className="text-sm text-slate-700">Hacking</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -290,7 +290,7 @@ export default function LevelsManager() {
                   onChange={(e) => setFormData({ ...formData, hasAdvancedIA: e.target.checked })}
                   className="w-4 h-4 rounded"
                 />
-                <span className="text-sm text-gray-300">IA Avanzada</span>
+                <span className="text-sm text-slate-700">IA Avanzada</span>
               </label>
             </div>
           </div>
@@ -299,14 +299,14 @@ export default function LevelsManager() {
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="px-4 py-2 text-slate-600 hover:text-slate-900 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-2 bg-brand-purple text-dark-900 font-semibold rounded-lg hover:bg-brand-purple/90 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-chaski-primary text-white font-semibold rounded-lg hover:bg-chaski-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {editingId ? 'Actualizar' : 'Crear'} Nivel
@@ -316,44 +316,44 @@ export default function LevelsManager() {
       )}
 
       {/* Levels List */}
-      <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <table className="w-full">
-          <thead className="bg-gray-100">
+          <thead className="bg-slate-50">
             <tr>
-              <th className="px-4 py-3 text-left text-sm text-gray-600">Nivel</th>
-              <th className="px-4 py-3 text-left text-sm text-gray-600">Categoría</th>
-              <th className="px-4 py-3 text-left text-sm text-gray-600">Edad</th>
-              <th className="px-4 py-3 text-left text-sm text-gray-600">Precio</th>
-              <th className="px-4 py-3 text-left text-sm text-gray-600">Funciones</th>
-              <th className="px-4 py-3 text-right text-sm text-gray-600">Acciones</th>
+              <th className="px-4 py-3 text-left text-sm text-slate-600">Nivel</th>
+              <th className="px-4 py-3 text-left text-sm text-slate-600">Categoría</th>
+              <th className="px-4 py-3 text-left text-sm text-slate-600">Edad</th>
+              <th className="px-4 py-3 text-left text-sm text-slate-600">Precio</th>
+              <th className="px-4 py-3 text-left text-sm text-slate-600">Funciones</th>
+              <th className="px-4 py-3 text-right text-sm text-slate-600">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-dark-600">
+          <tbody className="divide-y divide-slate-200">
             {levels.map((level) => (
-              <tr key={level.id} className="hover:bg-gray-100/50">
+              <tr key={level.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{level.icon}</span>
                     <div>
-                      <p className="text-gray-900 font-medium">{level.name}</p>
-                      <p className="text-xs text-gray-500">{level.id}</p>
+                      <p className="text-slate-900 font-medium">{level.name}</p>
+                      <p className="text-xs text-slate-500">{level.id}</p>
                     </div>
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="px-2 py-1 bg-dark-600 rounded text-sm text-gray-300 capitalize">
+                  <span className="px-2 py-1 bg-slate-100 rounded text-sm text-slate-700 capitalize">
                     {level.category}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-gray-300">{level.ageRange}</td>
-                <td className="px-4 py-3 text-gray-300">${level.kitPrice}</td>
+                <td className="px-4 py-3 text-slate-700">{level.ageRange}</td>
+                <td className="px-4 py-3 text-slate-700">${level.kitPrice}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
                     {level.hasHacking && (
-                      <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded">Hacking</span>
+                      <span className="px-2 py-0.5 bg-green-500/10 text-green-600 text-xs rounded">Hacking</span>
                     )}
                     {level.hasAdvancedIA && (
-                      <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-xs rounded">IA</span>
+                      <span className="px-2 py-0.5 bg-chaski-primary/10 text-chaski-primary text-xs rounded">IA</span>
                     )}
                   </div>
                 </td>
@@ -361,13 +361,13 @@ export default function LevelsManager() {
                   <div className="flex justify-end gap-2">
                     <button
                       onClick={() => handleEdit(level)}
-                      className="p-2 text-gray-600 hover:text-brand-purple transition-colors"
+                      className="p-2 text-slate-600 hover:text-chaski-primary transition-colors"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(level.id)}
-                      className="p-2 text-gray-600 hover:text-red-400 transition-colors"
+                      className="p-2 text-slate-600 hover:text-red-600 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

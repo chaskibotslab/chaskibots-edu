@@ -488,14 +488,14 @@ export default function UsersManager() {
           </button>
           <button
             onClick={() => { setShowBulkForm(!showBulkForm); setShowImportForm(false) }}
-            className="flex items-center gap-2 px-4 py-2 bg-brand-cyan/20 text-brand-cyan rounded-lg hover:bg-brand-cyan/30 active:scale-[0.98] transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-chaski-primary/10 text-chaski-primary rounded-lg hover:bg-chaski-primary/20 active:scale-[0.98] transition-all"
           >
             <Users className="w-4 h-4" />
             Crear en Lote
           </button>
           <button
             onClick={() => { setShowImportForm(!showImportForm); setShowBulkForm(false) }}
-            className="flex items-center gap-2 px-4 py-2 bg-brand-violet/20 text-brand-violet rounded-lg hover:bg-brand-violet/30 active:scale-[0.98] transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-chaski-primary/10 text-chaski-primary rounded-lg hover:bg-chaski-primary/20 active:scale-[0.98] transition-all"
           >
             <FileSpreadsheet className="w-4 h-4" />
             Importar Lista
@@ -539,9 +539,9 @@ export default function UsersManager() {
 
       {/* Bulk Create Form */}
       {showBulkForm && (
-        <form onSubmit={handleBulkCreate} className="bg-white rounded-xl p-6 border border-brand-cyan/30 shadow-sm animate-scale-in space-y-4">
+        <form onSubmit={handleBulkCreate} className="bg-white rounded-xl p-6 border border-chaski-primary/20 shadow-sm animate-scale-in space-y-4">
           <h4 className="text-slate-900 font-semibold flex items-center gap-2">
-            <Users className="w-5 h-5 text-brand-cyan" />
+            <Users className="w-5 h-5 text-chaski-primary" />
             Crear Usuarios en Lote
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -622,7 +622,7 @@ export default function UsersManager() {
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-2 bg-brand-cyan text-slate-900 font-semibold rounded-lg hover:bg-brand-cyan/90 active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-chaski-primary text-white font-semibold rounded-lg hover:bg-chaski-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Users className="w-4 h-4" />}
               Crear {bulkData.count} Usuarios
@@ -633,9 +633,9 @@ export default function UsersManager() {
 
       {/* Import Form - Lista de nombres */}
       {showImportForm && (
-        <form onSubmit={handleImportCreate} className="bg-white rounded-xl p-6 border border-brand-violet/30 shadow-sm animate-scale-in space-y-4">
+        <form onSubmit={handleImportCreate} className="bg-white rounded-xl p-6 border border-chaski-primary/20 shadow-sm animate-scale-in space-y-4">
           <h4 className="text-slate-900 font-semibold flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-brand-violet" />
+            <FileSpreadsheet className="w-5 h-5 text-chaski-primary" />
             Importar Lista de Estudiantes
           </h4>
           <p className="text-sm text-slate-600">
@@ -740,7 +740,7 @@ export default function UsersManager() {
             <button
               type="submit"
               disabled={saving || !importData.names.trim() || !importData.levelId}
-              className="flex items-center gap-2 px-6 py-2 bg-brand-violet text-white font-semibold rounded-lg hover:bg-brand-violet/90 active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-chaski-primary text-white font-semibold rounded-lg hover:bg-chaski-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
               Crear {importData.names.split('\n').filter(n => n.trim()).length} Usuarios
