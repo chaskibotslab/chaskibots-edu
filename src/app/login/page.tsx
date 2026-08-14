@@ -87,15 +87,24 @@ export default function LoginPage() {
       {/* Contenido centrado */}
       <div className={`relative z-10 w-full max-w-md flex flex-col items-center ${mounted ? 'animate-login-enter' : 'opacity-0'}`}>
 
-        {/* Robot mascota */}
-        <div className="relative mb-4 animate-float" style={{ animationDelay: '0.1s' }}>
-          <div className="absolute -inset-4 bg-chaski-primary/25 rounded-full blur-2xl animate-pulse-slow" />
-          <div className="absolute -inset-1.5 rounded-full border-2 border-dashed border-chaski-primary/40 animate-spin-slow" />
-          <div className="relative w-20 h-20 rounded-full overflow-hidden ring-4 ring-white shadow-xl bg-chaski-dark">
-            <Image src="/chaski.png" alt="ChaskiBots Bot" width={80} height={80} className="w-full h-full object-cover" priority />
-          </div>
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-hack-green flex items-center justify-center ring-4 ring-chaski-light">
-            <span className="w-2 h-2 rounded-full bg-white" />
+        {/* Logo oficial Chaski Bots LAB */}
+        <div className="relative mb-3 animate-float" style={{ animationDelay: '0.1s' }}>
+          <div className="absolute -inset-8 bg-gradient-to-r from-chaski-primary/30 via-chaski-gold/20 to-hack-green/25 rounded-full blur-3xl animate-pulse-slow scale-110" />
+          <div className="absolute -inset-3 rounded-full border-2 border-dashed border-chaski-primary/30 animate-spin-slow" />
+          <Image
+            src="/logo.jpg"
+            alt="Chaski Bots LAB"
+            width={200}
+            height={200}
+            className="relative w-[150px] sm:w-[170px] h-auto rounded-2xl shadow-xl animate-card-float"
+            priority
+          />
+          <div className="absolute -bottom-1 -right-1 flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-md ring-2 ring-white">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-hack-green opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-hack-green" />
+            </span>
+            <span className="text-[10px] font-semibold text-slate-600">online</span>
           </div>
         </div>
 
