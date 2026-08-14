@@ -90,7 +90,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-chaski-light flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
@@ -104,7 +104,7 @@ export default function DashboardPage() {
   const progress = user?.progress || 0
 
   return (
-    <div className={`min-h-screen flex flex-col bg-chaski-light transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen flex flex-col bg-slate-50 transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
       <Header />
 
       <main className="flex-1 py-6 px-4">

@@ -215,7 +215,7 @@ export default function NivelPage() {
 
   if (levelLoading) {
     return (
-      <div className="min-h-screen bg-chaski-light flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center animate-fade-in">
           <div className="w-8 h-8 border-2 border-chaski-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-500">Cargando nivel...</p>
@@ -226,7 +226,7 @@ export default function NivelPage() {
 
   if (!level) {
     return (
-      <div className="min-h-screen bg-chaski-light flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center animate-fade-in">
           <h1 className="text-2xl font-bold text-chaski-dark mb-4">Nivel no encontrado</h1>
           <Link href="/niveles" className="btn-primary active:scale-[0.98] transition-all">
@@ -250,13 +250,14 @@ export default function NivelPage() {
 
   return (
     <CourseAuthGuard levelId={levelId} levelName={level.name}>
-      <div className="min-h-screen bg-chaski-dark flex animate-fade-in">
+      <div className="min-h-screen bg-slate-50 flex animate-fade-in">
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-chaski-dark backdrop-blur-sm border-r border-white/10 transition-all duration-300 overflow-hidden flex-shrink-0`}>
-        <div className="h-full flex flex-col">
+      <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-chaski-dark border-r border-white/10 transition-all duration-300 overflow-hidden flex-shrink-0 relative`}>
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(229,115,97,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(229,115,97,0.5) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        <div className="relative h-full flex flex-col">
           {/* Header del Sidebar */}
           <div className="p-4 border-b border-white/10">
-            <Link href="/niveles" className="flex items-center gap-2 text-slate-400 hover:text-hack-green mb-4 text-sm transition-colors">
+            <Link href="/niveles" className="flex items-center gap-2 text-white/40 hover:text-chaski-primary mb-4 text-sm transition-colors">
               <ArrowLeft className="w-4 h-4" />
               Volver a niveles
             </Link>
@@ -264,67 +265,51 @@ export default function NivelPage() {
               <div className="text-3xl">{level.icon}</div>
               <div>
                 <h2 className="font-bold text-white">{level.name}</h2>
-                <p className="text-xs text-slate-500">{level.ageRange}</p>
+                <p className="text-xs text-white/40">{level.ageRange}</p>
               </div>
             </div>
           </div>
 
           {/* Navegación del Sidebar */}
-          <nav className="flex-1 overflow-y-auto p-4">
-            <div className="space-y-1">
-              <button
-                onClick={() => setActiveTab('lessons')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] ${activeTab === 'lessons' ? 'bg-hack-green/10 text-hack-green border border-hack-green/30' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
-              >
-                <BookOpen className="w-5 h-5" />
-                <span>Lecciones</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('kit')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] ${activeTab === 'kit' ? 'bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
-              >
-                <Package className="w-5 h-5" />
-                <span>Mi Kit</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('calendar')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] ${activeTab === 'calendar' ? 'bg-chaski-gold/10 text-chaski-gold border border-chaski-gold/30' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
-              >
-                <Calendar className="w-5 h-5" />
-                <span>Plan del Año</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('ai')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] ${activeTab === 'ai' ? 'bg-chaski-accent/10 text-chaski-accent border border-chaski-accent/30' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
-              >
-                <Brain className="w-5 h-5" />
-                <span>IA en Vivo</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('simulators')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] ${activeTab === 'simulators' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
-              >
-                <Cpu className="w-5 h-5" />
-                <span>Simuladores</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('tasks')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] ${activeTab === 'tasks' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
-              >
-                <FileText className="w-5 h-5" />
-                <span>Tareas</span>
-              </button>
+          <nav className="flex-1 overflow-y-auto p-3">
+            <div className="space-y-0.5">
+              {([
+                { id: 'lessons', label: 'Lecciones', icon: BookOpen },
+                { id: 'kit', label: 'Mi Kit', icon: Package },
+                { id: 'calendar', label: 'Plan del Año', icon: Calendar },
+                { id: 'ai', label: 'IA en Vivo', icon: Brain },
+                { id: 'simulators', label: 'Simuladores', icon: Cpu },
+                { id: 'tasks', label: 'Tareas', icon: FileText },
+              ] as const).map(tab => {
+                const Icon = tab.icon
+                const active = activeTab === tab.id
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`group relative w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] font-medium transition-all duration-150 active:scale-[0.98] ${
+                      active ? 'bg-chaski-primary/10 text-chaski-primary' : 'text-white/60 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    {active && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-chaski-primary rounded-full shadow-glow" />
+                    )}
+                    <Icon className={`w-[18px] h-[18px] flex-shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-chaski-primary' : 'text-white/30 group-hover:text-white/60'}`} />
+                    <span>{tab.label}</span>
+                  </button>
+                )
+              })}
             </div>
 
             {/* Progreso */}
-            <div className="mt-6 p-3 bg-white/[0.03] rounded-lg border border-white/10">
+            <div className="mt-6 p-3 bg-white/5 rounded-lg border border-white/10">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-slate-400">Progreso</span>
-                <span className="text-hack-green">{progress}%</span>
+                <span className="text-white/50">Progreso</span>
+                <span className="text-chaski-primary">{progress}%</span>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-hack-green to-emerald-400 rounded-full transition-all"
+                  className="h-full bg-chaski-primary rounded-full transition-all"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -333,27 +318,27 @@ export default function NivelPage() {
             {/* Opciones de Profesor */}
             {isTeacher && (
               <div className="mt-6 pt-4 border-t border-white/10 animate-fade-in">
-                <p className="text-xs text-slate-500 mb-2 px-1">Herramientas del Profesor</p>
+                <p className="px-2 mb-1 text-[10px] font-semibold uppercase tracking-wider text-white/30">Herramientas del Profesor</p>
                 <Link
                   href={`/admin/entregas?levelId=${levelId}`}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30 hover:bg-chaski-primary/20"
+                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] font-medium transition-all active:scale-[0.98] text-white/60 hover:bg-white/5 hover:text-white"
                 >
-                  <GraduationCap className="w-5 h-5" />
+                  <GraduationCap className="w-[18px] h-[18px] text-white/30" />
                   <span>Ver Entregas</span>
-                  <span className="ml-auto text-xs bg-chaski-primary/30 px-1.5 py-0.5 rounded">Nuevo</span>
+                  <span className="ml-auto text-[10px] bg-chaski-primary/20 text-chaski-primary px-1.5 py-0.5 rounded">Nuevo</span>
                 </Link>
                 <Link
                   href={`/admin/calificaciones?levelId=${levelId}`}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] text-hack-green hover:bg-hack-green/10 mt-1"
+                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] font-medium transition-all active:scale-[0.98] text-white/60 hover:bg-white/5 hover:text-white mt-0.5"
                 >
-                  <GraduationCap className="w-5 h-5" />
+                  <GraduationCap className="w-[18px] h-[18px] text-white/30" />
                   <span>Calificaciones</span>
                 </Link>
                 <Link
                   href={`/admin/tareas?levelId=${levelId}`}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all active:scale-[0.98] text-slate-400 hover:bg-white/5 hover:text-white mt-1"
+                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] font-medium transition-all active:scale-[0.98] text-white/60 hover:bg-white/5 hover:text-white mt-0.5"
                 >
-                  <Settings className="w-5 h-5" />
+                  <Settings className="w-[18px] h-[18px] text-white/30" />
                   <span>Gestionar Tareas</span>
                 </Link>
               </div>
@@ -365,24 +350,24 @@ export default function NivelPage() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Top Bar */}
-        <header className="h-14 bg-chaski-dark/80 backdrop-blur border-b border-white/10 flex items-center px-4 gap-4">
+        <header className="sticky top-0 z-40 h-14 bg-chaski-dark border-b border-white/10 flex items-center px-4 gap-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-slate-400 hover:text-white transition-colors active:scale-[0.98]"
+            className="p-1.5 rounded-lg text-white/60 hover:bg-white/10 transition-colors active:scale-[0.98]"
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
-          <div className="flex-1">
-            <h1 className="text-white font-semibold">{courseData.title}</h1>
-            <p className="text-xs text-slate-500">{courseData.description}</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-white font-semibold truncate">{courseData.title}</h1>
+            <p className="text-xs text-white/40 truncate">{courseData.description}</p>
           </div>
-          <Link href="/" className="p-2 text-slate-400 hover:text-hack-green transition-colors active:scale-[0.98]">
+          <Link href="/" className="p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-chaski-primary transition-colors active:scale-[0.98]">
             <Home className="w-5 h-5" />
           </Link>
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-chaski-light">
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
           {/* Lecciones Tab */}
           {activeTab === 'lessons' && (
             <div className="max-w-4xl mx-auto animate-slide-up" key="lessons">

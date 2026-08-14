@@ -80,7 +80,7 @@ export default function HomePage() {
   const py = (mouse.y / (typeof window !== 'undefined' ? window.innerHeight : 1) - 0.5) * 2
 
   return (
-    <div className="min-h-screen flex flex-col bg-chaski-dark">
+    <div className="min-h-screen flex flex-col bg-slate-50">
       <Header />
       
       <main className="flex-1">
@@ -193,21 +193,20 @@ export default function HomePage() {
         </section>
 
         {/* Stats Section */}
-        <section className="py-16 bg-chaski-dark border-y border-white/5 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-chaski-primary/5 via-transparent to-chaski-accent/5" />
+        <section className="py-16 bg-white border-y border-border-soft relative overflow-hidden">
           <div className="max-w-6xl mx-auto px-4 relative z-10">
             <Reveal className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
                 { value: count1, suffix: '+', label: 'Niveles Educativos', color: 'text-chaski-primary', bg: 'bg-chaski-primary/10 border-chaski-primary/20' },
                 { value: count2, suffix: '+', label: 'Áreas STEM', color: 'text-chaski-secondary', bg: 'bg-chaski-secondary/10 border-chaski-secondary/20' },
                 { value: count3, suffix: '', label: 'Kits Físicos', color: 'text-chaski-gold', bg: 'bg-chaski-gold/10 border-chaski-gold/20' },
-                { value: count4, suffix: '+', label: 'Simuladores', color: 'text-chaski-accent', bg: 'bg-chaski-accent/10 border-chaski-accent/20' },
+                { value: count4, suffix: '+', label: 'Simuladores', color: 'text-hack-green', bg: 'bg-hack-green/10 border-hack-green/20' },
               ].map((stat, i) => (
                 <div key={i} className={`group hover:scale-105 transition-all duration-300 cursor-default animate-fade-in rounded-2xl ${stat.bg} border p-5`} style={{ animationDelay: `${i * 0.05}s` }}>
                   <div className={`text-3xl md:text-4xl font-extrabold ${stat.color} transition-all`}>
                     {stat.value}{stat.suffix}
                   </div>
-                  <p className="text-slate-400 mt-1 text-sm font-medium">{stat.label}</p>
+                  <p className="text-slate-500 mt-1 text-sm font-medium">{stat.label}</p>
                 </div>
               ))}
             </Reveal>
@@ -215,45 +214,45 @@ export default function HomePage() {
         </section>
 
         {/* Experiencias ChaskiBots */}
-        <section className="py-20 px-4 bg-chaski-dark">
+        <section className="py-20 px-4 bg-slate-50">
           <div className="max-w-6xl mx-auto">
             <Reveal>
-              <h2 className="text-3xl font-bold text-center text-white mb-4">
+              <h2 className="text-3xl font-bold text-center text-chaski-dark mb-4">
                 Nuestras <span className="text-chaski-primary">Experiencias</span>
               </h2>
-              <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
+              <p className="text-center text-slate-500 mb-12 max-w-2xl mx-auto">
                 ChaskiBots ha llevado robótica educativa a instituciones de todo el país.
                 Conoce nuestro impacto en la educación STEM.
               </p>
             </Reveal>
 
             <Reveal delay={100} className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="group bg-white/5 rounded-xl border border-white/10 hover:border-chaski-primary/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0s' }}>
+              <div className="group bg-white rounded-xl border border-border-soft shadow-sm hover:border-chaski-primary/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0s' }}>
                 <div className="w-16 h-16 mx-auto mb-4 bg-chaski-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-chaski-primary/20 group-hover:scale-110 transition-all">
                   <Building2 className="w-8 h-8 text-chaski-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Instituciones Educativas</h3>
-                <p className="text-slate-400 text-sm mb-4">
+                <h3 className="text-xl font-bold text-chaski-dark mb-2">Instituciones Educativas</h3>
+                <p className="text-slate-500 text-sm mb-4">
                   Trabajamos con escuelas, colegios y universidades implementando programas de robótica adaptados a cada nivel.
                 </p>
                 <div className="text-chaski-primary font-semibold">+20 instituciones</div>
               </div>
-              <div className="group bg-white/5 rounded-xl border border-white/10 hover:border-chaski-secondary/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.05s' }}>
+              <div className="group bg-white rounded-xl border border-border-soft shadow-sm hover:border-chaski-secondary/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.05s' }}>
                 <div className="w-16 h-16 mx-auto mb-4 bg-chaski-secondary/10 rounded-2xl flex items-center justify-center group-hover:bg-chaski-secondary/20 group-hover:scale-110 transition-all">
                   <UserCheck className="w-8 h-8 text-chaski-secondary" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Capacitación Docente</h3>
-                <p className="text-slate-400 text-sm mb-4">
+                <h3 className="text-xl font-bold text-chaski-dark mb-2">Capacitación Docente</h3>
+                <p className="text-slate-500 text-sm mb-4">
                   Formamos a profesores en metodologías STEM para que puedan guiar a sus estudiantes en el mundo de la tecnología.
                 </p>
                 <div className="text-chaski-secondary font-semibold">+100 docentes</div>
               </div>
-              <div className="group bg-white/5 rounded-xl border border-white/10 hover:border-chaski-gold/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <div className="group bg-white rounded-xl border border-border-soft shadow-sm hover:border-chaski-gold/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
                 <div className="w-16 h-16 mx-auto mb-4 bg-chaski-gold/10 rounded-2xl flex items-center justify-center group-hover:bg-chaski-gold/20 group-hover:scale-110 transition-all">
                   <Calendar className="w-8 h-8 text-chaski-gold" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Talleres y Eventos</h3>
-                <p className="text-slate-400 text-sm mb-4">
+                <h3 className="text-xl font-bold text-chaski-dark mb-2">Talleres y Eventos</h3>
+                <p className="text-slate-500 text-sm mb-4">
                   Organizamos talleres prácticos, competencias de robótica y eventos tecnológicos para estudiantes de todas las edades.
                 </p>
                 <div className="text-chaski-gold font-semibold">+50 eventos</div>
@@ -261,8 +260,8 @@ export default function HomePage() {
             </Reveal>
 
             {/* Galería de Experiencias desde Airtable */}
-            <Reveal delay={150} className="bg-white/5 rounded-2xl p-6 border border-white/10">
-              <h3 className="text-xl font-bold text-white mb-4 text-center flex items-center justify-center gap-2">
+            <Reveal delay={150} className="bg-white rounded-2xl p-6 border border-border-soft shadow-sm">
+              <h3 className="text-xl font-bold text-chaski-dark mb-4 text-center flex items-center justify-center gap-2">
                 <Camera className="w-5 h-5 text-slate-400" /> Galería de Experiencias
               </h3>
               {loadingExp ? (
@@ -325,7 +324,7 @@ export default function HomePage() {
                   ))}
                 </div>
               )}
-              <p className="text-center text-slate-400 text-sm mt-4">
+              <p className="text-center text-slate-500 text-sm mt-4">
                 {experiencias.length > 0 ? `${experiencias.length} experiencias en instituciones educativas` : 'Agrega fotos desde Airtable para mostrar aquí'}
               </p>
             </Reveal>
@@ -333,26 +332,25 @@ export default function HomePage() {
         </section>
 
         {/* Subject Areas - Cards Interactivas */}
-        <section className="py-20 px-4 bg-chaski-dark relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-chaski-primary/5 to-transparent" />
+        <section className="py-20 px-4 bg-white relative overflow-hidden">
           <div className="max-w-6xl mx-auto relative z-10">
             <Reveal>
-              <h2 className="text-3xl font-bold text-center text-white mb-4">
+              <h2 className="text-3xl font-bold text-center text-chaski-dark mb-4">
                 Áreas de <span className="text-chaski-primary">Aprendizaje</span>
               </h2>
-              <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
+              <p className="text-center text-slate-500 mb-12 max-w-2xl mx-auto">
                 Contenido especializado y progresivo para cada área, adaptado a la edad y nivel de cada estudiante.
               </p>
             </Reveal>
 
             <Reveal delay={100} className="grid md:grid-cols-3 gap-6">
               {/* Robótica */}
-              <div className="group bg-white/5 rounded-xl border border-white/10 hover:border-chaski-primary/40 hover:scale-105 transition-all duration-300 p-6 cursor-pointer animate-fade-in" style={{ animationDelay: '0s' }} onClick={() => router.push('/login')}>
+              <div className="group bg-white rounded-xl border border-border-soft shadow-sm hover:border-chaski-primary/40 hover:scale-105 transition-all duration-300 p-6 cursor-pointer animate-fade-in" style={{ animationDelay: '0s' }} onClick={() => router.push('/login')}>
                 <div className="w-16 h-16 bg-gradient-to-br from-chaski-primary/20 to-chaski-secondary/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all group-hover:animate-pulse">
                   <Bot className="w-8 h-8 text-chaski-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Robótica</h3>
-                <p className="text-slate-400 mb-4">Programación, diseño y electrónica con kits reales para cada nivel.</p>
+                <h3 className="text-xl font-bold text-chaski-dark mb-2">Robótica</h3>
+                <p className="text-slate-500 mb-4">Programación, diseño y electrónica con kits reales para cada nivel.</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30">Arduino</span>
                   <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-primary/10 text-chaski-primary border border-chaski-primary/30">ESP32</span>
@@ -364,12 +362,12 @@ export default function HomePage() {
               </div>
 
               {/* IA */}
-              <div className="group bg-white/5 rounded-xl border border-white/10 hover:border-chaski-secondary/40 hover:scale-105 transition-all duration-300 p-6 cursor-pointer animate-fade-in" style={{ animationDelay: '0.05s' }} onClick={() => router.push('/login')}>
+              <div className="group bg-white rounded-xl border border-border-soft shadow-sm hover:border-chaski-secondary/40 hover:scale-105 transition-all duration-300 p-6 cursor-pointer animate-fade-in" style={{ animationDelay: '0.05s' }} onClick={() => router.push('/login')}>
                 <div className="w-16 h-16 bg-gradient-to-br from-chaski-secondary/20 to-chaski-accent/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all group-hover:animate-pulse">
                   <Brain className="w-8 h-8 text-chaski-secondary" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Inteligencia Artificial</h3>
-                <p className="text-slate-400 mb-4">Reconocimiento de imágenes, voz y machine learning en el navegador.</p>
+                <h3 className="text-xl font-bold text-chaski-dark mb-2">Inteligencia Artificial</h3>
+                <p className="text-slate-500 mb-4">Reconocimiento de imágenes, voz y machine learning en el navegador.</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-secondary/10 text-chaski-secondary border border-chaski-secondary/30">COCO-SSD</span>
                   <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-chaski-secondary/10 text-chaski-secondary border border-chaski-secondary/30">MobileNet</span>
@@ -381,15 +379,15 @@ export default function HomePage() {
               </div>
 
               {/* Hacking */}
-              <div className="group bg-white/5 rounded-xl border border-white/10 hover:border-hack-green/40 hover:scale-105 transition-all duration-300 p-6 relative overflow-hidden cursor-pointer animate-fade-in" style={{ animationDelay: '0.1s' }} onClick={() => router.push('/login')}>
+              <div className="group bg-white rounded-xl border border-border-soft shadow-sm hover:border-hack-green/40 hover:scale-105 transition-all duration-300 p-6 relative overflow-hidden cursor-pointer animate-fade-in" style={{ animationDelay: '0.1s' }} onClick={() => router.push('/login')}>
                 <div className="absolute top-3 right-3 px-2 py-1 bg-hack-green/10 border border-hack-green/30 rounded text-xs text-hack-green">
                   Desde 8° EGB
                 </div>
                 <div className="w-16 h-16 bg-hack-green/15 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all group-hover:animate-pulse">
                   <Shield className="w-8 h-8 text-hack-green" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Hacking Ético</h3>
-                <p className="text-slate-400 mb-4">Seguridad informática y ciberseguridad de forma responsable.</p>
+                <h3 className="text-xl font-bold text-chaski-dark mb-2">Hacking Ético</h3>
+                <p className="text-slate-500 mb-4">Seguridad informática y ciberseguridad de forma responsable.</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-hack-green/10 text-hack-green border border-hack-green/30">Pentesting</span>
                   <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-hack-green/10 text-hack-green border border-hack-green/30">Redes</span>
@@ -404,42 +402,41 @@ export default function HomePage() {
         </section>
 
         {/* Education Levels Preview - Simplificado */}
-        <section className="py-20 px-4 bg-chaski-dark relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-chaski-secondary/5 to-transparent"></div>
+        <section className="py-20 px-4 bg-slate-50 relative overflow-hidden">
           <div className="max-w-6xl mx-auto relative z-10">
             <Reveal>
-              <h2 className="text-3xl font-bold text-center text-white mb-4">
+              <h2 className="text-3xl font-bold text-center text-chaski-dark mb-4">
                 Niveles <span className="text-chaski-primary">Educativos</span>
               </h2>
-              <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
+              <p className="text-center text-slate-500 mb-12 max-w-2xl mx-auto">
                 Desde Inicial 2 hasta 3° de Bachillerato. Contenido y kits adaptados para cada edad.
               </p>
             </Reveal>
 
             {/* Cards de niveles resumidos */}
             <Reveal delay={100} className="grid md:grid-cols-3 gap-6 mb-12">
-              <div className="group bg-white/5 rounded-xl border border-white/10 hover:border-chaski-primary/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0s' }}>
+              <div className="group bg-white rounded-xl border border-border-soft shadow-sm hover:border-chaski-primary/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0s' }}>
                 <div className="text-4xl mb-4">🎒</div>
-                <h3 className="text-xl font-bold text-white mb-2">Inicial y Elemental</h3>
-                <p className="text-slate-400 text-sm mb-4">Inicial 2 hasta 4° EGB</p>
+                <h3 className="text-xl font-bold text-chaski-dark mb-2">Inicial y Elemental</h3>
+                <p className="text-slate-500 text-sm mb-4">Inicial 2 hasta 4° EGB</p>
                 <div className="text-chaski-primary font-semibold">5 niveles</div>
               </div>
-              <div className="group bg-white/5 rounded-xl border border-white/10 hover:border-chaski-secondary/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.05s' }}>
+              <div className="group bg-white rounded-xl border border-border-soft shadow-sm hover:border-chaski-secondary/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.05s' }}>
                 <div className="text-4xl mb-4">📚</div>
-                <h3 className="text-xl font-bold text-white mb-2">Media y Superior</h3>
-                <p className="text-slate-400 text-sm mb-4">5° EGB hasta 10° EGB</p>
+                <h3 className="text-xl font-bold text-chaski-dark mb-2">Media y Superior</h3>
+                <p className="text-slate-500 text-sm mb-4">5° EGB hasta 10° EGB</p>
                 <div className="text-chaski-secondary font-semibold">6 niveles</div>
               </div>
-              <div className="group bg-white/5 rounded-xl border border-white/10 hover:border-hack-green/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <div className="group bg-white rounded-xl border border-border-soft shadow-sm hover:border-hack-green/40 hover:scale-105 transition-all duration-300 p-6 text-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
                 <div className="text-4xl mb-4">🎓</div>
-                <h3 className="text-xl font-bold text-white mb-2">Bachillerato</h3>
-                <p className="text-slate-400 text-sm mb-4">1° a 3° Bachillerato</p>
+                <h3 className="text-xl font-bold text-chaski-dark mb-2">Bachillerato</h3>
+                <p className="text-slate-500 text-sm mb-4">1° a 3° Bachillerato</p>
                 <div className="text-hack-green font-semibold">3 niveles</div>
               </div>
             </Reveal>
 
             <div className="text-center">
-              <Link href="/login" className="px-8 py-4 bg-gradient-to-r from-chaski-primary to-chaski-secondary text-white font-bold rounded-xl hover:shadow-glow-lg hover:scale-105 active:scale-[0.98] transition-all duration-300 inline-flex items-center gap-2">
+              <Link href="/login" className="px-8 py-4 bg-chaski-primary text-white font-bold rounded-xl hover:bg-chaski-secondary hover:shadow-glow-lg hover:scale-105 active:scale-[0.98] transition-all duration-300 inline-flex items-center gap-2">
                 <GraduationCap className="w-5 h-5" />
                 Acceder a los Cursos
                 <ArrowRight className="w-4 h-4" />
@@ -448,40 +445,40 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Features - Futurista */}
-        <section className="py-20 px-4 bg-chaski-dark">
+        {/* Features */}
+        <section className="py-20 px-4 bg-white">
           <div className="max-w-6xl mx-auto">
             <Reveal>
-              <h2 className="text-3xl font-bold text-center text-white mb-12">
+              <h2 className="text-3xl font-bold text-center text-chaski-dark mb-12">
                 ¿Por qué <span className="text-chaski-primary">ChaskiBots</span> EDU?
               </h2>
             </Reveal>
-            
+
             <Reveal delay={100} className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center hover:border-chaski-primary/30 transition-all">
+              <div className="bg-white border border-border-soft shadow-sm rounded-2xl p-6 text-center hover:border-chaski-primary/30 transition-all">
                 <div className="w-16 h-16 bg-chaski-primary/10 border border-chaski-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-chaski-primary" />
                 </div>
-                <h3 className="font-bold text-lg text-white mb-2">Aprendizaje Progresivo</h3>
-                <p className="text-slate-400">
+                <h3 className="font-bold text-lg text-chaski-dark mb-2">Aprendizaje Progresivo</h3>
+                <p className="text-slate-500">
                   Contenido adaptado a cada nivel educativo, desde los 4 años hasta bachillerato.
                 </p>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center hover:border-chaski-accent/30 transition-all">
-                <div className="w-16 h-16 bg-chaski-accent/10 border border-chaski-accent/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Rocket className="w-8 h-8 text-chaski-accent" />
+              <div className="bg-white border border-border-soft shadow-sm rounded-2xl p-6 text-center hover:border-chaski-gold/30 transition-all">
+                <div className="w-16 h-16 bg-chaski-gold/10 border border-chaski-gold/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Rocket className="w-8 h-8 text-chaski-gold" />
                 </div>
-                <h3 className="font-bold text-lg text-white mb-2">Kits Reales</h3>
-                <p className="text-slate-400">
+                <h3 className="font-bold text-lg text-chaski-dark mb-2">Kits Reales</h3>
+                <p className="text-slate-500">
                   Aprende con kits físicos de robótica diseñados para cada nivel educativo.
                 </p>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center hover:border-hack-green/30 transition-all">
+              <div className="bg-white border border-border-soft shadow-sm rounded-2xl p-6 text-center hover:border-hack-green/30 transition-all">
                 <div className="w-16 h-16 bg-hack-green/10 border border-hack-green/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Award className="w-8 h-8 text-hack-green" />
                 </div>
-                <h3 className="font-bold text-lg text-white mb-2">Simuladores Online</h3>
-                <p className="text-slate-400">
+                <h3 className="font-bold text-lg text-chaski-dark mb-2">Simuladores Online</h3>
+                <p className="text-slate-500">
                   Practica con Wokwi, Tinkercad, Scratch y más simuladores integrados.
                 </p>
               </div>

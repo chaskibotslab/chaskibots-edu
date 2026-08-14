@@ -102,7 +102,7 @@ export default function NivelesPage() {
 
   if (levelsLoading || coursesLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-chaski-light">
+      <div className="min-h-screen flex flex-col bg-slate-50">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
@@ -113,7 +113,7 @@ export default function NivelesPage() {
   }
 
   return (
-    <div className={`min-h-screen flex flex-col bg-chaski-light transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen flex flex-col bg-slate-50 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       <Header />
 
       <main className="flex-1 py-6 px-4">
