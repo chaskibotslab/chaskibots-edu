@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useAuth } from '@/components/AuthProvider'
-import TypedText from '@/components/TypedText'
 import { Mail, Lock, Eye, EyeOff, Loader2, GraduationCap, Building2, ArrowRight } from 'lucide-react'
 
 export default function LoginPage() {
@@ -18,23 +17,10 @@ export default function LoginPage() {
   const { login } = useAuth()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [tilt, setTilt] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = cardRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const x = (e.clientX - rect.left) / rect.width - 0.5
-    const y = (e.clientY - rect.top) / rect.height - 0.5
-    setTilt({ x: y * -2, y: x * 3 })
-  }
-
-  const handleCardMouseLeave = () => setTilt({ x: 0, y: 0 })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -76,81 +62,39 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative bg-chaski-light flex items-start justify-center px-4 pt-10 pb-10">
-      {/* Fondo suave con acentos coral */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-chaski-primary/15 blur-[130px] animate-mesh-1" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[50%] h-[50%] rounded-full bg-chaski-gold/15 blur-[120px] animate-mesh-2" />
-        <div className="absolute top-[30%] right-[10%] w-[30%] h-[30%] rounded-full bg-hack-green/10 blur-[110px] animate-mesh-3" />
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(229,115,97,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(229,115,97,0.6) 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
-        {/* Chispas de código, eco hacking en colores de marca */}
-        <span className="absolute top-[12%] left-[8%] font-mono text-xs text-chaski-primary/25 animate-float">&lt;robot/&gt;</span>
-        <span className="absolute top-[22%] right-[10%] font-mono text-xs text-hack-green/25 animate-float" style={{ animationDelay: '1s' }}>01001</span>
-        <span className="absolute bottom-[15%] right-[14%] font-mono text-xs text-chaski-gold/30 animate-float" style={{ animationDelay: '2s' }}>sudo access</span>
-        <span className="absolute bottom-[10%] left-[10%] font-mono text-xs text-chaski-primary/25 animate-float" style={{ animationDelay: '1.6s' }}>{'{ ia: true }'}</span>
-      </div>
+    <div className="min-h-screen relative bg-chaski-light flex items-start justify-center px-4 pt-12 pb-10">
+      {/* Fondo suave, estático */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: 'radial-gradient(ellipse at top, rgba(229,115,97,0.06) 0%, transparent 60%)',
+      }} />
 
       {/* Contenido centrado */}
       <div className={`relative z-10 w-full max-w-md flex flex-col items-center ${mounted ? 'animate-login-enter' : 'opacity-0'}`}>
 
         {/* Logo oficial Chaski Bots LAB */}
-        <div className="relative mb-4 animate-float" style={{ animationDelay: '0.1s' }}>
-          <div className="absolute -inset-3 bg-gradient-to-br from-chaski-primary/25 to-chaski-gold/15 rounded-[1.75rem] blur-xl animate-pulse-slow" />
-          <div className="relative bg-white rounded-2xl shadow-xl border border-border-soft p-3 animate-card-float overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-chaski-primary/[0.08] to-transparent animate-scan-line pointer-events-none" style={{ animationDuration: '3s' }} />
+        <div className="relative mb-5">
+          <div className="bg-white rounded-2xl shadow-md border border-border-soft p-3">
             <Image
               src="/logo.jpg"
               alt="Chaski Bots LAB"
               width={170}
               height={170}
-              className="relative w-[110px] sm:w-[125px] h-auto"
+              className="w-[100px] h-auto"
               priority
             />
           </div>
-          <div className="absolute -bottom-2 -right-2 flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-md ring-2 ring-white">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-hack-green opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-hack-green" />
-            </span>
-            <span className="text-[10px] font-semibold text-slate-600">online</span>
-          </div>
         </div>
 
-        {/* Título con palabras que entran deslizando */}
-        <h1 className="text-chaski-dark text-2xl sm:text-3xl font-black leading-tight text-center mb-1 overflow-hidden">
-          <span className="inline-block animate-slide-in-left" style={{ animationDelay: '0.15s' }}>El</span>{' '}
-          <span className="inline-block animate-slide-in-right" style={{ animationDelay: '0.25s' }}>futuro</span>{' '}
-          <span className="inline-block animate-slide-in-left" style={{ animationDelay: '0.35s' }}>se</span>{' '}
-          <span className="inline-block animate-slide-in-right text-chaski-primary" style={{ animationDelay: '0.45s' }}>construye</span>{' '}
-          <span className="inline-block animate-slide-in-left" style={{ animationDelay: '0.55s' }}>aquí</span>
+        {/* Título */}
+        <h1 className="text-chaski-dark text-2xl sm:text-3xl font-bold leading-tight text-center mb-2">
+          El futuro se <span className="text-chaski-primary">construye</span> aquí
         </h1>
-        <p className={`text-slate-500 text-sm text-center max-w-sm mb-4 ${mounted ? 'animate-stagger-in' : 'opacity-0'}`} style={{ animationDelay: '0.6s' }}>
+        <p className="text-slate-500 text-sm text-center max-w-sm mb-8">
           Robótica, inteligencia artificial y hacking ético con laboratorios interactivos y proyectos reales.
         </p>
 
-        {/* Panel terminal, entorno hacking en colores de marca */}
-        <div className="inline-flex items-center gap-2 bg-chaski-dark px-3.5 py-2 rounded-lg mb-6 shadow-md relative overflow-hidden animate-fade-in" style={{ animationDelay: '0.8s' }}>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-chaski-primary/15 to-transparent animate-scan-line pointer-events-none" />
-          <span className="text-chaski-primary font-mono text-xs font-bold relative">&gt;_</span>
-          <TypedText
-            className="text-slate-300 font-mono text-xs relative"
-            lines={['verificando_acceso...', 'autenticando_usuario', 'bienvenido_de_vuelta']}
-          />
-        </div>
-
         {/* Card de login */}
-        <div
-          ref={cardRef}
-          onMouseMove={handleCardMouseMove}
-          onMouseLeave={handleCardMouseLeave}
-          style={{
-            transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-            transition: 'transform 0.2s ease-out',
-            transformStyle: 'preserve-3d',
-            animationDelay: '0.4s',
-          }}
-          className={`w-full ${mounted ? 'animate-login-card' : 'opacity-0'}`}
-        >
+        <div className="w-full">
           <div className="w-full bg-white rounded-2xl shadow-xl p-6 border border-border-soft">
             <div className="text-center mb-5">
               <h2 className="text-lg font-bold text-chaski-dark">Bienvenido</h2>
