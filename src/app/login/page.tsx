@@ -40,7 +40,8 @@ export default function LoginPage() {
           localStorage.setItem('chaskibots_user', JSON.stringify(result.user))
           // Debe coincidir con la duración de la cookie httpOnly que puso el servidor (7 días)
           localStorage.setItem('chaskibots_session_exp', String(Date.now() + 7 * 24 * 60 * 60 * 1000))
-          window.location.href = '/niveles'
+          const params = new URLSearchParams(window.location.search)
+          window.location.href = params.get('redirect') || '/niveles'
           return
         }
       } else {

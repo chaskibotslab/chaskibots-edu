@@ -6,7 +6,7 @@ import { verifySessionCookie, SESSION_COOKIE_NAME } from '@/lib/session'
 const ADMIN_ROUTES = ['/admin']
 
 // Rutas que requieren autenticación (cualquier usuario)
-const PROTECTED_ROUTES = ['/dashboard', '/curso', '/tareas']
+const PROTECTED_ROUTES = ['/dashboard', '/curso', '/tareas', '/simuladores', '/academy']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -48,6 +48,8 @@ export const config = {
     '/admin/:path*',
     '/dashboard/:path*',
     '/curso/:path*',
-    '/tareas/:path*'
+    '/tareas/:path*',
+    '/simuladores/:path*',
+    '/academy/:path*'
   ]
 }
