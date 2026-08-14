@@ -3,12 +3,17 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 const DEFAULT_BUCKET = 'submissions'
 
+// Buckets cuyo contenido es para mostrar públicamente en el sitio (no documentos
+// privados de estudiantes), así que se crean con URL pública fija en vez de
+// signed URL que expira.
+const PUBLIC_BUCKETS = ['experiencias']
+
 async function ensureBucket(bucket: string) {
   try {
     const { data: buckets, error: listError } = await supabaseAdmin.storage.listBuckets()
     if (listError) throw listError
     if (buckets?.some(b => b.id === bucket)) return true
-    const { error: createError } = await supabaseAdmin.storage.createBucket(bucket, { public: false })
+    const { error: createError } = await supabaseAdmin.storage.createBucket(bucket, { public: PUBLIC_BUCKETS.includes(bucket) })
     if (createError) throw createError
     console.log(`🪣 Bucket '${bucket}' creado`)
     return true
@@ -39,22 +44,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No se proporcionó archivo' }, { status: 400 })
     }
 
-    // Validar tipo de archivo - permitir imágenes, PDFs, documentos
+    // Validar tipo de archivo - permitir imágenes, videos, PDFs, documentos
     const allowedTypes = [
       'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+      'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo',
       'application/pdf',
       'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'text/plain', 'text/csv'
     ]
-    if (!allowedTypes.includes(file.type) && !file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'Tipo de archivo no permitido. Usa imágenes, PDF, Word o Excel.' }, { status: 400 })
+    const isImage = file.type.startsWith('image/')
+    const isVideo = file.type.startsWith('video/')
+    if (!allowedTypes.includes(file.type) && !isImage) {
+      return NextResponse.json({ error: 'Tipo de archivo no permitido. Usa imágenes, video, PDF, Word o Excel.' }, { status: 400 })
     }
 
-    // Validar tamaño (máximo 10MB)
-    const maxSize = 10 * 1024 * 1024
+    // Validar tamaño (10MB para imágenes/documentos, 100MB para video)
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024
     if (file.size > maxSize) {
-      return NextResponse.json({ error: 'Archivo muy grande. Máximo 10MB.' }, { status: 400 })
+      const limitLabel = isVideo ? '100MB' : '10MB'
+      return NextResponse.json({ error: `Archivo muy grande. Máximo ${limitLabel}.` }, { status: 400 })
     }
 
     const bucketReady = await ensureBucket(bucket)

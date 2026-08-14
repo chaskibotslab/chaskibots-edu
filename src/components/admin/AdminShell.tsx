@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Users, School, BookOpen, GraduationCap,
   Package, Monitor, Brain, ClipboardList, Inbox, Award,
   CheckSquare, FolderKanban, ChevronLeft, ChevronRight,
-  Search, LogOut, Home, Menu, X, FileText
+  Search, LogOut, Home, Menu, X, FileText, Camera
 } from 'lucide-react'
 
 interface NavItem {
@@ -46,6 +46,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/kits', label: 'Kits', icon: Package },
       { href: '/admin/simuladores', label: 'Simuladores', icon: Monitor },
       { href: '/admin/ia', label: 'Actividades IA', icon: Brain },
+      { href: '/admin/experiencias', label: 'Galería de Experiencias', icon: Camera },
     ]
   },
   {
@@ -70,6 +71,7 @@ const ROUTE_LABELS: Record<string, string> = {
   kits: 'Kits',
   simuladores: 'Simuladores',
   ia: 'Actividades IA',
+  experiencias: 'Galería de Experiencias',
   tareas: 'Tareas',
   entregas: 'Entregas',
   calificaciones: 'Calificaciones',

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Reveal from '@/components/Reveal'
-import { Bot, Brain, Shield, Rocket, Users, Award, ArrowRight, Sparkles, GraduationCap, Building2, UserCheck, Calendar, Camera } from 'lucide-react'
+import { Bot, Brain, Shield, Rocket, Users, Award, ArrowRight, Sparkles, GraduationCap, Building2, UserCheck, Calendar, Camera, Play, X } from 'lucide-react'
 
 export default function HomePage() {
   const router = useRouter()
@@ -17,6 +17,7 @@ export default function HomePage() {
   const [count4, setCount4] = useState(0)
   const [experiencias, setExperiencias] = useState<any[]>([])
   const [loadingExp, setLoadingExp] = useState(true)
+  const [lightboxExp, setLightboxExp] = useState<any | null>(null)
   const heroRef = useRef<HTMLElement>(null)
 
   // Cargar experiencias desde Airtable
@@ -213,10 +214,12 @@ export default function HomePage() {
                 </div>
               ) : experiencias.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {experiencias.slice(0, 8).map((exp, index) => (
-                    <div
+                  {experiencias.map((exp, index) => (
+                    <button
                       key={exp.id}
-                      className={`group relative aspect-video rounded-xl overflow-hidden border hover:scale-105 transition-all duration-300 cursor-pointer animate-fade-in ${
+                      type="button"
+                      onClick={() => setLightboxExp(exp)}
+                      className={`group relative aspect-video rounded-xl overflow-hidden border hover:scale-105 transition-all duration-300 cursor-pointer animate-fade-in text-left ${
                         index % 4 === 0 ? 'border-chaski-primary/30 hover:border-chaski-primary' :
                         index % 4 === 1 ? 'border-chaski-secondary/30 hover:border-chaski-secondary' :
                         index % 4 === 2 ? 'border-hack-green/30 hover:border-hack-green' :
@@ -224,7 +227,9 @@ export default function HomePage() {
                       }`}
                       style={{ animationDelay: `${(index % 4) * 0.05}s` }}
                     >
-                      {exp.url ? (
+                      {exp.url && exp.tipo === 'video' ? (
+                        <video src={exp.url} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" muted playsInline />
+                      ) : exp.url ? (
                         <Image
                           src={exp.url}
                           alt={exp.titulo}
@@ -246,11 +251,11 @@ export default function HomePage() {
                         </div>
                       </div>
                       {exp.tipo === 'video' && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                          Video
+                        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          <Play className="w-3 h-3 fill-current" /> Video
                         </div>
                       )}
-                    </div>
+                    </button>
                   ))}
                 </div>
               ) : (
@@ -268,7 +273,7 @@ export default function HomePage() {
                 </div>
               )}
               <p className="text-center text-slate-500 text-sm mt-4">
-                {experiencias.length > 0 ? `${experiencias.length} experiencias en instituciones educativas` : 'Agrega fotos desde Airtable para mostrar aquí'}
+                {experiencias.length > 0 ? `${experiencias.length} experiencias en instituciones educativas` : 'Sube fotos y videos desde el panel de administración para mostrarlos aquí'}
               </p>
             </Reveal>
           </div>
@@ -457,6 +462,36 @@ export default function HomePage() {
       </main>
 
       <Footer />
+
+      {/* Lightbox de la Galería de Experiencias */}
+      {lightboxExp && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setLightboxExp(null)}
+        >
+          <button
+            onClick={() => setLightboxExp(null)}
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+            aria-label="Cerrar"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <div className="max-w-4xl w-full max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="relative rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+              {lightboxExp.tipo === 'video' ? (
+                <video src={lightboxExp.url} className="max-h-[70vh] w-full" controls autoPlay />
+              ) : (
+                <img src={lightboxExp.url} alt={lightboxExp.titulo} className="max-h-[70vh] w-full object-contain" />
+              )}
+            </div>
+            <div className="mt-4 text-center">
+              <p className="text-white font-bold text-lg">{lightboxExp.titulo}</p>
+              {lightboxExp.institucion && <p className="text-slate-300 text-sm mt-0.5">{lightboxExp.institucion}</p>}
+              {lightboxExp.descripcion && <p className="text-slate-400 text-sm mt-2 max-w-2xl mx-auto">{lightboxExp.descripcion}</p>}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
