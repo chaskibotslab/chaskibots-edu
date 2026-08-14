@@ -20,7 +20,7 @@ const COLOR_STYLES: Record<ColorKey, { bg: string; border: string; borderHover: 
   coral: { bg: 'bg-chaski-primary/10', border: 'border-chaski-primary/20', borderHover: 'hover:border-chaski-primary/40', text: 'text-chaski-primary', textGroupHover: 'group-hover:text-chaski-primary', glow: 'hover:shadow-chaski-primary/10' },
   gold: { bg: 'bg-chaski-gold/10', border: 'border-chaski-gold/20', borderHover: 'hover:border-chaski-gold/40', text: 'text-chaski-gold', textGroupHover: 'group-hover:text-chaski-gold', glow: 'hover:shadow-chaski-gold/10' },
   green: { bg: 'bg-hack-green/10', border: 'border-hack-green/20', borderHover: 'hover:border-hack-green/40', text: 'text-hack-green', textGroupHover: 'group-hover:text-hack-green', glow: 'hover:shadow-hack-green/10' },
-  slate: { bg: 'bg-slate-400/10', border: 'border-slate-400/20', borderHover: 'hover:border-slate-400/40', text: 'text-slate-300', textGroupHover: 'group-hover:text-slate-300', glow: 'hover:shadow-slate-400/10' },
+  slate: { bg: 'bg-slate-100', border: 'border-slate-300', borderHover: 'hover:border-slate-400', text: 'text-slate-500', textGroupHover: 'group-hover:text-slate-600', glow: 'hover:shadow-slate-300/30' },
 }
 
 type Action = {
@@ -90,7 +90,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-chaski-dark flex items-center justify-center">
+      <div className="min-h-screen bg-chaski-light flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
       </div>
     )
@@ -104,7 +104,7 @@ export default function DashboardPage() {
   const progress = user?.progress || 0
 
   return (
-    <div className={`min-h-screen flex flex-col bg-chaski-dark transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen flex flex-col bg-chaski-light transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
       <Header />
 
       <main className="flex-1 py-6 px-4">
@@ -152,7 +152,7 @@ export default function DashboardPage() {
 
           {/* Quick Actions */}
           <div>
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-chaski-dark mb-4 flex items-center gap-2">
               <Zap className="w-5 h-5 text-chaski-primary" />
               Accesos rápidos
             </h2>
@@ -165,14 +165,14 @@ export default function DashboardPage() {
                   <Link
                     key={action.id}
                     href={href}
-                    className={`group relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 p-5 hover:shadow-xl ${c.glow} ${c.borderHover} transition-all duration-300 active:scale-[0.98] animate-slide-up`}
+                    className={`group relative overflow-hidden rounded-2xl bg-white border border-border-soft shadow-sm p-5 hover:shadow-xl ${c.glow} ${c.borderHover} transition-all duration-300 active:scale-[0.98] animate-slide-up`}
                     style={{ animationDelay: `${idx * 0.05}s` }}
                   >
                     <div className={`absolute top-0 right-0 w-24 h-24 ${c.bg} rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
                     <div className={`relative w-12 h-12 rounded-xl ${c.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border ${c.border}`}>
                       <Icon className={`w-6 h-6 ${c.text}`} />
                     </div>
-                    <h3 className="font-semibold text-white mb-1">{action.title}</h3>
+                    <h3 className="font-semibold text-chaski-dark mb-1">{action.title}</h3>
                     <p className="text-sm text-slate-500 mb-3">{action.description(currentLevel.name)}</p>
                     <span className={`text-sm font-medium ${c.text} flex items-center gap-2 group-hover:gap-3 transition-all`}>
                       {action.id === 'continue' ? 'Ir al curso' : action.id === 'simulators' ? 'Explorar' : 'Ver más'}
@@ -186,7 +186,7 @@ export default function DashboardPage() {
 
           {/* Study Areas */}
           <div>
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-chaski-dark mb-4 flex items-center gap-2">
               <Target className="w-5 h-5 text-chaski-primary" />
               Áreas de estudio
             </h2>
@@ -198,17 +198,17 @@ export default function DashboardPage() {
                   <Link
                     key={area.id}
                     href={area.href}
-                    className={`group flex items-center gap-4 rounded-2xl bg-white/[0.03] border border-white/10 p-5 hover:shadow-lg ${c.borderHover} transition-all duration-300 active:scale-[0.98] animate-slide-up`}
+                    className={`group flex items-center gap-4 rounded-2xl bg-white border border-border-soft shadow-sm p-5 hover:shadow-lg ${c.borderHover} transition-all duration-300 active:scale-[0.98] animate-slide-up`}
                     style={{ animationDelay: `${idx * 0.05}s` }}
                   >
                     <div className={`w-14 h-14 rounded-xl ${c.bg} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform border ${c.border}`}>
                       <Icon className={`w-7 h-7 ${c.text}`} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white">{area.title}</h3>
+                      <h3 className="font-semibold text-chaski-dark">{area.title}</h3>
                       <p className="text-sm text-slate-500">{area.description}</p>
                     </div>
-                    <ArrowRight className={`w-5 h-5 text-slate-600 ${c.textGroupHover} ml-auto transition-colors`} />
+                    <ArrowRight className={`w-5 h-5 text-slate-400 ${c.textGroupHover} ml-auto transition-colors`} />
                   </Link>
                 )
               })}
@@ -224,12 +224,12 @@ export default function DashboardPage() {
 
           {/* Motivational footer card */}
           <div className="rounded-2xl bg-chaski-primary/10 border border-chaski-primary/20 p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/5 border border-chaski-primary/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-white border border-chaski-primary/20 flex items-center justify-center">
               <Crown className="w-6 h-6 text-chaski-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-white">Sigue aprendiendo</h3>
-              <p className="text-sm text-white/60">
+              <h3 className="font-semibold text-chaski-dark">Sigue aprendiendo</h3>
+              <p className="text-sm text-slate-500">
                 Completa más lecciones para ganar insignias y desbloquear nuevos desafíos.
               </p>
             </div>

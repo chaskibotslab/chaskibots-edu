@@ -72,11 +72,11 @@ const COLOR_STYLES: Record<string, { icon: string; bg: string; border: string; h
     light: 'bg-chaski-gold/5'
   },
   slate: {
-    icon: 'text-slate-300',
-    bg: 'bg-slate-400/10',
-    border: 'border-slate-400/20',
-    hover: 'hover:border-slate-400/40 hover:bg-slate-400/5',
-    light: 'bg-slate-400/5'
+    icon: 'text-slate-500',
+    bg: 'bg-slate-100',
+    border: 'border-slate-300',
+    hover: 'hover:border-slate-400 hover:bg-slate-50',
+    light: 'bg-slate-200/40'
   },
   green: {
     icon: 'text-hack-green',
@@ -102,7 +102,7 @@ export default function NivelesPage() {
 
   if (levelsLoading || coursesLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-chaski-dark">
+      <div className="min-h-screen flex flex-col bg-chaski-light">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
@@ -113,7 +113,7 @@ export default function NivelesPage() {
   }
 
   return (
-    <div className={`min-h-screen flex flex-col bg-chaski-dark transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen flex flex-col bg-chaski-light transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       <Header />
 
       <main className="flex-1 py-6 px-4">
@@ -125,10 +125,10 @@ export default function NivelesPage() {
               <Sparkles className="w-4 h-4 text-chaski-primary" />
               <span className="text-sm font-medium text-chaski-primary">Plataforma Educativa</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white mb-3">
+            <h1 className="text-3xl md:text-4xl font-black text-chaski-dark mb-3">
               Niveles Educativos
             </h1>
-            <p className="text-white/50 max-w-xl mx-auto">
+            <p className="text-slate-500 max-w-xl mx-auto">
               Selecciona tu nivel para acceder a contenido de Robótica, IA y Hacking Ético
             </p>
           </div>
@@ -148,8 +148,8 @@ export default function NivelesPage() {
                     <CatIcon className={`w-6 h-6 ${styles.icon}`} />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white">{category.title}</h2>
-                    <p className="text-white/50 text-sm">{category.subtitle}</p>
+                    <h2 className="text-2xl font-bold text-chaski-dark">{category.title}</h2>
+                    <p className="text-slate-500 text-sm">{category.subtitle}</p>
                   </div>
                 </div>
 
@@ -163,7 +163,7 @@ export default function NivelesPage() {
                       <Link
                         key={level.id}
                         href={`/nivel/${level.id}`}
-                        className={`group relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 p-5 transition-all duration-300 animate-scale-in hover:shadow-lg hover:shadow-white/5 ${styles.hover}`}
+                        className={`group relative overflow-hidden rounded-2xl bg-white border border-border-soft shadow-sm p-5 transition-all duration-300 animate-scale-in hover:shadow-lg ${styles.hover}`}
                         style={{ animationDelay: `${levelIdx * 0.05}s` }}
                       >
                         <div className={`absolute top-0 right-0 w-20 h-20 ${styles.light} rounded-full blur-2xl -translate-y-1/2 translate-x-1/2`}></div>
@@ -172,7 +172,7 @@ export default function NivelesPage() {
                             <IconComponent className={`w-6 h-6 ${styles.icon}`} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-white text-sm leading-tight">{level.name}</h3>
+                            <h3 className="font-semibold text-chaski-dark text-sm leading-tight">{level.name}</h3>
                             <p className="text-slate-500 text-xs mt-0.5">{level.ageRange}</p>
                           </div>
                           {hasAccess ? (
