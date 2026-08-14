@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Reveal from '@/components/Reveal'
-import { Bot, Brain, Shield, Rocket, Users, Award, Play, ArrowRight, Cpu, Sparkles, GraduationCap, Building2, UserCheck, Calendar, Camera } from 'lucide-react'
+import TypedText from '@/components/TypedText'
+import { Bot, Brain, Shield, Rocket, Users, Award, Play, ArrowRight, Cpu, Sparkles, GraduationCap, Building2, UserCheck, Calendar, Camera, CheckCircle2 } from 'lucide-react'
 
 export default function HomePage() {
   const router = useRouter()
@@ -112,33 +113,36 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 gap-10 items-center">
               {/* Left - Text */}
               <div className="order-2 md:order-1">
-                <div className="inline-flex items-center gap-2 bg-chaski-dark/5 px-4 py-2 rounded-full mb-6 border border-chaski-primary/20 animate-fade-in">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-hack-green opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-hack-green"></span>
-                  </span>
-                  <span className="text-sm font-medium text-slate-600">Plataforma educativa en línea</span>
+                <div className="inline-flex items-center gap-2 bg-chaski-dark px-4 py-2 rounded-lg mb-6 shadow-md animate-fade-in relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-chaski-primary/15 to-transparent animate-scan-line pointer-events-none" />
+                  <span className="text-chaski-primary font-mono text-sm font-bold relative">&gt;_</span>
+                  <TypedText
+                    className="text-slate-200 font-mono text-sm relative"
+                    lines={['iniciando_plataforma.sh', 'cargando_robotica.py', 'modo_hacking_etico --on', 'sistema_listo ✓']}
+                  />
                 </div>
 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-[1.08] text-chaski-dark animate-slide-up">
-                  Aprende{' '}
-                  <span className="relative inline-block">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-[1.08] text-chaski-dark">
+                  <span className="inline-block animate-slide-in-left" style={{ animationDelay: '0s' }}>Aprende</span>{' '}
+                  <span className="relative inline-block animate-slide-in-right" style={{ animationDelay: '0.15s' }}>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-chaski-primary to-chaski-secondary">Robótica</span>
-                    <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-chaski-primary to-chaski-secondary rounded-full animate-expand-width" />
+                    <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-chaski-primary to-chaski-secondary rounded-full animate-expand-width" style={{ animationDelay: '0.6s' }} />
                   </span>,{' '}
-                  <span className="text-chaski-gold">IA</span> y{' '}
-                  <span className="text-hack-green">Hacking Ético</span>
+                  <span className="inline-block animate-slide-in-left text-chaski-gold" style={{ animationDelay: '0.3s' }}>IA</span>{' '}
+                  <span className="inline-block animate-slide-in-left" style={{ animationDelay: '0.35s' }}>y</span>{' '}
+                  <span className="inline-block animate-slide-in-right text-hack-green" style={{ animationDelay: '0.45s' }}>Hacking Ético</span>
                 </h1>
 
-                <p className="text-lg text-slate-600 mb-4 max-w-lg leading-relaxed animate-fade-in" style={{animationDelay: '0.3s'}}>
+                <p className="text-lg text-slate-600 mb-4 max-w-lg leading-relaxed animate-fade-in" style={{animationDelay: '0.6s'}}>
                   La plataforma educativa que transforma cómo aprenden tecnología
                   los estudiantes de Ecuador. Desde Inicial hasta Bachillerato.
                 </p>
 
-                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 mb-8 animate-fade-in" style={{animationDelay: '0.4s'}}>
-                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-chaski-primary" />14 kits físicos</span>
-                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-chaski-gold" />+30 simuladores</span>
-                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-hack-green" />Proyectos reales</span>
+                <div className="inline-flex flex-col gap-1.5 bg-chaski-dark rounded-xl px-4 py-3 mb-8 shadow-lg font-mono text-xs sm:text-sm animate-fade-in relative overflow-hidden" style={{animationDelay: '0.7s'}}>
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-chaski-primary/10 to-transparent animate-scan-line pointer-events-none" style={{ animationDelay: '1s' }} />
+                  <span className="relative flex items-center gap-2 text-slate-300"><CheckCircle2 className="w-3.5 h-3.5 text-chaski-primary" /> 14 kits físicos</span>
+                  <span className="relative flex items-center gap-2 text-slate-300"><CheckCircle2 className="w-3.5 h-3.5 text-chaski-gold" /> +30 simuladores</span>
+                  <span className="relative flex items-center gap-2 text-slate-300"><CheckCircle2 className="w-3.5 h-3.5 text-hack-green" /> Proyectos reales</span>
                 </div>
 
                 <div className="flex flex-wrap gap-3 animate-fade-in" style={{animationDelay: '0.5s'}}>
@@ -167,16 +171,21 @@ export default function HomePage() {
                     <div className="absolute -inset-4 bg-gradient-to-br from-chaski-primary/15 to-chaski-gold/10 rounded-[2.5rem] blur-2xl animate-pulse-slow" />
 
                     {/* Tarjeta blanca que enmarca el logo oficial */}
-                    <div className="relative bg-white rounded-[2rem] shadow-xl border border-border-soft p-6 sm:p-7 animate-card-float">
+                    <div className="relative bg-white rounded-[2rem] shadow-xl border border-border-soft p-6 sm:p-7 animate-card-float overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-chaski-primary/[0.06] to-transparent animate-scan-line pointer-events-none" style={{ animationDuration: '3.5s' }} />
                       <Image
                         src="/logo.jpg"
                         alt="Chaski Bots LAB"
                         width={280}
                         height={280}
-                        className="w-[190px] sm:w-[220px] h-auto"
+                        className="relative w-[190px] sm:w-[220px] h-auto"
                         priority
                       />
                     </div>
+
+                    {/* Chispas de código flotando, eco hacking en colores de marca */}
+                    <span className="absolute -top-6 right-4 font-mono text-[11px] text-chaski-primary/50 animate-float" style={{ animationDelay: '0.6s' }}>01</span>
+                    <span className="absolute bottom-2 -left-8 font-mono text-[11px] text-hack-green/50 animate-float" style={{ animationDelay: '1.4s' }}>&lt;/&gt;</span>
 
                     {/* Floating badges */}
                     <div className="absolute -top-4 -left-10 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-lg border border-border-soft animate-card-float" style={{ animationDelay: '0.5s' }}>
