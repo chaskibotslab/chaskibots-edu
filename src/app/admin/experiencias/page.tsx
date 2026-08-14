@@ -286,7 +286,9 @@ function ExpItem({ item, active, onClick, index }: { item: Experiencia; active: 
       }`}
     >
       {item.tipo === 'video' ? (
-        <video src={item.url} className="w-full h-full object-cover" muted />
+        <div className="w-full h-full bg-black">
+          <video src={item.url} className="w-full h-full object-contain" muted />
+        </div>
       ) : (
         <img src={item.url} alt="" className="w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.opacity = '0.2')} />
       )}

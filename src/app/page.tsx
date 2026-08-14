@@ -20,14 +20,14 @@ export default function HomePage() {
   const [lightboxExp, setLightboxExp] = useState<any | null>(null)
   const heroRef = useRef<HTMLElement>(null)
 
-  // Cargar experiencias desde Airtable
+  // Cargar experiencias desde Supabase
   useEffect(() => {
     const fetchExperiencias = async () => {
       try {
         const res = await fetch('/api/experiencias')
         if (res.ok) {
           const data = await res.json()
-          setExperiencias(data)
+          setExperiencias(data.experiencias || [])
         }
       } catch (error) {
         console.error('Error loading experiencias:', error)
@@ -228,7 +228,9 @@ export default function HomePage() {
                       style={{ animationDelay: `${(index % 4) * 0.05}s` }}
                     >
                       {exp.url && exp.tipo === 'video' ? (
-                        <video src={exp.url} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" muted playsInline />
+                        <div className="absolute inset-0 bg-black">
+                          <video src={exp.url} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" muted playsInline />
+                        </div>
                       ) : exp.url ? (
                         <Image
                           src={exp.url}
