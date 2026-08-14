@@ -78,8 +78,10 @@ export default function LoginPage() {
     <div className="min-h-screen relative overflow-hidden bg-chaski-light flex items-center justify-center px-4 py-8">
       {/* Fondo suave con acentos coral */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-chaski-primary/10 blur-[130px]" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[50%] h-[50%] rounded-full bg-chaski-secondary/15 blur-[120px]" />
+        <div className="absolute top-[-15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-chaski-primary/15 blur-[130px] animate-mesh-1" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[50%] h-[50%] rounded-full bg-chaski-gold/15 blur-[120px] animate-mesh-2" />
+        <div className="absolute top-[30%] right-[10%] w-[30%] h-[30%] rounded-full bg-hack-green/10 blur-[110px] animate-mesh-3" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(229,115,97,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(229,115,97,0.6) 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
       </div>
 
       {/* Contenido centrado */}
@@ -87,8 +89,10 @@ export default function LoginPage() {
 
         {/* Robot mascota */}
         <div className="relative mb-4 animate-float" style={{ animationDelay: '0.1s' }}>
-          <div className="relative w-16 h-16 rounded-full overflow-hidden ring-4 ring-white shadow-lg bg-chaski-dark">
-            <Image src="/chaski.png" alt="ChaskiBots Bot" width={64} height={64} className="w-full h-full object-cover" priority />
+          <div className="absolute -inset-4 bg-chaski-primary/25 rounded-full blur-2xl animate-pulse-slow" />
+          <div className="absolute -inset-1.5 rounded-full border-2 border-dashed border-chaski-primary/40 animate-spin-slow" />
+          <div className="relative w-20 h-20 rounded-full overflow-hidden ring-4 ring-white shadow-xl bg-chaski-dark">
+            <Image src="/chaski.png" alt="ChaskiBots Bot" width={80} height={80} className="w-full h-full object-cover" priority />
           </div>
           <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-hack-green flex items-center justify-center ring-4 ring-chaski-light">
             <span className="w-2 h-2 rounded-full bg-white" />
