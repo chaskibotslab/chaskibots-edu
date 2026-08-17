@@ -362,6 +362,464 @@ function processCommand(
       ]
     }
 
+    // ═══ OSINT / RECONOCIMIENTO ═══
+    case 'whois': {
+      if (!args[0]) return [{ text: 'uso: whois <dominio>', type: 'error' }]
+      return [
+        { text: `Domain Name: ${args[0].toUpperCase()}`, type: 'info' },
+        { text: 'Registrant: Target Corp S.A.', type: 'normal' },
+        { text: 'Registrant Email: admin@target-corp.com', type: 'normal' },
+        { text: 'Creation Date: 2018-03-14', type: 'normal' },
+        { text: 'Registrar: NameSecure LLC', type: 'normal' },
+        { text: 'Name Server: ns1.target-corp.com', type: 'normal' },
+        { text: 'Name Server: ns2.target-corp.com', type: 'normal' },
+      ]
+    }
+
+    case 'nslookup': {
+      if (!args[0]) return [{ text: 'uso: nslookup <dominio>', type: 'error' }]
+      return [
+        { text: `Server:  8.8.8.8`, type: 'info' },
+        { text: '', type: 'normal' },
+        { text: `Nombre: ${args[0]}`, type: 'normal' },
+        { text: `Address: 10.0.0.10`, type: 'success' },
+      ]
+    }
+
+    case 'dig': {
+      if (!args[0]) return [{ text: 'uso: dig <dominio> [ANY]', type: 'error' }]
+      return [
+        { text: `; <<>> DiG 9.18.1 <<>> ${args.join(' ')}`, type: 'system' },
+        { text: `${args[0]}.        3600  IN  A      10.0.0.10`, type: 'normal' },
+        { text: `${args[0]}.        3600  IN  MX     10 mail.target-corp.com`, type: 'normal' },
+        { text: `${args[0]}.        3600  IN  NS     ns1.target-corp.com`, type: 'normal' },
+        { text: `${args[0]}.        3600  IN  TXT    "v=spf1 include:_spf.target-corp.com ~all"`, type: 'normal' },
+      ]
+    }
+
+    case 'dork': {
+      const query = args.join(' ')
+      if (!query) return [{ text: 'uso: dork <consulta estilo Google>', type: 'error' }]
+      const lines: OutputLine[] = [{ text: `🔎 Simulando búsqueda: ${query}`, type: 'info' }, { text: '', type: 'normal' }]
+      if (query.includes('filetype:txt') || query.includes('password')) {
+        lines.push(
+          { text: '1. target-corp.com/backup/backup_passwords.txt', type: 'success' },
+          { text: '   "admin:T@rg3tDB2024! — no borrar antes del deploy"', type: 'warning' },
+        )
+      } else if (query.includes('filetype:pdf')) {
+        lines.push({ text: '1. target-corp.com/docs/organigrama_2023.pdf', type: 'success' })
+      } else if (query.includes('index of')) {
+        lines.push({ text: '1. target-corp.com/uploads/ — Index of /uploads (directorio expuesto)', type: 'success' })
+      } else {
+        lines.push({ text: '(sin resultados relevantes — prueba con filetype: o site:)', type: 'warning' })
+      }
+      return lines
+    }
+
+    case 'nmap': {
+      const flags = args.filter(a => a.startsWith('-'))
+      const target = args.find(a => !a.startsWith('-') && a !== 'vuln')
+      if (!target) return [{ text: 'uso: nmap [flags] <ip/host>', type: 'error' }]
+      const withVersion = flags.includes('-sV') || args.includes('-sC')
+      const lines: OutputLine[] = [
+        { text: 'Starting Nmap 7.94 ( https://nmap.org )', type: 'system' },
+        { text: `Scanning ${target}${flags.length ? ' [' + flags.join(' ') + ']' : ''}...`, type: 'info' },
+        { text: '', type: 'normal' },
+        { text: 'PORT     STATE    SERVICE' + (withVersion ? '  VERSION' : ''), type: 'info' },
+        { text: `22/tcp   open     ssh${withVersion ? '      OpenSSH 7.6p1 Ubuntu' : ''}`, type: 'success' },
+        { text: `80/tcp   open     http${withVersion ? '     Apache httpd 2.4.29' : ''}`, type: 'success' },
+        { text: `443/tcp  open     https${withVersion ? '    Apache httpd 2.4.29 (TLS)' : ''}`, type: 'success' },
+        { text: `3306/tcp open     mysql${withVersion ? '    MySQL 5.7.33' : ''}`, type: 'warning' },
+        { text: `8080/tcp closed   http-proxy`, type: 'normal' },
+      ]
+      if (args.includes('vuln') || args.includes('--script')) {
+        lines.push(
+          { text: '', type: 'normal' },
+          { text: '| vuln:', type: 'warning' },
+          { text: '|   CVE-2021-41773 — Apache 2.4.29 path traversal (posible)', type: 'error' },
+          { text: '|   MySQL 5.7.33 — versión desactualizada, revisar CVEs', type: 'error' },
+        )
+      }
+      lines.push({ text: '', type: 'normal' }, { text: `Nmap done: 1 host up, scanned in 2.34s`, type: 'system' })
+      return lines
+    }
+
+    case 'dirb':
+    case 'gobuster': {
+      if (!args[0]) return [{ text: 'uso: dirb <url>', type: 'error' }]
+      return [
+        { text: `START_TIME: ${new Date().toLocaleString('es-EC')}`, type: 'system' },
+        { text: `URL_BASE: ${args[0]}`, type: 'info' },
+        { text: '', type: 'normal' },
+        { text: '---- Escaneando URL: ' + args[0] + ' ----', type: 'info' },
+        { text: '+ /admin (CODE:200|SIZE:1841)', type: 'success' },
+        { text: '+ /backup (CODE:301|SIZE:0)', type: 'warning' },
+        { text: '+ /.git (CODE:200|SIZE:492)', type: 'error' },
+        { text: '+ /api (CODE:200|SIZE:230)', type: 'success' },
+        { text: '+ /uploads (CODE:301|SIZE:0)', type: 'warning' },
+        { text: '', type: 'normal' },
+        { text: 'DOWNLOADED: 4612 - FOUND: 5', type: 'system' },
+      ]
+    }
+
+    case 'curl': {
+      const isHead = args.includes('-I')
+      const url = args.find(a => !a.startsWith('-'))
+      if (!url) return [{ text: 'uso: curl [-I] <url>', type: 'error' }]
+      if (isHead) {
+        return [
+          { text: `> HEAD ${url}`, type: 'info' },
+          { text: 'HTTP/1.1 200 OK', type: 'success' },
+          { text: 'Server: Apache/2.4.29 (Ubuntu)', type: 'normal' },
+          { text: 'X-Powered-By: PHP/7.2.24', type: 'warning' },
+          { text: 'Content-Type: text/html; charset=UTF-8', type: 'normal' },
+        ]
+      }
+      if (url.includes('robots.txt')) {
+        return FILE_SYSTEM['/var/www/html/robots.txt'].content.split('\n').map((l: string) => ({ text: l, type: 'normal' as const }))
+      }
+      return [
+        { text: `> GET ${url}`, type: 'info' },
+        { text: '< HTTP/1.1 200 OK', type: 'success' },
+        { text: '', type: 'normal' },
+        { text: '<!DOCTYPE html><html><body><h1>Target Corp</h1></body></html>', type: 'normal' },
+      ]
+    }
+
+    case 'ssh': {
+      if (args.includes('-V')) {
+        return [{ text: 'OpenSSH_7.6p1 Ubuntu-4ubuntu0.7, OpenSSL 1.0.2n  7 Dec 2017', type: 'warning' }, { text: '⚠️ Versión desactualizada — vulnerable a varios CVEs', type: 'error' }]
+      }
+      if (!args[0]) return [{ text: 'uso: ssh <usuario>@<host>', type: 'error' }]
+      return [
+        { text: `Connecting to ${args[0]}...`, type: 'info' },
+        { text: "The authenticity of host can't be established.", type: 'warning' },
+        { text: '⚠️ [SIMULACIÓN] Conexión SSH simulada para fines educativos', type: 'warning' },
+        { text: 'Welcome to Ubuntu 18.04 LTS (GNU/Linux 5.4.0)', type: 'success' },
+      ]
+    }
+
+    // ═══ EXPLOTACIÓN WEB ═══
+    case 'sqli': {
+      const mode = args[0]
+      const payload = args.slice(1).join(' ')
+      if (mode === 'login') {
+        if (/1\s*=\s*1|or\s+true|'--/i.test(payload)) {
+          return [
+            { text: `Enviando payload al login: ${payload}`, type: 'info' },
+            { text: "SELECT * FROM users WHERE username='" + payload + "' AND password=''", type: 'system' },
+            { text: '✅ ACCESO CONCEDIDO — Bienvenido, admin (bypass de autenticación exitoso)', type: 'success' },
+          ]
+        }
+        return [{ text: `Enviando payload: ${payload}`, type: 'info' }, { text: '❌ Login fallido — el payload no rompe la lógica SQL', type: 'error' }]
+      }
+      if (mode === 'union') {
+        if (/union\s+select/i.test(payload)) {
+          return [
+            { text: `Ejecutando: ${payload}`, type: 'info' },
+            { text: '', type: 'normal' },
+            { text: 'username    | password (hash)', type: 'info' },
+            { text: 'admin       | 5f4dcc3b5aa765d61d8327deb882cf99', type: 'success' },
+            { text: 'jperez      | e10adc3949ba59abbe56e057f20f883e', type: 'success' },
+            { text: '', type: 'normal' },
+            { text: '⚠️ Credenciales extraídas de la base de datos', type: 'warning' },
+          ]
+        }
+        return [{ text: '❌ La consulta UNION no coincide en número de columnas', type: 'error' }]
+      }
+      if (mode === 'blind') {
+        const isTrue = /1\s*=\s*1/.test(payload)
+        return [
+          { text: `Consulta blind: ${payload}`, type: 'info' },
+          { text: isTrue ? '✅ Respuesta normal (condición verdadera) — servidor vulnerable' : '⚠️ Respuesta distinta (condición falsa)', type: isTrue ? 'success' : 'warning' },
+        ]
+      }
+      return [{ text: 'uso: sqli <login|union|blind> <payload>', type: 'error' }]
+    }
+
+    case 'waf-test': {
+      const payload = args.slice(1).join(' ')
+      return [
+        { text: `Enviando: ${payload}`, type: 'info' },
+        { text: '🛡️ ModSecurity: Access denied [id "942100"] [msg "SQL Injection Attack Detected"]', type: 'error' },
+        { text: 'BLOQUEADO — el WAF detectó el patrón malicioso', type: 'warning' },
+      ]
+    }
+
+    case 'xss': {
+      const mode = args[0]
+      const payload = args.slice(1).join(' ')
+      if (mode === 'stored') {
+        return [
+          { text: `Payload almacenado: ${payload}`, type: 'info' },
+          { text: '💾 El payload se guardó en la base de datos (comentario/perfil)', type: 'warning' },
+          { text: '⚠️ Se ejecutará automáticamente para CADA usuario que vea la página', type: 'error' },
+          { text: '🍪 document.cookie robada: session_id=a8f9c2...', type: 'error' },
+        ]
+      }
+      if (mode === 'bypass') {
+        return [
+          { text: `Probando bypass de filtro: ${payload}`, type: 'info' },
+          { text: '✅ El filtro solo bloquea <script>, este tag pasó sin problema', type: 'success' },
+        ]
+      }
+      return [
+        { text: `Payload reflejado: ${payload}`, type: 'info' },
+        { text: '⚠️ [XSS] alert() ejecutado en el navegador de la víctima', type: 'warning' },
+      ]
+    }
+
+    case 'csp-check': {
+      if (!args[0]) return [{ text: 'uso: csp-check <dominio>', type: 'error' }]
+      return [
+        { text: `Verificando Content-Security-Policy en ${args[0]}...`, type: 'info' },
+        { text: 'Header CSP: NO CONFIGURADO', type: 'error' },
+        { text: '⚠️ Sin CSP, XSS es mucho más fácil de explotar', type: 'warning' },
+      ]
+    }
+
+    case 'csrf': {
+      if (!args[0]) return [{ text: 'uso: csrf <url>', type: 'error' }]
+      return [
+        { text: `Generando request forjado: ${args[0]}`, type: 'info' },
+        { text: '📤 Si la víctima tiene sesión activa y hace click, la acción se ejecuta sin su consentimiento', type: 'warning' },
+        { text: '✅ Transferencia simulada ejecutada — no había token CSRF de protección', type: 'error' },
+      ]
+    }
+
+    case 'idor': {
+      if (!args[0]) return [{ text: 'uso: idor <ruta con id>', type: 'error' }]
+      return [
+        { text: `Solicitando: ${args[0]}`, type: 'info' },
+        { text: '👤 { "id": 1, "nombre": "Admin Root", "email": "admin@target-corp.com" }', type: 'warning' },
+        { text: '⚠️ Accediste al perfil de otro usuario cambiando el ID — no hay validación de propiedad', type: 'error' },
+      ]
+    }
+
+    case 'traversal': {
+      const p = args[0] || ''
+      if (p.includes('etc/passwd')) {
+        return [{ text: `Solicitando archivo: ${p}`, type: 'info' }, ...FILE_SYSTEM['/etc/passwd'].content.split('\n').map((l: string) => ({ text: l, type: 'success' as const }))]
+      }
+      return [{ text: `Solicitando: ${p}`, type: 'info' }, { text: '❌ Ruta no accesible o filtro activo', type: 'error' }]
+    }
+
+    case 'cmdinject': {
+      const injected = args.join(' ').replace(/^"|"$/g, '')
+      return [
+        { text: `Input vulnerable recibe: ${injected}`, type: 'info' },
+        { text: `Comando del sistema ejecutado en el servidor remoto:`, type: 'warning' },
+        { text: injected.includes('whoami') ? 'www-data' : `[salida simulada de: ${injected}]`, type: 'success' },
+      ]
+    }
+
+    // ═══ CRIPTOGRAFÍA Y CONTRASEÑAS ═══
+    case 'passcheck': {
+      const pw = args.join(' ')
+      if (!pw) return [{ text: 'uso: passcheck <contraseña>', type: 'error' }]
+      let score = 0
+      const tips: string[] = []
+      if (pw.length >= 8) score++; else tips.push('Usa al menos 8 caracteres')
+      if (pw.length >= 12) score++
+      if (/[a-z]/.test(pw)) score++; else tips.push('Agrega minúsculas')
+      if (/[A-Z]/.test(pw)) score++; else tips.push('Agrega mayúsculas')
+      if (/[0-9]/.test(pw)) score++; else tips.push('Agrega números')
+      if (/[^a-zA-Z0-9]/.test(pw)) score++; else tips.push('Agrega símbolos (!@#$%)')
+      const labels = ['Muy débil', 'Débil', 'Regular', 'Buena', 'Fuerte', 'Muy fuerte']
+      const label = labels[Math.min(score, labels.length - 1)]
+      const lines: OutputLine[] = [
+        { text: `Analizando: ${'*'.repeat(pw.length)}`, type: 'info' },
+        { text: `Fortaleza: ${label} (${score}/6)`, type: score >= 4 ? 'success' : score >= 2 ? 'warning' : 'error' },
+      ]
+      tips.forEach(t => lines.push({ text: `  - ${t}`, type: 'warning' }))
+      return lines
+    }
+
+    case 'crack-dict': {
+      if (args.length < 2) return [{ text: 'uso: crack-dict <usuario> <hash>', type: 'error' }]
+      const [target, hash] = args
+      return [
+        { text: `Cargando diccionario: rockyou.txt (14M contraseñas)`, type: 'info' },
+        { text: `Probando contra hash: ${hash}`, type: 'info' },
+        { text: '.'.repeat(20), type: 'system' },
+        { text: `🔓 Hash crackeado! ${target}:password123`, type: 'success' },
+        { text: `Tiempo: 0.8s — el hash SHA1 sin salt es débil ante diccionarios`, type: 'warning' },
+      ]
+    }
+
+    case 'hash-password': {
+      const text = args.join(' ')
+      if (!text) return [{ text: 'uso: hash-password <texto>', type: 'error' }]
+      const h = simpleHash(text)
+      return [
+        { text: `MD5:    ${h}${h}`, type: 'normal' },
+        { text: `SHA1:   ${h}${h}${h.slice(0, 8)}`, type: 'normal' },
+        { text: `SHA256: ${h}${h}${h}${h}`, type: 'normal' },
+        { text: '⚠️ Usa siempre salt + bcrypt/argon2, nunca MD5/SHA1 solos para passwords', type: 'warning' },
+      ]
+    }
+
+    case 'brute-force': {
+      const len = parseInt(args[0]) || 4
+      const combos = Math.pow(94, len)
+      return [
+        { text: `Alfabeto: 94 caracteres imprimibles, longitud: ${len}`, type: 'info' },
+        { text: `Combinaciones posibles: ${combos.toLocaleString('es-EC')}`, type: 'normal' },
+        { text: `Tiempo estimado (GPU moderna, ~10^10 hashes/s): ${(combos / 1e10).toFixed(4)}s`, type: len <= 6 ? 'error' : 'success' },
+        { text: len <= 6 ? '⚠️ Contraseña corta — crackeable casi al instante' : '✅ Longitud razonable frente a fuerza bruta', type: len <= 6 ? 'warning' : 'success' },
+      ]
+    }
+
+    case 'aes-encrypt': {
+      if (args.length < 2) return [{ text: 'uso: aes-encrypt <texto> <clave>', type: 'error' }]
+      const [text, key] = args
+      const h = simpleHash(text + key)
+      return [
+        { text: `Cifrando "${text}" con clave AES-256...`, type: 'info' },
+        { text: `Ciphertext (hex, simulado): ${h}${h}${h}`, type: 'success' },
+        { text: 'A diferencia del César, AES es criptográficamente seguro con clave robusta', type: 'normal' },
+      ]
+    }
+
+    case 'ssl-check': {
+      if (!args[0]) return [{ text: 'uso: ssl-check <dominio>', type: 'error' }]
+      return [
+        { text: `Conectando a ${args[0]}:443...`, type: 'info' },
+        { text: 'Certificado: CN=target-corp.com', type: 'normal' },
+        { text: "Emisor: Let's Encrypt Authority X3", type: 'normal' },
+        { text: 'Válido: 2024-01-10 → 2024-04-10', type: 'normal' },
+        { text: 'Protocolo: TLS 1.2 (TLS 1.3 no soportado)', type: 'warning' },
+        { text: 'Cipher: ECDHE-RSA-AES128-GCM-SHA256', type: 'normal' },
+      ]
+    }
+
+    case 'keygen': {
+      if (args[0] !== 'rsa') return [{ text: 'uso: keygen rsa <bits>', type: 'error' }]
+      const bits = args[1] || '2048'
+      return [
+        { text: `Generando par de claves RSA de ${bits} bits...`, type: 'info' },
+        { text: '-----BEGIN PUBLIC KEY-----', type: 'normal' },
+        { text: `MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA${simpleHash(bits + 'pub')}...`, type: 'success' },
+        { text: '-----END PUBLIC KEY-----', type: 'normal' },
+        { text: '🔐 Clave privada guardada en ~/.ssh/id_rsa (simulado — nunca la compartas)', type: 'warning' },
+      ]
+    }
+
+    case 'encrypt': {
+      if (args.length < 2) return [{ text: 'uso: encrypt <texto> <shift>', type: 'error' }]
+      const text = args[0]
+      const shift = parseInt(args[1]) || 3
+      return [
+        { text: `[César cipher, shift=${shift}]`, type: 'info' },
+        { text: `Original:   ${text}`, type: 'normal' },
+        { text: `Encriptado: ${caesarCipher(text, shift)}`, type: 'success' },
+      ]
+    }
+
+    case 'decrypt': {
+      if (args.length < 2) return [{ text: 'uso: decrypt <texto> <shift>', type: 'error' }]
+      const text = args[0]
+      const shift = parseInt(args[1]) || 3
+      return [
+        { text: `[César cipher, shift=${shift}]`, type: 'info' },
+        { text: `Encriptado:    ${text}`, type: 'normal' },
+        { text: `Desencriptado: ${caesarCipher(text, shift, true)}`, type: 'success' },
+      ]
+    }
+
+    case 'hash': {
+      const text = args.join(' ')
+      if (!text) return [{ text: 'uso: hash <texto>', type: 'error' }]
+      const h = simpleHash(text)
+      return [
+        { text: `MD5 (simulado):    ${h}${h}`, type: 'normal' },
+        { text: `SHA256 (simulado): ${h}${h}${h}${h}`, type: 'normal' },
+      ]
+    }
+
+    // ═══ FORENSE Y RESPUESTA A INCIDENTES ═══
+    case 'forensics': {
+      const mode = args[0]
+      if (mode === 'auth-analysis') {
+        return [
+          { text: '📊 Analizando /var/log/auth.log...', type: 'info' },
+          { text: '', type: 'normal' },
+          { text: 'IP atacante:     10.0.0.99', type: 'error' },
+          { text: 'Intentos fallidos: 6 (root x4, admin x2)', type: 'warning' },
+          { text: 'Ventana de tiempo: 03:11:02 - 03:11:11 (9 segundos)', type: 'warning' },
+          { text: 'Resultado:        ✅ ACCESO CONCEDIDO a las 03:12:45 (usuario: admin)', type: 'error' },
+          { text: '', type: 'normal' },
+          { text: '🚨 Diagnóstico: Ataque de fuerza bruta SSH exitoso', type: 'error' },
+          { text: '💡 Recomendación: fail2ban, MFA, deshabilitar login por contraseña', type: 'success' },
+        ]
+      }
+      if (mode === 'timeline') {
+        return [
+          { text: '🕐 TIMELINE DEL INCIDENTE', type: 'info' },
+          { text: '─'.repeat(50), type: 'system' },
+          { text: '03:10:01  Intentos de login POST /wp-login.php (403)', type: 'warning' },
+          { text: '03:11:02  Inicio de fuerza bruta SSH desde 10.0.0.99', type: 'warning' },
+          { text: '03:12:45  Login SSH exitoso — cuenta "admin" comprometida', type: 'error' },
+          { text: '03:12:50  POST /admin/login (200) — acceso al panel', type: 'error' },
+          { text: '03:13:10  Escalada a root vía su', type: 'error' },
+          { text: '─'.repeat(50), type: 'system' },
+          { text: '✅ Cadena de ataque reconstruida — 3 minutos de intrusión', type: 'success' },
+        ]
+      }
+      return [{ text: 'uso: forensics <auth-analysis|timeline>', type: 'error' }]
+    }
+
+    case 'iptables': {
+      if (args.includes('-L')) {
+        return [
+          { text: 'Chain INPUT (policy ACCEPT)', type: 'info' },
+          { text: 'target     prot opt source               destination', type: 'normal' },
+          { text: 'DROP       all  --  10.0.0.99            anywhere', type: 'warning' },
+        ]
+      }
+      if (args.includes('-A') && args.includes('-s')) {
+        const ip = args[args.indexOf('-s') + 1]
+        return [{ text: `Regla agregada: bloquear todo el tráfico desde ${ip}`, type: 'success' }, { text: '✅ Firewall actualizado', type: 'success' }]
+      }
+      return [{ text: 'uso: iptables -A INPUT -s <ip> -j DROP | iptables -L', type: 'error' }]
+    }
+
+    case 'lynis': {
+      return [
+        { text: '[+] Iniciando auditoría del sistema...', type: 'info' },
+        { text: '', type: 'normal' },
+        { text: '  - PermitRootLogin habilitado         [ADVERTENCIA]', type: 'warning' },
+        { text: '  - MaxAuthTries = 6 (recomendado: 3)   [ADVERTENCIA]', type: 'warning' },
+        { text: '  - Firewall activo                     [OK]', type: 'success' },
+        { text: '  - Actualizaciones pendientes: 14       [ADVERTENCIA]', type: 'warning' },
+        { text: '', type: 'normal' },
+        { text: 'Hardening index: 58/100', type: 'warning' },
+        { text: '💡 Corrige sshd_config y aplica actualizaciones para mejorar el score', type: 'info' },
+      ]
+    }
+
+    case 'help':
+      return [
+        { text: '╔══════════════════════════════════════════════════════════╗', type: 'info' },
+        { text: '║        🛡️  Hacking Terminal — ChaskiBots Lab             ║', type: 'info' },
+        { text: '╠══════════════════════════════════════════════════════════╣', type: 'info' },
+        { text: '║ SISTEMA:     ls, cd, pwd, cat, find, grep, sudo, whoami  ║', type: 'normal' },
+        { text: '║ OSINT:       whois, nslookup, dig, dork                 ║', type: 'normal' },
+        { text: '║ ESCANEO:     nmap [-sV -sC -sS --script vuln], dirb      ║', type: 'normal' },
+        { text: '║ WEB:         curl, sqli, waf-test, xss, csp-check,       ║', type: 'normal' },
+        { text: '║              csrf, idor, traversal, cmdinject            ║', type: 'normal' },
+        { text: '║ CRYPTO:      encrypt, decrypt, hash, hash-password,      ║', type: 'normal' },
+        { text: '║              aes-encrypt, keygen, ssl-check              ║', type: 'normal' },
+        { text: '║ PASSWORDS:   passcheck, crack-dict, brute-force          ║', type: 'normal' },
+        { text: '║ FORENSE:     forensics auth-analysis, forensics timeline ║', type: 'normal' },
+        { text: '║ DEFENSA:     iptables, lynis                             ║', type: 'normal' },
+        { text: '║ OTROS:       echo, clear, history, man, help, ps, top    ║', type: 'normal' },
+        { text: '╚══════════════════════════════════════════════════════════╝', type: 'info' },
+        { text: '', type: 'normal' },
+        { text: '💡 Tip: "help <comando>" no está disponible — usa man <comando>', type: 'success' },
+        { text: '🎯 Reto final: sudo cat /root/flag.txt', type: 'warning' },
+      ]
+
     case '':
       return []
 
