@@ -6,7 +6,7 @@ import {
   Terminal, ChevronRight, ChevronDown, Shield, Code,
   Loader2, Maximize2, Minimize2, X, Trash2, Copy, Download, Send,
   Check, GraduationCap, Trophy, CheckCircle2, Circle, BookOpen,
-  Zap, Skull
+  Zap, Skull, Lock, Key, Eye, EyeOff
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
 
@@ -126,12 +126,27 @@ function caesarCipher(text: string, shift: number, decrypt: boolean = false): st
   }).join('')
 }
 
+function checkPasswordStrength(password: string): { score: number; label: string; tips: string[] } {
+  let score = 0
+  const tips: string[] = []
+  if (password.length >= 8) score++; else tips.push('Usa al menos 8 caracteres')
+  if (password.length >= 12) score++
+  if (/[a-z]/.test(password)) score++; else tips.push('Agrega minúsculas')
+  if (/[A-Z]/.test(password)) score++; else tips.push('Agrega mayúsculas')
+  if (/[0-9]/.test(password)) score++; else tips.push('Agrega números')
+  if (/[^a-zA-Z0-9]/.test(password)) score++; else tips.push('Agrega símbolos (!@#$%)')
+  if (!/(.)\1{2,}/.test(password)) score++; else tips.push('Evita caracteres repetidos')
+  const labels = ['Muy débil', 'Débil', 'Regular', 'Buena', 'Fuerte', 'Muy fuerte', 'Excelente']
+  return { score, label: labels[Math.min(score, labels.length - 1)], tips }
+}
+
 function processCommand(
   input: string,
   cwd: string,
   setCwd: (p: string) => void,
   history: string[],
-  isSudo: boolean
+  isSudo: boolean,
+  userFiles: any[] = []
 ): OutputLine[] {
   const parts = input.trim().match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) || []
   const cmd = parts[0]?.toLowerCase()
@@ -229,7 +244,7 @@ function processCommand(
       const sudoCmd = args.join(' ')
       return [
         { text: '[sudo] contraseña para hacker: ********', type: 'system' },
-        ...processCommand(sudoCmd, cwd, setCwd, history, true)
+        ...processCommand(sudoCmd, cwd, setCwd, history, true, userFiles)
       ]
     }
 
@@ -613,23 +628,109 @@ function processCommand(
       ]
     }
 
+    // ═══ ARCHIVOS EN LA NUBE Y PYTHON ═══
+    case 'myfiles': {
+      if (userFiles.length === 0) {
+        return [{ text: '📂 No tienes archivos guardados aún', type: 'warning' }, { text: 'Usa: save <nombre> <contenido>', type: 'info' }]
+      }
+      return [
+        { text: '📂 TUS ARCHIVOS EN LA NUBE:', type: 'info' },
+        { text: '', type: 'normal' },
+        ...userFiles.map((f: any) => ({ text: `  📄 ${f.name} (${(f.content || '').length} bytes) — ${f.path}`, type: 'normal' as const })),
+        { text: '', type: 'normal' },
+        { text: `Total: ${userFiles.length} archivo(s). Usa "open <nombre>" o "export <nombre>"`, type: 'success' },
+      ]
+    }
+
+    case 'open': {
+      if (!args[0]) return [{ text: 'uso: open <archivo>', type: 'error' }]
+      const cloudFile = userFiles.find((f: any) => f.name === args[0])
+      if (cloudFile) {
+        return [{ text: `📄 ${cloudFile.name}`, type: 'info' }, ...cloudFile.content.split('\n').map((l: string) => ({ text: l, type: 'normal' as const }))]
+      }
+      const target = resolvePath(args[0])
+      const node = getNode(target)
+      if (!node || node.type === 'dir') return [{ text: `Archivo no encontrado: ${args[0]}`, type: 'error' }]
+      return node.content.split('\n').map((l: string) => ({ text: l, type: 'normal' as const }))
+    }
+
+    case 'python':
+    case 'python3': {
+      if (!args[0]) return [{ text: '🐍 Python 3.10.0 (simulado)', type: 'info' }, { text: 'Uso: python <archivo.py>', type: 'normal' }]
+      const pyFileName = args[0]
+      const cloudFile = userFiles.find((f: any) => f.name === pyFileName)
+      let content = cloudFile?.content
+      if (!content) {
+        const localPath = pyFileName.startsWith('/') ? pyFileName : resolvePath(pyFileName)
+        const node = getNode(localPath)
+        if (node && node.type === 'file') content = node.content
+      }
+      if (!content) return [{ text: `❌ Archivo no encontrado: ${pyFileName}`, type: 'error' }, { text: 'Usa "ls" o "myfiles" para ver archivos disponibles', type: 'info' }]
+      const lines: OutputLine[] = [{ text: '🐍 Ejecutando Python...', type: 'info' }, { text: '─'.repeat(40), type: 'system' }]
+      const variables: Record<string, any> = {}
+      content.split('\n').forEach((raw: string) => {
+        const line = raw.trim()
+        if (!line || line.startsWith('#')) return
+        const printStr = line.match(/print\s*\(\s*["'](.*)["']\s*\)/)
+        if (printStr) { lines.push({ text: printStr[1], type: 'normal' }); return }
+        const printVar = line.match(/print\s*\(\s*(.+)\s*\)/)
+        if (printVar) {
+          const c = printVar[1]
+          if (c.startsWith('"') || c.startsWith("'")) lines.push({ text: c.replace(/["']/g, ''), type: 'normal' })
+          else if (variables[c] !== undefined) lines.push({ text: String(variables[c]), type: 'normal' })
+          else lines.push({ text: c, type: 'normal' })
+          return
+        }
+        const assign = line.match(/^(\w+)\s*=\s*(.+)$/)
+        if (assign) {
+          const [, varName, value] = assign
+          if (value.startsWith('"') || value.startsWith("'")) variables[varName] = value.replace(/["']/g, '')
+          else if (!isNaN(Number(value))) variables[varName] = Number(value)
+          return
+        }
+        if (line.startsWith('def ')) {
+          const fn = line.match(/def\s+(\w+)/)
+          if (fn) lines.push({ text: `[Función ${fn[1]}() definida]`, type: 'system' })
+        }
+      })
+      lines.push({ text: '─'.repeat(40), type: 'system' }, { text: '✅ Ejecución completada', type: 'success' })
+      return lines
+    }
+
+    case 'run': {
+      if (!args[0]) return [{ text: 'uso: run <archivo>', type: 'error' }]
+      if (args[0].endsWith('.py')) return processCommand(`python ${args[0]}`, cwd, setCwd, history, isSudo, userFiles)
+      return [{ text: `Tipo de archivo no soportado: ${args[0]}`, type: 'error' }, { text: 'Archivos soportados: .py', type: 'info' }]
+    }
+
+    case 'edit':
+    case 'nano':
+    case 'vim': {
+      if (!args[0]) return [{ text: 'uso: edit <archivo>', type: 'error' }]
+      return [
+        { text: `📝 Editor de texto: ${args[0]}`, type: 'info' },
+        { text: '─'.repeat(40), type: 'system' },
+        { text: 'Para crear/editar archivos usa:', type: 'normal' },
+        { text: `  save ${args[0]} <contenido>`, type: 'success' },
+        { text: '', type: 'normal' },
+        { text: 'Ejemplo:', type: 'normal' },
+        { text: `  save ${args[0]} print("Hola Mundo!")`, type: 'success' },
+        { text: '─'.repeat(40), type: 'system' },
+      ]
+    }
+
+    // ═══ HERRAMIENTAS VISUALES ═══
+    case 'crypto':
+      return [{ text: '__OPEN_CRYPTO__', type: 'system' }]
+
     // ═══ CRIPTOGRAFÍA Y CONTRASEÑAS ═══
     case 'passcheck': {
       const pw = args.join(' ')
-      if (!pw) return [{ text: 'uso: passcheck <contraseña>', type: 'error' }]
-      let score = 0
-      const tips: string[] = []
-      if (pw.length >= 8) score++; else tips.push('Usa al menos 8 caracteres')
-      if (pw.length >= 12) score++
-      if (/[a-z]/.test(pw)) score++; else tips.push('Agrega minúsculas')
-      if (/[A-Z]/.test(pw)) score++; else tips.push('Agrega mayúsculas')
-      if (/[0-9]/.test(pw)) score++; else tips.push('Agrega números')
-      if (/[^a-zA-Z0-9]/.test(pw)) score++; else tips.push('Agrega símbolos (!@#$%)')
-      const labels = ['Muy débil', 'Débil', 'Regular', 'Buena', 'Fuerte', 'Muy fuerte']
-      const label = labels[Math.min(score, labels.length - 1)]
+      if (!pw) return [{ text: '__OPEN_PASSCHECK__', type: 'system' }]
+      const { score, label, tips } = checkPasswordStrength(pw)
       const lines: OutputLine[] = [
         { text: `Analizando: ${'*'.repeat(pw.length)}`, type: 'info' },
-        { text: `Fortaleza: ${label} (${score}/6)`, type: score >= 4 ? 'success' : score >= 2 ? 'warning' : 'error' },
+        { text: `Fortaleza: ${label} (${score}/7)`, type: score >= 5 ? 'success' : score >= 3 ? 'warning' : 'error' },
       ]
       tips.forEach(t => lines.push({ text: `  - ${t}`, type: 'warning' }))
       return lines
@@ -813,6 +914,9 @@ function processCommand(
         { text: '║ PASSWORDS:   passcheck, crack-dict, brute-force          ║', type: 'normal' },
         { text: '║ FORENSE:     forensics auth-analysis, forensics timeline ║', type: 'normal' },
         { text: '║ DEFENSA:     iptables, lynis                             ║', type: 'normal' },
+        { text: '║ NUBE:        save, myfiles, open, export, rm             ║', type: 'normal' },
+        { text: '║ PYTHON:      python <archivo.py>, run, edit              ║', type: 'normal' },
+        { text: '║ HERRAMIENTAS: crypto (visual), passcheck (visual)        ║', type: 'normal' },
         { text: '║ OTROS:       echo, clear, history, man, help, ps, top    ║', type: 'normal' },
         { text: '╚══════════════════════════════════════════════════════════╝', type: 'info' },
         { text: '', type: 'normal' },
@@ -891,6 +995,22 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
   const [isSending, setIsSending] = useState(false)
   const [sendSuccess, setSendSuccess] = useState(false)
 
+  // Cloud file manager
+  const [userFiles, setUserFiles] = useState<any[]>([])
+
+  // Crypto tool panel
+  const [showCrypto, setShowCrypto] = useState(false)
+  const [cryptoMode, setCryptoMode] = useState<'encrypt' | 'decrypt'>('encrypt')
+  const [encryptText, setEncryptText] = useState('')
+  const [encryptShift, setEncryptShift] = useState(3)
+  const [encryptedResult, setEncryptedResult] = useState('')
+
+  // Password checker panel
+  const [showPasswordChecker, setShowPasswordChecker] = useState(false)
+  const [passwordToCheck, setPasswordToCheck] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState<{ score: number; label: string; tips: string[] } | null>(null)
+
   const terminalRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -901,6 +1021,44 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
       .catch(() => {})
       .finally(() => setCurriculumLoading(false))
   }, [])
+
+  // Cloud files (Supabase-backed virtual filesystem)
+  const loadUserFiles = async () => {
+    if (!userId) return
+    try {
+      const res = await fetch(`/api/virtual-files?userId=${userId}`)
+      if (res.ok) setUserFiles(await res.json())
+    } catch {}
+  }
+
+  const saveFileToDb = async (name: string, content: string, path: string) => {
+    if (!userId) return { success: false, error: 'Debes iniciar sesión para guardar archivos' }
+    try {
+      const res = await fetch('/api/virtual-files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId, userName: userName || 'Hacker', path, name, type: 'file', content,
+          mimeType: name.endsWith('.py') ? 'text/x-python' : 'text/plain',
+        }),
+      })
+      if (res.ok) { await loadUserFiles(); return { success: true } }
+      return { success: false, error: 'Error al guardar' }
+    } catch {
+      return { success: false, error: 'Error de conexión' }
+    }
+  }
+
+  const exportFile = (name: string, content: string) => {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url; link.download = name
+    document.body.appendChild(link); link.click(); document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  useEffect(() => { if (userId) loadUserFiles() }, [userId])
 
   useEffect(() => {
     try {
@@ -931,16 +1089,73 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
 
     setCommandHistory(prev => [...prev, trimmed])
     setHistoryIndex(-1)
+    setInputValue('')
 
     const promptLine: OutputLine = { text: `hacker@chaskibots-lab:${cwd}$ ${trimmed}`, type: 'input' }
-    const result = processCommand(trimmed, cwd, setCwd, [...commandHistory, trimmed], false)
+    const parts = trimmed.split(/\s+/)
+    const cmdName = parts[0]?.toLowerCase()
+
+    // save: requiere fetch async, se intercepta antes del procesador puro
+    if (cmdName === 'save') {
+      const fileName = parts[1]
+      const content = parts.slice(2).join(' ')
+      if (!fileName || !content) {
+        setOutput(prev => [...prev, promptLine, { text: 'Uso: save <nombre_archivo> <contenido>', type: 'error' }])
+      } else if (!userId) {
+        setOutput(prev => [...prev, promptLine, { text: '⚠️ Debes iniciar sesión para guardar archivos', type: 'error' }])
+      } else {
+        setOutput(prev => [...prev, promptLine, { text: `💾 Guardando "${fileName}"...`, type: 'info' }])
+        saveFileToDb(fileName, content, cwd).then(result => {
+          setOutput(prev => [...prev, { text: result.success ? `✅ Archivo "${fileName}" guardado en la nube` : `❌ ${result.error}`, type: result.success ? 'success' : 'error' }])
+        })
+      }
+      return
+    }
+
+    // export: necesita Blob/document, se intercepta siempre
+    if (cmdName === 'export') {
+      const fileName = parts[1]
+      const cloudFile = userFiles.find((f: any) => f.name === fileName)
+      if (cloudFile) {
+        exportFile(cloudFile.name, cloudFile.content)
+        setOutput(prev => [...prev, promptLine, { text: `📥 Descargando "${cloudFile.name}"...`, type: 'success' }])
+      } else {
+        const localPath = fileName?.startsWith('/') ? fileName : `${cwd === '/' ? '' : cwd}/${fileName}`
+        const node = fileName ? FILE_SYSTEM[localPath] : null
+        if (node && node.type === 'file') {
+          exportFile(fileName, node.content)
+          setOutput(prev => [...prev, promptLine, { text: `📥 Descargando "${fileName}"...`, type: 'success' }])
+        } else {
+          setOutput(prev => [...prev, promptLine, { text: fileName ? `Archivo no encontrado: ${fileName}` : 'Uso: export <archivo>', type: 'error' }])
+        }
+      }
+      return
+    }
+
+    // rm: si es un archivo en la nube, requiere DELETE async; si no, cae al procesador puro
+    if (cmdName === 'rm' && userFiles.find((f: any) => f.name === parts[1])) {
+      const cloudFile = userFiles.find((f: any) => f.name === parts[1])
+      setOutput(prev => [...prev, promptLine, { text: `Eliminando "${cloudFile.name}"...`, type: 'info' }])
+      fetch(`/api/virtual-files?recordId=${cloudFile.recordId}`, { method: 'DELETE' }).then(() => {
+        loadUserFiles()
+        setOutput(prev => [...prev, { text: `🗑️ Archivo "${cloudFile.name}" eliminado`, type: 'success' }])
+      })
+      return
+    }
+
+    const result = processCommand(trimmed, cwd, setCwd, [...commandHistory, trimmed], false, userFiles)
 
     if (result.length === 1 && result[0].text === '__CLEAR__') {
       setOutput([])
+    } else if (result.length === 1 && result[0].text === '__OPEN_CRYPTO__') {
+      setShowCrypto(true)
+      setOutput(prev => [...prev, promptLine, { text: '🔐 Abriendo herramienta de cifrado visual...', type: 'info' }])
+    } else if (result.length === 1 && result[0].text === '__OPEN_PASSCHECK__') {
+      setShowPasswordChecker(true)
+      setOutput(prev => [...prev, promptLine, { text: '🔑 Abriendo verificador de contraseñas...', type: 'info' }])
     } else {
       setOutput(prev => [...prev, promptLine, ...result])
     }
-    setInputValue('')
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -1094,6 +1309,13 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
             <Download className="w-4 h-4" />
           </button>
           <div className="w-px h-5 bg-gray-700/50 mx-0.5" />
+          <button onClick={() => setShowCrypto(!showCrypto)} className={`p-2 rounded-lg transition-colors ${showCrypto ? 'bg-violet-500/20 text-violet-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Cifrado César">
+            <Lock className="w-4 h-4" />
+          </button>
+          <button onClick={() => setShowPasswordChecker(!showPasswordChecker)} className={`p-2 rounded-lg transition-colors ${showPasswordChecker ? 'bg-amber-500/20 text-amber-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Verificador de Contraseñas">
+            <Key className="w-4 h-4" />
+          </button>
+          <div className="w-px h-5 bg-gray-700/50 mx-0.5" />
           <button onClick={() => setShowCurriculum(!showCurriculum)} className={`p-2 rounded-lg transition-colors ${showCurriculum ? 'bg-red-500/20 text-red-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Curriculum">
             <GraduationCap className="w-4 h-4" />
           </button>
@@ -1220,7 +1442,100 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
         )}
 
         {/* ─── CENTER: TERMINAL ─── */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 relative">
+          {/* Floating tool: Crypto (Caesar cipher) */}
+          {showCrypto && (
+            <div className="absolute top-3 right-3 z-20 w-72 bg-[#161b22] rounded-xl p-4 border border-violet-500/30 shadow-2xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-violet-400" />
+                  <span className="font-medium text-gray-200 text-sm">Cifrado César</span>
+                </div>
+                <button onClick={() => setShowCrypto(false)} className="text-gray-500 hover:text-gray-300">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <button onClick={() => setCryptoMode('encrypt')} className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${cryptoMode === 'encrypt' ? 'bg-violet-600 text-white' : 'bg-gray-700/50 text-gray-400 hover:text-gray-200'}`}>Encriptar</button>
+                  <button onClick={() => setCryptoMode('decrypt')} className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${cryptoMode === 'decrypt' ? 'bg-violet-600 text-white' : 'bg-gray-700/50 text-gray-400 hover:text-gray-200'}`}>Desencriptar</button>
+                </div>
+                <input
+                  type="text"
+                  value={encryptText}
+                  onChange={(e) => setEncryptText(e.target.value)}
+                  placeholder="Escribe tu mensaje..."
+                  className="w-full px-3 py-1.5 bg-[#0d1117] border border-gray-700/50 rounded-lg text-gray-200 placeholder-gray-600 text-xs focus:border-violet-500/50 focus:outline-none"
+                />
+                <div className="flex items-center gap-3">
+                  <label className="text-[11px] text-gray-400">Shift:</label>
+                  <input type="range" min="1" max="25" value={encryptShift} onChange={(e) => setEncryptShift(parseInt(e.target.value))} className="flex-1 accent-violet-500" />
+                  <span className="text-gray-200 font-mono text-xs w-6">{encryptShift}</span>
+                </div>
+                <button
+                  onClick={() => setEncryptedResult(caesarCipher(encryptText, encryptShift, cryptoMode === 'decrypt'))}
+                  className="w-full py-1.5 bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors text-xs font-bold"
+                >
+                  {cryptoMode === 'encrypt' ? '🔒 Encriptar' : '🔓 Desencriptar'}
+                </button>
+                {encryptedResult && (
+                  <div className="p-2.5 bg-[#0d1117] rounded-lg">
+                    <div className="text-[10px] text-gray-500 mb-1">Resultado:</div>
+                    <div className="text-green-400 font-mono text-xs break-all">{encryptedResult}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Floating tool: Password strength checker */}
+          {showPasswordChecker && (
+            <div className="absolute top-3 right-3 z-20 w-72 bg-[#161b22] rounded-xl p-4 border border-amber-500/30 shadow-2xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Key className="w-4 h-4 text-amber-400" />
+                  <span className="font-medium text-gray-200 text-sm">Verificador de Contraseñas</span>
+                </div>
+                <button onClick={() => setShowPasswordChecker(false)} className="text-gray-500 hover:text-gray-300">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="space-y-3">
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={passwordToCheck}
+                    onChange={(e) => {
+                      setPasswordToCheck(e.target.value)
+                      setPasswordStrength(e.target.value ? checkPasswordStrength(e.target.value) : null)
+                    }}
+                    placeholder="Escribe una contraseña..."
+                    className="w-full px-3 py-1.5 pr-9 bg-[#0d1117] border border-gray-700/50 rounded-lg text-gray-200 placeholder-gray-600 text-xs focus:border-amber-500/50 focus:outline-none"
+                  />
+                  <button onClick={() => setShowPassword(!showPassword)} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                    {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+                {passwordStrength && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 bg-gray-700/50 rounded-full overflow-hidden">
+                        <div className={`h-full transition-all ${passwordStrength.score <= 2 ? 'bg-red-500' : passwordStrength.score <= 4 ? 'bg-yellow-500' : 'bg-green-500'}`} style={{ width: `${(passwordStrength.score / 7) * 100}%` }} />
+                      </div>
+                      <span className={`text-xs font-medium ${passwordStrength.score <= 2 ? 'text-red-400' : passwordStrength.score <= 4 ? 'text-yellow-400' : 'text-green-400'}`}>{passwordStrength.label}</span>
+                    </div>
+                    {passwordStrength.tips.length > 0 && (
+                      <div>
+                        <div className="text-gray-500 mb-1 text-[10px]">Sugerencias:</div>
+                        {passwordStrength.tips.map((tip, i) => <div key={i} className="text-amber-400 text-[10px]">• {tip}</div>)}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div
             ref={terminalRef}
             onClick={focusInput}
