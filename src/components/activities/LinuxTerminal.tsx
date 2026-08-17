@@ -687,22 +687,22 @@ export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
     setLessonLoading(true)
     setShowLessonPanel(true)
     try {
-      const res = await fetch(`/api/academy?course=linux&lessonId=${lesson.id}`)
+      const res = await fetch(`/api/academy?lesson=${lesson.id}`)
       const data = await res.json()
-      if (data.lesson) {
-        setActiveLesson(data.lesson)
-        // Load example commands into terminal
-        if (data.lesson.examples?.length > 0) {
-          setOutput(prev => [
-            ...prev,
-            { text: '', type: 'normal' },
-            { text: `📚 Lección: ${data.lesson.title}`, type: 'info' },
-            { text: `─────────────────────────────────────`, type: 'system' },
-            { text: data.lesson.description, type: 'normal' },
-            { text: '', type: 'normal' },
-            { text: '💡 Usa los comandos del panel derecho para practicar', type: 'success' },
-          ])
-        }
+      if (data) {
+        // Parse JSON fields if they're strings
+        if (typeof data.examples === 'string') data.examples = JSON.parse(data.examples)
+        if (typeof data.challenges === 'string') data.challenges = JSON.parse(data.challenges)
+        setActiveLesson(data)
+        setOutput(prev => [
+          ...prev,
+          { text: '', type: 'normal' },
+          { text: `📚 Lección: ${data.title}`, type: 'info' },
+          { text: `─────────────────────────────────────`, type: 'system' },
+          { text: data.description, type: 'normal' },
+          { text: '', type: 'normal' },
+          { text: '💡 Usa los comandos del panel derecho para practicar', type: 'success' },
+        ])
       }
     } catch {
       setOutput(prev => [...prev, { text: '❌ Error cargando lección', type: 'error' }])
