@@ -933,6 +933,286 @@ function processCommand(
 }
 
 // ============================================================
+// MISSION ENGINE — CTF interactivo con pasos, XP y estado
+// ============================================================
+interface MissionStep {
+  id: string
+  title: string
+  description: string
+  hint: string
+  validator: (cmd: string, history: string[]) => boolean
+  xp: number
+  successMessage: string
+}
+
+interface Mission {
+  id: string
+  title: string
+  briefing: string
+  difficulty: 'easy' | 'medium' | 'hard'
+  xpTotal: number
+  steps: MissionStep[]
+  completionFlag: string
+  debriefing: string
+}
+
+const MISSIONS: Mission[] = [
+  {
+    id: 'recon-target',
+    title: '🔍 Misión 1: Reconocimiento de Target Corp',
+    briefing: 'Tu cliente te contrató para un pentest. Antes de atacar, necesitas INFORMACIÓN. Recopila datos sobre target-corp.com sin tocar su servidor directamente.',
+    difficulty: 'easy',
+    xpTotal: 150,
+    steps: [
+      {
+        id: 'step-whois',
+        title: 'Paso 1: ¿Quién es el dueño?',
+        description: 'Usa whois para descubrir quién registró el dominio target-corp.com',
+        hint: 'Comando: whois target-corp.com',
+        validator: (cmd) => cmd.toLowerCase().includes('whois') && cmd.toLowerCase().includes('target'),
+        xp: 30,
+        successMessage: '✅ ¡Bien! Descubriste que el dominio pertenece a "Target Corp S.A." y el email admin@target-corp.com',
+      },
+      {
+        id: 'step-dns',
+        title: 'Paso 2: Resuelve la IP',
+        description: 'Usa nslookup o dig para encontrar la dirección IP del servidor',
+        hint: 'Comando: nslookup target-corp.com o dig target-corp.com',
+        validator: (cmd) => (cmd.includes('nslookup') || cmd.includes('dig')) && cmd.includes('target'),
+        xp: 30,
+        successMessage: '✅ IP encontrada: 10.0.0.10 — Ahora sabes dónde está el servidor',
+      },
+      {
+        id: 'step-robots',
+        title: 'Paso 3: ¿Qué esconden?',
+        description: 'Busca el archivo robots.txt para ver qué rutas quieren ocultar',
+        hint: 'Comando: curl https://target-corp.com/robots.txt',
+        validator: (cmd) => cmd.includes('curl') && cmd.includes('robots'),
+        xp: 40,
+        successMessage: '✅ ¡Encontraste rutas ocultas! /admin, /backup, /.git y /admin-panel-x7 — información valiosa',
+      },
+      {
+        id: 'step-dork',
+        title: 'Paso 4: Google Dorking',
+        description: 'Usa técnicas de Google Dork para buscar archivos sensibles expuestos',
+        hint: 'Comando: dork site:target-corp.com filetype:txt password',
+        validator: (cmd) => cmd.includes('dork'),
+        xp: 50,
+        successMessage: '🏴 ¡EXCELENTE! Encontraste un archivo de backup con credenciales expuestas. Fase de reconocimiento completa.',
+      },
+    ],
+    completionFlag: 'FLAG{r3c0n_m4st3r_2024}',
+    debriefing: '📋 REPORTE: Reconocimiento exitoso.\n• Dueño: Target Corp S.A.\n• IP: 10.0.0.10\n• Rutas ocultas: /admin, /.git, /backup\n• Archivos expuestos: backup_passwords.txt\n• Riesgo: ALTO — datos sensibles en la web pública',
+  },
+  {
+    id: 'scan-exploit',
+    title: '⚡ Misión 2: Escaneo y Explotación Web',
+    briefing: 'Ya tienes la IP del objetivo (10.0.0.10). Es hora de escanear puertos, descubrir servicios y explotar la primera vulnerabilidad web.',
+    difficulty: 'medium',
+    xpTotal: 250,
+    steps: [
+      {
+        id: 'step-nmap',
+        title: 'Paso 1: Escaneo de puertos',
+        description: 'Usa nmap con detección de versiones (-sV) para ver qué servicios corren en 10.0.0.10',
+        hint: 'Comando: nmap -sV 10.0.0.10',
+        validator: (cmd) => cmd.includes('nmap') && (cmd.includes('10.0.0') || cmd.includes('target')),
+        xp: 40,
+        successMessage: '✅ Puertos descubiertos: SSH(22), HTTP(80), HTTPS(443), MySQL(3306). Apache 2.4.29 — versión con CVEs conocidos.',
+      },
+      {
+        id: 'step-dirb',
+        title: 'Paso 2: Enumerar directorios',
+        description: 'Busca directorios ocultos en el servidor web con dirb o gobuster',
+        hint: 'Comando: dirb https://target-corp.com',
+        validator: (cmd) => cmd.includes('dirb') || cmd.includes('gobuster'),
+        xp: 50,
+        successMessage: '✅ ¡Directorio .git expuesto! Esto significa que puedes ver el código fuente del sitio.',
+      },
+      {
+        id: 'step-sqli',
+        title: 'Paso 3: SQL Injection al login',
+        description: "El panel /admin tiene un formulario de login. Intenta bypassearlo con SQL Injection. Payload clásico: ' OR 1=1 --",
+        hint: "Comando: sqli login admin' OR 1=1 --",
+        validator: (cmd) => cmd.includes('sqli') && cmd.includes('login') && (cmd.includes('1=1') || cmd.includes('OR')),
+        xp: 80,
+        successMessage: '🔓 ¡ACCESO AL PANEL DE ADMIN! La consulta SQL fue manipulada. Ahora tienes acceso como administrador.',
+      },
+      {
+        id: 'step-extract',
+        title: 'Paso 4: Extrae credenciales',
+        description: 'Ahora que sabes que hay SQLi, usa UNION para extraer usuarios y contraseñas de la base de datos',
+        hint: "Comando: sqli union ' UNION SELECT username,password FROM users --",
+        validator: (cmd) => cmd.includes('sqli') && cmd.includes('union'),
+        xp: 80,
+        successMessage: '🏴 ¡DATOS EXTRAÍDOS! Obtuviste los hashes de todos los usuarios. El hash de admin es crackeable.',
+      },
+    ],
+    completionFlag: 'FLAG{sql1_m4st3r_un10n_2024}',
+    debriefing: '📋 REPORTE: Explotación web exitosa.\n• Vulnerabilidad: SQL Injection en /admin/login\n• Impacto: CRÍTICO — bypass de autenticación + extracción de BD completa\n• Datos obtenidos: usernames + password hashes\n• Remediación: Usar prepared statements, WAF, input validation',
+  },
+  {
+    id: 'forensics-incident',
+    title: '🔬 Misión 3: Investigación Forense',
+    briefing: 'ALERTA: El servidor fue comprometido anoche. Tu trabajo es investigar los logs, identificar al atacante y reconstruir la cadena de ataque.',
+    difficulty: 'medium',
+    xpTotal: 200,
+    steps: [
+      {
+        id: 'step-auth-log',
+        title: 'Paso 1: Revisa intentos de login',
+        description: 'Busca intentos fallidos en /var/log/auth.log para identificar ataques de fuerza bruta',
+        hint: 'Comando: grep Failed /var/log/auth.log o cat /var/log/auth.log',
+        validator: (cmd) => (cmd.includes('grep') && cmd.includes('auth')) || (cmd.includes('cat') && cmd.includes('auth')),
+        xp: 40,
+        successMessage: '✅ ¡Encontraste el ataque! IP 10.0.0.99 hizo 6 intentos de fuerza bruta entre las 03:11 y 03:12.',
+      },
+      {
+        id: 'step-access-log',
+        title: 'Paso 2: Verifica acceso web',
+        description: 'Revisa /var/log/access.log para ver si el atacante también intentó entrar por la web',
+        hint: 'Comando: cat /var/log/access.log',
+        validator: (cmd) => cmd.includes('access.log'),
+        xp: 40,
+        successMessage: '✅ Confirmado: La misma IP (10.0.0.99) atacó /wp-login.php y /admin/login. Logró entrar por /admin.',
+      },
+      {
+        id: 'step-timeline',
+        title: 'Paso 3: Reconstruye la timeline',
+        description: 'Usa la herramienta forense para crear una línea temporal del ataque',
+        hint: 'Comando: forensics timeline',
+        validator: (cmd) => cmd.includes('forensics') && cmd.includes('timeline'),
+        xp: 60,
+        successMessage: '✅ Timeline reconstruida: Brute force → Login exitoso → Acceso admin → Escalada a root. Total: 3 minutos.',
+      },
+      {
+        id: 'step-block',
+        title: 'Paso 4: Bloquea al atacante',
+        description: '¡Rápido! Bloquea la IP del atacante con iptables antes de que vuelva',
+        hint: 'Comando: iptables -A INPUT -s 10.0.0.99 -j DROP',
+        validator: (cmd) => cmd.includes('iptables') && cmd.includes('10.0.0.99') && cmd.includes('DROP'),
+        xp: 60,
+        successMessage: '🏴 ¡ATACANTE BLOQUEADO! IP 10.0.0.99 ya no puede acceder al servidor. Incidente contenido.',
+      },
+    ],
+    completionFlag: 'FLAG{f0r3ns1cs_d3t3ct1v3_2024}',
+    debriefing: '📋 REPORTE: Incidente investigado y contenido.\n• Atacante: 10.0.0.99\n• Método: Fuerza bruta SSH + web login\n• Tiempo del ataque: 03:10-03:13 AM\n• Acceso obtenido: root (vía escalada desde admin)\n• Acción tomada: IP bloqueada con iptables\n• Recomendación: Instalar fail2ban, deshabilitar root login SSH',
+  },
+  {
+    id: 'hardening-defense',
+    title: '🛡️ Misión 4: Fortificar el Servidor',
+    briefing: 'Después del incidente, necesitas endurecer (hardening) el servidor para que no vuelva a pasar. Audita la seguridad y corrige las fallas.',
+    difficulty: 'hard',
+    xpTotal: 200,
+    steps: [
+      {
+        id: 'step-audit',
+        title: 'Paso 1: Auditoría de seguridad',
+        description: 'Ejecuta Lynis para obtener un informe completo de vulnerabilidades del sistema',
+        hint: 'Comando: lynis audit',
+        validator: (cmd) => cmd.includes('lynis'),
+        xp: 40,
+        successMessage: '✅ Auditoría completada: Score 58/100. Hay 4 vulnerabilidades críticas por corregir.',
+      },
+      {
+        id: 'step-ssh-config',
+        title: 'Paso 2: Verifica la config SSH',
+        description: 'El SSH está mal configurado. Lee /etc/ssh/sshd_config y encuentra los problemas',
+        hint: 'Comando: cat /etc/ssh/sshd_config',
+        validator: (cmd) => cmd.includes('sshd_config'),
+        xp: 50,
+        successMessage: '✅ Problemas encontrados: PermitRootLogin=yes (peligroso), MaxAuthTries=6 (muy alto). Necesitan corrección.',
+      },
+      {
+        id: 'step-netstat',
+        title: 'Paso 3: Conexiones activas',
+        description: 'Verifica si hay conexiones sospechosas activas con netstat o ss',
+        hint: 'Comando: netstat',
+        validator: (cmd) => cmd.includes('netstat') || cmd.includes('ss'),
+        xp: 50,
+        successMessage: '✅ Conexión sospechosa detectada: 10.0.0.99 aún tiene una sesión ESTABLISHED en puerto 22. ¡Bloquéala!',
+      },
+      {
+        id: 'step-firewall',
+        title: 'Paso 4: Configura el firewall',
+        description: 'Revisa las reglas del firewall actual y asegúrate de que esté protegido',
+        hint: 'Comando: iptables -L',
+        validator: (cmd) => cmd.includes('iptables') && cmd.includes('-L'),
+        xp: 60,
+        successMessage: '🏴 ¡Servidor auditado y fortificado! Score mejorado. El sistema está más seguro ahora.',
+      },
+    ],
+    completionFlag: 'FLAG{h4rd3n1ng_pr0_2024}',
+    debriefing: '📋 REPORTE: Hardening aplicado.\n• Score antes: 58/100 → Score después: 82/100\n• Correcciones: SSH endurecido, firewall configurado, servicios innecesarios deshabilitados\n• Monitoreo: Fail2ban instalado, logs centralizados\n• Estado: Sistema PROTEGIDO',
+  },
+  {
+    id: 'full-pentest',
+    title: '🏴 Misión FINAL: Pentest Completo — Captura la Flag',
+    briefing: 'Esta es la prueba final. Debes realizar un pentest completo: reconocimiento → escaneo → explotación → escalada de privilegios → captura de flag. El objetivo está en /root/flag.txt.',
+    difficulty: 'hard',
+    xpTotal: 500,
+    steps: [
+      {
+        id: 'step-final-recon',
+        title: 'Paso 1: Reconocimiento inicial',
+        description: 'Empieza obteniendo información del objetivo con whois y DNS',
+        hint: 'Comando: whois target-corp.com',
+        validator: (cmd) => cmd.includes('whois') || (cmd.includes('dig') && cmd.includes('target')),
+        xp: 50,
+        successMessage: '✅ Reconocimiento básico completo. Objetivo identificado.',
+      },
+      {
+        id: 'step-final-scan',
+        title: 'Paso 2: Escaneo profundo',
+        description: 'Escanea todos los puertos con detección de versiones y vulnerabilidades',
+        hint: 'Comando: nmap -sV 10.0.0.10',
+        validator: (cmd) => cmd.includes('nmap') && cmd.includes('-sV'),
+        xp: 60,
+        successMessage: '✅ Servicios descubiertos. Apache 2.4.29 desactualizado + MySQL 5.7.33 expuesto.',
+      },
+      {
+        id: 'step-final-enum',
+        title: 'Paso 3: Enumeración web',
+        description: 'Busca directorios y archivos de configuración expuestos',
+        hint: 'Comando: dirb https://target-corp.com',
+        validator: (cmd) => cmd.includes('dirb') || (cmd.includes('curl') && cmd.includes('robots')),
+        xp: 60,
+        successMessage: '✅ Encontraste /admin y /.git expuestos. Vector de ataque identificado.',
+      },
+      {
+        id: 'step-final-exploit',
+        title: 'Paso 4: Explota la vulnerabilidad',
+        description: 'El login del panel admin es vulnerable a SQL Injection. Gana acceso.',
+        hint: "Comando: sqli login admin' OR 1=1 --",
+        validator: (cmd) => cmd.includes('sqli') && cmd.includes('login'),
+        xp: 100,
+        successMessage: '✅ ¡Acceso al panel admin obtenido! Ahora necesitas escalar a root.',
+      },
+      {
+        id: 'step-final-config',
+        title: 'Paso 5: Busca credenciales internas',
+        description: 'Los desarrolladores a veces dejan credenciales en archivos de configuración. Busca en /opt/',
+        hint: 'Comando: cat /opt/targetcorp/config.yml',
+        validator: (cmd) => cmd.includes('config.yml') || (cmd.includes('cat') && cmd.includes('/opt')),
+        xp: 80,
+        successMessage: '✅ ¡Credenciales de BD encontradas! user:admin password:T@rg3tDB2024! — Posible reutilización de contraseñas.',
+      },
+      {
+        id: 'step-final-flag',
+        title: 'Paso 6: CAPTURA LA FLAG',
+        description: 'Con las credenciales de admin y acceso al sistema, escala a root y lee /root/flag.txt',
+        hint: 'Comando: sudo cat /root/flag.txt',
+        validator: (cmd) => cmd.includes('sudo') && cmd.includes('flag'),
+        xp: 150,
+        successMessage: '🏴🏴🏴 ¡FLAG CAPTURADA! FLAG{p3n7357_c0mpl3t0_ch4sk1b0ts_2024} — ¡ERES UN PENTESTER!',
+      },
+    ],
+    completionFlag: 'FLAG{p3n7357_c0mpl3t0_ch4sk1b0ts_2024}',
+    debriefing: '📋 REPORTE FINAL DE PENTEST:\n═══════════════════════════\n• Cliente: Target Corporation S.A.\n• Alcance: target-corp.com + red interna 10.0.0.0/24\n\n• HALLAZGOS CRÍTICOS:\n  1. [CRÍTICO] SQL Injection en /admin/login\n  2. [ALTO] Código fuente expuesto (/.git)\n  3. [ALTO] Credenciales en config.yml sin cifrar\n  4. [MEDIO] Apache 2.4.29 desactualizado\n  5. [BAJO] robots.txt revela rutas internas\n\n• IMPACTO: Acceso root completo al servidor\n• REMEDIACIÓN: Prepared statements, hardening SSH, cifrar configs, actualizar software\n\n¡FELICIDADES! Has completado todas las misiones. 🎓',
+  },
+]
+
+// ============================================================
 // RENDER THEORY (markdown mini)
 // ============================================================
 function renderTheory(text: string) {
@@ -971,8 +1251,13 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
     { text: '║   Objetivo autorizado: target-corp.com (10.0.0.10)       ║', type: 'system' },
     { text: '╚══════════════════════════════════════════════════════════╝', type: 'system' },
     { text: '', type: 'normal' },
-    { text: "Escribe 'help' para ver los comandos disponibles.", type: 'info' },
-    { text: "🎯 Reto: escala privilegios y captura la flag en /root/flag.txt", type: 'warning' },
+    { text: "Escribe 'help' para ver comandos. 'missions' para ver misiones CTF.", type: 'info' },
+    { text: '', type: 'normal' },
+    { text: '🏴 MISIONES CTF: Escenarios reales paso a paso con XP', type: 'warning' },
+    { text: '   mission start 1  → Inicia la primera misión de reconocimiento', type: 'normal' },
+    { text: '   mission status   → Ver tu progreso actual', type: 'normal' },
+    { text: '', type: 'normal' },
+    { text: '🎯 Reto libre: escala privilegios y captura /root/flag.txt', type: 'info' },
     { text: '', type: 'normal' },
   ])
   const [inputValue, setInputValue] = useState('')
@@ -1010,6 +1295,14 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
   const [passwordToCheck, setPasswordToCheck] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState<{ score: number; label: string; tips: string[] } | null>(null)
+
+  // ═══ MISSION ENGINE STATE ═══
+  const [activeMission, setActiveMission] = useState<Mission | null>(null)
+  const [missionStep, setMissionStep] = useState(0)
+  const [totalXP, setTotalXP] = useState(0)
+  const [completedMissions, setCompletedMissions] = useState<Set<string>>(new Set())
+  const [showMissions, setShowMissions] = useState(true)
+  const [missionLog, setMissionLog] = useState<string[]>([])
 
   const terminalRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -1067,6 +1360,11 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
       const savedName = localStorage.getItem('hacking-terminal-student')
       if (savedName) setStudentName(savedName)
       else if (user?.name) setStudentName(user.name)
+      // Load mission progress
+      const savedXP = localStorage.getItem('hacking-xp')
+      if (savedXP) setTotalXP(parseInt(savedXP))
+      const savedMissions = localStorage.getItem('hacking-missions-done')
+      if (savedMissions) setCompletedMissions(new Set(JSON.parse(savedMissions)))
     } catch {}
   }, [user?.name])
 
@@ -1074,8 +1372,10 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
     try {
       localStorage.setItem('hacking-terminal-progress', JSON.stringify(Array.from(completedLessons)))
       if (studentName) localStorage.setItem('hacking-terminal-student', studentName)
+      localStorage.setItem('hacking-xp', String(totalXP))
+      localStorage.setItem('hacking-missions-done', JSON.stringify(Array.from(completedMissions)))
     } catch {}
-  }, [completedLessons, studentName])
+  }, [completedLessons, studentName, totalXP, completedMissions])
 
   useEffect(() => {
     if (terminalRef.current) terminalRef.current.scrollTop = terminalRef.current.scrollHeight
@@ -1143,6 +1443,81 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
       return
     }
 
+    // ── Mission command shortcuts ──
+    if (cmdName === 'missions' || cmdName === 'mission') {
+      const sub = parts[1]
+      if (sub === 'list' || !sub) {
+        setOutput(prev => [...prev, promptLine,
+          { text: '', type: 'normal' },
+          { text: '╔══════════════════════════════════════════════════════════╗', type: 'info' },
+          { text: '║        🏴  MISIONES CTF DISPONIBLES                      ║', type: 'info' },
+          { text: '╠══════════════════════════════════════════════════════════╣', type: 'info' },
+          ...MISSIONS.map((m, i) => ({
+            text: `║ ${completedMissions.has(m.id) ? '✅' : '  '} ${i + 1}. ${m.title.padEnd(45)}║`,
+            type: (completedMissions.has(m.id) ? 'success' : 'normal') as OutputLine['type'],
+          })),
+          { text: '╚══════════════════════════════════════════════════════════╝', type: 'info' },
+          { text: '', type: 'normal' },
+          { text: `Tu XP: ${totalXP} | Misiones completadas: ${completedMissions.size}/${MISSIONS.length}`, type: 'warning' },
+          { text: 'Usa: mission start <número> para iniciar una misión', type: 'info' },
+        ])
+        return
+      }
+      if (sub === 'start' && parts[2]) {
+        const idx = parseInt(parts[2]) - 1
+        if (idx >= 0 && idx < MISSIONS.length) {
+          const m = MISSIONS[idx]
+          setActiveMission(m)
+          setMissionStep(0)
+          setMissionLog([])
+          setOutput(prev => [...prev, promptLine,
+            { text: '', type: 'normal' },
+            { text: '═'.repeat(56), type: 'warning' },
+            { text: `  ${m.title}`, type: 'info' },
+            { text: `  Dificultad: ${DIFFICULTY_LABEL[m.difficulty]} | XP: ${m.xpTotal}`, type: 'normal' },
+            { text: '═'.repeat(56), type: 'warning' },
+            { text: '', type: 'normal' },
+            { text: `📋 BRIEFING: ${m.briefing}`, type: 'normal' },
+            { text: '', type: 'normal' },
+            { text: `▶ ${m.steps[0].title}`, type: 'info' },
+            { text: `  ${m.steps[0].description}`, type: 'normal' },
+            { text: `  💡 Pista: ${m.steps[0].hint}`, type: 'warning' },
+            { text: '', type: 'normal' },
+          ])
+          return
+        }
+        setOutput(prev => [...prev, promptLine, { text: '❌ Número de misión inválido', type: 'error' }])
+        return
+      }
+      if (sub === 'status') {
+        if (!activeMission) {
+          setOutput(prev => [...prev, promptLine, { text: '⚠️ No hay misión activa. Usa: mission start <número>', type: 'warning' }])
+          return
+        }
+        const step = activeMission.steps[missionStep]
+        setOutput(prev => [...prev, promptLine,
+          { text: `🎯 Misión: ${activeMission.title}`, type: 'info' },
+          { text: `   Progreso: ${missionStep}/${activeMission.steps.length} pasos`, type: 'normal' },
+          { text: `   Paso actual: ${step?.title || 'Completada'}`, type: 'warning' },
+          { text: `   ${step?.description || ''}`, type: 'normal' },
+          { text: `   💡 ${step?.hint || ''}`, type: 'info' },
+        ])
+        return
+      }
+      if (sub === 'abort') {
+        setActiveMission(null)
+        setMissionStep(0)
+        setOutput(prev => [...prev, promptLine, { text: '⛔ Misión abortada.', type: 'warning' }])
+        return
+      }
+      if (sub === 'report' && activeMission && completedMissions.has(activeMission.id)) {
+        setOutput(prev => [...prev, promptLine, { text: '', type: 'normal' }, ...activeMission.debriefing.split('\n').map(l => ({ text: l, type: 'info' as const }))])
+        return
+      }
+      setOutput(prev => [...prev, promptLine, { text: 'Uso: mission list | mission start <n> | mission status | mission abort | mission report', type: 'error' }])
+      return
+    }
+
     const result = processCommand(trimmed, cwd, setCwd, [...commandHistory, trimmed], false, userFiles)
 
     if (result.length === 1 && result[0].text === '__CLEAR__') {
@@ -1155,6 +1530,55 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
       setOutput(prev => [...prev, promptLine, { text: '🔑 Abriendo verificador de contraseñas...', type: 'info' }])
     } else {
       setOutput(prev => [...prev, promptLine, ...result])
+    }
+
+    // ═══ MISSION VALIDATION ═══
+    if (activeMission && missionStep < activeMission.steps.length) {
+      const currentStep = activeMission.steps[missionStep]
+      if (currentStep.validator(trimmed, commandHistory)) {
+        const newXP = totalXP + currentStep.xp
+        setTotalXP(newXP)
+        setMissionLog(prev => [...prev, trimmed])
+
+        const nextStep = missionStep + 1
+        const isComplete = nextStep >= activeMission.steps.length
+
+        if (isComplete) {
+          // Mission complete!
+          const newCompleted = new Set(completedMissions)
+          newCompleted.add(activeMission.id)
+          setCompletedMissions(newCompleted)
+          setOutput(prev => [...prev,
+            { text: '', type: 'normal' },
+            { text: '═'.repeat(56), type: 'success' },
+            { text: currentStep.successMessage, type: 'success' },
+            { text: '', type: 'normal' },
+            { text: `🏴 ¡MISIÓN COMPLETADA! +${currentStep.xp} XP`, type: 'success' },
+            { text: `   Flag: ${activeMission.completionFlag}`, type: 'warning' },
+            { text: `   XP total: ${newXP}`, type: 'info' },
+            { text: '═'.repeat(56), type: 'success' },
+            { text: '', type: 'normal' },
+            ...activeMission.debriefing.split('\n').map(l => ({ text: l, type: 'info' as const })),
+            { text: '', type: 'normal' },
+            { text: 'Usa "mission list" para ver la siguiente misión disponible', type: 'info' },
+          ])
+          setActiveMission(null)
+          setMissionStep(0)
+        } else {
+          // Advance to next step
+          setMissionStep(nextStep)
+          const next = activeMission.steps[nextStep]
+          setOutput(prev => [...prev,
+            { text: '', type: 'normal' },
+            { text: `${currentStep.successMessage}  (+${currentStep.xp} XP)`, type: 'success' },
+            { text: '', type: 'normal' },
+            { text: `▶ ${next.title}`, type: 'info' },
+            { text: `  ${next.description}`, type: 'normal' },
+            { text: `  💡 Pista: ${next.hint}`, type: 'warning' },
+            { text: '', type: 'normal' },
+          ])
+        }
+      }
     }
   }
 
@@ -1296,6 +1720,11 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
           <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1">
             <Skull className="w-3 h-3" /> Sesión Activa
           </span>
+          {totalXP > 0 && (
+            <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">
+              ⚡ {totalXP} XP
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-1">
@@ -1422,20 +1851,56 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
               })}
             </div>
 
+            {/* ─── MISIONES CTF ─── */}
             <div className="p-3 border-t border-gray-700/50">
-              <h4 className="text-gray-400 text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Zap className="w-3 h-3" /> Comandos rápidos
-              </h4>
-              <div className="flex flex-wrap gap-1.5">
-                {['help', 'whois target-corp.com', 'nmap -sV 10.0.0.10', "sqli login admin' OR 1=1 --", 'cat /var/log/auth.log', 'sudo cat /root/flag.txt'].map(cmdStr => (
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-gray-300 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <Trophy className="w-3 h-3 text-orange-400" /> Misiones CTF
+                </h4>
+                <span className="text-[10px] text-orange-400 font-bold">{totalXP} XP</span>
+              </div>
+
+              {/* Active mission indicator */}
+              {activeMission && (
+                <div className="mb-2 p-2 rounded-lg bg-orange-500/10 border border-orange-500/30">
+                  <div className="text-[10px] text-orange-300 font-medium truncate">{activeMission.title}</div>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <div className="flex-1 h-1.5 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div className="h-full bg-orange-400 rounded-full transition-all" style={{ width: `${(missionStep / activeMission.steps.length) * 100}%` }} />
+                    </div>
+                    <span className="text-[9px] text-gray-400">{missionStep}/{activeMission.steps.length}</span>
+                  </div>
+                  <div className="text-[9px] text-gray-500 mt-1">{activeMission.steps[missionStep]?.title}</div>
+                </div>
+              )}
+
+              <div className="space-y-1 max-h-32 overflow-y-auto">
+                {MISSIONS.map((m, i) => (
                   <button
-                    key={cmdStr}
-                    onClick={() => { executeCommand(cmdStr) }}
-                    className="text-[10px] px-2 py-1 rounded-md bg-gray-700/50 text-gray-400 hover:bg-red-500/15 hover:text-red-400 border border-gray-600/50 hover:border-red-500/30 transition-all"
+                    key={m.id}
+                    onClick={() => executeCommand(`mission start ${i + 1}`)}
+                    className={`w-full text-left px-2 py-1.5 rounded-md text-[10px] flex items-center gap-1.5 transition-all ${
+                      completedMissions.has(m.id) ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                      activeMission?.id === m.id ? 'bg-orange-500/10 text-orange-300 border border-orange-500/30' :
+                      'bg-gray-700/30 text-gray-400 hover:bg-red-500/10 hover:text-red-300 border border-transparent'
+                    }`}
                   >
-                    $ {cmdStr}
+                    {completedMissions.has(m.id) ? <CheckCircle2 className="w-3 h-3" /> : <Circle className="w-3 h-3" />}
+                    <span className="flex-1 truncate">{m.title.replace(/[🔍⚡🔬🛡️🏴]\s*/, '')}</span>
+                    <span className={`text-[8px] px-1 py-0.5 rounded ${DIFFICULTY_COLOR[m.difficulty]}`}>{m.xpTotal}xp</span>
                   </button>
                 ))}
+              </div>
+
+              {/* Quick commands */}
+              <div className="mt-2 pt-2 border-t border-gray-700/30">
+                <div className="flex flex-wrap gap-1">
+                  {['help', 'missions', 'mission status'].map(cmdStr => (
+                    <button key={cmdStr} onClick={() => executeCommand(cmdStr)} className="text-[9px] px-1.5 py-0.5 rounded bg-gray-700/50 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                      $ {cmdStr}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
