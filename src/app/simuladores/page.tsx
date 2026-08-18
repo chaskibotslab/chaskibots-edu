@@ -33,6 +33,11 @@ const CADLab = dynamic(() => import('@/components/CADLab'), {
   ssr: false
 })
 
+const AITerminal = dynamic(() => import('@/components/activities/AITerminal'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
 const pythonChapters = [
   {
     id: 'ch1',
@@ -346,8 +351,22 @@ export default function SimuladoresPage() {
             <PythonIDE />
           </div>
 
-          {/* AI Lab */}
+          {/* AI Terminal */}
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center border border-purple-500/20">
+                <Brain className="w-6 h-6 text-purple-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">AI Terminal — Simulador de Inteligencia Artificial</h2>
+                <p className="text-white/50 text-sm">Instala paquetes, crea redes neuronales, usa OpenCV, entrena modelos y más</p>
+              </div>
+            </div>
+            <AITerminal />
+          </div>
+
+          {/* AI Lab */}
+          <div className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-chaski-gold/10 rounded-xl flex items-center justify-center border border-chaski-gold/20">
                 <Brain className="w-6 h-6 text-chaski-gold" />
