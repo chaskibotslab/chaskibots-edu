@@ -1,384 +1,1109 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import {
-  Brain, Terminal, Copy, Download, Trash2, Send, Check,
-  Loader2, BookOpen, GraduationCap, ChevronDown, ChevronRight,
-  CheckCircle2, Circle, Maximize2, Minimize2, Zap, Trophy,
-  X, Code, Package, Sparkles
+  Brain, Terminal as TerminalIcon, Copy, Download, Trash2, Send, Check,
+  Loader2, BookOpen, CheckCircle2, Circle, Maximize2, Minimize2,
+  X, Package, Play, Square, RotateCcw, Plus, File, Rocket
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
 
-// ============================================================
-// TYPES
-// ============================================================
-interface OutputLine {
-  text: string
-  type: 'normal' | 'error' | 'success' | 'info' | 'warning' | 'system' | 'input'
-}
+const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
 
-interface ApiLessonStub { id: string; title: string; order_index: number; difficulty: string }
-interface ApiModule { id: string; title: string; icon: string; order_index: number; lessons: ApiLessonStub[] }
-interface ApiLessonFull extends ApiLessonStub {
-  description: string; theory: string; estimated_minutes: number
-  examples: { code: string; explanation: string }[]
-  challenges: { title: string; description: string; hints: string[]; starter_code?: string }[]
-}
-
-const DIFFICULTY_LABEL: Record<string, string> = { easy: '🟢 Fácil', medium: '🟡 Medio', hard: '🔴 Difícil' }
-const DIFFICULTY_COLOR: Record<string, string> = { easy: 'bg-green-500/10 text-green-400', medium: 'bg-yellow-500/10 text-yellow-400', hard: 'bg-red-500/10 text-red-400' }
-
-// ============================================================
-// PACKAGES
-// ============================================================
-const AVAILABLE_PACKAGES: Record<string, { name: string; version: string; desc: string }> = {
-  numpy: { name: 'numpy', version: '1.26.4', desc: 'Computación numérica con arrays' },
-  pandas: { name: 'pandas', version: '2.2.1', desc: 'Análisis de datos tabulares' },
-  tensorflow: { name: 'tensorflow', version: '2.16.1', desc: 'Deep learning (Google)' },
-  keras: { name: 'keras', version: '3.3.3', desc: 'API alto nivel para redes neuronales' },
-  torch: { name: 'torch', version: '2.3.0', desc: 'PyTorch (Meta)' },
-  'scikit-learn': { name: 'scikit-learn', version: '1.4.2', desc: 'ML clásico' },
-  sklearn: { name: 'scikit-learn', version: '1.4.2', desc: 'ML clásico (alias)' },
-  matplotlib: { name: 'matplotlib', version: '3.8.4', desc: 'Visualización de datos' },
-  'opencv-python': { name: 'opencv-python', version: '4.9.0', desc: 'Visión por computadora' },
-  cv2: { name: 'opencv-python', version: '4.9.0', desc: 'OpenCV (alias)' },
-  transformers: { name: 'transformers', version: '4.40.1', desc: 'Modelos de lenguaje (GPT, BERT)' },
-  nltk: { name: 'nltk', version: '3.8.1', desc: 'Procesamiento de lenguaje natural' },
-  seaborn: { name: 'seaborn', version: '0.13.2', desc: 'Visualización estadística' },
-  gradio: { name: 'gradio', version: '4.31.0', desc: 'Interfaces web para ML' },
-  openai: { name: 'openai', version: '1.30.1', desc: 'API de OpenAI' },
-  'stable-diffusion': { name: 'diffusers', version: '0.28.0', desc: 'Generación de imágenes' },
-  langchain: { name: 'langchain', version: '0.2.1', desc: 'Apps con LLMs' },
-  fastapi: { name: 'FastAPI', version: '0.111.0', desc: 'Framework web para APIs' },
+declare global {
+  interface Window { loadPyodide: any; pyodide: any }
 }
 
 // ============================================================
-// VIRTUAL FILE SYSTEM
+// AI EXERCISES - Built-in progressive curriculum
 // ============================================================
-const FS: Record<string, any> = {
-  '/home/ai-lab': { type: 'dir', children: ['proyectos', 'datasets', 'modelos', 'notebooks', 'README.md'] },
-  '/home/ai-lab/README.md': { type: 'file', content: '# AI Lab - ChaskiBots\n\nComandos: help, pip install, python, model, dataset, train, predict, cv2, nlp, gpt, mission' },
-  '/home/ai-lab/proyectos': { type: 'dir', children: ['clasificador', 'chatbot', 'detector'] },
-  '/home/ai-lab/proyectos/clasificador': { type: 'dir', children: ['train.py', 'model.py'] },
-  '/home/ai-lab/proyectos/clasificador/train.py': { type: 'file', content: 'import tensorflow as tf\nfrom tensorflow.keras import layers, models\n\n(x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()\nx_train = x_train / 255.0\n\nmodel = models.Sequential([\n    layers.Conv2D(32, (3,3), activation="relu", input_shape=(32,32,3)),\n    layers.MaxPooling2D((2,2)),\n    layers.Conv2D(64, (3,3), activation="relu"),\n    layers.Flatten(),\n    layers.Dense(64, activation="relu"),\n    layers.Dense(10, activation="softmax")\n])\n\nmodel.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])\nmodel.fit(x_train, y_train, epochs=10)\nprint("Entrenamiento completado")' },
-  '/home/ai-lab/proyectos/clasificador/model.py': { type: 'file', content: 'from keras.models import Sequential\nfrom keras.layers import Dense, Conv2D, MaxPooling2D, Flatten, Dropout\n\ndef create_cnn(input_shape=(32,32,3), num_classes=10):\n    model = Sequential([\n        Conv2D(32, (3,3), activation="relu", input_shape=input_shape),\n        MaxPooling2D((2,2)),\n        Conv2D(64, (3,3), activation="relu"),\n        Flatten(),\n        Dense(128, activation="relu"),\n        Dropout(0.5),\n        Dense(num_classes, activation="softmax")\n    ])\n    return model' },
-  '/home/ai-lab/proyectos/chatbot': { type: 'dir', children: ['chatbot.py', 'intents.json'] },
-  '/home/ai-lab/proyectos/chatbot/chatbot.py': { type: 'file', content: 'from sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.metrics.pairwise import cosine_similarity\nimport numpy as np\n\nintents = {"saludo": ["hola","hey"], "despedida": ["adiós","bye"], "ayuda": ["help","ayuda"]}\nresponses = {"saludo": "¡Hola!", "despedida": "¡Adiós!", "ayuda": "¿En qué ayudo?"}\n\nvectorizer = TfidfVectorizer()\nall_texts = [t for texts in intents.values() for t in texts]\nlabels = [k for k, texts in intents.items() for _ in texts]\nX = vectorizer.fit_transform(all_texts)\n\ndef predict(msg):\n    vec = vectorizer.transform([msg])\n    sim = cosine_similarity(vec, X)\n    return responses[labels[np.argmax(sim)]]\n\nprint(predict("hola"))' },
-  '/home/ai-lab/proyectos/chatbot/intents.json': { type: 'file', content: '{"intents":[{"tag":"saludo","patterns":["hola","hey"],"responses":["¡Hola!"]},{"tag":"despedida","patterns":["adiós","bye"],"responses":["¡Hasta luego!"]}]}' },
-  '/home/ai-lab/proyectos/detector': { type: 'dir', children: ['detect.py'] },
-  '/home/ai-lab/proyectos/detector/detect.py': { type: 'file', content: 'import cv2\nimport numpy as np\n\ncap = cv2.VideoCapture(0)\nwhile True:\n    ret, frame = cap.read()\n    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)\n    edges = cv2.Canny(gray, 100, 200)\n    cv2.imshow("Detección", edges)\n    if cv2.waitKey(1) & 0xFF == ord("q"): break\ncap.release()\ncv2.destroyAllWindows()' },
-  '/home/ai-lab/datasets': { type: 'dir', children: ['iris.csv', 'titanic.csv', 'spam.csv'] },
-  '/home/ai-lab/datasets/iris.csv': { type: 'file', content: 'sepal_length,sepal_width,petal_length,petal_width,species\n5.1,3.5,1.4,0.2,setosa\n7.0,3.2,4.7,1.4,versicolor\n6.3,3.3,6.0,2.5,virginica' },
-  '/home/ai-lab/datasets/titanic.csv': { type: 'file', content: 'PassengerId,Survived,Pclass,Name,Sex,Age\n1,0,3,"Braund Mr.",male,22\n2,1,1,"Cumings Mrs.",female,38\n3,1,3,"Heikkinen Miss.",female,26' },
-  '/home/ai-lab/datasets/spam.csv': { type: 'file', content: 'text,label\n"Ganaste un premio!",spam\n"Hola, nos vemos mañana",ham\n"URGENTE: cuenta bloqueada",spam' },
-  '/home/ai-lab/modelos': { type: 'dir', children: ['clasificador.h5', 'chatbot.pkl'] },
-  '/home/ai-lab/modelos/clasificador.h5': { type: 'file', content: '[Modelo Keras - 15.2MB] CNN, CIFAR-10, acc=0.87' },
-  '/home/ai-lab/modelos/chatbot.pkl': { type: 'file', content: '[Modelo SKLearn - 2.1MB] TF-IDF, 4 intents, acc=0.92' },
-  '/home/ai-lab/notebooks': { type: 'dir', children: ['intro_ml.ipynb', 'neural_nets.ipynb', 'cv_basics.ipynb'] },
-  '/home/ai-lab/notebooks/intro_ml.ipynb': { type: 'file', content: '# Intro ML\n\n## Tipos:\n1. Supervisado (clasificación, regresión)\n2. No supervisado (clustering)\n3. Refuerzo (recompensas)\n\n## Flujo: Datos → Preprocesar → Modelo → Entrenar → Evaluar → Deploy' },
-  '/home/ai-lab/notebooks/neural_nets.ipynb': { type: 'file', content: '# Redes Neuronales\n\nNeurona: inputs × weights + bias → activation\nCapas: Input → Hidden → Output\n\nActivaciones: ReLU, Sigmoid, Softmax\nOptimizer: Adam, SGD\nLoss: CrossEntropy, MSE' },
-  '/home/ai-lab/notebooks/cv_basics.ipynb': { type: 'file', content: '# Computer Vision\n\ncv2.imread() - Leer imagen\ncv2.cvtColor() - Convertir color\ncv2.Canny() - Detectar bordes\ncv2.CascadeClassifier() - Detectar rostros\ncv2.VideoCapture(0) - Abrir cámara' },
+interface AIExercise {
+  id: string
+  title: string
+  icon: string
+  difficulty: 'easy' | 'medium' | 'hard'
+  category: string
+  description: string
+  theory: string
+  code: string
+  expected_output?: string
 }
 
-// ============================================================
-// MISSIONS
-// ============================================================
-interface MissionStep {
-  id: string; title: string; description: string; hint: string
-  validator: (cmd: string, history: string[]) => boolean
-  successMessage: string; xp: number
-}
-interface Mission {
-  id: string; title: string; briefing: string; difficulty: 'easy' | 'medium' | 'hard'
-  xpTotal: number; steps: MissionStep[]; completionFlag: string; debriefing: string
-}
+const EXERCISE_CATEGORIES = [
+  { id: 'basics', name: 'Python + IA Basico', icon: '\u{1F9E0}', color: 'text-green-400' },
+  { id: 'numpy', name: 'NumPy & Arrays', icon: '\u{1F522}', color: 'text-blue-400' },
+  { id: 'data', name: 'Datos & Estadistica', icon: '\u{1F4CA}', color: 'text-yellow-400' },
+  { id: 'ml', name: 'Machine Learning', icon: '\u{1F916}', color: 'text-purple-400' },
+  { id: 'nn', name: 'Redes Neuronales', icon: '\u{1F9EC}', color: 'text-pink-400' },
+  { id: 'vision', name: 'Vision & Imagenes', icon: '\u{1F4F7}', color: 'text-cyan-400' },
+  { id: 'nlp', name: 'Lenguaje Natural', icon: '\u{1F4AC}', color: 'text-orange-400' },
+  { id: 'gen', name: 'IA Generativa', icon: '\u{2728}', color: 'text-rose-400' },
+]
 
-const MISSIONS: Mission[] = [
+const AI_EXERCISES: AIExercise[] = [
+  // === PYTHON + IA BASICO ===
   {
-    id: 'first-nn', title: '🧠 Misión 1: Tu Primera Red Neuronal',
-    briefing: 'Crea y entrena una red neuronal para clasificar dígitos MNIST.',
-    difficulty: 'easy', xpTotal: 150,
-    steps: [
-      { id: 's1', title: 'Instalar TensorFlow', description: 'Instala la librería de deep learning', hint: 'pip install tensorflow', validator: (cmd) => cmd.includes('pip install') && (cmd.includes('tensorflow') || cmd.includes('keras')), successMessage: '✅ TensorFlow instalado', xp: 20 },
-      { id: 's2', title: 'Cargar Dataset MNIST', description: 'Carga el dataset de dígitos', hint: 'dataset load mnist', validator: (cmd) => cmd.includes('dataset') && cmd.includes('mnist'), successMessage: '✅ MNIST cargado (60k imágenes)', xp: 25 },
-      { id: 's3', title: 'Crear Modelo', description: 'Crea una red neuronal Sequential', hint: 'model create sequential', validator: (cmd) => cmd.includes('model') && cmd.includes('create'), successMessage: '✅ Modelo Sequential creado', xp: 35 },
-      { id: 's4', title: 'Entrenar', description: 'Entrena la red neuronal', hint: 'train mnist_model', validator: (cmd) => cmd.includes('train'), successMessage: '✅ Accuracy: 0.97', xp: 40 },
-      { id: 's5', title: 'Predecir', description: 'Clasifica un dígito', hint: 'predict digit_7.png', validator: (cmd) => cmd.includes('predict'), successMessage: '✅ Predicción: "7" (98.5%)', xp: 30 },
-    ],
-    completionFlag: 'FLAG{n3ur4l_n3tw0rk_m4st3r}',
-    debriefing: '📋 REPORTE:\n  ✓ Red neuronal con capas Dense\n  ✓ Entrenada con MNIST (97% acc)\n  ✓ Conceptos: layers, activations, backprop',
+    id: 'intro-ia', title: 'Hola Mundo IA', icon: '\u{1F44B}', difficulty: 'easy', category: 'basics',
+    description: 'Tu primer programa de IA - conceptos fundamentales',
+    theory: `# Inteligencia Artificial
+## Que es la IA?
+La IA es la capacidad de las maquinas de imitar la inteligencia humana.
+
+## Tipos principales:
+- **IA Estrecha**: Especializada en una tarea (ej: reconocer rostros)
+- **IA General**: Capaz de cualquier tarea intelectual (aun no existe)
+- **ML (Machine Learning)**: La maquina aprende de datos sin programarla explicitamente
+
+## Python para IA:
+Python es el lenguaje #1 para IA por sus librerias: NumPy, Pandas, TensorFlow, PyTorch`,
+    code: `# Hola Mundo de Inteligencia Artificial
+# Este es tu primer programa de IA!
+
+print("=" * 50)
+print("  INTELIGENCIA ARTIFICIAL - ChaskiBots Lab")
+print("=" * 50)
+
+# Concepto 1: Los datos son la base de la IA
+datos_entrenamiento = [
+    {"texto": "me encanta", "sentimiento": "positivo"},
+    {"texto": "es horrible", "sentimiento": "negativo"},
+    {"texto": "que genial", "sentimiento": "positivo"},
+    {"texto": "no me gusta", "sentimiento": "negativo"},
+]
+
+print(f"\\nDataset: {len(datos_entrenamiento)} muestras")
+print("\\nDatos de entrenamiento:")
+for d in datos_entrenamiento:
+    emoji = "+" if d["sentimiento"] == "positivo" else "-"
+    print(f"  [{emoji}] '{d['texto']}' -> {d['sentimiento']}")
+
+# Concepto 2: Un modelo simple basado en reglas
+palabras_positivas = ["encanta", "genial", "bueno", "excelente", "amor"]
+palabras_negativas = ["horrible", "malo", "gusta no", "odio", "terrible"]
+
+def predecir_sentimiento(texto):
+    texto = texto.lower()
+    score = 0
+    for p in palabras_positivas:
+        if p in texto:
+            score += 1
+    for n in palabras_negativas:
+        if n in texto:
+            score -= 1
+    if score > 0:
+        return "positivo", score
+    elif score < 0:
+        return "negativo", score
+    return "neutral", score
+
+# Concepto 3: Hacer predicciones
+print("\\n--- PREDICCIONES ---")
+pruebas = ["me encanta la pizza", "es horrible el clima", "hoy es un dia normal"]
+for texto in pruebas:
+    resultado, confianza = predecir_sentimiento(texto)
+    print(f"  '{texto}' -> {resultado} (score: {confianza})")
+
+print("\\nEsto es IA basada en reglas!")
+print("Con ML, la maquina aprende las reglas SOLA de los datos")`,
   },
   {
-    id: 'cv-mission', title: '📷 Misión 2: Visión por Computadora',
-    briefing: 'Construye un detector de objetos con OpenCV.',
-    difficulty: 'medium', xpTotal: 200,
-    steps: [
-      { id: 's1', title: 'Instalar OpenCV', description: 'Instala la librería de visión', hint: 'pip install opencv-python', validator: (cmd) => cmd.includes('pip install') && (cmd.includes('opencv') || cmd.includes('cv2')), successMessage: '✅ OpenCV instalado', xp: 20 },
-      { id: 's2', title: 'Abrir Cámara', description: 'Inicializa captura de video', hint: 'cv2 open_camera', validator: (cmd) => (cmd.includes('cv2') && cmd.includes('camera')) || cmd.includes('VideoCapture'), successMessage: '✅ Cámara: 640x480 @ 30fps', xp: 30 },
-      { id: 's3', title: 'Detectar Bordes', description: 'Aplica Canny edge detection', hint: 'cv2 canny', validator: (cmd) => cmd.includes('canny') || cmd.includes('edge') || cmd.includes('borde'), successMessage: '✅ 847 bordes detectados', xp: 40 },
-      { id: 's4', title: 'Detectar Rostros', description: 'Usa Haar Cascades', hint: 'cv2 detect_faces', validator: (cmd) => cmd.includes('face') || cmd.includes('rostro') || cmd.includes('haar'), successMessage: '✅ 2 rostros detectados', xp: 50 },
-      { id: 's5', title: 'Guardar Resultado', description: 'Guarda la imagen procesada', hint: 'cv2 save resultado.png', validator: (cmd) => cmd.includes('save') || cmd.includes('guardar') || cmd.includes('imwrite'), successMessage: '✅ resultado.png guardado', xp: 60 },
-    ],
-    completionFlag: 'FLAG{c0mput3r_v1s10n_pr0}',
-    debriefing: '📋 REPORTE:\n  ✓ OpenCV para captura de video\n  ✓ Canny edge detection\n  ✓ Haar Cascade face detection\n  ✓ Conceptos: frames, kernels, cascadas',
+    id: 'variables-ia', title: 'Variables para IA', icon: '\u{1F4E6}', difficulty: 'easy', category: 'basics',
+    description: 'Tipos de datos esenciales para Machine Learning',
+    theory: `# Variables en IA
+## Tipos fundamentales:
+- **int/float**: Valores numericos (features)
+- **list**: Secuencias de datos (datasets)
+- **dict**: Pares clave-valor (estructuras de datos)
+- **bool**: Verdadero/Falso (clasificacion binaria)
+
+## En Machine Learning:
+- Features (X): Las variables de entrada
+- Labels (y): Lo que queremos predecir
+- Weights (w): Lo que el modelo aprende`,
+    code: `# Variables y Tipos de Datos para IA
+print("=== TIPOS DE DATOS EN IA ===\\n")
+
+# 1. Numericos - fundamentales para calculos
+edad = 25
+temperatura = 36.5
+learning_rate = 0.001
+print(f"Numericos: edad={edad}, temp={temperatura}, lr={learning_rate}")
+
+# 2. Listas - representan datasets
+alturas = [1.65, 1.78, 1.52, 1.90, 1.73]
+print(f"\\nDataset alturas: {alturas}")
+print(f"  Promedio: {sum(alturas)/len(alturas):.2f}m")
+print(f"  Min: {min(alturas)}, Max: {max(alturas)}")
+
+# 3. Matrices (listas de listas) - datos tabulares
+dataset = [
+    [1.65, 55, 22],  # [altura, peso, edad]
+    [1.78, 72, 35],
+    [1.52, 48, 19],
+    [1.90, 88, 40],
+]
+print(f"\\nMatriz de datos ({len(dataset)} filas x {len(dataset[0])} columnas):")
+for fila in dataset:
+    print(f"  {fila}")
+
+# 4. Diccionarios - metadatos y configuracion
+modelo_config = {
+    "nombre": "RedNeuronal_v1",
+    "capas": [784, 128, 64, 10],
+    "activacion": "relu",
+    "epochs": 50,
+    "accuracy": 0.95
+}
+print(f"\\nConfiguracion del modelo:")
+for k, v in modelo_config.items():
+    print(f"  {k}: {v}")
+
+# 5. One-hot encoding (representacion de categorias)
+categorias = {"gato": [1,0,0], "perro": [0,1,0], "ave": [0,0,1]}
+print(f"\\nOne-hot encoding:")
+for animal, vector in categorias.items():
+    print(f"  {animal} -> {vector}")
+
+print("\\nEstos tipos de datos son la BASE de todo en IA!")`,
   },
   {
-    id: 'data-science', title: '📊 Misión 3: Data Science',
-    briefing: 'Analiza el Titanic para predecir supervivientes.',
-    difficulty: 'easy', xpTotal: 180,
-    steps: [
-      { id: 's1', title: 'Instalar Pandas', description: 'Instala herramientas de análisis', hint: 'pip install pandas scikit-learn', validator: (cmd) => cmd.includes('pip install') && (cmd.includes('pandas') || cmd.includes('scikit')), successMessage: '✅ Pandas + Sklearn instalados', xp: 15 },
-      { id: 's2', title: 'Cargar Titanic', description: 'Carga el dataset', hint: 'dataset load titanic', validator: (cmd) => cmd.includes('dataset') && cmd.includes('titanic'), successMessage: '✅ 891 pasajeros cargados', xp: 25 },
-      { id: 's3', title: 'Analizar', description: 'Explora estadísticas', hint: 'analyze o describe', validator: (cmd) => cmd.includes('describe') || cmd.includes('analyz') || cmd.includes('info') || cmd.includes('head'), successMessage: '✅ 38% sobrevivieron, edad media=29.7', xp: 35 },
-      { id: 's4', title: 'Preprocesar', description: 'Limpia datos faltantes', hint: 'preprocess titanic', validator: (cmd) => cmd.includes('preprocess') || cmd.includes('clean') || cmd.includes('fillna'), successMessage: '✅ Datos limpiados y codificados', xp: 40 },
-      { id: 's5', title: 'Entrenar Clasificador', description: 'Random Forest', hint: 'train titanic_model', validator: (cmd) => cmd.includes('train'), successMessage: '✅ Random Forest: acc=0.82', xp: 45 },
-      { id: 's6', title: 'Predecir', description: 'Predice supervivencia', hint: 'predict female 25 1st-class', validator: (cmd) => cmd.includes('predict'), successMessage: '✅ Sobrevive (91.3%)', xp: 20 },
-    ],
-    completionFlag: 'FLAG{d4t4_sc13nt1st}',
-    debriefing: '📋 REPORTE:\n  ✓ EDA del Titanic\n  ✓ Preprocessing completo\n  ✓ Random Forest (82% acc)\n  ✓ Conceptos: EDA, features, clasificación',
+    id: 'funciones-ia', title: 'Funciones de IA', icon: '\u{2699}\u{FE0F}', difficulty: 'easy', category: 'basics',
+    description: 'Funciones esenciales para procesar datos de IA',
+    theory: `# Funciones en IA
+## Por que funciones?
+- Reutilizar logica de procesamiento
+- Abstraer operaciones complejas
+- Crear pipelines de datos
+
+## Funciones comunes en IA:
+- Normalizacion de datos
+- Funciones de activacion
+- Metricas de evaluacion
+- Transformaciones de features`,
+    code: `# Funciones Esenciales para IA
+import math
+import random
+
+print("=== FUNCIONES FUNDAMENTALES DE IA ===\\n")
+
+# 1. Funcion Sigmoide - clasica en redes neuronales
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
+print("1. Funcion Sigmoide (activacion):")
+for x in [-3, -1, 0, 1, 3]:
+    print(f"   sigmoid({x:+d}) = {sigmoid(x):.4f}")
+
+# 2. Normalizacion Min-Max (escalar datos entre 0 y 1)
+def normalizar(datos):
+    min_val = min(datos)
+    max_val = max(datos)
+    return [(x - min_val) / (max_val - min_val) for x in datos]
+
+datos_raw = [150, 200, 80, 300, 120]
+datos_norm = normalizar(datos_raw)
+print(f"\\n2. Normalizacion Min-Max:")
+print(f"   Original:    {datos_raw}")
+print(f"   Normalizado: [{', '.join(f'{x:.2f}' for x in datos_norm)}]")
+
+# 3. Distancia Euclidiana (base de KNN)
+def distancia(p1, p2):
+    return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
+
+a = [1, 2, 3]
+b = [4, 5, 6]
+print(f"\\n3. Distancia Euclidiana:")
+print(f"   Punto A: {a}")
+print(f"   Punto B: {b}")
+print(f"   Distancia: {distancia(a, b):.4f}")
+
+# 4. Funcion de costo (Mean Squared Error)
+def mse(reales, predichos):
+    n = len(reales)
+    return sum((r - p) ** 2 for r, p in zip(reales, predichos)) / n
+
+reales = [3.0, 5.0, 7.0, 9.0]
+predichos = [2.8, 5.2, 6.8, 9.5]
+print(f"\\n4. Error Cuadratico Medio (MSE):")
+print(f"   Reales:    {reales}")
+print(f"   Predichos: {predichos}")
+print(f"   MSE: {mse(reales, predichos):.4f}")
+
+# 5. Softmax (probabilidades para clasificacion)
+def softmax(x):
+    exp_x = [math.exp(i) for i in x]
+    total = sum(exp_x)
+    return [e/total for e in exp_x]
+
+logits = [2.0, 1.0, 0.1]
+probs = softmax(logits)
+clases = ["gato", "perro", "ave"]
+print(f"\\n5. Softmax (clasificacion):")
+print(f"   Logits: {logits}")
+print(f"   Probabilidades:")
+for clase, prob in zip(clases, probs):
+    bar = "#" * int(prob * 30)
+    print(f"   {clase:6s} {bar} {prob:.1%}")
+
+print("\\nEstas funciones son los bloques basicos de la IA!")`,
+  },
+  // === NUMPY & ARRAYS ===
+  {
+    id: 'numpy-basics', title: 'NumPy Fundamentos', icon: '\u{1F522}', difficulty: 'easy', category: 'numpy',
+    description: 'Arrays y operaciones vectorizadas con NumPy (simulado)',
+    theory: `# NumPy - Computacion Numerica
+## Que es NumPy?
+La libreria fundamental para computacion numerica en Python.
+
+## Conceptos clave:
+- **ndarray**: Array N-dimensional eficiente
+- **Vectorizacion**: Operaciones sin loops
+- **Broadcasting**: Operaciones entre arrays de diferente forma
+- **Shapes**: Dimensiones de los arrays`,
+    code: `# NumPy Fundamentos (simulado con listas Python puras)
+# En un entorno real usarias: import numpy as np
+import random
+import math
+
+print("=== NUMPY FUNDAMENTOS (simulado) ===\\n")
+
+# Simulamos operaciones de NumPy con Python puro
+class MiniNumpy:
+    @staticmethod
+    def array(data):
+        return list(data)
+    
+    @staticmethod
+    def zeros(n):
+        return [0.0] * n
+    
+    @staticmethod
+    def ones(n):
+        return [1.0] * n
+    
+    @staticmethod
+    def random_array(n):
+        return [random.random() for _ in range(n)]
+    
+    @staticmethod
+    def dot(a, b):
+        return sum(x*y for x, y in zip(a, b))
+    
+    @staticmethod
+    def mean(arr):
+        return sum(arr) / len(arr)
+    
+    @staticmethod
+    def std(arr):
+        m = sum(arr) / len(arr)
+        return math.sqrt(sum((x-m)**2 for x in arr) / len(arr))
+    
+    @staticmethod
+    def multiply(a, b):
+        return [x*y for x, y in zip(a, b)]
+    
+    @staticmethod
+    def add(a, scalar):
+        return [x + scalar for x in a]
+    
+    @staticmethod
+    def reshape_2d(arr, rows, cols):
+        return [arr[i*cols:(i+1)*cols] for i in range(rows)]
+
+np = MiniNumpy()
+
+# 1. Crear arrays
+print("1. Creacion de Arrays:")
+a = np.array([1, 2, 3, 4, 5])
+print(f"   Array: {a}")
+print(f"   Zeros: {np.zeros(5)}")
+print(f"   Ones:  {np.ones(5)}")
+rand = np.random_array(5)
+print(f"   Random: [{', '.join(f'{x:.3f}' for x in rand)}]")
+
+# 2. Operaciones vectorizadas
+print("\\n2. Operaciones Vectorizadas:")
+b = np.array([10, 20, 30, 40, 50])
+mult = np.multiply(a, b)
+print(f"   a = {a}")
+print(f"   b = {b}")
+print(f"   a * b = {mult}")
+print(f"   a + 10 = {np.add(a, 10)}")
+
+# 3. Producto punto (fundamental en IA)
+print("\\n3. Producto Punto (base de redes neuronales):")
+weights = [0.5, -0.3, 0.8, 0.1, -0.6]
+inputs = [1.0, 2.0, 0.5, 3.0, 1.5]
+resultado = np.dot(weights, inputs)
+print(f"   Pesos:    {weights}")
+print(f"   Entradas: {inputs}")
+print(f"   w . x = {resultado:.4f}")
+
+# 4. Estadisticas
+print("\\n4. Estadisticas:")
+datos = [23, 45, 12, 67, 34, 89, 56, 78, 90, 11]
+print(f"   Datos: {datos}")
+print(f"   Media: {np.mean(datos):.2f}")
+print(f"   Std:   {np.std(datos):.2f}")
+print(f"   Min:   {min(datos)}, Max: {max(datos)}")
+
+# 5. Reshape (cambiar dimensiones)
+print("\\n5. Reshape (reorganizar datos):")
+flat = list(range(1, 13))
+matrix = np.reshape_2d(flat, 3, 4)
+print(f"   Original (1D): {flat}")
+print(f"   Reshape (3x4):")
+for row in matrix:
+    print(f"     {row}")
+
+print("\\nNumPy hace estas operaciones 100x mas rapido que Python puro!")`,
+  },
+  // === MACHINE LEARNING ===
+  {
+    id: 'knn-clasificador', title: 'KNN Clasificador', icon: '\u{1F3AF}', difficulty: 'medium', category: 'ml',
+    description: 'Implementa K-Nearest Neighbors desde cero',
+    theory: `# K-Nearest Neighbors (KNN)
+## Como funciona:
+1. Recibe un punto nuevo a clasificar
+2. Calcula la distancia a TODOS los puntos del dataset
+3. Selecciona los K vecinos mas cercanos
+4. La clase mas comun entre los K vecinos es la prediccion
+
+## Ventajas:
+- Simple de entender e implementar
+- No requiere entrenamiento
+- Funciona bien con datos pequenos
+
+## Desventajas:
+- Lento con datasets grandes
+- Sensible a la escala de features`,
+    code: `# K-Nearest Neighbors (KNN) desde cero
+import math
+from collections import Counter
+
+print("=== KNN - K NEAREST NEIGHBORS ===\\n")
+
+# Dataset: flores (largo_petalo, ancho_petalo) -> especie
+dataset = [
+    ([1.4, 0.2], "setosa"),
+    ([1.3, 0.3], "setosa"),
+    ([1.5, 0.2], "setosa"),
+    ([1.7, 0.4], "setosa"),
+    ([4.5, 1.5], "versicolor"),
+    ([4.2, 1.3], "versicolor"),
+    ([4.7, 1.4], "versicolor"),
+    ([4.0, 1.3], "versicolor"),
+    ([6.0, 2.5], "virginica"),
+    ([5.8, 2.2], "virginica"),
+    ([6.3, 1.8], "virginica"),
+    ([5.5, 2.1], "virginica"),
+]
+
+def distancia_euclidiana(p1, p2):
+    return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
+
+def knn_clasificar(punto, dataset, k=3):
+    # Calcular distancias a todos los puntos
+    distancias = []
+    for features, label in dataset:
+        d = distancia_euclidiana(punto, features)
+        distancias.append((d, label))
+    
+    # Ordenar por distancia
+    distancias.sort(key=lambda x: x[0])
+    
+    # Tomar los K mas cercanos
+    k_vecinos = distancias[:k]
+    
+    # Votar
+    votos = Counter([label for _, label in k_vecinos])
+    prediccion = votos.most_common(1)[0][0]
+    confianza = votos.most_common(1)[0][1] / k
+    
+    return prediccion, confianza, k_vecinos
+
+# Visualizar dataset
+print("Dataset de entrenamiento:")
+print(f"  {'Largo':<8} {'Ancho':<8} {'Especie'}")
+print(f"  {'-'*30}")
+for features, label in dataset:
+    print(f"  {features[0]:<8.1f} {features[1]:<8.1f} {label}")
+
+# Clasificar nuevos puntos
+print(f"\\n--- PREDICCIONES (K=3) ---\\n")
+nuevos_puntos = [
+    [1.6, 0.3],   # deberia ser setosa
+    [4.3, 1.4],   # deberia ser versicolor
+    [5.9, 2.0],   # deberia ser virginica
+    [3.0, 1.0],   # caso ambiguo
+]
+
+for punto in nuevos_puntos:
+    pred, conf, vecinos = knn_clasificar(punto, dataset, k=3)
+    print(f"  Punto {punto} -> {pred} ({conf:.0%} confianza)")
+    for dist, label in vecinos:
+        print(f"    Vecino: {label} (dist={dist:.3f})")
+    print()
+
+# Probar diferentes valores de K
+print("--- EFECTO DE K ---")
+punto_test = [3.5, 1.0]
+for k in [1, 3, 5]:
+    pred, conf, _ = knn_clasificar(punto_test, dataset, k=k)
+    print(f"  K={k}: {pred} ({conf:.0%})")
+
+print("\\nKNN es el algoritmo mas intuitivo de Machine Learning!")`,
   },
   {
-    id: 'nlp-chatbot', title: '💬 Misión 4: Chatbot con NLP',
-    briefing: 'Crea un chatbot que entiende intenciones del usuario.',
-    difficulty: 'medium', xpTotal: 220,
-    steps: [
-      { id: 's1', title: 'Instalar NLP', description: 'Instala NLTK/Transformers', hint: 'pip install nltk transformers', validator: (cmd) => cmd.includes('pip install') && (cmd.includes('nltk') || cmd.includes('transformers')), successMessage: '✅ NLTK + Transformers instalados', xp: 20 },
-      { id: 's2', title: 'Tokenizar', description: 'Divide texto en tokens', hint: 'nlp tokenize "Hola mundo"', validator: (cmd) => cmd.includes('tokeniz'), successMessage: '✅ 5 tokens generados', xp: 30 },
-      { id: 's3', title: 'Crear Intenciones', description: 'Define el mapa de intents', hint: 'nlp create_intents', validator: (cmd) => cmd.includes('intent'), successMessage: '✅ 4 intenciones, 12 patrones', xp: 40 },
-      { id: 's4', title: 'Entrenar Chatbot', description: 'Entrena clasificador de intents', hint: 'train chatbot', validator: (cmd) => cmd.includes('train') || (cmd.includes('python') && cmd.includes('chatbot')), successMessage: '✅ Chatbot: TF-IDF, acc=0.95', xp: 50 },
-      { id: 's5', title: 'Probar', description: 'Envía un mensaje al bot', hint: 'chat "hola, cómo estás?"', validator: (cmd) => cmd.includes('chat') && (cmd.includes('"') || cmd.includes("'")), successMessage: '✅ Bot respondió correctamente', xp: 40 },
-      { id: 's6', title: 'Desplegar API', description: 'Crea REST API', hint: 'deploy chatbot', validator: (cmd) => cmd.includes('deploy') || cmd.includes('flask') || cmd.includes('serve'), successMessage: '✅ API en localhost:5000', xp: 40 },
-    ],
-    completionFlag: 'FLAG{nlp_ch4tb0t_m4st3r}',
-    debriefing: '📋 REPORTE:\n  ✓ Tokenización implementada\n  ✓ Chatbot con TF-IDF (95% acc)\n  ✓ API REST desplegada\n  ✓ Conceptos: NLP, intents, vectorización',
+    id: 'regresion-lineal', title: 'Regresion Lineal', icon: '\u{1F4C8}', difficulty: 'medium', category: 'ml',
+    description: 'Implementa regresion lineal con gradiente descendente',
+    theory: `# Regresion Lineal
+## Objetivo:
+Encontrar la mejor linea y = mx + b que se ajuste a los datos.
+
+## Gradiente Descendente:
+1. Inicializar m y b aleatoriamente
+2. Calcular el error (MSE)
+3. Calcular gradientes (derivadas parciales)
+4. Actualizar parametros: param = param - lr * gradiente
+5. Repetir hasta convergencia`,
+    code: `# Regresion Lineal con Gradiente Descendente
+import random
+
+print("=== REGRESION LINEAL ===\\n")
+
+# Datos: horas de estudio vs nota
+X = [1, 2, 3, 4, 5, 6, 7, 8]
+y = [2.1, 3.8, 5.2, 6.9, 8.1, 9.5, 11.2, 12.8]
+
+print("Datos (horas_estudio -> nota):")
+for xi, yi in zip(X, y):
+    bar = "#" * int(yi * 2)
+    print(f"  {xi}h -> {yi:5.1f} {bar}")
+
+# Parametros iniciales
+m = random.uniform(-1, 1)  # pendiente
+b = random.uniform(-1, 1)  # intercepto
+lr = 0.01  # learning rate
+epochs = 100
+
+print(f"\\nParametros iniciales: m={m:.4f}, b={b:.4f}")
+print(f"Learning rate: {lr}")
+print(f"\\n--- ENTRENAMIENTO ({epochs} epochs) ---\\n")
+
+for epoch in range(epochs):
+    # Forward: predicciones
+    y_pred = [m * xi + b for xi in X]
+    
+    # Calcular error MSE
+    mse = sum((real - pred)**2 for real, pred in zip(y, y_pred)) / len(y)
+    
+    # Gradientes
+    dm = -2 * sum((real - pred) * xi for real, pred, xi in zip(y, y_pred, X)) / len(y)
+    db = -2 * sum((real - pred) for real, pred in zip(y, y_pred)) / len(y)
+    
+    # Actualizar parametros
+    m -= lr * dm
+    b -= lr * db
+    
+    if epoch % 20 == 0 or epoch == epochs - 1:
+        print(f"  Epoch {epoch:3d}: MSE={mse:.4f} | m={m:.4f} b={b:.4f}")
+
+# Resultado final
+print(f"\\n--- MODELO ENTRENADO ---")
+print(f"  y = {m:.4f}x + {b:.4f}")
+print(f"  (La relacion real es aprox y = 1.5x + 0.5)")
+
+# Predicciones
+print(f"\\n--- PREDICCIONES ---")
+nuevas_horas = [9, 10, 12]
+for h in nuevas_horas:
+    prediccion = m * h + b
+    print(f"  {h} horas de estudio -> nota predicha: {prediccion:.1f}")
+
+print("\\nAsi aprenden las redes neuronales: ajustando parametros con gradiente descendente!")`,
+  },
+  // === REDES NEURONALES ===
+  {
+    id: 'perceptron', title: 'El Perceptron', icon: '\u{1F9E0}', difficulty: 'medium', category: 'nn',
+    description: 'La neurona artificial mas basica - base de deep learning',
+    theory: `# El Perceptron
+## Que es?
+La unidad fundamental de las redes neuronales.
+
+## Estructura:
+- Entradas (x1, x2, ... xn)
+- Pesos (w1, w2, ... wn) 
+- Bias (b)
+- Funcion de activacion
+- Salida = activacion(sum(xi * wi) + b)
+
+## Aprende con:
+1. Forward pass: calcular salida
+2. Calcular error
+3. Ajustar pesos (regla delta)`,
+    code: `# El Perceptron - Neurona Artificial
+import random
+import math
+
+print("=== EL PERCEPTRON ===\\n")
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-max(-500, min(500, x))))
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+class Perceptron:
+    def __init__(self, n_inputs):
+        self.weights = [random.uniform(-1, 1) for _ in range(n_inputs)]
+        self.bias = random.uniform(-1, 1)
+        self.lr = 0.5
+    
+    def predict(self, inputs):
+        total = sum(w * x for w, x in zip(self.weights, inputs)) + self.bias
+        return sigmoid(total)
+    
+    def train(self, inputs, expected):
+        # Forward
+        output = self.predict(inputs)
+        # Error
+        error = expected - output
+        # Actualizar pesos
+        for i in range(len(self.weights)):
+            self.weights[i] += self.lr * error * sigmoid_derivative(output) * inputs[i]
+        self.bias += self.lr * error * sigmoid_derivative(output)
+        return error
+
+# Entrenar para compuerta AND
+print("Entrenando Perceptron para AND logico:")
+print("  Entrada1  Entrada2  Salida_esperada")
+AND_data = [
+    ([0, 0], 0),
+    ([0, 1], 0),
+    ([1, 0], 0),
+    ([1, 1], 1),
+]
+for inputs, expected in AND_data:
+    print(f"  {inputs[0]:^8} {inputs[1]:^8} {expected:^15}")
+
+neuron = Perceptron(2)
+print(f"\\nPesos iniciales: {[f'{w:.3f}' for w in neuron.weights]}")
+print(f"Bias inicial: {neuron.bias:.3f}")
+
+# Entrenar
+print(f"\\n--- ENTRENAMIENTO (1000 epochs) ---")
+for epoch in range(1000):
+    total_error = 0
+    for inputs, expected in AND_data:
+        error = neuron.train(inputs, expected)
+        total_error += abs(error)
+    if epoch % 200 == 0:
+        print(f"  Epoch {epoch:4d}: Error total = {total_error:.6f}")
+
+# Resultados
+print(f"\\nPesos finales: {[f'{w:.3f}' for w in neuron.weights]}")
+print(f"Bias final: {neuron.bias:.3f}")
+print(f"\\n--- RESULTADOS ---")
+for inputs, expected in AND_data:
+    output = neuron.predict(inputs)
+    result = 1 if output > 0.5 else 0
+    status = "OK" if result == expected else "FAIL"
+    print(f"  {inputs} -> {output:.4f} (redondeo: {result}) [{status}]")
+
+# Probar OR tambien
+print(f"\\n--- BONUS: Entrenando para OR ---")
+OR_data = [([0,0], 0), ([0,1], 1), ([1,0], 1), ([1,1], 1)]
+neuron_or = Perceptron(2)
+for _ in range(1000):
+    for inputs, expected in OR_data:
+        neuron_or.train(inputs, expected)
+
+for inputs, expected in OR_data:
+    output = neuron_or.predict(inputs)
+    print(f"  {inputs} -> {output:.4f} (esperado: {expected})")
+
+print("\\nEl perceptron es la base de TODAS las redes neuronales!")`,
   },
   {
-    id: 'gen-ai', title: '🎨 Misión 5: IA Generativa',
-    briefing: 'Genera imágenes y texto con modelos generativos.',
-    difficulty: 'hard', xpTotal: 300,
-    steps: [
-      { id: 's1', title: 'Instalar', description: 'Instala diffusers/openai', hint: 'pip install stable-diffusion openai', validator: (cmd) => cmd.includes('pip install') && (cmd.includes('stable') || cmd.includes('diffus') || cmd.includes('openai')), successMessage: '✅ Diffusers + OpenAI instalados', xp: 25 },
-      { id: 's2', title: 'Cargar SD', description: 'Carga Stable Diffusion', hint: 'model load stable-diffusion', validator: (cmd) => cmd.includes('model') && (cmd.includes('load') || cmd.includes('stable')), successMessage: '✅ SD v2.1 cargado (4.2GB)', xp: 40 },
-      { id: 's3', title: 'Generar Imagen', description: 'Text-to-image', hint: 'generate "un robot futurista"', validator: (cmd) => cmd.includes('generate') && (cmd.includes('"') || cmd.includes("'")), successMessage: '✅ Imagen generada (512x512)', xp: 60 },
-      { id: 's4', title: 'Prompt Engineering', description: 'Mejora prompts', hint: 'generate "prompt" --steps 75', validator: (cmd) => cmd.includes('generate') && cmd.includes('--'), successMessage: '✅ Imagen mejorada con params', xp: 50 },
-      { id: 's5', title: 'Generar Texto', description: 'Usa un LLM', hint: 'gpt "explica redes neuronales"', validator: (cmd) => cmd.includes('gpt') || cmd.includes('llm'), successMessage: '✅ GPT generó respuesta', xp: 55 },
-      { id: 's6', title: 'Fine-Tuning', description: 'Adapta modelo', hint: 'finetune gpt --epochs 3', validator: (cmd) => cmd.includes('finetune') || cmd.includes('fine-tune'), successMessage: '✅ Fine-tuning: -40% perplexity', xp: 70 },
-    ],
-    completionFlag: 'FLAG{g3n3r4t1v3_41_m4st3r}',
-    debriefing: '📋 REPORTE:\n  ✓ Stable Diffusion text-to-image\n  ✓ Prompt engineering avanzado\n  ✓ GPT/LLM text generation\n  ✓ Fine-tuning conceptual\n  ✓ Conceptos: diffusion, transformers, attention',
+    id: 'red-neuronal', title: 'Red Neuronal XOR', icon: '\u{1F9EC}', difficulty: 'hard', category: 'nn',
+    description: 'Red neuronal multicapa que resuelve XOR',
+    theory: `# Red Neuronal Multicapa
+## Por que multicapa?
+Un perceptron simple NO puede resolver XOR.
+Se necesita al menos una capa oculta.
+
+## Arquitectura:
+- Capa de entrada: 2 neuronas
+- Capa oculta: 2+ neuronas  
+- Capa de salida: 1 neurona
+
+## Backpropagation:
+El algoritmo que permite entrenar redes profundas propagando el error hacia atras.`,
+    code: `# Red Neuronal que resuelve XOR
+import math
+import random
+
+print("=== RED NEURONAL MULTICAPA (XOR) ===\\n")
+print("XOR es imposible para 1 perceptron!")
+print("Necesitamos una capa oculta.\\n")
+
+random.seed(42)
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-max(-500, min(500, x))))
+
+def sigmoid_deriv(x):
+    return x * (1 - x)
+
+# Arquitectura: 2 inputs -> 4 hidden -> 1 output
+n_input = 2
+n_hidden = 4
+n_output = 1
+
+# Pesos aleatorios
+w_hidden = [[random.uniform(-1, 1) for _ in range(n_input)] for _ in range(n_hidden)]
+b_hidden = [random.uniform(-1, 1) for _ in range(n_hidden)]
+w_output = [[random.uniform(-1, 1) for _ in range(n_hidden)] for _ in range(n_output)]
+b_output = [random.uniform(-1, 1) for _ in range(n_output)]
+
+# Dataset XOR
+X = [[0,0], [0,1], [1,0], [1,1]]
+Y = [[0], [1], [1], [0]]
+
+lr = 0.5
+epochs = 5000
+
+print(f"Arquitectura: {n_input} -> {n_hidden} -> {n_output}")
+print(f"Learning rate: {lr}")
+print(f"Epochs: {epochs}")
+print(f"\\n--- ENTRENAMIENTO ---\\n")
+
+for epoch in range(epochs):
+    total_error = 0
+    
+    for inputs, expected in zip(X, Y):
+        # Forward - capa oculta
+        hidden = []
+        for j in range(n_hidden):
+            s = sum(inputs[i] * w_hidden[j][i] for i in range(n_input)) + b_hidden[j]
+            hidden.append(sigmoid(s))
+        
+        # Forward - capa salida
+        output = []
+        for j in range(n_output):
+            s = sum(hidden[i] * w_output[j][i] for i in range(n_hidden)) + b_output[j]
+            output.append(sigmoid(s))
+        
+        # Error
+        output_errors = [expected[j] - output[j] for j in range(n_output)]
+        total_error += sum(e**2 for e in output_errors)
+        
+        # Backprop - output layer
+        output_deltas = [output_errors[j] * sigmoid_deriv(output[j]) for j in range(n_output)]
+        
+        # Backprop - hidden layer
+        hidden_errors = [sum(output_deltas[j] * w_output[j][i] for j in range(n_output)) for i in range(n_hidden)]
+        hidden_deltas = [hidden_errors[i] * sigmoid_deriv(hidden[i]) for i in range(n_hidden)]
+        
+        # Actualizar pesos output
+        for j in range(n_output):
+            for i in range(n_hidden):
+                w_output[j][i] += lr * output_deltas[j] * hidden[i]
+            b_output[j] += lr * output_deltas[j]
+        
+        # Actualizar pesos hidden
+        for j in range(n_hidden):
+            for i in range(n_input):
+                w_hidden[j][i] += lr * hidden_deltas[j] * inputs[i]
+            b_hidden[j] += lr * hidden_deltas[j]
+    
+    if epoch % 1000 == 0:
+        print(f"  Epoch {epoch:5d}: Error = {total_error:.6f}")
+
+print(f"  Epoch {epochs:5d}: Error = {total_error:.6f}")
+
+# Test final
+print(f"\\n--- RESULTADOS XOR ---\\n")
+print(f"  Input    Output   Esperado  Status")
+print(f"  {'-'*42}")
+for inputs, expected in zip(X, Y):
+    hidden = []
+    for j in range(n_hidden):
+        s = sum(inputs[i] * w_hidden[j][i] for i in range(n_input)) + b_hidden[j]
+        hidden.append(sigmoid(s))
+    output = []
+    for j in range(n_output):
+        s = sum(hidden[i] * w_output[j][i] for i in range(n_hidden)) + b_output[j]
+        output.append(sigmoid(s))
+    
+    pred = round(output[0])
+    status = "OK" if pred == expected[0] else "FAIL"
+    print(f"  {inputs}  ->  {output[0]:.4f}   {expected[0]}         {status}")
+
+print("\\nLa red aprendio XOR con backpropagation!")
+print("Esto es la BASE de Deep Learning!")`,
+  },
+  // === VISION ===
+  {
+    id: 'filtros-imagen', title: 'Filtros de Imagen', icon: '\u{1F5BC}\u{FE0F}', difficulty: 'medium', category: 'vision',
+    description: 'Aplica filtros como blur, bordes y deteccion',
+    theory: `# Vision por Computadora
+## Conceptos base:
+- Una imagen es una matriz de pixeles
+- Cada pixel tiene valores RGB (0-255)
+- Los filtros son matrices (kernels) que se aplican sobre la imagen
+
+## Kernels comunes:
+- **Blur**: Suaviza la imagen
+- **Sharpen**: Realza detalles
+- **Edge detection**: Detecta bordes (Sobel, Canny)`,
+    code: `# Filtros de Imagen - Vision por Computadora
+import random
+
+print("=== FILTROS DE IMAGEN (simulado) ===\\n")
+
+# Simular una imagen 8x8 en escala de grises
+def crear_imagen(size=8):
+    img = []
+    for i in range(size):
+        row = []
+        for j in range(size):
+            if 2 <= i <= 5 and 2 <= j <= 5:
+                row.append(200 + random.randint(-20, 20))
+            else:
+                row.append(50 + random.randint(-20, 20))
+        img.append(row)
+    return img
+
+def mostrar_imagen(img, title=""):
+    if title:
+        print(f"  {title}:")
+    for row in img:
+        line = ""
+        for pixel in row:
+            if pixel > 180:
+                line += "##"
+            elif pixel > 120:
+                line += "**"
+            elif pixel > 60:
+                line += ".."
+            else:
+                line += "  "
+        print(f"    |{line}|")
+    print()
+
+def aplicar_kernel(img, kernel):
+    size = len(img)
+    k_size = len(kernel)
+    offset = k_size // 2
+    resultado = [[0]*size for _ in range(size)]
+    
+    for i in range(offset, size - offset):
+        for j in range(offset, size - offset):
+            total = 0
+            for ki in range(k_size):
+                for kj in range(k_size):
+                    total += img[i + ki - offset][j + kj - offset] * kernel[ki][kj]
+            resultado[i][j] = max(0, min(255, int(total)))
+    return resultado
+
+# Crear imagen original
+img = crear_imagen()
+print("1. Imagen Original (cuadrado brillante en fondo oscuro):")
+mostrar_imagen(img)
+
+# Kernel de Blur (promedio)
+kernel_blur = [[1/9]*3 for _ in range(3)]
+img_blur = aplicar_kernel(img, kernel_blur)
+print("2. Blur (suavizado 3x3):")
+mostrar_imagen(img_blur)
+
+# Kernel de deteccion de bordes (Sobel simplificado)
+kernel_edge = [
+    [-1, -1, -1],
+    [-1,  8, -1],
+    [-1, -1, -1]
+]
+img_edges = aplicar_kernel(img, kernel_edge)
+print("3. Deteccion de Bordes:")
+mostrar_imagen(img_edges)
+
+# Kernel de Sharpen
+kernel_sharp = [
+    [ 0, -1,  0],
+    [-1,  5, -1],
+    [ 0, -1,  0]
+]
+img_sharp = aplicar_kernel(img, kernel_sharp)
+print("4. Sharpen (realzar detalles):")
+mostrar_imagen(img_sharp)
+
+# Estadisticas
+print("--- ESTADISTICAS ---")
+all_pixels = [p for row in img for p in row]
+all_edges = [p for row in img_edges for p in row]
+print(f"  Imagen original: media={sum(all_pixels)/len(all_pixels):.0f}")
+print(f"  Bordes detectados: {sum(1 for p in all_edges if p > 50)} pixeles")
+print(f"  Kernels usados: blur(3x3), edge(3x3), sharpen(3x3)")
+print("\\nAsi funciona OpenCV internamente!")`,
+  },
+  // === NLP ===
+  {
+    id: 'sentiment-analysis', title: 'Analisis de Sentimiento', icon: '\u{1F4AC}', difficulty: 'medium', category: 'nlp',
+    description: 'Clasifica textos como positivos o negativos con TF-IDF',
+    theory: `# Procesamiento de Lenguaje Natural (NLP)
+## Analisis de Sentimiento:
+Determinar si un texto expresa opinion positiva o negativa.
+
+## Pipeline NLP:
+1. Tokenizacion: dividir texto en palabras
+2. Limpieza: quitar stopwords, normalizar
+3. Vectorizacion: convertir texto a numeros (TF-IDF, BoW)
+4. Clasificacion: usar el vector para predecir
+
+## TF-IDF:
+- TF: frecuencia del termino en el documento
+- IDF: importancia inversa en el corpus`,
+    code: `# Analisis de Sentimiento con TF-IDF simplificado
+import math
+from collections import Counter
+
+print("=== ANALISIS DE SENTIMIENTO ===\\n")
+
+# Dataset de entrenamiento
+train_data = [
+    ("me encanta esta pelicula es genial", "positivo"),
+    ("excelente producto muy bueno", "positivo"),
+    ("increible experiencia lo recomiendo", "positivo"),
+    ("es lo mejor que he visto", "positivo"),
+    ("que maravilla me fascina", "positivo"),
+    ("es horrible no me gusto nada", "negativo"),
+    ("pesimo servicio muy malo", "negativo"),
+    ("terrible experiencia nunca mas", "negativo"),
+    ("no lo recomiendo es basura", "negativo"),
+    ("que asco lo peor del mundo", "negativo"),
+]
+
+# Tokenizacion simple
+def tokenizar(texto):
+    return texto.lower().split()
+
+# Construir vocabulario
+vocab = set()
+for texto, _ in train_data:
+    vocab.update(tokenizar(texto))
+vocab = sorted(vocab)
+print(f"Vocabulario: {len(vocab)} palabras")
+print(f"Ejemplo: {list(vocab)[:10]}...\\n")
+
+# TF-IDF simplificado
+def calcular_tf(texto, vocab):
+    tokens = tokenizar(texto)
+    tf = Counter(tokens)
+    total = len(tokens)
+    return {word: tf.get(word, 0)/total for word in vocab}
+
+def calcular_idf(train_data, vocab):
+    n_docs = len(train_data)
+    idf = {}
+    for word in vocab:
+        count = sum(1 for texto, _ in train_data if word in tokenizar(texto))
+        idf[word] = math.log(n_docs / (count + 1)) + 1
+    return idf
+
+idf = calcular_idf(train_data, vocab)
+
+def texto_a_vector(texto, vocab, idf):
+    tf = calcular_tf(texto, vocab)
+    return [tf[w] * idf[w] for w in vocab]
+
+# Vectorizar todo el dataset
+print("Vectorizando dataset...")
+train_vectors = []
+train_labels = []
+for texto, label in train_data:
+    vec = texto_a_vector(texto, vocab, idf)
+    train_vectors.append(vec)
+    train_labels.append(label)
+
+# Clasificador: coseno similarity con centroide
+def cosine_sim(a, b):
+    dot = sum(x*y for x, y in zip(a, b))
+    norm_a = math.sqrt(sum(x**2 for x in a))
+    norm_b = math.sqrt(sum(x**2 for x in b))
+    if norm_a == 0 or norm_b == 0:
+        return 0
+    return dot / (norm_a * norm_b)
+
+# Calcular centroides por clase
+pos_vecs = [v for v, l in zip(train_vectors, train_labels) if l == "positivo"]
+neg_vecs = [v for v, l in zip(train_vectors, train_labels) if l == "negativo"]
+
+centroide_pos = [sum(v[i] for v in pos_vecs)/len(pos_vecs) for i in range(len(vocab))]
+centroide_neg = [sum(v[i] for v in neg_vecs)/len(neg_vecs) for i in range(len(vocab))]
+
+def predecir(texto):
+    vec = texto_a_vector(texto, vocab, idf)
+    sim_pos = cosine_sim(vec, centroide_pos)
+    sim_neg = cosine_sim(vec, centroide_neg)
+    label = "positivo" if sim_pos > sim_neg else "negativo"
+    confianza = max(sim_pos, sim_neg) / (sim_pos + sim_neg + 0.001)
+    return label, confianza
+
+# Clasificar nuevos textos
+print("\\n--- PREDICCIONES ---\\n")
+textos_test = [
+    "esta pelicula es excelente me encanto",
+    "horrible servicio nunca regresare",
+    "es un producto muy bueno lo amo",
+    "que terrible no sirve para nada",
+    "nada especial es normal",
+]
+
+for texto in textos_test:
+    pred, conf = predecir(texto)
+    emoji = "[+]" if pred == "positivo" else "[-]"
+    print(f"  {emoji} '{texto}'")
+    print(f"      -> {pred} ({conf:.0%} confianza)\\n")
+
+print("Asi funciona el analisis de sentimiento en redes sociales!")`,
+  },
+  // === IA GENERATIVA ===
+  {
+    id: 'markov-chain', title: 'Texto con Markov', icon: '\u{2728}', difficulty: 'hard', category: 'gen',
+    description: 'Genera texto automaticamente con cadenas de Markov',
+    theory: `# Cadenas de Markov para Generacion de Texto
+## Idea:
+Predecir la siguiente palabra basandose SOLO en la(s) anterior(es).
+
+## Como funciona:
+1. Analizar un texto de entrenamiento
+2. Construir tabla de probabilidades de transicion
+3. Para generar: elegir siguiente palabra segun probabilidades
+
+## Relacion con GPT:
+GPT es basicamente una cadena de Markov ENORME con:
+- Billones de parametros
+- Arquitectura Transformer
+- Atencion a contexto largo`,
+    code: `# Generador de Texto con Cadenas de Markov
+import random
+from collections import defaultdict
+
+print("=== GENERADOR DE TEXTO (Cadenas de Markov) ===\\n")
+
+# Corpus de entrenamiento
+corpus = """
+la inteligencia artificial es el futuro de la tecnologia.
+la inteligencia artificial puede resolver problemas complejos.
+el machine learning es una rama de la inteligencia artificial.
+las redes neuronales son modelos de machine learning.
+el deep learning usa redes neuronales profundas.
+la inteligencia artificial esta cambiando el mundo.
+el futuro de la tecnologia depende de la inteligencia artificial.
+las redes neuronales pueden aprender de los datos.
+el machine learning necesita muchos datos para funcionar.
+la tecnologia avanza gracias a la inteligencia artificial.
+los datos son el combustible del machine learning.
+el deep learning revoluciono la inteligencia artificial.
+"""
+
+# Construir cadena de Markov (bigrama)
+def construir_cadena(texto, orden=2):
+    palabras = texto.lower().split()
+    cadena = defaultdict(list)
+    
+    for i in range(len(palabras) - orden):
+        estado = tuple(palabras[i:i+orden])
+        siguiente = palabras[i+orden]
+        cadena[estado].append(siguiente)
+    
+    return cadena
+
+# Generar texto
+def generar_texto(cadena, orden=2, longitud=20):
+    # Elegir estado inicial aleatorio
+    estados = list(cadena.keys())
+    estado = random.choice(estados)
+    resultado = list(estado)
+    
+    for _ in range(longitud):
+        if estado not in cadena:
+            break
+        siguiente = random.choice(cadena[estado])
+        resultado.append(siguiente)
+        estado = tuple(resultado[-orden:])
+    
+    return ' '.join(resultado)
+
+# Construir modelo
+cadena = construir_cadena(corpus, orden=2)
+
+print("Corpus de entrenamiento:")
+print(f"  {len(corpus.split())} palabras")
+print(f"  {len(cadena)} estados unicos\\n")
+
+# Mostrar algunas transiciones
+print("Tabla de transiciones (muestra):")
+for estado, siguientes in list(cadena.items())[:6]:
+    unique = list(set(siguientes))
+    print(f"  {' '.join(estado):30s} -> {unique}")
+
+# Generar textos
+print(f"\\n--- TEXTOS GENERADOS ---\\n")
+for i in range(5):
+    texto = generar_texto(cadena, orden=2, longitud=12)
+    print(f"  {i+1}. {texto}")
+
+# Mostrar probabilidades para un estado
+print(f"\\n--- PROBABILIDADES ---")
+estado_ejemplo = ("la", "inteligencia")
+if estado_ejemplo in cadena:
+    siguientes = cadena[estado_ejemplo]
+    total = len(siguientes)
+    from collections import Counter
+    conteo = Counter(siguientes)
+    print(f"\\n  Despues de '{' '.join(estado_ejemplo)}':")
+    for p, c in conteo.most_common():
+        prob = c / total
+        bar = "#" * int(prob * 20)
+        print(f"  {p:15s} {bar} {prob:.0%}")
+
+print("\\nAsi funciona GPT (pero con billones de parametros)")
+print("  GPT = Markov + Transformers + Atencion + Muuuchos datos")
+print("\\nCreaste un generador de texto como mini GPT!")`,
   },
 ]
 
-// ============================================================
-// COMMAND PROCESSOR
-// ============================================================
-function processCommand(
-  input: string, cwd: string, setCwd: (p: string) => void,
-  history: string[], installed: Set<string>,
-  setInstalled: (fn: (prev: Set<string>) => Set<string>) => void,
-): OutputLine[] {
-  const parts = input.trim().split(/\s+/)
-  const cmd = parts[0]?.toLowerCase()
-  const args = parts.slice(1)
-
-  const resolvePath = (p: string): string => {
-    if (!p) return cwd
-    if (p === '~') return '/home/ai-lab'
-    if (p.startsWith('~/')) return '/home/ai-lab/' + p.slice(2)
-    if (p.startsWith('/')) return p
-    if (p === '..') { const s = cwd.split('/').filter(Boolean); s.pop(); return '/' + s.join('/') }
-    if (p === '.') return cwd
-    return cwd === '/' ? `/${p}` : `${cwd}/${p}`
-  }
-
-  switch (cmd) {
-    case 'ls': {
-      const t = resolvePath(args[0] || '')
-      const n = FS[t]
-      if (!n) return [{ text: `ls: '${args[0] || t}': No existe`, type: 'error' }]
-      if (n.type !== 'dir') return [{ text: t.split('/').pop() || '', type: 'normal' }]
-      return [{ text: (n.children || []).map((c: string) => { const cn = FS[t === '/' ? `/${c}` : `${t}/${c}`]; return cn?.type === 'dir' ? `${c}/` : c }).join('  '), type: 'normal' }]
-    }
-    case 'cd': {
-      const t = resolvePath(args[0] || '~')
-      const n = FS[t]
-      if (!n) return [{ text: `cd: ${args[0]}: No existe`, type: 'error' }]
-      if (n.type !== 'dir') return [{ text: `cd: ${args[0]}: No es directorio`, type: 'error' }]
-      setCwd(t); return []
-    }
-    case 'pwd': return [{ text: cwd, type: 'normal' }]
-    case 'cat': {
-      if (!args[0]) return [{ text: 'cat: falta archivo', type: 'error' }]
-      const t = resolvePath(args[0]); const n = FS[t]
-      if (!n) return [{ text: `cat: ${args[0]}: No existe`, type: 'error' }]
-      if (n.type === 'dir') return [{ text: `cat: Es directorio`, type: 'error' }]
-      return n.content.split('\n').map((l: string) => ({ text: l, type: 'normal' as const }))
-    }
-    case 'pip': {
-      const sub = args[0]
-      if (sub === 'install') {
-        const pkg = AVAILABLE_PACKAGES[args[1]?.toLowerCase()]
-        if (!args[1]) return [{ text: 'uso: pip install <paquete>', type: 'error' }]
-        if (!pkg) return [{ text: `ERROR: '${args[1]}' no encontrado. Usa: pip search`, type: 'error' }, { text: `Disponibles: ${Object.keys(AVAILABLE_PACKAGES).filter(k => !['sklearn','cv2'].includes(k)).join(', ')}`, type: 'info' }]
-        if (installed.has(pkg.name)) return [{ text: `Already satisfied: ${pkg.name}==${pkg.version}`, type: 'warning' }]
-        setInstalled(prev => new Set([...prev, pkg.name]))
-        return [
-          { text: `Collecting ${pkg.name}`, type: 'normal' },
-          { text: `  Downloading ${pkg.name}-${pkg.version}.whl (${(Math.random()*50+5).toFixed(1)} MB)`, type: 'normal' },
-          { text: `Successfully installed ${pkg.name}-${pkg.version}`, type: 'success' },
-          { text: `📦 ${pkg.desc}`, type: 'info' },
-        ]
-      }
-      if (sub === 'list') {
-        if (installed.size <= 2) return [{ text: 'Sin paquetes extra. Usa: pip install <paquete>', type: 'warning' }]
-        return [{ text: 'Package              Version', type: 'info' }, { text: '─'.repeat(35), type: 'system' },
-          ...Array.from(installed).filter(n => n !== 'pip' && n !== 'setuptools').map(name => {
-            const p = Object.values(AVAILABLE_PACKAGES).find(pp => pp.name === name)
-            return { text: `${(p?.name||name).padEnd(20)} ${p?.version||'?'}`, type: 'normal' as const }
-          })]
-      }
-      if (sub === 'search') {
-        const q = args[1]?.toLowerCase() || ''
-        const res = Object.entries(AVAILABLE_PACKAGES).filter(([k,v]) => (k.includes(q)||v.desc.toLowerCase().includes(q)) && !['sklearn','cv2'].includes(k))
-        return res.length ? [{ text: `Resultados:`, type: 'info' }, ...res.map(([,p]) => ({ text: `  ${p.name} (${p.version}) — ${p.desc}`, type: 'normal' as const }))] : [{ text: 'Sin resultados', type: 'warning' }]
-      }
-      return [{ text: 'uso: pip install|list|search', type: 'error' }]
-    }
-    case 'python': case 'python3': {
-      if (!args[0]) return [{ text: 'Python 3.12.3 (ChaskiBots AI Lab)', type: 'info' }, { text: 'Usa: python <archivo.py>', type: 'normal' }]
-      const fp = resolvePath(args[0]); const n = FS[fp]
-      if (!n || n.type === 'dir') return [{ text: `can't open '${args[0]}'`, type: 'error' }]
-      const lines = n.content.split('\n')
-      return [{ text: `▶ Ejecutando ${args[0]}...`, type: 'info' }, { text: '─'.repeat(40), type: 'system' }, ...lines.slice(-4).map((l: string) => ({ text: `  ${l}`, type: 'normal' as const })), { text: '─'.repeat(40), type: 'system' }, { text: `✅ Completado (${(Math.random()*3+0.5).toFixed(2)}s)`, type: 'success' }]
-    }
-    case 'model': {
-      const sub = args[0]
-      if (sub === 'create') {
-        const t = args[1] || 'sequential'
-        const archs: Record<string, string[]> = {
-          sequential: ['Input(784)', 'Dense(128, relu)', 'Dense(64, relu)', 'Dense(10, softmax)'],
-          cnn: ['Conv2D(32, 3x3, relu)', 'MaxPool2D(2x2)', 'Conv2D(64, 3x3, relu)', 'Flatten', 'Dense(10, softmax)'],
-          rnn: ['Embedding(10000, 128)', 'LSTM(64)', 'Dense(1, sigmoid)'],
-          transformer: ['MultiHeadAttention(8)', 'LayerNorm', 'FFN(512)', 'Dense(vocab, softmax)'],
-          gan: ['Generator: Dense(256)→Dense(784,tanh)', 'Discriminator: Dense(512)→Dense(1,sigmoid)'],
-        }
-        const layers = archs[t.toLowerCase()] || archs.sequential
-        return [{ text: `🧠 Modelo "${t}" creado:`, type: 'success' }, ...layers.map((l,i) => ({ text: `  Layer ${i}: ${l}`, type: 'info' as const })), { text: `  Params: ${(Math.random()*900000+100000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`, type: 'normal' }]
-      }
-      if (sub === 'load') return [{ text: `✅ Modelo "${args[1]||'model'}" cargado`, type: 'success' }]
-      if (sub === 'list') return [{ text: 'Modelos: clasificador.h5, chatbot.pkl, resnet50, yolov8n, bert-base, gpt2, stable-diffusion', type: 'info' }]
-      if (sub === 'summary') return [{ text: 'Model: Sequential | Params: 109,386 | Layers: 4', type: 'info' }]
-      return [{ text: 'uso: model create|load|list|summary', type: 'error' }]
-    }
-    case 'dataset': {
-      const sub = args[0]
-      if (sub === 'load') {
-        const n = args[1]?.toLowerCase() || ''
-        const ds: Record<string, string> = { mnist: '60k imgs 28x28, 10 clases', cifar10: '60k imgs 32x32 RGB, 10 clases', iris: '150 muestras, 3 clases', titanic: '891 pasajeros, 12 cols', spam: '5.5k msgs, 2 clases', imdb: '50k reviews, 2 clases' }
-        if (ds[n]) return [{ text: `✅ Dataset ${n} cargado: ${ds[n]}`, type: 'success' }]
-        return [{ text: `Disponibles: ${Object.keys(ds).join(', ')}`, type: 'error' }]
-      }
-      if (sub === 'list') return [{ text: 'Datasets: mnist, cifar10, iris, titanic, spam, imdb', type: 'info' }]
-      return [{ text: 'uso: dataset load|list', type: 'error' }]
-    }
-    case 'train': {
-      const m = args[0] || 'modelo'
-      const lines: OutputLine[] = [{ text: `🏋️ Entrenando "${m}"...`, type: 'info' }]
-      for (let i = 1; i <= 5; i++) lines.push({ text: `  Epoch ${i}/5 ━━━━━━━━━━━━━━━━ loss: ${(2.3-i*0.4+Math.random()*0.1).toFixed(4)} acc: ${(0.3+i*0.13).toFixed(4)}`, type: 'normal' })
-      lines.push({ text: `✅ Completado. Accuracy: ${(0.85+Math.random()*0.12).toFixed(4)}`, type: 'success' })
-      return lines
-    }
-    case 'predict': {
-      if (!args[0]) return [{ text: 'uso: predict <datos>', type: 'error' }]
-      const preds = ['gato','7','spam','positivo','sobrevive','setosa']
-      return [{ text: `🔮 Resultado: "${preds[Math.floor(Math.random()*preds.length)]}" (${(85+Math.random()*14).toFixed(1)}%)`, type: 'success' }]
-    }
-    case 'cv2': case 'opencv': {
-      const sub = args[0]
-      if (sub === 'open_camera' || sub === 'camera') return [{ text: '📷 Cámara activa: 640x480 @ 30fps', type: 'success' }]
-      if (sub === 'canny' || sub === 'edges') return [{ text: `✅ Canny: ${Math.floor(Math.random()*1500+500)} bordes`, type: 'success' }]
-      if (sub === 'detect_faces' || sub === 'faces') return [{ text: `✅ ${Math.floor(Math.random()*3+1)} rostro(s) detectado(s)`, type: 'success' }]
-      if (sub === 'save' || sub === 'imwrite') return [{ text: `✅ Imagen guardada: ${args[1]||'output.png'}`, type: 'success' }]
-      return [{ text: 'uso: cv2 open_camera|canny|detect_faces|save', type: 'error' }]
-    }
-    case 'nlp': {
-      const sub = args[0]
-      if (sub === 'tokenize') { const t = args.slice(1).join(' ').replace(/["']/g,''); return [{ text: `Tokens: [${t.split(/\s+/).map(w=>`"${w}"`).join(', ')}]`, type: 'success' }] }
-      if (sub === 'sentiment') return [{ text: `Sentimiento: ${Math.random()>0.5?'POSITIVO':'NEGATIVO'} (${(Math.random()*0.4+0.6).toFixed(3)})`, type: 'success' }]
-      if (sub === 'create_intents' || sub === 'intents') return [{ text: '✅ 4 intenciones definidas (12 patrones)', type: 'success' }]
-      return [{ text: 'uso: nlp tokenize|sentiment|create_intents', type: 'error' }]
-    }
-    case 'chat': case 'chatbot': {
-      const msg = args.join(' ').replace(/["']/g,'')
-      if (!msg) return [{ text: 'uso: chat "mensaje"', type: 'error' }]
-      const r = msg.includes('hola') ? '¡Hola! ¿En qué ayudo?' : msg.includes('ayuda') ? 'Puedo responder sobre IA y ML.' : `Interesante: "${msg}". Los modelos de IA procesan patrones en datos.`
-      return [{ text: `👤 ${msg}`, type: 'normal' }, { text: `🤖 ${r}`, type: 'success' }]
-    }
-    case 'generate': {
-      const p = args.join(' ').replace(/["']/g,'')
-      if (!p) return [{ text: 'uso: generate "prompt"', type: 'error' }]
-      return [{ text: `🎨 Generando: "${p}"`, type: 'info' }, { text: `   SD v2.1 | 512x512 | 50 steps`, type: 'normal' }, { text: `✅ generated_${Date.now().toString(36)}.png`, type: 'success' }]
-    }
-    case 'gpt': case 'llm': {
-      const p = args.join(' ').replace(/["']/g,'')
-      if (!p) return [{ text: 'uso: gpt "pregunta"', type: 'error' }]
-      return [{ text: `🤖 GPT: Los modelos de IA como yo usamos la arquitectura Transformer para procesar "${p}".`, type: 'success' }]
-    }
-    case 'finetune': case 'fine-tune': case 'fine_tune':
-      return [{ text: `🔧 Fine-tuning...`, type: 'info' }, { text: `   3 epochs, loss: 2.41→1.12`, type: 'normal' }, { text: `✅ Perplexity -40%`, type: 'success' }]
-    case 'deploy': case 'flask': case 'serve':
-      return [{ text: `🚀 API en http://localhost:${args.find(a=>a.includes('port'))?.split('=')[1]||'5000'}`, type: 'success' }, { text: `   POST /predict | GET /health`, type: 'info' }]
-    case 'preprocess': case 'clean':
-      return [{ text: '🧹 Preprocesando...', type: 'info' }, { text: '✅ NaN eliminados, features codificadas, normalizado', type: 'success' }]
-    case 'analyze': case 'describe': case 'info':
-      return [{ text: `📊 Filas: ${Math.floor(Math.random()*5000+500)} | Cols: ${Math.floor(Math.random()*12+4)} | NaN: ${Math.floor(Math.random()*200)}`, type: 'info' }]
-    case 'nvidia-smi': case 'gpu':
-      return [{ text: `GPU: NVIDIA RTX 4090 | Mem: ${Math.floor(Math.random()*12000+4000)}/24564 MiB | ${Math.floor(Math.random()*60+20)}% util`, type: 'info' }]
-    case 'clear': return [{ text: '__CLEAR__', type: 'system' }]
-    case 'history': return history.slice(-10).map((h,i) => ({ text: `  ${i+1}  ${h}`, type: 'normal' as const }))
-    case 'whoami': return [{ text: 'ai-researcher@chaskibots', type: 'normal' }]
-    case 'echo': return [{ text: args.join(' '), type: 'normal' }]
-    case 'help': return [
-      { text: '╔══════════════════════════════════════════════════════════╗', type: 'info' },
-      { text: '║        🧠 AI Terminal — ChaskiBots Lab                   ║', type: 'info' },
-      { text: '╠══════════════════════════════════════════════════════════╣', type: 'info' },
-      { text: '║ PAQUETES:  pip install|list|search                       ║', type: 'normal' },
-      { text: '║ PYTHON:    python <file.py>                              ║', type: 'normal' },
-      { text: '║ MODELOS:   model create|summary|load|list                ║', type: 'normal' },
-      { text: '║ DATASETS:  dataset load|list                             ║', type: 'normal' },
-      { text: '║ TRAINING:  train <modelo> | predict <datos>              ║', type: 'normal' },
-      { text: '║ VISIÓN:    cv2 open_camera|canny|detect_faces|save       ║', type: 'normal' },
-      { text: '║ NLP:       nlp tokenize|sentiment|create_intents         ║', type: 'normal' },
-      { text: '║ CHAT:      chat "msg" | gpt "pregunta"                   ║', type: 'normal' },
-      { text: '║ GENERATIVO:generate "prompt" | finetune <model>          ║', type: 'normal' },
-      { text: '║ DATOS:     preprocess | analyze | describe               ║', type: 'normal' },
-      { text: '║ DEPLOY:    deploy <app> | serve                          ║', type: 'normal' },
-      { text: '║ ARCHIVOS:  ls | cd | cat | pwd                           ║', type: 'normal' },
-      { text: '║ MISIONES:  mission list|start <n>|status|abort           ║', type: 'normal' },
-      { text: '║ SISTEMA:   gpu | clear | history | help                  ║', type: 'normal' },
-      { text: '╚══════════════════════════════════════════════════════════╝', type: 'info' },
-      { text: '💡 Empieza: "pip install tensorflow" + "mission start 1"', type: 'success' },
-    ]
-    case '': return []
-    default: return [{ text: `'${cmd}' no encontrado. Escribe 'help'`, type: 'error' }]
-  }
-}
+const DIFFICULTY_LABEL: Record<string, string> = { easy: '\u{1F7E2} Facil', medium: '\u{1F7E1} Medio', hard: '\u{1F534} Dificil' }
+const DIFFICULTY_COLOR: Record<string, string> = { easy: 'bg-green-500/10 text-green-400 border border-green-500/20', medium: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20', hard: 'bg-red-500/10 text-red-400 border border-red-500/20' }
 
 // ============================================================
-// RENDER THEORY
+// RENDER THEORY HELPER
 // ============================================================
-function renderTheory(theory: string) {
-  if (!theory) return null
-  return theory.split('\n').map((line, idx) => {
-    if (line.startsWith('# ')) return <h3 key={idx} className="text-white font-bold text-sm mt-3 mb-1">{line.slice(2)}</h3>
-    if (line.startsWith('## ')) return <h4 key={idx} className="text-gray-300 font-semibold text-xs mt-2 mb-1">{line.slice(3)}</h4>
-    if (line.startsWith('- ')) return <li key={idx} className="text-gray-400 text-[11px] ml-3">{line.slice(2)}</li>
+function renderTheory(text: string) {
+  return text.split('\n').map((line, i) => {
     if (line.startsWith('```')) return null
-    if (line.trim() === '') return <div key={idx} className="h-2" />
-    return <p key={idx} className="text-gray-400 text-[11px] leading-relaxed">{line}</p>
+    if (line.startsWith('# ')) return <h1 key={i} className="text-gray-100 text-sm font-bold mt-3 mb-1.5">{line.slice(2)}</h1>
+    if (line.startsWith('## ')) return <h2 key={i} className="text-gray-200 text-[13px] font-bold mt-3 mb-1">{line.slice(3)}</h2>
+    if (line.startsWith('### ')) return <h3 key={i} className="text-gray-300 text-xs font-semibold mt-2 mb-1">{line.slice(4)}</h3>
+    if (line.startsWith('- ')) return <li key={i} className="text-gray-400 text-[11px] ml-3 mb-0.5 list-disc">{line.slice(2)}</li>
+    if (line.trim() === '') return <div key={i} className="h-1.5" />
+    return <p key={i} className="text-gray-400 text-[11px] leading-relaxed mb-1">{line}</p>
   })
 }
+
+// ============================================================
+// DEFAULT FILES
+// ============================================================
+interface VirtualFile { name: string; content: string }
+
+const DEFAULT_FILES: VirtualFile[] = [
+  { name: 'main.py', content: AI_EXERCISES[0].code },
+]
 
 // ============================================================
 // COMPONENT
@@ -387,258 +1112,373 @@ interface AITerminalProps { levelId?: string; userId?: string; userName?: string
 
 export default function AITerminal({ levelId, userId, userName }: AITerminalProps) {
   const { user } = useAuth()
-  const [output, setOutput] = useState<OutputLine[]>([
-    { text: '╔══════════════════════════════════════════════════════════╗', type: 'system' },
-    { text: '║   🧠  AI Terminal Professional — ChaskiBots Lab          ║', type: 'system' },
-    { text: '║   Python 3.12 | CUDA 12.2 | GPU: RTX 4090 (sim)         ║', type: 'system' },
-    { text: '╚══════════════════════════════════════════════════════════╝', type: 'system' },
-    { text: '', type: 'normal' },
-    { text: "'help' → comandos | 'missions' → misiones guiadas de IA", type: 'info' },
-    { text: '', type: 'normal' },
-    { text: '🧠 MISIONES: Aprende IA paso a paso con proyectos reales', type: 'warning' },
-    { text: '   mission start 1 → Tu primera red neuronal', type: 'normal' },
-    { text: '   pip install tensorflow → Instalar librerías', type: 'normal' },
-    { text: '', type: 'normal' },
-  ])
-  const [inputValue, setInputValue] = useState('')
-  const [cwd, setCwd] = useState('/home/ai-lab')
-  const [commandHistory, setCommandHistory] = useState<string[]>([])
-  const [historyIndex, setHistoryIndex] = useState(-1)
-  const [installedPackages, setInstalledPackages] = useState<Set<string>>(new Set(['pip','setuptools']))
-  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const [files, setFiles] = useState<VirtualFile[]>(DEFAULT_FILES)
+  const [activeFile, setActiveFile] = useState(0)
+  const [output, setOutput] = useState<string[]>(['\u{1F9E0} AI Lab Professional v2.0 \u{2014} Motor: Pyodide (CPython 3.11 WebAssembly)'])
+  const [isRunning, setIsRunning] = useState(false)
+  const [pyodideReady, setPyodideReady] = useState(false)
+  const [pyodideLoading, setPyodideLoading] = useState(false)
   const [showCurriculum, setShowCurriculum] = useState(true)
-  const [showLessonPanel, setShowLessonPanel] = useState(false)
-  const [modules, setModules] = useState<ApiModule[]>([])
-  const [curriculumLoading, setCurriculumLoading] = useState(true)
-  const [activeModule, setActiveModule] = useState<string | null>(null)
-  const [activeLesson, setActiveLesson] = useState<ApiLessonFull | null>(null)
-  const [lessonLoading, setLessonLoading] = useState(false)
-  const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set())
+  const [showTerminal, setShowTerminal] = useState(true)
+  const [showTheoryPanel, setShowTheoryPanel] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [activeCategory, setActiveCategory] = useState('basics')
+  const [activeExercise, setActiveExercise] = useState<AIExercise | null>(null)
+  const [completedExercises, setCompletedExercises] = useState<Set<string>>(new Set())
+  const [installedPackages, setInstalledPackages] = useState<string[]>(['math', 'random', 'json', 're', 'collections', 'functools', 'itertools', 'time', 'statistics'])
+  const [isInstalling, setIsInstalling] = useState(false)
   const [studentName, setStudentName] = useState(userName || '')
   const [isSending, setIsSending] = useState(false)
   const [sendSuccess, setSendSuccess] = useState(false)
-  const [activeMission, setActiveMission] = useState<Mission | null>(null)
-  const [missionStep, setMissionStep] = useState(0)
-  const [totalXP, setTotalXP] = useState(0)
-  const [completedMissions, setCompletedMissions] = useState<Set<string>>(new Set())
-  const terminalRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { fetch('/api/academy?course=ia').then(r=>r.json()).then(d=>setModules(d.modules||[])).catch(()=>{}).finally(()=>setCurriculumLoading(false)) }, [])
-  useEffect(() => { try { const s=localStorage.getItem('ai-terminal-progress'); if(s) setCompletedLessons(new Set(JSON.parse(s))); const n=localStorage.getItem('ai-terminal-student'); if(n) setStudentName(n); else if(user?.name) setStudentName(user.name); const x=localStorage.getItem('ai-terminal-xp'); if(x) setTotalXP(parseInt(x)); const m=localStorage.getItem('ai-terminal-missions'); if(m) setCompletedMissions(new Set(JSON.parse(m))); const p=localStorage.getItem('ai-terminal-pkgs'); if(p) setInstalledPackages(new Set(JSON.parse(p))) } catch{} }, [user?.name])
-  useEffect(() => { try { localStorage.setItem('ai-terminal-progress',JSON.stringify(Array.from(completedLessons))); if(studentName) localStorage.setItem('ai-terminal-student',studentName); localStorage.setItem('ai-terminal-xp',String(totalXP)); localStorage.setItem('ai-terminal-missions',JSON.stringify(Array.from(completedMissions))); localStorage.setItem('ai-terminal-pkgs',JSON.stringify(Array.from(installedPackages))) } catch{} }, [completedLessons,studentName,totalXP,completedMissions,installedPackages])
-  useEffect(() => { if(terminalRef.current) terminalRef.current.scrollTop = terminalRef.current.scrollHeight }, [output])
-  const focusInput = () => inputRef.current?.focus()
+  const outputRef = useRef<HTMLDivElement>(null)
+  const runShortcutRef = useRef<() => void>(() => {})
 
-  const executeCommand = (input: string) => {
-    const trimmed = input.trim(); if (!trimmed) return
-    setCommandHistory(prev => [...prev, trimmed]); setHistoryIndex(-1); setInputValue('')
-    const promptLine: OutputLine = { text: `ai-lab@chaskibots:${cwd==='/home/ai-lab'?'~':cwd}$ ${trimmed}`, type: 'input' }
-    const parts = trimmed.split(/\s+/); const cmdName = parts[0]?.toLowerCase()
-
-    if (cmdName === 'missions' || cmdName === 'mission') {
-      const sub = parts[1]
-      if (sub === 'list' || !sub) {
-        setOutput(prev => [...prev, promptLine, { text: '', type: 'normal' },
-          { text: '╔══════════════════════════════════════════════════════════╗', type: 'info' },
-          { text: '║      🧠  MISIONES IA DISPONIBLES                         ║', type: 'info' },
-          { text: '╠══════════════════════════════════════════════════════════╣', type: 'info' },
-          ...MISSIONS.map((m,i) => ({ text: `║ ${completedMissions.has(m.id)?'✅':'  '} ${i+1}. ${m.title.padEnd(45)}║`, type: (completedMissions.has(m.id)?'success':'normal') as OutputLine['type'] })),
-          { text: '╚══════════════════════════════════════════════════════════╝', type: 'info' },
-          { text: `XP: ${totalXP} | Completadas: ${completedMissions.size}/${MISSIONS.length}`, type: 'warning' },
-          { text: 'Usa: mission start <número>', type: 'info' },
-        ]); return
+  // --- PYODIDE ENGINE ---
+  const loadPyodideEngine = useCallback(async () => {
+    if (window.pyodide) { setPyodideReady(true); return }
+    if (pyodideLoading) return
+    setPyodideLoading(true)
+    setOutput(prev => [...prev, '\u{23F3} Descargando Python 3.11 (~12MB, solo la primera vez)...'])
+    try {
+      if (!document.querySelector('script[src*="pyodide"]')) {
+        const script = document.createElement('script')
+        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js'
+        script.async = true
+        document.head.appendChild(script)
+        await new Promise((resolve, reject) => { script.onload = resolve; script.onerror = reject })
       }
-      if (sub === 'start' && parts[2]) {
-        const idx = parseInt(parts[2])-1
-        if (idx >= 0 && idx < MISSIONS.length) {
-          const m = MISSIONS[idx]; setActiveMission(m); setMissionStep(0)
-          setOutput(prev => [...prev, promptLine, { text: '', type: 'normal' }, { text: '═'.repeat(56), type: 'warning' }, { text: `  ${m.title}`, type: 'info' }, { text: `  ${DIFFICULTY_LABEL[m.difficulty]} | XP: ${m.xpTotal}`, type: 'normal' }, { text: '═'.repeat(56), type: 'warning' }, { text: '', type: 'normal' }, { text: `📋 ${m.briefing}`, type: 'normal' }, { text: '', type: 'normal' }, { text: `▶ ${m.steps[0].title}`, type: 'info' }, { text: `  ${m.steps[0].description}`, type: 'normal' }, { text: `  💡 ${m.steps[0].hint}`, type: 'warning' }, { text: '', type: 'normal' }]); return
-        }
-        setOutput(prev => [...prev, promptLine, { text: '❌ Número inválido', type: 'error' }]); return
-      }
-      if (sub === 'status') {
-        if (!activeMission) { setOutput(prev => [...prev, promptLine, { text: '⚠️ Sin misión activa', type: 'warning' }]); return }
-        const step = activeMission.steps[missionStep]
-        setOutput(prev => [...prev, promptLine, { text: `🎯 ${activeMission.title} (${missionStep}/${activeMission.steps.length})`, type: 'info' }, { text: `   ${step?.title}: ${step?.description}`, type: 'normal' }, { text: `   💡 ${step?.hint}`, type: 'warning' }]); return
-      }
-      if (sub === 'abort') { setActiveMission(null); setMissionStep(0); setOutput(prev => [...prev, promptLine, { text: '⛔ Abortada', type: 'warning' }]); return }
-      setOutput(prev => [...prev, promptLine, { text: 'Uso: mission list|start|status|abort', type: 'error' }]); return
+      const pyodide = await window.loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/' })
+      window.pyodide = pyodide
+      setPyodideReady(true)
+      setOutput(prev => [...prev, '\u{2705} Python 3.11.3 (Pyodide) listo \u{2014} Motor WebAssembly activo'])
+    } catch (err: any) {
+      console.error('Pyodide load error:', err)
+      setOutput(prev => [...prev, '\u{274C} Error: No se pudo cargar Python. Verifica tu conexion.'])
     }
+    setPyodideLoading(false)
+  }, [pyodideLoading])
 
-    const result = processCommand(trimmed, cwd, setCwd, [...commandHistory, trimmed], installedPackages, setInstalledPackages)
-    if (result.length === 1 && result[0].text === '__CLEAR__') { setOutput([]) } else { setOutput(prev => [...prev, promptLine, ...result]) }
+  useEffect(() => { loadPyodideEngine() }, [])
+  useEffect(() => { if (outputRef.current) outputRef.current.scrollTop = outputRef.current.scrollHeight }, [output])
 
-    // Mission validation
-    if (activeMission && missionStep < activeMission.steps.length) {
-      const cs = activeMission.steps[missionStep]
-      if (cs.validator(trimmed, commandHistory)) {
-        const newXP = totalXP + cs.xp; setTotalXP(newXP)
-        const next = missionStep + 1; const done = next >= activeMission.steps.length
-        if (done) {
-          const nc = new Set(completedMissions); nc.add(activeMission.id); setCompletedMissions(nc)
-          setOutput(prev => [...prev, { text: '', type: 'normal' }, { text: '═'.repeat(56), type: 'success' }, { text: cs.successMessage, type: 'success' }, { text: `🧠 ¡MISIÓN COMPLETADA! +${cs.xp} XP`, type: 'success' }, { text: `   Flag: ${activeMission.completionFlag}`, type: 'warning' }, { text: `   XP: ${newXP}`, type: 'info' }, { text: '═'.repeat(56), type: 'success' }, { text: '', type: 'normal' }, ...activeMission.debriefing.split('\n').map(l => ({ text: l, type: 'info' as const })), { text: '', type: 'normal' }])
-          setActiveMission(null); setMissionStep(0)
-        } else {
-          setMissionStep(next); const ns = activeMission.steps[next]
-          setOutput(prev => [...prev, { text: '', type: 'normal' }, { text: `${cs.successMessage}  (+${cs.xp} XP)`, type: 'success' }, { text: `▶ ${ns.title}`, type: 'info' }, { text: `  ${ns.description}`, type: 'normal' }, { text: `  💡 ${ns.hint}`, type: 'warning' }, { text: '', type: 'normal' }])
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('ai-lab-progress')
+      if (saved) setCompletedExercises(new Set(JSON.parse(saved)))
+      const savedName = localStorage.getItem('ai-lab-student')
+      if (savedName) setStudentName(savedName)
+      else if (user?.name) setStudentName(user.name)
+    } catch {}
+  }, [user?.name])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('ai-lab-progress', JSON.stringify(Array.from(completedExercises)))
+      if (studentName) localStorage.setItem('ai-lab-student', studentName)
+    } catch {}
+  }, [completedExercises, studentName])
+
+  // --- RUN CODE ---
+  const runCode = async () => {
+    setIsRunning(true)
+    const code = files[activeFile].content
+    const timestamp = new Date().toLocaleTimeString('es-EC')
+    setOutput(prev => [...prev, '', `[${timestamp}] \u{25B6} Ejecutando ${files[activeFile].name}...`, '\u{2500}'.repeat(50)])
+    try {
+      if (!window.pyodide) await loadPyodideEngine()
+      if (window.pyodide) {
+        window.pyodide.runPython(`import sys\nfrom io import StringIO\nsys.stdout = StringIO()\nsys.stderr = StringIO()`)
+        try {
+          window.pyodide.runPython(code)
+          const stdout = window.pyodide.runPython('sys.stdout.getvalue()')
+          const stderr = window.pyodide.runPython('sys.stderr.getvalue()')
+          const results: string[] = []
+          if (stdout) results.push(...stdout.split('\n').filter((l: string) => l !== ''))
+          if (stderr) results.push(...stderr.split('\n').filter((l: string) => l !== '').map((l: string) => `\u{26A0}\u{FE0F} ${l}`))
+          if (results.length > 0) setOutput(prev => [...prev, ...results])
+          else setOutput(prev => [...prev, '\u{2713} Ejecucion exitosa (sin salida de print)'])
+          setOutput(prev => [...prev, `\u{2500} Completado en ${(Math.random() * 50 + 10).toFixed(0)}ms`])
+        } catch (pyErr: any) {
+          const errMsg = pyErr.message || String(pyErr)
+          const lines = errMsg.split('\n')
+          const relevantLines = lines.slice(-5).filter((l: string) => l.trim())
+          setOutput(prev => [...prev, '\u{274C} Error de Python:', ...relevantLines.map((l: string) => `   ${l}`)])
+        } finally {
+          window.pyodide.runPython(`sys.stdout = sys.__stdout__\nsys.stderr = sys.__stderr__`)
         }
       }
+    } catch (err: any) {
+      setOutput(prev => [...prev, `\u{274C} Error del motor: ${err.message}`])
     }
+    setIsRunning(false)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') { executeCommand(inputValue) }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); if (commandHistory.length > 0) { const i = historyIndex===-1 ? commandHistory.length-1 : Math.max(0, historyIndex-1); setHistoryIndex(i); setInputValue(commandHistory[i]) } }
-    else if (e.key === 'ArrowDown') { e.preventDefault(); if (historyIndex>=0) { const i=historyIndex+1; if(i>=commandHistory.length){setHistoryIndex(-1);setInputValue('')}else{setHistoryIndex(i);setInputValue(commandHistory[i])} } }
-    else if (e.key === 'l' && e.ctrlKey) { e.preventDefault(); setOutput([]) }
+  useEffect(() => { runShortcutRef.current = () => { if (!isRunning && pyodideReady) runCode() } })
+
+  // --- INSTALL PACKAGE ---
+  const installPackage = async (pkg: string) => {
+    if (installedPackages.includes(pkg)) return
+    setIsInstalling(true)
+    setOutput(prev => [...prev, `\u{1F4E6} pip install ${pkg}...`])
+    try {
+      if (window.pyodide) {
+        await window.pyodide.loadPackage(pkg)
+        setInstalledPackages(prev => [...prev, pkg])
+        setOutput(prev => [...prev, `\u{2705} Successfully installed ${pkg}`])
+      }
+    } catch (err: any) {
+      setOutput(prev => [...prev, `\u{274C} Error: Could not install ${pkg}`])
+    }
+    setIsInstalling(false)
   }
 
-  const loadLesson = async (lesson: ApiLessonStub) => {
-    setLessonLoading(true); setShowLessonPanel(true)
-    try { const res = await fetch(`/api/academy?lesson=${lesson.id}`); const data = await res.json(); if(data){if(typeof data.examples==='string')data.examples=JSON.parse(data.examples);if(typeof data.challenges==='string')data.challenges=JSON.parse(data.challenges);setActiveLesson(data);setOutput(prev=>[...prev,{text:'',type:'normal'},{text:`📚 ${data.title}`,type:'info'},{text:data.description,type:'normal'},{text:'💡 Usa los ejemplos del panel derecho',type:'success'}])} } catch{setOutput(prev=>[...prev,{text:'❌ Error',type:'error'}])}
-    setLessonLoading(false)
+  // --- FILE OPERATIONS ---
+  const updateFileContent = (content: string | undefined) => {
+    if (content === undefined) return
+    const newFiles = [...files]
+    newFiles[activeFile] = { ...newFiles[activeFile], content }
+    setFiles(newFiles)
   }
-  const markLessonComplete = () => { if(!activeLesson) return; const n=new Set(completedLessons);n.add(activeLesson.id);setCompletedLessons(n);setOutput(prev=>[...prev,{text:'🎉 ¡Lección completada! +⭐',type:'success'}]) }
+
+  const createFile = () => {
+    const name = prompt('Nombre del archivo (con .py):')
+    if (!name) return
+    const fileName = name.endsWith('.py') ? name : `${name}.py`
+    setFiles([...files, { name: fileName, content: `# ${fileName}\n\n` }])
+    setActiveFile(files.length)
+  }
+
+  const deleteFile = (idx: number) => {
+    if (files.length <= 1) return
+    const newFiles = files.filter((_, i) => i !== idx)
+    setFiles(newFiles)
+    if (activeFile >= newFiles.length) setActiveFile(newFiles.length - 1)
+  }
+
+  const downloadFile = () => {
+    const file = files[activeFile]
+    const blob = new Blob([file.content], { type: 'text/x-python' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = file.name; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  // --- EXERCISE NAVIGATION ---
+  const loadExercise = (exercise: AIExercise) => {
+    setActiveExercise(exercise)
+    setShowTheoryPanel(true)
+    const newFiles = [...files]
+    newFiles[0] = { name: `${exercise.id}.py`, content: exercise.code }
+    setFiles(newFiles)
+    setActiveFile(0)
+    setOutput(prev => [...prev, '', `\u{1F4DA} === ${exercise.icon} ${exercise.title} ===`, `\u{1F4DD} ${exercise.description}`, `\u{1F3AF} Dificultad: ${DIFFICULTY_LABEL[exercise.difficulty]}`, '', '\u{1F4A1} Presiona \u{25B6} Ejecutar para ver el resultado (Ctrl+Enter)'])
+  }
+
+  const markExerciseComplete = () => {
+    if (!activeExercise) return
+    const newCompleted = new Set(completedExercises)
+    newCompleted.add(activeExercise.id)
+    setCompletedExercises(newCompleted)
+    setOutput(prev => [...prev, '', '\u{1F389} Ejercicio completado! +\u{2B50}'])
+  }
+
+  // --- SEND TO TEACHER ---
   const handleSendToTeacher = async () => {
-    if(!studentName.trim()){setOutput(prev=>[...prev,{text:'⚠️ Escribe tu nombre',type:'warning'}]);return}
+    if (!studentName.trim()) { setOutput(prev => [...prev, '\u{26A0}\u{FE0F} Escribe tu nombre para enviar']); return }
     setIsSending(true)
-    try{const res=await fetch('/api/submissions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({taskId:`AI-${Date.now().toString(36).toUpperCase()}`,studentName,studentEmail:user?.email,code:`# Comandos:\n${commandHistory.slice(-20).join('\n')}`,output:output.slice(-30).map(o=>o.text).join('\n'),levelId:user?.levelId||levelId,lessonId:activeLesson?.id})});if(res.ok){setSendSuccess(true);setOutput(prev=>[...prev,{text:'✅ Enviado al profesor',type:'success'}]);setTimeout(()=>setSendSuccess(false),4000)}}catch{setOutput(prev=>[...prev,{text:'❌ Error de conexión',type:'error'}])}
+    try {
+      const res = await fetch('/api/submissions', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId: `AI-${Date.now().toString(36).toUpperCase()}`, studentName, studentEmail: user?.email || undefined, code: files[activeFile].content, output: output.slice(-20).join('\n'), levelId: user?.levelId || levelId, lessonId: activeExercise?.id || undefined })
+      })
+      if (res.ok) { setSendSuccess(true); setOutput(prev => [...prev, '\u{2705} Codigo enviado al profesor']); setTimeout(() => setSendSuccess(false), 4000) }
+    } catch { setOutput(prev => [...prev, '\u{274C} Error de conexion al enviar']) }
     setIsSending(false)
   }
 
-  const totalLessons = modules.reduce((a,m)=>a+m.lessons.length,0)
-  const progressPct = totalLessons > 0 ? (completedLessons.size/totalLessons)*100 : 0
+  const filteredExercises = AI_EXERCISES.filter(e => e.category === activeCategory)
+  const totalExercises = AI_EXERCISES.length
+  const progressPct = totalExercises > 0 ? (completedExercises.size / totalExercises) * 100 : 0
 
   return (
-    <div className={`flex flex-col bg-[#0d1117] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen?'fixed inset-0 z-50 rounded-none':'h-[750px]'}`}>
+    <div className={`flex flex-col bg-[#0d1117] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[780px]'}`}>
       {/* TOP BAR */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#0d1117] via-[#0d0d1a] to-[#0d1117] border-b border-gray-700/50">
+      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#0d1117] via-[#130d1a] to-[#0d1117] border-b border-gray-700/50">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:brightness-125" onClick={()=>setIsFullscreen(false)} />
+            <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:brightness-125" onClick={() => setIsFullscreen(false)} />
             <div className="w-3 h-3 rounded-full bg-yellow-500 cursor-pointer hover:brightness-125" />
-            <div className="w-3 h-3 rounded-full bg-green-500 cursor-pointer hover:brightness-125" onClick={()=>setIsFullscreen(!isFullscreen)} />
+            <div className="w-3 h-3 rounded-full bg-green-500 cursor-pointer hover:brightness-125" onClick={() => setIsFullscreen(!isFullscreen)} />
           </div>
           <div className="flex items-center gap-2">
             <Image src="/chaski.png" alt="ChaskiBots" width={24} height={24} className="rounded-md" />
             <div className="flex flex-col">
-              <span className="text-gray-200 text-sm font-bold leading-tight">AI Terminal</span>
+              <span className="text-gray-200 text-sm font-bold leading-tight">AI Lab</span>
               <span className="text-[9px] text-gray-500 leading-tight">by ChaskiBots Lab</span>
             </div>
           </div>
-          <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center gap-1">
-            <Brain className="w-3 h-3" /> Python AI
+          <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${pyodideReady ? 'bg-green-500/20 text-green-400 border border-green-500/30' : pyodideLoading ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 animate-pulse' : 'bg-gray-700 text-gray-400'}`}>
+            {pyodideReady ? '\u{25CF} Python 3.11 Listo' : pyodideLoading ? '\u{25CC} Cargando...' : '\u{25CB} Desconectado'}
           </span>
-          {totalXP > 0 && <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">⚡ {totalXP} XP</span>}
+          {completedExercises.size > 0 && <span className="text-[11px] px-2 py-0.5 rounded-full font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30">{`\u{2B50} ${completedExercises.size}/${totalExercises}`}</span>}
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={()=>navigator.clipboard.writeText(output.map(o=>o.text).join('\n'))} className="p-2 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors" title="Copiar"><Copy className="w-4 h-4" /></button>
-          <button onClick={()=>{const b=new Blob([output.map(o=>o.text).join('\n')],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ai-session.log';a.click()}} className="p-2 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors" title="Descargar"><Download className="w-4 h-4" /></button>
+          <button onClick={downloadFile} className="p-2 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors" title="Descargar .py"><Download className="w-4 h-4" /></button>
           <div className="w-px h-5 bg-gray-700/50 mx-0.5" />
-          <button onClick={()=>setShowCurriculum(!showCurriculum)} className={`p-2 rounded-lg transition-colors ${showCurriculum?'bg-purple-500/20 text-purple-400':'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Curriculum"><GraduationCap className="w-4 h-4" /></button>
-          <button onClick={()=>setShowLessonPanel(!showLessonPanel)} className={`p-2 rounded-lg transition-colors ${showLessonPanel?'bg-blue-500/20 text-blue-400':'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Lección"><BookOpen className="w-4 h-4" /></button>
-          <button onClick={()=>setIsFullscreen(!isFullscreen)} className="p-2 text-gray-500 hover:text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors">{isFullscreen?<Minimize2 className="w-4 h-4"/>:<Maximize2 className="w-4 h-4"/>}</button>
+          <button onClick={() => setShowCurriculum(!showCurriculum)} className={`p-2 rounded-lg transition-colors ${showCurriculum ? 'bg-purple-500/20 text-purple-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Ejercicios"><Brain className="w-4 h-4" /></button>
+          <button onClick={() => setShowTerminal(!showTerminal)} className={`p-2 rounded-lg transition-colors ${showTerminal ? 'bg-green-500/20 text-green-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Terminal"><TerminalIcon className="w-4 h-4" /></button>
+          <button onClick={() => { if (activeExercise) setShowTheoryPanel(!showTheoryPanel) }} className={`p-2 rounded-lg transition-colors ${showTheoryPanel ? 'bg-blue-500/20 text-blue-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Teoria"><BookOpen className="w-4 h-4" /></button>
+          <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-2 text-gray-500 hover:text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors">{isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}</button>
         </div>
       </div>
 
-      {/* MAIN */}
+      {/* MAIN LAYOUT */}
       <div className="flex flex-1 overflow-hidden">
         {/* LEFT SIDEBAR */}
         {showCurriculum && (
           <div className="w-72 bg-[#0d1117] border-r border-gray-700/50 flex flex-col overflow-hidden">
             <div className="p-3 border-b border-gray-700/50">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-white text-sm font-bold flex items-center gap-2"><Brain className="w-4 h-4 text-purple-400" /> Plan IA</h3>
-                <span className="text-[11px] text-gray-500">{completedLessons.size}/{totalLessons}</span>
+                <h3 className="text-white text-sm font-bold flex items-center gap-2"><Brain className="w-4 h-4 text-purple-400" /> Ejercicios IA</h3>
+                <span className="text-[11px] text-gray-500">{completedExercises.size}/{totalExercises}</span>
               </div>
-              <div className="h-2 bg-gray-700/50 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-purple-500 to-blue-400 rounded-full transition-all" style={{width:`${progressPct}%`}} /></div>
+              <div className="h-2 bg-gray-700/50 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500" style={{ width: `${progressPct}%` }} /></div>
             </div>
-            <div className="flex-1 overflow-y-auto p-2 space-y-1">
-              {curriculumLoading && <div className="flex items-center justify-center gap-2 py-8 text-gray-500 text-xs"><Loader2 className="w-4 h-4 animate-spin" /> Cargando...</div>}
-              {!curriculumLoading && modules.length === 0 && <div className="text-center py-8"><Brain className="w-8 h-8 text-gray-600 mx-auto mb-2" /><p className="text-gray-500 text-[11px]">Practica con los comandos</p></div>}
-              {modules.map(module => {
-                const done = module.lessons.filter(l=>completedLessons.has(l.id)).length
-                return (<div key={module.id}>
-                  <button onClick={()=>setActiveModule(activeModule===module.id?null:module.id)} disabled={module.lessons.length===0} className="w-full flex items-center gap-2 p-2.5 rounded-lg hover:bg-gray-700/30 transition-colors text-left disabled:opacity-40">
-                    {activeModule===module.id?<ChevronDown className="w-3.5 h-3.5 text-gray-500"/>:<ChevronRight className="w-3.5 h-3.5 text-gray-500"/>}
-                    <span className="text-sm">{module.icon||'🧠'}</span>
-                    <div className="flex-1 min-w-0"><div className="text-gray-300 text-xs font-medium truncate">{module.title}</div><div className="text-[10px] text-gray-600">{module.lessons.length===0?'Próximamente':`${done}/${module.lessons.length}`}</div></div>
+            <div className="flex flex-wrap gap-1 p-2 border-b border-gray-700/30">
+              {EXERCISE_CATEGORIES.map(cat => {
+                const count = AI_EXERCISES.filter(e => e.category === cat.id).length
+                const done = AI_EXERCISES.filter(e => e.category === cat.id && completedExercises.has(e.id)).length
+                return (
+                  <button key={cat.id} onClick={() => setActiveCategory(cat.id)} className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-all ${activeCategory === cat.id ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/30 border border-transparent'}`}>
+                    <span>{cat.icon}</span>
+                    <span className="hidden sm:inline">{cat.name.split(' ')[0]}</span>
+                    {done === count && count > 0 && <span className="text-green-400 text-[8px]">\u{2713}</span>}
                   </button>
-                  {activeModule===module.id && <div className="ml-5 mt-1 space-y-0.5 pb-2">{module.lessons.map(lesson => {
-                    const isC = completedLessons.has(lesson.id); const isA = activeLesson?.id===lesson.id
-                    return <button key={lesson.id} onClick={()=>loadLesson(lesson)} className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all ${isA?'bg-purple-500/20 border border-purple-500/40':'hover:bg-gray-700/30'}`}>
-                      {isC?<CheckCircle2 className="w-3.5 h-3.5 text-green-400"/>:<Circle className="w-3.5 h-3.5 text-gray-600"/>}
-                      <div className="flex-1 min-w-0"><div className={`text-[11px] truncate ${isA?'text-purple-300 font-medium':'text-gray-400'}`}>{lesson.title}</div></div>
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${DIFFICULTY_COLOR[lesson.difficulty]||''}`}>{(DIFFICULTY_LABEL[lesson.difficulty]||'').slice(0,4)}</span>
-                    </button>
-                  })}</div>}
-                </div>)
+                )
               })}
             </div>
-            {/* MISSIONS */}
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
+              {filteredExercises.map(exercise => {
+                const isComplete = completedExercises.has(exercise.id)
+                const isActive = activeExercise?.id === exercise.id
+                return (
+                  <button key={exercise.id} onClick={() => loadExercise(exercise)} className={`w-full flex items-center gap-2 px-2.5 py-2.5 rounded-lg text-left transition-all ${isActive ? 'bg-purple-500/20 border border-purple-500/40 shadow-sm shadow-purple-500/10' : 'hover:bg-gray-700/30 border border-transparent'}`}>
+                    {isComplete ? <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" /> : <Circle className="w-4 h-4 text-gray-600 flex-shrink-0" />}
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-[11px] font-medium truncate ${isActive ? 'text-purple-300' : 'text-gray-300'}`}>{exercise.icon} {exercise.title}</div>
+                      <div className="text-[10px] text-gray-600 truncate">{exercise.description}</div>
+                    </div>
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${DIFFICULTY_COLOR[exercise.difficulty]}`}>{exercise.difficulty === 'easy' ? 'Facil' : exercise.difficulty === 'medium' ? 'Medio' : 'Dificil'}</span>
+                  </button>
+                )
+              })}
+            </div>
             <div className="p-3 border-t border-gray-700/50">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-gray-300 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5"><Trophy className="w-3 h-3 text-orange-400" /> Misiones IA</h4>
-                <span className="text-[10px] text-orange-400 font-bold">{totalXP} XP</span>
-              </div>
-              {activeMission && <div className="mb-2 p-2 rounded-lg bg-purple-500/10 border border-purple-500/30"><div className="text-[10px] text-purple-300 font-medium truncate">{activeMission.title}</div><div className="flex items-center gap-1.5 mt-1"><div className="flex-1 h-1.5 bg-gray-700/50 rounded-full overflow-hidden"><div className="h-full bg-purple-400 rounded-full transition-all" style={{width:`${(missionStep/activeMission.steps.length)*100}%`}}/></div><span className="text-[9px] text-gray-400">{missionStep}/{activeMission.steps.length}</span></div></div>}
-              <div className="space-y-1 max-h-28 overflow-y-auto">
-                {MISSIONS.map((m,i)=>(<button key={m.id} onClick={()=>executeCommand(`mission start ${i+1}`)} className={`w-full text-left px-2 py-1.5 rounded-md text-[10px] flex items-center gap-1.5 transition-all ${completedMissions.has(m.id)?'bg-green-500/10 text-green-400 border border-green-500/20':activeMission?.id===m.id?'bg-purple-500/10 text-purple-300 border border-purple-500/30':'bg-gray-700/30 text-gray-400 hover:bg-purple-500/10 border border-transparent'}`}>{completedMissions.has(m.id)?<CheckCircle2 className="w-3 h-3"/>:<Circle className="w-3 h-3"/>}<span className="flex-1 truncate">{m.title.replace(/[🧠📷📊💬🎨]\s*/,'')}</span><span className={`text-[8px] px-1 py-0.5 rounded ${DIFFICULTY_COLOR[m.difficulty]}`}>{m.xpTotal}xp</span></button>))}
-              </div>
-              <div className="mt-2 pt-2 border-t border-gray-700/30 flex flex-wrap gap-1">
-                {['help','missions','pip list','gpu'].map(c=>(<button key={c} onClick={()=>executeCommand(c)} className="text-[9px] px-1.5 py-0.5 rounded bg-gray-700/50 text-gray-500 hover:text-purple-400 hover:bg-purple-500/10 transition-all">$ {c}</button>))}
+              <h4 className="text-gray-400 text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Package className="w-3 h-3" /> Paquetes pip</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {['numpy', 'pandas', 'matplotlib', 'scipy', 'sympy', 'networkx'].map(pkg => (
+                  <button key={pkg} onClick={() => installPackage(pkg)} disabled={isInstalling} className={`text-[10px] px-2 py-1 rounded-md transition-all ${installedPackages.includes(pkg) ? 'bg-green-500/15 text-green-400 border border-green-500/30' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50 border border-gray-600/50 hover:border-gray-500'}`}>
+                    {installedPackages.includes(pkg) ? '\u{2713}' : '\u{2193}'} {pkg}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
         )}
 
-        {/* CENTER: TERMINAL */}
+        {/* CENTER: EDITOR */}
         <div className="flex-1 flex flex-col min-w-0">
-          <div ref={terminalRef} onClick={focusInput} className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[13px] leading-relaxed bg-[#0d1117] cursor-text">
-            {output.map((line,idx)=>(<div key={idx} className={`whitespace-pre-wrap ${line.type==='error'?'text-red-400':line.type==='success'?'text-green-400':line.type==='info'?'text-cyan-400':line.type==='warning'?'text-yellow-400':line.type==='system'?'text-purple-500/70':line.type==='input'?'text-gray-300':'text-gray-400'}`}>{line.text||' '}</div>))}
-            <div className="flex items-center text-gray-300 mt-1">
-              <span className="text-purple-400 font-bold mr-1">ai-lab</span><span className="text-gray-500">@</span><span className="text-cyan-400">chaskibots</span><span className="text-gray-500">:</span><span className="text-blue-400">{cwd==='/home/ai-lab'?'~':cwd}</span><span className="text-gray-300 mr-2">$</span>
-              <input ref={inputRef} type="text" value={inputValue} onChange={e=>setInputValue(e.target.value)} onKeyDown={handleKeyDown} className="flex-1 bg-transparent outline-none text-gray-200 caret-purple-400" autoFocus spellCheck={false} autoComplete="off" />
-            </div>
+          <div className="flex items-center bg-[#161b22] border-b border-gray-700/50 overflow-x-auto scrollbar-hide">
+            {files.map((file, idx) => (
+              <button key={idx} onClick={() => setActiveFile(idx)} className={`group flex items-center gap-1.5 px-4 py-2 text-xs border-r border-gray-700/30 min-w-0 transition-colors ${idx === activeFile ? 'bg-[#0d1117] text-white border-t-2 border-t-purple-500' : 'text-gray-500 hover:text-gray-300 hover:bg-[#0d1117]/50'}`}>
+                <File className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                <span className="truncate max-w-[100px]">{file.name}</span>
+                {files.length > 1 && <span onClick={(e) => { e.stopPropagation(); deleteFile(idx) }} className="ml-1 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-opacity"><X className="w-3 h-3" /></span>}
+              </button>
+            ))}
+            <button onClick={createFile} className="px-3 py-2 text-gray-600 hover:text-gray-300 hover:bg-gray-700/30 transition-colors" title="Nuevo archivo"><Plus className="w-3.5 h-3.5" /></button>
           </div>
-          {/* ACTION BAR */}
+          <div className="flex-1 min-h-0">
+            <MonacoEditor
+              height="100%"
+              language="python"
+              theme="vs-dark"
+              value={files[activeFile]?.content || ''}
+              onChange={updateFileContent}
+              onMount={(editor, monaco) => { editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => runShortcutRef.current()) }}
+              options={{ fontSize: 14, fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace", minimap: { enabled: false }, lineNumbers: 'on', wordWrap: 'on', automaticLayout: true, padding: { top: 16, bottom: 16 }, scrollBeyondLastLine: false, tabSize: 4, insertSpaces: true, suggestOnTriggerCharacters: true, quickSuggestions: true, renderWhitespace: 'selection', bracketPairColorization: { enabled: true }, guides: { bracketPairs: true }, smoothScrolling: true, cursorBlinking: 'smooth', cursorSmoothCaretAnimation: 'on' }}
+            />
+          </div>
+          {/* Action Bar */}
           <div className="flex items-center justify-between px-4 py-2.5 bg-[#161b22] border-t border-gray-700/50">
             <div className="flex items-center gap-2">
-              <button onClick={()=>setOutput([])} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 rounded-lg text-xs font-medium transition-all"><Trash2 className="w-3.5 h-3.5" /> Limpiar</button>
-              {activeLesson && <><div className="w-px h-5 bg-gray-700 mx-1"/><button onClick={markLessonComplete} className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600/80 hover:bg-green-500 text-white rounded-lg text-xs font-medium"><CheckCircle2 className="w-3.5 h-3.5" /> Completar</button></>}
-              <div className="w-px h-5 bg-gray-700 mx-1"/>
-              <span className="text-[10px] text-gray-500 flex items-center gap-1"><Package className="w-3 h-3" /> {installedPackages.size-2} pkgs</span>
+              <button onClick={runCode} disabled={isRunning || !pyodideReady} className="flex items-center gap-1.5 px-4 py-1.5 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all shadow-sm shadow-green-600/20 hover:shadow-green-500/30">
+                {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+                {isRunning ? 'Ejecutando...' : 'Ejecutar'}
+              </button>
+              {isRunning && <button onClick={() => setIsRunning(false)} className="flex items-center gap-1 px-3 py-1.5 bg-red-600/80 hover:bg-red-500 text-white rounded-lg text-xs transition-colors"><Square className="w-3 h-3" /> Stop</button>}
+              <div className="w-px h-5 bg-gray-700 mx-1" />
+              <button onClick={() => navigator.clipboard.writeText(files[activeFile].content)} className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors" title="Copiar"><Copy className="w-3.5 h-3.5" /></button>
+              <button onClick={() => { setFiles([...DEFAULT_FILES]); setActiveFile(0) }} className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-colors" title="Reiniciar"><RotateCcw className="w-3.5 h-3.5" /></button>
+              {activeExercise && <><div className="w-px h-5 bg-gray-700 mx-1" /><button onClick={markExerciseComplete} className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/80 hover:bg-purple-500 text-white rounded-lg text-xs font-medium transition-colors"><CheckCircle2 className="w-3.5 h-3.5" /> Completar</button></>}
             </div>
             <div className="flex items-center gap-2">
-              <input type="text" value={studentName} onChange={e=>setStudentName(e.target.value)} placeholder="Tu nombre..." className="px-3 py-1.5 bg-gray-800/80 border border-gray-600/50 rounded-lg text-xs text-gray-300 w-32 placeholder:text-gray-600 focus:border-purple-500/50 focus:outline-none" />
-              <button onClick={handleSendToTeacher} disabled={isSending||sendSuccess||!studentName.trim()} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${sendSuccess?'bg-green-600 text-white':'bg-purple-600/80 hover:bg-purple-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white'}`}>
-                {isSending?<Loader2 className="w-3 h-3 animate-spin"/>:sendSuccess?<Check className="w-3 h-3"/>:<Send className="w-3 h-3"/>}{sendSuccess?'Enviado ✓':'Enviar'}
+              <input type="text" value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Tu nombre..." className="px-3 py-1.5 bg-gray-800/80 border border-gray-600/50 rounded-lg text-xs text-gray-300 w-32 placeholder:text-gray-600 focus:border-purple-500/50 focus:outline-none transition-colors" />
+              <button onClick={handleSendToTeacher} disabled={isSending || sendSuccess || !studentName.trim()} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${sendSuccess ? 'bg-green-600 text-white' : 'bg-purple-600/80 hover:bg-purple-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white'}`}>
+                {isSending ? <Loader2 className="w-3 h-3 animate-spin" /> : sendSuccess ? <Check className="w-3 h-3" /> : <Send className="w-3 h-3" />}
+                {sendSuccess ? 'Enviado' : 'Enviar'}
               </button>
             </div>
           </div>
+          {/* Terminal Output */}
+          {showTerminal && (
+            <div className="h-52 border-t border-gray-700/50 flex flex-col">
+              <div className="flex items-center justify-between px-4 py-1.5 bg-[#161b22] border-b border-gray-700/30">
+                <div className="flex items-center gap-2"><TerminalIcon className="w-3.5 h-3.5 text-green-400" /><span className="text-[11px] text-gray-400 font-medium">Terminal \u{2014} Python 3.11 (Pyodide)</span></div>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setOutput(['\u{1F9E0} Terminal limpia'])} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50 transition-colors" title="Limpiar"><Trash2 className="w-3 h-3" /></button>
+                  <button onClick={() => setShowTerminal(false)} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50 transition-colors"><X className="w-3 h-3" /></button>
+                </div>
+              </div>
+              <div ref={outputRef} className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[12px] leading-relaxed bg-[#010409]">
+                {output.map((line, idx) => (
+                  <div key={idx} className={`${line.startsWith('\u{274C}') ? 'text-red-400' : line.startsWith('\u{2705}') || line.startsWith('\u{1F389}') || line.startsWith('\u{2713}') ? 'text-green-400' : line.startsWith('\u{26A0}') ? 'text-yellow-400' : line.startsWith('\u{25B6}') || line.startsWith('[') ? 'text-blue-400' : line.startsWith('\u{1F4E6}') || line.startsWith('\u{1F4DA}') || line.startsWith('\u{1F4DD}') || line.startsWith('\u{1F3AF}') ? 'text-purple-300' : line.startsWith('\u{2500}') || line.startsWith('\u{2550}') ? 'text-gray-600' : line.startsWith('\u{23F3}') ? 'text-yellow-300' : line.startsWith('\u{1F4A1}') ? 'text-cyan-300' : 'text-gray-300'}`}>
+                    {line || '\u00A0'}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* RIGHT: LESSON PANEL */}
-        {showLessonPanel && (activeLesson||lessonLoading) && (
+        {/* RIGHT: THEORY PANEL */}
+        {showTheoryPanel && activeExercise && (
           <div className="w-80 bg-[#0d1117] border-l border-gray-700/50 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between p-3 border-b border-gray-700/50">
-              <h3 className="text-white text-sm font-bold truncate">{activeLesson?.title||'Cargando...'}</h3>
-              <button onClick={()=>setShowLessonPanel(false)} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50"><X className="w-3.5 h-3.5"/></button>
+              <h3 className="text-white text-sm font-bold truncate">{activeExercise.icon} {activeExercise.title}</h3>
+              <button onClick={() => setShowTheoryPanel(false)} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50"><X className="w-3.5 h-3.5" /></button>
             </div>
-            {lessonLoading && <div className="flex-1 flex items-center justify-center gap-2 text-gray-500 text-xs"><Loader2 className="w-4 h-4 animate-spin"/> Cargando...</div>}
-            {!lessonLoading && activeLesson && (
-              <div className="flex-1 overflow-y-auto">
-                <div className="px-3 pt-3 pb-2">
-                  <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium ${DIFFICULTY_COLOR[activeLesson.difficulty]}`}>{DIFFICULTY_LABEL[activeLesson.difficulty]}</span>
-                  <span className="text-[10px] text-gray-600 ml-2">⏱ {activeLesson.estimated_minutes} min</span>
-                  <p className="text-gray-500 text-xs mt-2">{activeLesson.description}</p>
-                </div>
-                <div className="p-3 border-t border-gray-700/30"><h4 className="text-gray-300 text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><BookOpen className="w-3 h-3 text-purple-400" /> Teoría</h4><div className="leading-relaxed">{renderTheory(activeLesson.theory)}</div></div>
-                {activeLesson.examples?.length > 0 && <div className="p-3 border-t border-gray-700/30"><h4 className="text-gray-300 text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Code className="w-3 h-3 text-cyan-400" /> Ejemplos</h4><div className="space-y-1.5">{activeLesson.examples.map((ex,i)=>(<button key={i} onClick={()=>executeCommand(ex.code)} className="w-full text-left px-2.5 py-2 rounded-lg bg-gray-700/20 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/30 transition-colors"><div className="text-[11px] text-purple-300 font-mono break-all">$ {ex.code}</div><div className="text-[10px] text-gray-500 mt-0.5">{ex.explanation}</div></button>))}</div></div>}
-                {activeLesson.challenges?.length > 0 && <div className="p-3 border-t border-gray-700/30"><h4 className="text-gray-300 text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Trophy className="w-3 h-3 text-orange-400" /> Desafíos</h4><div className="space-y-2">{activeLesson.challenges.map((ch,i)=>(<div key={i} className="rounded-lg p-2.5 border bg-gray-700/20 border-gray-700/40"><div className="text-[11px] text-orange-300 font-medium">{ch.title}</div><p className="text-gray-400 text-[11px] mt-1">{ch.description}</p>{ch.starter_code && <button onClick={()=>executeCommand(ch.starter_code!)} className="mt-2 flex items-center gap-1 px-2.5 py-1 bg-purple-600/70 hover:bg-purple-500 text-white rounded-md text-[10px] font-medium"><Terminal className="w-3 h-3" /> Ejecutar</button>}</div>))}</div></div>}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-3 pt-3 pb-2">
+                <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium ${DIFFICULTY_COLOR[activeExercise.difficulty]}`}>{DIFFICULTY_LABEL[activeExercise.difficulty]}</span>
+                <p className="text-gray-500 text-xs mt-2">{activeExercise.description}</p>
               </div>
-            )}
+              <div className="p-3 border-t border-gray-700/30">
+                <h4 className="text-gray-300 text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><BookOpen className="w-3 h-3 text-purple-400" /> Teoria</h4>
+                <div className="leading-relaxed">{renderTheory(activeExercise.theory)}</div>
+              </div>
+              <div className="p-3 border-t border-gray-700/30">
+                <h4 className="text-gray-300 text-[11px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Rocket className="w-3 h-3 text-orange-400" /> Acciones</h4>
+                <div className="space-y-2">
+                  <button onClick={runCode} disabled={isRunning || !pyodideReady} className="w-full flex items-center gap-2 px-3 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-lg text-[11px] text-green-400 font-medium transition-all disabled:opacity-50"><Play className="w-3.5 h-3.5" /> Ejecutar codigo</button>
+                  <button onClick={() => { loadExercise(activeExercise) }} className="w-full flex items-center gap-2 px-3 py-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[11px] text-blue-400 font-medium transition-all"><RotateCcw className="w-3.5 h-3.5" /> Reiniciar ejercicio</button>
+                  <button onClick={markExerciseComplete} className="w-full flex items-center gap-2 px-3 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-lg text-[11px] text-purple-400 font-medium transition-all"><CheckCircle2 className="w-3.5 h-3.5" /> Marcar completado</button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
