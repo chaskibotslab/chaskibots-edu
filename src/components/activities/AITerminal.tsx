@@ -359,113 +359,87 @@ print(f"\\nLa IA uso BUSQUEDA BINARIA: dividir el problema a la mitad cada vez")
   // === NUMPY & ARRAYS ===
   {
     id: 'numpy-basics', title: 'NumPy Fundamentos', icon: '\u{1F522}', difficulty: 'easy', category: 'numpy',
-    description: 'Arrays y operaciones vectorizadas con NumPy (simulado)',
+    description: 'Arrays y operaciones vectorizadas con NumPy real',
     theory: `# NumPy - Computacion Numerica
 ## Que es NumPy?
-La libreria fundamental para computacion numerica en Python.
+La libreria fundamental para computacion numerica en Python. Es la que usan por debajo TensorFlow, PyTorch, pandas y casi toda la IA en Python.
 
 ## Conceptos clave:
-- **ndarray**: Array N-dimensional eficiente
-- **Vectorizacion**: Operaciones sin loops
-- **Broadcasting**: Operaciones entre arrays de diferente forma
-- **Shapes**: Dimensiones de los arrays`,
-    code: `# NumPy Fundamentos (simulado con listas Python puras)
-# En un entorno real usarias: import numpy as np
-import random
-import math
+- **ndarray**: Array N-dimensional eficiente (no es una lista de Python)
+- **Vectorizacion**: Operaciones sobre TODO el array sin escribir un for
+- **Broadcasting**: Operaciones entre arrays de diferente forma (ej: array + numero)
+- **Shape / dtype**: Dimensiones y tipo de dato del array
 
-print("=== NUMPY FUNDAMENTOS (simulado) ===\\n")
+## Por que no usar listas de Python?
+Una lista de Python es una lista de objetos genericos. Un ndarray de NumPy es un bloque de memoria contiguo de un solo tipo (float64, int32...) — por eso es mucho mas rapido y es lo que hace viable entrenar redes neuronales con millones de numeros.`,
+    code: `# NumPy Fundamentos - libreria REAL, no simulada
+import numpy as np
 
-# Simulamos operaciones de NumPy con Python puro
-class MiniNumpy:
-    @staticmethod
-    def array(data):
-        return list(data)
-    
-    @staticmethod
-    def zeros(n):
-        return [0.0] * n
-    
-    @staticmethod
-    def ones(n):
-        return [1.0] * n
-    
-    @staticmethod
-    def random_array(n):
-        return [random.random() for _ in range(n)]
-    
-    @staticmethod
-    def dot(a, b):
-        return sum(x*y for x, y in zip(a, b))
-    
-    @staticmethod
-    def mean(arr):
-        return sum(arr) / len(arr)
-    
-    @staticmethod
-    def std(arr):
-        m = sum(arr) / len(arr)
-        return math.sqrt(sum((x-m)**2 for x in arr) / len(arr))
-    
-    @staticmethod
-    def multiply(a, b):
-        return [x*y for x, y in zip(a, b)]
-    
-    @staticmethod
-    def add(a, scalar):
-        return [x + scalar for x in a]
-    
-    @staticmethod
-    def reshape_2d(arr, rows, cols):
-        return [arr[i*cols:(i+1)*cols] for i in range(rows)]
-
-np = MiniNumpy()
+print("=== NUMPY FUNDAMENTOS (real) ===\\n")
 
 # 1. Crear arrays
 print("1. Creacion de Arrays:")
 a = np.array([1, 2, 3, 4, 5])
-print(f"   Array: {a}")
+print(f"   Array: {a}  (dtype={a.dtype}, shape={a.shape})")
 print(f"   Zeros: {np.zeros(5)}")
 print(f"   Ones:  {np.ones(5)}")
-rand = np.random_array(5)
-print(f"   Random: [{', '.join(f'{x:.3f}' for x in rand)}]")
+np.random.seed(42)
+rand = np.random.random(5)
+print(f"   Random: {np.round(rand, 3)}")
 
-# 2. Operaciones vectorizadas
+# 2. Operaciones vectorizadas (SIN for loops)
 print("\\n2. Operaciones Vectorizadas:")
 b = np.array([10, 20, 30, 40, 50])
-mult = np.multiply(a, b)
 print(f"   a = {a}")
 print(f"   b = {b}")
-print(f"   a * b = {mult}")
-print(f"   a + 10 = {np.add(a, 10)}")
+print(f"   a * b = {a * b}")
+print(f"   a + 10 = {a + 10}   <- broadcasting: suma 10 a CADA elemento")
+print(f"   b / a = {b / a}")
 
-# 3. Producto punto (fundamental en IA)
+# 3. Producto punto (fundamental en redes neuronales)
 print("\\n3. Producto Punto (base de redes neuronales):")
-weights = [0.5, -0.3, 0.8, 0.1, -0.6]
-inputs = [1.0, 2.0, 0.5, 3.0, 1.5]
+weights = np.array([0.5, -0.3, 0.8, 0.1, -0.6])
+inputs = np.array([1.0, 2.0, 0.5, 3.0, 1.5])
 resultado = np.dot(weights, inputs)
 print(f"   Pesos:    {weights}")
 print(f"   Entradas: {inputs}")
-print(f"   w . x = {resultado:.4f}")
+print(f"   w . x = {resultado:.4f}   <- exactamente lo que calcula UNA neurona")
 
-# 4. Estadisticas
+# 4. Estadisticas (metodos del array, no funciones sueltas)
 print("\\n4. Estadisticas:")
-datos = [23, 45, 12, 67, 34, 89, 56, 78, 90, 11]
+datos = np.array([23, 45, 12, 67, 34, 89, 56, 78, 90, 11])
 print(f"   Datos: {datos}")
-print(f"   Media: {np.mean(datos):.2f}")
-print(f"   Std:   {np.std(datos):.2f}")
-print(f"   Min:   {min(datos)}, Max: {max(datos)}")
+print(f"   Media: {datos.mean():.2f}")
+print(f"   Std:   {datos.std():.2f}")
+print(f"   Min:   {datos.min()}, Max: {datos.max()}")
+print(f"   Ordenado: {np.sort(datos)}")
 
-# 5. Reshape (cambiar dimensiones)
+# 5. Reshape (cambiar dimensiones sin copiar los datos)
 print("\\n5. Reshape (reorganizar datos):")
-flat = list(range(1, 13))
-matrix = np.reshape_2d(flat, 3, 4)
-print(f"   Original (1D): {flat}")
-print(f"   Reshape (3x4):")
-for row in matrix:
-    print(f"     {row}")
+flat = np.arange(1, 13)
+matrix = flat.reshape(3, 4)
+print(f"   Original (1D): {flat}  shape={flat.shape}")
+print(f"   Reshape (3x4): shape={matrix.shape}")
+print(matrix)
 
-print("\\nNumPy hace estas operaciones 100x mas rapido que Python puro!")`,
+# 6. Comparacion de velocidad real: NumPy vs Python puro
+print("\\n6. NumPy vs Python puro (100,000 numeros):")
+import time
+n = 100_000
+py_list = list(range(n))
+np_array = np.arange(n)
+
+t0 = time.time()
+py_result = [x * 2 for x in py_list]
+t_python = time.time() - t0
+
+t0 = time.time()
+np_result = np_array * 2
+t_numpy = time.time() - t0
+
+print(f"   Python puro: {t_python*1000:.2f} ms")
+print(f"   NumPy:       {t_numpy*1000:.2f} ms")
+print(f"   NumPy fue {t_python/max(t_numpy, 0.0001):.0f}x mas rapido")`,
   },
   // === DATOS & ESTADISTICA ===
   {
@@ -987,106 +961,117 @@ print("Esto es la BASE de Deep Learning!")`,
   // === VISION ===
   {
     id: 'filtros-imagen', title: 'Filtros de Imagen', icon: '\u{1F5BC}\u{FE0F}', difficulty: 'medium', category: 'vision',
-    description: 'Aplica filtros como blur, bordes y deteccion',
+    description: 'Aplica filtros REALES (blur, bordes, sharpen) con Pillow, y a tu propia foto',
     theory: `# Vision por Computadora
 ## Conceptos base:
 - Una imagen es una matriz de pixeles
 - Cada pixel tiene valores RGB (0-255)
-- Los filtros son matrices (kernels) que se aplican sobre la imagen
+- Los filtros son matrices (kernels) que se "deslizan" sobre la imagen, combinando cada pixel con sus vecinos
 
 ## Kernels comunes:
-- **Blur**: Suaviza la imagen
-- **Sharpen**: Realza detalles
-- **Edge detection**: Detecta bordes (Sobel, Canny)`,
-    code: `# Filtros de Imagen - Vision por Computadora
-import random
+- **Blur**: Promedia cada pixel con sus vecinos -> suaviza
+- **Sharpen**: Exagera la diferencia con los vecinos -> realza detalles
+- **Edge detection (FIND_EDGES)**: Resalta donde el brillo cambia bruscamente -> bordes
+- **Contour / Emboss**: Variantes de deteccion de bordes con distinto "look"
 
-print("=== FILTROS DE IMAGEN (simulado) ===\\n")
+## Esta version usa Pillow (PIL) real
+Nada de simulacion con texto: son los mismos filtros que usa cualquier editor de fotos, aplicados con \`PIL.ImageFilter\`, y los resultados se ven como imagenes de verdad.`,
+    code: `# Filtros de Imagen REALES con Pillow (PIL) - no es simulacion
+from PIL import Image, ImageDraw, ImageFilter
+import matplotlib.pyplot as plt
 
-# Simular una imagen 8x8 en escala de grises
-def crear_imagen(size=8):
-    img = []
-    for i in range(size):
-        row = []
-        for j in range(size):
-            if 2 <= i <= 5 and 2 <= j <= 5:
-                row.append(200 + random.randint(-20, 20))
-            else:
-                row.append(50 + random.randint(-20, 20))
-        img.append(row)
-    return img
+print("=== FILTROS DE IMAGEN (real) ===\\n")
 
-def mostrar_imagen(img, title=""):
-    if title:
-        print(f"  {title}:")
-    for row in img:
-        line = ""
-        for pixel in row:
-            if pixel > 180:
-                line += "##"
-            elif pixel > 120:
-                line += "**"
-            elif pixel > 60:
-                line += ".."
-            else:
-                line += "  "
-        print(f"    |{line}|")
-    print()
+# 1. Crear una imagen de ejemplo a color (para no depender de tu camara)
+#    - un fondo con gradiente + un circulo, para que los filtros se noten bien
+img = Image.new("RGB", (200, 200))
+for y in range(200):
+    for x in range(200):
+        img.putpixel((x, y), (x, y, 255 - x))
+draw = ImageDraw.Draw(img)
+draw.ellipse((60, 60, 140, 140), fill=(255, 255, 255))
 
-def aplicar_kernel(img, kernel):
-    size = len(img)
-    k_size = len(kernel)
-    offset = k_size // 2
-    resultado = [[0]*size for _ in range(size)]
-    
-    for i in range(offset, size - offset):
-        for j in range(offset, size - offset):
-            total = 0
-            for ki in range(k_size):
-                for kj in range(k_size):
-                    total += img[i + ki - offset][j + kj - offset] * kernel[ki][kj]
-            resultado[i][j] = max(0, min(255, int(total)))
-    return resultado
+# 2. Aplicar filtros REALES de Pillow
+filtros = {
+    "Original": img,
+    "Blur": img.filter(ImageFilter.GaussianBlur(radius=4)),
+    "Bordes (FIND_EDGES)": img.filter(ImageFilter.FIND_EDGES),
+    "Sharpen": img.filter(ImageFilter.SHARPEN),
+    "Contour": img.filter(ImageFilter.CONTOUR),
+    "Emboss": img.filter(ImageFilter.EMBOSS),
+}
 
-# Crear imagen original
-img = crear_imagen()
-print("1. Imagen Original (cuadrado brillante en fondo oscuro):")
-mostrar_imagen(img)
+# 3. Mostrar todos los resultados en una sola grafica
+fig, axes = plt.subplots(2, 3, figsize=(9, 6))
+for ax, (nombre, imagen) in zip(axes.flat, filtros.items()):
+    ax.imshow(imagen)
+    ax.set_title(nombre, fontsize=10)
+    ax.axis("off")
+plt.tight_layout()
+plt.show()
 
-# Kernel de Blur (promedio)
-kernel_blur = [[1/9]*3 for _ in range(3)]
-img_blur = aplicar_kernel(img, kernel_blur)
-print("2. Blur (suavizado 3x3):")
-mostrar_imagen(img_blur)
+print("Listo! Cada filtro de arriba es exactamente lo que usa un editor de fotos real.")
+print("\\n--- BONUS: aplica estos mismos filtros a TU cara ---")
+print("Descomenta las 5 lineas de abajo, dale Ejecutar, acepta el permiso de camara,")
+print("y en el SIGUIENTE Ejecutar corre solo la parte de 'foto = tomar_foto()' en adelante:")
+print()
+print("# activar_camara()")
+print("# foto = tomar_foto()")
+print("# if foto:")
+print("#     bordes = foto.convert('RGB').filter(ImageFilter.FIND_EDGES)")
+print("#     plt.imshow(bordes); plt.axis('off'); plt.show()")`,
+  },
+  {
+    id: 'camara-filtros-ia', title: 'Tu Camara con Filtros de IA', icon: '\u{1F4F8}', difficulty: 'medium', category: 'vision',
+    description: 'Usa tu camara real y aplicale filtros de vision por computadora a TU foto',
+    theory: `# Tu Camara + Vision por Computadora
+Este ejercicio usa tu camara web DE VERDAD (con tu permiso) y le aplica los mismos filtros que usan las apps de edicion de fotos y los sistemas de vision por computadora.
 
-# Kernel de deteccion de bordes (Sobel simplificado)
-kernel_edge = [
-    [-1, -1, -1],
-    [-1,  8, -1],
-    [-1, -1, -1]
-]
-img_edges = aplicar_kernel(img, kernel_edge)
-print("3. Deteccion de Bordes:")
-mostrar_imagen(img_edges)
+## Como funciona en 2 pasos:
+1. **Paso 1**: corres \`activar_camara()\` -> tu navegador te pide permiso -> ves tu camara en vivo debajo de la terminal.
+2. **Paso 2**: en un SEGUNDO "Ejecutar" (con la camara ya prendida) corres \`tomar_foto()\` -> te devuelve la foto como imagen real (PIL) -> le aplicas filtros y los ves con matplotlib.
 
-# Kernel de Sharpen
-kernel_sharp = [
-    [ 0, -1,  0],
-    [-1,  5, -1],
-    [ 0, -1,  0]
-]
-img_sharp = aplicar_kernel(img, kernel_sharp)
-print("4. Sharpen (realzar detalles):")
-mostrar_imagen(img_sharp)
+## Por que 2 pasos?
+Pedir permiso de camara toma un instante (tu decides si aceptar), asi que necesita un momento antes de poder tomar la foto. Es la misma razon por la que una app de verdad primero "abre" la camara y despues "captura".
 
-# Estadisticas
-print("--- ESTADISTICAS ---")
-all_pixels = [p for row in img for p in row]
-all_edges = [p for row in img_edges for p in row]
-print(f"  Imagen original: media={sum(all_pixels)/len(all_pixels):.0f}")
-print(f"  Bordes detectados: {sum(1 for p in all_edges if p > 50)} pixeles")
-print(f"  Kernels usados: blur(3x3), edge(3x3), sharpen(3x3)")
-print("\\nAsi funciona OpenCV internamente!")`,
+## Funciones disponibles:
+- \`activar_camara()\` - pide permiso y prende la camara
+- \`tomar_foto()\` - toma una foto y la devuelve como imagen PIL (o None si la camara no esta activa)
+- \`cerrar_camara()\` - apaga la camara cuando termines`,
+    code: `# PASO 1: activa tu camara (dale Ejecutar, acepta el permiso)
+activar_camara()
+print("Camara solicitada. Espera a verte en el panel de abajo,")
+print("luego borra esta linea y las de abajo, y pega el PASO 2.")
+
+# ─────────────────────────────────────────────────────────
+# PASO 2 (bórralo todo lo de arriba y pega esto en un SEGUNDO
+# Ejecutar, una vez que ya te veas en el panel de la camara):
+# ─────────────────────────────────────────────────────────
+#
+# from PIL import ImageFilter
+# import matplotlib.pyplot as plt
+#
+# foto = tomar_foto()
+# if foto is None:
+#     print("No se detecto la camara activa - corre primero activar_camara()")
+# else:
+#     foto = foto.convert("RGB")
+#     filtros = {
+#         "Tu foto": foto,
+#         "Blanco y negro": foto.convert("L"),
+#         "Bordes": foto.filter(ImageFilter.FIND_EDGES),
+#         "Blur": foto.filter(ImageFilter.GaussianBlur(radius=5)),
+#         "Sharpen": foto.filter(ImageFilter.SHARPEN),
+#         "Emboss": foto.filter(ImageFilter.EMBOSS),
+#     }
+#     fig, axes = plt.subplots(2, 3, figsize=(9, 6))
+#     for ax, (nombre, imagen) in zip(axes.flat, filtros.items()):
+#         ax.imshow(imagen, cmap="gray" if imagen.mode == "L" else None)
+#         ax.set_title(nombre, fontsize=10)
+#         ax.axis("off")
+#     plt.tight_layout()
+#     plt.show()
+#     cerrar_camara()`,
   },
   // === NLP ===
   {

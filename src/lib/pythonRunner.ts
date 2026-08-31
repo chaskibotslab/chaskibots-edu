@@ -20,7 +20,7 @@ declare global {
     __chaskiInput?: (promptText: string) => string | null
     __chaskiCameraStart?: () => Promise<void>
     __chaskiCameraStop?: () => void
-    __chaskiCameraCapture?: () => boolean
+    __chaskiCameraCapture?: () => string | null
   }
 }
 
@@ -240,10 +240,16 @@ def activar_camara():
     __js.window.__chaskiCameraStart()
 
 def tomar_foto():
-    """Toma una foto desde la camara activa y la muestra como imagen en la terminal."""
-    ok = __js.window.__chaskiCameraCapture()
-    if not ok:
+    """Toma una foto desde la camara activa, la muestra en la terminal, y la devuelve
+    como una imagen PIL para que puedas procesarla (filtros, blanco y negro, etc).
+    Devuelve None si la camara no esta activa."""
+    b64 = __js.window.__chaskiCameraCapture()
+    if b64 is None:
         print("No hay una foto disponible - activa la camara primero con activar_camara()")
+        return None
+    import base64 as __b64mod, io as __io_mod
+    from PIL import Image as __PILImage
+    return __PILImage.open(__io_mod.BytesIO(__b64mod.b64decode(str(b64))))
 
 def cerrar_camara():
     """Apaga la camara web."""
@@ -320,7 +326,7 @@ export async function runPython(code: string, opts: PyRunOptions = {}): Promise<
   window.__chaskiCameraCapture = () => {
     const photo = captureCameraFrame()
     if (photo) push(IMG_PREFIX + photo, 'stdout')
-    return !!photo
+    return photo
   }
 
   // Salida en streaming
