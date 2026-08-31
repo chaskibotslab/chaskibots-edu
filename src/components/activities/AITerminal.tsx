@@ -5,11 +5,14 @@ import Image from 'next/image'
 import {
   Brain, Terminal as TerminalIcon, Copy, Download, Trash2, Send, Check,
   Loader2, BookOpen, CheckCircle2, Circle, Maximize2, Minimize2,
-  X, Package, Play, Square, RotateCcw, Plus, File, Rocket
+  X, Package, Play, Square, RotateCcw, Plus, File, Rocket, Camera, VideoOff
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
-import { ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError } from '@/lib/pythonRunner'
+import {
+  ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError,
+  registerCameraVideoElement, onCameraStateChange, stopCamera as stopSharedCamera,
+} from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
 
@@ -1380,6 +1383,20 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
   const outputRef = useRef<HTMLDivElement>(null)
   const runShortcutRef = useRef<() => void>(() => {})
 
+  // --- CAMARA WEB (activar_camara/tomar_foto/cerrar_camara) ---
+  const cameraVideoRef = useRef<HTMLVideoElement>(null)
+  const [cameraActive, setCameraActive] = useState(false)
+
+  useEffect(() => {
+    registerCameraVideoElement(cameraVideoRef.current)
+    const unsubscribe = onCameraStateChange(setCameraActive)
+    return () => {
+      unsubscribe()
+      registerCameraVideoElement(null)
+      stopSharedCamera()
+    }
+  }, [])
+
   // --- PYODIDE ENGINE (motor compartido: @/lib/pythonRunner) ---
   const loadPyodideEngine = useCallback(async () => {
     if (typeof window !== 'undefined' && (window as any).pyodide) { setPyodideReady(true); return }
@@ -1388,7 +1405,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
     try {
       await ensurePyodide((msg) => setOutput(prev => [...prev, `\u{23F3} ${msg}`]))
       setPyodideReady(true)
-      setOutput(prev => [...prev, '\u{2705} Python 3.11.3 (Pyodide) listo \u{2014} Motor WebAssembly activo', '\u{1F4A1} input() habilitado \u{B7} gr\u00e1ficos matplotlib \u{B7} auto-instalaci\u00f3n de paquetes'])
+      setOutput(prev => [...prev, '\u{2705} Python 3.11.3 (Pyodide) listo \u{2014} Motor WebAssembly activo', '\u{1F4A1} input() habilitado \u{B7} gr\u00e1ficos matplotlib \u{B7} auto-instalaci\u00f3n de paquetes \u{B7} activar_camara()'])
     } catch (err: any) {
       console.error('Pyodide load error:', err)
       setOutput(prev => [...prev, '\u{274C} Error: No se pudo cargar Python. Verifica tu conexion.'])
@@ -1672,6 +1689,18 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
               </button>
             </div>
           </div>
+          {/* Camara web (activar_camara()/tomar_foto()/cerrar_camara()) */}
+          <div className={`px-4 py-2 border-t border-gray-700/50 bg-[#161b22] items-center gap-3 ${cameraActive ? 'flex' : 'hidden'}`}>
+            <video ref={cameraVideoRef} autoPlay playsInline muted className="w-40 h-28 rounded-lg border border-green-500/40 bg-black object-cover" />
+            <div className="flex-1">
+              <div className="text-green-400 text-xs font-bold flex items-center gap-1.5"><Camera className="w-3.5 h-3.5" /> Camara activa</div>
+              <p className="text-gray-500 text-[10px] mt-0.5">Usa tomar_foto() en tu codigo para capturarla, o apagala aqui</p>
+            </div>
+            <button onClick={() => stopSharedCamera()} className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600/80 hover:bg-red-500 text-white rounded-lg text-xs font-medium transition-colors">
+              <VideoOff className="w-3.5 h-3.5" /> Apagar camara
+            </button>
+          </div>
+
           {/* Terminal Output */}
           {showTerminal && (
             <div className="h-52 border-t border-gray-700/50 flex flex-col">

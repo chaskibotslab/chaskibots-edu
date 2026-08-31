@@ -8,6 +8,7 @@
  *  - Soporte de top-level await (runPythonAsync)
  *  - Auto-instalación de paquetes al importar (numpy, matplotlib, pandas...)
  *  - Captura de gráficos matplotlib como imágenes PNG base64
+ *  - Cámara web real: activar_camara() / tomar_foto() / cerrar_camara()
  *  - Timing real de ejecución
  *  - Tracebacks de Python limpios
  */
@@ -17,6 +18,9 @@ declare global {
     loadPyodide: any
     pyodide: any
     __chaskiInput?: (promptText: string) => string | null
+    __chaskiCameraStart?: () => Promise<void>
+    __chaskiCameraStop?: () => void
+    __chaskiCameraCapture?: () => boolean
   }
 }
 
@@ -37,6 +41,73 @@ export const RELOAD_BUTTON_MARKER = '__RELOAD_BUTTON__'
  */
 export function isInputBlockedError(error: string | null): boolean {
   return !!error && error.includes('No se recibió ninguna entrada')
+}
+
+// ─────────────────────────────────────────────────────────────
+// CÁMARA WEB — activar_camara() / tomar_foto() / cerrar_camara()
+// Estado compartido a nivel de módulo (como window.pyodide): así el
+// estudiante puede activar_camara() en un Ejecutar y tomar_foto() en el
+// siguiente, y el stream sigue vivo entre corridas hasta que la cierre.
+// ─────────────────────────────────────────────────────────────
+let cameraStream: MediaStream | null = null
+let cameraVideoEl: HTMLVideoElement | null = null
+const cameraListeners = new Set<(active: boolean) => void>()
+
+/** El componente que renderiza el <video> debe registrarlo aquí (y des-registrarlo con null al desmontar) */
+export function registerCameraVideoElement(el: HTMLVideoElement | null) {
+  cameraVideoEl = el
+  if (el && cameraStream) el.srcObject = cameraStream
+}
+
+/** Suscribirse a cambios de estado (cámara prendida/apagada). Devuelve función para des-suscribirse. */
+export function onCameraStateChange(cb: (active: boolean) => void): () => void {
+  cameraListeners.add(cb)
+  return () => cameraListeners.delete(cb)
+}
+
+export function isCameraActive(): boolean {
+  return !!cameraStream
+}
+
+/** Pide permiso y activa la cámara. Pública — usada por activar_camara() y por comandos como HackingTerminal's "webcam". */
+export async function startCamera(): Promise<{ ok: boolean; error?: string }> {
+  if (cameraStream) return { ok: true }
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    return { ok: false, error: 'Este navegador no soporta acceso a la cámara.' }
+  }
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    if (cameraVideoEl) cameraVideoEl.srcObject = cameraStream
+    cameraListeners.forEach(cb => cb(true))
+    return { ok: true }
+  } catch (e: any) {
+    let error = 'No se pudo acceder a la cámara.'
+    if (e?.name === 'NotAllowedError') error = 'Permiso de cámara denegado. Revisa los permisos del sitio (icono de candado en la barra de direcciones) y vuelve a intentar.'
+    else if (e?.name === 'NotFoundError') error = 'No se encontró ninguna cámara en este dispositivo.'
+    else if (e?.name === 'NotReadableError') error = 'La cámara está siendo usada por otra aplicación.'
+    return { ok: false, error }
+  }
+}
+
+/** Apaga la cámara. Pública — usada tanto por cerrar_camara() como por el botón manual y el cleanup al desmontar. */
+export function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop())
+    cameraStream = null
+  }
+  if (cameraVideoEl) cameraVideoEl.srcObject = null
+  cameraListeners.forEach(cb => cb(false))
+}
+
+function captureCameraFrame(): string | null {
+  if (!cameraVideoEl || !cameraStream) return null
+  const canvas = document.createElement('canvas')
+  canvas.width = cameraVideoEl.videoWidth || 320
+  canvas.height = cameraVideoEl.videoHeight || 240
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+  ctx.drawImage(cameraVideoEl, 0, 0, canvas.width, canvas.height)
+  return canvas.toDataURL('image/png').split(',')[1] || null
 }
 
 export interface PyRunOptions {
@@ -163,6 +234,20 @@ def __chaski_input(prompt=''):
     return res
 
 builtins.input = __chaski_input
+
+def activar_camara():
+    """Activa tu camara web (el navegador te pedira permiso) y la muestra en vivo en la terminal."""
+    __js.window.__chaskiCameraStart()
+
+def tomar_foto():
+    """Toma una foto desde la camara activa y la muestra como imagen en la terminal."""
+    ok = __js.window.__chaskiCameraCapture()
+    if not ok:
+        print("No hay una foto disponible - activa la camara primero con activar_camara()")
+
+def cerrar_camara():
+    """Apaga la camara web."""
+    __js.window.__chaskiCameraStop()
 `
 
 /** Script que captura los gráficos matplotlib después de cada ejecución */
@@ -220,6 +305,22 @@ export async function runPython(code: string, opts: PyRunOptions = {}): Promise<
   window.__chaskiInput = (promptText: string) => {
     if (opts.inputHandler) return opts.inputHandler(promptText)
     return window.prompt(promptText || 'Entrada (input):')
+  }
+
+  // Registrar los handlers de cámara (activar_camara/tomar_foto/cerrar_camara)
+  window.__chaskiCameraStart = async () => {
+    const res = await startCamera()
+    if (!res.ok) push(`⚠️ ${res.error}`, 'stderr')
+    else push('📷 Cámara activada', 'stdout')
+  }
+  window.__chaskiCameraStop = () => {
+    stopCamera()
+    push('📷 Cámara apagada', 'stdout')
+  }
+  window.__chaskiCameraCapture = () => {
+    const photo = captureCameraFrame()
+    if (photo) push(IMG_PREFIX + photo, 'stdout')
+    return !!photo
   }
 
   // Salida en streaming

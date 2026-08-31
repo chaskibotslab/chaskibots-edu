@@ -6,9 +6,10 @@ import {
   Terminal, ChevronRight, ChevronDown, Shield, Code,
   Loader2, Maximize2, Minimize2, X, Trash2, Copy, Download, Send,
   Check, GraduationCap, Trophy, CheckCircle2, Circle, BookOpen,
-  Zap, Skull, Lock, Key, Eye, EyeOff
+  Zap, Skull, Lock, Key, Eye, EyeOff, Camera, VideoOff
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
+import { startCamera, stopCamera, registerCameraVideoElement, onCameraStateChange } from '@/lib/pythonRunner'
 
 // ============================================================
 // ACADEMY API TYPES (backed by Supabase: simulator_courses/modules/lessons)
@@ -723,6 +724,11 @@ function processCommand(
     case 'crypto':
       return [{ text: '__OPEN_CRYPTO__', type: 'system' }]
 
+    case 'webcam':
+    case 'camara':
+    case 'camera':
+      return [{ text: '__OPEN_WEBCAM__', type: 'system' }]
+
     // ═══ CRIPTOGRAFÍA Y CONTRASEÑAS ═══
     case 'passcheck': {
       const pw = args.join(' ')
@@ -916,7 +922,7 @@ function processCommand(
         { text: '║ DEFENSA:     iptables, lynis                             ║', type: 'normal' },
         { text: '║ NUBE:        save, myfiles, open, export, rm             ║', type: 'normal' },
         { text: '║ PYTHON:      python <archivo.py>, run, edit              ║', type: 'normal' },
-        { text: '║ HERRAMIENTAS: crypto (visual), passcheck (visual)        ║', type: 'normal' },
+        { text: '║ HERRAMIENTAS: crypto (visual), passcheck (visual), webcam║', type: 'normal' },
         { text: '║ OTROS:       echo, clear, history, man, help, ps, top    ║', type: 'normal' },
         { text: '╚══════════════════════════════════════════════════════════╝', type: 'info' },
         { text: '', type: 'normal' },
@@ -1293,6 +1299,22 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
   // Password checker panel
   const [showPasswordChecker, setShowPasswordChecker] = useState(false)
   const [passwordToCheck, setPasswordToCheck] = useState('')
+
+  // Webcam permission demo panel
+  const [showWebcam, setShowWebcam] = useState(false)
+  const [webcamError, setWebcamError] = useState<string | null>(null)
+  const webcamVideoRef = useRef<HTMLVideoElement>(null)
+  const [webcamActive, setWebcamActive] = useState(false)
+
+  useEffect(() => {
+    registerCameraVideoElement(webcamVideoRef.current)
+    const unsubscribe = onCameraStateChange(setWebcamActive)
+    return () => {
+      unsubscribe()
+      registerCameraVideoElement(null)
+      stopCamera() // privacidad: nunca dejar la camara prendida al salir del simulador
+    }
+  }, [])
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState<{ score: number; label: string; tips: string[] } | null>(null)
 
@@ -1528,6 +1550,16 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
     } else if (result.length === 1 && result[0].text === '__OPEN_PASSCHECK__') {
       setShowPasswordChecker(true)
       setOutput(prev => [...prev, promptLine, { text: '🔑 Abriendo verificador de contraseñas...', type: 'info' }])
+    } else if (result.length === 1 && result[0].text === '__OPEN_WEBCAM__') {
+      setShowWebcam(true)
+      setWebcamError(null)
+      setOutput(prev => [...prev, promptLine,
+        { text: '📷 Solicitando acceso a tu cámara...', type: 'info' },
+        { text: 'Fíjate en el permiso que te pide el navegador — así es EXACTAMENTE como funciona: ninguna página (ni un atacante real) puede prender tu cámara sin que tú lo autorices explícitamente aquí.', type: 'warning' },
+      ])
+      startCamera().then(res => {
+        if (!res.ok) setWebcamError(res.error || 'No se pudo acceder a la cámara.')
+      })
     } else {
       setOutput(prev => [...prev, promptLine, ...result])
     }
@@ -1998,6 +2030,36 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Floating tool: Webcam permission demo */}
+          {showWebcam && (
+            <div className="absolute top-3 right-3 z-20 w-72 bg-[#161b22] rounded-xl p-4 border border-cyan-500/30 shadow-2xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-cyan-400" />
+                  <span className="font-medium text-gray-200 text-sm">Cámara — Demo de Permisos</span>
+                </div>
+                <button onClick={() => { setShowWebcam(false); stopCamera() }} className="text-gray-500 hover:text-gray-300">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <video ref={webcamVideoRef} autoPlay playsInline muted className={`w-full h-40 rounded-lg border border-gray-700/50 bg-black object-cover ${webcamActive ? '' : 'hidden'}`} />
+              {!webcamActive && !webcamError && (
+                <div className="w-full h-40 rounded-lg border border-gray-700/50 bg-black flex items-center justify-center text-gray-500 text-xs">
+                  Esperando permiso del navegador...
+                </div>
+              )}
+              {webcamError && (
+                <div className="text-red-400 text-xs p-2 bg-red-500/10 rounded-lg border border-red-500/20">{webcamError}</div>
+              )}
+              {webcamActive && (
+                <button onClick={() => stopCamera()} className="mt-2 w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-red-600/80 hover:bg-red-500 text-white rounded-lg text-xs font-medium transition-colors">
+                  <VideoOff className="w-3.5 h-3.5" /> Apagar cámara
+                </button>
+              )}
+              <p className="text-gray-500 text-[10px] mt-2">Esto es lo que un permiso de cámara SIEMPRE debe pedirte — desconfía de cualquier programa que diga poder acceder a tu cámara sin este paso.</p>
             </div>
           )}
 
