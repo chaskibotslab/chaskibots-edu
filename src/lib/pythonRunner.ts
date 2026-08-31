@@ -132,7 +132,19 @@ def __chaski_input(prompt=''):
     except Exception:
         res = None
     if res is None:
-        res = ''
+        # El navegador canceló o BLOQUEÓ el cuadro de diálogo (p. ej. el
+        # usuario marcó "No permitir más cuadros de diálogo en esta página").
+        # Antes esto devolvía '' silenciosamente y el error real (ValueError
+        # al convertir '' a int/float, etc.) confundía más que ayudaba.
+        # input() de Python real lanza EOFError cuando no hay más entrada —
+        # es el comportamiento correcto y además explica qué pasó.
+        print('', flush=True)
+        raise EOFError(
+            'No se recibió ninguna entrada. Si cancelaste el cuadro de texto, '
+            'o tu navegador bloqueó las ventanas emergentes de esta página '
+            '("No permitir más cuadros de diálogo"), recarga la página (F5) '
+            'e inténtalo de nuevo.'
+        )
     res = str(res)
     print(res, flush=True)
     return res
