@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
-import { ensurePyodide, runPython, installPyPackage, IMG_PREFIX } from '@/lib/pythonRunner'
+import { ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError } from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
 
@@ -1348,7 +1348,17 @@ interface AITerminalProps { levelId?: string; userId?: string; userName?: string
 export default function AITerminal({ levelId, userId, userName }: AITerminalProps) {
   const { user } = useAuth()
 
-  const [files, setFiles] = useState<VirtualFile[]>(DEFAULT_FILES)
+  const [files, setFiles] = useState<VirtualFile[]>(() => {
+    if (typeof window === 'undefined') return DEFAULT_FILES
+    try {
+      const saved = localStorage.getItem('ai-lab-files')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      }
+    } catch {}
+    return DEFAULT_FILES
+  })
   const [activeFile, setActiveFile] = useState(0)
   const [output, setOutput] = useState<string[]>(['\u{1F9E0} AI Lab Professional v2.0 \u{2014} Motor: Pyodide (CPython 3.11 WebAssembly)'])
   const [isRunning, setIsRunning] = useState(false)
@@ -1406,6 +1416,12 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
     } catch {}
   }, [completedExercises, studentName])
 
+  useEffect(() => {
+    try {
+      localStorage.setItem('ai-lab-files', JSON.stringify(files))
+    } catch {}
+  }, [files])
+
   // --- RUN CODE (motor robusto: input, matplotlib, streaming) ---
   const runCode = async () => {
     if (isRunning) return
@@ -1426,6 +1442,9 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
 
       if (result.error) {
         setOutput(prev => [...prev, '\u{274C} Error de Python:', ...result.error!.split('\n').map(l => `   ${l}`)])
+        if (isInputBlockedError(result.error)) {
+          setOutput(prev => [...prev, RELOAD_BUTTON_MARKER])
+        }
       } else if (result.lines.length === 0 && result.images.length === 0) {
         setOutput(prev => [...prev, '\u{2713} Ejecucion exitosa (sin salida de print)'])
       }
@@ -1665,7 +1684,15 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
               </div>
               <div ref={outputRef} className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[12px] leading-relaxed bg-[#010409]">
                 {output.map((line, idx) => (
-                  line.startsWith(IMG_PREFIX) ? (
+                  line === RELOAD_BUTTON_MARKER ? (
+                    <button
+                      key={idx}
+                      onClick={() => window.location.reload()}
+                      className="my-2 flex items-center gap-1.5 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg text-xs font-bold transition-colors animate-pulse"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" /> Recargar página (tu código no se pierde)
+                    </button>
+                  ) : line.startsWith(IMG_PREFIX) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img key={idx} src={`data:image/png;base64,${line.slice(IMG_PREFIX.length)}`} alt="Grafico matplotlib" className="my-2 max-w-full rounded-lg border border-gray-700/50" />
                   ) : (

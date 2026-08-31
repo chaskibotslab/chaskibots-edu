@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
-import { ensurePyodide, runPython, installPyPackage, IMG_PREFIX } from '@/lib/pythonRunner'
+import { ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError } from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
 
@@ -158,8 +158,19 @@ if __name__ == "__main__":
 export default function PythonIDE() {
   const { user } = useAuth()
 
-  // Files & Editor
-  const [files, setFiles] = useState<VirtualFile[]>(DEFAULT_FILES)
+  // Files & Editor (persistidos en localStorage — así un F5, necesario para
+  // recuperarse de un input() bloqueado por el navegador, no borra el código)
+  const [files, setFiles] = useState<VirtualFile[]>(() => {
+    if (typeof window === 'undefined') return DEFAULT_FILES
+    try {
+      const saved = localStorage.getItem('python-ide-files')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      }
+    } catch {}
+    return DEFAULT_FILES
+  })
   const [activeFile, setActiveFile] = useState(0)
 
   // Execution
@@ -250,6 +261,12 @@ export default function PythonIDE() {
     } catch {}
   }, [completedLessons, studentName])
 
+  useEffect(() => {
+    try {
+      localStorage.setItem('python-ide-files', JSON.stringify(files))
+    } catch {}
+  }, [files])
+
   // ─── RUN CODE (motor robusto: input, matplotlib, streaming) ─
   const runCode = async () => {
     if (isRunning) return
@@ -276,6 +293,9 @@ export default function PythonIDE() {
 
       if (result.error) {
         setOutput(prev => [...prev, '❌ Error de Python:', ...result.error!.split('\n').map(l => `   ${l}`)])
+        if (isInputBlockedError(result.error)) {
+          setOutput(prev => [...prev, RELOAD_BUTTON_MARKER])
+        }
       } else if (result.lines.length === 0 && result.images.length === 0) {
         setOutput(prev => [...prev, '✓ Ejecución exitosa (sin salida de print)'])
       }
@@ -862,7 +882,15 @@ export default function PythonIDE() {
               </div>
               <div ref={outputRef} className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[12px] leading-relaxed bg-labdark-void">
                 {output.map((line, idx) => (
-                  line.startsWith(IMG_PREFIX) ? (
+                  line === RELOAD_BUTTON_MARKER ? (
+                    <button
+                      key={idx}
+                      onClick={() => window.location.reload()}
+                      className="my-2 flex items-center gap-1.5 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg text-xs font-bold transition-colors animate-pulse"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" /> Recargar página (tu código no se pierde)
+                    </button>
+                  ) : line.startsWith(IMG_PREFIX) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img key={idx} src={`data:image/png;base64,${line.slice(IMG_PREFIX.length)}`} alt="Gráfico matplotlib" className="my-2 max-w-full rounded-lg border border-gray-700/50" />
                   ) : (

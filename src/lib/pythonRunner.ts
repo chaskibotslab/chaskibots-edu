@@ -26,6 +26,19 @@ const PYODIDE_BASE = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`
 // Prefijo especial para imágenes en la salida del terminal
 export const IMG_PREFIX = '__IMG__'
 
+/** Línea especial: la terminal debe renderizarla como un botón real de "recargar" */
+export const RELOAD_BUTTON_MARKER = '__RELOAD_BUTTON__'
+
+/**
+ * true si el error viene de que el navegador bloqueó/canceló el cuadro de
+ * input() (ver __chaski_input en PY_BOOTSTRAP). El componente que renderiza
+ * la terminal debe mostrar un botón real de "recargar" cuando esto ocurra —
+ * el texto del error por sí solo es fácil de pasar por alto.
+ */
+export function isInputBlockedError(error: string | null): boolean {
+  return !!error && error.includes('No se recibió ninguna entrada')
+}
+
 export interface PyRunOptions {
   /** Callback por cada línea de salida en tiempo real */
   onLine?: (line: string, type: 'stdout' | 'stderr') => void
