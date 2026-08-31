@@ -1,5 +1,6 @@
 /**
- * Aplica la migration 2026_courses_catalog.sql
+ * Aplica la migration 2026_courses_catalog.sql a Supabase
+ * Intenta usar la función exec_sql (si existe) o el endpoint pg de Supabase
  */
 const fs = require('fs')
 const path = require('path')
@@ -16,35 +17,50 @@ const SUPABASE_URL = (env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\/rest\/v1\/?
 const SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
 
+async function checkTable(name) {
+  const { error } = await supabase.from(name).select('id').limit(1)
+  return !error
+}
+
 async function main() {
-  console.log('Aplicando migration 2026_courses_catalog.sql...')
-  const sql = fs.readFileSync(path.join(__dirname, '..', 'supabase', 'migrations', '2026_courses_catalog.sql'), 'utf8')
+  console.log('=== Verificación de tablas en Supabase ===\n')
 
-  // Probar con RPC exec_sql si existe, o usar PostgREST schema directo
-  // Como Supabase JS no permite SQL directo, usamos fetch al endpoint de SQL via service role
-  const url = `${SUPABASE_URL}/rest/v1/rpc/exec_sql`
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'apikey': SERVICE_KEY,
-      'Authorization': `Bearer ${SERVICE_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ sql_query: sql })
-  })
+  // Check all important tables
+  const tables = [
+    'users', 'levels', 'programs', 'schools', 'lessons', 'tasks',
+    'courses', 'school_courses', 'teacher_courses',
+    'submissions', 'simulators', 'virtual_files',
+  ]
 
-  if (!res.ok) {
-    console.log('No existe rpc exec_sql. Aplica manualmente en Supabase SQL Editor.')
-    console.log('Archivo:', path.join(__dirname, '..', 'supabase', 'migrations', '2026_courses_catalog.sql'))
-    console.log('\nVerificando si las tablas ya existen...')
-    const { error: e1 } = await supabase.from('courses').select('id').limit(1)
-    const { error: e2 } = await supabase.from('school_courses').select('id').limit(1)
-    console.log('  courses:', e1 ? 'NO EXISTE - ' + e1.message : 'EXISTE')
-    console.log('  school_courses:', e2 ? 'NO EXISTE - ' + e2.message : 'EXISTE')
+  const missing = []
+  for (const t of tables) {
+    const exists = await checkTable(t)
+    const status = exists ? 'OK' : 'FALTA'
+    console.log(`  ${status.padEnd(6)} ${t}`)
+    if (!exists) missing.push(t)
+  }
+
+  if (missing.length === 0) {
+    console.log('\n✓ Todas las tablas existen.')
     return
   }
 
-  console.log('Migration aplicada con éxito')
+  console.log(`\n✗ Faltan ${missing.length} tabla(s): ${missing.join(', ')}`)
+  console.log('\n*** ACCIÓN REQUERIDA ***')
+  console.log('Ejecuta estos archivos SQL en el SQL Editor de Supabase Dashboard:')
+  console.log('  https://supabase.com/dashboard/project/jfsyvcslzgjrvsoqleiz/sql/new\n')
+
+  if (missing.includes('courses') || missing.includes('school_courses')) {
+    console.log('  1. supabase/migrations/2026_courses_catalog.sql')
+  }
+  if (missing.includes('teacher_courses')) {
+    console.log('  2. supabase/schema.sql (sección teacher_courses)')
+  }
+
+  console.log('\nSQL para courses:')
+  console.log('─'.repeat(60))
+  const sqlFile = fs.readFileSync(path.join(__dirname, '..', 'supabase', 'migrations', '2026_courses_catalog.sql'), 'utf8')
+  console.log(sqlFile)
 }
 
 main().catch(e => { console.error(e); process.exit(1) })

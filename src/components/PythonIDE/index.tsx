@@ -12,15 +12,9 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
+import { ensurePyodide, runPython, installPyPackage, IMG_PREFIX } from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
-
-declare global {
-  interface Window {
-    loadPyodide: any
-    pyodide: any
-  }
-}
 
 // ============================================================
 // ACADEMY API TYPES (backed by Supabase: simulator_courses/modules/lessons)
@@ -211,34 +205,18 @@ export default function PythonIDE() {
   const outputRef = useRef<HTMLDivElement>(null)
   const runShortcutRef = useRef<() => void>(() => {})
 
-  // ─── PYODIDE ENGINE ───────────────────────────────────────
+  // ─── PYODIDE ENGINE (motor compartido: @/lib/pythonRunner) ──
   const loadPyodideEngine = useCallback(async () => {
-    if (window.pyodide) {
+    if (typeof window !== 'undefined' && (window as any).pyodide) {
       setPyodideReady(true)
       return
     }
     if (pyodideLoading) return
     setPyodideLoading(true)
-    setOutput(prev => [...prev, '⏳ Descargando Python 3.11 (~12MB, solo la primera vez)...'])
-
     try {
-      if (!document.querySelector('script[src*="pyodide"]')) {
-        const script = document.createElement('script')
-        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js'
-        script.async = true
-        document.head.appendChild(script)
-        await new Promise((resolve, reject) => {
-          script.onload = resolve
-          script.onerror = reject
-        })
-      }
-
-      const pyodide = await window.loadPyodide({
-        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/',
-      })
-      window.pyodide = pyodide
+      await ensurePyodide((msg) => setOutput(prev => [...prev, `⏳ ${msg}`]))
       setPyodideReady(true)
-      setOutput(prev => [...prev, '✅ Python 3.11.3 (Pyodide) listo — Motor WebAssembly activo'])
+      setOutput(prev => [...prev, '✅ Python 3.11.3 (Pyodide) listo — Motor WebAssembly activo', '💡 input() habilitado · gráficos matplotlib · auto-instalación de paquetes'])
     } catch (err: any) {
       console.error('Pyodide load error:', err)
       setOutput(prev => [...prev, '❌ Error: No se pudo cargar Python. Verifica tu conexión.'])
@@ -272,54 +250,37 @@ export default function PythonIDE() {
     } catch {}
   }, [completedLessons, studentName])
 
-  // ─── RUN CODE ─────────────────────────────────────────────
+  // ─── RUN CODE (motor robusto: input, matplotlib, streaming) ─
   const runCode = async () => {
+    if (isRunning) return
     setIsRunning(true)
     const code = files[activeFile].content
     const timestamp = new Date().toLocaleTimeString('es-EC')
     setOutput(prev => [...prev, '', `[${timestamp}] ▶ Ejecutando ${files[activeFile].name}...`, '─'.repeat(50)])
 
     try {
-      if (!window.pyodide) {
-        await loadPyodideEngine()
+      const result = await runPython(code, {
+        onLine: (line, type) => {
+          setOutput(prev => [...prev, type === 'stderr' ? `⚠️ ${line}` : line])
+        },
+      })
+
+      // Registrar salida para validación de desafíos
+      const stdoutLines = result.lines.filter(l => l.type === 'stdout').map(l => l.text)
+      setLastRunOutput(stdoutLines)
+
+      // Gráficos matplotlib
+      if (result.images.length > 0) {
+        setOutput(prev => [...prev, ...result.images.map(img => `${IMG_PREFIX}${img}`), `📊 ${result.images.length} gráfico(s) generado(s)`])
       }
 
-      if (window.pyodide) {
-        window.pyodide.runPython(`
-import sys
-from io import StringIO
-sys.stdout = StringIO()
-sys.stderr = StringIO()
-`)
-        try {
-          window.pyodide.runPython(code)
-          const stdout = window.pyodide.runPython('sys.stdout.getvalue()')
-          const stderr = window.pyodide.runPython('sys.stderr.getvalue()')
-
-          const results: string[] = []
-          if (stdout) results.push(...stdout.split('\n').filter((l: string) => l !== ''))
-          if (stderr) results.push(...stderr.split('\n').filter((l: string) => l !== '').map((l: string) => `⚠️ ${l}`))
-          
-          if (results.length > 0) {
-            setOutput(prev => [...prev, ...results])
-            setLastRunOutput(results)
-          } else {
-            setOutput(prev => [...prev, '✓ Ejecución exitosa (sin salida de print)'])
-            setLastRunOutput([])
-          }
-          setOutput(prev => [...prev, `─ Completado en ${(Math.random() * 50 + 10).toFixed(0)}ms`])
-        } catch (pyErr: any) {
-          const errMsg = pyErr.message || String(pyErr)
-          const lines = errMsg.split('\n')
-          const relevantLines = lines.slice(-5).filter((l: string) => l.trim())
-          setOutput(prev => [...prev, '❌ Error de Python:', ...relevantLines.map((l: string) => `   ${l}`)])
-        } finally {
-          window.pyodide.runPython(`
-sys.stdout = sys.__stdout__
-sys.stderr = sys.__stderr__
-`)
-        }
+      if (result.error) {
+        setOutput(prev => [...prev, '❌ Error de Python:', ...result.error!.split('\n').map(l => `   ${l}`)])
+      } else if (result.lines.length === 0 && result.images.length === 0) {
+        setOutput(prev => [...prev, '✓ Ejecución exitosa (sin salida de print)'])
       }
+
+      setOutput(prev => [...prev, `─ Completado en ${result.elapsedMs.toFixed(0)}ms`])
     } catch (err: any) {
       setOutput(prev => [...prev, `❌ Error del motor: ${err.message}`])
     }
@@ -334,20 +295,18 @@ sys.stderr = sys.__stderr__
     }
   })
 
-  // ─── INSTALL PACKAGE ──────────────────────────────────────
+  // ─── INSTALL PACKAGE (pyodide + micropip fallback) ──────────
   const installPackage = async (pkg: string) => {
     if (installedPackages.includes(pkg)) return
     setIsInstalling(true)
     setOutput(prev => [...prev, `📦 pip install ${pkg}...`])
 
-    try {
-      if (window.pyodide) {
-        await window.pyodide.loadPackage(pkg)
-        setInstalledPackages(prev => [...prev, pkg])
-        setOutput(prev => [...prev, `✅ Successfully installed ${pkg}`])
-      }
-    } catch (err: any) {
-      setOutput(prev => [...prev, `❌ Error: Could not install ${pkg}`])
+    const { ok, error } = await installPyPackage(pkg)
+    if (ok) {
+      setInstalledPackages(prev => [...prev, pkg])
+      setOutput(prev => [...prev, `✅ Successfully installed ${pkg}`])
+    } else {
+      setOutput(prev => [...prev, `❌ Error: No se pudo instalar ${pkg}${error ? ` — ${error}` : ''}`])
     }
     setIsInstalling(false)
   }
@@ -903,12 +862,16 @@ sys.stderr = sys.__stderr__
               </div>
               <div ref={outputRef} className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[12px] leading-relaxed bg-labdark-void">
                 {output.map((line, idx) => (
+                  line.startsWith(IMG_PREFIX) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={idx} src={`data:image/png;base64,${line.slice(IMG_PREFIX.length)}`} alt="Gráfico matplotlib" className="my-2 max-w-full rounded-lg border border-gray-700/50" />
+                  ) : (
                   <div key={idx} className={`${
                     line.startsWith('❌') ? 'text-red-400' :
                     line.startsWith('✅') || line.startsWith('🎉') || line.startsWith('✓') ? 'text-green-400' :
                     line.startsWith('⚠️') ? 'text-yellow-400' :
                     line.startsWith('▶') || line.startsWith('[') ? 'text-blue-400' :
-                    line.startsWith('📦') || line.startsWith('📚') || line.startsWith('📝') || line.startsWith('🎯') ? 'text-purple-300' :
+                    line.startsWith('📦') || line.startsWith('📚') || line.startsWith('📝') || line.startsWith('🎯') || line.startsWith('📊') ? 'text-purple-300' :
                     line.startsWith('─') || line.startsWith('═') ? 'text-gray-600' :
                     line.startsWith('⏳') ? 'text-yellow-300' :
                     line.startsWith('💡') ? 'text-cyan-300' :
@@ -916,6 +879,7 @@ sys.stderr = sys.__stderr__
                   }`}>
                     {line || '\u00A0'}
                   </div>
+                  )
                 ))}
               </div>
             </div>

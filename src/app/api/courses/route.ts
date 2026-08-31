@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const { name, description, levelId, programId, durationHours, modality, icon, color, coverImage, isActive } = body
     if (!name) return NextResponse.json({ error: 'name requerido' }, { status: 400 })
     const id = body.id || `curso-${Date.now()}`
-    const { data, error } = await supabaseAdmin.from('courses').insert({
+    const insertPayload = {
       id, name,
       description: description || null,
       level_id: levelId || null,
@@ -50,10 +50,16 @@ export async function POST(request: NextRequest) {
       color: color || '#007AFF',
       cover_image: coverImage || null,
       is_active: isActive !== false,
-    }).select().single()
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    console.log('[POST /api/courses] insert payload:', JSON.stringify(insertPayload))
+    const { data, error } = await supabaseAdmin.from('courses').insert(insertPayload).select().single()
+    if (error) {
+      console.error('[POST /api/courses] Supabase error:', error)
+      return NextResponse.json({ error: error.message, details: error.details, hint: error.hint, code: error.code }, { status: 500 })
+    }
     return NextResponse.json({ course: row(data) })
   } catch (e: any) {
+    console.error('[POST /api/courses] Exception:', e)
     return NextResponse.json({ error: e.message }, { status: 500 })
   }
 }

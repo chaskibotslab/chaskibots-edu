@@ -9,12 +9,9 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
+import { ensurePyodide, runPython, installPyPackage, IMG_PREFIX } from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
-
-declare global {
-  interface Window { loadPyodide: any; pyodide: any }
-}
 
 // ============================================================
 // AI EXERCISES - Built-in progressive curriculum
@@ -249,6 +246,113 @@ for clase, prob in zip(clases, probs):
 
 print("\\nEstas funciones son los bloques basicos de la IA!")`,
   },
+  {
+    id: 'chatbot-interactivo', title: 'Chatbot Interactivo', icon: '\u{1F5E8}\u{FE0F}', difficulty: 'easy', category: 'basics',
+    description: 'Usa input() para crear un chatbot que conversa contigo',
+    theory: `# Programas Interactivos con input()
+## Que es input()?
+La funcion que permite al programa RECIBIR datos del usuario.
+
+## Sintaxis:
+- respuesta = input("Pregunta: ")
+- Siempre devuelve un string (texto)
+- Para numeros: int(input()) o float(input())
+
+## En IA:
+Los chatbots como ChatGPT reciben tu texto (input),
+lo procesan con un modelo, y generan una respuesta.
+Aqui construyes esa misma estructura basica!`,
+    code: `# Chatbot Interactivo - usa input() real!
+# Cuando ejecutes, apareceran ventanas para escribir
+
+print("=" * 45)
+print("  CHASKI-BOT: Tu asistente de IA")
+print("=" * 45)
+print("(escribe 'adios' para terminar)\\n")
+
+# Base de conocimiento del bot
+respuestas = {
+    "hola": "Hola! Soy Chaski-Bot, tu asistente de IA",
+    "como estas": "Excelente! Procesando datos a toda velocidad",
+    "que es la ia": "La IA es la capacidad de las maquinas de aprender y razonar",
+    "que es python": "Python es el lenguaje #1 para Inteligencia Artificial",
+    "quien te creo": "Me programaron en ChaskiBots Lab, Ecuador",
+    "chiste": "Por que Python no usa corbata? Porque ya tiene su propia clase!",
+}
+
+def responder(mensaje):
+    mensaje = mensaje.lower().strip()
+    # Buscar coincidencia en la base de conocimiento
+    for clave, respuesta in respuestas.items():
+        if clave in mensaje:
+            return respuesta
+    return "Interesante... aun estoy aprendiendo sobre eso. Prueba: 'que es la ia'"
+
+# Bucle de conversacion (maximo 5 turnos)
+nombre = input("Como te llamas? ")
+print(f"\\nMucho gusto, {nombre}! Preguntame algo.\\n")
+
+for turno in range(5):
+    mensaje = input(f"{nombre}: ")
+    if "adios" in mensaje.lower():
+        print(f"Chaski-Bot: Hasta pronto, {nombre}!")
+        break
+    print(f"Chaski-Bot: {responder(mensaje)}\\n")
+else:
+    print("\\nChaski-Bot: Se acabaron los turnos. Hasta pronto!")
+
+print("\\nAsi funciona la estructura basica de TODO chatbot!")`,
+  },
+  {
+    id: 'adivina-numero', title: 'IA que Adivina', icon: '\u{1F3B2}', difficulty: 'easy', category: 'basics',
+    description: 'Busqueda binaria: la IA adivina tu numero en 7 intentos',
+    theory: `# Busqueda Binaria - Pensamiento Algoritmico
+## El juego:
+Piensa un numero del 1 al 100. La IA lo adivina en maximo 7 intentos.
+
+## Como lo logra?
+Divide el rango a la mitad en cada intento:
+- 100 numeros -> 50 -> 25 -> 12 -> 6 -> 3 -> 1
+
+## Por que importa en IA?
+- log2(100) = 6.6 intentos maximo
+- Los arboles de decision funcionan igual
+- Es la base de algoritmos de busqueda eficiente`,
+    code: `# La IA adivina tu numero con busqueda binaria
+# Piensa un numero del 1 al 100!
+
+print("=" * 45)
+print("  LA IA ADIVINA TU NUMERO")
+print("=" * 45)
+print("Piensa un numero del 1 al 100.")
+print("Responde: 'mayor', 'menor' o 'si' si adivine\\n")
+
+bajo, alto = 1, 100
+intentos = 0
+
+while bajo <= alto:
+    intentos += 1
+    medio = (bajo + alto) // 2
+    print(f"Intento {intentos}: Tu numero es {medio}?")
+    respuesta = input("Es 'mayor', 'menor' o 'si'? ").lower().strip()
+
+    if "si" in respuesta:
+        print(f"\\nLo adivine en {intentos} intentos!")
+        print(f"Busqueda binaria: log2(100) = 6.6 intentos maximo")
+        print("Asi de eficiente es el pensamiento algoritmico!")
+        break
+    elif "mayor" in respuesta:
+        bajo = medio + 1
+    elif "menor" in respuesta:
+        alto = medio - 1
+    else:
+        print("   (no entendi, asumire 'mayor')")
+        bajo = medio + 1
+else:
+    print("\\nMmm, creo que cambiaste tu numero! El rango quedo vacio.")
+
+print(f"\\nLa IA uso BUSQUEDA BINARIA: dividir el problema a la mitad cada vez")`,
+  },
   // === NUMPY & ARRAYS ===
   {
     id: 'numpy-basics', title: 'NumPy Fundamentos', icon: '\u{1F522}', difficulty: 'easy', category: 'numpy',
@@ -359,6 +463,137 @@ for row in matrix:
     print(f"     {row}")
 
 print("\\nNumPy hace estas operaciones 100x mas rapido que Python puro!")`,
+  },
+  // === DATOS & ESTADISTICA ===
+  {
+    id: 'graficos-datos', title: 'Graficos con Matplotlib', icon: '\u{1F4C8}', difficulty: 'medium', category: 'data',
+    description: 'Visualiza datos con graficos REALES de matplotlib',
+    theory: `# Visualizacion de Datos
+## Por que visualizar?
+"Una imagen vale mas que mil filas de datos"
+- Detectar patrones y tendencias
+- Encontrar outliers (valores extranos)
+- Comunicar resultados
+
+## Matplotlib:
+La libreria de graficos #1 de Python.
+- plt.plot() - lineas
+- plt.bar() - barras
+- plt.scatter() - dispersion
+- plt.hist() - histogramas
+
+## Este simulador:
+Los graficos aparecen directamente en el terminal!
+(matplotlib se instala automaticamente al importar)`,
+    code: `# Graficos REALES con matplotlib
+# El grafico aparecera en el terminal al terminar!
+import matplotlib
+matplotlib.use('AGG')
+import matplotlib.pyplot as plt
+import random
+import math
+
+print("Generando datos y graficos...")
+
+# 1. Datos: precision de un modelo durante el entrenamiento
+epochs = list(range(1, 21))
+accuracy = [0.5 + 0.45 * (1 - math.exp(-e/5)) + random.uniform(-0.02, 0.02) for e in epochs]
+loss = [2.0 * math.exp(-e/4) + random.uniform(0, 0.05) for e in epochs]
+
+# 2. Crear figura con 2 subgraficos
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+fig.patch.set_facecolor('#0d1117')
+
+for ax in (ax1, ax2):
+    ax.set_facecolor('#161b22')
+    ax.tick_params(colors='white')
+    for spine in ax.spines.values():
+        spine.set_color('gray')
+
+# Grafico de accuracy
+ax1.plot(epochs, accuracy, 'o-', color='#10B981', linewidth=2, markersize=4)
+ax1.set_title('Accuracy del Modelo', color='white', fontweight='bold')
+ax1.set_xlabel('Epoch', color='white')
+ax1.set_ylabel('Accuracy', color='white')
+ax1.grid(True, alpha=0.2)
+
+# Grafico de loss
+ax2.plot(epochs, loss, 'o-', color='#EF4444', linewidth=2, markersize=4)
+ax2.set_title('Loss del Modelo', color='white', fontweight='bold')
+ax2.set_xlabel('Epoch', color='white')
+ax2.set_ylabel('Loss', color='white')
+ax2.grid(True, alpha=0.2)
+
+plt.tight_layout()
+
+print(f"Accuracy final: {accuracy[-1]:.2%}")
+print(f"Loss final: {loss[-1]:.4f}")
+print("\\nMira el grafico abajo! Asi se monitorea el entrenamiento de una IA")`,
+  },
+  {
+    id: 'estadistica-basica', title: 'Estadistica para IA', icon: '\u{1F4CA}', difficulty: 'easy', category: 'data',
+    description: 'Media, mediana, desviacion: la base de todo modelo de ML',
+    theory: `# Estadistica: el corazon de la IA
+## Medidas fundamentales:
+- **Media**: promedio de los datos
+- **Mediana**: valor central (robusta a outliers)
+- **Moda**: valor mas frecuente
+- **Desviacion estandar**: que tan dispersos estan los datos
+
+## En Machine Learning:
+- Normalizacion usa media y std
+- Deteccion de anomalias usa distribuciones
+- Los modelos APRENDEN distribuciones de datos`,
+    code: `# Estadistica para IA con el modulo statistics
+import statistics as stats
+import random
+
+print("=== ESTADISTICA PARA IA ===\\n")
+
+# Simular calificaciones de 30 estudiantes
+random.seed(42)
+notas = [round(random.gauss(7.5, 1.5), 1) for _ in range(30)]
+notas = [max(0, min(10, n)) for n in notas]  # limitar 0-10
+
+print(f"Notas de 30 estudiantes:")
+print(f"  {notas}\\n")
+
+# Medidas de tendencia central
+media = stats.mean(notas)
+mediana = stats.median(notas)
+moda = stats.mode(notas)
+std = stats.stdev(notas)
+
+print(f"Media:    {media:.2f}")
+print(f"Mediana:  {mediana:.2f}")
+print(f"Moda:     {moda}")
+print(f"Desv Std: {std:.2f}\\n")
+
+# Histograma ASCII
+print("Distribucion (histograma):")
+rangos = [(0,4), (4,5), (5,6), (6,7), (7,8), (8,9), (9,10.1)]
+for lo, hi in rangos:
+    count = sum(1 for n in notas if lo <= n < hi)
+    bar = "#" * count * 2
+    print(f"  [{lo:4.1f}-{hi:4.1f}) {bar} {count}")
+
+# Deteccion de anomalias (regla de 2 desviaciones)
+print("\\nDeteccion de anomalias (|z| > 2):")
+anomalias = [n for n in notas if abs(n - media) > 2 * std]
+if anomalias:
+    for a in anomalias:
+        z = (a - media) / std
+        print(f"  Nota {a} -> z-score = {z:+.2f} (ANOMALIA)")
+else:
+    print("  Sin anomalias detectadas")
+
+# Normalizacion Z-score (preprocesamiento tipico de ML)
+print("\\nNormalizacion Z-score (primeras 5 notas):")
+for n in notas[:5]:
+    z = (n - media) / std
+    print(f"  {n:5.1f} -> {z:+.3f}")
+
+print("\\nTodo modelo de ML empieza con este analisis de datos!")`,
   },
   // === MACHINE LEARNING ===
   {
@@ -1135,24 +1370,15 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
   const outputRef = useRef<HTMLDivElement>(null)
   const runShortcutRef = useRef<() => void>(() => {})
 
-  // --- PYODIDE ENGINE ---
+  // --- PYODIDE ENGINE (motor compartido: @/lib/pythonRunner) ---
   const loadPyodideEngine = useCallback(async () => {
-    if (window.pyodide) { setPyodideReady(true); return }
+    if (typeof window !== 'undefined' && (window as any).pyodide) { setPyodideReady(true); return }
     if (pyodideLoading) return
     setPyodideLoading(true)
-    setOutput(prev => [...prev, '\u{23F3} Descargando Python 3.11 (~12MB, solo la primera vez)...'])
     try {
-      if (!document.querySelector('script[src*="pyodide"]')) {
-        const script = document.createElement('script')
-        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js'
-        script.async = true
-        document.head.appendChild(script)
-        await new Promise((resolve, reject) => { script.onload = resolve; script.onerror = reject })
-      }
-      const pyodide = await window.loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/' })
-      window.pyodide = pyodide
+      await ensurePyodide((msg) => setOutput(prev => [...prev, `\u{23F3} ${msg}`]))
       setPyodideReady(true)
-      setOutput(prev => [...prev, '\u{2705} Python 3.11.3 (Pyodide) listo \u{2014} Motor WebAssembly activo'])
+      setOutput(prev => [...prev, '\u{2705} Python 3.11.3 (Pyodide) listo \u{2014} Motor WebAssembly activo', '\u{1F4A1} input() habilitado \u{B7} gr\u00e1ficos matplotlib \u{B7} auto-instalaci\u00f3n de paquetes'])
     } catch (err: any) {
       console.error('Pyodide load error:', err)
       setOutput(prev => [...prev, '\u{274C} Error: No se pudo cargar Python. Verifica tu conexion.'])
@@ -1180,35 +1406,31 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
     } catch {}
   }, [completedExercises, studentName])
 
-  // --- RUN CODE ---
+  // --- RUN CODE (motor robusto: input, matplotlib, streaming) ---
   const runCode = async () => {
+    if (isRunning) return
     setIsRunning(true)
     const code = files[activeFile].content
     const timestamp = new Date().toLocaleTimeString('es-EC')
     setOutput(prev => [...prev, '', `[${timestamp}] \u{25B6} Ejecutando ${files[activeFile].name}...`, '\u{2500}'.repeat(50)])
     try {
-      if (!window.pyodide) await loadPyodideEngine()
-      if (window.pyodide) {
-        window.pyodide.runPython(`import sys\nfrom io import StringIO\nsys.stdout = StringIO()\nsys.stderr = StringIO()`)
-        try {
-          window.pyodide.runPython(code)
-          const stdout = window.pyodide.runPython('sys.stdout.getvalue()')
-          const stderr = window.pyodide.runPython('sys.stderr.getvalue()')
-          const results: string[] = []
-          if (stdout) results.push(...stdout.split('\n').filter((l: string) => l !== ''))
-          if (stderr) results.push(...stderr.split('\n').filter((l: string) => l !== '').map((l: string) => `\u{26A0}\u{FE0F} ${l}`))
-          if (results.length > 0) setOutput(prev => [...prev, ...results])
-          else setOutput(prev => [...prev, '\u{2713} Ejecucion exitosa (sin salida de print)'])
-          setOutput(prev => [...prev, `\u{2500} Completado en ${(Math.random() * 50 + 10).toFixed(0)}ms`])
-        } catch (pyErr: any) {
-          const errMsg = pyErr.message || String(pyErr)
-          const lines = errMsg.split('\n')
-          const relevantLines = lines.slice(-5).filter((l: string) => l.trim())
-          setOutput(prev => [...prev, '\u{274C} Error de Python:', ...relevantLines.map((l: string) => `   ${l}`)])
-        } finally {
-          window.pyodide.runPython(`sys.stdout = sys.__stdout__\nsys.stderr = sys.__stderr__`)
-        }
+      const result = await runPython(code, {
+        onLine: (line, type) => {
+          setOutput(prev => [...prev, type === 'stderr' ? `\u{26A0}\u{FE0F} ${line}` : line])
+        },
+      })
+
+      if (result.images.length > 0) {
+        setOutput(prev => [...prev, ...result.images.map(img => `${IMG_PREFIX}${img}`), `\u{1F4CA} ${result.images.length} gr\u00e1fico(s) generado(s)`])
       }
+
+      if (result.error) {
+        setOutput(prev => [...prev, '\u{274C} Error de Python:', ...result.error!.split('\n').map(l => `   ${l}`)])
+      } else if (result.lines.length === 0 && result.images.length === 0) {
+        setOutput(prev => [...prev, '\u{2713} Ejecucion exitosa (sin salida de print)'])
+      }
+
+      setOutput(prev => [...prev, `\u{2500} Completado en ${result.elapsedMs.toFixed(0)}ms`])
     } catch (err: any) {
       setOutput(prev => [...prev, `\u{274C} Error del motor: ${err.message}`])
     }
@@ -1217,19 +1439,17 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
 
   useEffect(() => { runShortcutRef.current = () => { if (!isRunning && pyodideReady) runCode() } })
 
-  // --- INSTALL PACKAGE ---
+  // --- INSTALL PACKAGE (pyodide + micropip fallback) ---
   const installPackage = async (pkg: string) => {
     if (installedPackages.includes(pkg)) return
     setIsInstalling(true)
     setOutput(prev => [...prev, `\u{1F4E6} pip install ${pkg}...`])
-    try {
-      if (window.pyodide) {
-        await window.pyodide.loadPackage(pkg)
-        setInstalledPackages(prev => [...prev, pkg])
-        setOutput(prev => [...prev, `\u{2705} Successfully installed ${pkg}`])
-      }
-    } catch (err: any) {
-      setOutput(prev => [...prev, `\u{274C} Error: Could not install ${pkg}`])
+    const { ok, error } = await installPyPackage(pkg)
+    if (ok) {
+      setInstalledPackages(prev => [...prev, pkg])
+      setOutput(prev => [...prev, `\u{2705} Successfully installed ${pkg}`])
+    } else {
+      setOutput(prev => [...prev, `\u{274C} Error: No se pudo instalar ${pkg}${error ? ` \u{2014} ${error}` : ''}`])
     }
     setIsInstalling(false)
   }
@@ -1355,7 +1575,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
                   <button key={cat.id} onClick={() => setActiveCategory(cat.id)} className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-all ${activeCategory === cat.id ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/30 border border-transparent'}`}>
                     <span>{cat.icon}</span>
                     <span className="hidden sm:inline">{cat.name.split(' ')[0]}</span>
-                    {done === count && count > 0 && <span className="text-green-400 text-[8px]">\u{2713}</span>}
+                    {done === count && count > 0 && <span className="text-green-400 text-[8px]">{'\u2713'}</span>}
                   </button>
                 )
               })}
@@ -1437,7 +1657,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
           {showTerminal && (
             <div className="h-52 border-t border-gray-700/50 flex flex-col">
               <div className="flex items-center justify-between px-4 py-1.5 bg-[#161b22] border-b border-gray-700/30">
-                <div className="flex items-center gap-2"><TerminalIcon className="w-3.5 h-3.5 text-green-400" /><span className="text-[11px] text-gray-400 font-medium">Terminal \u{2014} Python 3.11 (Pyodide)</span></div>
+                <div className="flex items-center gap-2"><TerminalIcon className="w-3.5 h-3.5 text-green-400" /><span className="text-[11px] text-gray-400 font-medium">Terminal {'\u2014'} Python 3.11 (Pyodide)</span></div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => setOutput(['\u{1F9E0} Terminal limpia'])} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50 transition-colors" title="Limpiar"><Trash2 className="w-3 h-3" /></button>
                   <button onClick={() => setShowTerminal(false)} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50 transition-colors"><X className="w-3 h-3" /></button>
@@ -1445,9 +1665,14 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
               </div>
               <div ref={outputRef} className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[12px] leading-relaxed bg-[#010409]">
                 {output.map((line, idx) => (
-                  <div key={idx} className={`${line.startsWith('\u{274C}') ? 'text-red-400' : line.startsWith('\u{2705}') || line.startsWith('\u{1F389}') || line.startsWith('\u{2713}') ? 'text-green-400' : line.startsWith('\u{26A0}') ? 'text-yellow-400' : line.startsWith('\u{25B6}') || line.startsWith('[') ? 'text-blue-400' : line.startsWith('\u{1F4E6}') || line.startsWith('\u{1F4DA}') || line.startsWith('\u{1F4DD}') || line.startsWith('\u{1F3AF}') ? 'text-purple-300' : line.startsWith('\u{2500}') || line.startsWith('\u{2550}') ? 'text-gray-600' : line.startsWith('\u{23F3}') ? 'text-yellow-300' : line.startsWith('\u{1F4A1}') ? 'text-cyan-300' : 'text-gray-300'}`}>
+                  line.startsWith(IMG_PREFIX) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={idx} src={`data:image/png;base64,${line.slice(IMG_PREFIX.length)}`} alt="Grafico matplotlib" className="my-2 max-w-full rounded-lg border border-gray-700/50" />
+                  ) : (
+                  <div key={idx} className={`${line.startsWith('\u{274C}') ? 'text-red-400' : line.startsWith('\u{2705}') || line.startsWith('\u{1F389}') || line.startsWith('\u{2713}') ? 'text-green-400' : line.startsWith('\u{26A0}') ? 'text-yellow-400' : line.startsWith('\u{25B6}') || line.startsWith('[') ? 'text-blue-400' : line.startsWith('\u{1F4E6}') || line.startsWith('\u{1F4DA}') || line.startsWith('\u{1F4DD}') || line.startsWith('\u{1F3AF}') || line.startsWith('\u{1F4CA}') ? 'text-purple-300' : line.startsWith('\u{2500}') || line.startsWith('\u{2550}') ? 'text-gray-600' : line.startsWith('\u{23F3}') ? 'text-yellow-300' : line.startsWith('\u{1F4A1}') ? 'text-cyan-300' : 'text-gray-300'}`}>
                     {line || '\u00A0'}
                   </div>
+                  )
                 ))}
               </div>
             </div>

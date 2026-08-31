@@ -27,8 +27,9 @@ const PythonIDE = dynamic(() => import('./PythonIDE'), { ssr: false })
 const HackingTerminal = dynamic(() => import('./activities/HackingTerminal'), { ssr: false })
 const LinuxTerminal = dynamic(() => import('./activities/LinuxTerminal'), { ssr: false })
 const RobloxEditor = dynamic(() => import('./activities/RobloxEditor'), { ssr: false })
+const AITerminal = dynamic(() => import('./activities/AITerminal'), { ssr: false })
 
-const INTERNAL_TOOL_IDS = ['python-ide', 'hacking-terminal', 'linux-terminal', 'roblox-editor']
+const INTERNAL_TOOL_IDS = ['python-ide', 'hacking-terminal', 'linux-terminal', 'roblox-editor', 'ai-terminal']
 
 interface Simulator {
   id: string
@@ -244,6 +245,7 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
           {activeSimulator.id === 'hacking-terminal' && <HackingTerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} />}
           {activeSimulator.id === 'linux-terminal' && <LinuxTerminal levelId={levelId || ''} userId={user?.id} />}
           {activeSimulator.id === 'roblox-editor' && <RobloxEditor levelId={levelId || ''} />}
+          {activeSimulator.id === 'ai-terminal' && <AITerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} />}
         </div>
       ) : activeSimulator ? (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl shadow-brand-purple/5">
