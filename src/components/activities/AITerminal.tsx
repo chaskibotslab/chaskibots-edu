@@ -5,14 +5,14 @@ import Image from 'next/image'
 import {
   Brain, Terminal as TerminalIcon, Copy, Download, Trash2, Send, Check,
   Loader2, BookOpen, CheckCircle2, Circle, Maximize2, Minimize2,
-  X, Package, Play, Square, RotateCcw, Plus, File, Rocket, Camera, VideoOff, Upload
+  X, Package, Play, Square, RotateCcw, Plus, File, Rocket, Camera, VideoOff, Upload, Usb, Unplug
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
 import {
   ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError,
   registerCameraVideoElement, onCameraStateChange, stopCamera as stopSharedCamera,
-  onImageUploaded,
+  onImageUploaded, onSerialStateChange, onSerialLine, disconnectSerial,
 } from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
@@ -1438,6 +1438,19 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   useEffect(() => onImageUploaded(setUploadedFileName), [])
 
+  // --- PUENTE SERIAL (conectar_arduino/enviar_dato/leer_linea) ---
+  const [serialState, setSerialState] = useState<{ connected: boolean; baudRate: number }>({ connected: false, baudRate: 0 })
+  const [serialLines, setSerialLines] = useState<string[]>([])
+  useEffect(() => {
+    const unsubState = onSerialStateChange(setSerialState)
+    const unsubLine = onSerialLine(line => setSerialLines(prev => [...prev.slice(-199), line]))
+    return () => {
+      unsubState()
+      unsubLine()
+      disconnectSerial()
+    }
+  }, [])
+
   // --- LIGHTBOX (ampliar imagenes/graficos de la terminal) ---
   const [lightboxImg, setLightboxImg] = useState<string | null>(null)
 
@@ -1449,7 +1462,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
     try {
       await ensurePyodide((msg) => setOutput(prev => [...prev, `\u{23F3} ${msg}`]))
       setPyodideReady(true)
-      setOutput(prev => [...prev, '\u{2705} Python 3.11.3 (Pyodide) listo \u{2014} Motor WebAssembly activo', '\u{1F4A1} input() habilitado \u{B7} gr\u00e1ficos matplotlib \u{B7} auto-instalaci\u00f3n de paquetes \u{B7} activar_camara() \u{B7} subir_imagen()'])
+      setOutput(prev => [...prev, '\u{2705} Python 3.11.3 (Pyodide) listo \u{2014} Motor WebAssembly activo', '\u{1F4A1} input() habilitado \u{B7} gr\u00e1ficos matplotlib \u{B7} auto-instalaci\u00f3n de paquetes \u{B7} activar_camara() \u{B7} subir_imagen() \u{B7} conectar_arduino()'])
     } catch (err: any) {
       console.error('Pyodide load error:', err)
       setOutput(prev => [...prev, '\u{274C} Error: No se pudo cargar Python. Verifica tu conexion.'])
@@ -1750,6 +1763,26 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
             <div className="px-4 py-1.5 border-t border-gray-700/50 bg-[#161b22] flex items-center gap-2 text-[11px] text-cyan-300">
               <Upload className="w-3.5 h-3.5" /> Imagen subida: <span className="font-medium text-gray-200">{uploadedFileName}</span>
               <span className="text-gray-500">- usa obtener_imagen() en tu codigo</span>
+            </div>
+          )}
+
+          {/* Monitor Serial (conectar_arduino() / enviar_dato() / leer_linea()) */}
+          {serialState.connected && (
+            <div className="border-t border-gray-700/50 bg-[#161b22]">
+              <div className="px-4 py-1.5 flex items-center gap-2">
+                <Usb className="w-3.5 h-3.5 text-green-400" />
+                <span className="text-green-400 text-[11px] font-bold">● Conectado - {serialState.baudRate} baud</span>
+                <span className="text-gray-500 text-[10px] flex-1">usa enviar_dato()/leer_linea() en tu codigo</span>
+                <button onClick={() => disconnectSerial()} className="flex items-center gap-1.5 px-2.5 py-1 bg-red-600/80 hover:bg-red-500 text-white rounded-lg text-[11px] font-medium transition-colors">
+                  <Unplug className="w-3 h-3" /> Desconectar
+                </button>
+              </div>
+              <div className="h-20 overflow-y-auto px-4 pb-2 font-mono text-[11px] text-gray-400 leading-relaxed">
+                {serialLines.length === 0
+                  ? <span className="text-gray-600">Esperando datos de la placa...</span>
+                  : serialLines.map((line, idx) => <div key={idx}>{line}</div>)
+                }
+              </div>
             </div>
           )}
 

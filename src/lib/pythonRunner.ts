@@ -10,6 +10,7 @@
  *  - Captura de gráficos matplotlib como imágenes PNG base64
  *  - Cámara web real: activar_camara() / tomar_foto() / cerrar_camara()
  *  - Subir imágenes propias: subir_imagen() / obtener_imagen()
+ *  - Puente serial USB real: conectar_arduino() / enviar_dato() / leer_linea() / desconectar_arduino()
  *  - Timing real de ejecución
  *  - Tracebacks de Python limpios
  */
@@ -24,6 +25,23 @@ declare global {
     __chaskiCameraCapture?: () => string | null
     __chaskiUploadImage?: () => void
     __chaskiGetUploadedImage?: () => string | null
+    __chaskiSerialConnect?: (baudRate: number) => void
+    __chaskiSerialWrite?: (text: string) => boolean
+    __chaskiSerialRead?: () => string | null
+    __chaskiSerialDisconnect?: () => void
+  }
+  interface Navigator {
+    // Web Serial API — no está en lib.dom.d.ts por defecto. Tipado mínimo,
+    // solo lo que este archivo usa.
+    serial?: {
+      requestPort(): Promise<SerialPortLike>
+    }
+  }
+  interface SerialPortLike {
+    open(options: { baudRate: number }): Promise<void>
+    close(): Promise<void>
+    readable: ReadableStream<Uint8Array>
+    writable: WritableStream<Uint8Array>
   }
 }
 
@@ -153,6 +171,119 @@ function triggerImageUpload(onDone: (ok: boolean, error?: string) => void) {
     reader.readAsDataURL(file)
   }
   input.click()
+}
+
+// ─────────────────────────────────────────────────────────────
+// PUENTE SERIAL — conectar_arduino() / enviar_dato() / leer_linea() / desconectar_arduino()
+// Web Serial API (solo Chrome/Edge de escritorio). Una vez conectado, un loop
+// de lectura corre en segundo plano acumulando líneas en un buffer; leer_linea()
+// solo saca la más vieja del buffer sin bloquear — el alumno sondea con su
+// propio while/time.sleep(), igual que Serial.available() en Arduino real.
+// ─────────────────────────────────────────────────────────────
+let serialPort: SerialPortLike | null = null
+let serialReader: ReadableStreamDefaultReader<string> | null = null
+let serialWriter: WritableStreamDefaultWriter<Uint8Array> | null = null
+let serialLineBuffer: string[] = []
+let serialConnected = false
+let serialBaudRate = 0
+
+const serialStateListeners = new Set<(state: { connected: boolean; baudRate: number }) => void>()
+const serialLineListeners = new Set<(line: string) => void>()
+
+/** Suscribirse a cambios de estado (conectado/desconectado, baud rate). Devuelve función para des-suscribirse. */
+export function onSerialStateChange(cb: (state: { connected: boolean; baudRate: number }) => void): () => void {
+  serialStateListeners.add(cb)
+  return () => serialStateListeners.delete(cb)
+}
+
+/** Suscribirse a cada línea recibida de la placa (para el panel de Monitor Serial). Devuelve función para des-suscribirse. */
+export function onSerialLine(cb: (line: string) => void): () => void {
+  serialLineListeners.add(cb)
+  return () => serialLineListeners.delete(cb)
+}
+
+function notifySerialState() {
+  serialStateListeners.forEach(cb => cb({ connected: serialConnected, baudRate: serialBaudRate }))
+}
+
+async function readSerialLoop(reader: ReadableStreamDefaultReader<string>) {
+  let partial = ''
+  try {
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) break
+      partial += value
+      const parts = partial.split('\n')
+      partial = parts.pop() || ''
+      for (const raw of parts) {
+        const line = raw.replace(/\r$/, '')
+        if (!line) continue
+        serialLineBuffer.push(line)
+        if (serialLineBuffer.length > 500) serialLineBuffer.shift()
+        serialLineListeners.forEach(cb => cb(line))
+      }
+    }
+  } catch {
+    // el cable se desconectó o el puerto se cerró — se refleja abajo en el estado
+  }
+  serialConnected = false
+  serialBaudRate = 0
+  notifySerialState()
+}
+
+/** Pide permiso al usuario, abre el puerto USB y arranca el loop de lectura. Pública — usada por conectar_arduino(). */
+export async function connectSerial(baudRate: number = 9600): Promise<{ ok: boolean; error?: string }> {
+  if (typeof navigator === 'undefined' || !navigator.serial) {
+    return { ok: false, error: 'Tu navegador no soporta conexión USB directa (Web Serial). Usa Chrome o Edge en una computadora.' }
+  }
+  if (serialConnected) await disconnectSerial()
+  try {
+    const port = await navigator.serial.requestPort()
+    await port.open({ baudRate })
+    serialPort = port
+    serialWriter = port.writable.getWriter()
+
+    const textDecoder = new TextDecoderStream()
+    port.readable.pipeTo(textDecoder.writable as unknown as WritableStream<Uint8Array>).catch(() => {})
+    serialReader = textDecoder.readable.getReader()
+
+    serialConnected = true
+    serialBaudRate = baudRate
+    notifySerialState()
+    readSerialLoop(serialReader)
+    return { ok: true }
+  } catch (e: any) {
+    if (e?.name === 'NotFoundError') return { ok: false, error: 'No se seleccionó ninguna placa.' }
+    return { ok: false, error: e?.message || 'No se pudo conectar con la placa.' }
+  }
+}
+
+/** Envía una línea de texto a la placa (fire-and-forget, como el resto del puente). Pública — usada por enviar_dato(). */
+export function writeSerialLine(text: string): boolean {
+  if (!serialWriter) return false
+  serialWriter.write(new TextEncoder().encode(text + '\n')).catch(() => { /* el loop de lectura detecta la desconexión */ })
+  return true
+}
+
+/** Saca la línea más vieja del buffer, o null si no hay nada nuevo. Pública — usada por leer_linea(). */
+export function readSerialLine(): string | null {
+  return serialLineBuffer.shift() ?? null
+}
+
+/** Cierra la conexión con la placa. Pública — usada por desconectar_arduino(), el botón manual y el cleanup al desmontar. */
+export async function disconnectSerial(): Promise<void> {
+  try { await serialReader?.cancel() } catch { /* ya cerrado */ }
+  try { serialReader?.releaseLock() } catch { /* ya liberado */ }
+  try { await serialWriter?.close() } catch { /* ya cerrado */ }
+  try { serialWriter?.releaseLock() } catch { /* ya liberado */ }
+  try { await serialPort?.close() } catch { /* ya cerrado */ }
+  serialPort = null
+  serialReader = null
+  serialWriter = null
+  serialLineBuffer = []
+  serialConnected = false
+  serialBaudRate = 0
+  notifySerialState()
 }
 
 export interface PyRunOptions {
@@ -318,6 +449,28 @@ def obtener_imagen():
     import base64 as __b64mod2, io as __io_mod2
     from PIL import Image as __PILImage2
     return __PILImage2.open(__io_mod2.BytesIO(__b64mod2.b64decode(str(b64))))
+
+def conectar_arduino(baudrate=9600):
+    """Pide permiso para elegir tu placa (Arduino, ESP32, Raspberry Pi Pico...)
+    por USB y la conecta. Funciona en Chrome/Edge de escritorio - en Firefox,
+    Safari o celular no esta disponible."""
+    __js.window.__chaskiSerialConnect(baudrate)
+    print("Elige tu placa en el cuadro que se abrio. Cuando conecte, ya puedes usar enviar_dato()/leer_linea().")
+
+def enviar_dato(texto):
+    """Envia una linea de texto a la placa conectada por USB."""
+    ok = __js.window.__chaskiSerialWrite(str(texto))
+    if not ok:
+        print("No hay ninguna placa conectada. Usa conectar_arduino() primero.")
+
+def leer_linea():
+    """Devuelve la ultima linea recibida de la placa, o None si no hay nada nuevo todavia."""
+    linea = __js.window.__chaskiSerialRead()
+    return linea if linea else None
+
+def desconectar_arduino():
+    """Cierra la conexion con la placa USB."""
+    __js.window.__chaskiSerialDisconnect()
 `
 
 /** Script que captura los gráficos matplotlib después de cada ejecución */
@@ -401,6 +554,19 @@ export async function runPython(code: string, opts: PyRunOptions = {}): Promise<
     })
   }
   window.__chaskiGetUploadedImage = () => uploadedImageBase64
+
+  // Registrar los handlers del puente serial (conectar_arduino/enviar_dato/leer_linea/desconectar_arduino)
+  window.__chaskiSerialConnect = (baudRate: number) => {
+    connectSerial(baudRate).then(res => {
+      if (res.ok) push(`🔌 Conectado a la placa (${baudRate} baud)`, 'stdout')
+      else push(`⚠️ ${res.error}`, 'stderr')
+    })
+  }
+  window.__chaskiSerialWrite = (text: string) => writeSerialLine(text)
+  window.__chaskiSerialRead = () => readSerialLine()
+  window.__chaskiSerialDisconnect = () => {
+    disconnectSerial().then(() => push('🔌 Placa desconectada', 'stdout'))
+  }
 
   // Salida en streaming
   pyodide.setStdout({ batched: (t: string) => push(t, 'stdout') })
