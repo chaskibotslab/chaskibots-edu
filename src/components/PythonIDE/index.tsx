@@ -17,7 +17,7 @@ import {
   ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError,
   registerCameraVideoElement, onCameraStateChange, stopCamera as stopSharedCamera,
   onImageUploaded, getUploadedImageName,
-  onSerialStateChange, onSerialLine, disconnectSerial,
+  onSerialStateChange, onSerialLine, connectSerial, disconnectSerial,
 } from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
@@ -252,6 +252,17 @@ export default function PythonIDE() {
       disconnectSerial() // nunca dejar el puerto USB bloqueado al salir del simulador
     }
   }, [])
+
+  const handleToggleSerial = useCallback(async () => {
+    if (serialState.connected) {
+      await disconnectSerial()
+      setOutput(prev => [...prev, '🔌 Placa desconectada'])
+      return
+    }
+    const res = await connectSerial(9600)
+    if (res.ok) setOutput(prev => [...prev, '🔌 Conectado a la placa (9600 baud)'])
+    else setOutput(prev => [...prev, `⚠️ ${res.error}`])
+  }, [serialState.connected])
 
   // ─── LIGHTBOX (ampliar imágenes/gráficos de la terminal) ────
   const [lightboxImg, setLightboxImg] = useState<string | null>(null)
@@ -636,6 +647,10 @@ export default function PythonIDE() {
           </button>
           <button onClick={importProject} className="p-2 text-gray-500 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-colors" title="Importar Proyecto">
             <Upload className="w-4 h-4" />
+          </button>
+          <div className="w-px h-5 bg-gray-700/50 mx-0.5" />
+          <button onClick={handleToggleSerial} className={`p-2 rounded-lg transition-colors ${serialState.connected ? 'bg-green-500/20 text-green-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title={serialState.connected ? `Placa conectada (${serialState.baudRate} baud) — clic para desconectar` : 'Conectar placa (Arduino/ESP32/Pico) por USB'}>
+            <Usb className="w-4 h-4" />
           </button>
           <div className="w-px h-5 bg-gray-700/50 mx-0.5" />
           <button onClick={() => setShowCurriculum(!showCurriculum)} className={`p-2 rounded-lg transition-colors ${showCurriculum ? 'bg-blue-500/20 text-blue-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Curriculum">

@@ -12,7 +12,7 @@ import { useAuth } from '@/components/AuthProvider'
 import {
   ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError,
   registerCameraVideoElement, onCameraStateChange, stopCamera as stopSharedCamera,
-  onImageUploaded, onSerialStateChange, onSerialLine, disconnectSerial,
+  onImageUploaded, onSerialStateChange, onSerialLine, connectSerial, disconnectSerial,
 } from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
@@ -1451,6 +1451,17 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
     }
   }, [])
 
+  const handleToggleSerial = useCallback(async () => {
+    if (serialState.connected) {
+      await disconnectSerial()
+      setOutput(prev => [...prev, '🔌 Placa desconectada'])
+      return
+    }
+    const res = await connectSerial(9600)
+    if (res.ok) setOutput(prev => [...prev, '🔌 Conectado a la placa (9600 baud)'])
+    else setOutput(prev => [...prev, `⚠️ ${res.error}`])
+  }, [serialState.connected])
+
   // --- LIGHTBOX (ampliar imagenes/graficos de la terminal) ---
   const [lightboxImg, setLightboxImg] = useState<string | null>(null)
 
@@ -1640,6 +1651,8 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
         </div>
         <div className="flex items-center gap-1">
           <button onClick={downloadFile} className="p-2 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors" title="Descargar .py"><Download className="w-4 h-4" /></button>
+          <div className="w-px h-5 bg-gray-700/50 mx-0.5" />
+          <button onClick={handleToggleSerial} className={`p-2 rounded-lg transition-colors ${serialState.connected ? 'bg-green-500/20 text-green-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title={serialState.connected ? `Placa conectada (${serialState.baudRate} baud) - clic para desconectar` : 'Conectar placa (Arduino/ESP32/Pico) por USB'}><Usb className="w-4 h-4" /></button>
           <div className="w-px h-5 bg-gray-700/50 mx-0.5" />
           <button onClick={() => setShowCurriculum(!showCurriculum)} className={`p-2 rounded-lg transition-colors ${showCurriculum ? 'bg-purple-500/20 text-purple-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Ejercicios"><Brain className="w-4 h-4" /></button>
           <button onClick={() => setShowTerminal(!showTerminal)} className={`p-2 rounded-lg transition-colors ${showTerminal ? 'bg-green-500/20 text-green-400' : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'}`} title="Terminal"><TerminalIcon className="w-4 h-4" /></button>
