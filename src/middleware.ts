@@ -6,7 +6,10 @@ import { verifySessionCookie, SESSION_COOKIE_NAME } from '@/lib/session'
 const ADMIN_ROUTES = ['/admin']
 
 // Rutas que requieren autenticación (cualquier usuario)
-const PROTECTED_ROUTES = ['/dashboard', '/curso', '/tareas', '/simuladores', '/academy']
+const PROTECTED_ROUTES = [
+  '/dashboard', '/tareas', '/simuladores', '/academy',
+  '/diseno', '/hacking', '/ia', '/nivel', '/niveles', '/robotica',
+]
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -47,9 +50,14 @@ export const config = {
   matcher: [
     '/admin/:path*',
     '/dashboard/:path*',
-    '/curso/:path*',
     '/tareas/:path*',
     '/simuladores/:path*',
-    '/academy/:path*'
+    '/academy/:path*',
+    '/diseno/:path*',
+    '/hacking/:path*',
+    '/ia/:path*',
+    '/nivel/:path*',
+    '/niveles/:path*',
+    '/robotica/:path*',
   ]
 }

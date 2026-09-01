@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateAccessCode, validateEmailPassword } from '@/lib/supabase-auth'
 import { createSessionCookie, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from '@/lib/session'
+import { getClientIp, checkLoginLock, recordFailedLogin, resetLoginAttempts } from '@/lib/loginRateLimit'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +19,15 @@ async function withSessionCookie(response: NextResponse, user: { id: string; rol
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request)
+    const lock = checkLoginLock(ip)
+    if (lock.locked) {
+      return NextResponse.json(
+        { success: false, error: `Demasiados intentos fallidos. Intenta de nuevo en ${Math.ceil((lock.retryAfterSeconds || 0) / 60)} minutos.` },
+        { status: 429, headers: { 'Retry-After': String(lock.retryAfterSeconds || 0) } }
+      )
+    }
+
     const body = await request.json()
     const { accessCode, email, password } = body
 
@@ -26,12 +36,20 @@ export async function POST(request: NextRequest) {
       const result = await validateAccessCode(accessCode)
 
       if (!result.success) {
+        const attempt = recordFailedLogin(ip)
+        if (attempt.locked) {
+          return NextResponse.json(
+            { success: false, error: `Demasiados intentos fallidos. Intenta de nuevo en ${Math.ceil((attempt.retryAfterSeconds || 0) / 60)} minutos.` },
+            { status: 429, headers: { 'Retry-After': String(attempt.retryAfterSeconds || 0) } }
+          )
+        }
         return NextResponse.json(
           { success: false, error: result.error },
           { status: 401 }
         )
       }
 
+      resetLoginAttempts(ip)
       const response = NextResponse.json({
         success: true,
         user: result.user,
@@ -45,12 +63,20 @@ export async function POST(request: NextRequest) {
       const result = await validateEmailPassword(email, password)
 
       if (!result.success) {
+        const attempt = recordFailedLogin(ip)
+        if (attempt.locked) {
+          return NextResponse.json(
+            { success: false, error: `Demasiados intentos fallidos. Intenta de nuevo en ${Math.ceil((attempt.retryAfterSeconds || 0) / 60)} minutos.` },
+            { status: 429, headers: { 'Retry-After': String(attempt.retryAfterSeconds || 0) } }
+          )
+        }
         return NextResponse.json(
           { success: false, error: result.error },
           { status: 401 }
         )
       }
 
+      resetLoginAttempts(ip)
       const response = NextResponse.json({
         success: true,
         user: result.user,

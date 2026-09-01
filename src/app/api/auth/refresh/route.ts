@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { verifySessionCookie, SESSION_COOKIE_NAME } from '@/lib/session'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email } = body
-
-    if (!email) {
+    // Antes este endpoint confiaba en el email que mandaba el cliente en el
+    // body, sin verificar nada — cualquiera podía pedir el perfil completo
+    // (nombre, rol, curso, colegio) de cualquier usuario solo adivinando o
+    // conociendo su email. Ahora la identidad sale de la cookie de sesión
+    // firmada (HMAC), igual que en el middleware.
+    const session = await verifySessionCookie(request.cookies.get(SESSION_COOKIE_NAME)?.value)
+    if (!session?.email) {
       return NextResponse.json(
-        { success: false, error: 'Email requerido' },
-        { status: 400 }
+        { success: false, error: 'No autenticado' },
+        { status: 401 }
       )
     }
+    const email = session.email
 
     // Buscar usuario por email en Supabase
     const { data, error } = await supabaseAdmin
