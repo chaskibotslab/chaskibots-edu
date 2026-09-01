@@ -13,21 +13,15 @@ export interface SessionPayload {
 
 const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000 // 7 días
 
-// Fallback temporal: en el deploy de producción (Railway) la variable
-// SESSION_SECRET no se está propagando al contenedor pese a estar
-// configurada (bug de la plataforma, en investigación). Sin este
-// fallback el login queda completamente caído. Preferible a revertir
-// todo el hardening de la cookie firmada: sigue firmando/expirando
-// igual, solo que con una clave menos secreta hasta que se resuelva.
-const FALLBACK_SECRET = 'chaskibots-fallback-2c8f4a1e9d7b3f6045a812cde937b0f1a6d2e5c8'
-
-function getSecret(): string {
-  const secret = process.env.SESSION_SECRET
-  if (!secret) {
-    console.warn('[session] SESSION_SECRET no está en el entorno, usando fallback temporal')
-    return FALLBACK_SECRET
-  }
-  return secret
+// SESSION_SECRET es obligatorio: este repo es público en GitHub, así que
+// cualquier valor de respaldo escrito aquí en el código sería visible para
+// cualquiera y le permitiría fabricar una cookie de sesión válida con
+// role:"admin" sin loguearse. Antes había un FALLBACK_SECRET hardcodeado
+// para cuando la variable no llegaba al contenedor en Railway — eso
+// anulaba por completo la firma HMAC. Ahora, sin la variable configurada,
+// simplemente no hay sesiones válidas (falla cerrado, no abierto).
+function getSecret(): string | null {
+  return process.env.SESSION_SECRET || null
 }
 
 function base64UrlEncode(bytes: Uint8Array): string {
@@ -45,9 +39,11 @@ function base64UrlDecode(input: string): Uint8Array {
 }
 
 async function hmac(data: string): Promise<Uint8Array> {
+  const secret = getSecret()
+  if (!secret) throw new Error('SESSION_SECRET no configurado')
   const key = await crypto.subtle.importKey(
     'raw',
-    new TextEncoder().encode(getSecret()),
+    new TextEncoder().encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign']
