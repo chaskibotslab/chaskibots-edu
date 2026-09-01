@@ -74,7 +74,8 @@ export default function UsersManager() {
     schoolName: '',
     programId: '',
     programName: '',
-    expiresAt: ''
+    expiresAt: '',
+    accessCode: ''
   })
 
   const [bulkData, setBulkData] = useState({
@@ -203,6 +204,9 @@ export default function UsersManager() {
         if (res.ok) {
           await loadData()
           resetForm()
+        } else {
+          const errorData = await res.json()
+          alert(`Error al actualizar usuario: ${errorData.error || 'Error desconocido'}`)
         }
       } else {
         // Crear nuevo usuario
@@ -320,7 +324,8 @@ export default function UsersManager() {
       schoolName: user.schoolName || '',
       programId: user.programId,
       programName: user.programName,
-      expiresAt: user.expiresAt || ''
+      expiresAt: user.expiresAt || '',
+      accessCode: user.accessCode || ''
     })
     setEditingId(user.id)
     setShowForm(true)
@@ -413,7 +418,8 @@ export default function UsersManager() {
       schoolName: '',
       programId: '',
       programName: '',
-      expiresAt: ''
+      expiresAt: '',
+      accessCode: ''
     })
     setEditingId(null)
     setShowForm(false)
@@ -787,6 +793,22 @@ export default function UsersManager() {
               </select>
             </div>
           </div>
+
+          {editingId && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm text-slate-600 mb-1">Código de acceso</label>
+                <input
+                  type="text"
+                  value={formData.accessCode}
+                  onChange={(e) => setFormData({ ...formData, accessCode: e.target.value.toUpperCase() })}
+                  placeholder="CK-XXXXX"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-mono focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
+                />
+                <p className="text-xs text-slate-400 mt-1">Se usa tanto para login por código como por email. Debe ser único.</p>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>

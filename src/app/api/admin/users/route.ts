@@ -309,7 +309,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (action === 'update') {
-      const { name, email, levelId, role, courseId, courseName, programId, programName, expiresAt } = body
+      const { name, email, levelId, role, courseId, courseName, programId, programName, expiresAt, accessCode } = body
       const result = await updateUser(userId, {
         name,
         email,
@@ -319,7 +319,8 @@ export async function PATCH(request: NextRequest) {
         courseName,
         programId,
         programName,
-        expiresAt
+        expiresAt,
+        accessCode
       })
       if (!result.success) {
         return NextResponse.json(

@@ -282,6 +282,7 @@ export async function updateUser(
     programName?: string
     expiresAt?: string
     isActive?: boolean
+    accessCode?: string
   }
 ): Promise<{ success: boolean; error?: string }> {
   try {
@@ -298,6 +299,25 @@ export async function updateUser(
     if (data.programName !== undefined && data.programName.trim()) fields.program_name = data.programName
     if (data.expiresAt !== undefined && data.expiresAt.trim()) fields.expires_at = data.expiresAt
     if (data.isActive !== undefined) fields.is_active = data.isActive
+
+    if (data.accessCode !== undefined && data.accessCode.trim()) {
+      const newCode = data.accessCode.trim()
+      // El código de acceso es único: si ya lo tiene otro usuario, dos
+      // alumnos terminarían compartiendo credenciales sin darse cuenta.
+      const { data: existing } = await supabaseAdmin
+        .from('users')
+        .select('id, name')
+        .eq('access_code', newCode)
+        .neq('id', userId)
+        .limit(1)
+      if (existing && existing.length > 0) {
+        return { success: false, error: `Ese código ya está en uso por "${existing[0].name}".` }
+      }
+      // access_code (login por código) y password (login por email) se
+      // mantienen sincronizados — igual que hace regenerateAccessCode.
+      fields.access_code = newCode
+      fields.password = newCode
+    }
 
     const { error } = await supabaseAdmin.from('users').update(fields).eq('id', userId)
     if (error) return { success: false, error: error.message }
