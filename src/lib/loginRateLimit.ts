@@ -56,7 +56,9 @@ export function recordFailedLogin(ip: string): { locked: boolean; retryAfterSeco
   }
 
   entry.count += 1
-  if (entry.count >= MAX_ATTEMPTS) {
+  // MAX_ATTEMPTS intentos fallidos se permiten sin bloqueo; el bloqueo
+  // arranca al superarlos (intento número MAX_ATTEMPTS + 1).
+  if (entry.count > MAX_ATTEMPTS) {
     entry.lockedUntil = now + LOCKOUT_MS
     return { locked: true, retryAfterSeconds: Math.ceil(LOCKOUT_MS / 1000) }
   }
