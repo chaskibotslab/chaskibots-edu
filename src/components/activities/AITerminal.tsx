@@ -5,13 +5,14 @@ import Image from 'next/image'
 import {
   Brain, Terminal as TerminalIcon, Copy, Download, Trash2, Send, Check,
   Loader2, BookOpen, CheckCircle2, Circle, Maximize2, Minimize2,
-  X, Package, Play, Square, RotateCcw, Plus, File, Rocket, Camera, VideoOff
+  X, Package, Play, Square, RotateCcw, Plus, File, Rocket, Camera, VideoOff, Upload
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
 import {
   ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError,
   registerCameraVideoElement, onCameraStateChange, stopCamera as stopSharedCamera,
+  onImageUploaded,
 } from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
@@ -1073,6 +1074,57 @@ print("luego borra esta linea y las de abajo, y pega el PASO 2.")
 #     plt.show()
 #     cerrar_camara()`,
   },
+  {
+    id: 'subir-foto-filtros', title: 'Sube tu Foto y Aplicale Filtros', icon: '\u{1F4C1}', difficulty: 'easy', category: 'vision',
+    description: 'Sube una foto desde tu computadora (sin camara) y procesala con IA',
+    theory: `# Subir tus propias imagenes
+No siempre quieres usar la camara — a veces ya tienes una foto guardada (de tu celular, de internet, de un proyecto) y quieres procesarla con Python.
+
+## Como funciona en 2 pasos:
+1. **Paso 1**: corres \`subir_imagen()\` -> se abre el selector de archivos de tu computadora -> eliges cualquier imagen (jpg, png...).
+2. **Paso 2**: en un SEGUNDO "Ejecutar", corres \`obtener_imagen()\` -> te devuelve tu foto como imagen PIL real, lista para \`.filter()\`, \`.convert()\`, \`.resize()\`, o lo que necesites.
+
+## Ideas para experimentar:
+- Convertirla a blanco y negro: \`foto.convert("L")\`
+- Voltearla: \`foto.transpose(Image.FLIP_LEFT_RIGHT)\`
+- Rotarla: \`foto.rotate(45)\`
+- Cambiar el tamaño: \`foto.resize((200, 200))\`
+- Combinar varios filtros en una sola imagen final`,
+    code: `# PASO 1: sube una imagen desde tu computadora
+subir_imagen()
+print("Elige un archivo en el cuadro que se abrio.")
+print("Cuando termines, borra esta linea y pega el PASO 2 de abajo.")
+
+# ─────────────────────────────────────────────────────────
+# PASO 2 (bórralo todo lo de arriba y pega esto en un SEGUNDO
+# Ejecutar, una vez que ya subiste tu imagen):
+# ─────────────────────────────────────────────────────────
+#
+# from PIL import Image, ImageFilter
+# import matplotlib.pyplot as plt
+#
+# foto = obtener_imagen()
+# if foto is None:
+#     print("No se detecto ninguna imagen subida - corre primero subir_imagen()")
+# else:
+#     foto = foto.convert("RGB")
+#     versiones = {
+#         "Original": foto,
+#         "Blanco y negro": foto.convert("L"),
+#         "Volteada": foto.transpose(Image.FLIP_LEFT_RIGHT),
+#         "Rotada 45°": foto.rotate(45, expand=True, fillcolor=(30,30,30)),
+#         "Bordes": foto.filter(ImageFilter.FIND_EDGES),
+#         "Posterizado": foto.filter(ImageFilter.SMOOTH_MORE),
+#     }
+#     fig, axes = plt.subplots(2, 3, figsize=(10, 7))
+#     for ax, (nombre, imagen) in zip(axes.flat, versiones.items()):
+#         ax.imshow(imagen, cmap="gray" if imagen.mode == "L" else None)
+#         ax.set_title(nombre, fontsize=10)
+#         ax.axis("off")
+#     plt.tight_layout()
+#     plt.show()
+#     print(f"Tu foto original mide {foto.size[0]}x{foto.size[1]} pixeles")`,
+  },
   // === NLP ===
   {
     id: 'sentiment-analysis', title: 'Analisis de Sentimiento', icon: '\u{1F4AC}', difficulty: 'medium', category: 'nlp',
@@ -1382,6 +1434,13 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
     }
   }, [])
 
+  // --- SUBIR IMAGEN (subir_imagen/obtener_imagen) ---
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  useEffect(() => onImageUploaded(setUploadedFileName), [])
+
+  // --- LIGHTBOX (ampliar imagenes/graficos de la terminal) ---
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null)
+
   // --- PYODIDE ENGINE (motor compartido: @/lib/pythonRunner) ---
   const loadPyodideEngine = useCallback(async () => {
     if (typeof window !== 'undefined' && (window as any).pyodide) { setPyodideReady(true); return }
@@ -1390,7 +1449,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
     try {
       await ensurePyodide((msg) => setOutput(prev => [...prev, `\u{23F3} ${msg}`]))
       setPyodideReady(true)
-      setOutput(prev => [...prev, '\u{2705} Python 3.11.3 (Pyodide) listo \u{2014} Motor WebAssembly activo', '\u{1F4A1} input() habilitado \u{B7} gr\u00e1ficos matplotlib \u{B7} auto-instalaci\u00f3n de paquetes \u{B7} activar_camara()'])
+      setOutput(prev => [...prev, '\u{2705} Python 3.11.3 (Pyodide) listo \u{2014} Motor WebAssembly activo', '\u{1F4A1} input() habilitado \u{B7} gr\u00e1ficos matplotlib \u{B7} auto-instalaci\u00f3n de paquetes \u{B7} activar_camara() \u{B7} subir_imagen()'])
     } catch (err: any) {
       console.error('Pyodide load error:', err)
       setOutput(prev => [...prev, '\u{274C} Error: No se pudo cargar Python. Verifica tu conexion.'])
@@ -1545,7 +1604,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
   const progressPct = totalExercises > 0 ? (completedExercises.size / totalExercises) * 100 : 0
 
   return (
-    <div className={`flex flex-col bg-[#0d1117] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[780px]'}`}>
+    <div className={`flex flex-col bg-[#0d1117] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[850px]'}`}>
       {/* TOP BAR */}
       <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#0d1117] via-[#130d1a] to-[#0d1117] border-b border-gray-700/50">
         <div className="flex items-center gap-3">
@@ -1686,9 +1745,17 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
             </button>
           </div>
 
+          {/* Imagen subida (subir_imagen() / obtener_imagen()) */}
+          {uploadedFileName && (
+            <div className="px-4 py-1.5 border-t border-gray-700/50 bg-[#161b22] flex items-center gap-2 text-[11px] text-cyan-300">
+              <Upload className="w-3.5 h-3.5" /> Imagen subida: <span className="font-medium text-gray-200">{uploadedFileName}</span>
+              <span className="text-gray-500">- usa obtener_imagen() en tu codigo</span>
+            </div>
+          )}
+
           {/* Terminal Output */}
           {showTerminal && (
-            <div className="h-52 border-t border-gray-700/50 flex flex-col">
+            <div className="h-72 border-t border-gray-700/50 flex flex-col">
               <div className="flex items-center justify-between px-4 py-1.5 bg-[#161b22] border-b border-gray-700/30">
                 <div className="flex items-center gap-2"><TerminalIcon className="w-3.5 h-3.5 text-green-400" /><span className="text-[11px] text-gray-400 font-medium">Terminal {'\u2014'} Python 3.11 (Pyodide)</span></div>
                 <div className="flex items-center gap-1">
@@ -1708,7 +1775,14 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
                     </button>
                   ) : line.startsWith(IMG_PREFIX) ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img key={idx} src={`data:image/png;base64,${line.slice(IMG_PREFIX.length)}`} alt="Grafico matplotlib" className="my-2 max-w-full rounded-lg border border-gray-700/50" />
+                    <img
+                      key={idx}
+                      src={`data:image/png;base64,${line.slice(IMG_PREFIX.length)}`}
+                      alt="Grafico matplotlib"
+                      onClick={() => setLightboxImg(line.slice(IMG_PREFIX.length))}
+                      className="my-2 max-w-full rounded-lg border border-gray-700/50 cursor-zoom-in hover:border-blue-500/50 transition-colors"
+                      title="Clic para ampliar"
+                    />
                   ) : (
                   <div key={idx} className={`${line.startsWith('\u{274C}') ? 'text-red-400' : line.startsWith('\u{2705}') || line.startsWith('\u{1F389}') || line.startsWith('\u{2713}') ? 'text-green-400' : line.startsWith('\u{26A0}') ? 'text-yellow-400' : line.startsWith('\u{25B6}') || line.startsWith('[') ? 'text-blue-400' : line.startsWith('\u{1F4E6}') || line.startsWith('\u{1F4DA}') || line.startsWith('\u{1F4DD}') || line.startsWith('\u{1F3AF}') || line.startsWith('\u{1F4CA}') ? 'text-purple-300' : line.startsWith('\u{2500}') || line.startsWith('\u{2550}') ? 'text-gray-600' : line.startsWith('\u{23F3}') ? 'text-yellow-300' : line.startsWith('\u{1F4A1}') ? 'text-cyan-300' : 'text-gray-300'}`}>
                     {line || '\u00A0'}
@@ -1748,6 +1822,20 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
           </div>
         )}
       </div>
+
+      {/* Lightbox: ampliar graficos/imagenes de la terminal */}
+      {lightboxImg && (
+        <div
+          onClick={() => setLightboxImg(null)}
+          className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-8 cursor-zoom-out"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`data:image/png;base64,${lightboxImg}`} alt="Vista ampliada" className="max-w-full max-h-full rounded-lg shadow-2xl" />
+          <button onClick={() => setLightboxImg(null)} className="absolute top-4 right-4 text-white/70 hover:text-white p-2 rounded-lg hover:bg-white/10">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

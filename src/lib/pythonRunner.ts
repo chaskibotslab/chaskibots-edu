@@ -9,6 +9,7 @@
  *  - Auto-instalación de paquetes al importar (numpy, matplotlib, pandas...)
  *  - Captura de gráficos matplotlib como imágenes PNG base64
  *  - Cámara web real: activar_camara() / tomar_foto() / cerrar_camara()
+ *  - Subir imágenes propias: subir_imagen() / obtener_imagen()
  *  - Timing real de ejecución
  *  - Tracebacks de Python limpios
  */
@@ -21,6 +22,8 @@ declare global {
     __chaskiCameraStart?: () => Promise<void>
     __chaskiCameraStop?: () => void
     __chaskiCameraCapture?: () => string | null
+    __chaskiUploadImage?: () => void
+    __chaskiGetUploadedImage?: () => string | null
   }
 }
 
@@ -108,6 +111,48 @@ function captureCameraFrame(): string | null {
   if (!ctx) return null
   ctx.drawImage(cameraVideoEl, 0, 0, canvas.width, canvas.height)
   return canvas.toDataURL('image/png').split(',')[1] || null
+}
+
+// ─────────────────────────────────────────────────────────────
+// SUBIR IMAGEN — subir_imagen() / obtener_imagen()
+// Mismo patrón de 2 pasos que la cámara: abrir el selector es async
+// (esperando que el usuario elija un archivo), así que subir_imagen()
+// dispara el selector y obtener_imagen() recoge el resultado una vez listo.
+// ─────────────────────────────────────────────────────────────
+let uploadedImageBase64: string | null = null
+let uploadedImageName: string | null = null
+const uploadListeners = new Set<(fileName: string | null) => void>()
+
+/** Suscribirse a cuando el usuario termina de subir una imagen. Devuelve función para des-suscribirse. */
+export function onImageUploaded(cb: (fileName: string | null) => void): () => void {
+  uploadListeners.add(cb)
+  return () => uploadListeners.delete(cb)
+}
+
+export function getUploadedImageName(): string | null {
+  return uploadedImageName
+}
+
+function triggerImageUpload(onDone: (ok: boolean, error?: string) => void) {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.onchange = () => {
+    const file = input.files?.[0]
+    if (!file) return onDone(false, 'No se seleccionó ningún archivo.')
+    if (file.size > 8 * 1024 * 1024) return onDone(false, 'La imagen es muy grande (máximo 8MB).')
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      uploadedImageBase64 = dataUrl.split(',')[1] || null
+      uploadedImageName = file.name
+      uploadListeners.forEach(cb => cb(uploadedImageName))
+      onDone(true)
+    }
+    reader.onerror = () => onDone(false, 'No se pudo leer el archivo.')
+    reader.readAsDataURL(file)
+  }
+  input.click()
 }
 
 export interface PyRunOptions {
@@ -254,6 +299,25 @@ def tomar_foto():
 def cerrar_camara():
     """Apaga la camara web."""
     __js.window.__chaskiCameraStop()
+
+def subir_imagen():
+    """Abre el selector de archivos de tu computadora para elegir una imagen.
+    Es un proceso de 2 pasos: corre subir_imagen(), elige el archivo en el
+    cuadro que se abre, y luego en un SIGUIENTE Ejecutar usa obtener_imagen()
+    para recibirla como imagen PIL lista para procesar."""
+    __js.window.__chaskiUploadImage()
+    print("Selecciona una imagen en el cuadro que se abrió. Cuando termines, usa obtener_imagen().")
+
+def obtener_imagen():
+    """Devuelve la ultima imagen subida con subir_imagen(), como imagen PIL.
+    Devuelve None si todavia no has subido ninguna."""
+    b64 = __js.window.__chaskiGetUploadedImage()
+    if b64 is None:
+        print("No hay ninguna imagen subida todavia. Usa subir_imagen() primero.")
+        return None
+    import base64 as __b64mod2, io as __io_mod2
+    from PIL import Image as __PILImage2
+    return __PILImage2.open(__io_mod2.BytesIO(__b64mod2.b64decode(str(b64))))
 `
 
 /** Script que captura los gráficos matplotlib después de cada ejecución */
@@ -266,7 +330,7 @@ if 'matplotlib' in __sys.modules:
         import base64 as __b64, io as __io
         for __n in __plt.get_fignums():
             __buf = __io.BytesIO()
-            __plt.figure(__n).savefig(__buf, format='png', dpi=85, bbox_inches='tight', facecolor='#0d1117', edgecolor='none')
+            __plt.figure(__n).savefig(__buf, format='png', dpi=140, bbox_inches='tight', facecolor='#0d1117', edgecolor='none')
             __buf.seek(0)
             __figs.append(__b64.b64encode(__buf.read()).decode())
         __plt.close('all')
@@ -329,6 +393,15 @@ export async function runPython(code: string, opts: PyRunOptions = {}): Promise<
     return photo
   }
 
+  // Registrar los handlers de subida de imagen (subir_imagen/obtener_imagen)
+  window.__chaskiUploadImage = () => {
+    triggerImageUpload((ok, error) => {
+      if (ok) push(`🖼️ Imagen "${uploadedImageName}" subida — usa obtener_imagen() para procesarla`, 'stdout')
+      else push(`⚠️ ${error}`, 'stderr')
+    })
+  }
+  window.__chaskiGetUploadedImage = () => uploadedImageBase64
+
   // Salida en streaming
   pyodide.setStdout({ batched: (t: string) => push(t, 'stdout') })
   pyodide.setStderr({ batched: (t: string) => push(t, 'stderr') })
@@ -345,6 +418,15 @@ export async function runPython(code: string, opts: PyRunOptions = {}): Promise<
         'timeout instalando paquetes'
       )
     } catch { /* paquete no disponible o red lenta — el error real saldrá al ejecutar, o el import fallará con un mensaje claro */ }
+
+    // tomar_foto()/obtener_imagen() usan PIL internamente aunque el código del
+    // usuario no lo importe explícitamente — loadPackagesFromImports no lo detecta
+    // porque el `from PIL import ...` vive dentro de la función inyectada, no en `code`.
+    if (/\b(tomar_foto|obtener_imagen)\s*\(/.test(code)) {
+      try {
+        await withTimeout(pyodide.loadPackage('pillow'), 20000, 'timeout instalando pillow')
+      } catch { /* si falla, el error real saldrá al ejecutar */ }
+    }
 
     // runPythonAsync soporta top-level await (asyncio)
     await pyodide.runPythonAsync(code)

@@ -16,6 +16,7 @@ import { useAuth } from '@/components/AuthProvider'
 import {
   ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError,
   registerCameraVideoElement, onCameraStateChange, stopCamera as stopSharedCamera,
+  onImageUploaded, getUploadedImageName,
 } from '@/lib/pythonRunner'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
@@ -234,6 +235,13 @@ export default function PythonIDE() {
     }
   }, [])
 
+  // ─── SUBIR IMAGEN (subir_imagen/obtener_imagen) ─────────────
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  useEffect(() => onImageUploaded(setUploadedFileName), [])
+
+  // ─── LIGHTBOX (ampliar imágenes/gráficos de la terminal) ────
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null)
+
   // ─── PYODIDE ENGINE (motor compartido: @/lib/pythonRunner) ──
   const loadPyodideEngine = useCallback(async () => {
     if (typeof window !== 'undefined' && (window as any).pyodide) {
@@ -245,7 +253,7 @@ export default function PythonIDE() {
     try {
       await ensurePyodide((msg) => setOutput(prev => [...prev, `⏳ ${msg}`]))
       setPyodideReady(true)
-      setOutput(prev => [...prev, '✅ Python 3.11.3 (Pyodide) listo — Motor WebAssembly activo', '💡 input() habilitado · gráficos matplotlib · auto-instalación de paquetes · activar_camara()'])
+      setOutput(prev => [...prev, '✅ Python 3.11.3 (Pyodide) listo — Motor WebAssembly activo', '💡 input() habilitado · gráficos matplotlib · auto-instalación de paquetes · activar_camara() · subir_imagen()'])
     } catch (err: any) {
       console.error('Pyodide load error:', err)
       setOutput(prev => [...prev, '❌ Error: No se pudo cargar Python. Verifica tu conexión.'])
@@ -582,7 +590,7 @@ export default function PythonIDE() {
 
   // ─── RENDER ───────────────────────────────────────────────
   return (
-    <div className={`flex flex-col bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[750px]'}`}>
+    <div className={`flex flex-col bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[820px]'}`}>
       {/* ═══ TOP BAR ═══ */}
       <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-labdark-bg via-labdark-bg2 to-labdark-bg border-b border-gray-700/50">
         <div className="flex items-center gap-3">
@@ -893,9 +901,17 @@ export default function PythonIDE() {
             </button>
           </div>
 
+          {/* Imagen subida (subir_imagen() / obtener_imagen()) */}
+          {uploadedFileName && (
+            <div className="px-4 py-1.5 border-t border-gray-700/50 bg-labdark-bg flex items-center gap-2 text-[11px] text-cyan-300">
+              <Upload className="w-3.5 h-3.5" /> Imagen subida: <span className="font-medium text-gray-200">{uploadedFileName}</span>
+              <span className="text-gray-500">— usa obtener_imagen() en tu código</span>
+            </div>
+          )}
+
           {/* Terminal */}
           {showTerminal && (
-            <div className="h-52 border-t border-gray-700/50 flex flex-col">
+            <div className="h-72 border-t border-gray-700/50 flex flex-col">
               <div className="flex items-center justify-between px-4 py-1.5 bg-labdark-bg border-b border-gray-700/30">
                 <div className="flex items-center gap-2">
                   <TerminalIcon className="w-3.5 h-3.5 text-green-400" />
@@ -922,7 +938,14 @@ export default function PythonIDE() {
                     </button>
                   ) : line.startsWith(IMG_PREFIX) ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img key={idx} src={`data:image/png;base64,${line.slice(IMG_PREFIX.length)}`} alt="Gráfico matplotlib" className="my-2 max-w-full rounded-lg border border-gray-700/50" />
+                    <img
+                      key={idx}
+                      src={`data:image/png;base64,${line.slice(IMG_PREFIX.length)}`}
+                      alt="Gráfico matplotlib"
+                      onClick={() => setLightboxImg(line.slice(IMG_PREFIX.length))}
+                      className="my-2 max-w-full rounded-lg border border-gray-700/50 cursor-zoom-in hover:border-blue-500/50 transition-colors"
+                      title="Clic para ampliar"
+                    />
                   ) : (
                   <div key={idx} className={`${
                     line.startsWith('❌') ? 'text-red-400' :
@@ -1051,6 +1074,20 @@ export default function PythonIDE() {
           </div>
         )}
       </div>
+
+      {/* Lightbox: ampliar gráficos/imágenes de la terminal (clic para cerrar) */}
+      {lightboxImg && (
+        <div
+          onClick={() => setLightboxImg(null)}
+          className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-8 cursor-zoom-out"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`data:image/png;base64,${lightboxImg}`} alt="Vista ampliada" className="max-w-full max-h-full rounded-lg shadow-2xl" />
+          <button onClick={() => setLightboxImg(null)} className="absolute top-4 right-4 text-white/70 hover:text-white p-2 rounded-lg hover:bg-white/10">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }
