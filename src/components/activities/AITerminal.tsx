@@ -5,7 +5,8 @@ import Image from 'next/image'
 import {
   Brain, Terminal as TerminalIcon, Copy, Download, Trash2, Send, Check,
   Loader2, BookOpen, CheckCircle2, Circle, Maximize2, Minimize2,
-  X, Package, Play, Square, RotateCcw, Plus, File, Rocket, Camera, VideoOff, Upload, Usb, Unplug
+  X, Package, Play, Square, RotateCcw, Plus, File, Rocket, Camera, VideoOff, Upload, Usb, Unplug,
+  ChevronLeft, ChevronRight
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
@@ -20,6 +21,12 @@ const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false 
 // ============================================================
 // AI EXERCISES - Built-in progressive curriculum
 // ============================================================
+interface ExerciseStep {
+  title: string
+  explanation: string
+  code: string
+}
+
 interface AIExercise {
   id: string
   title: string
@@ -28,7 +35,7 @@ interface AIExercise {
   category: string
   description: string
   theory: string
-  code: string
+  steps: ExerciseStep[]
   expected_output?: string
 }
 
@@ -48,25 +55,56 @@ const AI_EXERCISES: AIExercise[] = [
   {
     id: 'intro-ia', title: 'Hola Mundo IA', icon: '\u{1F44B}', difficulty: 'easy', category: 'basics',
     description: 'Tu primer programa de IA - conceptos fundamentales',
-    theory: `# Inteligencia Artificial
-## Que es la IA?
-La IA es la capacidad de las maquinas de imitar la inteligencia humana.
+    theory: `# Tu primer día en una startup de IA
 
-## Tipos principales:
-- **IA Estrecha**: Especializada en una tarea (ej: reconocer rostros)
-- **IA General**: Capaz de cualquier tarea intelectual (aun no existe)
-- **ML (Machine Learning)**: La maquina aprende de datos sin programarla explicitamente
+## El caso
 
-## Python para IA:
-Python es el lenguaje #1 para IA por sus librerias: NumPy, Pandas, TensorFlow, PyTorch`,
-    code: `# Hola Mundo de Inteligencia Artificial
-# Este es tu primer programa de IA!
+Te acaban de contratar en una startup que vende zapatillas online. El dueño te dice:
+"recibimos cientos de comentarios de clientes por día y nadie tiene tiempo de leerlos todos
+— necesito saber rápido cuáles son quejas y cuáles son elogios". Tu primera tarea: armar la
+versión más simple posible de un clasificador de sentimiento, sin ninguna librería todavía,
+solo para entender la idea antes de usar herramientas más potentes.
 
+## Lo que vas a aprender
+
+- **IA Estrecha** vs **IA General**: tu clasificador va a ser bueno en UNA sola tarea (esto es
+  IA Estrecha — como casi todo lo que existe hoy).
+- **Machine Learning**: acá vas a programar las reglas vos mismo; en ML, la máquina las
+  aprendería sola a partir de ejemplos. Es el siguiente paso natural.
+- Python es el lenguaje #1 de IA por librerías como NumPy, Pandas, TensorFlow — las vas a usar
+  en los próximos ejercicios.`,
+    steps: [
+      {
+        title: 'Paso 1: Tus primeros ejemplos etiquetados',
+        explanation: 'Todo modelo de IA arranca con datos ya clasificados por un humano — esto se llama dataset de entrenamiento.',
+        code: `# Hola Mundo de Inteligencia Artificial
 print("=" * 50)
 print("  INTELIGENCIA ARTIFICIAL - ChaskiBots Lab")
 print("=" * 50)
 
-# Concepto 1: Los datos son la base de la IA
+# Los datos son la base de la IA: comentarios de clientes ya etiquetados
+datos_entrenamiento = [
+    {"texto": "me encanta", "sentimiento": "positivo"},
+    {"texto": "es horrible", "sentimiento": "negativo"},
+    {"texto": "que genial", "sentimiento": "positivo"},
+    {"texto": "no me gusta", "sentimiento": "negativo"},
+]
+
+print(f"\\nDataset: {len(datos_entrenamiento)} muestras")
+print("\\nDatos de entrenamiento:")
+for d in datos_entrenamiento:
+    emoji = "+" if d["sentimiento"] == "positivo" else "-"
+    print(f"  [{emoji}] '{d['texto']}' -> {d['sentimiento']}")`,
+      },
+      {
+        title: 'Paso 2: Un modelo simple basado en reglas',
+        explanation: 'Antes de aprender de datos, probá con la forma más simple: contar palabras positivas y negativas.',
+        code: `# Hola Mundo de Inteligencia Artificial
+print("=" * 50)
+print("  INTELIGENCIA ARTIFICIAL - ChaskiBots Lab")
+print("=" * 50)
+
+# Los datos son la base de la IA: comentarios de clientes ya etiquetados
 datos_entrenamiento = [
     {"texto": "me encanta", "sentimiento": "positivo"},
     {"texto": "es horrible", "sentimiento": "negativo"},
@@ -80,7 +118,7 @@ for d in datos_entrenamiento:
     emoji = "+" if d["sentimiento"] == "positivo" else "-"
     print(f"  [{emoji}] '{d['texto']}' -> {d['sentimiento']}")
 
-# Concepto 2: Un modelo simple basado en reglas
+# Un modelo simple basado en reglas escritas a mano
 palabras_positivas = ["encanta", "genial", "bueno", "excelente", "amor"]
 palabras_negativas = ["horrible", "malo", "gusta no", "odio", "terrible"]
 
@@ -99,59 +137,140 @@ def predecir_sentimiento(texto):
         return "negativo", score
     return "neutral", score
 
-# Concepto 3: Hacer predicciones
-print("\\n--- PREDICCIONES ---")
+print("\\nModelo de reglas listo — probemos con comentarios nuevos en el siguiente paso.")`,
+      },
+      {
+        title: 'Paso 3: Clasificar comentarios que nunca viste',
+        explanation: 'La prueba real de un modelo: ¿funciona con textos que no estaban en el dataset de entrenamiento?',
+        code: `# Hola Mundo de Inteligencia Artificial
+print("=" * 50)
+print("  INTELIGENCIA ARTIFICIAL - ChaskiBots Lab")
+print("=" * 50)
+
+datos_entrenamiento = [
+    {"texto": "me encanta", "sentimiento": "positivo"},
+    {"texto": "es horrible", "sentimiento": "negativo"},
+    {"texto": "que genial", "sentimiento": "positivo"},
+    {"texto": "no me gusta", "sentimiento": "negativo"},
+]
+
+print(f"\\nDataset: {len(datos_entrenamiento)} muestras")
+
+palabras_positivas = ["encanta", "genial", "bueno", "excelente", "amor"]
+palabras_negativas = ["horrible", "malo", "gusta no", "odio", "terrible"]
+
+def predecir_sentimiento(texto):
+    texto = texto.lower()
+    score = 0
+    for p in palabras_positivas:
+        if p in texto:
+            score += 1
+    for n in palabras_negativas:
+        if n in texto:
+            score -= 1
+    if score > 0:
+        return "positivo", score
+    elif score < 0:
+        return "negativo", score
+    return "neutral", score
+
+# Comentarios NUEVOS de clientes reales de la tienda de zapatillas
+print("\\n--- COMENTARIOS DE CLIENTES (nuevos) ---")
 pruebas = ["me encanta la pizza", "es horrible el clima", "hoy es un dia normal"]
 for texto in pruebas:
     resultado, confianza = predecir_sentimiento(texto)
     print(f"  '{texto}' -> {resultado} (score: {confianza})")
 
-print("\\nEsto es IA basada en reglas!")
-print("Con ML, la maquina aprende las reglas SOLA de los datos")`,
+print("\\nEsto es IA basada en reglas que programaste a mano.")
+print("Con Machine Learning, la maquina aprenderia esas reglas SOLA de los datos.")`,
+      },
+    ],
   },
   {
     id: 'variables-ia', title: 'Variables para IA', icon: '\u{1F4E6}', difficulty: 'easy', category: 'basics',
     description: 'Tipos de datos esenciales para Machine Learning',
-    theory: `# Variables en IA
-## Tipos fundamentales:
-- **int/float**: Valores numericos (features)
-- **list**: Secuencias de datos (datasets)
-- **dict**: Pares clave-valor (estructuras de datos)
-- **bool**: Verdadero/Falso (clasificacion binaria)
+    theory: `# El sistema de un hospital
 
-## En Machine Learning:
-- Features (X): Las variables de entrada
-- Labels (y): Lo que queremos predecir
-- Weights (w): Lo que el modelo aprende`,
-    code: `# Variables y Tipos de Datos para IA
+## El caso
+
+Un hospital te contrata para digitalizar los datos de sus pacientes: edades, alturas, pesos,
+historiales completos. Cada tipo de dato necesita una estructura distinta en Python — usar la
+incorrecta puede hacer que tu sistema de IA para diagnóstico falle sin que te des cuenta.
+
+## Lo que vas a aprender
+
+- **Features (X)**: las variables de entrada de un modelo (edad, altura, peso...)
+- **Labels (y)**: lo que queremos predecir (diagnóstico, riesgo...)
+- Los 4 tipos de datos que vas a usar en TODO proyecto de IA: numéricos, listas, tablas
+  (matrices) y diccionarios.`,
+    steps: [
+      {
+        title: 'Paso 1: Datos numéricos de un paciente',
+        explanation: 'Edad, temperatura, dosis — todo lo que se puede medir con un número.',
+        code: `# Variables y Tipos de Datos para un sistema hospitalario
 print("=== TIPOS DE DATOS EN IA ===\\n")
 
-# 1. Numericos - fundamentales para calculos
+# Numericos - fundamentales para calculos
+edad = 25
+temperatura = 36.5
+learning_rate = 0.001
+print(f"Numericos: edad={edad}, temp={temperatura}, lr={learning_rate}")`,
+      },
+      {
+        title: 'Paso 2: Una lista de mediciones',
+        explanation: 'Los datos de muchos pacientes juntos forman un dataset — una lista de Python.',
+        code: `# Variables y Tipos de Datos para un sistema hospitalario
+print("=== TIPOS DE DATOS EN IA ===\\n")
+
 edad = 25
 temperatura = 36.5
 learning_rate = 0.001
 print(f"Numericos: edad={edad}, temp={temperatura}, lr={learning_rate}")
 
-# 2. Listas - representan datasets
+# Listas - representan datasets (alturas de varios pacientes)
 alturas = [1.65, 1.78, 1.52, 1.90, 1.73]
 print(f"\\nDataset alturas: {alturas}")
 print(f"  Promedio: {sum(alturas)/len(alturas):.2f}m")
-print(f"  Min: {min(alturas)}, Max: {max(alturas)}")
+print(f"  Min: {min(alturas)}, Max: {max(alturas)}")`,
+      },
+      {
+        title: 'Paso 3: Una tabla completa de pacientes',
+        explanation: 'Un hospital real no tiene una sola medida por paciente — necesitás una tabla (matriz).',
+        code: `# Variables y Tipos de Datos para un sistema hospitalario
+print("=== TIPOS DE DATOS EN IA ===\\n")
 
-# 3. Matrices (listas de listas) - datos tabulares
+edad = 25
+alturas = [1.65, 1.78, 1.52, 1.90, 1.73]
+print(f"Dataset alturas: {alturas}")
+
+# Matrices (listas de listas) - la ficha de cada paciente en una fila
 dataset = [
     [1.65, 55, 22],  # [altura, peso, edad]
     [1.78, 72, 35],
     [1.52, 48, 19],
     [1.90, 88, 40],
 ]
-print(f"\\nMatriz de datos ({len(dataset)} filas x {len(dataset[0])} columnas):")
+print(f"\\nMatriz de pacientes ({len(dataset)} filas x {len(dataset[0])} columnas):")
 for fila in dataset:
-    print(f"  {fila}")
+    print(f"  {fila}")`,
+      },
+      {
+        title: 'Paso 4: Configuración y categorías',
+        explanation: 'Los diccionarios guardan configuración (como la de un modelo), y el one-hot encoding convierte categorías (como diagnósticos) en números que un modelo puede usar.',
+        code: `# Variables y Tipos de Datos para un sistema hospitalario
+print("=== TIPOS DE DATOS EN IA ===\\n")
 
-# 4. Diccionarios - metadatos y configuracion
+dataset = [
+    [1.65, 55, 22],
+    [1.78, 72, 35],
+    [1.52, 48, 19],
+    [1.90, 88, 40],
+]
+print(f"Matriz de pacientes: {len(dataset)} filas")
+
+# Diccionarios - metadatos y configuracion del modelo de diagnostico
 modelo_config = {
-    "nombre": "RedNeuronal_v1",
+    "nombre": "DiagnosticoIA_v1",
     "capas": [784, 128, 64, 10],
     "activacion": "relu",
     "epochs": 50,
@@ -161,43 +280,62 @@ print(f"\\nConfiguracion del modelo:")
 for k, v in modelo_config.items():
     print(f"  {k}: {v}")
 
-# 5. One-hot encoding (representacion de categorias)
+# One-hot encoding (representacion de categorias, ej: tipo de diagnostico)
 categorias = {"gato": [1,0,0], "perro": [0,1,0], "ave": [0,0,1]}
-print(f"\\nOne-hot encoding:")
+print(f"\\nOne-hot encoding (mismo principio para diagnosticos, especies, etc):")
 for animal, vector in categorias.items():
     print(f"  {animal} -> {vector}")
 
-print("\\nEstos tipos de datos son la BASE de todo en IA!")`,
+print("\\nEstos tipos de datos son la BASE de todo sistema de IA real!")`,
+      },
+    ],
   },
   {
     id: 'funciones-ia', title: 'Funciones de IA', icon: '\u{2699}\u{FE0F}', difficulty: 'easy', category: 'basics',
     description: 'Funciones esenciales para procesar datos de IA',
-    theory: `# Funciones en IA
-## Por que funciones?
-- Reutilizar logica de procesamiento
-- Abstraer operaciones complejas
-- Crear pipelines de datos
+    theory: `# La caja de herramientas de cualquier red neuronal
 
-## Funciones comunes en IA:
-- Normalizacion de datos
-- Funciones de activacion
-- Metricas de evaluacion
-- Transformaciones de features`,
-    code: `# Funciones Esenciales para IA
+## El caso
+
+Vas a programar una red neuronal en las próximas lecciones — pero antes necesitás las piezas
+matemáticas que CUALQUIER modelo de IA usa por dentro, una y otra vez. En vez de escribirlas
+sueltas cuando las necesites, las armás ahora como funciones reutilizables: tu propia caja de
+herramientas de IA.
+
+## Lo que vas a aprender
+
+Cinco funciones que vas a reconocer en cada ejercicio de acá en adelante: activación,
+normalización, distancia, error, y probabilidades.`,
+    steps: [
+      {
+        title: 'Paso 1: La función de activación (sigmoide)',
+        explanation: 'Convierte cualquier número en un valor entre 0 y 1 — así "decide" una neurona si se activa o no.',
+        code: `# Funciones Esenciales para IA
 import math
-import random
 
 print("=== FUNCIONES FUNDAMENTALES DE IA ===\\n")
 
-# 1. Funcion Sigmoide - clasica en redes neuronales
+# Funcion Sigmoide - clasica en redes neuronales
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
 print("1. Funcion Sigmoide (activacion):")
 for x in [-3, -1, 0, 1, 3]:
-    print(f"   sigmoid({x:+d}) = {sigmoid(x):.4f}")
+    print(f"   sigmoid({x:+d}) = {sigmoid(x):.4f}")`,
+      },
+      {
+        title: 'Paso 2: Normalizar datos a la misma escala',
+        explanation: 'Si mezclás edades (0-100) con salarios (0-100000), el modelo le da más peso al salario solo por ser un número más grande. Normalizar lo evita.',
+        code: `# Funciones Esenciales para IA
+import math
 
-# 2. Normalizacion Min-Max (escalar datos entre 0 y 1)
+print("=== FUNCIONES FUNDAMENTALES DE IA ===\\n")
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+print("1. Sigmoide lista.")
+
+# Normalizacion Min-Max (escalar datos entre 0 y 1)
 def normalizar(datos):
     min_val = min(datos)
     max_val = max(datos)
@@ -207,9 +345,22 @@ datos_raw = [150, 200, 80, 300, 120]
 datos_norm = normalizar(datos_raw)
 print(f"\\n2. Normalizacion Min-Max:")
 print(f"   Original:    {datos_raw}")
-print(f"   Normalizado: [{', '.join(f'{x:.2f}' for x in datos_norm)}]")
+print(f"   Normalizado: [{', '.join(f'{x:.2f}' for x in datos_norm)}]")`,
+      },
+      {
+        title: 'Paso 3: Medir qué tan parecidos son dos puntos',
+        explanation: 'La distancia euclidiana es la base de KNN (la vas a usar en un ejercicio próximo) para saber qué tan "cerca" está un dato de otro.',
+        code: `# Funciones Esenciales para IA
+import math
 
-# 3. Distancia Euclidiana (base de KNN)
+print("=== FUNCIONES FUNDAMENTALES DE IA ===\\n")
+
+def normalizar(datos):
+    min_val, max_val = min(datos), max(datos)
+    return [(x - min_val) / (max_val - min_val) for x in datos]
+print("Normalizacion lista.")
+
+# Distancia Euclidiana (base de KNN)
 def distancia(p1, p2):
     return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
 
@@ -218,9 +369,21 @@ b = [4, 5, 6]
 print(f"\\n3. Distancia Euclidiana:")
 print(f"   Punto A: {a}")
 print(f"   Punto B: {b}")
-print(f"   Distancia: {distancia(a, b):.4f}")
+print(f"   Distancia: {distancia(a, b):.4f}")`,
+      },
+      {
+        title: 'Paso 4: Medir qué tan equivocado está el modelo',
+        explanation: 'El MSE (error cuadrático medio) le dice a un modelo qué tan lejos están sus predicciones de la realidad — es lo que va a intentar minimizar en Regresión Lineal.',
+        code: `# Funciones Esenciales para IA
+import math
 
-# 4. Funcion de costo (Mean Squared Error)
+print("=== FUNCIONES FUNDAMENTALES DE IA ===\\n")
+
+def distancia(p1, p2):
+    return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
+print("Distancia lista.")
+
+# Funcion de costo (Mean Squared Error)
 def mse(reales, predichos):
     n = len(reales)
     return sum((r - p) ** 2 for r, p in zip(reales, predichos)) / n
@@ -230,9 +393,21 @@ predichos = [2.8, 5.2, 6.8, 9.5]
 print(f"\\n4. Error Cuadratico Medio (MSE):")
 print(f"   Reales:    {reales}")
 print(f"   Predichos: {predichos}")
-print(f"   MSE: {mse(reales, predichos):.4f}")
+print(f"   MSE: {mse(reales, predichos):.4f}")`,
+      },
+      {
+        title: 'Paso 5: Convertir puntajes en probabilidades',
+        explanation: 'Softmax convierte números sueltos (logits) en probabilidades que suman 100% — así un clasificador dice "80% gato, 15% perro, 5% ave".',
+        code: `# Funciones Esenciales para IA
+import math
 
-# 5. Softmax (probabilidades para clasificacion)
+print("=== FUNCIONES FUNDAMENTALES DE IA ===\\n")
+
+def mse(reales, predichos):
+    return sum((r-p)**2 for r,p in zip(reales, predichos)) / len(reales)
+print("MSE listo.")
+
+# Softmax (probabilidades para clasificacion)
 def softmax(x):
     exp_x = [math.exp(i) for i in x]
     total = sum(exp_x)
@@ -248,36 +423,39 @@ for clase, prob in zip(clases, probs):
     bar = "#" * int(prob * 30)
     print(f"   {clase:6s} {bar} {prob:.1%}")
 
-print("\\nEstas funciones son los bloques basicos de la IA!")`,
+print("\\nEstas 5 funciones son los bloques basicos de la IA - las vas a reusar!")`,
+      },
+    ],
   },
   {
     id: 'chatbot-interactivo', title: 'Chatbot Interactivo', icon: '\u{1F5E8}\u{FE0F}', difficulty: 'easy', category: 'basics',
     description: 'Usa input() para crear un chatbot que conversa contigo',
-    theory: `# Programas Interactivos con input()
-## Que es input()?
-La funcion que permite al programa RECIBIR datos del usuario.
+    theory: `# El bot de soporte de una tienda online
 
-## Sintaxis:
-- respuesta = input("Pregunta: ")
-- Siempre devuelve un string (texto)
-- Para numeros: int(input()) o float(input())
+## El caso
 
-## En IA:
-Los chatbots como ChatGPT reciben tu texto (input),
-lo procesan con un modelo, y generan una respuesta.
-Aqui construyes esa misma estructura basica!`,
-    code: `# Chatbot Interactivo - usa input() real!
-# Cuando ejecutes, apareceran ventanas para escribir
+Una tienda online te pide armar el primer borrador de su bot de atención al cliente — algo que
+responda preguntas frecuentes sin que un humano tenga que estar ahí las 24 horas. Vas a
+construir la misma estructura que usa cualquier chatbot, incluido ChatGPT: **recibir texto
+(input), procesarlo, generar una respuesta.**
 
+## Cómo funciona \`input()\`
+
+- \`respuesta = input("Pregunta: ")\` — muestra el mensaje y espera lo que escribas.
+- Siempre devuelve texto (string), aunque escribas un número.`,
+    steps: [
+      {
+        title: 'Paso 1: La base de conocimiento del bot',
+        explanation: 'Antes de conversar, el bot necesita saber qué responder — un diccionario de preguntas frecuentes.',
+        code: `# Chatbot de soporte - usa input() real!
 print("=" * 45)
-print("  CHASKI-BOT: Tu asistente de IA")
+print("  CHASKI-BOT: Soporte de la tienda")
 print("=" * 45)
-print("(escribe 'adios' para terminar)\\n")
 
 # Base de conocimiento del bot
 respuestas = {
-    "hola": "Hola! Soy Chaski-Bot, tu asistente de IA",
-    "como estas": "Excelente! Procesando datos a toda velocidad",
+    "hola": "Hola! Soy Chaski-Bot, tu asistente de soporte",
+    "como estas": "Excelente! Procesando pedidos a toda velocidad",
     "que es la ia": "La IA es la capacidad de las maquinas de aprender y razonar",
     "que es python": "Python es el lenguaje #1 para Inteligencia Artificial",
     "quien te creo": "Me programaron en ChaskiBots Lab, Ecuador",
@@ -286,7 +464,33 @@ respuestas = {
 
 def responder(mensaje):
     mensaje = mensaje.lower().strip()
-    # Buscar coincidencia en la base de conocimiento
+    for clave, respuesta in respuestas.items():
+        if clave in mensaje:
+            return respuesta
+    return "Interesante... aun estoy aprendiendo sobre eso. Prueba: 'que es la ia'"
+
+print("\\nBase de conocimiento lista - en el siguiente paso hablamos con el bot.")`,
+      },
+      {
+        title: 'Paso 2: La conversación real con input()',
+        explanation: 'Ahora sí — un bucle que recibe tu texto, lo procesa, y responde, igual que cualquier chatbot real.',
+        code: `# Chatbot de soporte - usa input() real!
+print("=" * 45)
+print("  CHASKI-BOT: Soporte de la tienda")
+print("=" * 45)
+print("(escribe 'adios' para terminar)\\n")
+
+respuestas = {
+    "hola": "Hola! Soy Chaski-Bot, tu asistente de soporte",
+    "como estas": "Excelente! Procesando pedidos a toda velocidad",
+    "que es la ia": "La IA es la capacidad de las maquinas de aprender y razonar",
+    "que es python": "Python es el lenguaje #1 para Inteligencia Artificial",
+    "quien te creo": "Me programaron en ChaskiBots Lab, Ecuador",
+    "chiste": "Por que Python no usa corbata? Porque ya tiene su propia clase!",
+}
+
+def responder(mensaje):
+    mensaje = mensaje.lower().strip()
     for clave, respuesta in respuestas.items():
         if clave in mensaje:
             return respuesta
@@ -305,26 +509,46 @@ for turno in range(5):
 else:
     print("\\nChaski-Bot: Se acabaron los turnos. Hasta pronto!")
 
-print("\\nAsi funciona la estructura basica de TODO chatbot!")`,
+print("\\nAsi funciona la estructura basica de TODO chatbot, incluido ChatGPT!")`,
+      },
+    ],
   },
   {
     id: 'adivina-numero', title: 'IA que Adivina', icon: '\u{1F3B2}', difficulty: 'easy', category: 'basics',
     description: 'Busqueda binaria: la IA adivina tu numero en 7 intentos',
-    theory: `# Busqueda Binaria - Pensamiento Algoritmico
-## El juego:
-Piensa un numero del 1 al 100. La IA lo adivina en maximo 7 intentos.
+    theory: `# El mismo truco que usa el buscador de contactos de tu celular
 
-## Como lo logra?
-Divide el rango a la mitad en cada intento:
-- 100 numeros -> 50 -> 25 -> 12 -> 6 -> 3 -> 1
+## El caso
 
-## Por que importa en IA?
-- log2(100) = 6.6 intentos maximo
-- Los arboles de decision funcionan igual
-- Es la base de algoritmos de busqueda eficiente`,
-    code: `# La IA adivina tu numero con busqueda binaria
+Pensá un número del 1 al 100. Vas a programar una IA que lo adivina en **máximo 7 intentos**
+— no por suerte, sino con el mismo algoritmo que usa tu celular para encontrar un contacto en
+una lista ordenada de miles de nombres, sin revisarlos uno por uno.
+
+## Cómo lo logra
+
+Divide el rango a la mitad en cada intento: 100 → 50 → 25 → 12 → 6 → 3 → 1. Esto es **búsqueda
+binaria**, la base de los árboles de decisión en Machine Learning: log2(100) ≈ 6.6 intentos
+como máximo, sin importar qué número hayas pensado.`,
+    steps: [
+      {
+        title: 'Paso 1: El rango inicial',
+        explanation: 'Todo arranca sabiendo el rango completo posible: del 1 al 100.',
+        code: `# La IA adivina tu numero con busqueda binaria
+print("=" * 45)
+print("  LA IA ADIVINA TU NUMERO")
+print("=" * 45)
+print("Piensa un numero del 1 al 100.\\n")
+
+bajo, alto = 1, 100
+medio = (bajo + alto) // 2
+print(f"Primer intento: le apuesto a que tu numero es {medio}")
+print("(en el siguiente paso, la IA sigue preguntando hasta adivinar)")`,
+      },
+      {
+        title: 'Paso 2: El juego completo',
+        explanation: 'Cada vez que respondés "mayor" o "menor", la IA descarta la mitad del rango — así llega a tu número en pocos intentos.',
+        code: `# La IA adivina tu numero con busqueda binaria
 # Piensa un numero del 1 al 100!
-
 print("=" * 45)
 print("  LA IA ADIVINA TU NUMERO")
 print("=" * 45)
@@ -356,76 +580,134 @@ else:
     print("\\nMmm, creo que cambiaste tu numero! El rango quedo vacio.")
 
 print(f"\\nLa IA uso BUSQUEDA BINARIA: dividir el problema a la mitad cada vez")`,
+      },
+    ],
   },
   // === NUMPY & ARRAYS ===
   {
     id: 'numpy-basics', title: 'NumPy Fundamentos', icon: '\u{1F522}', difficulty: 'easy', category: 'numpy',
     description: 'Arrays y operaciones vectorizadas con NumPy real',
-    theory: `# NumPy - Computacion Numerica
-## Que es NumPy?
-La libreria fundamental para computacion numerica en Python. Es la que usan por debajo TensorFlow, PyTorch, pandas y casi toda la IA en Python.
+    theory: `# El cerebro de un robot que sigue líneas
 
-## Conceptos clave:
-- **ndarray**: Array N-dimensional eficiente (no es una lista de Python)
-- **Vectorizacion**: Operaciones sobre TODO el array sin escribir un for
-- **Broadcasting**: Operaciones entre arrays de diferente forma (ej: array + numero)
-- **Shape / dtype**: Dimensiones y tipo de dato del array
+## El caso
 
-## Por que no usar listas de Python?
-Una lista de Python es una lista de objetos genericos. Un ndarray de NumPy es un bloque de memoria contiguo de un solo tipo (float64, int32...) — por eso es mucho mas rapido y es lo que hace viable entrenar redes neuronales con millones de numeros.`,
-    code: `# NumPy Fundamentos - libreria REAL, no simulada
+Estás programando el "cerebro" de un robot que sigue una línea usando sensores de luz. Cada
+sensor manda un número muchas veces por segundo, y tenés que combinarlos matemáticamente para
+decidir cuánto girar los motores — en tiempo real, sin que el robot "piense" y choque. Con
+listas de Python comunes, hacer esto para cientos de sensores por segundo sería demasiado
+lento. Por eso casi toda la IA real usa **NumPy**.
+
+## Por qué NumPy y no listas de Python
+
+Una lista de Python es una lista de objetos genéricos. Un \`ndarray\` de NumPy es un bloque de
+memoria contiguo de un solo tipo — por eso es mucho más rápido, y es lo que hace viable
+procesar miles de sensores (o entrenar redes con millones de números) en tiempo real.`,
+    steps: [
+      {
+        title: 'Paso 1: Tu primer array — lecturas de sensores',
+        explanation: 'Un array de NumPy representa las lecturas de varios sensores de una sola vez.',
+        code: `# NumPy Fundamentos - el cerebro de un robot que sigue lineas
 import numpy as np
 
 print("=== NUMPY FUNDAMENTOS (real) ===\\n")
 
-# 1. Crear arrays
+# Lecturas de 5 sensores de luz del robot
 print("1. Creacion de Arrays:")
-a = np.array([1, 2, 3, 4, 5])
-print(f"   Array: {a}  (dtype={a.dtype}, shape={a.shape})")
+sensores = np.array([1, 2, 3, 4, 5])
+print(f"   Sensores: {sensores}  (dtype={sensores.dtype}, shape={sensores.shape})")
 print(f"   Zeros: {np.zeros(5)}")
 print(f"   Ones:  {np.ones(5)}")
 np.random.seed(42)
 rand = np.random.random(5)
-print(f"   Random: {np.round(rand, 3)}")
+print(f"   Random: {np.round(rand, 3)}")`,
+      },
+      {
+        title: 'Paso 2: Combinar todos los sensores a la vez',
+        explanation: 'Vectorización: operás sobre los 5 sensores en una sola línea, sin loops — así se combinan en tiempo real.',
+        code: `# NumPy Fundamentos - el cerebro de un robot que sigue lineas
+import numpy as np
 
-# 2. Operaciones vectorizadas (SIN for loops)
+print("=== NUMPY FUNDAMENTOS (real) ===\\n")
+
+sensores = np.array([1, 2, 3, 4, 5])
+print(f"1. Sensores: {sensores}")
+
+# Operaciones vectorizadas (SIN for loops) - calibracion de sensores
 print("\\n2. Operaciones Vectorizadas:")
-b = np.array([10, 20, 30, 40, 50])
-print(f"   a = {a}")
-print(f"   b = {b}")
-print(f"   a * b = {a * b}")
-print(f"   a + 10 = {a + 10}   <- broadcasting: suma 10 a CADA elemento")
-print(f"   b / a = {b / a}")
+calibracion = np.array([10, 20, 30, 40, 50])
+print(f"   sensores = {sensores}")
+print(f"   calibracion = {calibracion}")
+print(f"   sensores * calibracion = {sensores * calibracion}")
+print(f"   sensores + 10 = {sensores + 10}   <- broadcasting: suma 10 a CADA sensor")
+print(f"   calibracion / sensores = {calibracion / sensores}")`,
+      },
+      {
+        title: 'Paso 3: Cómo decide el robot cuánto girar',
+        explanation: 'El producto punto combina las lecturas de los sensores con "pesos" para dar UN solo número de decisión — exactamente lo que calcula una neurona.',
+        code: `# NumPy Fundamentos - el cerebro de un robot que sigue lineas
+import numpy as np
 
-# 3. Producto punto (fundamental en redes neuronales)
-print("\\n3. Producto Punto (base de redes neuronales):")
+print("=== NUMPY FUNDAMENTOS (real) ===\\n")
+
+sensores = np.array([1, 2, 3, 4, 5])
+print(f"1-2. Sensores y operaciones listas.")
+
+# Producto punto (fundamental en redes neuronales y en el robot)
+print("\\n3. Producto Punto (como decide el robot cuanto girar):")
 weights = np.array([0.5, -0.3, 0.8, 0.1, -0.6])
 inputs = np.array([1.0, 2.0, 0.5, 3.0, 1.5])
 resultado = np.dot(weights, inputs)
 print(f"   Pesos:    {weights}")
 print(f"   Entradas: {inputs}")
-print(f"   w . x = {resultado:.4f}   <- exactamente lo que calcula UNA neurona")
+print(f"   w . x = {resultado:.4f}   <- exactamente lo que calcula UNA neurona")`,
+      },
+      {
+        title: 'Paso 4: Estadísticas de una vuelta completa',
+        explanation: 'Con métodos del array podés saber, tras una vuelta al circuito, el promedio y los extremos de las lecturas.',
+        code: `# NumPy Fundamentos - el cerebro de un robot que sigue lineas
+import numpy as np
 
-# 4. Estadisticas (metodos del array, no funciones sueltas)
-print("\\n4. Estadisticas:")
+print("=== NUMPY FUNDAMENTOS (real) ===\\n")
+print("1-3. Arrays, vectorizacion y producto punto listos.")
+
+# Estadisticas (metodos del array, no funciones sueltas)
+print("\\n4. Estadisticas de una vuelta al circuito:")
 datos = np.array([23, 45, 12, 67, 34, 89, 56, 78, 90, 11])
-print(f"   Datos: {datos}")
+print(f"   Lecturas: {datos}")
 print(f"   Media: {datos.mean():.2f}")
 print(f"   Std:   {datos.std():.2f}")
 print(f"   Min:   {datos.min()}, Max: {datos.max()}")
-print(f"   Ordenado: {np.sort(datos)}")
+print(f"   Ordenado: {np.sort(datos)}")`,
+      },
+      {
+        title: 'Paso 5: Una grilla de sensores en 2D',
+        explanation: 'Si el robot tiene sensores en filas y columnas (una grilla), reshape organiza los mismos datos sin copiarlos.',
+        code: `# NumPy Fundamentos - el cerebro de un robot que sigue lineas
+import numpy as np
 
-# 5. Reshape (cambiar dimensiones sin copiar los datos)
-print("\\n5. Reshape (reorganizar datos):")
+print("=== NUMPY FUNDAMENTOS (real) ===\\n")
+print("1-4. Arrays, vectorizacion, producto punto y estadisticas listos.")
+
+# Reshape (cambiar dimensiones sin copiar los datos)
+print("\\n5. Reshape (grilla de sensores 3x4):")
 flat = np.arange(1, 13)
 matrix = flat.reshape(3, 4)
 print(f"   Original (1D): {flat}  shape={flat.shape}")
 print(f"   Reshape (3x4): shape={matrix.shape}")
-print(matrix)
-
-# 6. Comparacion de velocidad real: NumPy vs Python puro
-print("\\n6. NumPy vs Python puro (100,000 numeros):")
+print(matrix)`,
+      },
+      {
+        title: 'Paso 6: Por qué esto importa a gran escala',
+        explanation: 'Con miles de sensores por segundo, la diferencia entre listas de Python y NumPy deja de ser cosmética.',
+        code: `# NumPy Fundamentos - el cerebro de un robot que sigue lineas
+import numpy as np
 import time
+
+print("=== NUMPY FUNDAMENTOS (real) ===\\n")
+print("1-5. Todo lo anterior listo.")
+
+# Comparacion de velocidad real: NumPy vs Python puro
+print("\\n6. NumPy vs Python puro (100,000 lecturas de sensores):")
 n = 100_000
 py_list = list(range(n))
 np_array = np.arange(n)
@@ -440,31 +722,79 @@ t_numpy = time.time() - t0
 
 print(f"   Python puro: {t_python*1000:.2f} ms")
 print(f"   NumPy:       {t_numpy*1000:.2f} ms")
-print(f"   NumPy fue {t_python/max(t_numpy, 0.0001):.0f}x mas rapido")`,
+print(f"   NumPy fue {t_python/max(t_numpy, 0.0001):.0f}x mas rapido")
+print("\\nPor esto NINGUN robot ni red neuronal real usa listas de Python puras.")`,
+      },
+    ],
   },
   // === DATOS & ESTADISTICA ===
   {
     id: 'graficos-datos', title: 'Graficos con Matplotlib', icon: '\u{1F4C8}', difficulty: 'medium', category: 'data',
     description: 'Visualiza datos con graficos REALES de matplotlib',
-    theory: `# Visualizacion de Datos
-## Por que visualizar?
-"Una imagen vale mas que mil filas de datos"
-- Detectar patrones y tendencias
-- Encontrar outliers (valores extranos)
-- Comunicar resultados
+    theory: `# El reporte que tu jefe realmente va a leer
 
-## Matplotlib:
-La libreria de graficos #1 de Python.
-- plt.plot() - lineas
-- plt.bar() - barras
-- plt.scatter() - dispersion
-- plt.hist() - histogramas
+## El caso
 
-## Este simulador:
-Los graficos aparecen directamente en el terminal!
-(matplotlib se instala automaticamente al importar)`,
-    code: `# Graficos REALES con matplotlib
-# El grafico aparecera en el terminal al terminar!
+Entrenaste un modelo (como el Perceptrón o la Regresión Lineal de otras lecciones) y tu jefe
+te pide un reporte del entrenamiento. Le mandás una tabla con 20 números… y no la abre. Le
+mandás un gráfico… y lo entiende en 2 segundos. "Una imagen vale más que mil filas de datos".
+
+## Matplotlib
+
+La librería de gráficos #1 de Python: \`plt.plot()\` (líneas), \`plt.bar()\` (barras),
+\`plt.scatter()\` (dispersión). En este simulador, el gráfico aparece directo en la terminal.`,
+    steps: [
+      {
+        title: 'Paso 1: Los datos del entrenamiento',
+        explanation: 'Simulamos cómo evolucionan accuracy (precisión) y loss (error) mientras un modelo se entrena — subiendo y bajando, como en la vida real.',
+        code: `# Graficos REALES con matplotlib - reporte de entrenamiento
+import matplotlib
+matplotlib.use('AGG')
+import matplotlib.pyplot as plt
+import random
+import math
+
+print("Generando datos de entrenamiento...")
+
+# Precision (accuracy) y error (loss) de un modelo durante el entrenamiento
+epochs = list(range(1, 21))
+accuracy = [0.5 + 0.45 * (1 - math.exp(-e/5)) + random.uniform(-0.02, 0.02) for e in epochs]
+loss = [2.0 * math.exp(-e/4) + random.uniform(0, 0.05) for e in epochs]
+
+print(f"Accuracy final: {accuracy[-1]:.2%}")
+print(f"Loss final: {loss[-1]:.4f}")
+print("Datos listos - en el siguiente paso armamos el grafico.")`,
+      },
+      {
+        title: 'Paso 2: Armar la figura con estilo',
+        explanation: 'Una figura con 2 gráficos lado a lado (subplots), con el estilo dark que combina con el resto del simulador.',
+        code: `# Graficos REALES con matplotlib - reporte de entrenamiento
+import matplotlib
+matplotlib.use('AGG')
+import matplotlib.pyplot as plt
+import random
+import math
+
+epochs = list(range(1, 21))
+accuracy = [0.5 + 0.45 * (1 - math.exp(-e/5)) + random.uniform(-0.02, 0.02) for e in epochs]
+loss = [2.0 * math.exp(-e/4) + random.uniform(0, 0.05) for e in epochs]
+
+# Crear figura con 2 subgraficos, estilo dark
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+fig.patch.set_facecolor('#0d1117')
+
+for ax in (ax1, ax2):
+    ax.set_facecolor('#161b22')
+    ax.tick_params(colors='white')
+    for spine in ax.spines.values():
+        spine.set_color('gray')
+
+print("Figura armada - en el siguiente paso dibujamos las curvas.")`,
+      },
+      {
+        title: 'Paso 3: El gráfico completo',
+        explanation: 'Dibujamos accuracy subiendo y loss bajando — el patrón clásico de un modelo que está aprendiendo bien.',
+        code: `# Graficos REALES con matplotlib - reporte de entrenamiento
 import matplotlib
 matplotlib.use('AGG')
 import matplotlib.pyplot as plt
@@ -473,15 +803,12 @@ import math
 
 print("Generando datos y graficos...")
 
-# 1. Datos: precision de un modelo durante el entrenamiento
 epochs = list(range(1, 21))
 accuracy = [0.5 + 0.45 * (1 - math.exp(-e/5)) + random.uniform(-0.02, 0.02) for e in epochs]
 loss = [2.0 * math.exp(-e/4) + random.uniform(0, 0.05) for e in epochs]
 
-# 2. Crear figura con 2 subgraficos
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
 fig.patch.set_facecolor('#0d1117')
-
 for ax in (ax1, ax2):
     ax.set_facecolor('#161b22')
     ax.tick_params(colors='white')
@@ -506,23 +833,32 @@ plt.tight_layout()
 
 print(f"Accuracy final: {accuracy[-1]:.2%}")
 print(f"Loss final: {loss[-1]:.4f}")
-print("\\nMira el grafico abajo! Asi se monitorea el entrenamiento de una IA")`,
+print("\\nMira el grafico abajo! Asi se monitorea el entrenamiento de una IA real")`,
+      },
+    ],
   },
   {
     id: 'estadistica-basica', title: 'Estadistica para IA', icon: '\u{1F4CA}', difficulty: 'easy', category: 'data',
     description: 'Media, mediana, desviacion: la base de todo modelo de ML',
-    theory: `# Estadistica: el corazon de la IA
-## Medidas fundamentales:
-- **Media**: promedio de los datos
-- **Mediana**: valor central (robusta a outliers)
-- **Moda**: valor mas frecuente
-- **Desviacion estandar**: que tan dispersos estan los datos
+    theory: `# ¿Cómo le fue a tu curso en el examen?
 
-## En Machine Learning:
-- Normalizacion usa media y std
-- Deteccion de anomalias usa distribuciones
-- Los modelos APRENDEN distribuciones de datos`,
-    code: `# Estadistica para IA con el modulo statistics
+## El caso
+
+Sos profe de un curso de 30 estudiantes y acabás de cargar las notas del examen. Antes de
+entregarlas, querés saber: ¿la clase entendió el tema en general? ¿hay alguna nota tan rara
+que capaz fue un error de carga? Esto es exactamente lo primero que hace cualquier proyecto de
+Machine Learning antes de entrenar nada: entender los datos.
+
+## Medidas fundamentales
+
+**Media** (promedio), **mediana** (valor central, ignora outliers), **moda** (más frecuente),
+**desviación estándar** (qué tan dispersos están los datos) — las cuatro preguntas que le hacés
+a cualquier dataset antes de usarlo.`,
+    steps: [
+      {
+        title: 'Paso 1: Las notas del curso',
+        explanation: 'Simulamos 30 notas realistas (con variación natural, como un curso de verdad).',
+        code: `# Estadistica para IA - notas de un curso
 import statistics as stats
 import random
 
@@ -534,7 +870,21 @@ notas = [round(random.gauss(7.5, 1.5), 1) for _ in range(30)]
 notas = [max(0, min(10, n)) for n in notas]  # limitar 0-10
 
 print(f"Notas de 30 estudiantes:")
-print(f"  {notas}\\n")
+print(f"  {notas}")`,
+      },
+      {
+        title: 'Paso 2: Las 4 medidas fundamentales',
+        explanation: 'Media, mediana, moda y desviación estándar te dan un resumen completo del curso en 4 números.',
+        code: `# Estadistica para IA - notas de un curso
+import statistics as stats
+import random
+
+print("=== ESTADISTICA PARA IA ===\\n")
+
+random.seed(42)
+notas = [round(random.gauss(7.5, 1.5), 1) for _ in range(30)]
+notas = [max(0, min(10, n)) for n in notas]
+print(f"Notas: {notas}\\n")
 
 # Medidas de tendencia central
 media = stats.mean(notas)
@@ -545,7 +895,22 @@ std = stats.stdev(notas)
 print(f"Media:    {media:.2f}")
 print(f"Mediana:  {mediana:.2f}")
 print(f"Moda:     {moda}")
-print(f"Desv Std: {std:.2f}\\n")
+print(f"Desv Std: {std:.2f}")`,
+      },
+      {
+        title: 'Paso 3: Ver la distribución completa',
+        explanation: 'Un histograma muestra de un vistazo si la mayoría aprobó, o si hay dos grupos muy distintos.',
+        code: `# Estadistica para IA - notas de un curso
+import statistics as stats
+import random
+
+print("=== ESTADISTICA PARA IA ===\\n")
+
+random.seed(42)
+notas = [round(random.gauss(7.5, 1.5), 1) for _ in range(30)]
+notas = [max(0, min(10, n)) for n in notas]
+media, std = stats.mean(notas), stats.stdev(notas)
+print(f"Media: {media:.2f}, Desv Std: {std:.2f}\\n")
 
 # Histograma ASCII
 print("Distribucion (histograma):")
@@ -553,10 +918,25 @@ rangos = [(0,4), (4,5), (5,6), (6,7), (7,8), (8,9), (9,10.1)]
 for lo, hi in rangos:
     count = sum(1 for n in notas if lo <= n < hi)
     bar = "#" * count * 2
-    print(f"  [{lo:4.1f}-{hi:4.1f}) {bar} {count}")
+    print(f"  [{lo:4.1f}-{hi:4.1f}) {bar} {count}")`,
+      },
+      {
+        title: 'Paso 4: ¿Hay alguna nota sospechosa?',
+        explanation: 'Una nota muy alejada del promedio (más de 2 desviaciones) puede ser un error de carga — o un caso genuinamente extremo que vale la pena revisar.',
+        code: `# Estadistica para IA - notas de un curso
+import statistics as stats
+import random
+
+print("=== ESTADISTICA PARA IA ===\\n")
+
+random.seed(42)
+notas = [round(random.gauss(7.5, 1.5), 1) for _ in range(30)]
+notas = [max(0, min(10, n)) for n in notas]
+media, std = stats.mean(notas), stats.stdev(notas)
+print(f"Media: {media:.2f}, Desv Std: {std:.2f}\\n")
 
 # Deteccion de anomalias (regla de 2 desviaciones)
-print("\\nDeteccion de anomalias (|z| > 2):")
+print("Deteccion de anomalias (|z| > 2):")
 anomalias = [n for n in notas if abs(n - media) > 2 * std]
 if anomalias:
     for a in anomalias:
@@ -572,27 +952,34 @@ for n in notas[:5]:
     print(f"  {n:5.1f} -> {z:+.3f}")
 
 print("\\nTodo modelo de ML empieza con este analisis de datos!")`,
+      },
+    ],
   },
   // === MACHINE LEARNING ===
   {
     id: 'knn-clasificador', title: 'KNN Clasificador', icon: '\u{1F3AF}', difficulty: 'medium', category: 'ml',
     description: 'Implementa K-Nearest Neighbors desde cero',
-    theory: `# K-Nearest Neighbors (KNN)
-## Como funciona:
-1. Recibe un punto nuevo a clasificar
-2. Calcula la distancia a TODOS los puntos del dataset
-3. Selecciona los K vecinos mas cercanos
-4. La clase mas comun entre los K vecinos es la prediccion
+    theory: `# La app que identifica flores por foto
 
-## Ventajas:
-- Simple de entender e implementar
-- No requiere entrenamiento
-- Funciona bien con datos pequenos
+## El caso
 
-## Desventajas:
-- Lento con datasets grandes
-- Sensible a la escala de features`,
-    code: `# K-Nearest Neighbors (KNN) desde cero
+Trabajás en una app de jardinería que identifica especies de flores. Antes de meterle fotos
+(eso viene con vision por computadora, en otra lección), empezás con el mismo dataset que usa
+el mundo real para aprender clasificación: medidas de pétalos de 3 especies distintas.
+
+## Cómo funciona KNN (K-Nearest Neighbors)
+
+1. Llega una flor nueva a clasificar.
+2. Calculás la distancia a TODAS las flores que ya conocés.
+3. Mirás los K vecinos más cercanos.
+4. La especie más común entre esos K vecinos es tu predicción.
+
+Simple, no necesita entrenamiento previo, y es sorprendentemente efectivo con datasets chicos.`,
+    steps: [
+      {
+        title: 'Paso 1: El dataset de flores conocidas',
+        explanation: 'Cada flor es un punto (largo y ancho de pétalo) con su especie ya identificada por un botánico.',
+        code: `# KNN - identificador de flores por medidas de petalo
 import math
 from collections import Counter
 
@@ -614,38 +1001,74 @@ dataset = [
     ([5.5, 2.1], "virginica"),
 ]
 
+print("Dataset de entrenamiento (flores ya identificadas):")
+print(f"  {'Largo':<8} {'Ancho':<8} {'Especie'}")
+print(f"  {'-'*30}")
+for features, label in dataset:
+    print(f"  {features[0]:<8.1f} {features[1]:<8.1f} {label}")`,
+      },
+      {
+        title: 'Paso 2: El algoritmo de clasificación',
+        explanation: 'La función que mide distancias, encuentra los K vecinos más cercanos, y vota por la especie más común entre ellos.',
+        code: `# KNN - identificador de flores por medidas de petalo
+import math
+from collections import Counter
+
+print("=== KNN - K NEAREST NEIGHBORS ===\\n")
+
+dataset = [
+    ([1.4, 0.2], "setosa"), ([1.3, 0.3], "setosa"), ([1.5, 0.2], "setosa"), ([1.7, 0.4], "setosa"),
+    ([4.5, 1.5], "versicolor"), ([4.2, 1.3], "versicolor"), ([4.7, 1.4], "versicolor"), ([4.0, 1.3], "versicolor"),
+    ([6.0, 2.5], "virginica"), ([5.8, 2.2], "virginica"), ([6.3, 1.8], "virginica"), ([5.5, 2.1], "virginica"),
+]
+print(f"Dataset con {len(dataset)} flores listo.")
+
 def distancia_euclidiana(p1, p2):
     return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
 
 def knn_clasificar(punto, dataset, k=3):
-    # Calcular distancias a todos los puntos
     distancias = []
     for features, label in dataset:
         d = distancia_euclidiana(punto, features)
         distancias.append((d, label))
-    
-    # Ordenar por distancia
     distancias.sort(key=lambda x: x[0])
-    
-    # Tomar los K mas cercanos
     k_vecinos = distancias[:k]
-    
-    # Votar
     votos = Counter([label for _, label in k_vecinos])
     prediccion = votos.most_common(1)[0][0]
     confianza = votos.most_common(1)[0][1] / k
-    
     return prediccion, confianza, k_vecinos
 
-# Visualizar dataset
-print("Dataset de entrenamiento:")
-print(f"  {'Largo':<8} {'Ancho':<8} {'Especie'}")
-print(f"  {'-'*30}")
-for features, label in dataset:
-    print(f"  {features[0]:<8.1f} {features[1]:<8.1f} {label}")
+print("Algoritmo KNN listo - en el siguiente paso clasificamos flores nuevas.")`,
+      },
+      {
+        title: 'Paso 3: Clasificar flores que llegan por la app',
+        explanation: 'Un usuario mide una flor nueva y la app debe decir a qué especie pertenece.',
+        code: `# KNN - identificador de flores por medidas de petalo
+import math
+from collections import Counter
 
-# Clasificar nuevos puntos
-print(f"\\n--- PREDICCIONES (K=3) ---\\n")
+print("=== KNN - K NEAREST NEIGHBORS ===\\n")
+
+dataset = [
+    ([1.4, 0.2], "setosa"), ([1.3, 0.3], "setosa"), ([1.5, 0.2], "setosa"), ([1.7, 0.4], "setosa"),
+    ([4.5, 1.5], "versicolor"), ([4.2, 1.3], "versicolor"), ([4.7, 1.4], "versicolor"), ([4.0, 1.3], "versicolor"),
+    ([6.0, 2.5], "virginica"), ([5.8, 2.2], "virginica"), ([6.3, 1.8], "virginica"), ([5.5, 2.1], "virginica"),
+]
+
+def distancia_euclidiana(p1, p2):
+    return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
+
+def knn_clasificar(punto, dataset, k=3):
+    distancias = [(distancia_euclidiana(punto, f), l) for f, l in dataset]
+    distancias.sort(key=lambda x: x[0])
+    k_vecinos = distancias[:k]
+    votos = Counter([label for _, label in k_vecinos])
+    prediccion = votos.most_common(1)[0][0]
+    confianza = votos.most_common(1)[0][1] / k
+    return prediccion, confianza, k_vecinos
+
+# Flores nuevas que un usuario midio con la app
+print(f"--- FLORES NUEVAS QUE LLEGAN A LA APP (K=3) ---\\n")
 nuevos_puntos = [
     [1.6, 0.3],   # deberia ser setosa
     [4.3, 1.4],   # deberia ser versicolor
@@ -655,109 +1078,194 @@ nuevos_puntos = [
 
 for punto in nuevos_puntos:
     pred, conf, vecinos = knn_clasificar(punto, dataset, k=3)
-    print(f"  Punto {punto} -> {pred} ({conf:.0%} confianza)")
+    print(f"  Flor medida {punto} -> {pred} ({conf:.0%} confianza)")
     for dist, label in vecinos:
         print(f"    Vecino: {label} (dist={dist:.3f})")
-    print()
+    print()`,
+      },
+      {
+        title: 'Paso 4: ¿Cuántos vecinos consultar?',
+        explanation: 'El valor de K cambia la predicción en casos ambiguos — muy pocos vecinos son ruidosos, demasiados diluyen el resultado.',
+        code: `# KNN - identificador de flores por medidas de petalo
+import math
+from collections import Counter
 
-# Probar diferentes valores de K
-print("--- EFECTO DE K ---")
+print("=== KNN - K NEAREST NEIGHBORS ===\\n")
+
+dataset = [
+    ([1.4, 0.2], "setosa"), ([1.3, 0.3], "setosa"), ([1.5, 0.2], "setosa"), ([1.7, 0.4], "setosa"),
+    ([4.5, 1.5], "versicolor"), ([4.2, 1.3], "versicolor"), ([4.7, 1.4], "versicolor"), ([4.0, 1.3], "versicolor"),
+    ([6.0, 2.5], "virginica"), ([5.8, 2.2], "virginica"), ([6.3, 1.8], "virginica"), ([5.5, 2.1], "virginica"),
+]
+
+def distancia_euclidiana(p1, p2):
+    return math.sqrt(sum((a-b)**2 for a, b in zip(p1, p2)))
+
+def knn_clasificar(punto, dataset, k=3):
+    distancias = [(distancia_euclidiana(punto, f), l) for f, l in dataset]
+    distancias.sort(key=lambda x: x[0])
+    votos = Counter([label for _, label in distancias[:k]])
+    prediccion = votos.most_common(1)[0][0]
+    confianza = votos.most_common(1)[0][1] / k
+    return prediccion, confianza, distancias[:k]
+
+# Un caso ambiguo, justo entre dos especies
+print("--- EFECTO DE K en un caso ambiguo ---")
 punto_test = [3.5, 1.0]
 for k in [1, 3, 5]:
     pred, conf, _ = knn_clasificar(punto_test, dataset, k=k)
     print(f"  K={k}: {pred} ({conf:.0%})")
 
-print("\\nKNN es el algoritmo mas intuitivo de Machine Learning!")`,
+print("\\nKNN es el algoritmo mas intuitivo de Machine Learning - y ya lo programaste!")`,
+      },
+    ],
   },
   {
     id: 'regresion-lineal', title: 'Regresion Lineal', icon: '\u{1F4C8}', difficulty: 'medium', category: 'ml',
     description: 'Implementa regresion lineal con gradiente descendente',
-    theory: `# Regresion Lineal
-## Objetivo:
-Encontrar la mejor linea y = mx + b que se ajuste a los datos.
+    theory: `# El sistema de alerta temprana de un profesor
 
-## Gradiente Descendente:
-1. Inicializar m y b aleatoriamente
-2. Calcular el error (MSE)
-3. Calcular gradientes (derivadas parciales)
-4. Actualizar parametros: param = param - lr * gradiente
-5. Repetir hasta convergencia`,
-    code: `# Regresion Lineal con Gradiente Descendente
+## El caso
+
+Un profesor quiere anticipar qué estudiantes van a tener problemas en el examen, ANTES de que
+lo rindan — usando solo un dato: cuántas horas estudiaron. Te pide un modelo que prediga la
+nota a partir de las horas de estudio. Vas a encontrar la mejor línea \`y = mx + b\` que
+describe esa relación, usando **gradiente descendente** — el mismo mecanismo con el que
+aprenden las redes neuronales.
+
+## Cómo funciona el gradiente descendente
+
+1. Arrancás con \`m\` y \`b\` al azar (una línea cualquiera, mala a propósito).
+2. Medís qué tan mal predice (error MSE).
+3. Calculás en qué dirección moverte para mejorar (el gradiente).
+4. Ajustás \`m\` y \`b\` un poquito en esa dirección. Repetís cientos de veces.`,
+    steps: [
+      {
+        title: 'Paso 1: Los datos históricos',
+        explanation: 'Horas de estudio vs. nota obtenida, de estudiantes de años anteriores.',
+        code: `# Regresion Lineal - prediciendo notas por horas de estudio
 import random
 
 print("=== REGRESION LINEAL ===\\n")
 
-# Datos: horas de estudio vs nota
+# Datos historicos: horas de estudio vs nota
 X = [1, 2, 3, 4, 5, 6, 7, 8]
 y = [2.1, 3.8, 5.2, 6.9, 8.1, 9.5, 11.2, 12.8]
 
 print("Datos (horas_estudio -> nota):")
 for xi, yi in zip(X, y):
     bar = "#" * int(yi * 2)
-    print(f"  {xi}h -> {yi:5.1f} {bar}")
+    print(f"  {xi}h -> {yi:5.1f} {bar}")`,
+      },
+      {
+        title: 'Paso 2: Arrancar con una línea mala (a propósito)',
+        explanation: 'El modelo arranca sin saber nada — parámetros al azar. El entrenamiento los va a ir corrigiendo.',
+        code: `# Regresion Lineal - prediciendo notas por horas de estudio
+import random
 
-# Parametros iniciales
+print("=== REGRESION LINEAL ===\\n")
+
+X = [1, 2, 3, 4, 5, 6, 7, 8]
+y = [2.1, 3.8, 5.2, 6.9, 8.1, 9.5, 11.2, 12.8]
+print("Datos historicos listos.")
+
+# Parametros iniciales - al azar, sin ningun conocimiento todavia
 m = random.uniform(-1, 1)  # pendiente
 b = random.uniform(-1, 1)  # intercepto
 lr = 0.01  # learning rate
+
+print(f"\\nParametros iniciales (al azar): m={m:.4f}, b={b:.4f}")
+print(f"Con esto, la prediccion para 5 horas seria: {m*5+b:.2f} (una nota sin sentido)")`,
+      },
+      {
+        title: 'Paso 3: Entrenar — ajustar de a poquito',
+        explanation: 'En cada epoch, el modelo mide su error y corrige m y b un poquito en la dirección correcta.',
+        code: `# Regresion Lineal - prediciendo notas por horas de estudio
+import random
+
+print("=== REGRESION LINEAL ===\\n")
+
+X = [1, 2, 3, 4, 5, 6, 7, 8]
+y = [2.1, 3.8, 5.2, 6.9, 8.1, 9.5, 11.2, 12.8]
+m = random.uniform(-1, 1)
+b = random.uniform(-1, 1)
+lr = 0.01
 epochs = 100
 
-print(f"\\nParametros iniciales: m={m:.4f}, b={b:.4f}")
-print(f"Learning rate: {lr}")
+print(f"Parametros iniciales: m={m:.4f}, b={b:.4f}")
 print(f"\\n--- ENTRENAMIENTO ({epochs} epochs) ---\\n")
 
 for epoch in range(epochs):
-    # Forward: predicciones
     y_pred = [m * xi + b for xi in X]
-    
-    # Calcular error MSE
     mse = sum((real - pred)**2 for real, pred in zip(y, y_pred)) / len(y)
-    
-    # Gradientes
+
+    # Gradientes: en que direccion ajustar m y b
     dm = -2 * sum((real - pred) * xi for real, pred, xi in zip(y, y_pred, X)) / len(y)
     db = -2 * sum((real - pred) for real, pred in zip(y, y_pred)) / len(y)
-    
-    # Actualizar parametros
+
     m -= lr * dm
     b -= lr * db
-    
+
     if epoch % 20 == 0 or epoch == epochs - 1:
-        print(f"  Epoch {epoch:3d}: MSE={mse:.4f} | m={m:.4f} b={b:.4f}")
+        print(f"  Epoch {epoch:3d}: MSE={mse:.4f} | m={m:.4f} b={b:.4f}")`,
+      },
+      {
+        title: 'Paso 4: Usar el modelo entrenado para predecir',
+        explanation: 'Con el modelo ya entrenado, el profesor puede anticipar la nota de un estudiante que todavía no rindió el examen.',
+        code: `# Regresion Lineal - prediciendo notas por horas de estudio
+import random
 
-# Resultado final
-print(f"\\n--- MODELO ENTRENADO ---")
+print("=== REGRESION LINEAL ===\\n")
+
+X = [1, 2, 3, 4, 5, 6, 7, 8]
+y = [2.1, 3.8, 5.2, 6.9, 8.1, 9.5, 11.2, 12.8]
+m, b, lr, epochs = random.uniform(-1, 1), random.uniform(-1, 1), 0.01, 100
+
+for epoch in range(epochs):
+    y_pred = [m * xi + b for xi in X]
+    dm = -2 * sum((r-p)*xi for r,p,xi in zip(y, y_pred, X)) / len(y)
+    db = -2 * sum((r-p) for r,p in zip(y, y_pred)) / len(y)
+    m -= lr * dm
+    b -= lr * db
+
+print(f"--- MODELO ENTRENADO ---")
 print(f"  y = {m:.4f}x + {b:.4f}")
-print(f"  (La relacion real es aprox y = 1.5x + 0.5)")
+print(f"  (La relacion real de los datos es aprox y = 1.5x + 0.5)")
 
-# Predicciones
-print(f"\\n--- PREDICCIONES ---")
+# El profesor quiere anticipar estos 3 casos, antes del examen
+print(f"\\n--- ALERTA TEMPRANA: estudiantes que aun no rindieron ---")
 nuevas_horas = [9, 10, 12]
 for h in nuevas_horas:
     prediccion = m * h + b
-    print(f"  {h} horas de estudio -> nota predicha: {prediccion:.1f}")
+    print(f"  Estudio {h}h -> nota predicha: {prediccion:.1f}")
 
 print("\\nAsi aprenden las redes neuronales: ajustando parametros con gradiente descendente!")`,
+      },
+    ],
   },
   // === REDES NEURONALES ===
   {
     id: 'perceptron', title: 'El Perceptron', icon: '\u{1F9E0}', difficulty: 'medium', category: 'nn',
     description: 'La neurona artificial mas basica - base de deep learning',
-    theory: `# El Perceptron
-## Que es?
-La unidad fundamental de las redes neuronales.
+    theory: `# Una neurona que aprende su propia compuerta lógica
 
-## Estructura:
-- Entradas (x1, x2, ... xn)
-- Pesos (w1, w2, ... wn) 
-- Bias (b)
-- Funcion de activacion
-- Salida = activacion(sum(xi * wi) + b)
+## El caso
 
-## Aprende con:
-1. Forward pass: calcular salida
-2. Calcular error
-3. Ajustar pesos (regla delta)`,
-    code: `# El Perceptron - Neurona Artificial
+Querés que un circuito prenda una luz solo cuando DOS interruptores están activados a la vez
+(una compuerta lógica AND). Podrías escribir la regla vos mismo con un \`if\` — pero en vez de
+eso, vas a hacer que **una sola neurona artificial la aprenda sola**, mostrándole ejemplos.
+Esto es el Perceptrón: la unidad fundamental de toda red neuronal.
+
+## Estructura de una neurona
+
+Entradas (x1, x2) → cada una multiplicada por un peso (w1, w2) → se suman con un bias (b) →
+pasan por una función de activación → esa es la salida. La neurona "aprende" ajustando sus
+pesos cada vez que se equivoca (regla delta).`,
+    steps: [
+      {
+        title: 'Paso 1: La clase Perceptrón',
+        explanation: 'Una neurona con pesos al azar, que sabe predecir (forward) y corregirse a sí misma (train).',
+        code: `# El Perceptron - Neurona Artificial que aprende AND
 import random
 import math
 
@@ -774,24 +1282,56 @@ class Perceptron:
         self.weights = [random.uniform(-1, 1) for _ in range(n_inputs)]
         self.bias = random.uniform(-1, 1)
         self.lr = 0.5
-    
+
     def predict(self, inputs):
         total = sum(w * x for w, x in zip(self.weights, inputs)) + self.bias
         return sigmoid(total)
-    
+
     def train(self, inputs, expected):
-        # Forward
         output = self.predict(inputs)
-        # Error
         error = expected - output
-        # Actualizar pesos
         for i in range(len(self.weights)):
             self.weights[i] += self.lr * error * sigmoid_derivative(output) * inputs[i]
         self.bias += self.lr * error * sigmoid_derivative(output)
         return error
 
-# Entrenar para compuerta AND
-print("Entrenando Perceptron para AND logico:")
+print("Clase Perceptron lista - en el siguiente paso le enseniamos AND.")`,
+      },
+      {
+        title: 'Paso 2: Los ejemplos de la compuerta AND',
+        explanation: 'Le mostramos a la neurona las 4 combinaciones posibles de dos interruptores, y qué debería responder cada una.',
+        code: `# El Perceptron - Neurona Artificial que aprende AND
+import random
+import math
+
+print("=== EL PERCEPTRON ===\\n")
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-max(-500, min(500, x))))
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+class Perceptron:
+    def __init__(self, n_inputs):
+        self.weights = [random.uniform(-1, 1) for _ in range(n_inputs)]
+        self.bias = random.uniform(-1, 1)
+        self.lr = 0.5
+
+    def predict(self, inputs):
+        total = sum(w * x for w, x in zip(self.weights, inputs)) + self.bias
+        return sigmoid(total)
+
+    def train(self, inputs, expected):
+        output = self.predict(inputs)
+        error = expected - output
+        for i in range(len(self.weights)):
+            self.weights[i] += self.lr * error * sigmoid_derivative(output) * inputs[i]
+        self.bias += self.lr * error * sigmoid_derivative(output)
+        return error
+
+# Los 4 casos posibles de dos interruptores, con la salida esperada de AND
+print("Casos de la compuerta AND:")
 print("  Entrada1  Entrada2  Salida_esperada")
 AND_data = [
     ([0, 0], 0),
@@ -803,10 +1343,44 @@ for inputs, expected in AND_data:
     print(f"  {inputs[0]:^8} {inputs[1]:^8} {expected:^15}")
 
 neuron = Perceptron(2)
-print(f"\\nPesos iniciales: {[f'{w:.3f}' for w in neuron.weights]}")
-print(f"Bias inicial: {neuron.bias:.3f}")
+print(f"\\nPesos iniciales (al azar): {[f'{w:.3f}' for w in neuron.weights]}")
+print(f"Bias inicial: {neuron.bias:.3f}")`,
+      },
+      {
+        title: 'Paso 3: Entrenar la neurona',
+        explanation: 'Le mostramos los 4 casos una y otra vez (1000 epochs) — cada vez que se equivoca, ajusta sus pesos un poquito.',
+        code: `# El Perceptron - Neurona Artificial que aprende AND
+import random
+import math
 
-# Entrenar
+print("=== EL PERCEPTRON ===\\n")
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-max(-500, min(500, x))))
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+class Perceptron:
+    def __init__(self, n_inputs):
+        self.weights = [random.uniform(-1, 1) for _ in range(n_inputs)]
+        self.bias = random.uniform(-1, 1)
+        self.lr = 0.5
+    def predict(self, inputs):
+        total = sum(w * x for w, x in zip(self.weights, inputs)) + self.bias
+        return sigmoid(total)
+    def train(self, inputs, expected):
+        output = self.predict(inputs)
+        error = expected - output
+        for i in range(len(self.weights)):
+            self.weights[i] += self.lr * error * sigmoid_derivative(output) * inputs[i]
+        self.bias += self.lr * error * sigmoid_derivative(output)
+        return error
+
+AND_data = [([0, 0], 0), ([0, 1], 0), ([1, 0], 0), ([1, 1], 1)]
+neuron = Perceptron(2)
+print(f"Pesos iniciales: {[f'{w:.3f}' for w in neuron.weights]}")
+
+# Entrenar mostrando los 4 casos una y otra vez
 print(f"\\n--- ENTRENAMIENTO (1000 epochs) ---")
 for epoch in range(1000):
     total_error = 0
@@ -816,18 +1390,54 @@ for epoch in range(1000):
     if epoch % 200 == 0:
         print(f"  Epoch {epoch:4d}: Error total = {total_error:.6f}")
 
-# Resultados
 print(f"\\nPesos finales: {[f'{w:.3f}' for w in neuron.weights]}")
-print(f"Bias final: {neuron.bias:.3f}")
-print(f"\\n--- RESULTADOS ---")
+print(f"Bias final: {neuron.bias:.3f}")`,
+      },
+      {
+        title: 'Paso 4: ¿Aprendió de verdad?',
+        explanation: 'Probamos la neurona ya entrenada contra los 4 casos — y de bonus, entrenamos una segunda neurona para OR, para confirmar que el mismo método sirve para cualquier compuerta simple.',
+        code: `# El Perceptron - Neurona Artificial que aprende AND
+import random
+import math
+
+print("=== EL PERCEPTRON ===\\n")
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-max(-500, min(500, x))))
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+class Perceptron:
+    def __init__(self, n_inputs):
+        self.weights = [random.uniform(-1, 1) for _ in range(n_inputs)]
+        self.bias = random.uniform(-1, 1)
+        self.lr = 0.5
+    def predict(self, inputs):
+        total = sum(w * x for w, x in zip(self.weights, inputs)) + self.bias
+        return sigmoid(total)
+    def train(self, inputs, expected):
+        output = self.predict(inputs)
+        error = expected - output
+        for i in range(len(self.weights)):
+            self.weights[i] += self.lr * error * sigmoid_derivative(output) * inputs[i]
+        self.bias += self.lr * error * sigmoid_derivative(output)
+        return error
+
+AND_data = [([0, 0], 0), ([0, 1], 0), ([1, 0], 0), ([1, 1], 1)]
+neuron = Perceptron(2)
+for _ in range(1000):
+    for inputs, expected in AND_data:
+        neuron.train(inputs, expected)
+
+print(f"--- RESULTADOS AND ---")
 for inputs, expected in AND_data:
     output = neuron.predict(inputs)
     result = 1 if output > 0.5 else 0
     status = "OK" if result == expected else "FAIL"
     print(f"  {inputs} -> {output:.4f} (redondeo: {result}) [{status}]")
 
-# Probar OR tambien
-print(f"\\n--- BONUS: Entrenando para OR ---")
+# BONUS: la misma clase, entrenada para OR en vez de AND
+print(f"\\n--- BONUS: la misma neurona, entrenada para OR ---")
 OR_data = [([0,0], 0), ([0,1], 1), ([1,0], 1), ([1,1], 1)]
 neuron_or = Perceptron(2)
 for _ in range(1000):
@@ -839,152 +1449,241 @@ for inputs, expected in OR_data:
     print(f"  {inputs} -> {output:.4f} (esperado: {expected})")
 
 print("\\nEl perceptron es la base de TODAS las redes neuronales!")`,
+      },
+    ],
   },
   {
     id: 'red-neuronal', title: 'Red Neuronal XOR', icon: '\u{1F9EC}', difficulty: 'hard', category: 'nn',
     description: 'Red neuronal multicapa que resuelve XOR',
-    theory: `# Red Neuronal Multicapa
-## Por que multicapa?
-Un perceptron simple NO puede resolver XOR.
-Se necesita al menos una capa oculta.
+    theory: `# El problema que una sola neurona no puede resolver
 
-## Arquitectura:
-- Capa de entrada: 2 neuronas
-- Capa oculta: 2+ neuronas  
-- Capa de salida: 1 neurona
+## El caso
 
-## Backpropagation:
-El algoritmo que permite entrenar redes profundas propagando el error hacia atras.`,
-    code: `# Red Neuronal que resuelve XOR
+En la lección del Perceptrón, una sola neurona aprendió AND y OR sin problema. Ahora intentá
+lo mismo con **XOR** — la compuerta que se usa en circuitos sumadores, que se activa cuando
+las entradas son DIFERENTES (0,1 o 1,0), pero no cuando son iguales. Vas a descubrir que un
+perceptrón simple **no puede** aprenderla, sin importar cuánto lo entrenes — y vas a resolverlo
+agregando una capa oculta entre la entrada y la salida.
+
+## Arquitectura
+
+Entrada (2 neuronas) → capa oculta (4 neuronas) → salida (1 neurona). El algoritmo que permite
+entrenar esto se llama **backpropagation**: propaga el error desde la salida hacia atrás, capa
+por capa, ajustando los pesos de cada una.`,
+    steps: [
+      {
+        title: 'Paso 1: La arquitectura y los datos',
+        explanation: 'Definimos las 3 capas (2→4→1) con pesos al azar, y el dataset de XOR: las 4 combinaciones posibles.',
+        code: `# Red Neuronal que resuelve XOR
 import math
 import random
 
 print("=== RED NEURONAL MULTICAPA (XOR) ===\\n")
-print("XOR es imposible para 1 perceptron!")
-print("Necesitamos una capa oculta.\\n")
+print("XOR es imposible para 1 perceptron - necesitamos una capa oculta.\\n")
 
 random.seed(42)
 
 def sigmoid(x):
     return 1 / (1 + math.exp(-max(-500, min(500, x))))
-
 def sigmoid_deriv(x):
     return x * (1 - x)
 
 # Arquitectura: 2 inputs -> 4 hidden -> 1 output
-n_input = 2
-n_hidden = 4
-n_output = 1
+n_input, n_hidden, n_output = 2, 4, 1
 
-# Pesos aleatorios
+# Pesos aleatorios de cada capa
 w_hidden = [[random.uniform(-1, 1) for _ in range(n_input)] for _ in range(n_hidden)]
 b_hidden = [random.uniform(-1, 1) for _ in range(n_hidden)]
 w_output = [[random.uniform(-1, 1) for _ in range(n_hidden)] for _ in range(n_output)]
 b_output = [random.uniform(-1, 1) for _ in range(n_output)]
 
-# Dataset XOR
+# Dataset XOR: se activa solo cuando las entradas son DIFERENTES
 X = [[0,0], [0,1], [1,0], [1,1]]
 Y = [[0], [1], [1], [0]]
 
-lr = 0.5
-epochs = 5000
-
 print(f"Arquitectura: {n_input} -> {n_hidden} -> {n_output}")
-print(f"Learning rate: {lr}")
-print(f"Epochs: {epochs}")
-print(f"\\n--- ENTRENAMIENTO ---\\n")
+print("Pesos inicializados al azar - todavia no sabe nada de XOR.")`,
+      },
+      {
+        title: 'Paso 2: Un forward pass, paso a paso',
+        explanation: 'Antes de entrenar, veamos qué hace la red con un solo ejemplo: los datos avanzan de la entrada, por la capa oculta, hasta la salida.',
+        code: `# Red Neuronal que resuelve XOR
+import math
+import random
 
+print("=== RED NEURONAL MULTICAPA (XOR) ===\\n")
+random.seed(42)
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-max(-500, min(500, x))))
+def sigmoid_deriv(x):
+    return x * (1 - x)
+
+n_input, n_hidden, n_output = 2, 4, 1
+w_hidden = [[random.uniform(-1, 1) for _ in range(n_input)] for _ in range(n_hidden)]
+b_hidden = [random.uniform(-1, 1) for _ in range(n_hidden)]
+w_output = [[random.uniform(-1, 1) for _ in range(n_hidden)] for _ in range(n_output)]
+b_output = [random.uniform(-1, 1) for _ in range(n_output)]
+X = [[0,0], [0,1], [1,0], [1,1]]
+Y = [[0], [1], [1], [0]]
+
+# Forward pass de UN solo ejemplo: [0,1] deberia dar 1
+inputs, expected = X[1], Y[1]
+hidden = []
+for j in range(n_hidden):
+    s = sum(inputs[i] * w_hidden[j][i] for i in range(n_input)) + b_hidden[j]
+    hidden.append(sigmoid(s))
+output = []
+for j in range(n_output):
+    s = sum(hidden[i] * w_output[j][i] for i in range(n_hidden)) + b_output[j]
+    output.append(sigmoid(s))
+
+print(f"Entrada: {inputs}  (esperado: {expected[0]})")
+print(f"Activaciones capa oculta: {[round(h,3) for h in hidden]}")
+print(f"Salida (sin entrenar todavia): {output[0]:.4f}")
+print("\\nSin entrenamiento, la salida es basicamente al azar - por eso hace falta entrenar.")`,
+      },
+      {
+        title: 'Paso 3: Entrenar con backpropagation',
+        explanation: 'Repetimos el forward pass para los 4 casos, medimos el error, y lo propagamos hacia atrás para ajustar ambas capas — 5000 veces.',
+        code: `# Red Neuronal que resuelve XOR
+import math
+import random
+
+print("=== RED NEURONAL MULTICAPA (XOR) ===\\n")
+random.seed(42)
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-max(-500, min(500, x))))
+def sigmoid_deriv(x):
+    return x * (1 - x)
+
+n_input, n_hidden, n_output = 2, 4, 1
+w_hidden = [[random.uniform(-1, 1) for _ in range(n_input)] for _ in range(n_hidden)]
+b_hidden = [random.uniform(-1, 1) for _ in range(n_hidden)]
+w_output = [[random.uniform(-1, 1) for _ in range(n_hidden)] for _ in range(n_output)]
+b_output = [random.uniform(-1, 1) for _ in range(n_output)]
+X = [[0,0], [0,1], [1,0], [1,1]]
+Y = [[0], [1], [1], [0]]
+lr, epochs = 0.5, 5000
+
+print(f"--- ENTRENAMIENTO ({epochs} epochs) ---\\n")
 for epoch in range(epochs):
     total_error = 0
-    
     for inputs, expected in zip(X, Y):
-        # Forward - capa oculta
-        hidden = []
-        for j in range(n_hidden):
-            s = sum(inputs[i] * w_hidden[j][i] for i in range(n_input)) + b_hidden[j]
-            hidden.append(sigmoid(s))
-        
-        # Forward - capa salida
-        output = []
-        for j in range(n_output):
-            s = sum(hidden[i] * w_output[j][i] for i in range(n_hidden)) + b_output[j]
-            output.append(sigmoid(s))
-        
+        # Forward
+        hidden = [sigmoid(sum(inputs[i]*w_hidden[j][i] for i in range(n_input)) + b_hidden[j]) for j in range(n_hidden)]
+        output = [sigmoid(sum(hidden[i]*w_output[j][i] for i in range(n_hidden)) + b_output[j]) for j in range(n_output)]
+
         # Error
         output_errors = [expected[j] - output[j] for j in range(n_output)]
         total_error += sum(e**2 for e in output_errors)
-        
-        # Backprop - output layer
+
+        # Backprop: primero la capa de salida, despues la oculta
         output_deltas = [output_errors[j] * sigmoid_deriv(output[j]) for j in range(n_output)]
-        
-        # Backprop - hidden layer
         hidden_errors = [sum(output_deltas[j] * w_output[j][i] for j in range(n_output)) for i in range(n_hidden)]
         hidden_deltas = [hidden_errors[i] * sigmoid_deriv(hidden[i]) for i in range(n_hidden)]
-        
-        # Actualizar pesos output
+
+        # Actualizar pesos de ambas capas
         for j in range(n_output):
             for i in range(n_hidden):
                 w_output[j][i] += lr * output_deltas[j] * hidden[i]
             b_output[j] += lr * output_deltas[j]
-        
-        # Actualizar pesos hidden
         for j in range(n_hidden):
             for i in range(n_input):
                 w_hidden[j][i] += lr * hidden_deltas[j] * inputs[i]
             b_hidden[j] += lr * hidden_deltas[j]
-    
+
     if epoch % 1000 == 0:
         print(f"  Epoch {epoch:5d}: Error = {total_error:.6f}")
 
 print(f"  Epoch {epochs:5d}: Error = {total_error:.6f}")
+print("\\nEl error bajo mucho - la red esta aprendiendo XOR.")`,
+      },
+      {
+        title: 'Paso 4: ¿Aprendió XOR de verdad?',
+        explanation: 'Entrenamos completo y probamos los 4 casos — donde el perceptrón simple fallaba, la red con capa oculta acierta.',
+        code: `# Red Neuronal que resuelve XOR
+import math
+import random
 
-# Test final
-print(f"\\n--- RESULTADOS XOR ---\\n")
+print("=== RED NEURONAL MULTICAPA (XOR) ===\\n")
+random.seed(42)
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-max(-500, min(500, x))))
+def sigmoid_deriv(x):
+    return x * (1 - x)
+
+n_input, n_hidden, n_output = 2, 4, 1
+w_hidden = [[random.uniform(-1, 1) for _ in range(n_input)] for _ in range(n_hidden)]
+b_hidden = [random.uniform(-1, 1) for _ in range(n_hidden)]
+w_output = [[random.uniform(-1, 1) for _ in range(n_hidden)] for _ in range(n_output)]
+b_output = [random.uniform(-1, 1) for _ in range(n_output)]
+X = [[0,0], [0,1], [1,0], [1,1]]
+Y = [[0], [1], [1], [0]]
+lr, epochs = 0.5, 5000
+
+for epoch in range(epochs):
+    for inputs, expected in zip(X, Y):
+        hidden = [sigmoid(sum(inputs[i]*w_hidden[j][i] for i in range(n_input)) + b_hidden[j]) for j in range(n_hidden)]
+        output = [sigmoid(sum(hidden[i]*w_output[j][i] for i in range(n_hidden)) + b_output[j]) for j in range(n_output)]
+        output_errors = [expected[j] - output[j] for j in range(n_output)]
+        output_deltas = [output_errors[j] * sigmoid_deriv(output[j]) for j in range(n_output)]
+        hidden_errors = [sum(output_deltas[j] * w_output[j][i] for j in range(n_output)) for i in range(n_hidden)]
+        hidden_deltas = [hidden_errors[i] * sigmoid_deriv(hidden[i]) for i in range(n_hidden)]
+        for j in range(n_output):
+            for i in range(n_hidden):
+                w_output[j][i] += lr * output_deltas[j] * hidden[i]
+            b_output[j] += lr * output_deltas[j]
+        for j in range(n_hidden):
+            for i in range(n_input):
+                w_hidden[j][i] += lr * hidden_deltas[j] * inputs[i]
+            b_hidden[j] += lr * hidden_deltas[j]
+
+print(f"--- RESULTADOS XOR ---\\n")
 print(f"  Input    Output   Esperado  Status")
 print(f"  {'-'*42}")
 for inputs, expected in zip(X, Y):
-    hidden = []
-    for j in range(n_hidden):
-        s = sum(inputs[i] * w_hidden[j][i] for i in range(n_input)) + b_hidden[j]
-        hidden.append(sigmoid(s))
-    output = []
-    for j in range(n_output):
-        s = sum(hidden[i] * w_output[j][i] for i in range(n_hidden)) + b_output[j]
-        output.append(sigmoid(s))
-    
+    hidden = [sigmoid(sum(inputs[i]*w_hidden[j][i] for i in range(n_input)) + b_hidden[j]) for j in range(n_hidden)]
+    output = [sigmoid(sum(hidden[i]*w_output[j][i] for i in range(n_hidden)) + b_output[j]) for j in range(n_output)]
     pred = round(output[0])
     status = "OK" if pred == expected[0] else "FAIL"
     print(f"  {inputs}  ->  {output[0]:.4f}   {expected[0]}         {status}")
 
-print("\\nLa red aprendio XOR con backpropagation!")
-print("Esto es la BASE de Deep Learning!")`,
+print("\\nLa red aprendio XOR con backpropagation - la base de Deep Learning!")`,
+      },
+    ],
   },
   // === VISION ===
   {
     id: 'filtros-imagen', title: 'Filtros de Imagen', icon: '\u{1F5BC}\u{FE0F}', difficulty: 'medium', category: 'vision',
     description: 'Aplica filtros REALES (blur, bordes, sharpen) con Pillow, y a tu propia foto',
-    theory: `# Vision por Computadora
-## Conceptos base:
-- Una imagen es una matriz de pixeles
-- Cada pixel tiene valores RGB (0-255)
-- Los filtros son matrices (kernels) que se "deslizan" sobre la imagen, combinando cada pixel con sus vecinos
+    theory: `# Cómo funciona el modo "retrato" de tu cámara
 
-## Kernels comunes:
-- **Blur**: Promedia cada pixel con sus vecinos -> suaviza
-- **Sharpen**: Exagera la diferencia con los vecinos -> realza detalles
-- **Edge detection (FIND_EDGES)**: Resalta donde el brillo cambia bruscamente -> bordes
-- **Contour / Emboss**: Variantes de deteccion de bordes con distinto "look"
+## El caso
 
-## Esta version usa Pillow (PIL) real
-Nada de simulacion con texto: son los mismos filtros que usa cualquier editor de fotos, aplicados con \`PIL.ImageFilter\`, y los resultados se ven como imagenes de verdad.`,
-    code: `# Filtros de Imagen REALES con Pillow (PIL) - no es simulacion
+Cada vez que usás el modo blanco y negro, blur o "bordes" de una app de fotos, hay matemática
+real pasando por debajo: una imagen es una matriz de píxeles (cada uno con valores RGB de
+0-255), y los filtros son matrices pequeñas (kernels) que se "deslizan" sobre la imagen
+combinando cada píxel con sus vecinos. Vas a programar los mismos filtros que usa cualquier
+editor de fotos real, con Pillow (PIL) — nada de simulación con texto.
+
+## Kernels comunes
+
+- **Blur**: promedia cada píxel con sus vecinos → suaviza.
+- **Sharpen**: exagera la diferencia con los vecinos → realza detalles.
+- **Edge detection**: resalta donde el brillo cambia bruscamente → bordes.`,
+    steps: [
+      {
+        title: 'Paso 1: Crear una imagen de prueba',
+        explanation: 'Un gradiente de color con un círculo — así los filtros se notan claramente, sin depender de tu cámara todavía.',
+        code: `# Filtros de Imagen REALES con Pillow (PIL) - no es simulacion
 from PIL import Image, ImageDraw, ImageFilter
-import matplotlib.pyplot as plt
 
 print("=== FILTROS DE IMAGEN (real) ===\\n")
 
-# 1. Crear una imagen de ejemplo a color (para no depender de tu camara)
-#    - un fondo con gradiente + un circulo, para que los filtros se noten bien
+# Imagen de ejemplo: fondo con gradiente + un circulo
 img = Image.new("RGB", (200, 200))
 for y in range(200):
     for x in range(200):
@@ -992,7 +1691,50 @@ for y in range(200):
 draw = ImageDraw.Draw(img)
 draw.ellipse((60, 60, 140, 140), fill=(255, 255, 255))
 
-# 2. Aplicar filtros REALES de Pillow
+print(f"Imagen de prueba creada: {img.size[0]}x{img.size[1]} pixeles")`,
+      },
+      {
+        title: 'Paso 2: Aplicar los filtros reales',
+        explanation: 'Los mismos filtros que usa cualquier editor de fotos, aplicados con PIL.ImageFilter.',
+        code: `# Filtros de Imagen REALES con Pillow (PIL) - no es simulacion
+from PIL import Image, ImageDraw, ImageFilter
+
+print("=== FILTROS DE IMAGEN (real) ===\\n")
+
+img = Image.new("RGB", (200, 200))
+for y in range(200):
+    for x in range(200):
+        img.putpixel((x, y), (x, y, 255 - x))
+draw = ImageDraw.Draw(img)
+draw.ellipse((60, 60, 140, 140), fill=(255, 255, 255))
+
+# Aplicar filtros REALES de Pillow
+filtros = {
+    "Original": img,
+    "Blur": img.filter(ImageFilter.GaussianBlur(radius=4)),
+    "Bordes (FIND_EDGES)": img.filter(ImageFilter.FIND_EDGES),
+    "Sharpen": img.filter(ImageFilter.SHARPEN),
+    "Contour": img.filter(ImageFilter.CONTOUR),
+    "Emboss": img.filter(ImageFilter.EMBOSS),
+}
+print(f"{len(filtros)} filtros aplicados - en el siguiente paso los vemos todos juntos.")`,
+      },
+      {
+        title: 'Paso 3: Comparar todos los resultados',
+        explanation: 'Una sola grilla con los 6 resultados lado a lado, para comparar de un vistazo.',
+        code: `# Filtros de Imagen REALES con Pillow (PIL) - no es simulacion
+from PIL import Image, ImageDraw, ImageFilter
+import matplotlib.pyplot as plt
+
+print("=== FILTROS DE IMAGEN (real) ===\\n")
+
+img = Image.new("RGB", (200, 200))
+for y in range(200):
+    for x in range(200):
+        img.putpixel((x, y), (x, y, 255 - x))
+draw = ImageDraw.Draw(img)
+draw.ellipse((60, 60, 140, 140), fill=(255, 255, 255))
+
 filtros = {
     "Original": img,
     "Blur": img.filter(ImageFilter.GaussianBlur(radius=4)),
@@ -1002,7 +1744,6 @@ filtros = {
     "Emboss": img.filter(ImageFilter.EMBOSS),
 }
 
-# 3. Mostrar todos los resultados en una sola grafica
 fig, axes = plt.subplots(2, 3, figsize=(9, 6))
 for ax, (nombre, imagen) in zip(axes.flat, filtros.items()):
     ax.imshow(imagen)
@@ -1012,143 +1753,153 @@ plt.tight_layout()
 plt.show()
 
 print("Listo! Cada filtro de arriba es exactamente lo que usa un editor de fotos real.")
-print("\\n--- BONUS: aplica estos mismos filtros a TU cara ---")
-print("Descomenta las 5 lineas de abajo, dale Ejecutar, acepta el permiso de camara,")
-print("y en el SIGUIENTE Ejecutar corre solo la parte de 'foto = tomar_foto()' en adelante:")
-print()
-print("# activar_camara()")
-print("# foto = tomar_foto()")
-print("# if foto:")
-print("#     bordes = foto.convert('RGB').filter(ImageFilter.FIND_EDGES)")
-print("#     plt.imshow(bordes); plt.axis('off'); plt.show()")`,
+print("\\nSiguiente ejercicio: aplica estos mismos filtros a TU cara con activar_camara().")`,
+      },
+    ],
   },
   {
     id: 'camara-filtros-ia', title: 'Tu Camara con Filtros de IA', icon: '\u{1F4F8}', difficulty: 'medium', category: 'vision',
     description: 'Usa tu camara real y aplicale filtros de vision por computadora a TU foto',
-    theory: `# Tu Camara + Vision por Computadora
-Este ejercicio usa tu camara web DE VERDAD (con tu permiso) y le aplica los mismos filtros que usan las apps de edicion de fotos y los sistemas de vision por computadora.
+    theory: `# El modo retrato, pero a TU cara
 
-## Como funciona en 2 pasos:
-1. **Paso 1**: corres \`activar_camara()\` -> tu navegador te pide permiso -> ves tu camara en vivo debajo de la terminal.
-2. **Paso 2**: en un SEGUNDO "Ejecutar" (con la camara ya prendida) corres \`tomar_foto()\` -> te devuelve la foto como imagen real (PIL) -> le aplicas filtros y los ves con matplotlib.
+## El caso
 
-## Por que 2 pasos?
-Pedir permiso de camara toma un instante (tu decides si aceptar), asi que necesita un momento antes de poder tomar la foto. Es la misma razon por la que una app de verdad primero "abre" la camara y despues "captura".
+En la lección anterior aplicaste filtros a una imagen de prueba. Ahora vas a hacer lo mismo
+pero con tu propia cámara, en vivo — exactamente como el modo retrato o blanco y negro de una
+app de fotos real.
 
-## Funciones disponibles:
-- \`activar_camara()\` - pide permiso y prende la camara
-- \`tomar_foto()\` - toma una foto y la devuelve como imagen PIL (o None si la camara no esta activa)
-- \`cerrar_camara()\` - apaga la camara cuando termines`,
-    code: `# PASO 1: activa tu camara (dale Ejecutar, acepta el permiso)
+## Por qué 2 pasos
+
+Pedir permiso de cámara toma un instante (vos decidís si aceptar), así que hace falta un
+momento antes de poder tomar la foto. Es la misma razón por la que una app real primero "abre"
+la cámara y después "captura" — no son dos cosas que puedan pasar en el mismo instante.`,
+    steps: [
+      {
+        title: 'Paso 1: Activar tu cámara',
+        explanation: 'Le pedís permiso al navegador — aceptalo, y vas a verte en vivo debajo de la terminal.',
+        code: `# PASO 1: activa tu camara (dale Ejecutar, acepta el permiso)
 activar_camara()
-print("Camara solicitada. Espera a verte en el panel de abajo,")
-print("luego borra esta linea y las de abajo, y pega el PASO 2.")
+print("Camara solicitada. Espera a verte en el panel de abajo.")
+print("Cuando te veas, pasa al Paso 2 con el navegador de pasos de arriba.")`,
+      },
+      {
+        title: 'Paso 2: Tomar la foto y aplicar filtros',
+        explanation: 'Con la cámara ya activa, tomás una foto real y le aplicás los mismos filtros de la lección anterior.',
+        code: `# PASO 2: con la camara ya activa, toma la foto y aplicale filtros
+from PIL import ImageFilter
+import matplotlib.pyplot as plt
 
-# ─────────────────────────────────────────────────────────
-# PASO 2 (bórralo todo lo de arriba y pega esto en un SEGUNDO
-# Ejecutar, una vez que ya te veas en el panel de la camara):
-# ─────────────────────────────────────────────────────────
-#
-# from PIL import ImageFilter
-# import matplotlib.pyplot as plt
-#
-# foto = tomar_foto()
-# if foto is None:
-#     print("No se detecto la camara activa - corre primero activar_camara()")
-# else:
-#     foto = foto.convert("RGB")
-#     filtros = {
-#         "Tu foto": foto,
-#         "Blanco y negro": foto.convert("L"),
-#         "Bordes": foto.filter(ImageFilter.FIND_EDGES),
-#         "Blur": foto.filter(ImageFilter.GaussianBlur(radius=5)),
-#         "Sharpen": foto.filter(ImageFilter.SHARPEN),
-#         "Emboss": foto.filter(ImageFilter.EMBOSS),
-#     }
-#     fig, axes = plt.subplots(2, 3, figsize=(9, 6))
-#     for ax, (nombre, imagen) in zip(axes.flat, filtros.items()):
-#         ax.imshow(imagen, cmap="gray" if imagen.mode == "L" else None)
-#         ax.set_title(nombre, fontsize=10)
-#         ax.axis("off")
-#     plt.tight_layout()
-#     plt.show()
-#     cerrar_camara()`,
+foto = tomar_foto()
+if foto is None:
+    print("No se detecto la camara activa - volve al Paso 1 y corre activar_camara()")
+else:
+    foto = foto.convert("RGB")
+    filtros = {
+        "Tu foto": foto,
+        "Blanco y negro": foto.convert("L"),
+        "Bordes": foto.filter(ImageFilter.FIND_EDGES),
+        "Blur": foto.filter(ImageFilter.GaussianBlur(radius=5)),
+        "Sharpen": foto.filter(ImageFilter.SHARPEN),
+        "Emboss": foto.filter(ImageFilter.EMBOSS),
+    }
+    fig, axes = plt.subplots(2, 3, figsize=(9, 6))
+    for ax, (nombre, imagen) in zip(axes.flat, filtros.items()):
+        ax.imshow(imagen, cmap="gray" if imagen.mode == "L" else None)
+        ax.set_title(nombre, fontsize=10)
+        ax.axis("off")
+    plt.tight_layout()
+    plt.show()
+    cerrar_camara()
+    print("Listo! Los mismos filtros de vision por computadora, aplicados a TU cara.")`,
+      },
+    ],
   },
   {
     id: 'subir-foto-filtros', title: 'Sube tu Foto y Aplicale Filtros', icon: '\u{1F4C1}', difficulty: 'easy', category: 'vision',
     description: 'Sube una foto desde tu computadora (sin camara) y procesala con IA',
-    theory: `# Subir tus propias imagenes
-No siempre quieres usar la camara — a veces ya tienes una foto guardada (de tu celular, de internet, de un proyecto) y quieres procesarla con Python.
+    theory: `# Cuando ya tenés la foto (no hace falta cámara)
 
-## Como funciona en 2 pasos:
-1. **Paso 1**: corres \`subir_imagen()\` -> se abre el selector de archivos de tu computadora -> eliges cualquier imagen (jpg, png...).
-2. **Paso 2**: en un SEGUNDO "Ejecutar", corres \`obtener_imagen()\` -> te devuelve tu foto como imagen PIL real, lista para \`.filter()\`, \`.convert()\`, \`.resize()\`, o lo que necesites.
+## El caso
 
-## Ideas para experimentar:
-- Convertirla a blanco y negro: \`foto.convert("L")\`
-- Voltearla: \`foto.transpose(Image.FLIP_LEFT_RIGHT)\`
-- Rotarla: \`foto.rotate(45)\`
-- Cambiar el tamaño: \`foto.resize((200, 200))\`
-- Combinar varios filtros en una sola imagen final`,
-    code: `# PASO 1: sube una imagen desde tu computadora
+No siempre querés usar la cámara en vivo — a veces ya tenés una foto guardada (del celular, de
+internet, de un proyecto) y querés procesarla con Python. Vas a subir un archivo real de tu
+computadora y aplicarle los mismos filtros que ya conocés.
+
+## Ideas para experimentar
+
+Blanco y negro (\`foto.convert("L")\`), voltear (\`foto.transpose(...)\`), rotar
+(\`foto.rotate(45)\`), cambiar tamaño (\`foto.resize((200,200))\`).`,
+    steps: [
+      {
+        title: 'Paso 1: Subir el archivo',
+        explanation: 'Se abre el selector de archivos de tu computadora — elegí cualquier imagen (jpg, png...).',
+        code: `# PASO 1: sube una imagen desde tu computadora
 subir_imagen()
 print("Elige un archivo en el cuadro que se abrio.")
-print("Cuando termines, borra esta linea y pega el PASO 2 de abajo.")
+print("Cuando termines, pasa al Paso 2 con el navegador de pasos de arriba.")`,
+      },
+      {
+        title: 'Paso 2: Procesarla con filtros reales',
+        explanation: 'Con la imagen ya subida, la convertís, rotás, volteás y filtrás — todo con tu propia foto.',
+        code: `# PASO 2: con la imagen ya subida, procesala
+from PIL import Image, ImageFilter
+import matplotlib.pyplot as plt
 
-# ─────────────────────────────────────────────────────────
-# PASO 2 (bórralo todo lo de arriba y pega esto en un SEGUNDO
-# Ejecutar, una vez que ya subiste tu imagen):
-# ─────────────────────────────────────────────────────────
-#
-# from PIL import Image, ImageFilter
-# import matplotlib.pyplot as plt
-#
-# foto = obtener_imagen()
-# if foto is None:
-#     print("No se detecto ninguna imagen subida - corre primero subir_imagen()")
-# else:
-#     foto = foto.convert("RGB")
-#     versiones = {
-#         "Original": foto,
-#         "Blanco y negro": foto.convert("L"),
-#         "Volteada": foto.transpose(Image.FLIP_LEFT_RIGHT),
-#         "Rotada 45°": foto.rotate(45, expand=True, fillcolor=(30,30,30)),
-#         "Bordes": foto.filter(ImageFilter.FIND_EDGES),
-#         "Posterizado": foto.filter(ImageFilter.SMOOTH_MORE),
-#     }
-#     fig, axes = plt.subplots(2, 3, figsize=(10, 7))
-#     for ax, (nombre, imagen) in zip(axes.flat, versiones.items()):
-#         ax.imshow(imagen, cmap="gray" if imagen.mode == "L" else None)
-#         ax.set_title(nombre, fontsize=10)
-#         ax.axis("off")
-#     plt.tight_layout()
-#     plt.show()
-#     print(f"Tu foto original mide {foto.size[0]}x{foto.size[1]} pixeles")`,
+foto = obtener_imagen()
+if foto is None:
+    print("No se detecto ninguna imagen subida - volve al Paso 1 y corre subir_imagen()")
+else:
+    foto = foto.convert("RGB")
+    versiones = {
+        "Original": foto,
+        "Blanco y negro": foto.convert("L"),
+        "Volteada": foto.transpose(Image.FLIP_LEFT_RIGHT),
+        "Rotada 45°": foto.rotate(45, expand=True, fillcolor=(30,30,30)),
+        "Bordes": foto.filter(ImageFilter.FIND_EDGES),
+        "Posterizado": foto.filter(ImageFilter.SMOOTH_MORE),
+    }
+    fig, axes = plt.subplots(2, 3, figsize=(10, 7))
+    for ax, (nombre, imagen) in zip(axes.flat, versiones.items()):
+        ax.imshow(imagen, cmap="gray" if imagen.mode == "L" else None)
+        ax.set_title(nombre, fontsize=10)
+        ax.axis("off")
+    plt.tight_layout()
+    plt.show()
+    print(f"Tu foto original mide {foto.size[0]}x{foto.size[1]} pixeles")`,
+      },
+    ],
   },
   // === NLP ===
   {
     id: 'sentiment-analysis', title: 'Analisis de Sentimiento', icon: '\u{1F4AC}', difficulty: 'medium', category: 'nlp',
     description: 'Clasifica textos como positivos o negativos con TF-IDF',
-    theory: `# Procesamiento de Lenguaje Natural (NLP)
-## Analisis de Sentimiento:
-Determinar si un texto expresa opinion positiva o negativa.
+    theory: `# Miles de reseñas, cero tiempo para leerlas
 
-## Pipeline NLP:
-1. Tokenizacion: dividir texto en palabras
-2. Limpieza: quitar stopwords, normalizar
-3. Vectorizacion: convertir texto a numeros (TF-IDF, BoW)
-4. Clasificacion: usar el vector para predecir
+## El caso
 
-## TF-IDF:
-- TF: frecuencia del termino en el documento
-- IDF: importancia inversa en el corpus`,
-    code: `# Analisis de Sentimiento con TF-IDF simplificado
+Una tienda online recibe miles de reseñas de productos por semana. Nadie tiene tiempo de
+leerlas todas a mano — pero necesitan saber rápido cuáles son quejas graves que hay que
+atender ya. Vas a construir un clasificador de sentimiento real con **TF-IDF**, la misma
+técnica que usan buscadores y sistemas de recomendación para entender texto.
+
+## El pipeline de NLP
+
+1. **Tokenización**: dividir el texto en palabras.
+2. **Vectorización (TF-IDF)**: convertir texto a números — TF mide qué tan frecuente es una
+   palabra en un texto, IDF mide qué tan rara es en general (las palabras raras son más
+   informativas que "el" o "la").
+3. **Clasificación**: comparar el vector del texto nuevo con los patrones ya conocidos.`,
+    steps: [
+      {
+        title: 'Paso 1: Reseñas ya clasificadas por un humano',
+        explanation: 'Para entrenar el modelo, necesitamos ejemplos donde ya sabemos si la reseña es positiva o negativa.',
+        code: `# Analisis de Sentimiento con TF-IDF - reseñas de una tienda online
 import math
 from collections import Counter
 
 print("=== ANALISIS DE SENTIMIENTO ===\\n")
 
-# Dataset de entrenamiento
+# Dataset de entrenamiento: reseñas ya clasificadas
 train_data = [
     ("me encanta esta pelicula es genial", "positivo"),
     ("excelente producto muy bueno", "positivo"),
@@ -1162,24 +1913,47 @@ train_data = [
     ("que asco lo peor del mundo", "negativo"),
 ]
 
-# Tokenizacion simple
+print(f"Dataset: {len(train_data)} reseñas ya clasificadas")
+for texto, label in train_data[:3]:
+    print(f"  [{label}] '{texto}'")`,
+      },
+      {
+        title: 'Paso 2: Convertir texto en números (TF-IDF)',
+        explanation: 'Una computadora no entiende palabras — necesita vectores. TF-IDF le da más peso a las palabras que realmente distinguen positivo de negativo.',
+        code: `# Analisis de Sentimiento con TF-IDF - reseñas de una tienda online
+import math
+from collections import Counter
+
+print("=== ANALISIS DE SENTIMIENTO ===\\n")
+
+train_data = [
+    ("me encanta esta pelicula es genial", "positivo"),
+    ("excelente producto muy bueno", "positivo"),
+    ("increible experiencia lo recomiendo", "positivo"),
+    ("es lo mejor que he visto", "positivo"),
+    ("que maravilla me fascina", "positivo"),
+    ("es horrible no me gusto nada", "negativo"),
+    ("pesimo servicio muy malo", "negativo"),
+    ("terrible experiencia nunca mas", "negativo"),
+    ("no lo recomiendo es basura", "negativo"),
+    ("que asco lo peor del mundo", "negativo"),
+]
+
 def tokenizar(texto):
     return texto.lower().split()
 
-# Construir vocabulario
+# Construir vocabulario de todas las palabras que aparecen
 vocab = set()
 for texto, _ in train_data:
     vocab.update(tokenizar(texto))
 vocab = sorted(vocab)
-print(f"Vocabulario: {len(vocab)} palabras")
-print(f"Ejemplo: {list(vocab)[:10]}...\\n")
+print(f"Vocabulario: {len(vocab)} palabras -> {list(vocab)[:10]}...")
 
 # TF-IDF simplificado
 def calcular_tf(texto, vocab):
     tokens = tokenizar(texto)
     tf = Counter(tokens)
-    total = len(tokens)
-    return {word: tf.get(word, 0)/total for word in vocab}
+    return {word: tf.get(word, 0)/len(tokens) for word in vocab}
 
 def calcular_idf(train_data, vocab):
     n_docs = len(train_data)
@@ -1195,41 +1969,124 @@ def texto_a_vector(texto, vocab, idf):
     tf = calcular_tf(texto, vocab)
     return [tf[w] * idf[w] for w in vocab]
 
-# Vectorizar todo el dataset
-print("Vectorizando dataset...")
-train_vectors = []
-train_labels = []
-for texto, label in train_data:
-    vec = texto_a_vector(texto, vocab, idf)
-    train_vectors.append(vec)
-    train_labels.append(label)
+print("\\nCada reseña ahora es un vector de numeros - listo para comparar.")`,
+      },
+      {
+        title: 'Paso 3: El clasificador por similitud',
+        explanation: 'Calculamos un "vector promedio" de las reseñas positivas y otro de las negativas — un texto nuevo se clasifica según a cuál se parece más.',
+        code: `# Analisis de Sentimiento con TF-IDF - reseñas de una tienda online
+import math
+from collections import Counter
 
-# Clasificador: coseno similarity con centroide
+print("=== ANALISIS DE SENTIMIENTO ===\\n")
+
+train_data = [
+    ("me encanta esta pelicula es genial", "positivo"),
+    ("excelente producto muy bueno", "positivo"),
+    ("increible experiencia lo recomiendo", "positivo"),
+    ("es lo mejor que he visto", "positivo"),
+    ("que maravilla me fascina", "positivo"),
+    ("es horrible no me gusto nada", "negativo"),
+    ("pesimo servicio muy malo", "negativo"),
+    ("terrible experiencia nunca mas", "negativo"),
+    ("no lo recomiendo es basura", "negativo"),
+    ("que asco lo peor del mundo", "negativo"),
+]
+
+def tokenizar(texto):
+    return texto.lower().split()
+vocab = sorted(set(w for texto, _ in train_data for w in tokenizar(texto)))
+
+def calcular_tf(texto, vocab):
+    tokens = tokenizar(texto)
+    tf = Counter(tokens)
+    return {word: tf.get(word, 0)/len(tokens) for word in vocab}
+def calcular_idf(train_data, vocab):
+    n_docs = len(train_data)
+    return {word: math.log(n_docs / (sum(1 for t,_ in train_data if word in tokenizar(t)) + 1)) + 1 for word in vocab}
+idf = calcular_idf(train_data, vocab)
+def texto_a_vector(texto, vocab, idf):
+    tf = calcular_tf(texto, vocab)
+    return [tf[w] * idf[w] for w in vocab]
+
+train_vectors = [texto_a_vector(t, vocab, idf) for t, _ in train_data]
+train_labels = [l for _, l in train_data]
+
 def cosine_sim(a, b):
     dot = sum(x*y for x, y in zip(a, b))
-    norm_a = math.sqrt(sum(x**2 for x in a))
-    norm_b = math.sqrt(sum(x**2 for x in b))
-    if norm_a == 0 or norm_b == 0:
-        return 0
-    return dot / (norm_a * norm_b)
+    norm_a, norm_b = math.sqrt(sum(x**2 for x in a)), math.sqrt(sum(x**2 for x in b))
+    return 0 if norm_a == 0 or norm_b == 0 else dot / (norm_a * norm_b)
 
-# Calcular centroides por clase
 pos_vecs = [v for v, l in zip(train_vectors, train_labels) if l == "positivo"]
 neg_vecs = [v for v, l in zip(train_vectors, train_labels) if l == "negativo"]
-
 centroide_pos = [sum(v[i] for v in pos_vecs)/len(pos_vecs) for i in range(len(vocab))]
 centroide_neg = [sum(v[i] for v in neg_vecs)/len(neg_vecs) for i in range(len(vocab))]
 
 def predecir(texto):
     vec = texto_a_vector(texto, vocab, idf)
-    sim_pos = cosine_sim(vec, centroide_pos)
-    sim_neg = cosine_sim(vec, centroide_neg)
+    sim_pos, sim_neg = cosine_sim(vec, centroide_pos), cosine_sim(vec, centroide_neg)
     label = "positivo" if sim_pos > sim_neg else "negativo"
     confianza = max(sim_pos, sim_neg) / (sim_pos + sim_neg + 0.001)
     return label, confianza
 
-# Clasificar nuevos textos
-print("\\n--- PREDICCIONES ---\\n")
+print("Clasificador listo - en el siguiente paso lo probamos con reseñas nuevas.")`,
+      },
+      {
+        title: 'Paso 4: Clasificar reseñas nuevas de clientes',
+        explanation: 'La prueba real: reseñas que nunca vio el modelo, escritas como las escribiría un cliente de verdad.',
+        code: `# Analisis de Sentimiento con TF-IDF - reseñas de una tienda online
+import math
+from collections import Counter
+
+print("=== ANALISIS DE SENTIMIENTO ===\\n")
+
+train_data = [
+    ("me encanta esta pelicula es genial", "positivo"),
+    ("excelente producto muy bueno", "positivo"),
+    ("increible experiencia lo recomiendo", "positivo"),
+    ("es lo mejor que he visto", "positivo"),
+    ("que maravilla me fascina", "positivo"),
+    ("es horrible no me gusto nada", "negativo"),
+    ("pesimo servicio muy malo", "negativo"),
+    ("terrible experiencia nunca mas", "negativo"),
+    ("no lo recomiendo es basura", "negativo"),
+    ("que asco lo peor del mundo", "negativo"),
+]
+
+def tokenizar(texto):
+    return texto.lower().split()
+vocab = sorted(set(w for texto, _ in train_data for w in tokenizar(texto)))
+def calcular_tf(texto, vocab):
+    tokens = tokenizar(texto)
+    tf = Counter(tokens)
+    return {word: tf.get(word, 0)/len(tokens) for word in vocab}
+def calcular_idf(train_data, vocab):
+    n_docs = len(train_data)
+    return {word: math.log(n_docs / (sum(1 for t,_ in train_data if word in tokenizar(t)) + 1)) + 1 for word in vocab}
+idf = calcular_idf(train_data, vocab)
+def texto_a_vector(texto, vocab, idf):
+    tf = calcular_tf(texto, vocab)
+    return [tf[w] * idf[w] for w in vocab]
+
+train_vectors = [texto_a_vector(t, vocab, idf) for t, _ in train_data]
+train_labels = [l for _, l in train_data]
+def cosine_sim(a, b):
+    dot = sum(x*y for x, y in zip(a, b))
+    norm_a, norm_b = math.sqrt(sum(x**2 for x in a)), math.sqrt(sum(x**2 for x in b))
+    return 0 if norm_a == 0 or norm_b == 0 else dot / (norm_a * norm_b)
+pos_vecs = [v for v, l in zip(train_vectors, train_labels) if l == "positivo"]
+neg_vecs = [v for v, l in zip(train_vectors, train_labels) if l == "negativo"]
+centroide_pos = [sum(v[i] for v in pos_vecs)/len(pos_vecs) for i in range(len(vocab))]
+centroide_neg = [sum(v[i] for v in neg_vecs)/len(neg_vecs) for i in range(len(vocab))]
+def predecir(texto):
+    vec = texto_a_vector(texto, vocab, idf)
+    sim_pos, sim_neg = cosine_sim(vec, centroide_pos), cosine_sim(vec, centroide_neg)
+    label = "positivo" if sim_pos > sim_neg else "negativo"
+    confianza = max(sim_pos, sim_neg) / (sim_pos + sim_neg + 0.001)
+    return label, confianza
+
+# Reseñas NUEVAS que llegaron hoy a la tienda
+print("--- RESEÑAS NUEVAS DE CLIENTES ---\\n")
 textos_test = [
     "esta pelicula es excelente me encanto",
     "horrible servicio nunca regresare",
@@ -1244,30 +2101,34 @@ for texto in textos_test:
     print(f"  {emoji} '{texto}'")
     print(f"      -> {pred} ({conf:.0%} confianza)\\n")
 
-print("Asi funciona el analisis de sentimiento en redes sociales!")`,
+print("Asi funciona el analisis de sentimiento en tiendas online y redes sociales!")`,
+      },
+    ],
   },
   // === IA GENERATIVA ===
   {
     id: 'markov-chain', title: 'Texto con Markov', icon: '\u{2728}', difficulty: 'hard', category: 'gen',
     description: 'Genera texto automaticamente con cadenas de Markov',
-    theory: `# Cadenas de Markov para Generacion de Texto
-## Idea:
-Predecir la siguiente palabra basandose SOLO en la(s) anterior(es).
+    theory: `# El mismo truco detrás del teclado de tu celular
 
-## Como funciona:
-1. Analizar un texto de entrenamiento
-2. Construir tabla de probabilidades de transicion
-3. Para generar: elegir siguiente palabra segun probabilidades
+## El caso
 
-## Relacion con GPT:
-GPT es basicamente una cadena de Markov ENORME con:
-- Billones de parametros
-- Arquitectura Transformer
-- Atencion a contexto largo`,
-    code: `# Generador de Texto con Cadenas de Markov
-import random
-from collections import defaultdict
+¿Cómo hace el teclado de tu celular para sugerirte la siguiente palabra mientras escribís? La
+idea de base es simple: mirar qué palabra sigue MÁS SEGUIDO después de las anteriores, en
+muchísimo texto ya escrito. Vas a construir tu propio mini-generador con **cadenas de Markov**
+— la misma idea de fondo detrás de GPT (que es básicamente esto, pero con billones de
+parámetros, arquitectura Transformer, y atención a contexto larguísimo).
 
+## Cómo funciona
+
+1. Analizás un texto de entrenamiento (el "corpus").
+2. Construís una tabla: después de estas 2 palabras, ¿cuáles suelen seguir?
+3. Para generar texto nuevo, elegís la siguiente palabra según esas probabilidades.`,
+    steps: [
+      {
+        title: 'Paso 1: El corpus de entrenamiento',
+        explanation: 'Un texto de ejemplo sobre IA — de ahí va a "aprender" el modelo qué palabras suelen ir juntas.',
+        code: `# Generador de Texto con Cadenas de Markov
 print("=== GENERADOR DE TEXTO (Cadenas de Markov) ===\\n")
 
 # Corpus de entrenamiento
@@ -1286,60 +2147,138 @@ los datos son el combustible del machine learning.
 el deep learning revoluciono la inteligencia artificial.
 """
 
-# Construir cadena de Markov (bigrama)
+print(f"Corpus: {len(corpus.split())} palabras")
+print("En el siguiente paso construimos la tabla de que palabra sigue a cual.")`,
+      },
+      {
+        title: 'Paso 2: La tabla de "qué palabra sigue"',
+        explanation: 'Para cada par de palabras (bigrama), guardamos todas las palabras que lo siguieron en el corpus.',
+        code: `# Generador de Texto con Cadenas de Markov
+from collections import defaultdict
+
+print("=== GENERADOR DE TEXTO (Cadenas de Markov) ===\\n")
+
+corpus = """
+la inteligencia artificial es el futuro de la tecnologia.
+la inteligencia artificial puede resolver problemas complejos.
+el machine learning es una rama de la inteligencia artificial.
+las redes neuronales son modelos de machine learning.
+el deep learning usa redes neuronales profundas.
+la inteligencia artificial esta cambiando el mundo.
+el futuro de la tecnologia depende de la inteligencia artificial.
+las redes neuronales pueden aprender de los datos.
+el machine learning necesita muchos datos para funcionar.
+la tecnologia avanza gracias a la inteligencia artificial.
+los datos son el combustible del machine learning.
+el deep learning revoluciono la inteligencia artificial.
+"""
+
+# Construir cadena de Markov (bigrama: mirar 2 palabras para predecir la 3ra)
 def construir_cadena(texto, orden=2):
     palabras = texto.lower().split()
     cadena = defaultdict(list)
-    
     for i in range(len(palabras) - orden):
         estado = tuple(palabras[i:i+orden])
         siguiente = palabras[i+orden]
         cadena[estado].append(siguiente)
-    
     return cadena
 
-# Generar texto
+cadena = construir_cadena(corpus, orden=2)
+print(f"Tabla construida: {len(cadena)} estados unicos (pares de palabras)\\n")
+
+# Mostrar algunas transiciones de ejemplo
+print("Tabla de transiciones (muestra):")
+for estado, siguientes in list(cadena.items())[:6]:
+    unique = list(set(siguientes))
+    print(f"  {' '.join(estado):30s} -> {unique}")`,
+      },
+      {
+        title: 'Paso 3: Generar texto nuevo',
+        explanation: 'Arrancamos de un par de palabras al azar y vamos eligiendo la siguiente palabra según la tabla — así se arma texto nuevo, palabra por palabra.',
+        code: `# Generador de Texto con Cadenas de Markov
+import random
+from collections import defaultdict
+
+print("=== GENERADOR DE TEXTO (Cadenas de Markov) ===\\n")
+
+corpus = """
+la inteligencia artificial es el futuro de la tecnologia.
+la inteligencia artificial puede resolver problemas complejos.
+el machine learning es una rama de la inteligencia artificial.
+las redes neuronales son modelos de machine learning.
+el deep learning usa redes neuronales profundas.
+la inteligencia artificial esta cambiando el mundo.
+el futuro de la tecnologia depende de la inteligencia artificial.
+las redes neuronales pueden aprender de los datos.
+el machine learning necesita muchos datos para funcionar.
+la tecnologia avanza gracias a la inteligencia artificial.
+los datos son el combustible del machine learning.
+el deep learning revoluciono la inteligencia artificial.
+"""
+
+def construir_cadena(texto, orden=2):
+    palabras = texto.lower().split()
+    cadena = defaultdict(list)
+    for i in range(len(palabras) - orden):
+        cadena[tuple(palabras[i:i+orden])].append(palabras[i+orden])
+    return cadena
+
 def generar_texto(cadena, orden=2, longitud=20):
-    # Elegir estado inicial aleatorio
-    estados = list(cadena.keys())
-    estado = random.choice(estados)
+    estado = random.choice(list(cadena.keys()))
     resultado = list(estado)
-    
     for _ in range(longitud):
         if estado not in cadena:
             break
         siguiente = random.choice(cadena[estado])
         resultado.append(siguiente)
         estado = tuple(resultado[-orden:])
-    
     return ' '.join(resultado)
 
-# Construir modelo
 cadena = construir_cadena(corpus, orden=2)
 
-print("Corpus de entrenamiento:")
-print(f"  {len(corpus.split())} palabras")
-print(f"  {len(cadena)} estados unicos\\n")
-
-# Mostrar algunas transiciones
-print("Tabla de transiciones (muestra):")
-for estado, siguientes in list(cadena.items())[:6]:
-    unique = list(set(siguientes))
-    print(f"  {' '.join(estado):30s} -> {unique}")
-
-# Generar textos
-print(f"\\n--- TEXTOS GENERADOS ---\\n")
+print(f"--- TEXTOS GENERADOS ---\\n")
 for i in range(5):
     texto = generar_texto(cadena, orden=2, longitud=12)
-    print(f"  {i+1}. {texto}")
+    print(f"  {i+1}. {texto}")`,
+      },
+      {
+        title: 'Paso 4: Las probabilidades detrás de la magia',
+        explanation: 'No es magia — es contar. Vemos exactamente qué tan probable es cada palabra siguiente después de un par dado.',
+        code: `# Generador de Texto con Cadenas de Markov
+import random
+from collections import defaultdict, Counter
 
-# Mostrar probabilidades para un estado
-print(f"\\n--- PROBABILIDADES ---")
+print("=== GENERADOR DE TEXTO (Cadenas de Markov) ===\\n")
+
+corpus = """
+la inteligencia artificial es el futuro de la tecnologia.
+la inteligencia artificial puede resolver problemas complejos.
+el machine learning es una rama de la inteligencia artificial.
+las redes neuronales son modelos de machine learning.
+el deep learning usa redes neuronales profundas.
+la inteligencia artificial esta cambiando el mundo.
+el futuro de la tecnologia depende de la inteligencia artificial.
+las redes neuronales pueden aprender de los datos.
+el machine learning necesita muchos datos para funcionar.
+la tecnologia avanza gracias a la inteligencia artificial.
+los datos son el combustible del machine learning.
+el deep learning revoluciono la inteligencia artificial.
+"""
+
+def construir_cadena(texto, orden=2):
+    palabras = texto.lower().split()
+    cadena = defaultdict(list)
+    for i in range(len(palabras) - orden):
+        cadena[tuple(palabras[i:i+orden])].append(palabras[i+orden])
+    return cadena
+
+cadena = construir_cadena(corpus, orden=2)
+
+print(f"--- PROBABILIDADES REALES ---")
 estado_ejemplo = ("la", "inteligencia")
 if estado_ejemplo in cadena:
     siguientes = cadena[estado_ejemplo]
     total = len(siguientes)
-    from collections import Counter
     conteo = Counter(siguientes)
     print(f"\\n  Despues de '{' '.join(estado_ejemplo)}':")
     for p, c in conteo.most_common():
@@ -1347,9 +2286,11 @@ if estado_ejemplo in cadena:
         bar = "#" * int(prob * 20)
         print(f"  {p:15s} {bar} {prob:.0%}")
 
-print("\\nAsi funciona GPT (pero con billones de parametros)")
+print("\\nAsi funciona GPT (pero con billones de parametros):")
 print("  GPT = Markov + Transformers + Atencion + Muuuchos datos")
 print("\\nCreaste un generador de texto como mini GPT!")`,
+      },
+    ],
   },
 ]
 
@@ -1377,7 +2318,7 @@ function renderTheory(text: string) {
 interface VirtualFile { name: string; content: string }
 
 const DEFAULT_FILES: VirtualFile[] = [
-  { name: 'main.py', content: AI_EXERCISES[0].code },
+  { name: 'main.py', content: AI_EXERCISES[0].steps[0].code },
 ]
 
 // ============================================================
@@ -1410,6 +2351,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [activeCategory, setActiveCategory] = useState('basics')
   const [activeExercise, setActiveExercise] = useState<AIExercise | null>(null)
+  const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [completedExercises, setCompletedExercises] = useState<Set<string>>(new Set())
   const [installedPackages, setInstalledPackages] = useState<string[]>(['math', 'random', 'json', 're', 'collections', 'functools', 'itertools', 'time', 'statistics'])
   const [isInstalling, setIsInstalling] = useState(false)
@@ -1593,12 +2535,24 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
   // --- EXERCISE NAVIGATION ---
   const loadExercise = (exercise: AIExercise) => {
     setActiveExercise(exercise)
+    setCurrentStepIndex(0)
     setShowTheoryPanel(true)
     const newFiles = [...files]
-    newFiles[0] = { name: `${exercise.id}.py`, content: exercise.code }
+    newFiles[0] = { name: `${exercise.id}.py`, content: exercise.steps[0].code }
     setFiles(newFiles)
     setActiveFile(0)
     setOutput(prev => [...prev, '', `\u{1F4DA} === ${exercise.icon} ${exercise.title} ===`, `\u{1F4DD} ${exercise.description}`, `\u{1F3AF} Dificultad: ${DIFFICULTY_LABEL[exercise.difficulty]}`, '', '\u{1F4A1} Presiona \u{25B6} Ejecutar para ver el resultado (Ctrl+Enter)'])
+  }
+
+  // --- STEP NAVIGATION (dentro de un ejercicio) ---
+  const goToStep = (index: number) => {
+    if (!activeExercise) return
+    if (index < 0 || index >= activeExercise.steps.length) return
+    setCurrentStepIndex(index)
+    const newFiles = [...files]
+    newFiles[0] = { name: `${activeExercise.id}.py`, content: activeExercise.steps[index].code }
+    setFiles(newFiles)
+    setActiveFile(0)
   }
 
   const markExerciseComplete = () => {
@@ -1727,6 +2681,21 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
             ))}
             <button onClick={createFile} className="px-3 py-2 text-gray-600 hover:text-gray-300 hover:bg-gray-700/30 transition-colors" title="Nuevo archivo"><Plus className="w-3.5 h-3.5" /></button>
           </div>
+          {activeExercise && activeExercise.steps.length > 1 && (
+            <div className="flex items-center gap-3 px-4 py-2 bg-[#0d1117] border-b border-gray-700/50">
+              <button onClick={() => goToStep(currentStepIndex - 1)} disabled={currentStepIndex === 0} className="p-1 rounded text-gray-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-[10px] text-purple-400 font-bold whitespace-nowrap">Paso {currentStepIndex + 1} de {activeExercise.steps.length}</span>
+              <button onClick={() => goToStep(currentStepIndex + 1)} disabled={currentStepIndex === activeExercise.steps.length - 1} className="p-1 rounded text-gray-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <div className="min-w-0 flex-1">
+                <div className="text-[11px] text-gray-200 font-medium truncate">{activeExercise.steps[currentStepIndex].title}</div>
+                <div className="text-[10px] text-gray-500 truncate">{activeExercise.steps[currentStepIndex].explanation}</div>
+              </div>
+            </div>
+          )}
           <div className="flex-1 min-h-0">
             <MonacoEditor
               height="100%"
