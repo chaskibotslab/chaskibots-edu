@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
-// GET - Obtener todos los niveles desde Supabase
+// GET - Obtener todos los niveles desde Supabase.
+// A propósito SIN requireAdmin: es data de referencia de solo lectura
+// (nombres/colores/grados de nivel) que consumen páginas de estudiantes
+// (useDynamicLevels, /hacking, /nivel/[id]) — no expone nada sensible.
 export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
@@ -47,6 +51,8 @@ export async function GET() {
 
 // POST - Crear nivel
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { id, name, fullName, category, ageRange, gradeNumber, kitPrice, hasHacking, hasAdvancedIA, color, neonColor, icon } = body
@@ -97,6 +103,8 @@ export async function POST(request: NextRequest) {
 
 // PUT - Actualizar nivel
 export async function PUT(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { originalId, recordId, ...updateData } = body
@@ -147,6 +155,8 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Eliminar nivel
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')

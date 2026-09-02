@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createCourse, getAllCourses, getTeacherCourses, updateCourse, deleteCourse } from '@/lib/supabase-auth'
 import { cache } from '@/lib/cache'
 import { getUserFriendlyError } from '@/lib/airtable-errors'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
 // GET - Obtener cursos
 export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   const { searchParams } = new URL(request.url)
   const teacherId = searchParams.get('teacherId')
   
@@ -55,6 +58,8 @@ export async function GET(request: NextRequest) {
 
 // POST - Crear curso
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { name, levelId, teacherId, teacherName, description, maxStudents, schoolId, schoolName } = body
@@ -101,6 +106,8 @@ export async function POST(request: NextRequest) {
 
 // PATCH - Actualizar curso
 export async function PATCH(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { courseId, name, description, levelId, teacherId, teacherName, schoolId, schoolName, maxStudents, isActive } = body
@@ -147,6 +154,8 @@ export async function PATCH(request: NextRequest) {
 
 // DELETE - Eliminar curso
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { courseId } = body

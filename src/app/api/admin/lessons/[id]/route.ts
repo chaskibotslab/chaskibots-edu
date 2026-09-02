@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { id } = params
     const body = await request.json()
@@ -54,6 +57,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { id } = params
 

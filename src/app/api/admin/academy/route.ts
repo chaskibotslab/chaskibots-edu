@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,9 @@ function isEntity(value: any): value is Entity {
 }
 
 // GET /api/admin/academy — árbol completo: cursos -> módulos -> lecciones (con conteos)
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const [{ data: courses, error: cErr }, { data: modules, error: mErr }, { data: lessons, error: lErr }] = await Promise.all([
       supabaseAdmin.from('simulator_courses').select('*').order('sort_order'),
@@ -45,6 +48,8 @@ export async function GET() {
 
 // POST /api/admin/academy — body: { entity: 'course'|'module'|'lesson', ...campos }
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { entity, ...fields } = body
@@ -76,6 +81,8 @@ export async function POST(request: NextRequest) {
 
 // PATCH /api/admin/academy — body: { entity, id, ...campos a actualizar }
 export async function PATCH(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { entity, id, ...fields } = body
@@ -95,6 +102,8 @@ export async function PATCH(request: NextRequest) {
 
 // DELETE /api/admin/academy?entity=lesson&id=uuid
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
     const entity = searchParams.get('entity')

@@ -9,11 +9,14 @@ import {
 } from '@/lib/supabase-auth'
 import { cache } from '@/lib/cache'
 import { getUserFriendlyError } from '@/lib/airtable-errors'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
 // GET - Obtener usuarios (todos o filtrados)
 export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   const { searchParams } = new URL(request.url)
   const courseId = searchParams.get('courseId')
   
@@ -64,11 +67,13 @@ export async function GET(request: NextRequest) {
 
 // POST - Crear usuario(s)
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
-    const { 
+    const {
       action,
-      name, 
+      name,
       role, 
       courseId, 
       courseName, 
@@ -245,6 +250,8 @@ export async function POST(request: NextRequest) {
 
 // PATCH - Actualizar usuario (regenerar código, desactivar)
 export async function PATCH(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { userId, action } = body
@@ -353,6 +360,8 @@ export async function PATCH(request: NextRequest) {
 
 // DELETE - Eliminar usuario
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { userId } = body

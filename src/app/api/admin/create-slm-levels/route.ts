@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -120,7 +121,9 @@ const SLM_LEVELS = [
 ]
 
 // POST - Crear los niveles SLM faltantes
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     console.log('[Create SLM Levels] Iniciando creación de niveles SLM...')
 
@@ -188,7 +191,9 @@ export async function POST() {
 }
 
 // GET - Ver qué niveles SLM faltan
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { data: existingRecords, error: fetchError } = await supabaseAdmin
       .from('levels')

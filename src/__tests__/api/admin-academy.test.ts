@@ -24,6 +24,13 @@ vi.mock('@/lib/supabase', () => ({
   supabaseAdmin: { from: (...args: any[]) => fromMock(...args) },
 }))
 
+// Estos tests cubren la lógica de CRUD (validación, mapeo a Supabase), no el
+// guard de sesión — se mockea requireAdmin para que siempre pase, igual que
+// pasaría con un admin ya logueado.
+vi.mock('@/lib/requireAdmin', () => ({
+  requireAdmin: vi.fn(async () => ({ ok: true, session: { id: 'admin-test', role: 'admin' } })),
+}))
+
 const jsonRequest = (body: any) => ({ json: async () => body }) as any
 const urlRequest = (query: string) => ({ url: `http://localhost/api/admin/academy${query}` }) as any
 

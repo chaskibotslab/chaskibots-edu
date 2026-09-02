@@ -1,10 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
 // POST - Sincronizar levelId en teacher_courses con los de programs/courses
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     console.log('[Sync] Iniciando sincronización de teacher_courses...')
 
@@ -92,7 +95,9 @@ export async function POST() {
 }
 
 // GET - Ver estado actual sin hacer cambios
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { data: programs } = await supabaseAdmin.from('programs').select('id, level_id')
     const { data: courses } = await supabaseAdmin.from('courses_catalog').select('id, level_id')
