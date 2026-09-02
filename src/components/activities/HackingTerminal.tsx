@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
 import { startCamera, stopCamera, registerCameraVideoElement, onCameraStateChange } from '@/lib/pythonRunner'
+import NetworkMapPanel from './NetworkMapPanel'
 
 // ============================================================
 // ACADEMY API TYPES (backed by Supabase: simulator_courses/modules/lessons)
@@ -941,6 +942,18 @@ function processCommand(
 // ============================================================
 // MISSION ENGINE — CTF interactivo con pasos, XP y estado
 // ============================================================
+// Lo que un paso revela en el panel de mapeo de red (NetworkMapPanel) al
+// completarse. Reutiliza la misma información que el paso ya muestra en su
+// successMessage — no es contenido nuevo, es una vista visual de lo mismo.
+export type NetworkReveal =
+  | { kind: 'owner'; value: string }
+  | { kind: 'ip'; value: string }
+  | { kind: 'route'; values: string[] }
+  | { kind: 'file'; value: string }
+  | { kind: 'port'; port: number; service: string; version?: string }
+  | { kind: 'vuln'; onPort: number; label: string }
+  | { kind: 'breach'; label: string }
+
 interface MissionStep {
   id: string
   title: string
@@ -949,6 +962,7 @@ interface MissionStep {
   validator: (cmd: string, history: string[]) => boolean
   xp: number
   successMessage: string
+  reveal?: NetworkReveal | NetworkReveal[]
 }
 
 interface Mission {
@@ -978,6 +992,7 @@ const MISSIONS: Mission[] = [
         validator: (cmd) => cmd.toLowerCase().includes('whois') && cmd.toLowerCase().includes('target'),
         xp: 30,
         successMessage: '✅ ¡Bien! Descubriste que el dominio pertenece a "Target Corp S.A." y el email admin@target-corp.com',
+        reveal: { kind: 'owner', value: 'Target Corp S.A.' },
       },
       {
         id: 'step-dns',
@@ -987,6 +1002,7 @@ const MISSIONS: Mission[] = [
         validator: (cmd) => (cmd.includes('nslookup') || cmd.includes('dig')) && cmd.includes('target'),
         xp: 30,
         successMessage: '✅ IP encontrada: 10.0.0.10 — Ahora sabes dónde está el servidor',
+        reveal: { kind: 'ip', value: '10.0.0.10' },
       },
       {
         id: 'step-robots',
@@ -996,6 +1012,7 @@ const MISSIONS: Mission[] = [
         validator: (cmd) => cmd.includes('curl') && cmd.includes('robots'),
         xp: 40,
         successMessage: '✅ ¡Encontraste rutas ocultas! /admin, /backup, /.git y /admin-panel-x7 — información valiosa',
+        reveal: { kind: 'route', values: ['/admin', '/backup', '/.git', '/admin-panel-x7'] },
       },
       {
         id: 'step-dork',
@@ -1005,6 +1022,7 @@ const MISSIONS: Mission[] = [
         validator: (cmd) => cmd.includes('dork'),
         xp: 50,
         successMessage: '🏴 ¡EXCELENTE! Encontraste un archivo de backup con credenciales expuestas. Fase de reconocimiento completa.',
+        reveal: { kind: 'file', value: 'backup_passwords.txt' },
       },
     ],
     completionFlag: 'FLAG{r3c0n_m4st3r_2024}',
@@ -1025,6 +1043,12 @@ const MISSIONS: Mission[] = [
         validator: (cmd) => cmd.includes('nmap') && (cmd.includes('10.0.0') || cmd.includes('target')),
         xp: 40,
         successMessage: '✅ Puertos descubiertos: SSH(22), HTTP(80), HTTPS(443), MySQL(3306). Apache 2.4.29 — versión con CVEs conocidos.',
+        reveal: [
+          { kind: 'port', port: 22, service: 'SSH' },
+          { kind: 'port', port: 80, service: 'HTTP', version: 'Apache 2.4.29' },
+          { kind: 'port', port: 443, service: 'HTTPS' },
+          { kind: 'port', port: 3306, service: 'MySQL' },
+        ],
       },
       {
         id: 'step-dirb',
@@ -1034,6 +1058,7 @@ const MISSIONS: Mission[] = [
         validator: (cmd) => cmd.includes('dirb') || cmd.includes('gobuster'),
         xp: 50,
         successMessage: '✅ ¡Directorio .git expuesto! Esto significa que puedes ver el código fuente del sitio.',
+        reveal: { kind: 'file', value: '.git (código fuente expuesto)' },
       },
       {
         id: 'step-sqli',
@@ -1043,6 +1068,7 @@ const MISSIONS: Mission[] = [
         validator: (cmd) => cmd.includes('sqli') && cmd.includes('login') && (cmd.includes('1=1') || cmd.includes('OR')),
         xp: 80,
         successMessage: '🔓 ¡ACCESO AL PANEL DE ADMIN! La consulta SQL fue manipulada. Ahora tienes acceso como administrador.',
+        reveal: { kind: 'vuln', onPort: 80, label: 'SQL Injection en /admin/login' },
       },
       {
         id: 'step-extract',
@@ -1052,6 +1078,7 @@ const MISSIONS: Mission[] = [
         validator: (cmd) => cmd.includes('sqli') && cmd.includes('union'),
         xp: 80,
         successMessage: '🏴 ¡DATOS EXTRAÍDOS! Obtuviste los hashes de todos los usuarios. El hash de admin es crackeable.',
+        reveal: { kind: 'breach', label: 'Credenciales de todos los usuarios extraídas' },
       },
     ],
     completionFlag: 'FLAG{sql1_m4st3r_un10n_2024}',
@@ -1594,8 +1621,14 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
             { text: '', type: 'normal' },
             { text: 'Usa "mission list" para ver la siguiente misión disponible', type: 'info' },
           ])
-          setActiveMission(null)
-          setMissionStep(0)
+          // Mostrar el paso final completo (incluido su reveal) en el mapa de red
+          // antes de limpiar la misión activa — si se resetea en el mismo render,
+          // el revelado mas importante (ej. el breach final) nunca llega a verse.
+          setMissionStep(nextStep)
+          setTimeout(() => {
+            setActiveMission(null)
+            setMissionStep(0)
+          }, 4000)
         } else {
           // Advance to next step
           setMissionStep(nextStep)
@@ -1903,6 +1936,12 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
                     <span className="text-[9px] text-gray-400">{missionStep}/{activeMission.steps.length}</span>
                   </div>
                   <div className="text-[9px] text-gray-500 mt-1">{activeMission.steps[missionStep]?.title}</div>
+                </div>
+              )}
+
+              {activeMission && (
+                <div className="mb-2">
+                  <NetworkMapPanel mission={activeMission} currentStep={missionStep} />
                 </div>
               )}
 
