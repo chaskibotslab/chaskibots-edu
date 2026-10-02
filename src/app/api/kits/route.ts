@@ -34,7 +34,15 @@ export async function GET(request: NextRequest) {
     const levelId = searchParams.get('levelId')
 
     let query = supabaseAdmin.from('kits').select('*').order('name')
-    if (levelId) query = query.eq('level_id', levelId)
+    if (levelId) {
+      // Esta consulta (por levelId) la usa KitDisplay en la pagina publica
+      // /nivel/[id]: debe devolver el kit del catalogo GENERAL, nunca el
+      // kit de un colegio especifico (ej. Lizardo Villamarin), o su precio
+      // y descripcion particulares se verian como si fueran para cualquier
+      // visitante del sitio. Los kits de un colegio se consultan aparte,
+      // filtrando por school_id, desde el panel de ese colegio.
+      query = query.eq('level_id', levelId).is('school_id', null)
+    }
 
     const { data, error } = await query
     if (error) return NextResponse.json({ kits: [] })
