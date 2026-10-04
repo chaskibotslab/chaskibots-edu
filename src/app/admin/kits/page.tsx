@@ -301,6 +301,7 @@ export default function KitsAdminPage() {
               dirty={dirty}
               saving={saving}
               isCreating={isCreating}
+              kitId={selectedId}
               allLevels={allLevels}
               imageUrls={imageUrls}
               onAddImages={addUploadedImages}
@@ -355,7 +356,7 @@ function KitItem({ kit, active, onClick, index }: { kit: Kit; active: boolean; o
   )
 }
 
-function KitEditor({ form, setField, dirty, saving, isCreating, allLevels, imageUrls, onAddImages, onRemoveImage, onClose, onSave, onDelete }: any) {
+function KitEditor({ form, setField, dirty, saving, isCreating, kitId, allLevels, imageUrls, onAddImages, onRemoveImage, onClose, onSave, onDelete }: any) {
   return (
     <>
       <div className="shrink-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
@@ -373,6 +374,15 @@ function KitEditor({ form, setField, dirty, saving, isCreating, allLevels, image
           {dirty && <span className="text-xs text-amber-600 font-medium shrink-0">• Sin guardar</span>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {!isCreating && kitId && (
+            <Link
+              href={`/admin/kits/${kitId}/ficha`}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold text-chaski-primary hover:bg-chaski-primary/10 transition-colors"
+              title="Materiales, proyectos, esquemas y codigo Arduino de este kit"
+            >
+              <BookOpen className="w-4 h-4" /> Ver ficha completa
+            </Link>
+          )}
           {!isCreating && (
             <button
               onClick={onDelete}
