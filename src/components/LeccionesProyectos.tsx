@@ -10,14 +10,14 @@ const typeConfig = {
     icon: Trophy,
     color: 'text-chaski-primary',
     bg: 'bg-chaski-primary/10',
-    border: 'border-chaski-primary/30',
+    ring: 'ring-chaski-primary/20',
     label: 'Proyecto principal',
   },
   adicional: {
     icon: Wrench,
     color: 'text-amber-600',
     bg: 'bg-amber-100',
-    border: 'border-amber-300',
+    ring: 'ring-amber-200',
     label: 'Proyecto adicional',
   },
 }
@@ -35,23 +35,23 @@ function ProyectoRow({ proyecto, index, onSelect }: { proyecto: KitFichaProyecto
   return (
     <button
       onClick={onSelect}
-      className="group w-full text-left bg-white rounded-xl p-4 border border-border-soft shadow-sm transition-all duration-200 hover:shadow-md hover:border-chaski-primary/30"
+      className="group w-full text-left bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm transition-all duration-200 hover:shadow-md hover:border-chaski-primary/30 hover:-translate-y-0.5"
     >
       <div className="flex items-start gap-4">
-        <div className={`relative w-12 h-12 ${config.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+        <div className={`relative w-12 h-12 ${config.bg} rounded-2xl flex items-center justify-center flex-shrink-0 ring-1 ${config.ring}`}>
           <Icon className={`w-5 h-5 ${config.color}`} />
-          <span className="absolute -top-2 -left-2 w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-[10px] font-bold text-white">
+          <span className="absolute -top-2 -left-2 w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-white">
             {index}
           </span>
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="font-semibold text-chaski-dark truncate">{proyecto.titulo}</h4>
-          {proyecto.descripcion && <p className="text-sm text-slate-500 mt-0.5 line-clamp-2">{proyecto.descripcion}</p>}
-          <div className="flex items-center gap-3 mt-2">
-            <span className="flex items-center gap-1 text-xs text-slate-400">
+          <h4 className="font-semibold text-chaski-dark truncate group-hover:text-chaski-primary transition-colors">{proyecto.titulo}</h4>
+          {proyecto.descripcion && <p className="text-sm text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">{proyecto.descripcion}</p>}
+          <div className="flex items-center gap-2.5 mt-2.5">
+            <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
               <Clock className="w-3 h-3" /> {duracionEstimada(proyecto)}
             </span>
-            <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${config.bg} ${config.color}`}>
+            <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${config.bg} ${config.color}`}>
               {config.label}
             </span>
           </div>
@@ -71,17 +71,17 @@ export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaP
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-7">
         {principal && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Proyecto principal</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-chaski-primary/70 mb-2.5">Proyecto principal</p>
             <ProyectoRow proyecto={principal} index={1} onSelect={() => setSelected(principal)} />
           </div>
         )}
         {adicionales.length > 0 && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Proyectos adicionales</p>
-            <div className="space-y-2">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">Proyectos adicionales</p>
+            <div className="space-y-2.5">
               {adicionales.map((p, i) => (
                 <ProyectoRow key={p.id} proyecto={p} index={i + 2} onSelect={() => setSelected(p)} />
               ))}
@@ -91,45 +91,48 @@ export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaP
       </div>
 
       {/* Modal del proyecto seleccionado */}
-      {selected && (
+      {selected && (() => {
+        const config = typeConfig[selected.tipo]
+        const Icon = config.icon
+        return (
         <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setSelected(null)}
         >
           <div
-            className="bg-slate-50 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl animate-scale-in"
+            className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-slate-50 border-b border-slate-200 p-4 flex items-center justify-between z-10">
+            <div className={`sticky top-0 bg-white/95 backdrop-blur-xl border-b border-slate-200 p-5 flex items-center justify-between z-10`}>
               <div className="flex items-center gap-3 min-w-0">
-                <div className={`w-10 h-10 ${typeConfig[selected.tipo].bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                  {(() => { const Icon = typeConfig[selected.tipo].icon; return <Icon className={`w-5 h-5 ${typeConfig[selected.tipo].color}`} /> })()}
+                <div className={`w-11 h-11 ${config.bg} rounded-2xl flex items-center justify-center flex-shrink-0 ring-1 ${config.ring}`}>
+                  <Icon className={`w-5 h-5 ${config.color}`} />
                 </div>
                 <div className="min-w-0">
                   <h3 className="text-lg font-bold text-slate-900 truncate">{selected.titulo}</h3>
-                  <p className="text-sm text-slate-600">{duracionEstimada(selected)} • {typeConfig[selected.tipo].label}</p>
+                  <p className="text-sm text-slate-500">{duracionEstimada(selected)} · {config.label}</p>
                 </div>
               </div>
               <button
                 onClick={() => setSelected(null)}
-                className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 hover:text-slate-900 transition-colors active:scale-[0.98] flex-shrink-0"
+                className="p-2 hover:bg-slate-100 rounded-xl text-slate-500 hover:text-slate-900 transition-colors active:scale-[0.98] flex-shrink-0"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-5 space-y-6">
-              {selected.descripcion && <p className="text-slate-600">{selected.descripcion}</p>}
+            <div className="p-6 space-y-7">
+              {selected.descripcion && <p className="text-slate-600 leading-relaxed">{selected.descripcion}</p>}
 
               {esquemaDelSeleccionado && (
                 <div>
-                  <h4 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">Esquema de conexion</h4>
+                  <h4 className="text-sm font-bold text-slate-700 mb-2.5">Esquema de conexión</h4>
                   {esquemaEsDelPrincipal && (
                     <p className="text-xs text-slate-400 italic mb-2">
-                      Usa el mismo armado fisico del proyecto principal ({principal?.titulo}); solo cambia el programa.
+                      Usa el mismo armado físico del proyecto principal ({principal?.titulo}); solo cambia el programa.
                     </p>
                   )}
-                  <div className="border border-slate-200 rounded-xl p-2 bg-white overflow-x-auto">
+                  <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50/50 overflow-x-auto">
                     <div dangerouslySetInnerHTML={{ __html: esquemaDelSeleccionado.contenido }} />
                   </div>
                 </div>
@@ -137,37 +140,42 @@ export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaP
 
               {selected.objetivos.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">
+                  <h4 className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
                     <Target className="w-4 h-4 text-chaski-primary" /> Objetivos de aprendizaje
                   </h4>
-                  <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
-                    {selected.objetivos.map((o, i) => <li key={i}>{o}</li>)}
+                  <ul className="space-y-1.5">
+                    {selected.objetivos.map((o, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                        <span className="w-1.5 h-1.5 rounded-full bg-chaski-primary/50 mt-[7px] flex-shrink-0" />
+                        {o}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               )}
 
               {selected.conexiones.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">
+                  <h4 className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
                     <Cable className="w-4 h-4 text-chaski-primary" /> Tabla de conexiones
                   </h4>
-                  <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                  <div className="overflow-x-auto border border-slate-200 rounded-2xl">
                     <table className="w-full text-sm">
-                      <thead className="bg-slate-100 text-slate-500 text-xs uppercase">
+                      <thead className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wide">
                         <tr>
-                          <th className="text-left px-3 py-2 font-semibold">Componente</th>
-                          <th className="text-left px-3 py-2 font-semibold">Pin del componente</th>
-                          <th className="text-left px-3 py-2 font-semibold">Pin de la placa</th>
-                          <th className="text-left px-3 py-2 font-semibold">Nota</th>
+                          <th className="text-left px-4 py-2.5 font-semibold">Componente</th>
+                          <th className="text-left px-4 py-2.5 font-semibold">Pin del componente</th>
+                          <th className="text-left px-4 py-2.5 font-semibold">Pin de la placa</th>
+                          <th className="text-left px-4 py-2.5 font-semibold">Nota</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 bg-white">
                         {selected.conexiones.map((c, i) => (
-                          <tr key={i}>
-                            <td className="px-3 py-2 text-slate-800 font-medium">{c.componente}</td>
-                            <td className="px-3 py-2 text-slate-600">{c.pinComponente}</td>
-                            <td className="px-3 py-2 text-slate-600 font-mono">{c.pinPlaca}</td>
-                            <td className="px-3 py-2 text-slate-400 text-xs">{c.nota || ''}</td>
+                          <tr key={i} className={i % 2 === 1 ? 'bg-slate-50/50' : ''}>
+                            <td className="px-4 py-2.5 text-slate-800 font-medium">{c.componente}</td>
+                            <td className="px-4 py-2.5 text-slate-600">{c.pinComponente}</td>
+                            <td className="px-4 py-2.5 text-chaski-primary font-mono text-xs font-semibold">{c.pinPlaca}</td>
+                            <td className="px-4 py-2.5 text-slate-400 text-xs">{c.nota || ''}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -178,14 +186,15 @@ export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaP
 
               {selected.codigo && (
                 <div>
-                  <h4 className="text-sm font-bold text-slate-700 mb-2">Codigo Arduino</h4>
+                  <h4 className="text-sm font-bold text-slate-700 mb-2.5">Código Arduino</h4>
                   <ArduinoCodeViewer code={selected.codigo.contenido} filename={`${selected.slug}.ino`} />
                 </div>
               )}
             </div>
           </div>
         </div>
-      )}
+        )
+      })()}
     </>
   )
 }

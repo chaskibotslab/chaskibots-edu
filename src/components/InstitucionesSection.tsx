@@ -53,15 +53,19 @@ export default function InstitucionesSection() {
     <>
       {instituciones.map((inst, i) => (
         <section key={inst.schoolId} className="animate-slide-up">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-chaski-gold/10 rounded-2xl flex items-center justify-center border border-chaski-gold/25">
-              <School className="w-6 h-6 text-chaski-gold" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-chaski-dark">{inst.schoolName}</h2>
-              <p className="text-slate-500 text-sm">
-                {inst.city ? `${inst.city} • ` : ''}Cursos de tu institución
-              </p>
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-chaski-dark to-slate-800 p-5 sm:p-6 mb-5 shadow-lg">
+            <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '18px 18px' }} />
+            <div className="absolute -top-8 -right-8 w-40 h-40 bg-chaski-gold/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative flex items-center gap-4">
+              <div className="w-12 h-12 bg-chaski-gold/20 rounded-2xl flex items-center justify-center border border-chaski-gold/30 flex-shrink-0">
+                <School className="w-6 h-6 text-chaski-gold" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">{inst.schoolName}</h2>
+                <p className="text-white/60 text-sm">
+                  {inst.city ? `${inst.city} · ` : ''}{inst.cursos.length} {inst.cursos.length === 1 ? 'curso' : 'cursos'} de tu institución
+                </p>
+              </div>
             </div>
           </div>
 
@@ -70,19 +74,19 @@ export default function InstitucionesSection() {
               <Link
                 key={curso.kitId}
                 href={`/academia/${inst.schoolId}/${curso.kitId}`}
-                className="group relative overflow-hidden rounded-2xl bg-white border border-border-soft shadow-sm p-5 transition-all duration-300 animate-scale-in hover:shadow-lg hover:border-chaski-gold/40 hover:bg-chaski-gold/5"
+                className="group relative overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-sm p-5 transition-all duration-300 animate-scale-in hover:shadow-md hover:border-chaski-gold/40 hover:-translate-y-0.5"
                 style={{ animationDelay: `${(i * 6 + idx) * 0.04}s` }}
               >
                 <div className="absolute top-0 right-0 w-20 h-20 bg-chaski-gold/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
                 <div className="relative flex items-center gap-4">
-                  <div className="w-12 h-12 bg-chaski-gold/10 rounded-xl flex items-center justify-center flex-shrink-0 border border-chaski-gold/25 group-hover:scale-110 transition-transform">
-                    <School className="w-6 h-6 text-chaski-gold" />
+                  <div className="w-11 h-11 bg-chaski-gold/10 rounded-xl flex items-center justify-center flex-shrink-0 ring-1 ring-chaski-gold/20 group-hover:scale-110 transition-transform">
+                    <School className="w-5 h-5 text-chaski-gold" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-chaski-dark text-sm leading-tight">{curso.courseName}</h3>
-                    {curso.price != null && <p className="text-slate-500 text-xs mt-0.5">Kit ${curso.price}</p>}
+                    <h3 className="font-semibold text-chaski-dark text-sm leading-tight group-hover:text-chaski-gold transition-colors">{curso.courseName}</h3>
+                    {curso.price != null && <p className="text-slate-400 text-xs mt-0.5">Kit ${curso.price}</p>}
                   </div>
-                  <ArrowRight className="w-5 h-5 text-chaski-gold group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-chaski-gold group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                 </div>
               </Link>
             ))}
