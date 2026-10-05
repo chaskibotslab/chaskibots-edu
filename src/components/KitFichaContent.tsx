@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import {
-  Cpu, School, DollarSign, Zap, ShieldAlert, Package, Target, Cable, Code2, Copy, Check,
+  Cpu, School, DollarSign, Zap, ShieldAlert, Package, Target, Cable, Code2,
 } from 'lucide-react'
+import ArduinoCodeViewer from './ArduinoCodeViewer'
 
 export interface KitFichaMaterial {
   id: string
@@ -51,35 +51,6 @@ export interface KitFichaDetalle {
   placa: { nombre: string; voltajeLogico: string | null; conectorUsb: string | null; notasTecnicas: string | null } | null
   materiales: KitFichaMaterial[]
   proyectos: KitFichaProyecto[]
-}
-
-function CodeBlock({ code }: { code: string }) {
-  const [copied, setCopied] = useState(false)
-
-  const copiar = async () => {
-    try {
-      await navigator.clipboard.writeText(code)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch {
-      // Sin acceso al portapapeles (ej. http sin permiso): no hacemos nada mas.
-    }
-  }
-
-  return (
-    <div className="relative group">
-      <button
-        onClick={copiar}
-        className="no-print absolute top-2 right-2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-        {copied ? 'Copiado' : 'Copiar'}
-      </button>
-      <pre className="bg-slate-900 text-slate-100 text-xs leading-relaxed rounded-xl p-4 overflow-x-auto whitespace-pre-wrap break-words">
-        <code>{code}</code>
-      </pre>
-    </div>
-  )
 }
 
 export function Badge({ children, color = 'slate' }: { children: React.ReactNode; color?: string }) {
@@ -261,7 +232,7 @@ export function ProyectoCard({ proyecto: p, principal }: { proyecto: KitFichaPro
           <h3 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">
             <Code2 className="w-4 h-4 text-chaski-primary" /> Codigo Arduino
           </h3>
-          <CodeBlock code={p.codigo.contenido} />
+          <ArduinoCodeViewer code={p.codigo.contenido} filename={`${p.slug}.ino`} />
         </div>
       )}
     </section>

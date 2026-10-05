@@ -10,7 +10,8 @@ import {
   ArrowLeft, Printer, Loader2, AlertCircle, BookOpen, Package, Calendar,
   Brain, Cpu, FileText, Menu, X, Home, GraduationCap, Settings,
 } from 'lucide-react'
-import KitFichaContent, { KitFichaDetalle, KitHeaderMateriales, ProyectoCard } from '@/components/KitFichaContent'
+import KitFichaContent, { KitFichaDetalle, KitHeaderMateriales } from '@/components/KitFichaContent'
+import LeccionesProyectos from '@/components/LeccionesProyectos'
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
@@ -73,7 +74,6 @@ function AcademiaKitPageInner({ kitId }: { kitId: string }) {
     )
   }
 
-  const principal = kit.proyectos.find(p => p.tipo === 'principal') || null
   const levelId = kit.levelId
 
   return (
@@ -182,7 +182,7 @@ function AcademiaKitPageInner({ kitId }: { kitId: string }) {
                   <p className="text-slate-500">Proyecto principal + {kit.proyectos.length - 1} adicionales</p>
                 </div>
               </div>
-              {kit.proyectos.map(p => <ProyectoCard key={p.id} proyecto={p} principal={principal} />)}
+              <LeccionesProyectos proyectos={kit.proyectos} />
             </div>
           )}
 
