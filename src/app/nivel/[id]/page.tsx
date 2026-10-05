@@ -39,6 +39,11 @@ const KitDisplay = dynamic(() => import('@/components/KitDisplay'), {
   ssr: false
 })
 
+const AcademiaKitBlock = dynamic(() => import('@/components/AcademiaKitBlock'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false
+})
+
 const TasksPanel = dynamic(() => import('@/components/TasksPanel'), {
   loading: () => <LoadingSpinner />,
   ssr: false
@@ -556,6 +561,7 @@ export default function NivelPage() {
           {activeTab === 'kit' && (
             <div className="max-w-4xl mx-auto animate-slide-up" key="kit">
               <KitDisplay levelId={levelId} />
+              <AcademiaKitBlock levelId={levelId} />
             </div>
           )}
 
