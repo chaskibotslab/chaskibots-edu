@@ -9,6 +9,7 @@ const ADMIN_ROUTES = ['/admin']
 const PROTECTED_ROUTES = [
   '/dashboard', '/tareas', '/simuladores', '/academy',
   '/diseno', '/hacking', '/ia', '/nivel', '/niveles', '/robotica',
+  '/academia',
 ]
 
 export async function middleware(request: NextRequest) {
@@ -59,5 +60,6 @@ export const config = {
     '/nivel/:path*',
     '/niveles/:path*',
     '/robotica/:path*',
+    '/academia/:path*',
   ]
 }

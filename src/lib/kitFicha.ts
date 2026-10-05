@@ -2,8 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 // Arma la ficha completa (placa + materiales + cada proyecto con sus
 // conexiones/esquema/codigo) de uno o varios kits a la vez, en lote (sin
-// N+1 queries). La usan /api/admin/kits/[id] (un kit) y
-// /api/kits/academia (todos los kits visibles de un nivel).
+// N+1 queries). La usan /api/admin/kits/[id] y /api/academia/kit/[id].
 export async function buildKitFichas(kitRows: any[]) {
   if (kitRows.length === 0) return []
 

@@ -6,6 +6,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
 import { useLevels, useUserCourses } from '@/hooks'
+import InstitucionesSection from '@/components/InstitucionesSection'
 import {
   ArrowRight, Sparkles, Bot, Baby, BookOpen, Code,
   GraduationCap, Rocket, Loader2, Lock
@@ -132,6 +133,9 @@ export default function NivelesPage() {
               Selecciona tu nivel para acceder a contenido de Robótica, IA y Hacking Ético
             </p>
           </div>
+
+          {/* Cursos por institucion (Academia) */}
+          <InstitucionesSection />
 
           {/* Categories */}
           {CATEGORIES.map((category) => {
