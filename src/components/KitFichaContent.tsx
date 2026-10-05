@@ -82,7 +82,7 @@ function CodeBlock({ code }: { code: string }) {
   )
 }
 
-function Badge({ children, color = 'slate' }: { children: React.ReactNode; color?: string }) {
+export function Badge({ children, color = 'slate' }: { children: React.ReactNode; color?: string }) {
   const colors: Record<string, string> = {
     slate: 'bg-slate-100 text-slate-700',
     coral: 'bg-chaski-primary/10 text-chaski-primary',
@@ -93,17 +93,12 @@ function Badge({ children, color = 'slate' }: { children: React.ReactNode; color
   return <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${colors[color]}`}>{children}</span>
 }
 
-// Ficha completa de un kit: materiales + cada proyecto (principal y
-// adicionales) con sus objetivos, conexiones, esquema y codigo Arduino.
-// La usan tanto /admin/kits/[id]/ficha como el bloque de "tu Academia"
-// en /nivel/[id] -- es puramente presentacional, no hace fetch ni
-// chequea permisos (eso lo hace quien la usa).
-export default function KitFichaContent({ kit, printableId }: { kit: KitFichaDetalle; printableId?: string }) {
-  const principal = kit.proyectos.find(p => p.tipo === 'principal') || null
-
+// Encabezado del kit (placa, precio, alimentacion, notas) + tabla de
+// materiales. Se usa solo en el tab "Mi Kit" de /academia/[...] y dentro
+// de la ficha completa combinada (KitFichaContent, mas abajo).
+export function KitHeaderMateriales({ kit }: { kit: KitFichaDetalle }) {
   return (
-    <div id={printableId} className="max-w-4xl mx-auto">
-      {/* Encabezado del kit */}
+    <div className="max-w-4xl mx-auto">
       <header className="mb-10">
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <Badge color="coral">{kit.levelId}</Badge>
@@ -148,8 +143,7 @@ export default function KitFichaContent({ kit, printableId }: { kit: KitFichaDet
         )}
       </header>
 
-      {/* Materiales */}
-      <section className="mb-10">
+      <section>
         <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 mb-3">
           <Package className="w-5 h-5 text-chaski-primary" /> Materiales del kit
         </h2>
@@ -185,89 +179,108 @@ export default function KitFichaContent({ kit, printableId }: { kit: KitFichaDet
           </table>
         </div>
       </section>
+    </div>
+  )
+}
 
-      {/* Proyectos */}
-      {kit.proyectos.map(p => {
-        const esquemaMostrado = p.esquema || (p.tipo === 'adicional' ? principal?.esquema : null)
-        const esquemaEsDelPrincipal = !p.esquema && !!esquemaMostrado
+// Un proyecto (principal o adicional): objetivos, conexiones, esquema y
+// codigo. Se usa como "leccion" en el tab Lecciones de /academia/[...]
+// y dentro de la ficha completa combinada.
+export function ProyectoCard({ proyecto: p, principal }: { proyecto: KitFichaProyecto; principal: KitFichaProyecto | null }) {
+  const esquemaMostrado = p.esquema || (p.tipo === 'adicional' ? principal?.esquema : null)
+  const esquemaEsDelPrincipal = !p.esquema && !!esquemaMostrado
 
-        return (
-          <section key={p.id} className="proyecto-imprimible mb-12 pt-8 border-t border-slate-200">
-            <div className="flex items-center gap-2 mb-2">
-              <Badge color={p.tipo === 'principal' ? 'coral' : 'slate'}>
-                {p.tipo === 'principal' ? 'Proyecto principal' : 'Proyecto adicional'}
-              </Badge>
-            </div>
-            <h2 className="text-xl font-bold text-slate-900 mb-2">{p.titulo}</h2>
-            {p.descripcion && <p className="text-slate-600 mb-4">{p.descripcion}</p>}
+  return (
+    <section className="proyecto-imprimible mb-12 pt-8 border-t border-slate-200 first:border-t-0 first:pt-0">
+      <div className="flex items-center gap-2 mb-2">
+        <Badge color={p.tipo === 'principal' ? 'coral' : 'slate'}>
+          {p.tipo === 'principal' ? 'Proyecto principal' : 'Proyecto adicional'}
+        </Badge>
+      </div>
+      <h2 className="text-xl font-bold text-slate-900 mb-2">{p.titulo}</h2>
+      {p.descripcion && <p className="text-slate-600 mb-4">{p.descripcion}</p>}
 
-            {p.objetivos.length > 0 && (
-              <div className="mb-5">
-                <h3 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">
-                  <Target className="w-4 h-4 text-chaski-primary" /> Objetivos de aprendizaje
-                </h3>
-                <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
-                  {p.objetivos.map((o, i) => <li key={i}>{o}</li>)}
-                </ul>
-              </div>
-            )}
+      {p.objetivos.length > 0 && (
+        <div className="mb-5">
+          <h3 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">
+            <Target className="w-4 h-4 text-chaski-primary" /> Objetivos de aprendizaje
+          </h3>
+          <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
+            {p.objetivos.map((o, i) => <li key={i}>{o}</li>)}
+          </ul>
+        </div>
+      )}
 
-            {p.conexiones.length > 0 && (
-              <div className="mb-5">
-                <h3 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">
-                  <Cable className="w-4 h-4 text-chaski-primary" /> Tabla de conexiones
-                </h3>
-                <div className="overflow-x-auto border border-slate-200 rounded-xl">
-                  <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
-                      <tr>
-                        <th className="text-left px-3 py-2 font-semibold">Componente</th>
-                        <th className="text-left px-3 py-2 font-semibold">Pin del componente</th>
-                        <th className="text-left px-3 py-2 font-semibold">Pin de la placa</th>
-                        <th className="text-left px-3 py-2 font-semibold">Nota</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {p.conexiones.map((c, i) => (
-                        <tr key={i}>
-                          <td className="px-3 py-2 text-slate-800 font-medium">{c.componente}</td>
-                          <td className="px-3 py-2 text-slate-600">{c.pinComponente}</td>
-                          <td className="px-3 py-2 text-slate-600 font-mono">{c.pinPlaca}</td>
-                          <td className="px-3 py-2 text-slate-400 text-xs">{c.nota || ''}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+      {p.conexiones.length > 0 && (
+        <div className="mb-5">
+          <h3 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">
+            <Cable className="w-4 h-4 text-chaski-primary" /> Tabla de conexiones
+          </h3>
+          <div className="overflow-x-auto border border-slate-200 rounded-xl">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
+                <tr>
+                  <th className="text-left px-3 py-2 font-semibold">Componente</th>
+                  <th className="text-left px-3 py-2 font-semibold">Pin del componente</th>
+                  <th className="text-left px-3 py-2 font-semibold">Pin de la placa</th>
+                  <th className="text-left px-3 py-2 font-semibold">Nota</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {p.conexiones.map((c, i) => (
+                  <tr key={i}>
+                    <td className="px-3 py-2 text-slate-800 font-medium">{c.componente}</td>
+                    <td className="px-3 py-2 text-slate-600">{c.pinComponente}</td>
+                    <td className="px-3 py-2 text-slate-600 font-mono">{c.pinPlaca}</td>
+                    <td className="px-3 py-2 text-slate-400 text-xs">{c.nota || ''}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
-            {esquemaMostrado && (
-              <div className="mb-5">
-                <h3 className="text-sm font-bold text-slate-700 mb-2">Esquema de conexion</h3>
-                {esquemaEsDelPrincipal && (
-                  <p className="text-xs text-slate-400 italic mb-2">
-                    Usa el mismo armado fisico del proyecto principal ({principal?.titulo}); solo cambia el programa.
-                  </p>
-                )}
-                <div
-                  className="border border-slate-200 rounded-xl p-2 bg-white overflow-x-auto"
-                  dangerouslySetInnerHTML={{ __html: esquemaMostrado.contenido }}
-                />
-              </div>
-            )}
+      {esquemaMostrado && (
+        <div className="mb-5">
+          <h3 className="text-sm font-bold text-slate-700 mb-2">Esquema de conexion</h3>
+          {esquemaEsDelPrincipal && (
+            <p className="text-xs text-slate-400 italic mb-2">
+              Usa el mismo armado fisico del proyecto principal ({principal?.titulo}); solo cambia el programa.
+            </p>
+          )}
+          <div
+            className="border border-slate-200 rounded-xl p-2 bg-white overflow-x-auto"
+            dangerouslySetInnerHTML={{ __html: esquemaMostrado.contenido }}
+          />
+        </div>
+      )}
 
-            {p.codigo && (
-              <div>
-                <h3 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">
-                  <Code2 className="w-4 h-4 text-chaski-primary" /> Codigo Arduino
-                </h3>
-                <CodeBlock code={p.codigo.contenido} />
-              </div>
-            )}
-          </section>
-        )
-      })}
+      {p.codigo && (
+        <div>
+          <h3 className="flex items-center gap-1.5 text-sm font-bold text-slate-700 mb-2">
+            <Code2 className="w-4 h-4 text-chaski-primary" /> Codigo Arduino
+          </h3>
+          <CodeBlock code={p.codigo.contenido} />
+        </div>
+      )}
+    </section>
+  )
+}
+
+// Ficha completa de un kit (header + materiales + todos los proyectos
+// seguidos), para imprimir/PDF. La usa /admin/kits/[id]/ficha.
+export default function KitFichaContent({ kit, printableId }: { kit: KitFichaDetalle; printableId?: string }) {
+  const principal = kit.proyectos.find(p => p.tipo === 'principal') || null
+
+  return (
+    <div id={printableId} className="max-w-4xl mx-auto">
+      <KitHeaderMateriales kit={kit} />
+      <div className="mt-10">
+        {kit.proyectos.map(p => (
+          <ProyectoCard key={p.id} proyecto={p} principal={principal} />
+        ))}
+      </div>
     </div>
   )
 }
