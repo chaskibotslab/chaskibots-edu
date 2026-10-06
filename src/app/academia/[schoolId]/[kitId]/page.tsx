@@ -179,7 +179,16 @@ function AcademiaKitPageInner({ kitId }: { kitId: string }) {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-chaski-dark">Proyectos del curso</h2>
-                  <p className="text-slate-500">Proyecto principal + {kit.proyectos.length - 1} adicionales</p>
+                  <p className="text-slate-500">
+                    {(() => {
+                      const practicas = kit.proyectos.filter((p: any) => p.tipo === 'practica').length
+                      const adicionales = kit.proyectos.filter((p: any) => p.tipo === 'adicional').length
+                      const partes = ['Proyecto principal']
+                      if (practicas > 0) partes.push(`${practicas} ${practicas === 1 ? 'práctica' : 'prácticas'}`)
+                      if (adicionales > 0) partes.push(`${adicionales} ${adicionales === 1 ? 'adicional' : 'adicionales'}`)
+                      return partes.join(' + ')
+                    })()}
+                  </p>
                 </div>
               </div>
               <LeccionesProyectos proyectos={kit.proyectos} />

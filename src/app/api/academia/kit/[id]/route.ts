@@ -25,6 +25,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     if (!kitRow) return NextResponse.json({ success: false, error: 'Kit no encontrado' }, { status: 404 })
 
     const [kit] = await buildKitFichas([kitRow])
+    // Los cursos de Academia muestran solo el proyecto principal + sus
+    // practicas (maximo 3-4 "circuitos" por kit, a pedido del cliente).
+    // Los "adicionales" se mantienen en la base de datos (no se borran,
+    // el admin los sigue viendo en /admin/kits) pero no se exponen aqui.
+    if (kit) kit.proyectos = kit.proyectos.filter((p: any) => p.tipo !== 'adicional')
     return NextResponse.json({ success: true, kit })
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error?.message || 'Error interno' }, { status: 500 })
