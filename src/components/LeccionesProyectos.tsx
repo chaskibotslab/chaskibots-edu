@@ -155,7 +155,15 @@ export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaP
                     </p>
                   )}
                   <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50/50 overflow-x-auto">
-                    <div dangerouslySetInnerHTML={{ __html: esquemaDelSeleccionado.contenido }} />
+                    {esquemaDelSeleccionado.tipo === 'imagen' && esquemaDelSeleccionado.url?.toLowerCase().endsWith('.pdf') ? (
+                      <a href={esquemaDelSeleccionado.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-chaski-primary font-medium underline">
+                        Ver esquema (PDF)
+                      </a>
+                    ) : esquemaDelSeleccionado.tipo === 'imagen' && esquemaDelSeleccionado.url ? (
+                      <img src={esquemaDelSeleccionado.url} alt="Esquema de conexión" className="w-full h-auto rounded-xl" />
+                    ) : (
+                      <div dangerouslySetInnerHTML={{ __html: esquemaDelSeleccionado.contenido }} />
+                    )}
                   </div>
                 </div>
               )}

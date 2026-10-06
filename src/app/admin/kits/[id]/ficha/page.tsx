@@ -65,12 +65,20 @@ export default function KitFichaPage() {
           <ArrowLeft className="w-4 h-4" /> Volver a Kits
         </Link>
         {kit && (
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-chaski-primary text-white text-sm font-semibold hover:bg-chaski-primary/90 transition-colors active:scale-[0.98]"
-          >
-            <Printer className="w-4 h-4" /> Imprimir / Guardar como PDF
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/admin/kits/${params.id}/editar`}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-chaski-primary text-chaski-primary text-sm font-semibold hover:bg-chaski-primary/5 transition-colors active:scale-[0.98]"
+            >
+              Editar contenido
+            </Link>
+            <button
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-chaski-primary text-white text-sm font-semibold hover:bg-chaski-primary/90 transition-colors active:scale-[0.98]"
+            >
+              <Printer className="w-4 h-4" /> Imprimir / Guardar como PDF
+            </button>
+          </div>
         )}
       </div>
 

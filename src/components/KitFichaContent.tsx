@@ -31,7 +31,7 @@ export interface KitFichaProyecto {
   objetivos: string[]
   orden: number
   conexiones: KitFichaConexion[]
-  esquema: { tipo: string; contenido: string } | null
+  esquema: { tipo: string; contenido: string; url?: string | null } | null
   codigo: { lenguaje: string; contenido: string } | null
 }
 
@@ -282,10 +282,15 @@ export function ProyectoCard({ proyecto: p, principal }: { proyecto: KitFichaPro
                 Usa el mismo armado físico del proyecto principal ({principal?.titulo}); solo cambia el programa.
               </p>
             )}
-            <div
-              className="border border-slate-200 rounded-2xl p-3 bg-slate-50/50 overflow-x-auto"
-              dangerouslySetInnerHTML={{ __html: esquemaMostrado.contenido }}
-            />
+            <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50/50 overflow-x-auto">
+              {esquemaMostrado.tipo === 'imagen' && esquemaMostrado.url?.toLowerCase().endsWith('.pdf') ? (
+                <a href={esquemaMostrado.url} target="_blank" rel="noopener noreferrer" className="text-chaski-primary font-medium underline">Ver esquema (PDF)</a>
+              ) : esquemaMostrado.tipo === 'imagen' && esquemaMostrado.url ? (
+                <img src={esquemaMostrado.url} alt="Esquema de conexión" className="w-full h-auto rounded-xl" />
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: esquemaMostrado.contenido }} />
+              )}
+            </div>
           </div>
         )}
 

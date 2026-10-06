@@ -94,7 +94,7 @@ export async function buildKitFichas(kitRows: any[]) {
         nota: c.nota,
       })),
       esquema: esquemaByProyecto.has(p.id)
-        ? { tipo: esquemaByProyecto.get(p.id).tipo, contenido: esquemaByProyecto.get(p.id).contenido }
+        ? { tipo: esquemaByProyecto.get(p.id).tipo, contenido: esquemaByProyecto.get(p.id).contenido, url: esquemaByProyecto.get(p.id).url }
         : null,
       codigo: codigoByProyecto.has(p.id)
         ? { lenguaje: codigoByProyecto.get(p.id).lenguaje, contenido: codigoByProyecto.get(p.id).contenido }
