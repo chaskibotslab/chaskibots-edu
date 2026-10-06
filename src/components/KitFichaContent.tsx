@@ -1,7 +1,7 @@
 'use client'
 
 import {
-  Cpu, School, DollarSign, Zap, ShieldAlert, Package, Target, Cable, Code2, Trophy, Wrench,
+  Cpu, School, DollarSign, Zap, ShieldAlert, Package, Target, Cable, Code2, Trophy, Wrench, Sparkles,
 } from 'lucide-react'
 import ArduinoCodeViewer from './ArduinoCodeViewer'
 
@@ -26,7 +26,7 @@ export interface KitFichaProyecto {
   id: string
   titulo: string
   slug: string
-  tipo: 'principal' | 'adicional'
+  tipo: 'principal' | 'adicional' | 'practica'
   descripcion: string | null
   objetivos: string[]
   orden: number
@@ -201,20 +201,29 @@ export function KitHeaderMateriales({ kit }: { kit: KitFichaDetalle }) {
 // Un proyecto (principal o adicional): objetivos, conexiones, esquema y
 // codigo. Se usa como "leccion" en el tab Lecciones de /academia/[...]
 // y dentro de la ficha completa combinada.
+const PROYECTO_TIPO_CONFIG = {
+  principal: { icon: Trophy, iconBg: 'bg-chaski-primary/10', iconColor: 'text-chaski-primary', badge: 'coral', label: 'Proyecto principal', topBar: 'bg-gradient-to-r from-chaski-primary to-chaski-gold', border: 'border-chaski-primary/25' },
+  adicional: { icon: Wrench, iconBg: 'bg-amber-50', iconColor: 'text-amber-600', badge: 'gold', label: 'Proyecto adicional', topBar: 'bg-slate-200', border: 'border-slate-200' },
+  practica: { icon: Sparkles, iconBg: 'bg-sky-50', iconColor: 'text-sky-600', badge: 'slate', label: 'Práctica', topBar: 'bg-sky-200', border: 'border-sky-200' },
+}
+
 export function ProyectoCard({ proyecto: p, principal }: { proyecto: KitFichaProyecto; principal: KitFichaProyecto | null }) {
-  const esquemaMostrado = p.esquema || (p.tipo === 'adicional' ? principal?.esquema : null)
+  // Las practicas y los adicionales que comparten armado con el
+  // principal no tienen esquema propio: se muestra el del principal.
+  const esquemaMostrado = p.esquema || (p.tipo !== 'principal' ? principal?.esquema : null)
   const esquemaEsDelPrincipal = !p.esquema && !!esquemaMostrado
-  const esPrincipal = p.tipo === 'principal'
+  const cfg = PROYECTO_TIPO_CONFIG[p.tipo]
+  const Icon = cfg.icon
 
   return (
-    <section className={`proyecto-imprimible mb-8 rounded-3xl border bg-white shadow-sm overflow-hidden ${esPrincipal ? 'border-chaski-primary/25' : 'border-slate-200'}`}>
-      <div className={`h-1.5 ${esPrincipal ? 'bg-gradient-to-r from-chaski-primary to-chaski-gold' : 'bg-slate-200'}`} />
+    <section className={`proyecto-imprimible mb-8 rounded-3xl border bg-white shadow-sm overflow-hidden ${cfg.border}`}>
+      <div className={`h-1.5 ${cfg.topBar}`} />
       <div className="p-6 sm:p-7">
         <div className="flex items-center gap-2 mb-3">
-          <span className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${esPrincipal ? 'bg-chaski-primary/10' : 'bg-amber-50'}`}>
-            {esPrincipal ? <Trophy className="w-4.5 h-4.5 text-chaski-primary" /> : <Wrench className="w-4.5 h-4.5 text-amber-600" />}
+          <span className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.iconBg}`}>
+            <Icon className={`w-4.5 h-4.5 ${cfg.iconColor}`} />
           </span>
-          <Badge color={esPrincipal ? 'coral' : 'gold'}>{esPrincipal ? 'Proyecto principal' : 'Proyecto adicional'}</Badge>
+          <Badge color={cfg.badge}>{cfg.label}</Badge>
         </div>
         <h2 className="text-xl font-bold text-slate-900 mb-2">{p.titulo}</h2>
         {p.descripcion && <p className="text-slate-600 mb-5 leading-relaxed">{p.descripcion}</p>}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Trophy, Wrench, Clock, ChevronRight, X, Target, Cable } from 'lucide-react'
+import { Trophy, Wrench, Sparkles, Clock, ChevronRight, X, Target, Cable } from 'lucide-react'
 import { KitFichaProyecto } from './KitFichaContent'
 import ArduinoCodeViewer from './ArduinoCodeViewer'
 
@@ -20,12 +20,20 @@ const typeConfig = {
     ring: 'ring-amber-200',
     label: 'Proyecto adicional',
   },
+  practica: {
+    icon: Sparkles,
+    color: 'text-sky-600',
+    bg: 'bg-sky-100',
+    ring: 'ring-sky-200',
+    label: 'Práctica',
+  },
 }
 
 // Duracion estimada solo para mostrar algo util en la fila (no hay dato
-// real todavia): 25 min base + 6 por cada conexion + 15 si trae codigo.
+// real todavia): las practicas son mas cortas (una sola pieza) que un
+// proyecto completo.
 function duracionEstimada(p: KitFichaProyecto): string {
-  const base = 25 + p.conexiones.length * 6 + (p.codigo ? 15 : 0)
+  const base = (p.tipo === 'practica' ? 12 : 25) + p.conexiones.length * 6 + (p.codigo ? 15 : 0)
   return `~${base} min`
 }
 
@@ -64,18 +72,32 @@ function ProyectoRow({ proyecto, index, onSelect }: { proyecto: KitFichaProyecto
 
 export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaProyecto[] }) {
   const [selected, setSelected] = useState<KitFichaProyecto | null>(null)
+  const practicas = proyectos.filter(p => p.tipo === 'practica')
   const principal = proyectos.find(p => p.tipo === 'principal') || null
   const adicionales = proyectos.filter(p => p.tipo === 'adicional')
-  const esquemaDelSeleccionado = selected ? (selected.esquema || (selected.tipo === 'adicional' ? principal?.esquema : null)) : null
+  // Las practicas y los adicionales que comparten armado con el
+  // principal no tienen esquema propio: se muestra el del principal.
+  const esquemaDelSeleccionado = selected ? (selected.esquema || (selected.tipo !== 'principal' ? principal?.esquema : null)) : null
   const esquemaEsDelPrincipal = !!selected && !selected.esquema && !!esquemaDelSeleccionado
 
   return (
     <>
       <div className="space-y-7">
+        {practicas.length > 0 && (
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-sky-600/80 mb-2.5">Práctica previa</p>
+            <p className="text-xs text-slate-400 mb-2.5 -mt-1.5">Antes del proyecto principal, practica con cada pieza por separado.</p>
+            <div className="space-y-2.5">
+              {practicas.map((p, i) => (
+                <ProyectoRow key={p.id} proyecto={p} index={i + 1} onSelect={() => setSelected(p)} />
+              ))}
+            </div>
+          </div>
+        )}
         {principal && (
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-chaski-primary/70 mb-2.5">Proyecto principal</p>
-            <ProyectoRow proyecto={principal} index={1} onSelect={() => setSelected(principal)} />
+            <ProyectoRow proyecto={principal} index={practicas.length + 1} onSelect={() => setSelected(principal)} />
           </div>
         )}
         {adicionales.length > 0 && (
@@ -83,7 +105,7 @@ export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaP
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">Proyectos adicionales</p>
             <div className="space-y-2.5">
               {adicionales.map((p, i) => (
-                <ProyectoRow key={p.id} proyecto={p} index={i + 2} onSelect={() => setSelected(p)} />
+                <ProyectoRow key={p.id} proyecto={p} index={practicas.length + i + 2} onSelect={() => setSelected(p)} />
               ))}
             </div>
           </div>
