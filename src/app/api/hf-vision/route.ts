@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireSession } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,6 +29,8 @@ function translate(label: string) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireSession(req)
+  if (!auth.ok) return auth.response
   const apiKey = process.env.HUGGINGFACE_API_KEY
   if (!apiKey) {
     return NextResponse.json(

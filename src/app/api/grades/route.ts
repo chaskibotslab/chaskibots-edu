@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin, requireSession } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,6 +23,8 @@ function rowToGrade(row: any) {
 }
 
 export async function GET(request: NextRequest) {
+  const auth = await requireSession(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
     const studentId = searchParams.get('studentId')
@@ -48,6 +51,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { studentName, studentId, lessonId, levelId, courseId, schoolId, taskId, score, feedback, gradedBy } = body

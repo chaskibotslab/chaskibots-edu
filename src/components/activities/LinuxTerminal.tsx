@@ -520,7 +520,7 @@ function processCommand(
 // ============================================================
 // RENDER THEORY (markdown mini)
 // ============================================================
-function renderTheory(text: string) {
+export function renderTheory(text: string) {
   const formatInline = (s: string) => {
     s = s.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>')
     s = s.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 bg-gray-700/50 text-green-300 rounded text-[10px] font-mono">$1</code>')

@@ -10,19 +10,18 @@ export async function POST(request: NextRequest) {
     // conociendo su email. Ahora la identidad sale de la cookie de sesión
     // firmada (HMAC), igual que en el middleware.
     const session = await verifySessionCookie(request.cookies.get(SESSION_COOKIE_NAME)?.value)
-    if (!session?.email) {
+    if (!session) {
       return NextResponse.json(
         { success: false, error: 'No autenticado' },
         { status: 401 }
       )
     }
-    const email = session.email
 
-    // Buscar usuario por email en Supabase
+    // Buscar usuario por id de sesión (los estudiantes entran con código y no tienen email)
     const { data, error } = await supabaseAdmin
       .from('users')
       .select('*')
-      .eq('email', email)
+      .eq('id', session.id)
       .limit(1)
 
     if (error) {

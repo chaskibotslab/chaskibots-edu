@@ -55,8 +55,8 @@ git push -u origin main
 2. Agrega las siguientes variables (copia de tu `.env.local`):
 
 ```
-AIRTABLE_API_KEY=pattYOEnWGkv9ObRe.891a5001dce0659c59f7188d8d8c1b8a63cd0bf0a852523db9ddd05611840486
-AIRTABLE_BASE_ID=appGayG3c8NkjCjav
+AIRTABLE_API_KEY=<tu_token_de_airtable>
+AIRTABLE_BASE_ID=<tu_base_id>
 AIRTABLE_KITS_TABLE_ID=kits_para_importar
 GOOGLE_DRIVE_FOLDER_ID=16SM93MXpHiVXE6cVPkfD4rcVS3FrhKDH
 GOOGLE_SERVICE_ACCOUNT_EMAIL=chaskibots-drive@chaskibots-edu.iam.gserviceaccount.com

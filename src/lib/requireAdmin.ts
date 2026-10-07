@@ -20,3 +20,16 @@ export async function requireAdmin(request: NextRequest): Promise<
   }
   return { ok: true, session }
 }
+
+// Cualquier usuario con sesión válida (admin, teacher o student). Para las
+// rutas /api/* que usan los estudiantes (entregas, progreso, archivos) y que
+// antes aceptaban llamadas sin haber iniciado sesión.
+export async function requireSession(request: NextRequest): Promise<
+  { ok: true; session: SessionPayload } | { ok: false; response: NextResponse }
+> {
+  const session = await verifySessionCookie(request.cookies.get(SESSION_COOKIE_NAME)?.value)
+  if (!session) {
+    return { ok: false, response: NextResponse.json({ success: false, error: 'No autenticado' }, { status: 401 }) }
+  }
+  return { ok: true, session }
+}

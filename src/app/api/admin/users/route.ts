@@ -13,6 +13,20 @@ import { requireAdmin } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
+// requireAdmin deja pasar a admin y a teacher. Sin este control extra un
+// profesor podía crear cuentas admin, subirse el rol a sí mismo, o regenerar
+// el código del administrador y entrar con él.
+const isAdminRole = (role: unknown) => String(role ?? '').toLowerCase().includes('admin')
+
+async function targetIsAdmin(userId: string): Promise<boolean> {
+  const { supabaseAdmin } = await import('@/lib/supabase')
+  const { data } = await supabaseAdmin.from('users').select('role').eq('id', userId).limit(1)
+  return isAdminRole(data?.[0]?.role)
+}
+
+const soloAdmin = () =>
+  NextResponse.json({ success: false, error: 'Solo un administrador puede hacer esto' }, { status: 403 })
+
 // GET - Obtener usuarios (todos o filtrados)
 export async function GET(request: NextRequest) {
   const auth = await requireAdmin(request)
@@ -174,6 +188,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear usuario individual
+    if (isAdminRole(role) && auth.session.role !== 'admin') return soloAdmin()
     if (!name || !role || !levelId) {
       return NextResponse.json(
         { success: false, error: 'Faltan campos requeridos: nombre, rol y nivel' },
@@ -261,6 +276,10 @@ export async function PATCH(request: NextRequest) {
         { success: false, error: 'userId y action son requeridos' },
         { status: 400 }
       )
+    }
+
+    if (auth.session.role !== 'admin') {
+      if (isAdminRole(body.role) || await targetIsAdmin(userId)) return soloAdmin()
     }
 
     if (action === 'regenerate') {
@@ -372,6 +391,8 @@ export async function DELETE(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    if (auth.session.role !== 'admin' && await targetIsAdmin(userId)) return soloAdmin()
 
     // Eliminar usuario de Supabase
     const { supabaseAdmin } = await import('@/lib/supabase')

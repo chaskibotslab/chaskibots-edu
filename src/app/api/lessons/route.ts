@@ -1,8 +1,9 @@
 /**
  * API /lessons usando Supabase
  */
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -94,7 +95,9 @@ export async function GET(request: Request) {
 // ============================================================
 // POST /api/lessons - Crear lección
 // ============================================================
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
 
@@ -134,7 +137,9 @@ export async function POST(request: Request) {
 // ============================================================
 // PUT /api/lessons - Actualizar lección
 // ============================================================
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { id, ...rest } = body
@@ -173,7 +178,9 @@ export async function PUT(request: Request) {
 // ============================================================
 // DELETE /api/lessons?id=X
 // ============================================================
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')

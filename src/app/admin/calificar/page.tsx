@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
-import { supabase } from '@/lib/supabase'
 import {
   ArrowLeft, Search, Loader2, Clock, CheckCircle2, Award,
   User, FileText, ChevronRight, X, Star, Send,
@@ -82,6 +81,7 @@ export default function CalificarPage() {
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<Submission | null>(null)
   const [newCount, setNewCount] = useState(0)
+  const lastCount = useRef<number | null>(null)
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || !isTeacher)) {
@@ -98,7 +98,13 @@ export default function CalificarPage() {
       const subsData = await subsRes.json()
       const tasksData = await tasksRes.json()
 
-      setSubmissions(subsData.submissions || [])
+      const subs = subsData.submissions || []
+      if (lastCount.current !== null && subs.length > lastCount.current) {
+        const added = subs.length - lastCount.current
+        setNewCount(c => c + added)
+      }
+      lastCount.current = subs.length
+      setSubmissions(subs)
       const taskMap: Record<string, Task> = {}
       for (const t of tasksData.tasks || []) {
         taskMap[t.id] = { id: t.id, title: t.title, points: t.points, category: t.category }
@@ -115,20 +121,13 @@ export default function CalificarPage() {
     if (user) loadData()
   }, [user, loadData])
 
-  // Realtime subscription
+  // Refresco periódico. Antes era una suscripción Realtime con la clave
+  // pública de Supabase, lo que obligaba a dejar la tabla submissions legible
+  // para cualquiera en internet.
   useEffect(() => {
     if (!user) return
-    const channel = supabase
-      .channel('submissions-realtime')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'submissions' }, () => {
-        setNewCount(c => c + 1)
-        loadData()
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'submissions' }, () => {
-        loadData()
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
+    const timer = setInterval(loadData, 30000)
+    return () => clearInterval(timer)
   }, [user, loadData])
 
   const stats = useMemo(() => ({

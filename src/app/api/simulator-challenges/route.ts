@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin, requireSession } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,6 +56,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireSession(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { challengeId, challengeName, challengeCategory, challengeDifficulty, studentName, studentEmail, courseId, schoolId, levelId } = body
@@ -91,6 +94,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { id, status, verifiedBy } = body
@@ -112,6 +117,8 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')

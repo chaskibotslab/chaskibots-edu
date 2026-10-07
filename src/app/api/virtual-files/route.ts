@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireSession } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,6 +22,8 @@ function rowToFile(row: any) {
 }
 
 export async function GET(request: NextRequest) {
+  const auth = await requireSession(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
@@ -43,6 +46,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireSession(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { userId, userName, path, name, type, content, mimeType, permissions } = body
@@ -72,6 +77,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const auth = await requireSession(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { id, content, name, permissions } = body
@@ -95,9 +102,11 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const auth = await requireSession(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
+    const id = searchParams.get('id') || searchParams.get('recordId')
     if (!id) return NextResponse.json({ error: 'id requerido' }, { status: 400 })
 
     const { error } = await supabaseAdmin.from('virtual_files').delete().eq('id', id)

@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireSession } from '@/lib/requireAdmin'
 
 const DEFAULT_BUCKET = 'submissions'
 
@@ -7,6 +8,10 @@ const DEFAULT_BUCKET = 'submissions'
 // privados de estudiantes), así que se crean con URL pública fija en vez de
 // signed URL que expira.
 const PUBLIC_BUCKETS = ['experiencias']
+
+// Únicos buckets a los que la app sube archivos. Antes el nombre venía
+// libre del formulario y el endpoint creaba cualquier bucket que le pidieran.
+const ALLOWED_BUCKETS = ['submissions', 'experiencias', 'lesson-images']
 
 async function ensureBucket(bucket: string) {
   try {
@@ -34,11 +39,17 @@ async function isPublicBucket(bucket: string): Promise<boolean> {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const auth = await requireSession(request)
+  if (!auth.ok) return auth.response
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File
     const bucket = (formData.get('bucket') as string) || DEFAULT_BUCKET
+
+    if (!ALLOWED_BUCKETS.includes(bucket)) {
+      return NextResponse.json({ error: 'Bucket no permitido' }, { status: 400 })
+    }
 
     if (!file) {
       return NextResponse.json({ error: 'No se proporcionó archivo' }, { status: 400 })
@@ -75,7 +86,8 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(arrayBuffer)
 
     const timestamp = Date.now()
-    const fileName = `${timestamp}-${file.name}`
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-120)
+    const fileName = `${timestamp}-${safeName}`
     const filePath = `uploads/${fileName}`
 
     const { error: uploadError } = await supabaseAdmin.storage

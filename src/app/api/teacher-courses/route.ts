@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin, requireSession } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +19,8 @@ function rowToTC(row: any) {
 }
 
 export async function GET(request: NextRequest) {
+  const auth = await requireSession(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
     const teacherId = searchParams.get('teacherId')
@@ -36,6 +39,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { teacherId, teacherName, courseId, courseName, levelId, schoolId, schoolName } = body
@@ -55,9 +60,11 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
+    const id = searchParams.get('id') || searchParams.get('recordId')
     if (!id) return NextResponse.json({ error: 'id requerido' }, { status: 400 })
 
     const { error } = await supabaseAdmin.from('teacher_courses').delete().eq('id', id)

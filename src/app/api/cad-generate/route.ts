@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ALLOWED_CALLS, GLSL_KEYWORDS } from '@/components/AILab/sdfShaderLib'
+import { requireSession } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -103,6 +104,8 @@ async function callModel(apiKey: string, messages: { role: string; content: stri
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireSession(req)
+  if (!auth.ok) return auth.response
   const apiKey = process.env.HUGGINGFACE_API_KEY
   if (!apiKey) {
     return NextResponse.json({ error: 'La IA de generación 3D no está configurada todavía.' }, { status: 503 })

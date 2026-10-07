@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireSession } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
 // GET /api/academy/progress?userId=xxx&courseSlug=python
 export async function GET(req: NextRequest) {
+  const auth = await requireSession(req)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(req.url)
     const userId = searchParams.get('userId')
@@ -12,6 +15,9 @@ export async function GET(req: NextRequest) {
 
     if (!userId) {
       return NextResponse.json({ error: 'userId required' }, { status: 400 })
+    }
+    if (auth.session.role === 'student' && userId !== auth.session.id) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
     }
 
     let query = supabaseAdmin
@@ -37,12 +43,17 @@ export async function GET(req: NextRequest) {
 
 // POST /api/academy/progress - Save progress
 export async function POST(req: NextRequest) {
+  const auth = await requireSession(req)
+  if (!auth.ok) return auth.response
   try {
     const body = await req.json()
     const { userId, lessonId, completed, score, codeSubmitted } = body
 
     if (!userId || !lessonId) {
       return NextResponse.json({ error: 'userId and lessonId required' }, { status: 400 })
+    }
+    if (auth.session.role === 'student' && userId !== auth.session.id) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
     }
 
     const { data, error } = await supabaseAdmin

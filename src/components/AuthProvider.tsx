@@ -53,19 +53,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessLogs, setAccessLogs] = useState<AccessLog[]>([])
 
   // Función para refrescar datos del usuario desde Airtable
-  const refreshUserData = async (identifier: { accessCode?: string; email?: string }) => {
+  const refreshUserData = async () => {
     try {
-      const body = identifier.accessCode 
-        ? { accessCode: identifier.accessCode }
-        : { email: identifier.email, password: '' } // Usamos API de refresh
-      
-      // Usar endpoint de refresh si existe, o login con accessCode
-      const endpoint = identifier.accessCode ? '/api/auth/login' : '/api/auth/refresh'
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(identifier.accessCode ? { accessCode: identifier.accessCode } : { email: identifier.email })
-      })
+      // La identidad sale de la cookie de sesión. Antes se re-enviaba el
+      // código de acceso a /api/auth/login en cada carga de página: si el
+      // código había cambiado, cada carga contaba como intento fallido y
+      // podía bloquear por IP a todo el colegio.
+      const response = await fetch('/api/auth/refresh', { method: 'POST' })
       const data = await response.json()
       if (data.success && data.user) {
         const refreshedUser: User = {
@@ -109,11 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(parsedUser)
 
         // Refrescar datos del usuario desde Airtable
-        if (parsedUser.accessCode) {
-          refreshUserData({ accessCode: parsedUser.accessCode })
-        } else if (parsedUser.email) {
-          refreshUserData({ email: parsedUser.email })
-        }
+        refreshUserData()
       } catch {
         localStorage.removeItem('chaskibots_user')
         localStorage.removeItem('chaskibots_session_exp')

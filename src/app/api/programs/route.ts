@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,6 +46,8 @@ export async function GET(request: NextRequest) {
 
 // POST - Crear programa
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { name, description, levelId, levelName, type, duration, price } = body
@@ -84,6 +87,8 @@ export async function POST(request: NextRequest) {
 
 // PATCH - Actualizar programa
 export async function PATCH(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const body = await request.json()
     const { programId, name, description, levelId, levelName, type, duration, price, isActive } = body
@@ -114,6 +119,8 @@ export async function PATCH(request: NextRequest) {
 
 // DELETE - Eliminar programa
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (!auth.ok) return auth.response
   try {
     const { searchParams } = new URL(request.url)
     const programId = searchParams.get('programId')
