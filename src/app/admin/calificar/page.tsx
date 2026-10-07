@@ -232,7 +232,7 @@ export default function CalificarPage() {
                 key={f.id}
                 onClick={() => setFilter(f.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all active:scale-[0.98] border whitespace-nowrap ${
-                  active ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                  active ? 'bg-chaski-primary text-white border-chaski-primary' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -531,7 +531,7 @@ function GradingSheet({ submission, task, gradedBy, onClose, onGraded }: {
                     onClick={() => setGrade(qg.value)}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold border transition-all active:scale-[0.98] ${
                       grade === qg.value
-                        ? 'bg-slate-900 text-white border-slate-900 scale-105'
+                        ? 'bg-chaski-primary text-white border-chaski-primary scale-105'
                         : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                     }`}
                   >

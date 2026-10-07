@@ -748,7 +748,7 @@ function AdminTareasContent() {
                     onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'drive', attachmentData: '', attachmentName: '' }))}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-[0.98] flex items-center gap-2 ${
                       formData.attachmentType === 'drive'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-chaski-primary text-white'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >

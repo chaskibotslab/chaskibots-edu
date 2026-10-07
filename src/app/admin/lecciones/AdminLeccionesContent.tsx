@@ -250,7 +250,7 @@ export default function AdminLeccionesContent() {
               onClick={() => { setSelectedProgram(p.id); setSelectedLessonId(null); setIsCreating(false) }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                 selectedProgram === p.id
-                  ? 'bg-slate-900 text-white shadow-sm'
+                  ? 'bg-chaski-primary text-white shadow-sm'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -358,7 +358,7 @@ export default function AdminLeccionesContent() {
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
           <div className={`flex items-center gap-2 px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-xl ${
-            toast.type === 'success' ? 'bg-slate-900/90 text-white' : 'bg-red-500/95 text-white'
+            toast.type === 'success' ? 'bg-chaski-dark/90 text-white' : 'bg-red-500/95 text-white'
           }`}>
             {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
             <span className="font-medium text-sm">{toast.text}</span>

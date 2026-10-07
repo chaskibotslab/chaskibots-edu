@@ -523,10 +523,10 @@ function EntregasContent() {
                             target="_blank"
                             rel="noopener noreferrer"
                             download
-                            className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/30"
+                            className="flex items-center gap-2 p-3 bg-chaski-primary/10 hover:bg-chaski-primary/20 rounded-lg transition-colors border border-chaski-primary/30"
                           >
-                            <Download className="w-5 h-5 text-blue-500 shrink-0" />
-                            <span className="text-sm text-blue-700 truncate flex-1">{fileName}</span>
+                            <Download className="w-5 h-5 text-chaski-primary shrink-0" />
+                            <span className="text-sm text-chaski-primary truncate flex-1">{fileName}</span>
                           </a>
                         )
                       })}
@@ -578,10 +578,10 @@ function EntregasContent() {
                                   href={file.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-500/30"
+                                  className="flex items-center gap-2 p-3 bg-chaski-primary/10 hover:bg-chaski-primary/20 rounded-lg transition-colors border border-chaski-primary/30"
                                 >
-                                  <Download className="w-5 h-5 text-blue-500" />
-                                  <span className="text-sm text-blue-700 flex-1">{file.name}</span>
+                                  <Download className="w-5 h-5 text-chaski-primary" />
+                                  <span className="text-sm text-chaski-primary flex-1">{file.name}</span>
                                   <span className="text-xs text-slate-500">Ver en Google Drive →</span>
                                 </a>
                               )

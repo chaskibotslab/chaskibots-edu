@@ -250,7 +250,7 @@ export default function AdminLessonsPage() {
           </div>
           <button 
             onClick={fetchLessons}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-300 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Actualizar
@@ -580,14 +580,14 @@ export default function AdminLessonsPage() {
                       <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                         <button
                           onClick={cancelEditing}
-                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-300 transition-colors"
+                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors"
                         >
                           Cancelar
                         </button>
                         <button
                           onClick={saveLesson}
                           disabled={saving}
-                          className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-gray-900 font-medium transition-colors disabled:opacity-50"
+                          className="flex items-center gap-2 px-6 py-2 bg-chaski-primary hover:bg-chaski-primary/90 rounded-lg text-white font-medium transition-colors disabled:opacity-50"
                         >
                           {saving ? (
                             <RefreshCw className="w-4 h-4 animate-spin" />
