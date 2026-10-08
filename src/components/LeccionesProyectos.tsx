@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { Trophy, Wrench, Sparkles, Clock, ChevronRight, X, Target, Cable } from 'lucide-react'
-import { KitFichaProyecto } from './KitFichaContent'
+import { KitFichaProyecto, EsquemaBloque, fotoArmado } from './KitFichaContent'
+import ProyectoGuia from './ProyectoGuia'
 import ArduinoCodeViewer from './ArduinoCodeViewer'
 
 const typeConfig = {
@@ -33,6 +34,7 @@ const typeConfig = {
 // real todavia): las practicas son mas cortas (una sola pieza) que un
 // proyecto completo.
 function duracionEstimada(p: KitFichaProyecto): string {
+  if (p.guia?.reto.duracion) return p.guia.reto.duracion
   const base = (p.tipo === 'practica' ? 12 : 25) + p.conexiones.length * 6 + (p.codigo ? 15 : 0)
   return `~${base} min`
 }
@@ -70,15 +72,11 @@ function ProyectoRow({ proyecto, index, onSelect }: { proyecto: KitFichaProyecto
   )
 }
 
-export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaProyecto[] }) {
+export default function LeccionesProyectos({ proyectos, boardName }: { proyectos: KitFichaProyecto[]; boardName?: string | null }) {
   const [selected, setSelected] = useState<KitFichaProyecto | null>(null)
   const practicas = proyectos.filter(p => p.tipo === 'practica')
   const principal = proyectos.find(p => p.tipo === 'principal') || null
   const adicionales = proyectos.filter(p => p.tipo === 'adicional')
-  // Las practicas y los adicionales que comparten armado con el
-  // principal no tienen esquema propio: se muestra el del principal.
-  const esquemaDelSeleccionado = selected ? (selected.esquema || (selected.tipo !== 'principal' ? principal?.esquema : null)) : null
-  const esquemaEsDelPrincipal = !!selected && !selected.esquema && !!esquemaDelSeleccionado
 
   return (
     <>
@@ -143,30 +141,24 @@ export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaP
               </button>
             </div>
 
+            {selected.guia ? (
+              <div className="p-6">
+                <ProyectoGuia
+                  key={selected.id}
+                  proyectoId={selected.id}
+                  slug={selected.slug}
+                  guia={selected.guia}
+                  conexiones={selected.conexiones.length > 0 ? selected.conexiones : principal?.conexiones || []}
+                  boardName={boardName}
+                  codigo={selected.codigo?.contenido}
+                  fotoArmadoUrl={fotoArmado(selected)}
+                />
+              </div>
+            ) : (
             <div className="p-6 space-y-7">
               {selected.descripcion && <p className="text-slate-600 leading-relaxed">{selected.descripcion}</p>}
 
-              {esquemaDelSeleccionado && (
-                <div>
-                  <h4 className="text-sm font-bold text-slate-700 mb-2.5">Esquema de conexión</h4>
-                  {esquemaEsDelPrincipal && (
-                    <p className="text-xs text-slate-400 italic mb-2">
-                      Usa el mismo armado físico del proyecto principal ({principal?.titulo}); solo cambia el programa.
-                    </p>
-                  )}
-                  <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50/50 overflow-x-auto">
-                    {esquemaDelSeleccionado.tipo === 'imagen' && esquemaDelSeleccionado.url?.toLowerCase().endsWith('.pdf') ? (
-                      <a href={esquemaDelSeleccionado.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-chaski-primary font-medium underline">
-                        Ver esquema (PDF)
-                      </a>
-                    ) : esquemaDelSeleccionado.tipo === 'imagen' && esquemaDelSeleccionado.url ? (
-                      <img src={esquemaDelSeleccionado.url} alt="Esquema de conexión" className="w-full h-auto rounded-xl" />
-                    ) : (
-                      <div dangerouslySetInnerHTML={{ __html: esquemaDelSeleccionado.contenido }} />
-                    )}
-                  </div>
-                </div>
-              )}
+              <EsquemaBloque proyecto={selected} principal={principal} boardName={boardName} />
 
               {selected.objetivos.length > 0 && (
                 <div>
@@ -221,6 +213,7 @@ export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaP
                 </div>
               )}
             </div>
+            )}
           </div>
         </div>
         )

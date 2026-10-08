@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import { parseGuia } from '@/lib/kitGuia'
 
 // Arma la ficha completa (placa + materiales + cada proyecto con sus
 // conexiones/esquema/codigo) de uno o varios kits a la vez, en lote (sin
@@ -87,6 +88,7 @@ export async function buildKitFichas(kitRows: any[]) {
       descripcion: p.descripcion,
       objetivos: p.objetivos || [],
       orden: p.orden,
+      guia: parseGuia(p.guia),
       conexiones: (conexionesByProyecto.get(p.id) || []).map((c: any) => ({
         componente: c.componente,
         pinComponente: c.pin_componente,

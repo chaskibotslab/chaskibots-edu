@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { ArrowLeft, Loader2, AlertCircle, Save, Upload, Trash2, CheckCircle2, Image as ImageIcon, Code2 } from 'lucide-react'
 import { KitFichaDetalle, KitFichaProyecto } from '@/components/KitFichaContent'
+import GuiaEditor from '@/components/admin/GuiaEditor'
+import type { KitGuia } from '@/lib/kitGuia'
 
 const TIPO_LABEL: Record<string, string> = { principal: 'Proyecto principal', adicional: 'Proyecto adicional', practica: 'Práctica' }
 
@@ -14,6 +16,7 @@ function ProyectoEditor({ kitId, proyecto, onSaved }: { kitId: string; proyecto:
   const [descripcion, setDescripcion] = useState(proyecto.descripcion || '')
   const [objetivos, setObjetivos] = useState((proyecto.objetivos || []).join('\n'))
   const [codigo, setCodigo] = useState(proyecto.codigo?.contenido || '')
+  const [guia, setGuia] = useState<KitGuia | null>(proyecto.guia || null)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -22,7 +25,6 @@ function ProyectoEditor({ kitId, proyecto, onSaved }: { kitId: string; proyecto:
 
   const esquemaUrl = proyecto.esquema?.tipo === 'imagen' ? proyecto.esquema.url : null
   const esPdf = esquemaUrl?.toLowerCase().endsWith('.pdf')
-  const esGenerado = proyecto.esquema?.tipo === 'svg'
 
   function markDirty() { setDirty(true); setMsg(null) }
 
@@ -37,6 +39,7 @@ function ProyectoEditor({ kitId, proyecto, onSaved }: { kitId: string; proyecto:
           titulo, descripcion,
           objetivos: objetivos.split('\n').map(o => o.trim()).filter(Boolean),
           codigo,
+          ...(guia ? { guia } : {}),
         }),
       })
       const data = await res.json()
@@ -117,12 +120,11 @@ function ProyectoEditor({ kitId, proyecto, onSaved }: { kitId: string; proyecto:
       </div>
 
       <div>
-        <label className="text-xs font-semibold text-slate-500 mb-1 flex items-center gap-1.5"><ImageIcon className="w-3.5 h-3.5" /> Esquema de conexión</label>
+        <label className="text-xs font-semibold text-slate-500 mb-1 flex items-center gap-1.5"><ImageIcon className="w-3.5 h-3.5" /> Foto del armado real (opcional)</label>
         <div className="border border-slate-200 rounded-lg p-3 bg-slate-50/60 space-y-2">
           {esquemaUrl && !esPdf && <img src={esquemaUrl} alt="esquema" className="max-h-48 rounded-lg border border-slate-200" />}
           {esPdf && <a href={esquemaUrl!} target="_blank" rel="noopener noreferrer" className="text-chaski-primary text-sm underline">Ver PDF subido</a>}
-          {esGenerado && <p className="text-xs text-slate-400 italic">Usando el diagrama generado automáticamente.</p>}
-          {!proyecto.esquema && <p className="text-xs text-slate-400 italic">Sin esquema (usa el del proyecto principal si aplica).</p>}
+          <p className="text-xs text-slate-400 italic">El diagrama de cables se dibuja solo a partir de la tabla de conexiones. Aquí puedes añadir una foto real del armado.</p>
           <div className="flex items-center gap-2">
             <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,application/pdf" className="hidden"
               onChange={e => { const f = e.target.files?.[0]; if (f) subirEsquema(f) }} />
@@ -139,6 +141,10 @@ function ProyectoEditor({ kitId, proyecto, onSaved }: { kitId: string; proyecto:
           </div>
         </div>
       </div>
+
+      {guia
+        ? <GuiaEditor guia={guia} onChange={g => { setGuia(g); markDirty() }} />
+        : <p className="text-xs text-slate-400 italic">Este proyecto todavía no tiene guía paso a paso.</p>}
 
       <button onClick={guardar} disabled={!dirty || saving}
         className="inline-flex items-center gap-2 px-4 py-2 bg-chaski-primary text-white rounded-lg text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-chaski-primary/90">

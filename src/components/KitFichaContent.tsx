@@ -4,6 +4,9 @@ import {
   Cpu, School, DollarSign, Zap, ShieldAlert, Package, Target, Cable, Code2, Trophy, Wrench, Sparkles,
 } from 'lucide-react'
 import ArduinoCodeViewer from './ArduinoCodeViewer'
+import WiringDiagram from './WiringDiagram'
+import ProyectoGuia from './ProyectoGuia'
+import type { KitGuia } from '@/lib/kitGuia'
 
 export interface KitFichaMaterial {
   id: string
@@ -33,6 +36,7 @@ export interface KitFichaProyecto {
   conexiones: KitFichaConexion[]
   esquema: { tipo: string; contenido: string; url?: string | null } | null
   codigo: { lenguaje: string; contenido: string } | null
+  guia?: KitGuia | null
 }
 
 export interface KitFichaDetalle {
@@ -198,6 +202,48 @@ export function KitHeaderMateriales({ kit }: { kit: KitFichaDetalle }) {
   )
 }
 
+// Foto del armado subida por el admin (si es imagen, no PDF).
+export function fotoArmado(p: KitFichaProyecto): string | null {
+  const url = p.esquema?.tipo === 'imagen' ? p.esquema.url : null
+  return url && !url.toLowerCase().endsWith('.pdf') ? url : null
+}
+
+// Esquema de un proyecto: el diagrama se dibuja a partir de la tabla de
+// conexiones (las prácticas sin conexiones propias usan las del principal).
+// Si el admin subió una foto o PDF del armado, se muestra además.
+export function EsquemaBloque({ proyecto: p, principal, boardName }: { proyecto: KitFichaProyecto; principal: KitFichaProyecto | null; boardName?: string | null }) {
+  const propias = p.conexiones.length > 0
+  const conexiones = propias ? p.conexiones : principal?.conexiones || []
+  const foto = fotoArmado(p)
+  const pdf = p.esquema?.tipo === 'imagen' && p.esquema.url?.toLowerCase().endsWith('.pdf') ? p.esquema.url : null
+  const legacy = conexiones.length === 0 && p.esquema?.tipo !== 'imagen' ? p.esquema?.contenido || principal?.esquema?.contenido : null
+  if (conexiones.length === 0 && !foto && !pdf && !legacy) return null
+
+  return (
+    <div>
+      <h3 className="text-sm font-bold text-slate-700 mb-2.5">Esquema de conexión</h3>
+      {!propias && conexiones.length > 0 && (
+        <p className="text-xs text-slate-400 italic mb-2">
+          Usa el mismo armado físico del proyecto principal ({principal?.titulo}); solo cambia el programa.
+        </p>
+      )}
+      {conexiones.length > 0 && (
+        <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+          <WiringDiagram boardName={boardName} conexiones={conexiones} />
+        </div>
+      )}
+      {legacy && <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50/50 overflow-x-auto" dangerouslySetInnerHTML={{ __html: legacy }} />}
+      {foto && (
+        <div className="mt-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Foto del armado real</p>
+          <img src={foto} alt="Armado real" className="w-full h-auto rounded-2xl border border-slate-200" />
+        </div>
+      )}
+      {pdf && <a href={pdf} target="_blank" rel="noopener noreferrer" className="inline-block mt-3 text-chaski-primary font-medium underline">Ver esquema (PDF)</a>}
+    </div>
+  )
+}
+
 // Un proyecto (principal o adicional): objetivos, conexiones, esquema y
 // codigo. Se usa como "leccion" en el tab Lecciones de /academia/[...]
 // y dentro de la ficha completa combinada.
@@ -207,11 +253,7 @@ const PROYECTO_TIPO_CONFIG = {
   practica: { icon: Sparkles, iconBg: 'bg-chaski-primary/5', iconColor: 'text-chaski-primary', badge: 'slate', label: 'Práctica', topBar: 'bg-chaski-primary/20', border: 'border-chaski-primary/30' },
 }
 
-export function ProyectoCard({ proyecto: p, principal }: { proyecto: KitFichaProyecto; principal: KitFichaProyecto | null }) {
-  // Las practicas y los adicionales que comparten armado con el
-  // principal no tienen esquema propio: se muestra el del principal.
-  const esquemaMostrado = p.esquema || (p.tipo !== 'principal' ? principal?.esquema : null)
-  const esquemaEsDelPrincipal = !p.esquema && !!esquemaMostrado
+export function ProyectoCard({ proyecto: p, principal, boardName }: { proyecto: KitFichaProyecto; principal: KitFichaProyecto | null; boardName?: string | null }) {
   const cfg = PROYECTO_TIPO_CONFIG[p.tipo]
   const Icon = cfg.icon
 
@@ -274,33 +316,29 @@ export function ProyectoCard({ proyecto: p, principal }: { proyecto: KitFichaPro
           </div>
         )}
 
-        {esquemaMostrado && (
-          <div className="mb-6">
-            <h3 className="text-sm font-bold text-slate-700 mb-2.5">Esquema de conexión</h3>
-            {esquemaEsDelPrincipal && (
-              <p className="text-xs text-slate-400 italic mb-2">
-                Usa el mismo armado físico del proyecto principal ({principal?.titulo}); solo cambia el programa.
-              </p>
+        {p.guia ? (
+          <ProyectoGuia
+            proyectoId={p.id}
+            slug={p.slug}
+            guia={p.guia}
+            conexiones={p.conexiones.length > 0 ? p.conexiones : principal?.conexiones || []}
+            boardName={boardName}
+            codigo={p.codigo?.contenido}
+            fotoArmadoUrl={fotoArmado(p)}
+            expandido
+          />
+        ) : (
+          <>
+            <div className="mb-6"><EsquemaBloque proyecto={p} principal={principal} boardName={boardName} /></div>
+            {p.codigo && (
+              <div>
+                <h3 className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
+                  <Code2 className="w-4 h-4 text-chaski-primary" /> Código Arduino
+                </h3>
+                <ArduinoCodeViewer code={p.codigo.contenido} filename={`${p.slug}.ino`} />
+              </div>
             )}
-            <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50/50 overflow-x-auto">
-              {esquemaMostrado.tipo === 'imagen' && esquemaMostrado.url?.toLowerCase().endsWith('.pdf') ? (
-                <a href={esquemaMostrado.url} target="_blank" rel="noopener noreferrer" className="text-chaski-primary font-medium underline">Ver esquema (PDF)</a>
-              ) : esquemaMostrado.tipo === 'imagen' && esquemaMostrado.url ? (
-                <img src={esquemaMostrado.url} alt="Esquema de conexión" className="w-full h-auto rounded-xl" />
-              ) : (
-                <div dangerouslySetInnerHTML={{ __html: esquemaMostrado.contenido }} />
-              )}
-            </div>
-          </div>
-        )}
-
-        {p.codigo && (
-          <div>
-            <h3 className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
-              <Code2 className="w-4 h-4 text-chaski-primary" /> Código Arduino
-            </h3>
-            <ArduinoCodeViewer code={p.codigo.contenido} filename={`${p.slug}.ino`} />
-          </div>
+          </>
         )}
       </div>
     </section>
@@ -317,7 +355,7 @@ export default function KitFichaContent({ kit, printableId }: { kit: KitFichaDet
       <KitHeaderMateriales kit={kit} />
       <div className="mt-10 space-y-6">
         {kit.proyectos.map(p => (
-          <ProyectoCard key={p.id} proyecto={p} principal={principal} />
+          <ProyectoCard key={p.id} proyecto={p} principal={principal} boardName={kit.placa?.nombre} />
         ))}
       </div>
     </div>

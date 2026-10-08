@@ -13,7 +13,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
   try {
     const body = await request.json()
-    const { titulo, descripcion, objetivos, codigo } = body
+    const { titulo, descripcion, objetivos, codigo, guia } = body
 
     const { data: proyecto, error: proyErr } = await supabaseAdmin
       .from('kit_proyectos')
@@ -28,6 +28,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     if (titulo !== undefined) updateFields.titulo = titulo
     if (descripcion !== undefined) updateFields.descripcion = descripcion
     if (objetivos !== undefined) updateFields.objetivos = objetivos
+    if (guia !== undefined) updateFields.guia = guia
 
     if (Object.keys(updateFields).length > 0) {
       const { error: updErr } = await supabaseAdmin.from('kit_proyectos').update(updateFields).eq('id', proyecto.id)

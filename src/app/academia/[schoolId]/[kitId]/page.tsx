@@ -191,7 +191,7 @@ function AcademiaKitPageInner({ kitId }: { kitId: string }) {
                   </p>
                 </div>
               </div>
-              <LeccionesProyectos proyectos={kit.proyectos} />
+              <LeccionesProyectos proyectos={kit.proyectos} boardName={kit.placa?.nombre} />
             </div>
           )}
 
