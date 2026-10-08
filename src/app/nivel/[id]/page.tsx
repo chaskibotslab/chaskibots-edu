@@ -14,6 +14,7 @@ import {
 import { useState, useEffect } from 'react'
 import CourseAuthGuard from '@/components/CourseAuthGuard'
 import { useAuth } from '@/components/AuthProvider'
+import { useMyScope } from '@/hooks/useMyScope'
 import ModuleAccordion from '@/components/ModuleAccordion'
 import { logger } from '@/lib/logger'
 
@@ -88,6 +89,15 @@ export default function NivelPage() {
   const [dynamicLevel, setDynamicLevel] = useState<any>(null)
   const [levelLoading, setLevelLoading] = useState(true)
   const [selectedProgram, setSelectedProgram] = useState<'robotica' | 'ia' | 'hacking'>('robotica')
+  const { allows } = useMyScope()
+  const visiblePrograms = (['robotica', 'ia', 'hacking'] as const).filter(allows)
+  const visibleKey = visiblePrograms.join(',')
+
+  // Si el programa seleccionado no es del grupo del usuario, pasar al primero que sí.
+  useEffect(() => {
+    const visible = visibleKey.split(',').filter(Boolean) as ('robotica' | 'ia' | 'hacking')[]
+    if (visible.length > 0 && !visible.includes(selectedProgram)) setSelectedProgram(visible[0])
+  }, [visibleKey, selectedProgram])
 
   // Buscar primero en constantes, luego en Airtable
   const staticLevel = EDUCATION_LEVELS.find(l => l.id === levelId)
@@ -384,10 +394,10 @@ export default function NivelPage() {
               </div>
 
               {/* Selector de Programa - Diseño mejorado */}
-              <div className="grid grid-cols-3 gap-3 mb-8">
+              <div className="grid gap-3 mb-8" style={{ gridTemplateColumns: `repeat(${Math.max(visiblePrograms.length, 1)}, minmax(0, 1fr))` }}>
                 <button
                   onClick={() => setSelectedProgram('robotica')}
-                  className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
+                  className={`${allows('robotica') ? '' : 'hidden '}relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
                     selectedProgram === 'robotica'
                       ? 'bg-chaski-primary/10 text-chaski-dark border border-chaski-primary/40 shadow-md scale-[1.02]'
                       : 'bg-white text-slate-500 hover:bg-slate-50 border border-border-soft shadow-sm'
@@ -409,7 +419,7 @@ export default function NivelPage() {
 
                 <button
                   onClick={() => setSelectedProgram('ia')}
-                  className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
+                  className={`${allows('ia') ? '' : 'hidden '}relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
                     selectedProgram === 'ia'
                       ? 'bg-chaski-gold/10 text-chaski-dark border border-chaski-gold/40 shadow-md scale-[1.02]'
                       : 'bg-white text-slate-500 hover:bg-slate-50 border border-border-soft shadow-sm'
@@ -431,7 +441,7 @@ export default function NivelPage() {
 
                 <button
                   onClick={() => setSelectedProgram('hacking')}
-                  className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
+                  className={`${allows('hacking') ? '' : 'hidden '}relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
                     selectedProgram === 'hacking'
                       ? 'bg-hack-green/10 text-chaski-dark border border-hack-green/40 shadow-md scale-[1.02]'
                       : 'bg-white text-slate-500 hover:bg-slate-50 border border-border-soft shadow-sm'

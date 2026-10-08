@@ -14,6 +14,7 @@ function rowToTC(row: any) {
     levelId: row.level_id || '',
     schoolId: row.school_id || '',
     schoolName: row.school_name || '',
+    programIds: Array.isArray(row.program_ids) ? row.program_ids : [],
     createdAt: row.created_at || '',
   }
 }
@@ -27,7 +28,13 @@ export async function GET(request: NextRequest) {
     const schoolId = searchParams.get('schoolId')
 
     let query = supabaseAdmin.from('teacher_courses').select('*').order('created_at', { ascending: false })
-    if (teacherId) query = query.eq('teacher_id', teacherId)
+    // Las pantallas mandaban el código de acceso como teacherId, que nunca
+    // coincide con teacher_id (uuid) y devolvía una lista vacía. Para un
+    // docente la identidad sale de la sesión.
+    const isUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
+    if (auth.session.role === 'student') return NextResponse.json({ success: true, assignments: [] })
+    if (auth.session.role === 'teacher') query = query.eq('teacher_id', auth.session.id)
+    else if (teacherId && isUuid(teacherId)) query = query.eq('teacher_id', teacherId)
     if (schoolId) query = query.eq('school_id', schoolId)
 
     const { data, error } = await query

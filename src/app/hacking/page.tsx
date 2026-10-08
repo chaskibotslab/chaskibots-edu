@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
+import { useMyScope } from '@/hooks/useMyScope'
 import { isProgramAvailable, minGradeLabel } from '@/lib/programGating'
 import { Shield, Lock, Eye, Key, ArrowRight, Sparkles, AlertTriangle } from 'lucide-react'
 
@@ -116,7 +117,8 @@ export default function HackingPage() {
     return allLevels.find(l => l.id === user.levelId)?.gradeNumber ?? null
   }, [allLevels, user?.levelId])
 
-  const isUnlocked = isAdmin || isProgramAvailable('hacking', myGrade)
+  const { allows } = useMyScope()
+  const isUnlocked = isAdmin || (isProgramAvailable('hacking', myGrade) && allows('hacking'))
 
 const FEATURES: { icon: React.ComponentType<{ className?: string }>; color: ColorKey; title: string; description: string }[] = [
   { icon: Lock, color: 'green', title: 'Seguridad', description: 'Contraseñas y privacidad' },

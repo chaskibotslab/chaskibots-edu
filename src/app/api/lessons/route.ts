@@ -3,7 +3,8 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { requireAdmin } from '@/lib/requireAdmin'
+import { requireAdmin, requireSession } from '@/lib/requireAdmin'
+import { getUserScope } from '@/lib/scope'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,12 +25,20 @@ function getVideoEmbedUrl(url: string): string {
 // ============================================================
 // GET /api/lessons?levelId=X&programId=Y
 // ============================================================
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const auth = await requireSession(request)
+  if (!auth.ok) return auth.response
   const { searchParams } = new URL(request.url)
   const levelId = searchParams.get('levelId')
   const programId = searchParams.get('programId') || 'robotica'
 
   try {
+    // Un estudiante o docente solo recibe lecciones de los programas de sus grupos.
+    const scope = await getUserScope(auth.session)
+    if (scope.programIds && !scope.programIds.includes(programId)) {
+      return NextResponse.json([])
+    }
+
     let query = supabaseAdmin
       .from('lessons')
       .select('*')

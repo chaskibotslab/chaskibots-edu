@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin, requireSession } from '@/lib/requireAdmin'
+import { getUserScope } from '@/lib/scope'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,6 +49,10 @@ export async function GET(request: NextRequest) {
     if (courseId) query = query.eq('course_id', courseId)
     if (schoolId) query = query.eq('school_id', schoolId)
     if (studentEmail) query = query.eq('student_email', studentEmail)
+
+    // Estudiantes y docentes solo ven entregas de los niveles de sus grupos.
+    const scope = await getUserScope(auth.session)
+    if (scope.role !== 'admin' && scope.levelIds.length > 0) query = query.in('level_id', scope.levelIds)
 
     const { data, error } = await query
     if (error) {

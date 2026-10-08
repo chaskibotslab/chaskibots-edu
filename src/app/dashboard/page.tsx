@@ -7,6 +7,7 @@ import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
+import { useMyScope } from '@/hooks/useMyScope'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import {
   Bot, Brain, Shield, BookOpen, ArrowRight, Play,
@@ -75,6 +76,7 @@ const STUDY_AREAS: { id: string; href: string; icon: React.ComponentType<{ class
 
 export default function DashboardPage() {
   const { user, isAuthenticated, isLoading } = useAuth()
+  const { allows } = useMyScope()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
 
@@ -101,6 +103,7 @@ export default function DashboardPage() {
   }
 
   const currentLevel = EDUCATION_LEVELS.find(l => l.id === user?.levelId) || EDUCATION_LEVELS[0]
+  const studyAreas = STUDY_AREAS.filter(area => allows(area.id))
   const progress = user?.progress || 0
 
   return (
@@ -191,7 +194,7 @@ export default function DashboardPage() {
               Áreas de estudio
             </h2>
             <div className="grid sm:grid-cols-3 gap-4">
-              {STUDY_AREAS.map((area, idx) => {
+              {studyAreas.map((area, idx) => {
                 const Icon = area.icon
                 const c = COLOR_STYLES[area.color]
                 return (
