@@ -13,6 +13,9 @@ import {
 } from 'lucide-react'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import { useDynamicLevels } from '@/hooks/useDynamicLevels'
+import GuiaEditor from '@/components/admin/GuiaEditor'
+import { guiaVacia } from '@/lib/kitGuia'
+import type { KitGuia } from '@/lib/kitGuia'
 
 interface Lesson {
   id: string
@@ -29,6 +32,7 @@ interface Lesson {
   content: string
   locked: boolean
   images?: string[]
+  guia?: KitGuia | null
 }
 
 const LESSON_TYPES = [
@@ -124,6 +128,7 @@ export default function AdminLeccionesContent() {
         content: lesson.content || '',
         locked: lesson.locked,
         images: lesson.images || [],
+        guia: lesson.guia || undefined,
       })
       setDirty(false)
     }
@@ -616,6 +621,24 @@ function LessonEditor({ form, setField, dirty, saving, isCreating, allLevels, on
               placeholder="Descripción y contenido detallado de la lección..."
               className={inputClass + ' resize-none leading-relaxed'}
             />
+          </FieldBlock>
+
+          {/* Guía por etapas: mismo formato que los cursos con kit */}
+          <FieldBlock label="Guía paso a paso" icon={BookOpen}>
+            <p className="text-xs text-slate-500 mb-3">
+              Con guía, el estudiante ve la lección por etapas: El reto, Materiales, Paso a paso, Comprueba y Demuestra. Las etapas que dejes vacías no aparecen.
+            </p>
+            {form.guia ? (
+              <GuiaEditor guia={form.guia} onChange={(g: KitGuia) => setField('guia', g)} />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setField('guia', guiaVacia())}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-chaski-primary text-chaski-primary text-sm font-semibold hover:bg-chaski-primary/5"
+              >
+                Crear guía paso a paso
+              </button>
+            )}
           </FieldBlock>
 
           {/* Locked toggle */}

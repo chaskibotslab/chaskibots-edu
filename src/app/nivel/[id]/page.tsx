@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import CourseAuthGuard from '@/components/CourseAuthGuard'
+import LeccionGuiaModal from '@/components/LeccionGuiaModal'
 import { useAuth } from '@/components/AuthProvider'
 import { useMyScope } from '@/hooks/useMyScope'
 import ModuleAccordion from '@/components/ModuleAccordion'
@@ -209,6 +210,7 @@ export default function NivelPage() {
 
   // Encontrar la lección seleccionada
   const currentLesson = apiLessons.find(l => l.id === selectedLesson)
+  const currentGuia = (currentLesson as any)?.guia || null
 
   // Navegación entre lecciones
   const currentLessonIndex = apiLessons.findIndex(l => l.id === selectedLesson)
@@ -668,7 +670,7 @@ export default function NivelPage() {
       </div>
 
       {/* Modal de Lección con Video */}
-      {selectedLesson && (() => {
+      {selectedLesson && !currentGuia && (() => {
         const lesson = apiLessons.find(l => l.id === selectedLesson) ||
                        courseData.modules.flatMap(m => m.lessons).find(l => l.id === selectedLesson)
         if (!lesson) return null
@@ -777,7 +779,16 @@ export default function NivelPage() {
       })()}
 
       {/* Modal de Lección Detallada */}
-      {currentLesson && selectedLesson && (
+      {currentLesson && currentGuia && (
+        <LeccionGuiaModal
+          lesson={{ id: currentLesson.id, title: currentLesson.title, moduleName: currentLesson.moduleName, duration: currentLesson.duration, guia: currentGuia }}
+          onClose={() => setSelectedLesson(null)}
+          onNext={handleNextLesson}
+          onPrev={handlePrevLesson}
+        />
+      )}
+
+      {currentLesson && selectedLesson && !currentGuia && (
         <LessonViewerModern
           lesson={{
             id: currentLesson.id,

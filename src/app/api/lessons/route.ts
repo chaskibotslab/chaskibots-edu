@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin, requireSession } from '@/lib/requireAdmin'
 import { getUserScope } from '@/lib/scope'
+import { parseGuia } from '@/lib/kitGuia'
 
 export const dynamic = 'force-dynamic'
 
@@ -91,6 +92,7 @@ export async function GET(request: NextRequest) {
         content: row.content || '',
         locked: row.locked || false,
         pdfUrl: row.pdf_url || '',
+        guia: parseGuia(row.guia),
       }
     })
 
@@ -124,6 +126,7 @@ export async function POST(request: NextRequest) {
       locked: body.locked || false,
     }
     if (Array.isArray(body.images)) insertRow.images = body.images
+    if (body.guia) insertRow.guia = body.guia
 
     const { data, error } = await supabaseAdmin
       .from('lessons')
@@ -168,6 +171,8 @@ export async function PUT(request: NextRequest) {
     if (rest.content !== undefined) updates.content = rest.content
     if (rest.locked !== undefined) updates.locked = rest.locked
     if (Array.isArray(rest.images)) updates.images = rest.images
+    // La columna guia existe desde la migración 2026_10_lessons_guia.sql.
+    if (rest.guia !== undefined) updates.guia = rest.guia
 
     const { data, error } = await supabaseAdmin
       .from('lessons')
@@ -176,7 +181,10 @@ export async function PUT(request: NextRequest) {
       .select()
       .single()
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) {
+      const falta = error.message.includes('guia')
+      return NextResponse.json({ error: falta ? 'Falta ejecutar en Supabase la migración 2026_10_lessons_guia.sql' : error.message }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true, record: data })
   } catch (error) {
