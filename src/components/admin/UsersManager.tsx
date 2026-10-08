@@ -40,6 +40,8 @@ interface Course {
   id: string
   name: string
   levelId: string
+  schoolId?: string
+  schoolName?: string
 }
 
 interface School {
@@ -431,24 +433,24 @@ export default function UsersManager() {
     return true
   })
 
-  const filteredPrograms = formData.levelId 
-    ? programs.filter(p => p.levelId === formData.levelId || p.levelId === 'all')
-    : programs
+  const levelName = (id: string) => levels.find(l => l.id === id)?.name || id
 
-  // Mostrar todos los cursos si no hay filtro o si no hay coincidencias
-  const filteredCourses = formData.levelId
-    ? courses.filter(c => c.levelId === formData.levelId)
+  // Los grupos se eligen dentro del colegio seleccionado.
+  const displayCourses = formData.schoolId
+    ? courses.filter(c => c.schoolId === formData.schoolId)
     : courses
-  
-  // Si no hay cursos filtrados pero hay cursos disponibles, mostrar todos
-  const displayCourses = filteredCourses.length > 0 ? filteredCourses : courses
 
+  // Elegir un grupo fija el nivel y el colegio: el usuario los hereda de su grupo.
   const handleCourseChange = (courseId: string) => {
     const course = courses.find(c => c.id === courseId)
+    const school = schools.find(s => s.id === course?.schoolId)
     setFormData({
       ...formData,
       courseId,
-      courseName: course?.name || ''
+      courseName: course?.name || '',
+      levelId: course?.levelId || formData.levelId,
+      schoolId: course?.schoolId || formData.schoolId,
+      schoolName: school?.name || course?.schoolName || formData.schoolName,
     })
   }
 
@@ -812,7 +814,41 @@ export default function UsersManager() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-slate-600 mb-1">Nivel</label>
+              <label className="block text-sm text-slate-600 mb-1">1. Colegio / Institución</label>
+              <select
+                value={formData.schoolId}
+                onChange={(e) => {
+                  const school = schools.find(s => s.id === e.target.value)
+                  setFormData({ ...formData, schoolId: e.target.value, schoolName: school?.name || '', courseId: '', courseName: '' })
+                }}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
+              >
+                <option value="">Sin asignar</option>
+                {schools.map(school => (
+                  <option key={school.id} value={school.id}>{school.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm text-slate-600 mb-1">2. Grupo</label>
+              <select
+                value={formData.courseId}
+                onChange={(e) => handleCourseChange(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
+              >
+                <option value="">Sin grupo</option>
+                {displayCourses.map(course => (
+                  <option key={course.id} value={course.id}>{course.name} · {levelName(course.levelId)}</option>
+                ))}
+              </select>
+              <p className="text-xs text-slate-400 mt-1">
+                {formData.schoolId && displayCourses.length === 0
+                  ? 'Este colegio aún no tiene grupos. Créalos en Estructura Académica.'
+                  : 'El grupo define el nivel y los programas que verá.'}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm text-slate-600 mb-1">3. Nivel</label>
               <select
                 value={formData.levelId}
                 onChange={(e) => handleLevelChange(e.target.value)}
@@ -822,55 +858,6 @@ export default function UsersManager() {
                 <option value="">Seleccionar...</option>
                 {levels.map(level => (
                   <option key={level.id} value={level.id}>{level.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm text-slate-600 mb-1">Programa</label>
-              <select
-                value={formData.programId}
-                onChange={(e) => handleProgramChange(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
-              >
-                <option value="">Seleccionar...</option>
-                {filteredPrograms.map(prog => (
-                  <option key={prog.id} value={prog.id}>{prog.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm text-slate-600 mb-1">Curso/Clase (opcional)</label>
-              <select
-                value={formData.courseId}
-                onChange={(e) => handleCourseChange(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
-              >
-                <option value="">Sin asignar</option>
-                {displayCourses.map(course => (
-                  <option key={course.id} value={course.id}>{course.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm text-slate-600 mb-1">Colegio/Institución</label>
-              <select
-                value={formData.schoolId}
-                onChange={(e) => {
-                  const school = schools.find(s => s.id === e.target.value)
-                  setFormData({
-                    ...formData,
-                    schoolId: e.target.value,
-                    schoolName: school?.name || ''
-                  })
-                }}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
-              >
-                <option value="">Sin asignar</option>
-                {schools.map(school => (
-                  <option key={school.id} value={school.id}>{school.name} ({school.code})</option>
                 ))}
               </select>
             </div>

@@ -89,6 +89,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Sin esto la lista de grupos quedaba desactualizada hasta 10 minutos.
+    cache.invalidateByPrefix('courses:')
+
     return NextResponse.json({
       success: true,
       course: result.course,
@@ -138,6 +141,9 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
+    // Sin esto la lista de grupos quedaba desactualizada hasta 10 minutos.
+    cache.invalidateByPrefix('courses:')
+
     return NextResponse.json({
       success: true,
       message: 'Curso actualizado exitosamente'
@@ -175,6 +181,9 @@ export async function DELETE(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Sin esto la lista de grupos quedaba desactualizada hasta 10 minutos.
+    cache.invalidateByPrefix('courses:')
 
     return NextResponse.json({
       success: true,

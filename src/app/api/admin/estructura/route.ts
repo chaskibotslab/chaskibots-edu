@@ -33,13 +33,15 @@ export async function GET(request: NextRequest) {
   if (!auth.ok) return auth.response
 
   try {
-    const [schoolsRes, levelsRes, programsRes, groupsRes, assignRes, usersRes] = await Promise.all([
+    const [schoolsRes, levelsRes, programsRes, groupsRes, assignRes, usersRes, schoolCoursesRes, kitCoursesRes] = await Promise.all([
       supabaseAdmin.from('schools').select('id, name').order('name'),
       supabaseAdmin.from('levels').select('id, name, grade_number').order('grade_number', { ascending: true }),
       supabaseAdmin.from('programs').select('id, name').in('id', BASE_PROGRAM_IDS),
       supabaseAdmin.from('courses_catalog').select('*').order('name'),
       supabaseAdmin.from('teacher_courses').select('*'),
       supabaseAdmin.from('users').select('id, name, role, course_id, school_id, level_id, is_active').order('name'),
+      supabaseAdmin.from('school_courses').select('school_id, course_id'),
+      supabaseAdmin.from('courses').select('id, name, level_id'),
     ])
 
     const firstError = [schoolsRes, levelsRes, programsRes, groupsRes, assignRes, usersRes].find(r => r.error)?.error
@@ -78,7 +80,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       migrated,
-      schools: schoolsRes.data || [],
+      // Cursos con kit de cada colegio (catálogo `courses` vía `school_courses`):
+      // es contenido, distinto de los grupos donde se inscribe a las personas.
+      schools: (schoolsRes.data || []).map(s => ({
+        ...s,
+        kitCourses: (schoolCoursesRes.data || [])
+          .filter(sc => sc.school_id === s.id)
+          .map(sc => (kitCoursesRes.data || []).find(c => c.id === sc.course_id))
+          .filter((c): c is { id: string; name: string; level_id: string } => !!c)
+          .map(c => ({ id: c.id, name: c.name, levelId: c.level_id || '' })),
+      })),
       levels: levelsRes.data || [],
       programs,
       groups,

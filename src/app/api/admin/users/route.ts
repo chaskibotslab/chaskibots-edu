@@ -335,7 +335,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (action === 'update') {
-      const { name, email, levelId, role, courseId, courseName, programId, programName, expiresAt, accessCode } = body
+      const { name, email, levelId, role, courseId, courseName, schoolId, schoolName, programId, programName, expiresAt, accessCode } = body
       const result = await updateUser(userId, {
         name,
         email,
@@ -343,6 +343,8 @@ export async function PATCH(request: NextRequest) {
         role,
         courseId,
         courseName,
+        schoolId,
+        schoolName,
         programId,
         programName,
         expiresAt,

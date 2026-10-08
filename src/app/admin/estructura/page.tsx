@@ -18,9 +18,10 @@ interface Group {
   teachers: TeacherLink[]
   students: { id: string; name: string; isActive: boolean }[]
 }
+interface SchoolRef extends Ref { kitCourses?: { id: string; name: string; levelId: string }[] }
 interface Estructura {
   migrated: boolean
-  schools: Ref[]
+  schools: SchoolRef[]
   levels: Ref[]
   programs: Ref[]
   groups: Group[]
@@ -121,7 +122,7 @@ export default function EstructuraPage() {
     const known = new Set(data.schools.map(s => s.id))
     const list = data.schools.map(s => ({ ...s, groups: data.groups.filter(g => g.schoolId === s.id) }))
     const orphans = data.groups.filter(g => !known.has(g.schoolId))
-    if (orphans.length > 0) list.push({ id: NO_SCHOOL, name: 'Grupos sin colegio', groups: orphans })
+    if (orphans.length > 0) list.push({ id: NO_SCHOOL, name: 'Grupos sin colegio', kitCourses: [], groups: orphans })
     return list
   }, [data])
 
@@ -234,6 +235,24 @@ export default function EstructuraPage() {
                     </button>
                   )}
                 </div>
+
+                {(school.kitCourses?.length || 0) > 0 && (
+                  <div className="px-1 flex flex-wrap items-center gap-1.5">
+                    <span className="text-xs text-slate-500">Cursos con kit:</span>
+                    {school.kitCourses!.map(c => {
+                      const hasGroup = school.groups.some(g => g.levelId === c.levelId)
+                      return (
+                        <span
+                          key={c.id}
+                          title={hasGroup ? 'Hay un grupo de este nivel' : 'Falta crear un grupo de este nivel para inscribir estudiantes'}
+                          className={`text-[11px] rounded-full px-2 py-0.5 ${hasGroup ? 'bg-slate-100 text-slate-600' : 'bg-amber-100 text-amber-700'}`}
+                        >
+                          {c.name}{hasGroup ? '' : ' · sin grupo'}
+                        </span>
+                      )
+                    })}
+                  </div>
+                )}
 
                 {newGroup?.schoolId === school.id && (
                   <div className="bg-white rounded-2xl border border-chaski-primary/30 p-4 flex flex-col sm:flex-row gap-2">
