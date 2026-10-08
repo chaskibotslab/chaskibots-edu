@@ -300,6 +300,8 @@ export default function AdminPage() {
                   Herramientas de administración
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <QuickAction href="/admin/estructura" icon={GraduationCap} color="coral" title="Estructura Académica" description="Grupos, programas y docentes" />
+
                   <QuickAction href="/admin/colegios" icon={GraduationCap} color="coral" title="Colegios y Cursos" description="Asignar cursos a colegios" />
                   <QuickAction href="/admin/cursos" icon={BookOpen} color="slate" title="Catálogo de Cursos" description="Cursos reutilizables" />
                   <QuickAction href="/admin/calificar" icon={Award} color="gold" title="Calificar Entregas" description="Panel realtime de calificación" />
