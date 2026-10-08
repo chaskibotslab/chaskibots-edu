@@ -391,6 +391,18 @@ export default function EstructuraPage() {
                                 </ul>
                               )}
                             </div>
+                            <div className="pt-1">
+                              <button
+                                disabled={saving || g.students.length > 0 || g.teachers.length > 0}
+                                onClick={() => { if (window.confirm(`¿Eliminar el grupo "${g.name}"?`)) send('/api/admin/courses', 'DELETE', { courseId: g.id }) }}
+                                className="inline-flex items-center gap-1.5 text-xs font-medium text-red-600 disabled:text-slate-300"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Eliminar grupo
+                              </button>
+                              {(g.students.length > 0 || g.teachers.length > 0) && (
+                                <p className="text-[11px] text-slate-400 mt-1">Para eliminarlo, primero quita sus docentes y mueve sus estudiantes.</p>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>

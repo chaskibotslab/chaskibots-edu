@@ -27,36 +27,43 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: 'General',
     items: [
-      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/admin', label: 'Inicio', icon: LayoutDashboard },
     ]
   },
   {
-    title: 'Gestión',
+    title: 'Personas y grupos',
     items: [
+      { href: '/admin/estructura', label: 'Estructura académica', icon: School },
       { href: '/admin/gestion', label: 'Usuarios', icon: Users },
-      { href: '/admin/colegios', label: 'Colegios', icon: School },
-      { href: '/admin/cursos', label: 'Cursos', icon: GraduationCap },
     ]
   },
   {
     title: 'Contenido',
     items: [
-      { href: '/admin/lecciones', label: 'Lecciones', icon: BookOpen },
-      { href: '/admin/contenido', label: 'Contenido', icon: FileText },
-      { href: '/admin/kits', label: 'Kits', icon: Package },
+      { href: '/admin/lecciones', label: 'Lecciones por nivel', icon: BookOpen },
+      { href: '/admin/academia', label: 'Lecciones de cursos con kit', icon: GraduationCap },
+      { href: '/admin/academy', label: 'Cursos en línea', icon: FileText },
       { href: '/admin/simuladores', label: 'Simuladores', icon: Monitor },
       { href: '/admin/ia', label: 'Actividades IA', icon: Brain },
-      { href: '/admin/experiencias', label: 'Galería de Experiencias', icon: Camera },
+      { href: '/admin/proyectos', label: 'Proyectos avanzados', icon: FolderKanban },
+      { href: '/admin/experiencias', label: 'Galería de experiencias', icon: Camera },
+    ]
+  },
+  {
+    title: 'Kits y colegios',
+    items: [
+      { href: '/admin/kits', label: 'Kits', icon: Package },
+      { href: '/admin/cursos', label: 'Cursos con kit', icon: GraduationCap },
+      { href: '/admin/colegios', label: 'Colegios', icon: School },
     ]
   },
   {
     title: 'Evaluación',
     items: [
       { href: '/admin/tareas', label: 'Tareas', icon: ClipboardList },
+      { href: '/admin/calificar', label: 'Calificar entregas', icon: CheckSquare },
       { href: '/admin/entregas', label: 'Entregas', icon: Inbox },
-      { href: '/admin/calificaciones', label: 'Calificaciones', icon: Award },
-      { href: '/admin/calificar', label: 'Calificar', icon: CheckSquare },
-      { href: '/admin/proyectos', label: 'Proyectos', icon: FolderKanban },
+      { href: '/admin/calificaciones', label: 'Libreta de notas', icon: Award },
     ]
   },
 ]
@@ -64,20 +71,23 @@ const NAV_GROUPS: NavGroup[] = [
 const ROUTE_LABELS: Record<string, string> = {
   admin: 'Admin',
   gestion: 'Usuarios',
+  estructura: 'Estructura académica',
+  academia: 'Lecciones de cursos con kit',
+  academy: 'Cursos en línea',
   colegios: 'Colegios',
-  cursos: 'Cursos',
-  lecciones: 'Lecciones',
-  contenido: 'Contenido',
+  cursos: 'Cursos con kit',
+  lecciones: 'Lecciones por nivel',
   kits: 'Kits',
+  editar: 'Editar lecciones',
+  ficha: 'Ficha',
   simuladores: 'Simuladores',
   ia: 'Actividades IA',
   experiencias: 'Galería de Experiencias',
   tareas: 'Tareas',
   entregas: 'Entregas',
-  calificaciones: 'Calificaciones',
-  calificar: 'Calificar',
-  proyectos: 'Proyectos',
-  lessons: 'Lessons',
+  calificaciones: 'Libreta de notas',
+  calificar: 'Calificar entregas',
+  proyectos: 'Proyectos avanzados',
 }
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
