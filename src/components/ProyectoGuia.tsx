@@ -83,7 +83,18 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
   }
 
   const pasoActual = guia.pasos[paso]
-  const idx = ETAPAS.findIndex(e => e.id === etapa)
+  // Una lección sin cableado o sin programa (por ejemplo, de niveles iniciales)
+  // muestra solo las etapas que tienen contenido.
+  const hayDiagrama = conexiones.length > 0
+  const visibles = ETAPAS.filter(e =>
+    e.id === 'reto' ||
+    (e.id === 'piezas' && guia.piezas.length > 0) ||
+    (e.id === 'arma' && guia.pasos.length > 0) ||
+    (e.id === 'programa' && (guia.codigo.length > 0 || !!codigo)) ||
+    (e.id === 'prueba' && (guia.prueba.queDebePasar.length > 0 || guia.prueba.siNoFunciona.length > 0)) ||
+    (e.id === 'demuestra' && (!!guia.demuestra.reto || guia.demuestra.preguntas.length > 0))
+  ).map(e => (e.id === 'arma' && !hayDiagrama ? { ...e, label: 'Paso a paso' } : e.id === 'piezas' && !hayDiagrama ? { ...e, label: 'Materiales' } : e))
+  const idx = Math.max(0, visibles.findIndex(e => e.id === etapa))
   const mostrar = (id: EtapaId) => expandido || etapa === id
 
   const reto = (
@@ -103,7 +114,7 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
 
   const piezas = (
     <section>
-      <Titulo icon={Puzzle}>Conoce las piezas</Titulo>
+      <Titulo icon={Puzzle}>{hayDiagrama ? 'Conoce las piezas' : 'Materiales'}</Titulo>
       <div className="grid sm:grid-cols-2 gap-3">
         {guia.piezas.map((p, i) => (
           <div key={i} className="rounded-2xl border border-border-soft bg-white p-4">
@@ -123,12 +134,14 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
 
   const arma = (
     <section>
-      <Titulo icon={Cable}>Arma paso a paso</Titulo>
+      <Titulo icon={Cable}>{hayDiagrama ? 'Arma paso a paso' : 'Paso a paso'}</Titulo>
       {expandido ? (
         <>
-          <div className="rounded-2xl border border-border-soft overflow-hidden mb-4">
-            <WiringDiagram boardName={boardName} conexiones={conexiones} />
-          </div>
+          {hayDiagrama && (
+            <div className="rounded-2xl border border-border-soft overflow-hidden mb-4">
+              <WiringDiagram boardName={boardName} conexiones={conexiones} />
+            </div>
+          )}
           <ol className="space-y-3">
             {guia.pasos.map((p, i) => (
               <li key={i} className="flex gap-3">
@@ -170,7 +183,7 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
                     hechos.includes(paso) ? 'bg-emerald-50 text-emerald-700' : 'bg-chaski-primary text-white'
                   }`}
                 >
-                  <Check className="w-4 h-4" /> {hechos.includes(paso) ? 'Hecho' : 'Listo, ya lo conecté'}
+                  <Check className="w-4 h-4" /> {hechos.includes(paso) ? 'Hecho' : hayDiagrama ? 'Listo, ya lo conecté' : 'Listo, ya lo hice'}
                 </button>
                 <button
                   onClick={() => setPaso(p => Math.min(guia.pasos.length - 1, p + 1))}
@@ -183,14 +196,16 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
               </div>
             </div>
           )}
-          <div className="rounded-2xl border border-border-soft overflow-hidden bg-white">
-            <WiringDiagram
-              boardName={boardName}
-              conexiones={conexiones}
-              resaltar={verTodo ? [] : pasoActual?.conexiones || []}
-              rieles={verTodo ? [] : pasoActual?.rieles || []}
-            />
-          </div>
+          {hayDiagrama && (
+            <div className="rounded-2xl border border-border-soft overflow-hidden bg-white">
+              <WiringDiagram
+                boardName={boardName}
+                conexiones={conexiones}
+                resaltar={verTodo ? [] : pasoActual?.conexiones || []}
+                rieles={verTodo ? [] : pasoActual?.rieles || []}
+              />
+            </div>
+          )}
           <div className="flex items-center justify-between mt-2">
             <div className="flex gap-1.5">
               {guia.pasos.map((_, i) => (
@@ -202,9 +217,11 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
                 />
               ))}
             </div>
-            <button onClick={() => setVerTodo(v => !v)} className="text-xs font-medium text-chaski-primary">
-              {verTodo ? 'Volver al paso' : 'Ver todo el circuito'}
-            </button>
+            {hayDiagrama && (
+              <button onClick={() => setVerTodo(v => !v)} className="text-xs font-medium text-chaski-primary">
+                {verTodo ? 'Volver al paso' : 'Ver todo el circuito'}
+              </button>
+            )}
           </div>
 
         </>
@@ -325,14 +342,14 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
   const contenido: Record<EtapaId, React.ReactNode> = { reto, piezas, arma, programa, prueba, demuestra }
 
   if (expandido) {
-    return <div className="space-y-8">{ETAPAS.map(e => <div key={e.id}>{contenido[e.id]}</div>)}</div>
+    return <div className="space-y-8">{visibles.map(e => <div key={e.id}>{contenido[e.id]}</div>)}</div>
   }
 
   return (
     <div>
       {/* Selector de etapas */}
       <div className="flex gap-1 p-1 bg-slate-100 rounded-2xl overflow-x-auto mb-6">
-        {ETAPAS.map((e, i) => {
+        {visibles.map((e, i) => {
           const Icon = e.icon
           const active = e.id === etapa
           return (
@@ -350,22 +367,22 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
         })}
       </div>
 
-      {ETAPAS.map(e => (mostrar(e.id) ? <div key={e.id} className="animate-fade-in">{contenido[e.id]}</div> : null))}
+      {visibles.map(e => (mostrar(e.id) ? <div key={e.id} className="animate-fade-in">{contenido[e.id]}</div> : null))}
 
       <div className="flex items-center justify-between mt-8 pt-5 border-t border-border-soft">
         <button
-          onClick={() => setEtapa(ETAPAS[Math.max(0, idx - 1)].id)}
+          onClick={() => setEtapa(visibles[Math.max(0, idx - 1)].id)}
           disabled={idx === 0}
           className="flex items-center gap-1 text-sm font-medium text-slate-500 disabled:opacity-0"
         >
           <ChevronLeft className="w-4 h-4" /> Anterior
         </button>
-        {idx < ETAPAS.length - 1 && (
+        {idx < visibles.length - 1 && (
           <button
-            onClick={() => setEtapa(ETAPAS[idx + 1].id)}
+            onClick={() => setEtapa(visibles[idx + 1].id)}
             className="flex items-center gap-1 px-5 py-2.5 rounded-full bg-chaski-primary text-white text-sm font-semibold active:scale-[0.98] transition-all"
           >
-            Siguiente: {ETAPAS[idx + 1].label} <ChevronRight className="w-4 h-4" />
+            Siguiente: {visibles[idx + 1].label} <ChevronRight className="w-4 h-4" />
           </button>
         )}
       </div>

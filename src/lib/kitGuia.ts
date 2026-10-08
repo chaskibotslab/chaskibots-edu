@@ -35,6 +35,17 @@ export interface KitGuia {
   demuestra: { reto: string; preguntas: GuiaPregunta[] }
 }
 
+export function guiaVacia(): KitGuia {
+  return {
+    reto: { texto: '' },
+    piezas: [],
+    pasos: [],
+    codigo: [],
+    prueba: { queDebePasar: [], siNoFunciona: [] },
+    demuestra: { reto: '', preguntas: [] },
+  }
+}
+
 // Acepta solo guías con la forma mínima esperada; cualquier otra cosa se ignora
 // y la lección se muestra en el formato simple.
 export function parseGuia(raw: unknown): KitGuia | null {

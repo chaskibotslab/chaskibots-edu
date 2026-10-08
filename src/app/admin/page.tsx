@@ -318,13 +318,14 @@ export default function AdminPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <QuickAction href="/admin/lecciones" icon={BookOpen} color="coral" title="Lecciones" description="Por nivel y programa (Robótica, IA, Hacking)" />
                   <QuickAction href="/admin/simuladores" icon={Monitor} color="coral" title="Simuladores" description="Por nivel y programa" />
-                  <QuickAction href="/admin/academy" icon={GraduationCap} color="gold" title="Academia en línea" description="Cursos de Python, Hacking e IA paso a paso" />
+                  <QuickAction href="/admin/academy" icon={GraduationCap} color="gold" title="Cursos en línea" description="Python, Hacking e IA paso a paso" />
                   <QuickAction href="/admin/ia" icon={Brain} color="green" title="Actividades de IA" description="Actividades de IA por nivel" />
                   <QuickAction href="/admin/proyectos" icon={Activity} color="coral" title="Proyectos Avanzados" description="Jetson, Raspberry, Digispark" />
                 </div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Kits y cursos por colegio</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <QuickAction href="/admin/kits" icon={Package} color="green" title="Kits" description="Fichas, prácticas, imágenes y precios" />
+                  <QuickAction href="/admin/academia" icon={BookOpen} color="coral" title="Lecciones de cursos con kit" description="Editar contenido, fotos y video (8vo a 3ro BGU)" />
+                  <QuickAction href="/admin/kits" icon={Package} color="green" title="Kits" description="Materiales, imágenes y precios" />
                   <QuickAction href="/admin/cursos" icon={BookOpen} color="slate" title="Cursos con kit" description="Catálogo (ej. 8vo EGB Academia)" />
                   <QuickAction href="/admin/colegios" icon={GraduationCap} color="slate" title="Colegios" description="Datos del colegio y sus cursos con kit" />
                 </div>

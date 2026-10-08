@@ -376,6 +376,15 @@ function KitEditor({ form, setField, dirty, saving, isCreating, kitId, allLevels
         <div className="flex items-center gap-2 shrink-0">
           {!isCreating && kitId && (
             <Link
+              href={`/admin/kits/${kitId}/editar`}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold bg-chaski-primary/10 text-chaski-primary hover:bg-chaski-primary/15 transition-colors"
+              title="Editar el contenido de las lecciones de este kit"
+            >
+              Editar lecciones
+            </Link>
+          )}
+          {!isCreating && kitId && (
+            <Link
               href={`/admin/kits/${kitId}/ficha`}
               className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold text-chaski-primary hover:bg-chaski-primary/10 transition-colors"
               title="Materiales, proyectos, esquemas y codigo Arduino de este kit"

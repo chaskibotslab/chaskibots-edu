@@ -4,9 +4,10 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
-import { ArrowLeft, Loader2, AlertCircle, Save, Upload, Trash2, CheckCircle2, Image as ImageIcon, Code2 } from 'lucide-react'
+import { ArrowLeft, Loader2, AlertCircle, Save, Upload, Trash2, CheckCircle2, Image as ImageIcon, Code2, ChevronDown, Eye, Plus } from 'lucide-react'
 import { KitFichaDetalle, KitFichaProyecto } from '@/components/KitFichaContent'
 import GuiaEditor from '@/components/admin/GuiaEditor'
+import { guiaVacia } from '@/lib/kitGuia'
 import type { KitGuia } from '@/lib/kitGuia'
 
 const TIPO_LABEL: Record<string, string> = { principal: 'Proyecto principal', adicional: 'Proyecto adicional', practica: 'Práctica' }
@@ -18,6 +19,7 @@ function ProyectoEditor({ kitId, proyecto, onSaved }: { kitId: string; proyecto:
   const [codigo, setCodigo] = useState(proyecto.codigo?.contenido || '')
   const [guia, setGuia] = useState<KitGuia | null>(proyecto.guia || null)
   const [dirty, setDirty] = useState(false)
+  const [abierto, setAbierto] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
@@ -88,9 +90,21 @@ function ProyectoEditor({ kitId, proyecto, onSaved }: { kitId: string; proyecto:
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600">{TIPO_LABEL[proyecto.tipo] || proyecto.tipo}</span>
+    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+      <button type="button" onClick={() => setAbierto(a => !a)} className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-slate-50 transition-colors">
+        <span className="flex-1 min-w-0">
+          <span className="block font-semibold text-chaski-dark truncate">{titulo}</span>
+          <span className="flex items-center gap-2 mt-1">
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600">{TIPO_LABEL[proyecto.tipo] || proyecto.tipo}</span>
+            <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${guia ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{guia ? 'Con guía paso a paso' : 'Sin guía'}</span>
+            {dirty && <span className="text-[11px] font-medium text-amber-600">• Sin guardar</span>}
+          </span>
+        </span>
+        <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${abierto ? 'rotate-180' : ''}`} />
+      </button>
+      {abierto && (
+      <div className="px-5 pb-5 space-y-4 border-t border-slate-100 pt-4">
+      <div className="flex items-center justify-end min-h-[1rem]">
         {msg && (
           <span className={`text-xs font-medium flex items-center gap-1 ${msg.type === 'ok' ? 'text-emerald-600' : 'text-red-600'}`}>
             {msg.type === 'ok' && <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -142,15 +156,26 @@ function ProyectoEditor({ kitId, proyecto, onSaved }: { kitId: string; proyecto:
         </div>
       </div>
 
-      {guia
-        ? <GuiaEditor guia={guia} onChange={g => { setGuia(g); markDirty() }} />
-        : <p className="text-xs text-slate-400 italic">Este proyecto todavía no tiene guía paso a paso.</p>}
+      <div>
+        <p className="text-sm font-bold text-slate-800 mb-1">Guía paso a paso</p>
+        <p className="text-xs text-slate-500 mb-3">Lo que el estudiante ve en las pestañas El reto, Piezas, Arma, Programa, Prueba y Demuestra. Abre cada sección para editarla.</p>
+        {guia ? (
+          <GuiaEditor guia={guia} onChange={g => { setGuia(g); markDirty() }} conexiones={proyecto.conexiones} />
+        ) : (
+          <button type="button" onClick={() => { setGuia(guiaVacia()); markDirty() }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-chaski-primary text-chaski-primary text-sm font-semibold hover:bg-chaski-primary/5">
+            <Plus className="w-4 h-4" /> Crear guía paso a paso
+          </button>
+        )}
+      </div>
 
       <button onClick={guardar} disabled={!dirty || saving}
         className="inline-flex items-center gap-2 px-4 py-2 bg-chaski-primary text-white rounded-lg text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-chaski-primary/90">
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
         Guardar cambios
       </button>
+      </div>
+      )}
     </div>
   )
 }
@@ -199,11 +224,16 @@ export default function KitEditarPage() {
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
-          <Link href="/admin/kits" className="p-2 hover:bg-slate-100 rounded-lg"><ArrowLeft className="w-5 h-5" /></Link>
-          <div>
-            <h1 className="font-bold text-chaski-dark">{kit?.name || 'Editar kit'}</h1>
-            <p className="text-xs text-slate-500">Edita texto, código y el esquema de cada proyecto (sin tocar la base de datos)</p>
+          <Link href="/admin/academia" className="p-2 hover:bg-slate-100 rounded-lg"><ArrowLeft className="w-5 h-5" /></Link>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-bold text-chaski-dark truncate">{kit?.name || 'Editar lecciones'}</h1>
+            <p className="text-xs text-slate-500">Toca una lección para abrirla y editar su contenido, fotos y video</p>
           </div>
+          {kit?.schoolId && (
+            <Link href={`/academia/${kit.schoolId}/${kit.id}`} target="_blank" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium text-chaski-primary hover:bg-chaski-primary/10">
+              <Eye className="w-4 h-4" /> <span className="hidden sm:inline">Ver como estudiante</span>
+            </Link>
+          )}
         </div>
       </header>
 

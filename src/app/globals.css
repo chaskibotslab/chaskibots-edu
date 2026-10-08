@@ -34,6 +34,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* El body usa texto claro (pensado para fondos oscuros). Los campos de
+   formulario tienen fondo blanco, así que sin esto lo escrito casi no se ve.
+   Cualquier clase text-* de Tailwind sigue teniendo prioridad. */
+input, textarea, select {
+  color: #22252A;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
   background: var(--bg-main);
