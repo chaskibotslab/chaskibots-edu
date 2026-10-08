@@ -14,6 +14,7 @@ interface Lesson {
   locked?: boolean
   images?: string[]
   videoUrl?: string
+  guia?: { reto?: { texto?: string } } | null
 }
 
 interface ModuleAccordionProps {
@@ -76,21 +77,22 @@ export default function ModuleAccordion({
   const completedCount = 0 // TODO: implementar progreso real
 
   return (
-    <div className={`rounded-2xl border ${colors.border} bg-white/[0.03] overflow-hidden transition-all duration-300 ${isOpen ? `shadow-lg ${colors.glow}` : ''}`}>
+    <div className={`rounded-2xl border bg-white overflow-hidden transition-all duration-300 ${isOpen ? `${colors.border} shadow-md` : 'border-slate-200/80 shadow-sm'}`}>
       {/* Header del módulo */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center gap-4 p-5 ${colors.bg} hover:brightness-125 transition-all`}
+        className={`w-full flex items-center gap-4 p-4 sm:p-5 transition-colors ${isOpen ? colors.bg : 'hover:bg-slate-50'}`}
       >
         {/* Número del módulo */}
-        <div className={`w-12 h-12 ${colors.accent} rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+        <div className={`w-12 h-12 ${colors.accent} rounded-2xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0`}>
           {moduleIndex}
         </div>
 
         {/* Info del módulo */}
-        <div className="flex-1 text-left">
-          <h3 className="font-bold text-white text-lg">{moduleName}</h3>
-          <div className="flex items-center gap-4 mt-1 text-sm text-slate-400">
+        <div className="flex-1 text-left min-w-0">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Módulo {moduleIndex}</p>
+          <h3 className="font-bold text-chaski-dark text-lg leading-tight truncate">{moduleName}</h3>
+          <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
             <span className="flex items-center gap-1">
               <BookOpen className="w-4 h-4" />
               {lessons.length} lecciones
@@ -100,21 +102,11 @@ export default function ModuleAccordion({
               ~{totalDuration} min
             </span>
             {completedCount > 0 && (
-              <span className="flex items-center gap-1 text-green-400">
+              <span className="flex items-center gap-1 text-green-600">
                 <CheckCircle className="w-4 h-4" />
                 {completedCount}/{lessons.length}
               </span>
             )}
-          </div>
-        </div>
-
-        {/* Barra de progreso mini */}
-        <div className="hidden sm:block w-24">
-          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-            <div
-              className={`h-full ${colors.accent} rounded-full transition-all`}
-              style={{ width: `${(completedCount / lessons.length) * 100}%` }}
-            />
           </div>
         </div>
 
@@ -124,7 +116,7 @@ export default function ModuleAccordion({
 
       {/* Contenido expandible */}
       <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
-        <div className="p-4 space-y-3 bg-black/20">
+        <div className="p-3 sm:p-4 space-y-2.5 bg-slate-50/70 border-t border-slate-100">
           {sortedLessons.map((lesson, idx) => (
             <LessonCard
               key={lesson.id}

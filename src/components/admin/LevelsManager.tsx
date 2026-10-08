@@ -103,6 +103,24 @@ export default function LevelsManager() {
     setSaving(false)
   }
 
+  // Activa o quita un módulo (IA o Ciberseguridad) del nivel con un clic.
+  const toggleModule = async (level: Level, key: 'hasAdvancedIA' | 'hasHacking') => {
+    setSaving(true)
+    try {
+      const res = await fetch('/api/admin/levels', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ originalId: level.id, [key]: !level[key] })
+      })
+      const result = await res.json()
+      if (res.ok && result.success) await loadLevels()
+      else alert(result.error || 'No se pudo guardar el cambio')
+    } catch (error) {
+      console.error('Error toggling module:', error)
+    }
+    setSaving(false)
+  }
+
   const handleEdit = (level: Level) => {
     setFormData(level)
     setEditingId(level.id)
@@ -281,7 +299,7 @@ export default function LevelsManager() {
                   onChange={(e) => setFormData({ ...formData, hasHacking: e.target.checked })}
                   className="w-4 h-4 rounded"
                 />
-                <span className="text-sm text-slate-700">Hacking</span>
+                <span className="text-sm text-slate-700">Módulo de Ciberseguridad</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -290,7 +308,7 @@ export default function LevelsManager() {
                   onChange={(e) => setFormData({ ...formData, hasAdvancedIA: e.target.checked })}
                   className="w-4 h-4 rounded"
                 />
-                <span className="text-sm text-slate-700">IA Avanzada</span>
+                <span className="text-sm text-slate-700">Módulo de Inteligencia Artificial</span>
               </label>
             </div>
           </div>
@@ -324,7 +342,7 @@ export default function LevelsManager() {
               <th className="px-4 py-3 text-left text-sm text-slate-600">Categoría</th>
               <th className="px-4 py-3 text-left text-sm text-slate-600">Edad</th>
               <th className="px-4 py-3 text-left text-sm text-slate-600">Precio</th>
-              <th className="px-4 py-3 text-left text-sm text-slate-600">Funciones</th>
+              <th className="px-4 py-3 text-left text-sm text-slate-600">Módulos (clic para activar o quitar)</th>
               <th className="px-4 py-3 text-right text-sm text-slate-600">Acciones</th>
             </tr>
           </thead>
@@ -348,13 +366,24 @@ export default function LevelsManager() {
                 <td className="px-4 py-3 text-slate-700">{level.ageRange}</td>
                 <td className="px-4 py-3 text-slate-700">${level.kitPrice}</td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2">
-                    {level.hasHacking && (
-                      <span className="px-2 py-0.5 bg-green-500/10 text-green-600 text-xs rounded">Hacking</span>
-                    )}
-                    {level.hasAdvancedIA && (
-                      <span className="px-2 py-0.5 bg-chaski-primary/10 text-chaski-primary text-xs rounded">IA</span>
-                    )}
+                  <div className="flex flex-wrap gap-1.5">
+                    <span className="px-2.5 py-1 bg-chaski-primary/10 text-chaski-primary text-xs font-medium rounded-full">Robótica</span>
+                    {([['hasAdvancedIA', 'IA'], ['hasHacking', 'Ciberseguridad']] as const).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        disabled={saving}
+                        onClick={() => toggleModule(level, key)}
+                        title={level[key] ? 'Clic para ocultar este módulo en el nivel' : 'Clic para mostrar este módulo en el nivel'}
+                        className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors ${
+                          level[key]
+                            ? 'bg-chaski-primary/10 text-chaski-primary border-chaski-primary/30'
+                            : 'bg-white text-slate-400 border-slate-200 line-through'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
                   </div>
                 </td>
                 <td className="px-4 py-3">

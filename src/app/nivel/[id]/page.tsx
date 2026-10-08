@@ -91,7 +91,23 @@ export default function NivelPage() {
   const [levelLoading, setLevelLoading] = useState(true)
   const [selectedProgram, setSelectedProgram] = useState<'robotica' | 'ia' | 'hacking'>('robotica')
   const { allows } = useMyScope()
-  const visiblePrograms = (['robotica', 'ia', 'hacking'] as const).filter(allows)
+  // Módulos que el administrador activó para este nivel (Admin > Usuarios > Niveles).
+  // Robótica va siempre; IA y Ciberseguridad se muestran solo si están activados.
+  const [levelModules, setLevelModules] = useState<{ ia: boolean; hacking: boolean }>({ ia: false, hacking: false })
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/levels')
+      .then(res => res.json())
+      .then(data => {
+        const found = Array.isArray(data) ? data.find((l: any) => l.id === levelId) : null
+        if (!cancelled && found) setLevelModules({ ia: !!found.hasAdvancedIA, hacking: !!found.hasHacking })
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [levelId])
+  const visiblePrograms = (['robotica', 'ia', 'hacking'] as const).filter(
+    p => allows(p) && (p === 'robotica' || levelModules[p])
+  )
   const visibleKey = visiblePrograms.join(',')
 
   // Si el programa seleccionado no es del grupo del usuario, pasar al primero que sí.
@@ -390,16 +406,16 @@ export default function NivelPage() {
                 <div>
                   <h2 className="text-2xl font-bold text-chaski-dark">Lecciones del Curso</h2>
                   <p className="text-slate-500">
-                    {apiLessons.length > 0 ? `${apiLessons.length} lecciones` : `${courseData.totalLessons} lecciones`} • {courseData.duration}
+                    {lessonsLoading ? 'Cargando…' : `${apiLessons.length} lecciones en ${Object.keys(groupedApiLessons).length} módulos`}
                   </p>
                 </div>
               </div>
 
               {/* Selector de Programa - Diseño mejorado */}
-              <div className="grid gap-3 mb-8" style={{ gridTemplateColumns: `repeat(${Math.max(visiblePrograms.length, 1)}, minmax(0, 1fr))` }}>
+              <div className={`${visiblePrograms.length > 1 ? 'grid' : 'hidden'} gap-3 mb-8`} style={{ gridTemplateColumns: `repeat(${Math.max(visiblePrograms.length, 1)}, minmax(0, 1fr))` }}>
                 <button
                   onClick={() => setSelectedProgram('robotica')}
-                  className={`${allows('robotica') ? '' : 'hidden '}relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
+                  className={`${visiblePrograms.includes('robotica') ? '' : 'hidden '}relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
                     selectedProgram === 'robotica'
                       ? 'bg-chaski-primary/10 text-chaski-dark border border-chaski-primary/40 shadow-md scale-[1.02]'
                       : 'bg-white text-slate-500 hover:bg-slate-50 border border-border-soft shadow-sm'
@@ -421,7 +437,7 @@ export default function NivelPage() {
 
                 <button
                   onClick={() => setSelectedProgram('ia')}
-                  className={`${allows('ia') ? '' : 'hidden '}relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
+                  className={`${visiblePrograms.includes('ia') ? '' : 'hidden '}relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
                     selectedProgram === 'ia'
                       ? 'bg-chaski-gold/10 text-chaski-dark border border-chaski-gold/40 shadow-md scale-[1.02]'
                       : 'bg-white text-slate-500 hover:bg-slate-50 border border-border-soft shadow-sm'
@@ -443,7 +459,7 @@ export default function NivelPage() {
 
                 <button
                   onClick={() => setSelectedProgram('hacking')}
-                  className={`${allows('hacking') ? '' : 'hidden '}relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
+                  className={`${visiblePrograms.includes('hacking') ? '' : 'hidden '}relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-300 overflow-hidden active:scale-[0.98] ${
                     selectedProgram === 'hacking'
                       ? 'bg-hack-green/10 text-chaski-dark border border-hack-green/40 shadow-md scale-[1.02]'
                       : 'bg-white text-slate-500 hover:bg-slate-50 border border-border-soft shadow-sm'
@@ -508,57 +524,10 @@ export default function NivelPage() {
                   ))}
                 </div>
               ) : (
-                /* Lecciones locales (fallback) */
-                <div className="space-y-4">
-                  {courseData.modules.map((module, modIdx) => (
-                    <div key={module.id} className="bg-white border border-border-soft shadow-sm rounded-xl p-5 animate-slide-up" style={{ animationDelay: `${modIdx * 0.05}s` }}>
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="w-10 h-10 bg-hack-green/10 border border-hack-green/30 rounded-lg flex items-center justify-center text-hack-green font-bold">
-                          {modIdx + 1}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-chaski-dark">{module.title}</h3>
-                          <p className="text-sm text-slate-500">{module.description}</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 ml-14">
-                        {module.lessons.map((lesson) => (
-                          <button
-                            key={lesson.id}
-                            onClick={() => !lesson.locked && setSelectedLesson(lesson.id)}
-                            disabled={lesson.locked}
-                            className={`group w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all active:scale-[0.98] border ${
-                              lesson.locked
-                                ? 'bg-slate-50 border-transparent text-slate-400 cursor-not-allowed'
-                                : selectedLesson === lesson.id
-                                  ? 'bg-hack-green/10 border-hack-green/30 text-chaski-dark'
-                                  : 'bg-white border-border-soft text-slate-600 hover:bg-slate-50'
-                            }`}
-                          >
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 ${
-                              lesson.completed ? 'bg-hack-green/20 text-hack-green' :
-                              lesson.locked ? 'bg-slate-100 text-slate-400' :
-                              'bg-slate-100 text-slate-500'
-                            }`}>
-                              {lesson.completed ? <CheckCircle className="w-4 h-4" /> :
-                               lesson.locked ? <Lock className="w-4 h-4" /> :
-                               getLessonIcon(lesson.type)}
-                            </div>
-                            <div className="flex-1">
-                              <p className={lesson.locked ? 'text-slate-400' : 'text-chaski-dark'}>{lesson.title}</p>
-                              <div className="flex items-center gap-2 text-xs text-slate-500">
-                                <Clock className="w-3 h-3" />
-                                {lesson.duration}
-                                <span className="capitalize">• {lesson.type}</span>
-                              </div>
-                            </div>
-                            {!lesson.locked && <ChevronRight className="w-4 h-4 text-slate-400" />}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                <div className="bg-white border border-border-soft shadow-sm rounded-2xl p-8 text-center">
+                  <BookOpen className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+                  <p className="font-semibold text-chaski-dark">Todavía no hay lecciones en este módulo</p>
+                  <p className="text-sm text-slate-500 mt-1">Tu docente las publicará aquí cuando estén listas.</p>
                 </div>
               )}
             </div>
