@@ -55,7 +55,16 @@ const firma = l => JSON.stringify(CONTENIDO.map(c => l[c] ?? null))
       // Nunca borrar una copia que una entrega esté usando.
       aBorrar.push(...otras.filter(o => !referenciadas.has(o.id)).map(o => o.id))
     } else {
-      conDiferencias.push(filas)
+      // Copia más pobre: mismo texto y, en video/pdf/imágenes, vacía o igual a la mejor.
+      // Borrarla no pierde nada, porque todo lo que tiene está también en la que se conserva.
+      const riqueza = f => (f.video_url ? 1 : 0) + (f.pdf_url ? 1 : 0) + (f.images || []).length
+      const mejor = filas.slice().sort((x, y) => riqueza(y) - riqueza(x))[0]
+      const vacioOIgual = (o, c) => o[c] == null || o[c] === '' || (Array.isArray(o[c]) && o[c].length === 0) || JSON.stringify(o[c]) === JSON.stringify(mejor[c])
+      const subconjuntos = filas.filter(f => f.id !== mejor.id && !referenciadas.has(f.id) &&
+        ['type', 'duration', 'display_order', 'content', 'locked'].every(c => JSON.stringify(f[c] ?? null) === JSON.stringify(mejor[c] ?? null)) &&
+        ['video_url', 'pdf_url', 'images'].every(c => vacioOIgual(f, c)))
+      if (subconjuntos.length === filas.length - 1) aBorrar.push(...subconjuntos.map(f => f.id))
+      else conDiferencias.push(filas)
     }
   }
 
