@@ -37,7 +37,7 @@ export default function LevelsManager() {
     kitPrice: 50,
     hasHacking: false,
     hasAdvancedIA: false,
-    color: 'from-chaski-primary to-cyan-600',
+    color: 'from-chaski-primary to-chaski-secondary',
     neonColor: '#00d4ff',
     icon: '📚'
   })
@@ -131,7 +131,7 @@ export default function LevelsManager() {
       kitPrice: 50,
       hasHacking: false,
       hasAdvancedIA: false,
-      color: 'from-chaski-primary to-cyan-600',
+      color: 'from-chaski-primary to-chaski-secondary',
       neonColor: '#00d4ff',
       icon: '📚'
     })

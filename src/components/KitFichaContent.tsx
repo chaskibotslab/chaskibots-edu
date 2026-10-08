@@ -85,7 +85,7 @@ function StatCard({ icon: Icon, iconBg, iconColor, label, value, hint }: {
 }
 
 const CATEGORY_DOT: Record<string, string> = {
-  placa: 'bg-sky-500',
+  placa: 'bg-chaski-primary',
   sensor: 'bg-chaski-primary',
   actuador: 'bg-amber-500',
   componente: 'bg-slate-400',
@@ -121,7 +121,7 @@ export function KitHeaderMateriales({ kit }: { kit: KitFichaDetalle }) {
       <div className="grid sm:grid-cols-3 gap-3 mb-5 -mt-16 relative z-10 px-1">
         {kit.placa && (
           <StatCard
-            icon={Cpu} iconBg="bg-sky-100" iconColor="text-sky-600"
+            icon={Cpu} iconBg="bg-chaski-primary/10" iconColor="text-chaski-primary"
             label="Placa" value={kit.placa.nombre}
             hint={kit.placa.voltajeLogico ? `${kit.placa.voltajeLogico} • ${kit.placa.conectorUsb}` : undefined}
           />
@@ -135,8 +135,8 @@ export function KitHeaderMateriales({ kit }: { kit: KitFichaDetalle }) {
       </div>
 
       {kit.placa?.notasTecnicas && (
-        <div className="flex items-start gap-2.5 text-sm text-sky-900 bg-sky-50 border border-sky-200 rounded-2xl p-4 mb-3">
-          <Cpu className="w-4 h-4 shrink-0 mt-0.5 text-sky-500" />
+        <div className="flex items-start gap-2.5 text-sm text-chaski-primary bg-chaski-primary/5 border border-chaski-primary/30 rounded-2xl p-4 mb-3">
+          <Cpu className="w-4 h-4 shrink-0 mt-0.5 text-chaski-primary" />
           <p><strong className="font-semibold">Notas técnicas de la placa:</strong> {kit.placa.notasTecnicas}</p>
         </div>
       )}
@@ -204,7 +204,7 @@ export function KitHeaderMateriales({ kit }: { kit: KitFichaDetalle }) {
 const PROYECTO_TIPO_CONFIG = {
   principal: { icon: Trophy, iconBg: 'bg-chaski-primary/10', iconColor: 'text-chaski-primary', badge: 'coral', label: 'Proyecto principal', topBar: 'bg-gradient-to-r from-chaski-primary to-chaski-gold', border: 'border-chaski-primary/25' },
   adicional: { icon: Wrench, iconBg: 'bg-amber-50', iconColor: 'text-amber-600', badge: 'gold', label: 'Proyecto adicional', topBar: 'bg-slate-200', border: 'border-slate-200' },
-  practica: { icon: Sparkles, iconBg: 'bg-sky-50', iconColor: 'text-sky-600', badge: 'slate', label: 'Práctica', topBar: 'bg-sky-200', border: 'border-sky-200' },
+  practica: { icon: Sparkles, iconBg: 'bg-chaski-primary/5', iconColor: 'text-chaski-primary', badge: 'slate', label: 'Práctica', topBar: 'bg-chaski-primary/20', border: 'border-chaski-primary/30' },
 }
 
 export function ProyectoCard({ proyecto: p, principal }: { proyecto: KitFichaProyecto; principal: KitFichaProyecto | null }) {

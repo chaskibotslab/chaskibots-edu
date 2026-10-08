@@ -22,9 +22,9 @@ const typeConfig = {
   },
   practica: {
     icon: Sparkles,
-    color: 'text-sky-600',
-    bg: 'bg-sky-100',
-    ring: 'ring-sky-200',
+    color: 'text-chaski-primary',
+    bg: 'bg-chaski-primary/10',
+    ring: 'ring-chaski-primary/30',
     label: 'Práctica',
   },
 }
@@ -85,7 +85,7 @@ export default function LeccionesProyectos({ proyectos }: { proyectos: KitFichaP
       <div className="space-y-7">
         {practicas.length > 0 && (
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-sky-600/80 mb-2.5">Práctica previa</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-chaski-primary/80 mb-2.5">Práctica previa</p>
             <p className="text-xs text-slate-400 mb-2.5 -mt-1.5">Antes del proyecto principal, practica con cada pieza por separado.</p>
             <div className="space-y-2.5">
               {practicas.map((p, i) => (

@@ -81,8 +81,8 @@ const BADGES_CONFIG: Omit<Badge, 'unlocked' | 'progress'>[] = [
     name: 'Robotista',
     description: 'Completa módulo de Robótica',
     icon: Bot,
-    color: 'text-cyan-400',
-    bgColor: 'bg-cyan-500/20',
+    color: 'text-chaski-secondary',
+    bgColor: 'bg-chaski-primary/20',
   },
   {
     id: 'ia',
@@ -163,8 +163,8 @@ export default function BadgesDisplay({
             <Award className="w-5 h-5 text-chaski-primary" />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900">Mis Insignias</h3>
-            <p className="text-sm text-gray-500">{unlockedCount} de {badges.length} desbloqueadas</p>
+            <h3 className="font-bold text-slate-900">Mis Insignias</h3>
+            <p className="text-sm text-slate-500">{unlockedCount} de {badges.length} desbloqueadas</p>
           </div>
         </div>
       </div>
@@ -179,7 +179,7 @@ export default function BadgesDisplay({
               className={`relative p-3 rounded-xl border transition-all duration-300 ${
                 badge.unlocked 
                   ? `${badge.bgColor} border-transparent hover:scale-105` 
-                  : 'bg-gray-100/50 border-gray-200 opacity-50'
+                  : 'bg-slate-100/50 border-slate-200 opacity-50'
               }`}
             >
               <div className="flex flex-col items-center gap-2">
@@ -189,11 +189,11 @@ export default function BadgesDisplay({
                   {badge.unlocked ? (
                     <Icon className={`w-5 h-5 ${badge.color}`} />
                   ) : (
-                    <Lock className="w-4 h-4 text-gray-600" />
+                    <Lock className="w-4 h-4 text-slate-600" />
                   )}
                 </div>
                 <span className={`text-xs font-medium text-center ${
-                  badge.unlocked ? 'text-gray-900' : 'text-gray-600'
+                  badge.unlocked ? 'text-slate-900' : 'text-slate-600'
                 }`}>
                   {badge.name}
                 </span>
@@ -222,29 +222,29 @@ export default function BadgesDisplay({
           onClick={() => setSelectedBadge(null)}
         >
           <div 
-            className="bg-gray-50 rounded-2xl p-6 max-w-sm w-full border border-gray-200"
+            className="bg-slate-50 rounded-2xl p-6 max-w-sm w-full border border-slate-200"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex flex-col items-center text-center">
               <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-4 ${
-                selectedBadge.unlocked ? selectedBadge.bgColor : 'bg-gray-100'
+                selectedBadge.unlocked ? selectedBadge.bgColor : 'bg-slate-100'
               }`}>
                 {selectedBadge.unlocked ? (
                   <selectedBadge.icon className={`w-10 h-10 ${selectedBadge.color}`} />
                 ) : (
-                  <Lock className="w-8 h-8 text-gray-600" />
+                  <Lock className="w-8 h-8 text-slate-600" />
                 )}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedBadge.name}</h3>
-              <p className="text-gray-600 mb-4">{selectedBadge.description}</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">{selectedBadge.name}</h3>
+              <p className="text-slate-600 mb-4">{selectedBadge.description}</p>
               
               {selectedBadge.maxProgress && !selectedBadge.unlocked && (
                 <div className="w-full">
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-500">Progreso</span>
-                    <span className="text-gray-900">{selectedBadge.progress}/{selectedBadge.maxProgress}</span>
+                    <span className="text-slate-500">Progreso</span>
+                    <span className="text-slate-900">{selectedBadge.progress}/{selectedBadge.maxProgress}</span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                     <div 
                       className={`h-full ${selectedBadge.bgColor.replace('/20', '')}`}
                       style={{ width: `${((selectedBadge.progress || 0) / selectedBadge.maxProgress) * 100}%` }}
@@ -263,7 +263,7 @@ export default function BadgesDisplay({
             
             <button
               onClick={() => setSelectedBadge(null)}
-              className="w-full mt-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-900 font-medium transition-colors"
+              className="w-full mt-6 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-900 font-medium transition-colors"
             >
               Cerrar
             </button>

@@ -159,11 +159,11 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
   return (
     <div className="space-y-2">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 p-2 bg-gray-100 rounded-lg">
+      <div className="flex flex-wrap items-center gap-2 p-2 bg-slate-100 rounded-lg">
         <button
           onClick={() => setTool('pencil')}
           className={`p-2 rounded-lg transition-colors ${
-            tool === 'pencil' ? 'bg-brand-purple text-dark-900' : 'text-gray-600 hover:bg-gray-200'
+            tool === 'pencil' ? 'bg-chaski-primary text-slate-800' : 'text-slate-600 hover:bg-slate-200'
           }`}
           title="Lápiz"
         >
@@ -173,32 +173,32 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
         <button
           onClick={() => setTool('eraser')}
           className={`p-2 rounded-lg transition-colors ${
-            tool === 'eraser' ? 'bg-brand-purple text-dark-900' : 'text-gray-600 hover:bg-gray-200'
+            tool === 'eraser' ? 'bg-chaski-primary text-slate-800' : 'text-slate-600 hover:bg-slate-200'
           }`}
           title="Borrador"
         >
           <Eraser className="w-4 h-4" />
         </button>
 
-        <div className="w-px h-6 bg-dark-500" />
+        <div className="w-px h-6 bg-slate-400" />
 
         <div className="relative">
           <button
             onClick={() => setShowColors(!showColors)}
-            className="p-2 rounded-lg text-gray-600 hover:bg-gray-200 flex items-center gap-1"
+            className="p-2 rounded-lg text-slate-600 hover:bg-slate-200 flex items-center gap-1"
             title="Color"
           >
-            <div className="w-4 h-4 rounded-full border border-gray-500" style={{ backgroundColor: color }} />
+            <div className="w-4 h-4 rounded-full border border-slate-500" style={{ backgroundColor: color }} />
             <Palette className="w-3 h-3" />
           </button>
           
           {showColors && (
-            <div className="absolute top-full left-0 mt-1 p-2 bg-gray-50 border border-gray-200 rounded-lg grid grid-cols-5 gap-1 z-10">
+            <div className="absolute top-full left-0 mt-1 p-2 bg-slate-50 border border-slate-200 rounded-lg grid grid-cols-5 gap-1 z-10">
               {COLORS.map(c => (
                 <button
                   key={c}
                   onClick={() => { setColor(c); setShowColors(false); }}
-                  className={`w-6 h-6 rounded-full border-2 ${color === c ? 'border-brand-purple' : 'border-transparent'}`}
+                  className={`w-6 h-6 rounded-full border-2 ${color === c ? 'border-chaski-primary' : 'border-transparent'}`}
                   style={{ backgroundColor: c }}
                 />
               ))}
@@ -207,23 +207,23 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
         </div>
 
         <div className="flex items-center gap-1">
-          <span className="text-xs text-gray-500">Tamaño:</span>
+          <span className="text-xs text-slate-500">Tamaño:</span>
           <input
             type="range"
             min="1"
             max="20"
             value={brushSize}
             onChange={(e) => setBrushSize(parseInt(e.target.value))}
-            className="w-16 h-1 bg-dark-600 rounded-lg appearance-none cursor-pointer"
+            className="w-16 h-1 bg-slate-500 rounded-lg appearance-none cursor-pointer"
           />
-          <span className="text-xs text-gray-600 w-4">{brushSize}</span>
+          <span className="text-xs text-slate-600 w-4">{brushSize}</span>
         </div>
 
-        <div className="w-px h-6 bg-dark-500" />
+        <div className="w-px h-6 bg-slate-400" />
 
         <button
           onClick={undo}
-          className="p-2 rounded-lg text-gray-600 hover:bg-gray-200 disabled:opacity-50"
+          className="p-2 rounded-lg text-slate-600 hover:bg-slate-200 disabled:opacity-50"
           disabled={history.length <= 1}
           title="Deshacer"
         >
@@ -240,7 +240,7 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
 
         <button
           onClick={downloadImage}
-          className="p-2 rounded-lg text-neon-green hover:bg-neon-green/20"
+          className="p-2 rounded-lg text-hack-green hover:bg-hack-green/20"
           title="Descargar"
         >
           <Download className="w-4 h-4" />
@@ -248,7 +248,7 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
       </div>
 
       {/* Canvas */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+      <div className="border border-slate-200 rounded-lg overflow-hidden bg-white">
         <canvas
           ref={canvasRef}
           width={width}
@@ -265,7 +265,7 @@ export default function DrawingCanvas({ onSave, width = 400, height = 300 }: Dra
         />
       </div>
       
-      <p className="text-xs text-gray-500 text-center">
+      <p className="text-xs text-slate-500 text-center">
         Dibuja tu respuesta aquí. Se guardará automáticamente.
       </p>
     </div>

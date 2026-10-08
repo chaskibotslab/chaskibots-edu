@@ -33,7 +33,7 @@ const BLANK: Omit<Course, 'id'> = {
 
 const PROGRAMS = [
   { id: 'robotica', label: 'Robótica', emoji: '🤖', color: 'from-chaski-primary to-chaski-secondary' },
-  { id: 'ia', label: 'IA', emoji: '🧠', color: 'from-pink-500 to-rose-500' },
+  { id: 'ia', label: 'IA', emoji: '🧠', color: 'from-chaski-primary to-rose-500' },
   { id: 'hacking', label: 'Hacking Ético', emoji: '🛡️', color: 'from-emerald-500 to-green-500' },
 ]
 

@@ -80,7 +80,7 @@ export default function KitDisplay({ levelId }: KitDisplayProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-purple"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-chaski-primary"></div>
       </div>
     )
   }
@@ -148,7 +148,7 @@ export default function KitDisplay({ levelId }: KitDisplayProps) {
                   onClick={() => setCurrentImageIndex(idx)}
                   className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                     idx === currentImageIndex
-                      ? 'border-brand-purple'
+                      ? 'border-chaski-primary'
                       : 'border-transparent hover:border-white/30'
                   }`}
                 >
@@ -181,7 +181,7 @@ export default function KitDisplay({ levelId }: KitDisplayProps) {
           </div>
           {kit.price && (
             <div className="text-right">
-              <span className="text-2xl font-bold text-brand-purple">${kit.price}</span>
+              <span className="text-2xl font-bold text-chaski-primary">${kit.price}</span>
               <p className="text-slate-500 text-sm">USD</p>
             </div>
           )}
@@ -197,7 +197,7 @@ export default function KitDisplay({ levelId }: KitDisplayProps) {
                   key={idx}
                   className="flex items-center gap-2 bg-black/20 rounded-lg px-3 py-2"
                 >
-                  <span className="w-2 h-2 bg-brand-purple rounded-full"></span>
+                  <span className="w-2 h-2 bg-chaski-primary rounded-full"></span>
                   <span className="text-slate-300 text-sm">{component}</span>
                 </div>
               ))}
@@ -213,7 +213,7 @@ export default function KitDisplay({ levelId }: KitDisplayProps) {
               {kit.skills.map((skill, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 bg-brand-violet/20 text-brand-violet rounded-full text-sm"
+                  className="px-3 py-1 bg-chaski-primary/20 text-chaski-primary rounded-full text-sm"
                 >
                   {skill}
                 </span>
@@ -240,7 +240,7 @@ export default function KitDisplay({ levelId }: KitDisplayProps) {
                 href={kit.videoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-brand-purple hover:underline"
+                className="flex items-center gap-2 text-chaski-primary hover:underline"
               >
                 <ExternalLink className="w-4 h-4" />
                 Ver video tutorial del kit

@@ -108,7 +108,7 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 text-brand-purple animate-spin" />
+        <Loader2 className="w-6 h-6 text-chaski-primary animate-spin" />
       </div>
     )
   }
@@ -116,20 +116,20 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
   // Si no hay nombre, mostrar mensaje
   if (!studentName || !studentName.trim()) {
     return (
-      <div className="bg-gray-50 border border-yellow-500/30 rounded-xl p-6 text-center">
+      <div className="bg-slate-50 border border-yellow-500/30 rounded-xl p-6 text-center">
         <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
-        <p className="text-gray-900 font-medium">Ingresa tu nombre primero</p>
-        <p className="text-sm text-gray-600 mt-1">Escribe tu nombre completo en el campo de arriba para ver tus calificaciones</p>
+        <p className="text-slate-900 font-medium">Ingresa tu nombre primero</p>
+        <p className="text-sm text-slate-600 mt-1">Escribe tu nombre completo en el campo de arriba para ver tus calificaciones</p>
       </div>
     )
   }
 
   if (submissions.length === 0) {
     return (
-      <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
-        <FileText className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-        <p className="text-gray-600">No tienes entregas registradas aún</p>
-        <p className="text-sm text-gray-500 mt-1">Completa una tarea para ver tu progreso aquí</p>
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center">
+        <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+        <p className="text-slate-600">No tienes entregas registradas aún</p>
+        <p className="text-sm text-slate-500 mt-1">Completa una tarea para ver tu progreso aquí</p>
       </div>
     )
   }
@@ -137,20 +137,20 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
   return (
     <div className="space-y-4">
       {/* Resumen */}
-      <div className="bg-gradient-to-r from-chaski-primary/10 to-pink-500/10 border border-chaski-primary/30 rounded-xl p-4">
+      <div className="bg-gradient-to-r from-chaski-primary/10 to-chaski-primary/10 border border-chaski-primary/30 rounded-xl p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-chaski-secondary" />
               Mi Progreso
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-600">
               {submissions.length} tareas enviadas • {gradedSubmissions.length} calificadas
             </p>
           </div>
           {average && (
             <div className="text-right">
-              <p className="text-sm text-gray-600">Promedio</p>
+              <p className="text-sm text-slate-600">Promedio</p>
               <p className={`text-2xl font-bold ${getGradeColor(average)}`}>
                 {average}/10
               </p>
@@ -164,16 +164,16 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
         {submissions.map(submission => (
           <div
             key={submission.id}
-            className={`bg-gray-50 border rounded-xl overflow-hidden transition-all ${
+            className={`bg-slate-50 border rounded-xl overflow-hidden transition-all ${
               submission.status === 'graded' 
                 ? 'border-green-500/30' 
-                : 'border-gray-200'
+                : 'border-slate-200'
             }`}
           >
             {/* Header */}
             <button
               onClick={() => setExpandedId(expandedId === submission.id ? null : submission.id)}
-              className="w-full p-4 flex items-center gap-4 text-left hover:bg-gray-100/50 transition-colors"
+              className="w-full p-4 flex items-center gap-4 text-left hover:bg-slate-100/50 transition-colors"
             >
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                 submission.status === 'graded' 
@@ -191,10 +191,10 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="font-medium text-gray-900">{getTaskName(submission.output)}</h4>
+                  <h4 className="font-medium text-slate-900">{getTaskName(submission.output)}</h4>
                   {getStatusBadge(submission.status)}
                 </div>
-                <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
                     {new Date(submission.submittedAt).toLocaleDateString('es-ES', {
@@ -211,22 +211,22 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
               </div>
 
               {expandedId === submission.id ? (
-                <ChevronUp className="w-5 h-5 text-gray-600" />
+                <ChevronUp className="w-5 h-5 text-slate-600" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-gray-600" />
+                <ChevronDown className="w-5 h-5 text-slate-600" />
               )}
             </button>
 
             {/* Contenido expandido */}
             {expandedId === submission.id && (
-              <div className="px-4 pb-4 border-t border-gray-200">
+              <div className="px-4 pb-4 border-t border-slate-200">
                 <div className="pt-4 space-y-4">
                   {/* Calificación grande */}
                   {submission.status === 'graded' && submission.grade && (
-                    <div className="flex items-center gap-4 p-4 bg-gray-100 rounded-lg">
+                    <div className="flex items-center gap-4 p-4 bg-slate-100 rounded-lg">
                       <div className={`text-4xl font-bold ${getGradeColor(submission.grade)}`}>
                         {submission.grade}
-                        <span className="text-lg text-gray-500">/10</span>
+                        <span className="text-lg text-slate-500">/10</span>
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -240,7 +240,7 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
                                     : parseFloat(submission.grade || '0') >= 5 
                                       ? 'bg-yellow-500' 
                                       : 'bg-red-500'
-                                  : 'bg-dark-600'
+                                  : 'bg-slate-500'
                               }`}
                             />
                           ))}
@@ -256,7 +256,7 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
                         <MessageSquare className="w-4 h-4" />
                         Retroalimentación del Profesor
                       </h5>
-                      <p className="text-gray-900 whitespace-pre-wrap">{submission.feedback}</p>
+                      <p className="text-slate-900 whitespace-pre-wrap">{submission.feedback}</p>
                     </div>
                   )}
 
@@ -267,7 +267,7 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
                         <AlertCircle className="w-5 h-5" />
                         <span className="font-medium">Tu tarea está siendo revisada</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-slate-600 mt-1">
                         El profesor revisará tu entrega pronto. Recibirás tu calificación y retroalimentación aquí.
                       </p>
                     </div>
@@ -275,8 +275,8 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
 
                   {/* Resumen de lo enviado */}
                   <div className="p-3 bg-white rounded-lg">
-                    <h5 className="text-xs font-medium text-gray-600 mb-2">Tu respuesta:</h5>
-                    <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap max-h-32 overflow-auto">
+                    <h5 className="text-xs font-medium text-slate-600 mb-2">Tu respuesta:</h5>
+                    <pre className="text-xs text-slate-300 font-mono whitespace-pre-wrap max-h-32 overflow-auto">
                       {submission.code.slice(0, 500)}
                       {submission.code.length > 500 && '...'}
                     </pre>

@@ -126,8 +126,8 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
     return (
       <div className="min-h-screen flex items-center justify-center bg-chaski-light">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 text-gray-900 animate-spin mx-auto mb-4" />
-          <p className="text-gray-900/80">Verificando acceso...</p>
+          <Loader2 className="w-10 h-10 text-slate-900 animate-spin mx-auto mb-4" />
+          <p className="text-slate-900/80">Verificando acceso...</p>
         </div>
       </div>
     )
@@ -151,7 +151,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
             className="mx-auto mb-6 rounded-2xl"
           />
           <h2 className="text-2xl font-bold text-chaski-dark mb-4">Acceso Requerido</h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-slate-600 mb-6">
             Debes iniciar sesión para acceder a este curso.
           </p>
           <a 
@@ -176,7 +176,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
           <h2 className="text-2xl font-bold text-chaski-dark mb-2">
             Acceso al Curso
           </h2>
-          <p className="text-gray-600">
+          <p className="text-slate-600">
             <span className="font-semibold text-chaski-primary">{levelName}</span>
           </p>
         </div>
@@ -196,16 +196,16 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               O ingresa la contraseña del curso
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-chaski-accent focus:border-transparent transition-all"
+                className="w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-chaski-accent focus:border-transparent transition-all"
                 placeholder="Contraseña del curso"
                 required
                 autoFocus
@@ -213,7 +213,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-600"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -239,8 +239,8 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-          <p className="text-sm text-gray-500">
+        <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+          <p className="text-sm text-slate-500">
             La contraseña fue proporcionada por tu profesor o institución.
           </p>
         </div>

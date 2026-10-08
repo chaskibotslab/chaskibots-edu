@@ -135,18 +135,18 @@ export default function SimulatorChallengesPanel() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-chaski-primary/20 to-pink-500/20 rounded-xl">
+          <div className="p-2 bg-gradient-to-br from-chaski-primary/20 to-chaski-primary/20 rounded-xl">
             <Gamepad2 className="w-6 h-6 text-chaski-secondary" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Retos del Simulador 3D</h2>
-            <p className="text-sm text-gray-600">Progreso de estudiantes en los retos</p>
+            <h2 className="text-xl font-bold text-slate-900">Retos del Simulador 3D</h2>
+            <p className="text-sm text-slate-600">Progreso de estudiantes en los retos</p>
           </div>
         </div>
         <button
           onClick={() => { setSyncing(true); loadChallenges().finally(() => setSyncing(false)) }}
           disabled={syncing}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-300 rounded-lg transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-300 rounded-lg transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
           Actualizar
@@ -155,38 +155,38 @@ export default function SimulatorChallengesPanel() {
 
       {/* Estadísticas */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
           <div className="flex items-center gap-2 mb-2">
-            <Target className="w-4 h-4 text-gray-600" />
-            <span className="text-xs text-gray-600">Total Retos</span>
+            <Target className="w-4 h-4 text-slate-600" />
+            <span className="text-xs text-slate-600">Total Retos</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+          <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
         </div>
-        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-4 h-4 text-yellow-400" />
-            <span className="text-xs text-gray-600">Pendientes</span>
+            <span className="text-xs text-slate-600">Pendientes</span>
           </div>
           <p className="text-2xl font-bold text-yellow-400">{stats.completed}</p>
         </div>
-        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle className="w-4 h-4 text-green-400" />
-            <span className="text-xs text-gray-600">Verificados</span>
+            <span className="text-xs text-slate-600">Verificados</span>
           </div>
           <p className="text-2xl font-bold text-green-400">{stats.verified}</p>
         </div>
-        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-sm">🧩</span>
-            <span className="text-xs text-gray-600">Laberintos</span>
+            <span className="text-xs text-slate-600">Laberintos</span>
           </div>
           <p className="text-2xl font-bold text-chaski-secondary">{stats.byCategory.laberinto}</p>
         </div>
-        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-sm">🥋</span>
-            <span className="text-xs text-gray-600">Mini Sumo</span>
+            <span className="text-xs text-slate-600">Mini Sumo</span>
           </div>
           <p className="text-2xl font-bold text-red-400">{stats.byCategory.minisumo}</p>
         </div>
@@ -198,82 +198,82 @@ export default function SimulatorChallengesPanel() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="appearance-none bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 pr-8 text-sm text-gray-900 focus:outline-none focus:border-chaski-primary"
+            className="appearance-none bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 pr-8 text-sm text-slate-900 focus:outline-none focus:border-chaski-primary"
           >
             <option value="">Todas las categorías</option>
             <option value="laberinto">🧩 Laberintos</option>
             <option value="coleccionables">⭐ Coleccionables</option>
             <option value="minisumo">🥋 Mini Sumo</option>
           </select>
-          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 pointer-events-none" />
+          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" />
         </div>
         <div className="relative">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="appearance-none bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 pr-8 text-sm text-gray-900 focus:outline-none focus:border-chaski-primary"
+            className="appearance-none bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 pr-8 text-sm text-slate-900 focus:outline-none focus:border-chaski-primary"
           >
             <option value="">Todos los estados</option>
             <option value="completed">⏳ Pendientes</option>
             <option value="verified">✅ Verificados</option>
           </select>
-          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 pointer-events-none" />
+          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" />
         </div>
       </div>
 
       {/* Tabla de retos */}
-      <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">
             <RefreshCw className="w-8 h-8 text-chaski-secondary animate-spin mx-auto mb-2" />
-            <p className="text-gray-600">Cargando retos...</p>
+            <p className="text-slate-600">Cargando retos...</p>
           </div>
         ) : challenges.length === 0 ? (
           <div className="p-8 text-center">
-            <Gamepad2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-600">No hay retos completados aún</p>
-            <p className="text-sm text-gray-500 mt-1">Los estudiantes pueden enviar sus retos desde el simulador 3D</p>
+            <Gamepad2 className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+            <p className="text-slate-600">No hay retos completados aún</p>
+            <p className="text-sm text-slate-500 mt-1">Los estudiantes pueden enviar sus retos desde el simulador 3D</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-100">
+              <thead className="bg-slate-100">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estudiante</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Reto</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Categoría</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Dificultad</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Acciones</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase">Estudiante</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase">Reto</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase">Categoría</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase">Dificultad</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase">Fecha</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase">Estado</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-600">
+              <tbody className="divide-y divide-slate-500">
                 {challenges.map((challenge) => (
-                  <tr key={challenge.id} className="hover:bg-gray-100/50 transition-colors">
+                  <tr key={challenge.id} className="hover:bg-slate-100/50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-chaski-primary to-pink-500 rounded-full flex items-center justify-center text-gray-900 text-xs font-bold">
+                        <div className="w-8 h-8 bg-gradient-to-br from-chaski-primary to-chaski-secondary rounded-full flex items-center justify-center text-slate-900 text-xs font-bold">
                           {challenge.studentName.charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-gray-900 font-medium">{challenge.studentName}</span>
+                        <span className="text-slate-900 font-medium">{challenge.studentName}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-gray-900">{challenge.challengeName}</span>
+                      <span className="text-slate-900">{challenge.challengeName}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${CATEGORY_INFO[challenge.challengeCategory]?.color || 'bg-gray-500/20 text-gray-600'}`}>
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${CATEGORY_INFO[challenge.challengeCategory]?.color || 'bg-slate-500/20 text-slate-600'}`}>
                         {CATEGORY_INFO[challenge.challengeCategory]?.icon || '🎮'}
                         {CATEGORY_INFO[challenge.challengeCategory]?.name || challenge.challengeCategory}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${DIFFICULTY_INFO[challenge.challengeDifficulty]?.color || 'bg-gray-500/20 text-gray-600'}`}>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${DIFFICULTY_INFO[challenge.challengeDifficulty]?.color || 'bg-slate-500/20 text-slate-600'}`}>
                         {DIFFICULTY_INFO[challenge.challengeDifficulty]?.name || challenge.challengeDifficulty}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-slate-600">
                       {formatDate(challenge.completedAt)}
                     </td>
                     <td className="px-4 py-3">
@@ -293,7 +293,7 @@ export default function SimulatorChallengesPanel() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedChallenge(challenge)}
-                          className="p-1.5 bg-dark-600 hover:bg-dark-500 text-gray-300 rounded-lg transition-colors"
+                          className="p-1.5 bg-slate-500 hover:bg-slate-400 text-slate-300 rounded-lg transition-colors"
                           title="Ver detalles"
                         >
                           <Eye className="w-4 h-4" />
@@ -319,31 +319,31 @@ export default function SimulatorChallengesPanel() {
 
       {/* Resumen por estudiante */}
       {Object.keys(studentStats).length > 0 && (
-        <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-slate-50 rounded-xl border border-slate-200 p-4">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
             <Award className="w-5 h-5 text-yellow-400" />
             Progreso por Estudiante
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(studentStats).map(([name, stats]) => (
-              <div key={name} className="bg-gray-100 rounded-lg p-4">
+              <div key={name} className="bg-slate-100 rounded-lg p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-chaski-primary to-pink-500 rounded-full flex items-center justify-center text-gray-900 font-bold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-chaski-primary to-chaski-secondary rounded-full flex items-center justify-center text-slate-900 font-bold">
                     {name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-gray-900 font-medium">{name}</p>
-                    <p className="text-xs text-gray-600">{stats.total} retos completados</p>
+                    <p className="text-slate-900 font-medium">{name}</p>
+                    <p className="text-xs text-slate-600">{stats.total} retos completados</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-dark-600 rounded-full h-2">
+                  <div className="flex-1 bg-slate-500 rounded-full h-2">
                     <div 
                       className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all"
                       style={{ width: `${(stats.verified / stats.total) * 100}%` }}
                     />
                   </div>
-                  <span className="text-xs text-gray-600">{stats.verified}/{stats.total}</span>
+                  <span className="text-xs text-slate-600">{stats.verified}/{stats.total}</span>
                 </div>
               </div>
             ))}
@@ -354,29 +354,29 @@ export default function SimulatorChallengesPanel() {
       {/* Modal de detalles */}
       {selectedChallenge && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-50 rounded-xl border border-gray-200 max-w-lg w-full">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <div className="bg-slate-50 rounded-xl border border-slate-200 max-w-lg w-full">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-yellow-400" />
                 Detalles del Reto
               </h3>
               <button
                 onClick={() => setSelectedChallenge(null)}
-                className="p-1 hover:bg-gray-200 rounded-lg transition-colors"
+                className="p-1 hover:bg-slate-200 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
             <div className="p-4 space-y-4">
-              <div className="bg-gray-100 rounded-lg p-4">
+              <div className="bg-slate-100 rounded-lg p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-chaski-primary to-pink-500 rounded-full flex items-center justify-center text-gray-900 text-xl font-bold">
+                  <div className="w-12 h-12 bg-gradient-to-br from-chaski-primary to-chaski-secondary rounded-full flex items-center justify-center text-slate-900 text-xl font-bold">
                     {selectedChallenge.studentName.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-gray-900 font-semibold">{selectedChallenge.studentName}</p>
+                    <p className="text-slate-900 font-semibold">{selectedChallenge.studentName}</p>
                     {selectedChallenge.studentEmail && (
-                      <p className="text-sm text-gray-600">{selectedChallenge.studentEmail}</p>
+                      <p className="text-sm text-slate-600">{selectedChallenge.studentEmail}</p>
                     )}
                   </div>
                 </div>
@@ -384,24 +384,24 @@ export default function SimulatorChallengesPanel() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-gray-600 mb-1">Reto</p>
-                  <p className="text-gray-900 font-medium">{selectedChallenge.challengeName}</p>
+                  <p className="text-xs text-slate-600 mb-1">Reto</p>
+                  <p className="text-slate-900 font-medium">{selectedChallenge.challengeName}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-600 mb-1">Categoría</p>
+                  <p className="text-xs text-slate-600 mb-1">Categoría</p>
                   <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${CATEGORY_INFO[selectedChallenge.challengeCategory]?.color}`}>
                     {CATEGORY_INFO[selectedChallenge.challengeCategory]?.icon}
                     {CATEGORY_INFO[selectedChallenge.challengeCategory]?.name}
                   </span>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-600 mb-1">Dificultad</p>
+                  <p className="text-xs text-slate-600 mb-1">Dificultad</p>
                   <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${DIFFICULTY_INFO[selectedChallenge.challengeDifficulty]?.color}`}>
                     {DIFFICULTY_INFO[selectedChallenge.challengeDifficulty]?.name}
                   </span>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-600 mb-1">Estado</p>
+                  <p className="text-xs text-slate-600 mb-1">Estado</p>
                   {selectedChallenge.status === 'verified' ? (
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">
                       <CheckCircle className="w-3 h-3" />
@@ -415,13 +415,13 @@ export default function SimulatorChallengesPanel() {
                   )}
                 </div>
                 <div>
-                  <p className="text-xs text-gray-600 mb-1">Completado</p>
-                  <p className="text-gray-900 text-sm">{formatDate(selectedChallenge.completedAt)}</p>
+                  <p className="text-xs text-slate-600 mb-1">Completado</p>
+                  <p className="text-slate-900 text-sm">{formatDate(selectedChallenge.completedAt)}</p>
                 </div>
                 {selectedChallenge.verifiedBy && (
                   <div>
-                    <p className="text-xs text-gray-600 mb-1">Verificado por</p>
-                    <p className="text-gray-900 text-sm">{selectedChallenge.verifiedBy}</p>
+                    <p className="text-xs text-slate-600 mb-1">Verificado por</p>
+                    <p className="text-slate-900 text-sm">{selectedChallenge.verifiedBy}</p>
                   </div>
                 )}
               </div>

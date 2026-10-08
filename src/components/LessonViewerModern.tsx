@@ -166,14 +166,14 @@ export default function LessonViewerModern({
   const parseMarkdown = (text: string) => {
     if (!text) return ''
     return text
-      .replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold text-gray-900 mt-4 mb-2">$1</h3>')
-      .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold text-gray-900 mt-6 mb-3 flex items-center gap-2"><span class="w-1 h-6 bg-gradient-to-b ' + program.gradient + ' rounded-full"></span>$1</h2>')
-      .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold text-gray-900 mt-6 mb-4">$1</h1>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong class="text-gray-900 font-semibold">$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em class="text-gray-600 italic">$1</em>')
-      .replace(/^- (.+)$/gm, '<li class="flex items-start gap-2 text-gray-700 ml-4"><span class="' + program.text + ' mt-1">•</span><span>$1</span></li>')
-      .replace(/^\d+\. (.+)$/gm, '<li class="flex items-start gap-3 text-gray-700 ml-4 mb-2"><span class="flex-shrink-0 w-6 h-6 rounded-full ' + program.bg20 + ' ' + program.text + ' text-sm flex items-center justify-center font-medium">$1</span></li>')
-      .replace(/\n\n/g, '</p><p class="text-gray-700 leading-relaxed mb-3">')
+      .replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold text-slate-900 mt-4 mb-2">$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3 flex items-center gap-2"><span class="w-1 h-6 bg-gradient-to-b ' + program.gradient + ' rounded-full"></span>$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold text-slate-900 mt-6 mb-4">$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong class="text-slate-900 font-semibold">$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em class="text-slate-600 italic">$1</em>')
+      .replace(/^- (.+)$/gm, '<li class="flex items-start gap-2 text-slate-700 ml-4"><span class="' + program.text + ' mt-1">•</span><span>$1</span></li>')
+      .replace(/^\d+\. (.+)$/gm, '<li class="flex items-start gap-3 text-slate-700 ml-4 mb-2"><span class="flex-shrink-0 w-6 h-6 rounded-full ' + program.bg20 + ' ' + program.text + ' text-sm flex items-center justify-center font-medium">$1</span></li>')
+      .replace(/\n\n/g, '</p><p class="text-slate-700 leading-relaxed mb-3">')
       .replace(/\n/g, '<br/>')
   }
 
@@ -230,7 +230,7 @@ export default function LessonViewerModern({
   const progressPercent = ((currentIndex + 1) / totalLessons) * 100
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-50/95 backdrop-blur-sm overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-slate-50/95 backdrop-blur-sm overflow-hidden">
       {/* Header con progreso estilo Duolingo */}
       <div className="bg-white border-b border-border-soft">
         <div className="max-w-7xl mx-auto px-4">
@@ -238,7 +238,7 @@ export default function LessonViewerModern({
             {/* Botón cerrar */}
             <button 
               onClick={onClose}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
             >
               <X className="w-5 h-5" />
               <span className="hidden sm:inline">Cerrar</span>
@@ -247,13 +247,13 @@ export default function LessonViewerModern({
             {/* Barra de progreso central */}
             <div className="flex-1 max-w-md mx-4">
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
                   <div 
                     className={`h-full bg-gradient-to-r ${program.gradient} rounded-full transition-all duration-500`}
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
-                <span className="text-sm text-gray-600 whitespace-nowrap">
+                <span className="text-sm text-slate-600 whitespace-nowrap">
                   {currentIndex + 1}/{totalLessons}
                 </span>
               </div>
@@ -279,7 +279,7 @@ export default function LessonViewerModern({
         {/* Panel izquierdo - Video/Contenido principal */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Tabs de navegación */}
-          <div className="bg-gray-50 border-b border-border-soft px-4">
+          <div className="bg-slate-50 border-b border-border-soft px-4">
             <div className="flex gap-1">
               {[
                 { id: 'video', label: 'Video', icon: Play },
@@ -292,7 +292,7 @@ export default function LessonViewerModern({
                   className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 ${
                     activeSection === tab.id
                       ? `${program.text} ${program.border}`
-                      : 'text-gray-600 border-transparent hover:text-gray-900'
+                      : 'text-slate-600 border-transparent hover:text-slate-900'
                   }`}
                 >
                   <tab.icon className="w-4 h-4" />
@@ -357,8 +357,8 @@ export default function LessonViewerModern({
                       <div className={`w-24 h-24 rounded-full bg-gradient-to-r ${program.gradient} flex items-center justify-center mx-auto mb-6`}>
                         <ProgramIcon className="w-12 h-12 text-white" />
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{lesson.title}</h3>
-                      <p className="text-gray-600 mb-6">Esta lección es práctica. Lee el contenido y usa los simuladores.</p>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">{lesson.title}</h3>
+                      <p className="text-slate-600 mb-6">Esta lección es práctica. Lee el contenido y usa los simuladores.</p>
                       <button
                         onClick={() => setActiveSection('content')}
                         className={`px-6 py-3 bg-gradient-to-r ${program.gradient} rounded-xl text-white font-medium hover:opacity-90 transition-opacity`}
@@ -373,8 +373,8 @@ export default function LessonViewerModern({
                 <div className="mt-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h1 className="text-2xl font-bold text-gray-900 mb-2">{lesson.title}</h1>
-                      <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <h1 className="text-2xl font-bold text-slate-900 mb-2">{lesson.title}</h1>
+                      <div className="flex items-center gap-3 text-sm text-slate-600">
                         <span className={`flex items-center gap-1 ${lessonType.color}`}>
                           <TypeIcon className="w-4 h-4" />
                           {lessonType.label}
@@ -392,10 +392,10 @@ export default function LessonViewerModern({
                     
                     {/* Acciones */}
                     <div className="flex items-center gap-2">
-                      <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                      <button className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
                         <Bookmark className="w-5 h-5" />
                       </button>
-                      <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                      <button className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
                         <Share2 className="w-5 h-5" />
                       </button>
                       {lesson.pdfUrl && (
@@ -420,19 +420,19 @@ export default function LessonViewerModern({
                 {/* Contenido formateado */}
                 <div 
                   className="prose prose-invert max-w-none [&_img]:relative [&_img]:z-0 [&_img]:max-w-[200px] [&_img]:float-right [&_img]:ml-4 [&_img]:mb-4 [&_img]:rounded-xl [&_p]:relative [&_p]:z-10"
-                  dangerouslySetInnerHTML={{ __html: `<div class="text-gray-700 leading-relaxed space-y-3">${parseMarkdown(lesson.content || '')}</div>` }}
+                  dangerouslySetInnerHTML={{ __html: `<div class="text-slate-700 leading-relaxed space-y-3">${parseMarkdown(lesson.content || '')}</div>` }}
                 />
 
                 {/* Imágenes */}
                 {lesson.images && lesson.images.length > 0 && (
                   <div className="mt-8">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                       <ImageIcon className="w-5 h-5 text-chaski-primary" />
                       Diagramas y Referencias
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {lesson.images.map((img, idx) => (
-                        <div key={idx} className="rounded-xl overflow-hidden border border-gray-200 hover:border-chaski-primary/50 transition-colors">
+                        <div key={idx} className="rounded-xl overflow-hidden border border-slate-200 hover:border-chaski-primary/50 transition-colors">
                           <img 
                             src={img} 
                             alt={`Imagen ${idx + 1}`}
@@ -457,15 +457,15 @@ export default function LessonViewerModern({
                     Tips para esta lección
                   </h3>
                   <ul className="space-y-2">
-                    <li className="flex items-start gap-2 text-gray-600">
+                    <li className="flex items-start gap-2 text-slate-600">
                       <span className="text-amber-400 mt-1">•</span>
                       <span>Toma notas mientras ves el video</span>
                     </li>
-                    <li className="flex items-start gap-2 text-gray-600">
+                    <li className="flex items-start gap-2 text-slate-600">
                       <span className="text-amber-400 mt-1">•</span>
                       <span>Pausa y practica cada concepto nuevo</span>
                     </li>
-                    <li className="flex items-start gap-2 text-gray-600">
+                    <li className="flex items-start gap-2 text-slate-600">
                       <span className="text-amber-400 mt-1">•</span>
                       <span>No tengas miedo de experimentar</span>
                     </li>
@@ -477,37 +477,37 @@ export default function LessonViewerModern({
         </div>
 
         {/* Panel derecho - Sidebar con info adicional */}
-        <div className="w-80 bg-gray-50 border-l border-border-soft overflow-y-auto hidden lg:block">
+        <div className="w-80 bg-slate-50 border-l border-border-soft overflow-y-auto hidden lg:block">
           <div className="p-4 space-y-4">
             {/* Progreso de la lección */}
             <div className="bg-white rounded-xl p-4">
-              <h4 className="text-sm font-medium text-gray-600 mb-3">Tu progreso</h4>
+              <h4 className="text-sm font-medium text-slate-600 mb-3">Tu progreso</h4>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${completed ? 'bg-green-500' : 'bg-gray-100'}`}>
-                    {completed ? <CheckCircle className="w-5 h-5 text-white" /> : <Play className="w-4 h-4 text-gray-600" />}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${completed ? 'bg-green-500' : 'bg-slate-100'}`}>
+                    {completed ? <CheckCircle className="w-5 h-5 text-white" /> : <Play className="w-4 h-4 text-slate-600" />}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-gray-900">Ver el video</p>
-                    <p className="text-xs text-gray-500">{completed ? 'Completado' : 'En progreso'}</p>
+                    <p className="text-sm text-slate-900">Ver el video</p>
+                    <p className="text-xs text-slate-500">{completed ? 'Completado' : 'En progreso'}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                    <BookOpen className="w-4 h-4 text-gray-600" />
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <BookOpen className="w-4 h-4 text-slate-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-gray-900">Leer el contenido</p>
-                    <p className="text-xs text-gray-500">Pendiente</p>
+                    <p className="text-sm text-slate-900">Leer el contenido</p>
+                    <p className="text-xs text-slate-500">Pendiente</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                    <Code className="w-4 h-4 text-gray-600" />
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <Code className="w-4 h-4 text-slate-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-gray-900">Practicar</p>
-                    <p className="text-xs text-gray-500">Pendiente</p>
+                    <p className="text-sm text-slate-900">Practicar</p>
+                    <p className="text-xs text-slate-500">Pendiente</p>
                   </div>
                 </div>
               </div>
@@ -517,7 +517,7 @@ export default function LessonViewerModern({
             <div className="bg-white rounded-xl p-4">
               <button 
                 onClick={() => toggleSection('objectives')}
-                className="w-full flex items-center justify-between text-gray-900"
+                className="w-full flex items-center justify-between text-slate-900"
               >
                 <span className="flex items-center gap-2 font-medium">
                   <Target className={`w-5 h-5 ${program.text}`} />
@@ -527,15 +527,15 @@ export default function LessonViewerModern({
               </button>
               {expandedSections.includes('objectives') && (
                 <ul className="mt-3 space-y-2">
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <li className="flex items-start gap-2 text-sm text-slate-600">
                     <CheckCircle className={`w-4 h-4 ${program.text} mt-0.5 flex-shrink-0`} />
                     <span>Comprender los conceptos clave</span>
                   </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <li className="flex items-start gap-2 text-sm text-slate-600">
                     <CheckCircle className={`w-4 h-4 ${program.text} mt-0.5 flex-shrink-0`} />
                     <span>Aplicar en práctica</span>
                   </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <li className="flex items-start gap-2 text-sm text-slate-600">
                     <CheckCircle className={`w-4 h-4 ${program.text} mt-0.5 flex-shrink-0`} />
                     <span>Completar el ejercicio</span>
                   </li>
@@ -547,9 +547,9 @@ export default function LessonViewerModern({
             <div className={`bg-gradient-to-br ${program.lightGradient} rounded-xl p-4 border ${program.border30}`}>
               <div className="flex items-center gap-2 mb-2">
                 <Gift className={`w-5 h-5 ${program.text}`} />
-                <span className="font-bold text-gray-900">Reto Extra</span>
+                <span className="font-bold text-slate-900">Reto Extra</span>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-slate-600 mb-3">
                 ¿Puedes modificar lo aprendido para crear algo nuevo? ¡Intenta agregar tu toque personal!
               </p>
               <button className={`w-full py-2 ${program.bg} ${program.bgHover} text-white rounded-lg font-medium transition-colors`}>
@@ -561,7 +561,7 @@ export default function LessonViewerModern({
             <div className="bg-white rounded-xl p-4">
               <button 
                 onClick={() => toggleSection('materials')}
-                className="w-full flex items-center justify-between text-gray-900"
+                className="w-full flex items-center justify-between text-slate-900"
               >
                 <span className="flex items-center gap-2 font-medium">
                   <Wrench className="w-5 h-5 text-amber-400" />
@@ -570,7 +570,7 @@ export default function LessonViewerModern({
                 {expandedSections.includes('materials') ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
               {expandedSections.includes('materials') && (
-                <div className="mt-3 text-sm text-gray-600">
+                <div className="mt-3 text-sm text-slate-600">
                   <p>Revisa tu kit para esta lección en la pestaña "Mi Kit"</p>
                 </div>
               )}
@@ -585,7 +585,7 @@ export default function LessonViewerModern({
           <button
             onClick={onPrev}
             disabled={!onPrev}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             <span className="hidden sm:inline">Anterior</span>
@@ -616,7 +616,7 @@ export default function LessonViewerModern({
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
               onNext
                 ? `bg-gradient-to-r ${program.gradient} text-white hover:opacity-90`
-                : 'text-gray-600 opacity-50 cursor-not-allowed'
+                : 'text-slate-600 opacity-50 cursor-not-allowed'
             }`}
           >
             <span className="hidden sm:inline">Siguiente</span>

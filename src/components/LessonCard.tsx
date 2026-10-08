@@ -103,7 +103,7 @@ export default function LessonCard({ lesson, isSelected, onSelect, index }: Less
         {/* Número de lección e ícono */}
         <div className={`relative w-14 h-14 ${config.bg} rounded-xl flex items-center justify-center`}>
           <Icon className={`w-6 h-6 ${config.color}`} />
-          <span className="absolute -top-2 -left-2 w-6 h-6 bg-slate-800 rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-dark-800">
+          <span className="absolute -top-2 -left-2 w-6 h-6 bg-slate-800 rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-slate-700">
             {index}
           </span>
         </div>
