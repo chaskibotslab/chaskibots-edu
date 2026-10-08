@@ -129,7 +129,7 @@ export default function NivelPage() {
                 ageRange: found.ageRange || '',
                 icon: found.icon || '📚',
                 category: found.category || 'elemental',
-                color: found.color || 'from-blue-500 to-cyan-600',
+                color: found.color || 'from-chaski-primary to-cyan-600',
                 neonColor: found.neonColor || '#00d4ff',
                 kitPrice: found.kitPrice || 50,
                 hasHacking: found.hasHacking || false,

@@ -86,10 +86,10 @@ function StatCard({ icon: Icon, iconBg, iconColor, label, value, hint }: {
 
 const CATEGORY_DOT: Record<string, string> = {
   placa: 'bg-sky-500',
-  sensor: 'bg-blue-500',
+  sensor: 'bg-chaski-primary',
   actuador: 'bg-amber-500',
   componente: 'bg-slate-400',
-  cable: 'bg-violet-500',
+  cable: 'bg-chaski-primary',
   herramienta: 'bg-rose-500',
   alimentacion: 'bg-red-500',
 }

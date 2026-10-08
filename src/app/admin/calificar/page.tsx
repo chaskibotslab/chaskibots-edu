@@ -343,7 +343,7 @@ function SubmissionRow({ submission, task, onClick, style }: { submission: Submi
               {timeAgo}
             </span>
             {hasAttachments && (
-              <span className="flex items-center gap-1 text-blue-500">
+              <span className="flex items-center gap-1 text-chaski-primary">
                 <ImageIcon className="w-3 h-3" />
                 {submission.attachmentUrls.length} archivo{submission.attachmentUrls.length > 1 ? 's' : ''}
               </span>

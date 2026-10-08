@@ -24,8 +24,8 @@ interface SimulatorChallenge {
 }
 
 const CATEGORY_INFO: Record<string, { name: string, icon: string, color: string }> = {
-  laberinto: { name: 'Laberintos', icon: '🧩', color: 'bg-blue-500/20 text-blue-400' },
-  coleccionables: { name: 'Coleccionables', icon: '⭐', color: 'bg-purple-500/20 text-purple-400' },
+  laberinto: { name: 'Laberintos', icon: '🧩', color: 'bg-chaski-primary/20 text-chaski-secondary' },
+  coleccionables: { name: 'Coleccionables', icon: '⭐', color: 'bg-chaski-primary/20 text-chaski-secondary' },
   minisumo: { name: 'Mini Sumo', icon: '🥋', color: 'bg-red-500/20 text-red-400' }
 }
 
@@ -135,8 +135,8 @@ export default function SimulatorChallengesPanel() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl">
-            <Gamepad2 className="w-6 h-6 text-purple-400" />
+          <div className="p-2 bg-gradient-to-br from-chaski-primary/20 to-pink-500/20 rounded-xl">
+            <Gamepad2 className="w-6 h-6 text-chaski-secondary" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">Retos del Simulador 3D</h2>
@@ -181,7 +181,7 @@ export default function SimulatorChallengesPanel() {
             <span className="text-sm">🧩</span>
             <span className="text-xs text-gray-600">Laberintos</span>
           </div>
-          <p className="text-2xl font-bold text-blue-400">{stats.byCategory.laberinto}</p>
+          <p className="text-2xl font-bold text-chaski-secondary">{stats.byCategory.laberinto}</p>
         </div>
         <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
           <div className="flex items-center gap-2 mb-2">
@@ -198,7 +198,7 @@ export default function SimulatorChallengesPanel() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="appearance-none bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 pr-8 text-sm text-gray-900 focus:outline-none focus:border-purple-500"
+            className="appearance-none bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 pr-8 text-sm text-gray-900 focus:outline-none focus:border-chaski-primary"
           >
             <option value="">Todas las categorías</option>
             <option value="laberinto">🧩 Laberintos</option>
@@ -211,7 +211,7 @@ export default function SimulatorChallengesPanel() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="appearance-none bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 pr-8 text-sm text-gray-900 focus:outline-none focus:border-purple-500"
+            className="appearance-none bg-gray-100 border border-gray-200 rounded-lg px-4 py-2 pr-8 text-sm text-gray-900 focus:outline-none focus:border-chaski-primary"
           >
             <option value="">Todos los estados</option>
             <option value="completed">⏳ Pendientes</option>
@@ -225,7 +225,7 @@ export default function SimulatorChallengesPanel() {
       <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">
-            <RefreshCw className="w-8 h-8 text-purple-400 animate-spin mx-auto mb-2" />
+            <RefreshCw className="w-8 h-8 text-chaski-secondary animate-spin mx-auto mb-2" />
             <p className="text-gray-600">Cargando retos...</p>
           </div>
         ) : challenges.length === 0 ? (
@@ -253,7 +253,7 @@ export default function SimulatorChallengesPanel() {
                   <tr key={challenge.id} className="hover:bg-gray-100/50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-gray-900 text-xs font-bold">
+                        <div className="w-8 h-8 bg-gradient-to-br from-chaski-primary to-pink-500 rounded-full flex items-center justify-center text-gray-900 text-xs font-bold">
                           {challenge.studentName.charAt(0).toUpperCase()}
                         </div>
                         <span className="text-gray-900 font-medium">{challenge.studentName}</span>
@@ -328,7 +328,7 @@ export default function SimulatorChallengesPanel() {
             {Object.entries(studentStats).map(([name, stats]) => (
               <div key={name} className="bg-gray-100 rounded-lg p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-gray-900 font-bold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-chaski-primary to-pink-500 rounded-full flex items-center justify-center text-gray-900 font-bold">
                     {name.charAt(0).toUpperCase()}
                   </div>
                   <div>
@@ -370,7 +370,7 @@ export default function SimulatorChallengesPanel() {
             <div className="p-4 space-y-4">
               <div className="bg-gray-100 rounded-lg p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-gray-900 text-xl font-bold">
+                  <div className="w-12 h-12 bg-gradient-to-br from-chaski-primary to-pink-500 rounded-full flex items-center justify-center text-gray-900 text-xl font-bold">
                     {selectedChallenge.studentName.charAt(0).toUpperCase()}
                   </div>
                   <div>

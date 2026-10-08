@@ -47,8 +47,8 @@ const programConfig = {
 const typeConfig = {
   video: { icon: Play, color: 'text-red-400' },
   activity: { icon: Wrench, color: 'text-yellow-400' },
-  tutorial: { icon: BookOpen, color: 'text-blue-400' },
-  project: { icon: Trophy, color: 'text-purple-400' },
+  tutorial: { icon: BookOpen, color: 'text-chaski-secondary' },
+  project: { icon: Trophy, color: 'text-chaski-secondary' },
   quiz: { icon: FileQuestion, color: 'text-green-400' }
 }
 
@@ -279,7 +279,7 @@ export default function AdminLessonsPage() {
                   placeholder="Buscar lección..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-chaski-primary"
                 />
               </div>
             </div>
@@ -288,7 +288,7 @@ export default function AdminLessonsPage() {
             <select
               value={filterLevel}
               onChange={(e) => setFilterLevel(e.target.value)}
-              className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-500"
+              className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-chaski-primary"
             >
               <option value="">Todos los niveles</option>
               {levels.map(level => (
@@ -300,7 +300,7 @@ export default function AdminLessonsPage() {
             <select
               value={filterProgram}
               onChange={(e) => setFilterProgram(e.target.value)}
-              className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-500"
+              className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-chaski-primary"
             >
               <option value="">Todos los programas</option>
               <option value="robotica">Robótica</option>
@@ -324,13 +324,13 @@ export default function AdminLessonsPage() {
           </div>
           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
             <p className="text-gray-600 text-sm">Con imagen</p>
-            <p className="text-2xl font-bold text-blue-400">
+            <p className="text-2xl font-bold text-chaski-secondary">
               {lessons.filter(l => l.imageUrl).length}
             </p>
           </div>
           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
             <p className="text-gray-600 text-sm">Con recursos</p>
-            <p className="text-2xl font-bold text-purple-400">
+            <p className="text-2xl font-bold text-chaski-secondary">
               {lessons.filter(l => l.resources && parseJsonField(l.resources).length > 0).length}
             </p>
           </div>
@@ -359,7 +359,7 @@ export default function AdminLessonsPage() {
                 <div 
                   key={lesson.id}
                   className={`bg-gray-50 rounded-xl border transition-all ${
-                    isEditing ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-200 hover:border-dark-500'
+                    isEditing ? 'border-chaski-primary ring-2 ring-chaski-primary/20' : 'border-gray-200 hover:border-dark-500'
                   }`}
                 >
                   {/* Lesson header */}
@@ -391,7 +391,7 @@ export default function AdminLessonsPage() {
                         </span>
                       )}
                       {hasImage && (
-                        <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full flex items-center gap-1">
+                        <span className="px-2 py-1 bg-chaski-primary/20 text-chaski-secondary text-xs rounded-full flex items-center gap-1">
                           <ImageIcon className="w-3 h-3" />
                           Imagen
                         </span>
@@ -442,7 +442,7 @@ export default function AdminLessonsPage() {
                           value={formData.videoUrl}
                           onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
                           placeholder="https://www.youtube.com/watch?v=..."
-                          className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-chaski-primary"
                         />
                         <p className="text-xs text-gray-500 mt-1">
                           Soporta: YouTube y URLs de video directas
@@ -460,7 +460,7 @@ export default function AdminLessonsPage() {
                           value={formData.imageUrl}
                           onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
                           placeholder="https://images.unsplash.com/..."
-                          className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-chaski-primary"
                         />
                         <p className="text-xs text-gray-500 mt-1">
                           Usa Unsplash, Supabase Storage o cualquier URL de imagen
@@ -490,19 +490,19 @@ export default function AdminLessonsPage() {
                                 value={resource.title}
                                 onChange={(e) => updateResource(idx, 'title', e.target.value)}
                                 placeholder="Título"
-                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-chaski-primary text-sm"
                               />
                               <input
                                 type="text"
                                 value={resource.url}
                                 onChange={(e) => updateResource(idx, 'url', e.target.value)}
                                 placeholder="URL (Google Drive, etc.)"
-                                className="flex-[2] px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-[2] px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-chaski-primary text-sm"
                               />
                               <select
                                 value={resource.type || 'pdf'}
                                 onChange={(e) => updateResource(idx, 'type', e.target.value)}
-                                className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-blue-500 text-sm"
+                                className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-chaski-primary text-sm"
                               >
                                 <option value="pdf">PDF</option>
                                 <option value="video">Video</option>
@@ -546,21 +546,21 @@ export default function AdminLessonsPage() {
                                 value={link.title}
                                 onChange={(e) => updateExternalLink(idx, 'title', e.target.value)}
                                 placeholder="Título"
-                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-chaski-primary text-sm"
                               />
                               <input
                                 type="text"
                                 value={link.url}
                                 onChange={(e) => updateExternalLink(idx, 'url', e.target.value)}
                                 placeholder="URL"
-                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-chaski-primary text-sm"
                               />
                               <input
                                 type="text"
                                 value={link.desc || ''}
                                 onChange={(e) => updateExternalLink(idx, 'desc', e.target.value)}
                                 placeholder="Descripción"
-                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                                className="flex-1 px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-chaski-primary text-sm"
                               />
                               <button
                                 onClick={() => removeExternalLink(idx)}

@@ -35,16 +35,16 @@ const typeConfig = {
   },
   tutorial: {
     icon: BookOpen,
-    color: 'text-blue-400',
-    bg: 'bg-blue-500/20',
-    border: 'border-blue-500/30',
+    color: 'text-chaski-secondary',
+    bg: 'bg-chaski-primary/20',
+    border: 'border-chaski-primary/30',
     label: 'Tutorial'
   },
   project: {
     icon: Trophy,
-    color: 'text-purple-400',
-    bg: 'bg-purple-500/20',
-    border: 'border-purple-500/30',
+    color: 'text-chaski-secondary',
+    bg: 'bg-chaski-primary/20',
+    border: 'border-chaski-primary/30',
     label: 'Proyecto'
   },
   quiz: {

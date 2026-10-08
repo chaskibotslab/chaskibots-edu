@@ -354,8 +354,8 @@ export default function SimuladoresPage() {
           {/* AI Terminal */}
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center border border-purple-500/20">
-                <Brain className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 bg-chaski-primary/10 rounded-xl flex items-center justify-center border border-chaski-primary/20">
+                <Brain className="w-6 h-6 text-chaski-secondary" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">AI Terminal — Simulador de Inteligencia Artificial</h2>

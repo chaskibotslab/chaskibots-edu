@@ -50,13 +50,13 @@ interface LessonViewerProps {
 const programConfig = {
   robotica: {
     color: 'blue',
-    gradient: 'from-blue-500 to-cyan-600',
+    gradient: 'from-chaski-primary to-cyan-600',
     icon: Bot,
     name: 'Robótica'
   },
   ia: {
     color: 'purple',
-    gradient: 'from-purple-500 to-pink-600',
+    gradient: 'from-chaski-primary to-pink-600',
     icon: Brain,
     name: 'Inteligencia Artificial'
   },
@@ -71,8 +71,8 @@ const programConfig = {
 const typeConfig = {
   video: { icon: Play, label: 'Video', color: 'text-red-400', bg: 'bg-red-500/20' },
   activity: { icon: Wrench, label: 'Actividad', color: 'text-yellow-400', bg: 'bg-yellow-500/20' },
-  tutorial: { icon: BookOpen, label: 'Tutorial', color: 'text-blue-400', bg: 'bg-blue-500/20' },
-  project: { icon: Trophy, label: 'Proyecto', color: 'text-purple-400', bg: 'bg-purple-500/20' },
+  tutorial: { icon: BookOpen, label: 'Tutorial', color: 'text-chaski-secondary', bg: 'bg-chaski-primary/20' },
+  project: { icon: Trophy, label: 'Proyecto', color: 'text-chaski-secondary', bg: 'bg-chaski-primary/20' },
   quiz: { icon: FileQuestion, label: 'Quiz', color: 'text-green-400', bg: 'bg-green-500/20' }
 }
 

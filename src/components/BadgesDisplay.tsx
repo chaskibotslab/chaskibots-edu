@@ -36,8 +36,8 @@ const BADGES_CONFIG: Omit<Badge, 'unlocked' | 'progress'>[] = [
     name: 'Explorador',
     description: 'Completa 5 lecciones',
     icon: Target,
-    color: 'text-blue-400',
-    bgColor: 'bg-blue-500/20',
+    color: 'text-chaski-secondary',
+    bgColor: 'bg-chaski-primary/20',
     maxProgress: 5,
   },
   {
@@ -45,8 +45,8 @@ const BADGES_CONFIG: Omit<Badge, 'unlocked' | 'progress'>[] = [
     name: 'Dedicado',
     description: 'Completa 10 lecciones',
     icon: Zap,
-    color: 'text-purple-400',
-    bgColor: 'bg-purple-500/20',
+    color: 'text-chaski-secondary',
+    bgColor: 'bg-chaski-primary/20',
     maxProgress: 10,
   },
   {
@@ -89,8 +89,8 @@ const BADGES_CONFIG: Omit<Badge, 'unlocked' | 'progress'>[] = [
     name: 'IA Expert',
     description: 'Completa módulo de IA',
     icon: Brain,
-    color: 'text-violet-400',
-    bgColor: 'bg-violet-500/20',
+    color: 'text-chaski-secondary',
+    bgColor: 'bg-chaski-primary/20',
   },
   {
     id: 'hacking',

@@ -38,7 +38,7 @@ export default function AcademyPage() {
   }
 
   const courseColors: Record<string, string> = {
-    'python': 'from-blue-500 to-indigo-600',
+    'python': 'from-chaski-primary to-chaski-secondary',
     'hacking-etico': 'from-emerald-500 to-teal-600',
   }
 

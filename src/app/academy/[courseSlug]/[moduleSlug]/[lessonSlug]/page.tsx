@@ -312,7 +312,7 @@ export default function LessonPage() {
     return <span dangerouslySetInnerHTML={{ __html: text }} />
   }
 
-  const courseGradient = courseSlug === 'python' ? 'from-blue-500 to-indigo-600' : 'from-emerald-500 to-teal-600'
+  const courseGradient = courseSlug === 'python' ? 'from-chaski-primary to-chaski-secondary' : 'from-emerald-500 to-teal-600'
 
   // ═══ IA lessons: embed the AILab activity instead of the Python code editor ═══
   if (lesson.activity_type) {

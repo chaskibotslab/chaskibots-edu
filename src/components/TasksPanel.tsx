@@ -531,7 +531,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
             onClick={() => setActiveTab('calificaciones')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'calificaciones'
-                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
+                ? 'bg-chaski-primary/20 text-chaski-secondary border border-chaski-primary/50'
                 : 'bg-gray-100 text-gray-600 hover:text-gray-900 border border-transparent'
             }`}
           >
@@ -623,8 +623,8 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                 <div className="pt-4 space-y-4">
                   {/* Archivo adjunto del docente */}
                   {task.attachmentUrl && (
-                    <div className="p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/40 rounded-xl">
-                      <p className="text-sm text-blue-200 mb-3 flex items-center gap-2 font-medium">
+                    <div className="p-4 bg-gradient-to-r from-chaski-primary/20 to-chaski-primary/20 border border-chaski-primary/40 rounded-xl">
+                      <p className="text-sm text-white/80 mb-3 flex items-center gap-2 font-medium">
                         <FileText className="w-5 h-5" />
                         📎 Material adjunto del profesor
                       </p>
@@ -632,7 +632,7 @@ export default function TasksPanel({ levelId, studentName = '', studentEmail = '
                         href={task.attachmentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-3 px-5 py-3 bg-blue-500 hover:bg-blue-400 text-gray-900 font-medium rounded-lg transition-colors shadow-lg"
+                        className="inline-flex items-center gap-3 px-5 py-3 bg-chaski-primary hover:bg-chaski-secondary text-gray-900 font-medium rounded-lg transition-colors shadow-lg"
                       >
                         <Download className="w-5 h-5" />
                         Descargar archivo adjunto

@@ -28,18 +28,18 @@ interface ModuleAccordionProps {
 
 const colorConfig = {
   blue: {
-    bg: 'bg-blue-500/10',
-    border: 'border-blue-500/30',
-    text: 'text-blue-400',
-    accent: 'bg-blue-500',
-    glow: 'shadow-blue-500/20'
+    bg: 'bg-chaski-primary/10',
+    border: 'border-chaski-primary/30',
+    text: 'text-chaski-secondary',
+    accent: 'bg-chaski-primary',
+    glow: 'shadow-chaski-primary/20'
   },
   purple: {
-    bg: 'bg-purple-500/10',
-    border: 'border-purple-500/30',
-    text: 'text-purple-400',
-    accent: 'bg-purple-500',
-    glow: 'shadow-purple-500/20'
+    bg: 'bg-chaski-primary/10',
+    border: 'border-chaski-primary/30',
+    text: 'text-chaski-secondary',
+    accent: 'bg-chaski-primary',
+    glow: 'shadow-chaski-primary/20'
   },
   red: {
     bg: 'bg-red-500/10',

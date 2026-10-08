@@ -943,7 +943,7 @@ export default function UsersManager() {
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded text-xs ${
                     user.role === 'admin' ? 'bg-red-500/10 text-red-600' :
-                    user.role === 'teacher' ? 'bg-blue-500/10 text-blue-600' :
+                    user.role === 'teacher' ? 'bg-chaski-primary/10 text-chaski-primary' :
                     'bg-green-500/10 text-green-600'
                   }`}>
                     {user.role}

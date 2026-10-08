@@ -82,7 +82,7 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
         )
       case 'returned':
         return (
-          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full flex items-center gap-1">
+          <span className="px-2 py-1 bg-chaski-primary/20 text-chaski-secondary text-xs rounded-full flex items-center gap-1">
             <MessageSquare className="w-3 h-3" /> Con comentarios
           </span>
         )
@@ -137,11 +137,11 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
   return (
     <div className="space-y-4">
       {/* Resumen */}
-      <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-4">
+      <div className="bg-gradient-to-r from-chaski-primary/10 to-pink-500/10 border border-chaski-primary/30 rounded-xl p-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-purple-400" />
+              <TrendingUp className="w-5 h-5 text-chaski-secondary" />
               Mi Progreso
             </h3>
             <p className="text-sm text-gray-600">
@@ -251,8 +251,8 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
 
                   {/* Retroalimentación del profesor */}
                   {submission.feedback && (
-                    <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                      <h5 className="text-sm font-medium text-blue-400 mb-2 flex items-center gap-2">
+                    <div className="p-4 bg-chaski-primary/10 border border-chaski-primary/30 rounded-lg">
+                      <h5 className="text-sm font-medium text-chaski-secondary mb-2 flex items-center gap-2">
                         <MessageSquare className="w-4 h-4" />
                         Retroalimentación del Profesor
                       </h5>

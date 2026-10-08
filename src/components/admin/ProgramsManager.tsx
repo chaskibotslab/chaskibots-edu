@@ -45,7 +45,7 @@ export default function ProgramsManager() {
   })
 
   const programTypes = [
-    { value: 'robotica', label: '🤖 Robótica', color: 'bg-blue-500/10 text-blue-600' },
+    { value: 'robotica', label: '🤖 Robótica', color: 'bg-chaski-primary/10 text-chaski-primary' },
     { value: 'programacion', label: '💻 Programación', color: 'bg-green-500/10 text-green-600' },
     { value: 'electronica', label: '⚡ Electrónica', color: 'bg-amber-500/10 text-amber-600' },
     { value: 'ia', label: '🧠 Inteligencia Artificial', color: 'bg-chaski-primary/10 text-chaski-primary' },

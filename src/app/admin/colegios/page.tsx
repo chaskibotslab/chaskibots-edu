@@ -60,7 +60,7 @@ const BLANK_SCHOOL: Omit<School, 'id'> = {
 }
 
 const PROGRAM_COLORS: Record<string, string> = {
-  robotica: 'from-violet-500 to-purple-500',
+  robotica: 'from-chaski-primary to-chaski-secondary',
   ia: 'from-pink-500 to-rose-500',
   hacking: 'from-emerald-500 to-green-500',
 }

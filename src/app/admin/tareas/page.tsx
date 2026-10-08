@@ -48,7 +48,7 @@ const CATEGORIES = [
   { id: 'robotica', name: 'Robótica', icon: Bot, color: 'text-chaski-primary' },
   { id: 'electronica', name: 'Electrónica', icon: CircuitBoard, color: 'text-amber-500' },
   { id: 'programacion', name: 'Programación', icon: Code, color: 'text-hack-green' },
-  { id: 'ia', name: 'Inteligencia Artificial', icon: Lightbulb, color: 'text-purple-500' },
+  { id: 'ia', name: 'Inteligencia Artificial', icon: Lightbulb, color: 'text-chaski-primary' },
   { id: 'general', name: 'General', icon: BookOpen, color: 'text-slate-600' },
 ]
 
@@ -773,7 +773,7 @@ function AdminTareasContent() {
                     onClick={() => setFormData(prev => ({ ...prev, attachmentType: 'link', attachmentData: '', attachmentName: '' }))}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-[0.98] ${
                       formData.attachmentType === 'link'
-                        ? 'bg-purple-600 text-white'
+                        ? 'bg-chaski-primary text-white'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
@@ -856,9 +856,9 @@ function AdminTareasContent() {
                     </div>
                   )}
                   {formData.attachmentType === 'drive' && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <p className="text-sm text-blue-700 mb-3 font-medium">📋 Pasos para compartir desde Google Drive:</p>
-                      <ol className="text-xs text-blue-600 space-y-1 mb-4 list-decimal list-inside">
+                    <div className="bg-chaski-primary/5 border border-chaski-primary/30 rounded-lg p-4">
+                      <p className="text-sm text-chaski-primary mb-3 font-medium">📋 Pasos para compartir desde Google Drive:</p>
+                      <ol className="text-xs text-chaski-primary space-y-1 mb-4 list-decimal list-inside">
                         <li>Sube tu archivo a Google Drive</li>
                         <li>Clic derecho → <strong>Compartir</strong></li>
                         <li>Cambia a <strong>"Cualquier persona con el enlace"</strong></li>
@@ -869,7 +869,7 @@ function AdminTareasContent() {
                         value={formData.attachmentUrl}
                         onChange={(e) => setFormData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
                         placeholder="Pega aquí el enlace de Google Drive..."
-                        className="w-full px-4 py-3 bg-white border border-blue-300 rounded-lg text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/10 transition-all"
+                        className="w-full px-4 py-3 bg-white border border-chaski-primary/30 rounded-lg text-slate-900 placeholder-slate-400 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
                       />
                       {formData.attachmentUrl && (
                         <p className="text-xs text-green-600 mt-2 flex items-center gap-1">✓ Enlace guardado correctamente</p>
@@ -877,14 +877,14 @@ function AdminTareasContent() {
                     </div>
                   )}
                   {formData.attachmentType === 'link' && (
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                      <p className="text-sm text-purple-700 mb-3">🔗 Pega cualquier enlace externo:</p>
+                    <div className="bg-chaski-primary/5 border border-chaski-primary/30 rounded-lg p-4">
+                      <p className="text-sm text-chaski-primary mb-3">🔗 Pega cualquier enlace externo:</p>
                       <input
                         type="url"
                         value={formData.attachmentUrl}
                         onChange={(e) => setFormData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
                         placeholder="https://..."
-                        className="w-full px-4 py-3 bg-white border border-purple-300 rounded-lg text-slate-900 placeholder-slate-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/10 transition-all"
+                        className="w-full px-4 py-3 bg-white border border-chaski-primary/30 rounded-lg text-slate-900 placeholder-slate-400 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
                       />
                       {formData.attachmentUrl && (
                         <p className="text-xs text-green-600 mt-2">✓ Enlace guardado</p>

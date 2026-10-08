@@ -34,13 +34,13 @@ interface Lesson {
 const LESSON_TYPES = [
   { value: 'video', label: 'Video', icon: Video, accent: 'bg-red-100 text-red-700 border-red-200' },
   { value: 'activity', label: 'Actividad', icon: Zap, accent: 'bg-amber-100 text-amber-700 border-amber-200' },
-  { value: 'tutorial', label: 'Tutorial', icon: FileText, accent: 'bg-blue-100 text-blue-700 border-blue-200' },
-  { value: 'project', label: 'Proyecto', icon: Package, accent: 'bg-purple-100 text-purple-700 border-purple-200' },
+  { value: 'tutorial', label: 'Tutorial', icon: FileText, accent: 'bg-chaski-primary/10 text-chaski-primary border-chaski-primary/30' },
+  { value: 'project', label: 'Proyecto', icon: Package, accent: 'bg-chaski-primary/10 text-chaski-primary border-chaski-primary/30' },
   { value: 'quiz', label: 'Quiz', icon: BookOpen, accent: 'bg-green-100 text-green-700 border-green-200' },
 ]
 
 const PROGRAMS = [
-  { id: 'robotica', label: 'Robótica', emoji: '🤖', color: 'from-violet-500 to-purple-500' },
+  { id: 'robotica', label: 'Robótica', emoji: '🤖', color: 'from-chaski-primary to-chaski-secondary' },
   { id: 'ia', label: 'IA', emoji: '🧠', color: 'from-pink-500 to-rose-500' },
   { id: 'hacking', label: 'Hacking', emoji: '🛡️', color: 'from-emerald-500 to-green-500' },
 ]

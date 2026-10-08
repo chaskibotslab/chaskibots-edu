@@ -83,7 +83,7 @@ const programConfig = {
 const SIMS = [
   { id: 'wokwi', name: 'Wokwi', desc: 'Circuitos ESP32/Arduino', url: 'https://wokwi.com', color: 'bg-green-500/20', textColor: 'text-green-400' },
   { id: 'trinket', name: 'Trinket Python', desc: 'Python online', url: 'https://trinket.io/python', color: 'bg-yellow-500/20', textColor: 'text-yellow-400' },
-  { id: 'tinkercad', name: 'Tinkercad', desc: 'Circuitos Arduino', url: 'https://www.tinkercad.com/circuits', color: 'bg-blue-500/20', textColor: 'text-blue-400' },
+  { id: 'tinkercad', name: 'Tinkercad', desc: 'Circuitos Arduino', url: 'https://www.tinkercad.com/circuits', color: 'bg-chaski-primary/20', textColor: 'text-chaski-secondary' },
   { id: 'scratch', name: 'Scratch', desc: 'Bloques visuales', url: 'https://scratch.mit.edu/projects/editor', color: 'bg-orange-500/20', textColor: 'text-orange-400' },
 ]
 
@@ -135,8 +135,8 @@ function PracticeSimulators() {
 const typeConfig = {
   video: { icon: Play, label: 'Video', color: 'text-red-400', bg: 'bg-red-500/20' },
   activity: { icon: Wrench, label: 'Práctica', color: 'text-amber-400', bg: 'bg-amber-500/20' },
-  tutorial: { icon: BookOpen, label: 'Tutorial', color: 'text-blue-400', bg: 'bg-blue-500/20' },
-  project: { icon: Trophy, label: 'Proyecto', color: 'text-purple-400', bg: 'bg-purple-500/20' },
+  tutorial: { icon: BookOpen, label: 'Tutorial', color: 'text-chaski-secondary', bg: 'bg-chaski-primary/20' },
+  project: { icon: Trophy, label: 'Proyecto', color: 'text-chaski-secondary', bg: 'bg-chaski-primary/20' },
   quiz: { icon: FileQuestion, label: 'Quiz', color: 'text-green-400', bg: 'bg-green-500/20' }
 }
 

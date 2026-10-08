@@ -88,7 +88,7 @@ export default function CoursePage() {
   }
 
   const courseGradient = courseSlug === 'python' 
-    ? 'from-blue-500 to-indigo-600' 
+    ? 'from-chaski-primary to-chaski-secondary' 
     : 'from-emerald-500 to-teal-600'
 
   if (loading) {

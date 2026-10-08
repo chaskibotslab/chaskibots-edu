@@ -208,7 +208,7 @@ function EntregasContent() {
       case 'graded':
         return <span className="px-2 py-1 bg-green-500/10 text-green-600 text-xs rounded-full flex items-center gap-1"><Check className="w-3 h-3" /> Calificado</span>
       case 'returned':
-        return <span className="px-2 py-1 bg-blue-500/10 text-blue-600 text-xs rounded-full flex items-center gap-1"><MessageSquare className="w-3 h-3" /> Devuelto</span>
+        return <span className="px-2 py-1 bg-chaski-primary/10 text-chaski-primary text-xs rounded-full flex items-center gap-1"><MessageSquare className="w-3 h-3" /> Devuelto</span>
       default:
         return <span className="px-2 py-1 bg-slate-500/10 text-slate-600 text-xs rounded-full">{status}</span>
     }
@@ -389,7 +389,7 @@ function EntregasContent() {
                               </span>
                             )}
                             {(submission.attachmentUrls?.length || submission.drawing || submission.files) && (
-                              <span className="flex items-center gap-1 text-blue-600 font-medium">
+                              <span className="flex items-center gap-1 text-chaski-primary font-medium">
                                 <Paperclip className="w-4 h-4" />
                                 {submission.attachmentUrls?.length || 1} archivo{(submission.attachmentUrls?.length || 1) > 1 ? 's' : ''}
                               </span>
@@ -509,7 +509,7 @@ function EntregasContent() {
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group relative block rounded-lg overflow-hidden border border-slate-200 hover:border-blue-400 transition-colors"
+                            className="group relative block rounded-lg overflow-hidden border border-slate-200 hover:border-chaski-primary transition-colors"
                           >
                             <img src={url} alt={fileName} className="w-full h-24 object-cover" />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-colors">
@@ -565,7 +565,7 @@ function EntregasContent() {
 
                       return (
                         <div className="space-y-2">
-                          <p className="text-sm text-blue-600 flex items-center gap-2">
+                          <p className="text-sm text-chaski-primary flex items-center gap-2">
                             <FileText className="w-4 h-4" />
                             📎 Archivos adjuntos ({filesArray.length}):
                           </p>

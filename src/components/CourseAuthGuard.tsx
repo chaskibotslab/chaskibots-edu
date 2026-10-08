@@ -124,7 +124,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
   // Mostrar loading mientras se verifica acceso
   if (isCheckingAccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-chaski-dark via-blue-900 to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-chaski-light">
         <div className="text-center">
           <Loader2 className="w-10 h-10 text-gray-900 animate-spin mx-auto mb-4" />
           <p className="text-gray-900/80">Verificando acceso...</p>
@@ -141,7 +141,7 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
   // Si no está logueado, redirigir al login
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-chaski-dark via-blue-900 to-indigo-900 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-chaski-light px-4">
         <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
           <Image 
             src="/chaski.png" 
@@ -167,17 +167,17 @@ export default function CourseAuthGuard({ levelId, levelName, children }: Course
 
   // Mostrar mensaje de acceso denegado o formulario de contraseña
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-chaski-dark via-blue-900 to-indigo-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-chaski-light px-4">
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-chaski-accent to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-10 h-10 text-gray-900" />
+          <div className="w-20 h-20 bg-gradient-to-br from-chaski-accent to-chaski-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-10 h-10 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-chaski-dark mb-2">
             Acceso al Curso
           </h2>
           <p className="text-gray-600">
-            <span className="font-semibold text-chaski-blue">{levelName}</span>
+            <span className="font-semibold text-chaski-primary">{levelName}</span>
           </p>
         </div>
 
