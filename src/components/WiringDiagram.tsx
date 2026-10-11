@@ -10,6 +10,10 @@ import { pinoutForBoard, normalizePin, isPowerPin, isGroundPin } from '@/lib/boa
 //    como se arma de verdad. Así no hay manojos de cables.
 //  - Cada cable de señal tiene su propio color y su propio carril: dos
 //    cables nunca van uno encima de otro, solo se cruzan en ángulo recto.
+//  - Los pines de la placa y las filas de las piezas están en rejillas
+//    desfasadas media fila, así un tramo horizontal nunca cae sobre otro.
+//  - Lo que no se conecta a la placa (por ejemplo la bomba, que va al relé)
+//    se muestra como nota en la pieza, sin inventar un pin.
 
 export interface WiringConnection {
   componente: string
@@ -36,7 +40,7 @@ const BX = 110
 const BW = 156
 const BOARD_TOP = 54
 const CARD_W = 236
-const ROW = 28
+const ROW = PITCH
 
 const resistorOf = (c: WiringConnection): string | null => {
   const m = `${c.pinComponente} ${c.nota || ''}`.match(/R\s?(\d+(?:[.,]\d+)?\s?k?)\b|(\d+(?:[.,]\d+)?\s?k?)\s?(?:Ω|ohm)/i)
@@ -49,13 +53,19 @@ const cleanPinLabel = (s: string) => short(s.replace(/\s*v[ií]a\s+R?\s?\d+\s?k?
 
 export default function WiringDiagram({ boardName, conexiones, resaltar = [], rieles = [] }: Props) {
   const base = pinoutForBoard(boardName)
-  const conns = conexiones.map((c, i) => ({ ...c, i, pin: normalizePin(c.pinPlaca) }))
-
-  // Pines que la tabla usa pero el dibujo de la placa no trae: se añaden abajo a la derecha.
   const known = new Set([...base.left, ...base.right])
-  const extras = Array.from(new Set(conns.map(c => c.pin).filter(p => !known.has(p))))
+  // 5V y VIN son el mismo pin en las placas que solo traen uno de los dos.
+  const resolve = (raw: string) => {
+    const p = normalizePin(raw)
+    if (p === '5V' && !known.has('5V') && known.has('VIN')) return 'VIN'
+    if (p === 'VIN' && !known.has('VIN') && known.has('5V')) return '5V'
+    return p
+  }
+  const all = conexiones.map((c, i) => ({ ...c, i, pin: resolve(c.pinPlaca) }))
+  // Solo se dibuja cable hacia pines que la placa tiene de verdad.
+  const conns = all.filter(c => known.has(c.pin))
   const left = base.left
-  const right = [...base.right, ...extras]
+  const right = base.right
 
   const rows = Math.max(left.length, right.length)
   const boardH = rows * PITCH + 46
@@ -71,7 +81,7 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
   }
 
   // Piezas, en orden de aparición
-  const compNames = Array.from(new Set(conns.map(c => c.componente)))
+  const compNames = Array.from(new Set(all.map(c => c.componente)))
   const signal = conns.filter(c => !isPowerPin(c.pin) && !isGroundPin(c.pin))
   const railPins = Array.from(new Set(conns.filter(c => isPowerPin(c.pin) || isGroundPin(c.pin)).map(c => c.pin)))
     .sort((a, b) => Number(isGroundPin(a)) - Number(isGroundPin(b)))
@@ -82,12 +92,12 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
   const compX = railX0 + Math.max(railPins.length, 1) * 26 + 46
 
   // Tarjetas de piezas apiladas a la derecha
-  let cursor = BOARD_TOP
+  let cursor = BOARD_TOP - 4
   const cards = compNames.map(name => {
-    const pins = conns.filter(c => c.componente === name)
-    const h = 44 + pins.length * ROW + 10
+    const pins = all.filter(c => c.componente === name)
+    const h = 48 + pins.length * ROW
     const card = { name, y: cursor, h, pins }
-    cursor += h + 18
+    cursor += h + 24
     return card
   })
   const targetY = new Map<number, number>()
@@ -105,7 +115,7 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
   const leftRoute = (key: string) => {
     if (!leftWires.includes(key)) leftWires.push(key)
     const k = leftWires.indexOf(key)
-    return { x: BX - 22 - k * 10, y: boardBottom + 18 + k * 12 }
+    return { x: BX - 22 - k * 10, y: boardBottom + 18 + k * PITCH }
   }
 
   const colorOf = new Map<number, string>()
@@ -137,10 +147,13 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
     const ys = [railFeeds.find(f => f.pin === pin)!.joinY, ...conns.filter(c => c.pin === pin).map(c => targetY.get(c.i)!)]
     return { y1: Math.min(...ys) - 12, y2: Math.max(...ys) + 12 }
   }
+  // Todas las líneas de alimentación empiezan a la misma altura: así sus rótulos quedan arriba, lejos de los cables.
+  const railTop = Math.min(BOARD_TOP - 6, ...railPins.map(p => railSpan(p).y1))
 
   const W = compX + CARD_W + 18
-  const H = Math.max(boardBottom + 18 + leftWires.length * 12 + 26, cursor + 6)
+  const H = Math.max(boardBottom + 18 + leftWires.length * PITCH + 14, cursor + (all.length > conns.length ? 14 : 0))
   const usedPins = new Set(conns.map(c => c.pin))
+  const hayFuera = all.length > conns.length
   const dim = 0.13
 
   return (
@@ -154,13 +167,13 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
         const col = isGroundPin(pin) ? GROUND : POWER
         return (
           <g key={pin} opacity={railOn(pin) ? 1 : dim}>
-            <line x1={x} y1={span.y1} x2={x} y2={span.y2} stroke={col} strokeWidth="5" strokeLinecap="round" />
-            <text x={x} y={span.y1 - 9} textAnchor="middle" fontSize="9.5" fontWeight="700" fill={col}>{pin}</text>
+            <line x1={x} y1={railTop} x2={x} y2={span.y2} stroke={col} strokeWidth="5" strokeLinecap="round" />
+            <text x={x} y={railTop - 9} textAnchor="middle" fontSize="9.5" fontWeight="700" fill={col}>{pin}</text>
           </g>
         )
       })}
       {railPins.length > 0 && (
-        <text x={railX0 + (railPins.length - 1) * 13} y={BOARD_TOP - 30} textAnchor="middle" fontSize="10" fontWeight="600" fill="#94A3B8">
+        <text x={railX0 + (railPins.length - 1) * 13} y={railTop - 26} textAnchor="middle" fontSize="10" fontWeight="600" fill="#94A3B8">
           Protoboard
         </text>
       )}
@@ -192,7 +205,7 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
       {/* Resistencias dibujadas sobre su cable */}
       {conns.map(c => {
         const value = resistorOf(c)
-        if (!value) return null
+        if (!value || !known.has(c.pin)) return null
         const y = targetY.get(c.i)!
         const x = compX - 44
         return (
@@ -226,6 +239,10 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
         })
       )}
 
+      {hayFuera && (
+        <text x={compX} y={H - 8} fontSize="9.5" fill="#94A3B8">Círculo punteado: esa pata no va a la placa, lee adónde se conecta.</text>
+      )}
+
       {/* Piezas */}
       {cards.map(card => {
         const active = !focusing || card.pins.some(p => on(p.i))
@@ -235,6 +252,14 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
             <text x={compX + 16} y={card.y + 27} fontSize="12.5" fontWeight="700" fill="#22252A">{card.name}</text>
             {card.pins.map(p => {
               const y = targetY.get(p.i)!
+              if (!known.has(p.pin)) {
+                return (
+                  <g key={p.i} opacity={on(p.i) ? 1 : 0.4}>
+                    <circle cx={compX} cy={y} r="4.5" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="1.5" strokeDasharray="2 2" />
+                    <text x={compX + 16} y={y + 4} fontSize="10.5" fontStyle="italic" fill="#64748B">{short(p.pinComponente, 38)}</text>
+                  </g>
+                )
+              }
               return (
                 <g key={p.i} opacity={on(p.i) ? 1 : 0.4}>
                   <circle cx={compX} cy={y} r="5.5" fill={wireColor(p)} stroke="#FFFFFF" strokeWidth="1.5" />

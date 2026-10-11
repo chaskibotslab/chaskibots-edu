@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import {
-  Flag, Puzzle, Cable, Code2, FlaskConical, Award, ChevronLeft, ChevronRight, Check, Lightbulb, AlertTriangle, CircleHelp,
+  Flag, Puzzle, Cable, Code2, FlaskConical, Award, ChevronLeft, ChevronRight, ChevronDown, Check, Lightbulb, AlertTriangle, CircleHelp,
+  RotateCcw, Star, Hand, PartyPopper, X,
 } from 'lucide-react'
 import ArduinoCodeViewer from './ArduinoCodeViewer'
 import WiringDiagram, { WiringConnection } from './WiringDiagram'
@@ -50,6 +51,38 @@ function Media({ fotoUrl, videoUrl, alt }: { fotoUrl?: string; videoUrl?: string
   )
 }
 
+// Parte un párrafo en frases para mostrarlo en trozos cortos en vez de un bloque de texto.
+function frases(t: string): string[] {
+  const out: string[] = []
+  let start = 0
+  const re = /[.!?]\s+/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(t))) {
+    const next = t[m.index + m[0].length] || ''
+    if (/[A-ZÁÉÍÓÚÑ¿¡"“]/.test(next)) {
+      out.push(t.slice(start, m.index + 1).trim())
+      start = m.index + m[0].length
+    }
+  }
+  const rest = t.slice(start).trim()
+  if (rest) out.push(rest)
+  return out
+}
+
+function Trozos({ texto, className = '' }: { texto: string; className?: string }) {
+  const partes = frases(texto)
+  if (partes.length < 3) return <p className={`text-slate-700 leading-relaxed ${className}`}>{texto}</p>
+  return (
+    <ul className={`space-y-2 ${className}`}>
+      {partes.map((p, i) => (
+        <li key={i} className="flex items-start gap-2.5 text-slate-700 leading-relaxed">
+          <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-chaski-primary flex-shrink-0" /> {p}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function Titulo({ icon: Icon, children }: { icon: React.ComponentType<{ className?: string }>; children: React.ReactNode }) {
   return (
     <h4 className="flex items-center gap-2 text-base font-bold text-chaski-dark mb-3">
@@ -66,7 +99,17 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
   const [paso, setPaso] = useState(0)
   const [hechos, setHechos] = useState<number[]>([])
   const [verTodo, setVerTodo] = useState(false)
-  const [respuestas, setRespuestas] = useState<Record<number, number>>({})
+  const [visitadas, setVisitadas] = useState<EtapaId[]>(['reto'])
+  const [vistas, setVistas] = useState<number[]>([])
+  const [checks, setChecks] = useState<number[]>([])
+  const [ayuda, setAyuda] = useState<number | null>(null)
+  // Preguntas: una a la vez; si fallas puedes volver a intentar, y al final reiniciar todo.
+  const [pregunta, setPregunta] = useState(0)
+  const [fallos, setFallos] = useState<Record<number, number[]>>({})
+  const [acertadas, setAcertadas] = useState<number[]>([])
+  const reiniciarPreguntas = () => { setPregunta(0); setFallos({}); setAcertadas([]) }
+  const ir = (id: EtapaId) => { setEtapa(id); setVisitadas(v => (v.includes(id) ? v : [...v, id])) }
+  const alternar = (lista: number[], i: number) => (lista.includes(i) ? lista.filter(x => x !== i) : [...lista, i])
 
   // El avance del armado se recuerda en este dispositivo.
   const storageKey = `chaski_guia_${proyectoId}`
@@ -100,7 +143,7 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
   const reto = (
     <section>
       <Titulo icon={Flag}>El reto</Titulo>
-      <p className="text-slate-700 leading-relaxed">{guia.reto.texto}</p>
+      <Trozos texto={guia.reto.texto} className="text-[15px]" />
       {guia.reto.paraQue && (
         <div className="mt-4 rounded-2xl bg-chaski-light px-4 py-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">¿Para qué sirve en la vida real?</p>
@@ -115,19 +158,46 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
   const piezas = (
     <section>
       <Titulo icon={Puzzle}>{hayDiagrama ? 'Conoce las piezas' : 'Materiales'}</Titulo>
-      <div className="grid sm:grid-cols-2 gap-3">
-        {guia.piezas.map((p, i) => (
-          <div key={i} className="rounded-2xl border border-border-soft bg-white p-4">
-            {p.fotoUrl && <img src={p.fotoUrl} alt={p.nombre} className="w-full h-32 object-contain mb-3 rounded-xl bg-slate-50" />}
-            <p className="font-semibold text-chaski-dark">{p.nombre}</p>
-            <p className="text-sm text-slate-600 mt-1 leading-relaxed">{p.paraQue}</p>
-            {p.cuidado && (
-              <p className="mt-2 flex items-start gap-1.5 text-xs text-amber-700">
-                <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" /> {p.cuidado}
-              </p>
-            )}
-          </div>
-        ))}
+      {!expandido && guia.piezas.length > 1 && (
+        <p className="flex items-center gap-1.5 text-xs font-medium text-slate-500 mb-3">
+          <Hand className="w-3.5 h-3.5 text-chaski-primary" />
+          Toca cada tarjeta para descubrir qué hace · {vistas.length} de {guia.piezas.length}
+        </p>
+      )}
+      <div className="grid sm:grid-cols-2 gap-3 items-start">
+        {guia.piezas.map((p, i) => {
+          const abierta = expandido || guia.piezas.length === 1 || vistas.includes(i)
+          return (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setVistas(v => alternar(v, i))}
+              className={`text-left rounded-2xl border p-4 transition-all duration-200 active:scale-[0.98] ${
+                abierta ? 'bg-white border-chaski-primary/30 shadow-sm' : 'bg-slate-50 border-border-soft hover:border-chaski-primary/30'
+              }`}
+            >
+              {p.fotoUrl && <img src={p.fotoUrl} alt={p.nombre} className="w-full h-32 object-contain mb-3 rounded-xl bg-slate-50" />}
+              <span className="flex items-center justify-between gap-2 font-semibold text-chaski-dark">
+                {p.nombre}
+                {!expandido && guia.piezas.length > 1 && (
+                  <ChevronDown className={`w-4 h-4 flex-shrink-0 text-slate-400 transition-transform ${abierta ? 'rotate-180' : ''}`} />
+                )}
+              </span>
+              {abierta ? (
+                <span className="block animate-fade-in">
+                  <span className="block text-sm text-slate-600 mt-1 leading-relaxed">{p.paraQue}</span>
+                  {p.cuidado && (
+                    <span className="mt-2 flex items-start gap-1.5 text-xs text-amber-700">
+                      <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" /> {p.cuidado}
+                    </span>
+                  )}
+                </span>
+              ) : (
+                <span className="block text-xs text-slate-400 mt-1">¿Para qué sirve?</span>
+              )}
+            </button>
+          )
+        })}
       </div>
     </section>
   )
@@ -161,7 +231,7 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
             <div className="rounded-2xl border border-border-soft bg-white p-5 mb-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-chaski-primary mb-1">Paso {paso + 1} de {guia.pasos.length}</p>
               <p className="text-lg font-bold text-chaski-dark">{pasoActual.titulo}</p>
-              <p className="text-slate-700 leading-relaxed mt-2">{pasoActual.texto}</p>
+              <Trozos texto={pasoActual.texto} className="mt-2" />
               {pasoActual.consejo && (
                 <p className="mt-3 flex items-start gap-2 text-sm text-slate-600 bg-chaski-light rounded-xl px-3 py-2">
                   <Lightbulb className="w-4 h-4 text-chaski-gold flex-shrink-0 mt-0.5" /> {pasoActual.consejo}
@@ -262,25 +332,54 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
     <section>
       <Titulo icon={FlaskConical}>Prueba</Titulo>
       <div className="rounded-2xl bg-emerald-50 border border-emerald-100 p-4 mb-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 mb-2">Si todo está bien, debe pasar esto</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 mb-2">
+          {expandido ? 'Si todo está bien, debe pasar esto' : 'Marca lo que ya funciona'}
+        </p>
         <ul className="space-y-1.5">
-          {guia.prueba.queDebePasar.map((t, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-              <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" /> {t}
-            </li>
-          ))}
+          {guia.prueba.queDebePasar.map((t, i) => {
+            const ok = expandido || checks.includes(i)
+            return (
+              <li key={i}>
+                <button
+                  type="button"
+                  onClick={() => setChecks(c => alternar(c, i))}
+                  className="w-full flex items-start gap-2.5 text-left text-sm text-slate-700 py-1 active:scale-[0.99] transition-transform"
+                >
+                  <span className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${ok ? 'bg-emerald-600' : 'bg-white ring-1 ring-emerald-300'}`}>
+                    {ok && <Check className="w-3.5 h-3.5 text-white" />}
+                  </span>
+                  {t}
+                </button>
+              </li>
+            )
+          })}
         </ul>
+        {!expandido && guia.prueba.queDebePasar.length > 0 && checks.length === guia.prueba.queDebePasar.length && (
+          <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-emerald-700 animate-fade-in">
+            <PartyPopper className="w-4 h-4" /> ¡Todo funciona! Pasa a la última etapa.
+          </p>
+        )}
       </div>
       {guia.prueba.siNoFunciona.length > 0 && (
         <>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Si no funciona, revisa</p>
-          <div className="rounded-2xl border border-border-soft bg-white divide-y divide-border-soft">
-            {guia.prueba.siNoFunciona.map((f, i) => (
-              <div key={i} className="px-4 py-3">
-                <p className="text-sm font-semibold text-chaski-dark">{f.problema}</p>
-                <p className="text-sm text-slate-600 mt-0.5 leading-relaxed">{f.revisa}</p>
-              </div>
-            ))}
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">{expandido ? 'Si no funciona, revisa' : '¿Algo no funciona? Toca tu problema'}</p>
+          <div className="rounded-2xl border border-border-soft bg-white divide-y divide-border-soft overflow-hidden">
+            {guia.prueba.siNoFunciona.map((f, i) => {
+              const abierto = expandido || ayuda === i
+              return (
+                <div key={i}>
+                  <button
+                    type="button"
+                    onClick={() => setAyuda(ayuda === i ? null : i)}
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors"
+                  >
+                    <span className="text-sm font-semibold text-chaski-dark">{f.problema}</span>
+                    {!expandido && <ChevronDown className={`w-4 h-4 flex-shrink-0 text-slate-400 transition-transform ${abierto ? 'rotate-180' : ''}`} />}
+                  </button>
+                  {abierto && <p className="px-4 pb-3 text-sm text-slate-600 leading-relaxed animate-fade-in">{f.revisa}</p>}
+                </div>
+              )
+            })}
           </div>
         </>
       )}
@@ -296,46 +395,111 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
           <p className="text-sm text-slate-700 leading-relaxed">{guia.demuestra.reto}</p>
         </div>
       )}
-      <div className="space-y-4">
-        {guia.demuestra.preguntas.map((q, qi) => {
-          const elegida = respuestas[qi]
-          const respondida = elegida !== undefined
-          return (
+      {expandido ? (
+        <div className="space-y-4">
+          {guia.demuestra.preguntas.map((q, qi) => (
             <div key={qi} className="rounded-2xl border border-border-soft bg-white p-4">
-              <p className="flex items-start gap-2 font-semibold text-chaski-dark text-sm">
-                <CircleHelp className="w-4 h-4 text-chaski-primary flex-shrink-0 mt-0.5" /> {q.pregunta}
-              </p>
-              <div className="mt-3 space-y-2">
-                {q.opciones.map((op, oi) => {
-                  const esCorrecta = oi === q.correcta
-                  const estado = !respondida || expandido
-                    ? 'bg-slate-50 text-slate-700 hover:bg-slate-100'
-                    : esCorrecta
-                      ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200'
-                      : oi === elegida
-                        ? 'bg-red-50 text-red-700 ring-1 ring-red-200'
-                        : 'bg-slate-50 text-slate-400'
-                  return (
-                    <button
-                      key={oi}
-                      disabled={respondida}
-                      onClick={() => setRespuestas({ ...respuestas, [qi]: oi })}
-                      className={`w-full text-left text-sm px-3.5 py-2.5 rounded-xl transition-all ${estado}`}
-                    >
-                      {op}
-                    </button>
-                  )
-                })}
-              </div>
-              {respondida && !expandido && (
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                  <span className="font-semibold">{elegida === q.correcta ? '¡Correcto! ' : 'Casi. '}</span>{q.explicacion}
-                </p>
-              )}
+              <p className="font-semibold text-chaski-dark text-sm">{qi + 1}. {q.pregunta}</p>
+              <ul className="mt-2 space-y-1">
+                {q.opciones.map((op, oi) => <li key={oi} className="text-sm text-slate-700">○ {op}</li>)}
+              </ul>
             </div>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      ) : guia.demuestra.preguntas.length > 0 && (
+        <div className="rounded-2xl border border-border-soft bg-white p-5">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-1.5">
+              {guia.demuestra.preguntas.map((_, i) => (
+                <span key={i} className={`h-2 rounded-full transition-all ${
+                  i === pregunta ? 'w-6 bg-chaski-primary' : acertadas.includes(i) ? ((fallos[i] || []).length ? 'w-2 bg-amber-400' : 'w-2 bg-emerald-500') : 'w-2 bg-slate-200'
+                }`} />
+              ))}
+            </div>
+            <button type="button" onClick={reiniciarPreguntas} className="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-chaski-primary transition-colors">
+              <RotateCcw className="w-3.5 h-3.5" /> Reiniciar
+            </button>
+          </div>
+
+          {pregunta >= guia.demuestra.preguntas.length ? (() => {
+            const aLaPrimera = guia.demuestra.preguntas.filter((_, i) => !(fallos[i] || []).length).length
+            const todas = aLaPrimera === guia.demuestra.preguntas.length
+            return (
+              <div className="text-center py-4 animate-fade-in">
+                <div className="flex justify-center gap-1 mb-3">
+                  {guia.demuestra.preguntas.map((_, i) => (
+                    <Star key={i} className={`w-7 h-7 ${i < aLaPrimera ? 'text-chaski-gold fill-current' : 'text-slate-200'}`} />
+                  ))}
+                </div>
+                <p className="text-lg font-bold text-chaski-dark">{todas ? '¡Perfecto!' : '¡Lección completada!'}</p>
+                <p className="text-sm text-slate-600 mt-1">Acertaste {aLaPrimera} de {guia.demuestra.preguntas.length} a la primera.</p>
+                <button
+                  type="button"
+                  onClick={reiniciarPreguntas}
+                  className={`mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold active:scale-[0.98] transition-all ${todas ? 'bg-slate-100 text-slate-600' : 'bg-chaski-primary text-white'}`}
+                >
+                  <RotateCcw className="w-4 h-4" /> {todas ? 'Repetir las preguntas' : 'Intentar de nuevo'}
+                </button>
+              </div>
+            )
+          })() : (() => {
+            const q = guia.demuestra.preguntas[pregunta]
+            const malas = fallos[pregunta] || []
+            const acertada = acertadas.includes(pregunta)
+            return (
+              <div key={pregunta} className="animate-fade-in">
+                <p className="text-xs font-semibold uppercase tracking-wide text-chaski-primary mb-1">Pregunta {pregunta + 1} de {guia.demuestra.preguntas.length}</p>
+                <p className="flex items-start gap-2 font-semibold text-chaski-dark">
+                  <CircleHelp className="w-4 h-4 text-chaski-primary flex-shrink-0 mt-1" /> {q.pregunta}
+                </p>
+                <div className="mt-3 space-y-2">
+                  {q.opciones.map((op, oi) => {
+                    const mala = malas.includes(oi)
+                    const buena = acertada && oi === q.correcta
+                    const estado = buena
+                      ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200'
+                      : mala
+                        ? 'bg-red-50 text-red-400 ring-1 ring-red-100 line-through'
+                        : acertada
+                          ? 'bg-slate-50 text-slate-400'
+                          : 'bg-slate-50 text-slate-700 hover:bg-slate-100 active:scale-[0.99]'
+                    return (
+                      <button
+                        key={oi}
+                        type="button"
+                        disabled={acertada || mala}
+                        onClick={() => {
+                          if (oi === q.correcta) setAcertadas(a => [...a, pregunta])
+                          else setFallos(fl => ({ ...fl, [pregunta]: [...(fl[pregunta] || []), oi] }))
+                        }}
+                        className={`w-full flex items-center justify-between gap-2 text-left text-sm px-3.5 py-3 rounded-xl transition-all ${estado}`}
+                      >
+                        {op}
+                        {buena && <Check className="w-4 h-4 flex-shrink-0" />}
+                        {mala && <X className="w-4 h-4 flex-shrink-0" />}
+                      </button>
+                    )
+                  })}
+                </div>
+                {acertada ? (
+                  <div className="mt-4 animate-fade-in">
+                    <p className="text-sm text-slate-600 leading-relaxed"><span className="font-semibold text-emerald-700">¡Correcto! </span>{q.explicacion}</p>
+                    <button
+                      type="button"
+                      onClick={() => setPregunta(pregunta + 1)}
+                      className="mt-3 inline-flex items-center gap-1 px-5 py-2.5 rounded-full bg-chaski-primary text-white text-sm font-semibold active:scale-[0.98] transition-all"
+                    >
+                      {pregunta === guia.demuestra.preguntas.length - 1 ? 'Ver mi resultado' : 'Siguiente pregunta'} <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : malas.length > 0 && (
+                  <p className="mt-3 text-sm font-medium text-amber-700 animate-fade-in">Casi. Piénsalo otra vez y prueba con otra opción.</p>
+                )}
+              </div>
+            )
+          })()}
+        </div>
+      )}
     </section>
   )
 
@@ -355,12 +519,12 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
           return (
             <button
               key={e.id}
-              onClick={() => setEtapa(e.id)}
+              onClick={() => ir(e.id)}
               className={`flex-1 min-w-[84px] flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                 active ? 'bg-white text-chaski-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              <Icon className="w-3.5 h-3.5" />
+              {!active && visitadas.includes(e.id) ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Icon className="w-3.5 h-3.5" />}
               <span>{i + 1}. {e.label}</span>
             </button>
           )
@@ -371,7 +535,7 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
 
       <div className="flex items-center justify-between mt-8 pt-5 border-t border-border-soft">
         <button
-          onClick={() => setEtapa(visibles[Math.max(0, idx - 1)].id)}
+          onClick={() => ir(visibles[Math.max(0, idx - 1)].id)}
           disabled={idx === 0}
           className="flex items-center gap-1 text-sm font-medium text-slate-500 disabled:opacity-0"
         >
@@ -379,7 +543,7 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
         </button>
         {idx < visibles.length - 1 && (
           <button
-            onClick={() => setEtapa(visibles[idx + 1].id)}
+            onClick={() => ir(visibles[idx + 1].id)}
             className="flex items-center gap-1 px-5 py-2.5 rounded-full bg-chaski-primary text-white text-sm font-semibold active:scale-[0.98] transition-all"
           >
             Siguiente: {visibles[idx + 1].label} <ChevronRight className="w-4 h-4" />
