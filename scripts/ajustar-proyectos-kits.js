@@ -7,6 +7,9 @@
  *    y con un LED verde y uno rojo; el sensor de luz es el módulo del kit.
  *  - Las prácticas que eran solo un pulsador ahora encienden un LED.
  *  - 8vo: los 3 pulsadores del Piano se conectan igual, sin resistencia.
+ *  - 3ro BGU: el sensor ultrasónico HC-SR04P se alimenta a 3,3 V, para que su
+ *    pin Echo no envíe 5 V a un pin del ESP32.
+ *  - Textos de alimentación y notas de materiales según la lista real de cada kit.
  * Reemplaza conexiones, código y textos de cada proyecto listado.
  * Por defecto solo simula; con --apply escribe. Guarda respaldo en backups/.
  * Después hay que recargar las guías: node scripts/seed-kit-guias.js <kit-id>
@@ -444,6 +447,18 @@ void loop() {
   },
 }
 
+// Textos del kit y notas de materiales, según la lista real de cada kit.
+const KITS = {
+  'kit-lv-decimo-egb': {
+    alimentacion: 'Cable USB V8 para programar y alimentar con un cargador de celular de al menos 1 A (cargador NO incluido). La bomba usa esa misma alimentación, pasando por el relé.',
+    notas: 'El módulo relé ya trae transistor y diodo. La bomba se alimenta del mismo USB que la placa a través del relé, con GND común con el Nano.',
+  },
+}
+const NOTAS_MATERIAL = [
+  ['kit-lv-octavo-egb', 'resistencia-10k', 'Repuesto / experimentación libre'],
+  ['kit-lv-primero-bach', 'resistencia-1k', 'Para el LED verde de la estación'],
+]
+
 ;(async () => {
   const proyectos = await get('kit_proyectos', 'select=*&kit_id=like.kit-lv-*')
   const ids = proyectos.map(p => p.id).join(',')
@@ -477,5 +492,21 @@ void loop() {
       )))
     }
   }
+  for (const [id, textos] of Object.entries(KITS)) await send('PATCH', 'kits', `id=eq.${id}`, textos)
+  for (const [kit, material, nota] of NOTAS_MATERIAL) await send('PATCH', 'kit_materiales', `kit_id=eq.${kit}&material_id=eq.${material}`, { nota })
+
+  // 3ro BGU: HC-SR04P a 3,3 V
+  const tercero = proyectos.filter(p => p.kit_id === 'kit-lv-tercero-bach').map(p => p.id).join(',')
+  await send('PATCH', 'kit_conexiones', `proyecto_id=in.(${tercero})&componente=eq.SENSOR HC-SR04P&pin_componente=eq.VCC`, { pin_placa: '3V3' })
+
+  // Los pasos de las guías señalan conexiones por posición: el orden no puede tener números repetidos.
+  const actuales = await get('kit_conexiones', `select=id,proyecto_id,orden&proyecto_id=in.(${ids})&order=orden`)
+  let renumeradas = 0
+  for (const p of proyectos) {
+    const filas = actuales.filter(c => c.proyecto_id === p.id)
+    if (new Set(filas.map(f => f.orden)).size === filas.length) continue
+    for (const [i, f] of filas.entries()) if (f.orden !== i + 1) { await send('PATCH', 'kit_conexiones', `id=eq.${f.id}`, { orden: i + 1 }); renumeradas++ }
+  }
+  console.log(`conexiones renumeradas: ${renumeradas}`)
   console.log('listo')
 })().catch(e => { console.error(e.message); process.exit(1) })
