@@ -235,8 +235,8 @@ export function EsquemaBloque({ proyecto: p, principal, boardName }: { proyecto:
       {legacy && <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50/50 overflow-x-auto" dangerouslySetInnerHTML={{ __html: legacy }} />}
       {foto && (
         <div className="mt-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Foto del armado real</p>
-          <img src={foto} alt="Armado real" className="w-full h-auto rounded-2xl border border-slate-200" />
+          {conexiones.length > 0 && <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Foto del armado real</p>}
+          <img src={foto} alt={conexiones.length > 0 ? 'Armado real' : 'Circuito completo'} className="w-full h-auto rounded-2xl border border-slate-200" />
         </div>
       )}
       {pdf && <a href={pdf} target="_blank" rel="noopener noreferrer" className="inline-block mt-3 text-chaski-primary font-medium underline">Ver esquema (PDF)</a>}

@@ -298,8 +298,9 @@ export default function ProyectoGuia({ proyectoId, slug, guia, conexiones, board
       )}
       {fotoArmadoUrl && (
         <div className="mt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Foto del armado real</p>
-          <img src={fotoArmadoUrl} alt="Armado real" className="w-full h-auto rounded-2xl border border-border-soft" />
+          {/* Los kits sin placa (pila o batería) traen el circuito dibujado, no una foto */}
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">{hayDiagrama ? 'Foto del armado real' : 'Circuito completo'}</p>
+          <img src={fotoArmadoUrl} alt={hayDiagrama ? 'Armado real' : 'Circuito completo'} className="w-full h-auto rounded-2xl border border-border-soft" />
         </div>
       )}
     </section>
