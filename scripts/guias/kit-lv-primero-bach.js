@@ -20,14 +20,14 @@ module.exports = {
       duracion: '30 minutos',
     },
     piezas: [
-      { nombre: 'Módulo sensor de luz (LDR)', paraQue: 'Lleva una LDR, una resistencia que cambia con la luz. Entrega por su pin AOUT un voltaje que depende de la iluminación.', cuidado: 'Lee las letras junto a cada pin. Usa el pin AOUT (analógico); si tu módulo también tiene DOUT, ese no se usa aquí.' },
+      { nombre: 'LDR y resistencia de 1 kΩ', paraQue: 'La LDR es una resistencia que cambia con la luz. Puesta en fila con la resistencia de 1 kΩ, entre 3,3 V y tierra, entrega en la unión de las dos un voltaje que depende de la iluminación.', cuidado: 'La LDR tiene 2 patas y no tiene polaridad: puede ir en cualquier sentido. Lo importante es que una de sus patas comparta fila con una pata de la resistencia.' },
       C3, PROTO,
     ],
     pasos: [
       PLACA,
       RIELES,
-      { titulo: 'Dale energía al sensor', texto: 'Une el pin VCC del módulo con la línea roja (3,3 V) y el pin GND con la línea negra.', conexiones: [0, 1] },
-      { titulo: 'Conecta la señal', texto: 'Une el pin AOUT del módulo con el pin GPIO0 de la placa. Ese pin puede leer valores analógicos.', conexiones: [2] },
+      { titulo: 'Arma la LDR con su resistencia', texto: 'Pon la LDR con cada pata en una fila distinta. Pon la resistencia de 1 kΩ con una pata en la misma fila que una pata de la LDR, y la otra pata en una fila nueva. Une la pata libre de la LDR con la línea roja (3,3 V) y la pata libre de la resistencia con la línea negra.', conexiones: [0, 2], consejo: 'A este armado se le llama divisor de voltaje: reparte los 3,3 V entre la LDR y la resistencia.' },
+      { titulo: 'Conecta la señal', texto: 'Une la fila donde se juntan la LDR y la resistencia con el pin GPIO0 de la placa. Ese pin puede leer valores analógicos.', conexiones: [1] },
       USB_SERIAL,
     ],
     codigo: [
@@ -39,11 +39,11 @@ module.exports = {
       queDebePasar: [
         'Aparece un número entre 0 y 4095 que se actualiza varias veces por segundo.',
         'Al tapar el sensor con la mano el número cambia claramente, y vuelve al soltarlo.',
-        'Anota el valor con luz normal y con el sensor tapado. Fíjate si al oscurecer el número sube o baja: depende del módulo.',
+        'Anota el valor con luz normal y con el sensor tapado. Con este armado, más luz da un número más alto.',
       ],
       siNoFunciona: [
-        { problema: 'El número no cambia al tapar el sensor', revisa: 'La señal no está saliendo de AOUT. Revisa que el cable de GPIO0 esté en el pin AOUT y no en DOUT.' },
-        { problema: 'Siempre marca 0 o 4095', revisa: 'Al módulo le falta energía: VCC debe ir a la línea roja (3,3 V) y GND a la línea negra.' },
+        { problema: 'El número no cambia al tapar el sensor', revisa: 'La señal no sale de la unión. Revisa que el cable de GPIO0 esté en la fila donde se juntan la LDR y la resistencia, y no en un extremo.' },
+        { problema: 'Siempre marca 0 o 4095', revisa: 'Falta uno de los extremos: uno debe ir a 3,3 V y el otro a tierra.' },
         NO_SERIAL, NO_SUBE,
       ],
     },
@@ -189,14 +189,14 @@ module.exports = {
 
   'estacion-meteorologica-iot': {
     reto: {
-      texto: 'Vas a construir una estación que vigila el ambiente: mide temperatura, humedad y luz, y muestra los datos en tu celular con una página web que crea la propia placa. Una luz verde indica que todo está normal; una luz roja y una alarma avisan cuando hace demasiado calor o hay demasiada humedad.',
+      texto: 'Vas a construir una estación que vigila el ambiente: mide temperatura, humedad y luz, y muestra los datos en tu celular con una página web que crea la propia placa. La luz azul de la placa indica que todo está normal; una luz roja y una alarma avisan cuando hace demasiado calor o hay demasiada humedad.',
       paraQue: 'Las estaciones meteorológicas alimentan los pronósticos del clima y alertan sobre heladas, olas de calor y tormentas. Hoy casi todas envían sus datos por red para verlos desde lejos. La tuya usa los mismos principios: sensores, un límite, una alarma y una pantalla remota.',
       duracion: '100 minutos',
     },
     piezas: [
       { nombre: 'Sensor DHT11', paraQue: 'Mide temperatura y humedad del aire.', cuidado: 'Lee las letras de sus pines; solo mide una vez cada dos segundos.' },
-      { nombre: 'Módulo sensor de luz (LDR)', paraQue: 'Mide cuánta luz hay en el ambiente.', cuidado: 'Usa el pin AOUT (analógico). Se alimenta con 3,3 V.' },
-      { nombre: 'LED verde con resistencia de 1 kΩ', paraQue: 'Encendido significa que todo está normal.', cuidado: 'Pata larga hacia la resistencia; pata corta a tierra.' },
+      { nombre: 'LDR con resistencia de 1 kΩ', paraQue: 'Mide cuánta luz hay en el ambiente.', cuidado: 'La señal sale de la fila donde se juntan la LDR y la resistencia.' },
+      { nombre: 'Luz azul de la placa', paraQue: 'Ya viene soldada en el ESP32-C3. Encendida significa que todo está normal.', cuidado: 'No hay que conectar nada: el programa la controla por el pin GPIO8.' },
       { nombre: 'LED rojo con resistencia de 330 Ω', paraQue: 'Se enciende cuando algún valor está fuera de rango.', cuidado: 'Pata larga hacia la resistencia; pata corta a tierra.' },
       { nombre: 'Buzzer activo', paraQue: 'Suena junto con el LED rojo.', cuidado: 'La pata marcada con + va al pin de la placa.' },
       { nombre: 'Pulsador', paraQue: 'Activa o silencia el sonido de la alarma.' },
@@ -206,11 +206,10 @@ module.exports = {
     pasos: [
       RIELES,
       { titulo: 'Conecta el sensor DHT11', texto: 'VCC a la línea roja, GND a la línea negra y DATA al pin GPIO3.', conexiones: [0, 1, 2] },
-      { titulo: 'Conecta el sensor de luz', texto: 'VCC a la línea roja, GND a la línea negra y AOUT al pin GPIO0.', conexiones: [3, 4, 5] },
+      { titulo: 'Conecta el sensor de luz', texto: 'Arma la LDR en fila con la resistencia de 1 kΩ, como en la práctica: pata libre de la LDR a la línea roja, pata libre de la resistencia a la línea negra y la unión de las dos al pin GPIO0.', conexiones: [3, 4, 5] },
       { titulo: 'Conecta el buzzer', texto: 'La pata marcada con + al pin GPIO4 y la otra a la línea negra.', conexiones: [6, 7] },
       { titulo: 'Arma el LED rojo', texto: 'Pata larga al pin GPIO5 pasando por la resistencia de 330 Ω. Pata corta a la línea negra.', conexiones: [8, 9] },
-      { titulo: 'Arma el LED verde', texto: 'Pata larga al pin GPIO6 pasando por la resistencia de 1 kΩ. Pata corta a la línea negra.', conexiones: [10, 11], consejo: 'El kit trae dos resistencias distintas. Con la de 1 kΩ el LED brilla un poco menos, y está bien.' },
-      { titulo: 'Conecta el pulsador', texto: 'Una pata al pin GPIO10 y la pata del lado opuesto a la línea negra.', conexiones: [12, 13] },
+      { titulo: 'Conecta el pulsador', texto: 'Una pata al pin GPIO10 y la pata del lado opuesto a la línea negra.', conexiones: [10, 11] },
       { titulo: 'Ponle nombre a tu red y sube el programa', texto: 'En el programa cambia "Estacion-Grupo1" por el número de tu grupo, para no confundirte con las redes de tus compañeros. Conecta el USB-C, sube el programa y abre el Monitor Serial a 115200 baudios.' },
       { titulo: 'Abre la estación en el celular', texto: 'En el celular abre los ajustes de WiFi, conéctate a la red de tu grupo con la clave clima1234 y luego escribe 192.168.4.1 en el navegador.', consejo: 'Esa red no tiene Internet: el celular puede avisarlo y preguntar si quieres seguir conectado. Dile que sí. Si la página no abre, apaga los datos móviles un momento.' },
     ],
@@ -220,14 +219,14 @@ module.exports = {
       { titulo: 'Atender al celular sin detenerse', texto: 'handleClient revisa si alguien pidió la página. Debe ejecutarse muchas veces por segundo; por eso este programa no usa delay(2000).', fragmento: 'servidor.handleClient();' },
       { titulo: 'Medir cada 2 segundos con millis()', texto: 'millis() dice cuántos milisegundos lleva encendida la placa. Si ya pasaron 2000 desde la última lectura, se mide otra vez. Mientras tanto el programa sigue atendiendo al celular y al botón.', fragmento: 'if (millis() - ultimaLectura >= INTERVALO_MS) {\n  ultimaLectura = millis();\n  temperatura = dht.readTemperature();\n  humedad = dht.readHumidity();\n  luz = analogRead(PIN_LDR);' },
       { titulo: 'La decisión de alerta', texto: 'Hay alerta si la temperatura pasa de 28 grados, o si la humedad pasa de 70 %. isnan() descarta las lecturas fallidas para que un error del sensor no dispare la alarma.', fragmento: 'alerta = (!isnan(temperatura) && temperatura > TEMP_MAXIMA)\n      || (!isnan(humedad) && humedad > HUMEDAD_MAXIMA);' },
-      { titulo: 'Avisar con luces y sonido', texto: 'Solo uno de los dos LED está encendido a la vez. El buzzer suena únicamente si hay alerta y el sonido no fue silenciado con el botón.', fragmento: 'digitalWrite(LED_ROJO, alerta ? HIGH : LOW);\ndigitalWrite(LED_VERDE, alerta ? LOW : HIGH);\nif (alerta && sonido) tone(BUZZER, 2000, 200);' },
+      { titulo: 'Avisar con luces y sonido', texto: 'Solo una de las dos luces está encendida a la vez. La luz azul de la placa funciona al revés que un LED normal: se enciende con LOW. El buzzer suena únicamente si hay alerta y el sonido no fue silenciado con el botón.', fragmento: 'digitalWrite(LED_ROJO, alerta ? HIGH : LOW);\ndigitalWrite(LED_PLACA, alerta ? HIGH : LOW);\nif (alerta && sonido) tone(BUZZER, 2000, 200);' },
     ],
     prueba: {
       queDebePasar: [
         'En la lista de redes WiFi del celular aparece la red de tu grupo.',
         'Al abrir 192.168.4.1 se ven la temperatura, la humedad y la luz, y la página se actualiza sola cada 3 segundos.',
-        'Con valores normales está encendido el LED verde y la página dice "Todo normal".',
-        'Al soplar aire caliente y húmedo sobre el DHT11, se enciende el LED rojo, suena el buzzer y la página dice "ALERTA".',
+        'Con valores normales está encendida la luz azul de la placa y la página dice "Todo normal".',
+        'Al soplar aire caliente y húmedo sobre el DHT11, se apaga la luz azul, se enciende el LED rojo, suena el buzzer y la página dice "ALERTA".',
         'Al presionar el botón durante una alerta, el buzzer deja de sonar pero el LED rojo sigue encendido.',
       ],
       siNoFunciona: [
@@ -235,7 +234,8 @@ module.exports = {
         { problema: 'El celular se conecta pero la página no abre', revisa: 'Escribe exactamente 192.168.4.1 en la barra de direcciones (no en el buscador) y apaga los datos móviles un momento.' },
         { problema: 'Temperatura y humedad salen como "nan"', revisa: 'El DHT11 no responde: revisa DATA en GPIO3 y que VCC y GND no estén invertidos.' },
         { problema: 'El LED rojo está siempre encendido', revisa: 'La temperatura del salón pasa de 28 grados o la humedad de 70 %. Sube TEMP_MAXIMA o HUMEDAD_MAXIMA en el programa.' },
-        { problema: 'Un LED no enciende', revisa: 'Gíralo y revisa su resistencia. Rojo al GPIO5 y verde al GPIO6.' },
+        { problema: 'El LED rojo no enciende durante la alerta', revisa: 'Gíralo y comprueba que la resistencia de 330 Ω llega a GPIO5.' },
+        { problema: 'La luz azul de la placa nunca enciende', revisa: 'Algunas placas traen esa luz en otro pin. Pide a tu docente que revise el número impreso junto a la luz y cambia LED_PLACA en el programa.' },
         NO_SERIAL, NO_SUBE,
       ],
     },

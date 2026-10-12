@@ -4,9 +4,9 @@
  *  - 10mo: el riego principal queda con sensor, relé, bomba y 2 LEDs; el
  *    potenciómetro y el pulsador pasan al Mini invernadero.
  *  - 1ro BGU: la estación muestra los datos en el celular (página web por WiFi)
- *    y con un LED verde y uno rojo; el sensor de luz es el módulo del kit.
+ *    y con dos luces: la azul de la propia placa (todo normal) y un LED rojo (alerta).
  *  - Las prácticas que eran solo un pulsador ahora encienden un LED.
- *  - 8vo: los 3 pulsadores del Piano se conectan igual, sin resistencia.
+ *  - 8vo: el kit trae 1 pulsador, así que el Piano elige la nota con el potenciómetro.
  *  - 3ro BGU: el sensor ultrasónico HC-SR04P se alimenta a 3,3 V, para que su
  *    pin Echo no envíe 5 V a un pin del ESP32.
  *  - Textos de alimentación y notas de materiales según la lista real de cada kit.
@@ -27,7 +27,7 @@ const base = `${env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/`
 const headers = { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json' }
 const get = async (t, q) => { const r = await fetch(`${base}${t}?${q}&limit=5000`, { headers }); const j = await r.json(); if (!Array.isArray(j)) throw new Error(JSON.stringify(j).slice(0, 200)); return j }
 const send = async (method, t, q, body) => {
-  const r = await fetch(`${base}${t}${q ? `?${q}` : ''}`, { method, headers: { ...headers, Prefer: 'return=minimal' }, body: body ? JSON.stringify(body) : undefined })
+  const r = await fetch(`${base}${t}${q ? `?${q}` : ''}`, { method, headers: { ...headers, Prefer: 'return=minimal,resolution=merge-duplicates' }, body: body ? JSON.stringify(body) : undefined })
   if (!r.ok) throw new Error(`${method} ${t}: ${r.status} ${(await r.text()).slice(0, 300)}`)
 }
 
@@ -40,7 +40,8 @@ const pot = (nombre, v, pin) => [[nombre, 'Terminal A', v], [nombre, 'Wiper', pi
 
 const SUELO = modulo('SENSOR HUMEDAD SUELO', '5V', 'AOUT', 'A0')
 const RELE = modulo('MODULO RELE 1 CANAL', '5V', 'IN', 'D7')
-const LDR_C3 = modulo('SENSOR LDR (modulo)', '3V3', 'AOUT', 'GPIO0')
+// LDR suelta de 2 patas en serie con la resistencia de 1 kΩ: la señal sale de la unión de las dos.
+const LDR_C3 = [['LDR + R1K (divisor)', 'Terminal superior', '3V3'], ['LDR + R1K (divisor)', 'Punto medio', 'GPIO0'], ['LDR + R1K (divisor)', 'Terminal inferior', 'GND']]
 const DHT_C3 = modulo('SENSOR DHT11', '3V3', 'DATA', 'GPIO3')
 
 const CAMBIOS = {
@@ -206,16 +207,16 @@ void loop() {
   },
 
   'estacion-meteorologica-iot': {
-    descripcion: 'Mide temperatura, humedad y luz ambiental, y muestra los datos en el celular con una página web que crea la propia placa por WiFi. Un LED verde indica que todo está normal; un LED rojo y el buzzer avisan cuando algún valor sale de rango.',
+    descripcion: 'Mide temperatura, humedad y luz ambiental, y muestra los datos en el celular con una página web que crea la propia placa por WiFi. La luz azul de la placa indica que todo está normal; un LED rojo y el buzzer avisan cuando algún valor sale de rango.',
     objetivos: [
       'Soldar correctamente los pines de una placa ESP32-C3 con supervisión docente.',
-      'Leer temperatura y humedad ambiental con un sensor digital (DHT11) y la luz con un sensor analógico.',
+      'Leer temperatura y humedad ambiental con un sensor digital (DHT11) y la luz con una LDR en divisor de voltaje.',
       'Crear una red WiFi y una página web dentro del ESP32 para ver los datos desde un celular.',
       'Combinar dos condiciones (temperatura y humedad) en una sola alerta con el operador OR.',
     ],
     conexiones: [
       ...DHT_C3, ...LDR_C3, ...buzzer('BUZZER ACTIVO', 'GPIO4'),
-      ...led('LED ROJO (alerta)', 'GPIO5'), ...led('LED VERDE (todo normal)', 'GPIO6', 'R1k'),
+      ...led('LED ROJO (alerta)', 'GPIO5'),
       ...pulsador('PULSADOR (modo)', 'GPIO10'),
     ],
     codigo: `/*
@@ -223,10 +224,11 @@ void loop() {
   Kit 1ro BGU - ESP32-C3 Super Mini
   Academia Militar Lizardo Alfonzo Villamarin
 
-  Lee temperatura y humedad (DHT11) y nivel de luz (modulo LDR).
+  Lee temperatura y humedad (DHT11) y nivel de luz (LDR con su
+  resistencia de 1k).
   La placa crea su propia red WiFi y una pagina web: conecta tu
   celular a esa red y abre http://192.168.4.1 para ver los datos.
-  LED verde = todo normal. LED rojo + buzzer = alerta.
+  Luz azul de la placa = todo normal. LED rojo + buzzer = alerta.
   El pulsador activa o silencia el sonido de la alarma.
 
   Requiere instalar: "DHT sensor library" (Adafruit) + "Adafruit
@@ -248,7 +250,7 @@ const int PIN_LDR = 0;
 const int PIN_DHT = 3;
 const int BUZZER = 4;
 const int LED_ROJO = 5;
-const int LED_VERDE = 6;
+const int LED_PLACA = 8; // luz azul que ya viene soldada en la placa; enciende con LOW
 const int PULSADOR = 10;
 
 const float TEMP_MAXIMA = 28.0;
@@ -292,7 +294,7 @@ void setup() {
   dht.begin();
   pinMode(BUZZER, OUTPUT);
   pinMode(LED_ROJO, OUTPUT);
-  pinMode(LED_VERDE, OUTPUT);
+  pinMode(LED_PLACA, OUTPUT);
   pinMode(PULSADOR, INPUT_PULLUP);
 
   WiFi.mode(WIFI_AP);
@@ -331,7 +333,7 @@ void loop() {
           || (!isnan(humedad) && humedad > HUMEDAD_MAXIMA);
 
     digitalWrite(LED_ROJO, alerta ? HIGH : LOW);
-    digitalWrite(LED_VERDE, alerta ? LOW : HIGH);
+    digitalWrite(LED_PLACA, alerta ? HIGH : LOW); // esta luz funciona al reves: LOW la enciende
     if (alerta && sonido) tone(BUZZER, 2000, 200);
 
     Serial.print("Temp: "); Serial.print(temperatura);
@@ -347,16 +349,13 @@ void loop() {
     codigo: `/*
   Luz automatica
   Kit 1ro BGU - ESP32-C3 Super Mini - Proyecto adicional
-  Usa solo el modulo sensor de luz y un LED. Enciende el LED cuando
-  detecta poca luz ambiental.
-
-  NOTA: en este modulo, mas oscuro = numero mas alto. Si el tuyo
-  funciona al reves, cambia el signo > por < en la comparacion.
+  Mismo armado de la estacion meteorologica (usa solo la LDR y un
+  LED). Enciende el LED cuando detecta poca luz ambiental.
 */
 const int PIN_LDR = 0;
 const int LED_LUZ = 5;
 
-const int UMBRAL_OSCURIDAD = 2500; // 0-4095, usa los valores que anotaste en la practica
+const int UMBRAL_OSCURIDAD = 1500; // 0-4095, ajustar segun el ambiente
 
 void setup() {
   pinMode(LED_LUZ, OUTPUT);
@@ -364,7 +363,7 @@ void setup() {
 
 void loop() {
   int luz = analogRead(PIN_LDR);
-  digitalWrite(LED_LUZ, luz > UMBRAL_OSCURIDAD ? HIGH : LOW);
+  digitalWrite(LED_LUZ, luz < UMBRAL_OSCURIDAD ? HIGH : LOW);
   delay(300);
 }
 `,
@@ -403,45 +402,44 @@ void loop() {
 
   // ───────────── 8vo EGB — Piano ─────────────
   'piano-pulsadores': {
-    descripcion: 'Tres pulsadores, tres notas: cada botón hace sonar una nota distinta en el buzzer. Los tres se conectan igual, sin resistencia, usando la resistencia interna del Arduino.',
+    titulo: 'Piano con pulsador y potenciómetro',
+    descripcion: 'Un piano de una sola tecla: giras el potenciómetro para elegir la nota y presionas el pulsador para que suene en el buzzer.',
     objetivos: [
-      'Leer varios pulsadores con la resistencia interna del Arduino (INPUT_PULLUP).',
-      'Usar varias entradas digitales al mismo tiempo.',
+      'Leer una entrada analógica (potenciómetro) y una digital (pulsador) en el mismo programa.',
+      'Convertir un rango de valores en posiciones de una lista con map().',
       'Generar tonos de distinta frecuencia con la función tone(), ideal para el buzzer pasivo de este kit.',
     ],
-    conexiones: [...pulsador('PULSADOR DO', 'D2'), ...pulsador('PULSADOR RE', 'D3'), ...pulsador('PULSADOR MI', 'D4'), ...buzzer('BUZZER PASIVO', 'D8')],
+    conexiones: [...pulsador('PULSADOR (tecla)', 'D2'), ...pot('POTENCIOMETRO (nota)', '5V', 'A0'), ...buzzer('BUZZER PASIVO', 'D8')],
     codigo: `/*
-  Piano con pulsadores
+  Piano con pulsador y potenciometro
   Kit 8vo EGB - Arduino UNO R3 - Proyecto adicional
-  Tres pulsadores, tres notas. Los tres usan la resistencia interna
-  del Arduino (INPUT_PULLUP): una pata al pin y la otra a GND, sin
-  resistencias en la protoboard. Presionado se lee como LOW.
+  El potenciometro elige la nota (do, re, mi, fa, sol, la, si, do)
+  y el pulsador la hace sonar en el buzzer pasivo. El pulsador usa
+  la resistencia interna del Arduino (INPUT_PULLUP): presionado = LOW.
 */
-const int PULSADOR_DO = 2;
-const int PULSADOR_RE = 3;
-const int PULSADOR_MI = 4;
+const int PULSADOR = 2;
+const int POTENCIOMETRO = A0;
 const int BUZZER = 8;
 
-const int NOTA_DO = 262;
-const int NOTA_RE = 294;
-const int NOTA_MI = 330;
+const int NOTAS[8] = {262, 294, 330, 349, 392, 440, 494, 523};
 
 void setup() {
-  pinMode(PULSADOR_DO, INPUT_PULLUP);
-  pinMode(PULSADOR_RE, INPUT_PULLUP);
-  pinMode(PULSADOR_MI, INPUT_PULLUP);
+  pinMode(PULSADOR, INPUT_PULLUP);
+  Serial.begin(9600);
 }
 
 void loop() {
-  if (digitalRead(PULSADOR_DO) == LOW) {
-    tone(BUZZER, NOTA_DO);
-  } else if (digitalRead(PULSADOR_RE) == LOW) {
-    tone(BUZZER, NOTA_RE);
-  } else if (digitalRead(PULSADOR_MI) == LOW) {
-    tone(BUZZER, NOTA_MI);
+  int posicion = map(analogRead(POTENCIOMETRO), 0, 1023, 0, 7);
+
+  if (digitalRead(PULSADOR) == LOW) {
+    tone(BUZZER, NOTAS[posicion]);
+    Serial.print("Nota numero: ");
+    Serial.println(posicion + 1);
   } else {
     noTone(BUZZER);
   }
+
+  delay(20);
 }
 `,
   },
@@ -454,9 +452,10 @@ const KITS = {
     notas: 'El módulo relé ya trae transistor y diodo. La bomba se alimenta del mismo USB que la placa a través del relé, con GND común con el Nano.',
   },
 }
+const CANTIDADES = [['kit-lv-octavo-egb', 'pulsador', 1]]
 const NOTAS_MATERIAL = [
   ['kit-lv-octavo-egb', 'resistencia-10k', 'Repuesto / experimentación libre'],
-  ['kit-lv-primero-bach', 'resistencia-1k', 'Para el LED verde de la estación'],
+  ['kit-lv-primero-bach', 'resistencia-1k', 'Divisor de voltaje de la LDR'],
 ]
 
 ;(async () => {
@@ -494,6 +493,11 @@ const NOTAS_MATERIAL = [
   }
   for (const [id, textos] of Object.entries(KITS)) await send('PATCH', 'kits', `id=eq.${id}`, textos)
   for (const [kit, material, nota] of NOTAS_MATERIAL) await send('PATCH', 'kit_materiales', `kit_id=eq.${kit}&material_id=eq.${material}`, { nota })
+
+  for (const [kit, material, cantidad] of CANTIDADES) await send('PATCH', 'kit_materiales', `kit_id=eq.${kit}&material_id=eq.${material}`, { cantidad })
+  // 1ro BGU trae la LDR suelta de 2 patas, no el módulo de 3 pines de otros kits.
+  await send('POST', 'materiales', 'on_conflict=id', { id: 'ldr-2-patas', nombre: 'LDR (fotorresistencia de 2 patas)', categoria: 'sensor' })
+  await send('PATCH', 'kit_materiales', 'kit_id=eq.kit-lv-primero-bach&material_id=eq.sensor-ldr', { material_id: 'ldr-2-patas' })
 
   // 3ro BGU: HC-SR04P a 3,3 V
   const tercero = proyectos.filter(p => p.kit_id === 'kit-lv-tercero-bach').map(p => p.id).join(',')
