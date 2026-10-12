@@ -60,7 +60,7 @@ module.exports = {
 
   'practica-potenciometro': {
     reto: {
-      texto: 'Vas a usar una perilla para enviarle un número al Arduino: al girarla, el valor en pantalla sube o baja entre 0 y 1023. Esa perilla será el ajuste de tu sistema de riego.',
+      texto: 'Vas a usar una perilla para enviarle un número al Arduino: al girarla, el valor en pantalla sube o baja entre 0 y 1023. La usarás en el proyecto Mini invernadero, para ajustar cuándo regar sin volver a programar.',
       paraQue: 'El control de volumen de un parlante, la perilla de una cocina o el regulador de luz de un cuarto funcionan así. Una perilla permite ajustar una máquina sin volver a programarla.',
       duracion: '25 minutos',
     },
@@ -76,9 +76,9 @@ module.exports = {
       USB_SERIAL,
     ],
     codigo: [
-      { titulo: 'El pin de la perilla', texto: 'Se usa A1 porque A0 quedará reservado para el sensor de humedad.', fragmento: 'const int POT = A1;' },
+      { titulo: 'El pin de la perilla', texto: 'Se usa A1 porque A0 ya lo ocupa el sensor de humedad.', fragmento: 'const int POT = A1;' },
       { titulo: 'Leer la posición', texto: 'Con la perilla en un extremo lee cerca de 0; en el otro, cerca de 1023; a la mitad, alrededor de 512.', fragmento: 'int valor = analogRead(POT);' },
-      { titulo: 'Mostrar el valor', texto: 'El texto dice "Umbral" porque en el proyecto este número será el límite que decide cuándo regar.', fragmento: 'Serial.print("Umbral (0-1023): ");\nSerial.println(valor);\ndelay(300);' },
+      { titulo: 'Mostrar el valor', texto: 'El texto dice "Umbral" porque en el Mini invernadero este número será el límite que decide cuándo regar.', fragmento: 'Serial.print("Umbral (0-1023): ");\nSerial.println(valor);\ndelay(300);' },
     ],
     prueba: {
       queDebePasar: [
@@ -136,7 +136,7 @@ module.exports = {
       ],
     },
     demuestra: {
-      reto: 'Cambia los tiempos para que el relé quede encendido 4 segundos y apagado 10. Ese será el ritmo de riego de tu sistema.',
+      reto: 'Cambia los tiempos para que el relé quede encendido 4 segundos y apagado 10. Así riega tu sistema: unos segundos de agua y una pausa larga.',
       preguntas: [
         { pregunta: '¿Por qué no se conecta la bomba directo a un pin del Arduino?', opciones: ['Porque la bomba necesita más corriente de la que un pin puede dar', 'Porque la bomba es muy pequeña', 'Porque el Arduino no tiene suficientes pines'], correcta: 0, explicacion: 'Un pin entrega muy poca corriente. Conectar un motor directo puede dañar el Arduino.' },
         { pregunta: '¿Qué produce el "clic" del relé?', opciones: ['Un parlante', 'Una lámina de metal que se mueve para cerrar o abrir el interruptor', 'El programa'], correcta: 1, explicacion: 'Dentro hay un electroimán que mueve un contacto metálico.' },
@@ -147,103 +147,98 @@ module.exports = {
 
   'practica-pulsador-manual': {
     reto: {
-      texto: 'Vas a hacer que el Arduino reconozca cuándo presionas un botón y lo avise en pantalla con el mensaje "Riego manual activado". Será el botón para regar cuando tú quieras, sin esperar al sensor.',
-      paraQue: 'Todo sistema automático necesita un control manual: una puerta eléctrica tiene llave, un ascensor tiene botón de emergencia. El pulsador te da el mando cuando lo necesitas.',
-      duracion: '20 minutos',
+      texto: 'Vas a encender una luz con un botón: mientras lo mantienes presionado, el LED rojo se enciende; al soltarlo, se apaga. Ese LED será la luz de "regando" de tu sistema de riego.',
+      paraQue: 'Un timbre, el botón de un ascensor o el control de un juego funcionan así: una entrada (el botón) decide lo que hace una salida (la luz). Es la base de cualquier máquina que responde a una persona.',
+      duracion: '25 minutos',
     },
     piezas: [
       { nombre: 'Pulsador', paraQue: 'Es un interruptor que solo deja pasar corriente mientras lo presionas.', cuidado: 'Tiene 4 patas unidas de dos en dos. Colócalo a caballo sobre el canal central y usa dos patas de lados opuestos.' },
+      { nombre: 'LED rojo con resistencia de 330 Ω', paraQue: 'El LED da la luz. La resistencia limita la corriente para que no se queme.', cuidado: 'El LED tiene una pata larga (+) y una corta (–). Si lo pones al revés no enciende.' },
       NANO, PROTO,
     ],
     pasos: [
       NANO_EN_PROTO,
       TIERRA,
-      { titulo: 'Conecta el pulsador', texto: 'Pon el pulsador a caballo sobre el canal central. Une una pata con el pin D2 del Nano y la pata del lado opuesto con la línea negra (–).', conexiones: [0, 1], consejo: 'No necesitas resistencia: el programa activa una que el Arduino ya trae por dentro.' },
-      USB_SERIAL,
+      { titulo: 'Conecta el pulsador', texto: 'Pon el pulsador a caballo sobre el canal central. Une una pata con el pin D2 del Nano y la pata del lado opuesto con la línea negra (–).', conexiones: [0, 1], consejo: 'No necesitas resistencia para el pulsador: el programa activa una que el Arduino ya trae por dentro.' },
+      { titulo: 'Arma el LED rojo', texto: 'Une el pin D9 con la pata larga del LED pasando por la resistencia de 330 Ω. Une la pata corta con la línea negra (–).', conexiones: [2, 3] },
+      { titulo: 'Conecta el USB', texto: 'Conecta el Nano a la computadora y sube el programa.' },
     ],
     codigo: [
-      { titulo: 'Configurar el botón', texto: 'INPUT_PULLUP activa una resistencia interna que mantiene el pin en HIGH mientras nadie presiona.', fragmento: 'pinMode(PULSADOR, INPUT_PULLUP);' },
+      { titulo: 'Una entrada y una salida', texto: 'El pulsador es una entrada: el Arduino lo lee. El LED es una salida: el Arduino lo enciende. INPUT_PULLUP activa una resistencia interna que mantiene el pin en HIGH mientras nadie presiona.', fragmento: 'pinMode(PULSADOR, INPUT_PULLUP);\npinMode(LED, OUTPUT);' },
       { titulo: 'Leer el botón', texto: 'Con INPUT_PULLUP, presionado se lee como LOW, porque al presionar el pin queda unido a tierra.', fragmento: 'bool presionado = (digitalRead(PULSADOR) == LOW);' },
-      { titulo: 'Avisar solo cuando está presionado', texto: 'El mensaje se escribe únicamente si la condición es verdadera. La pausa de 200 ms evita llenar la pantalla.', fragmento: 'if (presionado) Serial.println("Riego manual activado");\ndelay(200);' },
+      { titulo: 'Encender según el botón', texto: 'El signo ? elige entre dos opciones: si presionado es verdadero se envía HIGH (encendido); si no, LOW (apagado).', fragmento: 'digitalWrite(LED, presionado ? HIGH : LOW);' },
     ],
     prueba: {
       queDebePasar: [
-        'Con el botón suelto, la pantalla no escribe nada.',
-        'Mientras lo mantienes presionado, aparece "Riego manual activado" varias veces por segundo.',
+        'Con el botón suelto, el LED está apagado.',
+        'Mientras lo mantienes presionado, el LED rojo se enciende.',
+        'Al soltarlo, el LED se apaga de inmediato.',
       ],
       siNoFunciona: [
-        { problema: 'El mensaje aparece sin presionar', revisa: 'Estás usando dos patas del pulsador que ya están unidas por dentro. Gíralo un cuarto de vuelta.' },
-        { problema: 'Nunca aparece el mensaje', revisa: 'Comprueba que una pata va al pin D2 y la otra a la línea negra, y que esa línea llega a GND.' },
-        SIMBOLOS,
+        { problema: 'El LED está siempre encendido', revisa: 'Estás usando dos patas del pulsador que ya están unidas por dentro. Gíralo un cuarto de vuelta.' },
+        { problema: 'El LED nunca enciende', revisa: 'Gira el LED: la pata larga va hacia la resistencia. Comprueba que la resistencia llega al pin D9 y que la línea negra llega a GND.' },
+        { problema: 'El botón no hace nada', revisa: 'Comprueba que una pata va al pin D2 y la del lado opuesto a la línea negra.' },
         NO_SUBE,
       ],
     },
     demuestra: {
-      reto: 'Haz que el mensaje aparezca una sola vez por cada pulsación, no repetido. Pista: guarda en una variable si en la vuelta anterior ya estaba presionado.',
+      reto: 'Invierte el comportamiento: que el LED esté encendido siempre y se apague mientras presionas. Pista: intercambia HIGH y LOW.',
       preguntas: [
         { pregunta: 'Con INPUT_PULLUP, ¿qué se lee al presionar?', opciones: ['HIGH', 'LOW', 'Un número entre 0 y 1023'], correcta: 1, explicacion: 'El pin queda unido a tierra y se lee LOW.' },
-        { pregunta: '¿Para qué sirve un botón manual en un sistema automático?', opciones: ['Para que el sensor mida mejor', 'Para poder actuar cuando uno quiere, sin depender del sensor', 'Para gastar menos energía'], correcta: 1, explicacion: 'Permite regar aunque el sensor diga que no hace falta, por ejemplo para probar la bomba.' },
-        { pregunta: '¿Qué pasaría sin el delay(200)?', opciones: ['El mensaje se escribiría miles de veces por segundo', 'El botón dejaría de funcionar', 'Nada'], correcta: 0, explicacion: 'loop() se repite muy rápido; sin pausa la pantalla se llenaría al instante.' },
+        { pregunta: '¿Para qué sirve la resistencia de 330 Ω?', opciones: ['Para que el LED brille más', 'Para limitar la corriente y que el LED no se queme', 'Para que el botón funcione'], correcta: 1, explicacion: 'Sin resistencia pasaría demasiada corriente por el LED.' },
+        { pregunta: '¿Cuál de estas piezas es una entrada?', opciones: ['El LED', 'El pulsador', 'La resistencia'], correcta: 1, explicacion: 'El Arduino lee el pulsador (entrada) y enciende el LED (salida).' },
       ],
     },
   },
 
   'sistema-riego-automatico': {
     reto: {
-      texto: 'Vas a construir un sistema que cuida una planta solo: mide la humedad de la tierra, y cuando está seca enciende una bomba que la riega durante 4 segundos. Tres luces muestran el estado, una perilla ajusta el límite y un botón permite regar a mano.',
+      texto: 'Vas a construir un sistema que cuida una planta solo: mide la humedad de la tierra, y cuando está seca enciende una bomba que la riega durante 4 segundos. Una luz roja avisa que está regando y una verde que la planta tiene suficiente agua.',
       paraQue: 'El riego automático se usa en invernaderos y cultivos para dar a cada planta el agua justa. Ahorra agua, evita que las plantas se sequen cuando nadie está y es un ejemplo completo de automatización: medir, decidir y actuar.',
-      duracion: '90 minutos',
+      duracion: '70 minutos',
     },
     piezas: [
       { nombre: 'Sensor de humedad del suelo', paraQue: 'Mide cuánta agua hay en la tierra. Es el "sentido" del sistema.', cuidado: 'Entierra solo la punta; la parte de arriba no debe mojarse.' },
-      { nombre: 'Potenciómetro', paraQue: 'Ajusta el límite de humedad a partir del cual se riega.', cuidado: 'Extremos a 5V y tierra; centro a la señal.' },
       { nombre: 'Módulo relé y bomba de agua', paraQue: 'El relé es el interruptor que el Arduino acciona; la bomba impulsa el agua por la manguera.', cuidado: 'La bomba debe estar sumergida antes de encenderla: en seco se daña. Mantén el recipiente de agua lejos de la protoboard y del Arduino.' },
-      { nombre: 'LED rojo, amarillo y verde', paraQue: 'Verde: humedad correcta. Amarillo: la tierra se está secando. Rojo: regando.', cuidado: 'Pata larga hacia la resistencia de 330 Ω; pata corta a tierra.' },
-      { nombre: 'Buzzer activo', paraQue: 'Da un pitido corto cada vez que empieza un riego.', cuidado: 'La pata marcada con + va al pin del Arduino.' },
-      { nombre: 'Pulsador', paraQue: 'Fuerza un riego manual.', cuidado: 'Usa patas de lados opuestos.' },
+      { nombre: 'LED rojo y LED verde', paraQue: 'Rojo: está regando. Verde: la tierra tiene suficiente agua.', cuidado: 'Pata larga hacia la resistencia de 330 Ω; pata corta a tierra.' },
       NANO,
     ],
     pasos: [
       RIELES,
       { titulo: 'Conecta el sensor de humedad', texto: 'VCC a la línea roja, GND a la línea negra y AOUT al pin A0.', conexiones: [0, 1, 2] },
-      { titulo: 'Conecta el potenciómetro', texto: 'Un extremo a la línea roja, el otro a la línea negra y la pata del centro al pin A1.', conexiones: [18, 19, 20] },
       { titulo: 'Conecta el módulo relé', texto: 'VCC a la línea roja, GND a la línea negra e IN al pin D7.', conexiones: [3, 4, 5] },
-      { titulo: 'Conecta el buzzer', texto: 'La pata marcada con + al pin D8 y la otra a la línea negra.', conexiones: [8, 9] },
-      { titulo: 'Arma el LED rojo', texto: 'Pata larga al pin D9 pasando por una resistencia de 330 Ω. Pata corta a la línea negra.', conexiones: [10, 11] },
-      { titulo: 'Arma el LED amarillo', texto: 'Pata larga al pin D10 pasando por una resistencia de 330 Ω. Pata corta a la línea negra.', conexiones: [12, 13] },
-      { titulo: 'Arma el LED verde', texto: 'Pata larga al pin D11 pasando por una resistencia de 330 Ω. Pata corta a la línea negra.', conexiones: [14, 15] },
-      { titulo: 'Conecta el pulsador', texto: 'Una pata al pin D2 y la pata del lado opuesto a la línea negra.', conexiones: [16, 17] },
+      { titulo: 'Arma el LED rojo', texto: 'Pata larga al pin D9 pasando por una resistencia de 330 Ω. Pata corta a la línea negra.', conexiones: [8, 9] },
+      { titulo: 'Arma el LED verde', texto: 'Pata larga al pin D11 pasando por una resistencia de 330 Ω. Pata corta a la línea negra.', conexiones: [10, 11] },
       { titulo: 'Conecta la bomba con ayuda de tu docente', texto: 'El positivo de la bomba no va directo a su fuente de energía: pasa por los bornes con tornillo del relé (COM y NO), que funcionan como un interruptor. El negativo de la bomba va a tierra, junto con el GND del Nano. Hazlo con todo desconectado y pide a tu docente que lo revise antes de encender.', conexiones: [6, 7], consejo: 'Prueba primero todo el sistema sin agua: debes escuchar el clic del relé. Solo después sumerge la bomba.' },
     ],
     codigo: [
-      { titulo: 'Leer el sensor y la perilla', texto: 'En cada vuelta se leen las dos entradas analógicas. map() convierte el giro de la perilla (0 a 1023) en un límite útil, entre 300 y 800.', fragmento: 'int humedad = analogRead(SENSOR_HUMEDAD);\nint umbral = map(analogRead(POTENCIOMETRO), 0, 1023, 300, 800);' },
-      { titulo: 'Leer el botón', texto: 'riegoManual es verdadero mientras el pulsador está presionado.', fragmento: 'bool riegoManual = (digitalRead(PULSADOR_MANUAL) == LOW);' },
-      { titulo: 'Decisión 1: regar', texto: 'Se riega si la tierra está más seca que el límite, o si alguien presiona el botón. Las dos barras || significan "o". Se enciende el rojo, se activa el relé, suena un pitido, se espera el tiempo de riego y se apaga la bomba.', fragmento: 'if (humedad > umbral || riegoManual) {\n  digitalWrite(LED_ROJO, HIGH);\n  digitalWrite(RELE_BOMBA, HIGH);\n  tone(BUZZER, 1500, 100);\n  delay(TIEMPO_RIEGO_MS);\n  digitalWrite(RELE_BOMBA, LOW);\n  digitalWrite(LED_ROJO, LOW);\n}' },
-      { titulo: 'Decisión 2: avisar que se está secando', texto: 'Si todavía no llega al límite pero está a menos de 100 unidades, se enciende el amarillo como advertencia.', fragmento: '} else if (humedad > umbral - 100) {\n  digitalWrite(LED_VERDE, LOW);\n  digitalWrite(LED_AMARILLO, HIGH);\n}' },
-      { titulo: 'Decisión 3: todo bien', texto: 'Si ninguna de las anteriores se cumple, la planta tiene suficiente agua: luz verde.', fragmento: '} else {\n  digitalWrite(LED_AMARILLO, LOW);\n  digitalWrite(LED_VERDE, HIGH);\n}' },
-      { titulo: 'Ver lo que piensa el sistema', texto: 'El Monitor Serial muestra la humedad y el límite en cada vuelta. Es la mejor herramienta para entender por qué riega o no riega.', fragmento: 'Serial.print("Humedad: "); Serial.print(humedad);\nSerial.print(" Umbral: "); Serial.println(umbral);' },
+      { titulo: 'El límite de "tierra seca"', texto: 'Este número decide cuándo regar. Cámbialo por el valor que anotaste en la práctica del sensor para tierra seca.', fragmento: 'const int UMBRAL_SECO = 600;' },
+      { titulo: 'Medir', texto: 'En cada vuelta se lee el sensor y se muestra el valor en el Monitor Serial. Es la mejor herramienta para entender por qué riega o no riega.', fragmento: 'int humedad = analogRead(SENSOR_HUMEDAD);\nSerial.print("Humedad: ");\nSerial.println(humedad);' },
+      { titulo: 'Decidir y regar', texto: 'Si la tierra está más seca que el límite, se apaga el verde, se enciende el rojo y se activa el relé. La bomba funciona 4 segundos y se apaga.', fragmento: 'if (humedad > UMBRAL_SECO) {\n  digitalWrite(LED_VERDE, LOW);\n  digitalWrite(LED_ROJO, HIGH);\n  digitalWrite(RELE_BOMBA, HIGH);\n  delay(TIEMPO_RIEGO_MS);\n  digitalWrite(RELE_BOMBA, LOW);\n  digitalWrite(LED_ROJO, LOW);' },
+      { titulo: 'Esperar a que el agua llegue', texto: 'El agua tarda unos segundos en repartirse por la tierra. Sin esta pausa el sensor seguiría marcando "seco" y la bomba volvería a regar enseguida.', fragmento: '  delay(TIEMPO_ESPERA_MS);\n}' },
+      { titulo: 'Todo bien', texto: 'Si la tierra no está seca, la planta tiene suficiente agua: luz verde.', fragmento: 'else {\n  digitalWrite(LED_VERDE, HIGH);\n}' },
     ],
     prueba: {
       queDebePasar: [
         'Con el sensor en tierra húmeda se enciende el LED verde y la bomba está apagada.',
-        'Al sacar el sensor al aire, se enciende el rojo, suena un pitido, el relé hace clic y la bomba funciona 4 segundos.',
-        'Al presionar el botón, riega aunque la tierra esté húmeda.',
-        'Al girar la perilla cambia el número "Umbral" en el Monitor Serial, y con él el momento en que empieza a regar.',
+        'Al sacar el sensor al aire, se apaga el verde, se enciende el rojo, el relé hace clic y la bomba funciona 4 segundos.',
+        'Después de regar espera 5 segundos antes de volver a medir.',
+        'En el Monitor Serial aparece el valor de humedad en cada vuelta.',
       ],
       siNoFunciona: [
-        { problema: 'Riega sin parar', revisa: 'El límite está muy bajo. Abre el Monitor Serial, compara Humedad con Umbral y gira la perilla hasta que el umbral quede por encima de la lectura en tierra húmeda.' },
-        { problema: 'Nunca riega', revisa: 'El límite está muy alto, o tu sensor funciona al revés (el número sube al mojar). En ese caso cambia humedad > umbral por humedad < umbral.' },
+        { problema: 'Riega sin parar', revisa: 'El límite está muy bajo. Abre el Monitor Serial, mira el valor en tierra húmeda y pon en UMBRAL_SECO un número mayor que ese.' },
+        { problema: 'Nunca riega', revisa: 'El límite está muy alto, o tu sensor funciona al revés (el número sube al mojar). En ese caso cambia humedad > UMBRAL_SECO por humedad < UMBRAL_SECO.' },
         { problema: 'El relé hace clic pero la bomba no gira', revisa: 'Revisa los bornes con tornillo del relé (COM y NO) y la fuente de la bomba. Comprueba que la bomba está sumergida.' },
         { problema: 'El Arduino se reinicia al encender la bomba', revisa: 'La bomba consume demasiado para compartir la energía del Nano. Pide a tu docente alimentarla con una fuente aparte, uniendo las tierras.' },
-        { problema: 'Un LED no enciende', revisa: 'Gíralo y revisa su resistencia. Rojo al D9, amarillo al D10 y verde al D11.' },
+        { problema: 'Un LED no enciende', revisa: 'Gíralo y revisa su resistencia. Rojo al D9 y verde al D11.' },
         NO_SUBE,
       ],
     },
     demuestra: {
-      reto: 'Calibra tu sistema para una planta real: anota la lectura con la tierra recién regada y con la tierra seca, y ajusta la perilla para que riegue justo en el punto intermedio. Explica a un compañero cómo elegiste ese valor.',
+      reto: 'Calibra tu sistema para una planta real: anota la lectura con la tierra recién regada y con la tierra seca, y pon en UMBRAL_SECO el punto intermedio. Explica a un compañero cómo elegiste ese valor.',
       preguntas: [
-        { pregunta: '¿Qué significa humedad > umbral || riegoManual?', opciones: ['Riega solo si se cumplen las dos condiciones', 'Riega si la tierra está seca o si se presiona el botón', 'Nunca riega'], correcta: 1, explicacion: '|| significa "o": basta con que una de las dos sea verdadera.' },
-        { pregunta: '¿Qué hace map(valor, 0, 1023, 300, 800)?', opciones: ['Dibuja un mapa', 'Convierte un número del rango 0–1023 al rango 300–800', 'Suma 300 al valor'], correcta: 1, explicacion: 'map() traslada un valor de un rango a otro manteniendo la proporción.' },
+        { pregunta: '¿Qué hace el sistema cuando humedad > UMBRAL_SECO?', opciones: ['Enciende el LED verde', 'Enciende la bomba y el LED rojo', 'Se apaga'], correcta: 1, explicacion: 'Un valor mayor que el límite significa tierra seca: hay que regar.' },
+        { pregunta: '¿Para qué sirve la pausa después de regar?', opciones: ['Para ahorrar energía', 'Para dar tiempo a que el agua llegue al sensor antes de volver a medir', 'Para que el LED descanse'], correcta: 1, explicacion: 'Sin esa pausa el sensor seguiría marcando seco y se regaría de más.' },
         { pregunta: '¿Por qué la bomba se enciende a través de un relé?', opciones: ['Porque el Arduino no puede entregar la corriente que necesita un motor', 'Para que haga ruido', 'Porque es más barato'], correcta: 0, explicacion: 'El relé permite que una señal pequeña controle una corriente grande.' },
       ],
     },

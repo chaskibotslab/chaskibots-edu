@@ -143,34 +143,37 @@ module.exports = {
 
   'practica-pulsador-domotica': {
     reto: {
-      texto: 'Vas a hacer que tu placa reconozca cuándo presionas un botón y lo avise en pantalla. Será el control manual de tu casa inteligente.',
+      texto: 'Vas a hacer que tu placa reconozca cuándo presionas un botón: mientras lo presionas se enciende un LED y aparece un aviso en pantalla. Será el control manual de tu casa inteligente.',
       paraQue: 'Una casa automática no puede depender solo de sensores: si quieres la luz encendida aunque estés quieto leyendo, necesitas poder mandarla tú.',
       duracion: '20 minutos',
     },
     piezas: [
       { nombre: 'Pulsador', paraQue: 'Interruptor que solo deja pasar corriente mientras lo presionas.', cuidado: 'Colócalo a caballo sobre el canal central y usa dos patas de lados opuestos.' },
+      { nombre: 'LED con resistencia de 330 Ω', paraQue: 'Confirma con luz que la placa leyó el botón.', cuidado: 'Pata larga hacia la resistencia; pata corta a tierra.' },
       ESP, PROTO,
     ],
     pasos: [
       PLACA,
       TIERRA,
       { titulo: 'Conecta el pulsador', texto: 'Une una pata con el pin GPIO14 y la pata del lado opuesto con la línea negra (–).', conexiones: [0, 1] },
+      { titulo: 'Arma el LED de confirmación', texto: 'Une el pin GPIO25 con la pata larga del LED pasando por la resistencia de 330 Ω. Une la pata corta con la línea negra (–).', conexiones: [2, 3] },
       USB_SERIAL,
     ],
     codigo: [
-      { titulo: 'Configurar el botón', texto: 'INPUT_PULLUP activa una resistencia interna que mantiene el pin en HIGH mientras nadie presiona.', fragmento: 'pinMode(PULSADOR, INPUT_PULLUP);' },
-      { titulo: 'Leer y avisar', texto: 'Presionado se lee como LOW, porque el pin queda unido a tierra. El mensaje se escribe solo en ese caso.', fragmento: 'bool presionado = (digitalRead(PULSADOR) == LOW);\nif (presionado) Serial.println("Control manual activado");\ndelay(200);' },
+      { titulo: 'Una entrada y una salida', texto: 'INPUT_PULLUP activa una resistencia interna que mantiene el pin del botón en HIGH mientras nadie presiona. El LED es una salida.', fragmento: 'pinMode(PULSADOR, INPUT_PULLUP);\npinMode(LED, OUTPUT);' },
+      { titulo: 'Leer y avisar', texto: 'Presionado se lee como LOW, porque el pin queda unido a tierra. El LED se enciende y el mensaje se escribe solo en ese caso.', fragmento: 'bool presionado = (digitalRead(PULSADOR) == LOW);\ndigitalWrite(LED, presionado ? HIGH : LOW);\nif (presionado) Serial.println("Control manual activado");\ndelay(200);' },
     ],
     prueba: {
-      queDebePasar: ['Con el botón suelto la pantalla no escribe nada.', 'Mientras lo presionas aparece "Control manual activado".'],
+      queDebePasar: ['Con el botón suelto el LED está apagado y la pantalla no escribe nada.', 'Mientras lo presionas se enciende el LED y aparece "Control manual activado".'],
       siNoFunciona: [
         { problema: 'El mensaje aparece sin presionar', revisa: 'Estás usando dos patas del pulsador que ya están unidas por dentro. Gíralo un cuarto de vuelta.' },
         { problema: 'Nunca aparece', revisa: 'Comprueba que una pata va a GPIO14 y la otra a la línea negra.' },
+        { problema: 'Aparece el mensaje pero el LED no enciende', revisa: 'Gira el LED y comprueba que la resistencia llega a GPIO25.' },
         SIMBOLOS, NO_SUBE,
       ],
     },
     demuestra: {
-      reto: 'Convierte el botón en un interruptor: una pulsación escribe "ENCENDIDO" y la siguiente "APAGADO". Pista: usa una variable bool y el signo ! para invertirla.',
+      reto: 'Convierte el botón en un interruptor: una pulsación deja el LED encendido y la siguiente lo apaga. Pista: usa una variable bool y el signo ! para invertirla.',
       preguntas: [
         { pregunta: 'Con INPUT_PULLUP, ¿qué se lee al presionar?', opciones: ['HIGH', 'LOW', '4095'], correcta: 1, explicacion: 'El pin queda unido a tierra.' },
         { pregunta: '¿Por qué un sistema automático necesita control manual?', opciones: ['Para poder decidir uno mismo cuando el sensor no acierta', 'Para gastar más energía', 'No lo necesita'], correcta: 0, explicacion: 'Los sensores no conocen tus intenciones; el botón sí.' },
