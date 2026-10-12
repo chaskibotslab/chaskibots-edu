@@ -1,4 +1,5 @@
 import { pinoutForBoard, normalizePin, isPowerPin, isGroundPin } from '@/lib/boardPinouts'
+import { partFor, sortPins, PART_WIDTH } from './WiringParts'
 
 // Diagrama de conexiones generado a partir de la tabla de conexiones del
 // proyecto (no es una imagen fija: si cambia un pin, el dibujo cambia).
@@ -15,6 +16,7 @@ import { pinoutForBoard, normalizePin, isPowerPin, isGroundPin } from '@/lib/boa
 //    desfasadas media fila, así un tramo horizontal nunca cae sobre otro.
 //  - Lo que no se conecta a la placa (por ejemplo la bomba, que va al relé)
 //    se muestra como texto en la pieza, sin inventar un pin ni un cable.
+//  - Cada pieza se dibuja como es (WiringParts) y el cable llega a su pata.
 
 export interface WiringConnection {
   componente: string
@@ -40,7 +42,8 @@ const PITCH = 24
 const BX = 110
 const BW = 156
 const BOARD_TOP = 54
-const CARD_W = 236
+// Tramo final del cable, donde va escrito el nombre de la pata
+const LEAD = 150
 const ROW = PITCH
 
 const resistorOf = (c: WiringConnection): string | null => {
@@ -50,7 +53,9 @@ const resistorOf = (c: WiringConnection): string | null => {
   return `${v.replace('k', ' k')}${v.includes('k') ? 'Ω' : ' Ω'}`
 }
 const short = (s: string, max: number) => (s.length > max ? s.slice(0, max - 1).trimEnd() + '…' : s)
-const cleanPinLabel = (s: string) => short(s.replace(/\s*v[ií]a\s+R?\s?\d+\s?k?(?:Ω|ohm)?/i, '').trim(), 24)
+// Quita la resistencia (se dibuja aparte) y las aclaraciones largas entre paréntesis; "(+)" y "(-)" se quedan.
+const cleanPinLabel = (s: string, max = 18) =>
+  short(s.replace(/\s*v[ií]a\s+R?\s?\d+\s?k?(?:Ω|ohm)?/i, '').replace(/\s*\([^)]{3,}\)/g, '').trim(), max)
 
 export default function WiringDiagram({ boardName, conexiones, resaltar = [], rieles = [] }: Props) {
   const base = pinoutForBoard(boardName)
@@ -92,13 +97,15 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
   const railX = (pin: string) => railX0 + railPins.indexOf(pin) * 26
   const compX = railX0 + Math.max(railPins.length, 1) * 26 + 60
 
-  // Tarjetas de piezas apiladas a la derecha
+  // Piezas apiladas a la derecha, cada una con sus patas en el orden real
+  const pinX = compX + LEAD
   let cursor = BOARD_TOP - 4
   const cards = compNames.map(name => {
-    const pins = all.filter(c => c.componente === name)
-    const h = 48 + pins.length * ROW
-    const card = { name, y: cursor, h, pins }
-    cursor += h + 24
+    const part = partFor(name)
+    const pins = sortPins(part, all.filter(c => c.componente === name))
+    const h = 44 + pins.length * ROW
+    const card = { name, y: cursor, h, pins, part }
+    cursor += h + 28
     return card
   })
   const targetY = new Map<number, number>()
@@ -138,9 +145,9 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
     const s = src(c)
     const ty = targetY.get(c.i)!
     const lx = laneX(c.i)
-    if (s.side === 'right') return `M${BX + BW},${s.y} H${lx} V${ty} H${compX}`
+    if (s.side === 'right') return `M${BX + BW},${s.y} H${lx} V${ty} H${pinX}`
     const r = leftRoute(`s${c.i}`)
-    return `M${BX},${s.y} H${r.x} V${r.y} H${lx} V${ty} H${compX}`
+    return `M${BX},${s.y} H${r.x} V${r.y} H${lx} V${ty} H${pinX}`
   }
   // Cable de la placa a la protoboard: termina en un agujero de su fila.
   const railFeeds = railPins.map(pin => {
@@ -159,7 +166,7 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
   const holes: number[] = []
   for (let y = BOARD_TOP + 16; y <= stripBottom - 8; y += PITCH / 2) holes.push(y)
 
-  const W = compX + CARD_W + 18
+  const W = pinX + PART_WIDTH + 14
   const H = stripBottom + 14
   const usedPins = new Set(conns.map(c => c.pin))
   const dim = 0.13
@@ -209,7 +216,7 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
         const x = railX(c.pin)
         return (
           <g key={c.i} opacity={on(c.i) ? 1 : dim}>
-            <Wire d={`M${x},${y} H${compX}`} color={wireColor(c)} strong={on(c.i) && focusing} />
+            <Wire d={`M${x},${y} H${pinX}`} color={wireColor(c)} strong={on(c.i) && focusing} />
             <circle cx={x} cy={y} r="4.5" fill={wireColor(c)} stroke="#FFFFFF" strokeWidth="1.5" />
           </g>
         )
@@ -259,24 +266,26 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
       {/* Piezas */}
       {cards.map(card => {
         const active = !focusing || card.pins.some(p => on(p.i))
+        const top = card.y + 44
         return (
-          <g key={card.name} opacity={active ? 1 : 0.35}>
-            <rect x={compX} y={card.y} width={CARD_W} height={card.h} rx="14" fill="#F8FAFC" stroke="#E2E8F0" strokeWidth="1.5" />
-            <text x={compX + 16} y={card.y + 27} fontSize="12.5" fontWeight="700" fill="#22252A">{card.name}</text>
+          <g key={card.name}>
+            <text x={compX + 4} y={card.y + 26} fontSize="12.5" fontWeight="700" fill="#22252A" opacity={active ? 1 : 0.35}>{card.name}</text>
+            <g transform={`translate(${pinX} ${top})`} opacity={active ? 1 : 0.3}>
+              {card.part.draw(card.pins.map((_, j) => j * ROW + ROW / 2), card.name)}
+            </g>
             {card.pins.map(p => {
               const y = targetY.get(p.i)!
               if (!known.has(p.pin)) {
                 return (
-                  <g key={p.i} opacity={on(p.i) ? 1 : 0.4}>
-                    <text x={compX + 16} y={y + 4} fontSize="10.5" fontStyle="italic" fill="#64748B">{short(p.pinComponente, 40)}</text>
-                  </g>
+                  <text key={p.i} x={compX + 4} y={y + 4} fontSize="10" fontStyle="italic" fill="#64748B" opacity={on(p.i) ? 1 : 0.4}>
+                    {cleanPinLabel(p.pinComponente, 28)}
+                  </text>
                 )
               }
               return (
                 <g key={p.i} opacity={on(p.i) ? 1 : 0.4}>
-                  <circle cx={compX} cy={y} r="5.5" fill={wireColor(p)} stroke="#FFFFFF" strokeWidth="1.5" />
-                  <text x={compX + 16} y={y + 4} fontSize="11.5" fill="#334155">{cleanPinLabel(p.pinComponente)}</text>
-                  <text x={compX + CARD_W - 14} y={y + 4} textAnchor="end" fontSize="10.5" fontWeight="700" fill={wireColor(p)}>{short(p.pin, 8)}</text>
+                  <text x={compX + 4} y={y - 6} fontSize="10" fill="#334155">{cleanPinLabel(p.pinComponente)}</text>
+                  <text x={pinX - 6} y={y - 6} textAnchor="end" fontSize="10" fontWeight="700" fill={wireColor(p)}>{short(p.pin, 8)}</text>
                 </g>
               )
             })}
