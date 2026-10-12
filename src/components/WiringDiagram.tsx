@@ -5,15 +5,16 @@ import { pinoutForBoard, normalizePin, isPowerPin, isGroundPin } from '@/lib/boa
 //
 // Reglas de dibujo:
 //  - La placa muestra sus pines en la posición real.
-//  - 5V/3V3 y GND llegan a las líneas de alimentación de la protoboard
-//    (rojo y negro); cada pieza toma corriente de ahí con un cable corto,
-//    como se arma de verdad. Así no hay manojos de cables.
+//  - 5V/3V3 y GND llegan a la tira de alimentación de la protoboard; cada
+//    pieza toma corriente de un agujero de esa tira con un cable corto,
+//    como se arma de verdad. Ningún cable se divide en dos.
+//  - Un cable nunca se une a otro: sale de un pin y termina en un punto.
 //  - Cada cable de señal tiene su propio color y su propio carril: dos
 //    cables nunca van uno encima de otro, solo se cruzan en ángulo recto.
 //  - Los pines de la placa y las filas de las piezas están en rejillas
 //    desfasadas media fila, así un tramo horizontal nunca cae sobre otro.
 //  - Lo que no se conecta a la placa (por ejemplo la bomba, que va al relé)
-//    se muestra como nota en la pieza, sin inventar un pin.
+//    se muestra como texto en la pieza, sin inventar un pin ni un cable.
 
 export interface WiringConnection {
   componente: string
@@ -43,7 +44,7 @@ const CARD_W = 236
 const ROW = PITCH
 
 const resistorOf = (c: WiringConnection): string | null => {
-  const m = `${c.pinComponente} ${c.nota || ''}`.match(/R\s?(\d+(?:[.,]\d+)?\s?k?)\b|(\d+(?:[.,]\d+)?\s?k?)\s?(?:Ω|ohm)/i)
+  const m = `${c.pinComponente} ${c.nota || ''}`.match(/v[ií]a\s+R\s?(\d+(?:[.,]\d+)?\s?k?)\b|v[ií]a\s+(\d+(?:[.,]\d+)?\s?k?)\s?(?:Ω|ohm)/i)
   if (!m) return null
   const v = (m[1] || m[2]).replace(/\s/g, '').toLowerCase()
   return `${v.replace('k', ' k')}${v.includes('k') ? 'Ω' : ' Ω'}`
@@ -87,9 +88,9 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
     .sort((a, b) => Number(isGroundPin(a)) - Number(isGroundPin(b)))
 
   const laneX0 = BX + BW + 46
-  const railX0 = laneX0 + signal.length * 14 + 26
+  const railX0 = laneX0 + signal.length * 14 + 28
   const railX = (pin: string) => railX0 + railPins.indexOf(pin) * 26
-  const compX = railX0 + Math.max(railPins.length, 1) * 26 + 46
+  const compX = railX0 + Math.max(railPins.length, 1) * 26 + 60
 
   // Tarjetas de piezas apiladas a la derecha
   let cursor = BOARD_TOP - 4
@@ -103,20 +104,25 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
   const targetY = new Map<number, number>()
   for (const card of cards) card.pins.forEach((p, j) => targetY.set(p.i, card.y + 44 + j * ROW + ROW / 2))
 
-  // Carriles de señal: el cable que sale más arriba y baja usa el carril más alejado, para no cruzarse con los demás.
-  const src = (c: typeof conns[number]) => locate(c.pin)
-  const down = signal.filter(c => targetY.get(c.i)! >= src(c).y).sort((a, b) => src(a).y - src(b).y)
-  const up = signal.filter(c => targetY.get(c.i)! < src(c).y).sort((a, b) => src(b).y - src(a).y)
-  const laneOrder = [...down, ...up]
-  const laneX = (i: number) => laneX0 + (signal.length - 1 - laneOrder.findIndex(c => c.i === i)) * 14
-
-  // Cables que salen del lado izquierdo de la placa: rodean la placa por abajo, cada uno por su canal.
-  const leftWires: string[] = []
+  // Cables que salen del lado izquierdo de la placa: rodean la placa por abajo. El pin más bajo usa el canal
+  // más pegado a la placa y los de arriba lo envuelven, así no se cruzan entre ellos.
+  const leftKeys = [
+    ...signal.filter(c => locate(c.pin).side === 'left').map(c => ({ key: `s${c.i}`, y: locate(c.pin).y })),
+    ...railPins.filter(p => locate(p).side === 'left').map(p => ({ key: `r${p}`, y: locate(p).y })),
+  ].sort((a, b) => b.y - a.y).map(k => k.key)
   const leftRoute = (key: string) => {
-    if (!leftWires.includes(key)) leftWires.push(key)
-    const k = leftWires.indexOf(key)
+    const k = leftKeys.indexOf(key)
     return { x: BX - 22 - k * 10, y: boardBottom + 18 + k * PITCH }
   }
+
+  // Carriles de señal: el cable que sale más arriba y baja usa el carril más alejado, para no cruzarse con los demás.
+  // Un cable que viene del lado izquierdo llega desde abajo de la placa.
+  const src = (c: typeof conns[number]) => locate(c.pin)
+  const fromY = (c: typeof conns[number]) => (src(c).side === 'left' ? leftRoute(`s${c.i}`).y : src(c).y)
+  const down = signal.filter(c => targetY.get(c.i)! >= fromY(c)).sort((a, b) => fromY(a) - fromY(b))
+  const up = signal.filter(c => targetY.get(c.i)! < fromY(c)).sort((a, b) => fromY(b) - fromY(a))
+  const laneOrder = [...down, ...up]
+  const laneX = (i: number) => laneX0 + (signal.length - 1 - laneOrder.findIndex(c => c.i === i)) * 14
 
   const colorOf = new Map<number, string>()
   signal.forEach((c, k) => colorOf.set(c.i, SIGNAL_COLORS[k % SIGNAL_COLORS.length]))
@@ -136,6 +142,7 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
     const r = leftRoute(`s${c.i}`)
     return `M${BX},${s.y} H${r.x} V${r.y} H${lx} V${ty} H${compX}`
   }
+  // Cable de la placa a la protoboard: termina en un agujero de su fila.
   const railFeeds = railPins.map(pin => {
     const s = locate(pin)
     const x = railX(pin)
@@ -143,52 +150,58 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
     const r = leftRoute(`r${pin}`)
     return { pin, d: `M${BX},${s.y} H${r.x} V${r.y} H${x}`, joinY: r.y }
   })
-  const railSpan = (pin: string) => {
-    const ys = [railFeeds.find(f => f.pin === pin)!.joinY, ...conns.filter(c => c.pin === pin).map(c => targetY.get(c.i)!)]
-    return { y1: Math.min(...ys) - 12, y2: Math.max(...ys) + 12 }
-  }
-  // Todas las líneas de alimentación empiezan a la misma altura: así sus rótulos quedan arriba, lejos de los cables.
-  const railTop = Math.min(BOARD_TOP - 6, ...railPins.map(p => railSpan(p).y1))
+
+  // Protoboard: una tira con agujeros de arriba a abajo. Los cables terminan en un agujero; ninguno se divide.
+  const stripTop = BOARD_TOP - 26
+  const stripBottom = Math.max(boardBottom + 10 + leftKeys.length * PITCH, cursor - 20)
+  const stripX1 = railX0 - 18
+  const stripX2 = railX0 + (Math.max(railPins.length, 1) - 1) * 26 + 16
+  const holes: number[] = []
+  for (let y = BOARD_TOP + 16; y <= stripBottom - 8; y += PITCH / 2) holes.push(y)
 
   const W = compX + CARD_W + 18
-  const H = Math.max(boardBottom + 18 + leftWires.length * PITCH + 14, cursor + (all.length > conns.length ? 14 : 0))
+  const H = stripBottom + 14
   const usedPins = new Set(conns.map(c => c.pin))
-  const hayFuera = all.length > conns.length
   const dim = 0.13
+
+  // Un cable nunca se une a otro: empieza en un pin y termina en un punto. Donde dos se cruzan, solo se cruzan.
+  const Wire = ({ d, color, strong }: { d: string; color: string; strong: boolean }) => (
+    <path d={d} fill="none" stroke={color} strokeWidth={strong ? 4.5 : 3} strokeLinecap="round" strokeLinejoin="round" />
+  )
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img" aria-label="Diagrama de conexiones" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <rect x="0" y="0" width={W} height={H} rx="18" fill="#FFFFFF" />
 
-      {/* Protoboard: líneas de alimentación */}
-      {railPins.map(pin => {
-        const span = railSpan(pin)
-        const x = railX(pin)
-        const col = isGroundPin(pin) ? GROUND : POWER
-        return (
-          <g key={pin} opacity={railOn(pin) ? 1 : dim}>
-            <line x1={x} y1={railTop} x2={x} y2={span.y2} stroke={col} strokeWidth="5" strokeLinecap="round" />
-            <text x={x} y={railTop - 9} textAnchor="middle" fontSize="9.5" fontWeight="700" fill={col}>{pin}</text>
-          </g>
-        )
-      })}
+      {/* Protoboard: tira de alimentación */}
       {railPins.length > 0 && (
-        <text x={railX0 + (railPins.length - 1) * 13} y={railTop - 26} textAnchor="middle" fontSize="10" fontWeight="600" fill="#94A3B8">
-          Protoboard
-        </text>
+        <g>
+          <text x={(stripX1 + stripX2) / 2} y={stripTop - 8} textAnchor="middle" fontSize="10" fontWeight="600" fill="#94A3B8">Protoboard</text>
+          <rect x={stripX1} y={stripTop} width={stripX2 - stripX1} height={stripBottom - stripTop} rx="8" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="1.5" />
+          {railPins.map(pin => {
+            const x = railX(pin)
+            const col = isGroundPin(pin) ? GROUND : POWER
+            return (
+              <g key={pin}>
+                <text x={x - 2} y={stripTop + 17} textAnchor="middle" fontSize="9.5" fontWeight="700" fill={col} opacity={railOn(pin) ? 1 : 0.4}>{pin}</text>
+                <line x1={x - 9} y1={stripTop + 26} x2={x - 9} y2={stripBottom - 8} stroke={col} strokeWidth="1.5" opacity="0.45" />
+                {holes.map(y => <circle key={y} cx={x} cy={y} r="2.2" fill="#CBD5E1" />)}
+              </g>
+            )
+          })}
+        </g>
       )}
 
       {/* Cables de la placa a la protoboard */}
-      {railFeeds.map(f => (
-        <path key={f.pin} d={f.d} fill="none" stroke={isGroundPin(f.pin) ? GROUND : POWER} strokeWidth={railOn(f.pin) && focusing ? 4.5 : 3}
-          strokeLinecap="round" strokeLinejoin="round" opacity={railOn(f.pin) ? 1 : dim} />
-      ))}
-
-      {/* Cables de señal */}
-      {signal.map(c => (
-        <path key={c.i} d={signalPath(c)} fill="none" stroke={wireColor(c)} strokeWidth={on(c.i) && focusing ? 4.5 : 3}
-          strokeLinecap="round" strokeLinejoin="round" opacity={on(c.i) ? 1 : dim} />
-      ))}
+      {railFeeds.map(f => {
+        const col = isGroundPin(f.pin) ? GROUND : POWER
+        return (
+          <g key={f.pin} opacity={railOn(f.pin) ? 1 : dim}>
+            <Wire d={f.d} color={col} strong={railOn(f.pin) && focusing} />
+            <circle cx={railX(f.pin)} cy={f.joinY} r="4.5" fill={col} stroke="#FFFFFF" strokeWidth="1.5" />
+          </g>
+        )
+      })}
 
       {/* Cables cortos de la protoboard a cada pieza */}
       {conns.filter(c => isPowerPin(c.pin) || isGroundPin(c.pin)).map(c => {
@@ -196,25 +209,29 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
         const x = railX(c.pin)
         return (
           <g key={c.i} opacity={on(c.i) ? 1 : dim}>
-            <path d={`M${x},${y} H${compX}`} fill="none" stroke={wireColor(c)} strokeWidth={on(c.i) && focusing ? 4.5 : 3} strokeLinecap="round" />
+            <Wire d={`M${x},${y} H${compX}`} color={wireColor(c)} strong={on(c.i) && focusing} />
             <circle cx={x} cy={y} r="4.5" fill={wireColor(c)} stroke="#FFFFFF" strokeWidth="1.5" />
           </g>
         )
       })}
 
+      {/* Cables de señal */}
+      {signal.map(c => (
+        <g key={c.i} opacity={on(c.i) ? 1 : dim}>
+          <Wire d={signalPath(c)} color={wireColor(c)} strong={on(c.i) && focusing} />
+        </g>
+      ))}
+
       {/* Resistencias dibujadas sobre su cable */}
       {conns.map(c => {
         const value = resistorOf(c)
-        if (!value || !known.has(c.pin)) return null
+        if (!value) return null
         const y = targetY.get(c.i)!
-        const x = compX - 44
+        const x = compX - 50
         return (
           <g key={`r${c.i}`} opacity={on(c.i) ? 1 : dim}>
-            <rect x={x} y={y - 7} width="30" height="14" rx="4" fill="#E8D5A8" stroke="#8A6D2F" strokeWidth="1.2" />
-            <line x1={x + 8} y1={y - 7} x2={x + 8} y2={y + 7} stroke="#C2410C" strokeWidth="2.5" />
-            <line x1={x + 15} y1={y - 7} x2={x + 15} y2={y + 7} stroke="#C2410C" strokeWidth="2.5" />
-            <line x1={x + 22} y1={y - 7} x2={x + 22} y2={y + 7} stroke="#78350F" strokeWidth="2.5" />
-            <text x={x + 15} y={y - 12} textAnchor="middle" fontSize="9" fontWeight="600" fill="#78350F">{value}</text>
+            <rect x={x} y={y - 8} width="40" height="16" rx="5" fill="#F3E3B8" stroke="#8A6D2F" strokeWidth="1.2" />
+            <text x={x + 20} y={y + 3.2} textAnchor="middle" fontSize="8.5" fontWeight="700" fill="#78350F">{value}</text>
           </g>
         )
       })}
@@ -239,10 +256,6 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
         })
       )}
 
-      {hayFuera && (
-        <text x={compX} y={H - 8} fontSize="9.5" fill="#94A3B8">Círculo punteado: esa pata no va a la placa, lee adónde se conecta.</text>
-      )}
-
       {/* Piezas */}
       {cards.map(card => {
         const active = !focusing || card.pins.some(p => on(p.i))
@@ -255,8 +268,7 @@ export default function WiringDiagram({ boardName, conexiones, resaltar = [], ri
               if (!known.has(p.pin)) {
                 return (
                   <g key={p.i} opacity={on(p.i) ? 1 : 0.4}>
-                    <circle cx={compX} cy={y} r="4.5" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="1.5" strokeDasharray="2 2" />
-                    <text x={compX + 16} y={y + 4} fontSize="10.5" fontStyle="italic" fill="#64748B">{short(p.pinComponente, 38)}</text>
+                    <text x={compX + 16} y={y + 4} fontSize="10.5" fontStyle="italic" fill="#64748B">{short(p.pinComponente, 40)}</text>
                   </g>
                 )
               }
