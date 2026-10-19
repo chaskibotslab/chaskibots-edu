@@ -36,7 +36,8 @@ const SimulatorTabsDynamic = dynamic(() => import('@/components/SimulatorTabsDyn
   ssr: false
 })
 
-const KitDisplay = dynamic(() => import('@/components/KitDisplay'), {
+// Proyectos del kit del colegio para este grado; si no hay, el kit general.
+const MiKitColegio = dynamic(() => import('@/components/MiKitColegio'), {
   loading: () => <LoadingSpinner />,
   ssr: false
 })
@@ -303,7 +304,7 @@ export default function NivelPage() {
             <div className="space-y-0.5">
               {([
                 { id: 'lessons', label: 'Lecciones', icon: BookOpen },
-                { id: 'kit', label: 'Mi Kit', icon: Package },
+                { id: 'kit', label: 'Mi kit', icon: Package },
                 { id: 'calendar', label: 'Plan del Año', icon: Calendar },
                 { id: 'ai', label: 'IA en Vivo', icon: Brain },
                 { id: 'simulators', label: 'Simuladores', icon: Cpu },
@@ -536,7 +537,7 @@ export default function NivelPage() {
           {/* Kit Tab - Datos desde la base de datos */}
           {activeTab === 'kit' && (
             <div className="max-w-4xl mx-auto animate-slide-up" key="kit">
-              <KitDisplay levelId={levelId} />
+              <MiKitColegio levelId={levelId} />
             </div>
           )}
 

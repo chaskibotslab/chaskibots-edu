@@ -234,8 +234,8 @@ export default function AdminLeccionesContent() {
               <ArrowLeft className="w-4 h-4 text-slate-700" />
             </Link>
             <div className="min-w-0">
-              <h1 className="text-lg font-bold text-slate-900">Lecciones</h1>
-              <p className="text-xs text-slate-500">{lessons.length} en {PROGRAMS.find(p => p.id === selectedProgram)?.label}</p>
+              <h1 className="text-lg font-bold text-slate-900">Lecciones generales por grado</h1>
+              <p className="text-xs text-slate-500">{lessons.length} en {PROGRAMS.find(p => p.id === selectedProgram)?.label} · las ve todo estudiante de este grado, de cualquier colegio</p>
             </div>
           </div>
           <button

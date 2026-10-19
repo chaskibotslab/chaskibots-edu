@@ -40,8 +40,8 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: 'Contenido',
     items: [
-      { href: '/admin/lecciones', label: 'Lecciones por nivel', icon: BookOpen },
-      { href: '/admin/academia', label: 'Lecciones de cursos con kit', icon: GraduationCap },
+      { href: '/admin/lecciones', label: 'Lecciones generales por grado', icon: BookOpen },
+      { href: '/admin/academia', label: 'Proyectos del kit por colegio', icon: GraduationCap },
       { href: '/admin/academy', label: 'Cursos en línea', icon: FileText },
       { href: '/admin/simuladores', label: 'Simuladores', icon: Monitor },
       { href: '/admin/ia', label: 'Actividades IA', icon: Brain },
@@ -53,7 +53,7 @@ const NAV_GROUPS: NavGroup[] = [
     title: 'Kits y colegios',
     items: [
       { href: '/admin/kits', label: 'Kits', icon: Package },
-      { href: '/admin/cursos', label: 'Cursos con kit', icon: GraduationCap },
+      { href: '/admin/cursos', label: 'Catálogo de cursos con kit', icon: GraduationCap },
       { href: '/admin/colegios', label: 'Colegios', icon: School },
     ]
   },
@@ -72,11 +72,11 @@ const ROUTE_LABELS: Record<string, string> = {
   admin: 'Admin',
   gestion: 'Usuarios',
   estructura: 'Estructura académica',
-  academia: 'Lecciones de cursos con kit',
+  academia: 'Proyectos del kit por colegio',
   academy: 'Cursos en línea',
   colegios: 'Colegios',
-  cursos: 'Cursos con kit',
-  lecciones: 'Lecciones por nivel',
+  cursos: 'Catálogo de cursos con kit',
+  lecciones: 'Lecciones generales por grado',
   kits: 'Kits',
   editar: 'Editar lecciones',
   ficha: 'Ficha',

@@ -167,7 +167,7 @@ export default function CursosCatalogoPage() {
             <ArrowLeft className="w-4 h-4 text-slate-700" />
           </Link>
           <div className="min-w-0">
-            <h1 className="text-lg font-bold text-slate-900">Catálogo de Cursos</h1>
+            <h1 className="text-lg font-bold text-slate-900">Catálogo de cursos con kit</h1>
             <p className="text-xs text-slate-500">{courses.length} cursos · reutilizables en múltiples colegios</p>
           </div>
         </div>

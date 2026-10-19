@@ -314,7 +314,7 @@ export default function AdminPage() {
                 </div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Contenido de las clases</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <QuickAction href="/admin/lecciones" icon={BookOpen} color="coral" title="Lecciones" description="Por nivel y programa (Robótica, IA, Hacking)" />
+                  <QuickAction href="/admin/lecciones" icon={BookOpen} color="coral" title="Lecciones generales por grado" description="Robótica, IA y Hacking. Las ve todo estudiante de ese grado, de cualquier colegio" />
                   <QuickAction href="/admin/simuladores" icon={Monitor} color="coral" title="Simuladores" description="Por nivel y programa" />
                   <QuickAction href="/admin/academy" icon={GraduationCap} color="gold" title="Cursos en línea" description="Python, Hacking e IA paso a paso" />
                   <QuickAction href="/admin/ia" icon={Brain} color="green" title="Actividades de IA" description="Actividades de IA por nivel" />
@@ -322,9 +322,9 @@ export default function AdminPage() {
                 </div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Kits y cursos por colegio</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <QuickAction href="/admin/academia" icon={BookOpen} color="coral" title="Lecciones de cursos con kit" description="Editar contenido, fotos y video (8vo a 3ro BGU)" />
+                  <QuickAction href="/admin/academia" icon={BookOpen} color="coral" title="Proyectos del kit por colegio" description="Circuito, código y guía de cada kit. Solo los ve ese colegio y grado" />
                   <QuickAction href="/admin/kits" icon={Package} color="green" title="Kits" description="Materiales, imágenes y precios" />
-                  <QuickAction href="/admin/cursos" icon={BookOpen} color="slate" title="Cursos con kit" description="Catálogo (ej. 8vo EGB Academia)" />
+                  <QuickAction href="/admin/cursos" icon={BookOpen} color="slate" title="Catálogo de cursos con kit" description="Une cada kit con su colegio (ej. 8vo EGB Academia)" />
                   <QuickAction href="/admin/colegios" icon={GraduationCap} color="slate" title="Colegios" description="Datos del colegio y sus cursos con kit" />
                 </div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Evaluación</p>

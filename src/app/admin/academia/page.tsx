@@ -43,8 +43,8 @@ export default function AdminAcademiaPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-lg font-semibold text-chaski-dark leading-tight">Lecciones de cursos con kit</h1>
-            <p className="text-xs text-slate-500">Elige un curso para editar sus lecciones, fotos y video</p>
+            <h1 className="text-lg font-semibold text-chaski-dark leading-tight">Proyectos del kit por colegio</h1>
+            <p className="text-xs text-slate-500">Circuito, código y guía de cada kit. Solo los ven los estudiantes de ese colegio y grado, en la pestaña "Mi kit"</p>
           </div>
         </div>
       </header>
