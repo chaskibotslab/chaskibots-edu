@@ -126,6 +126,19 @@ export default function EstructuraPage() {
     return list
   }, [data])
 
+  // Opciones de grupo agrupadas por colegio: varios colegios tienen grupos
+  // del mismo nivel y con la lista plana no se distinguían.
+  const groupOptions = (exclude?: string) =>
+    sections.map(s => {
+      const list = s.groups.filter(g => g.id !== exclude)
+      if (list.length === 0) return null
+      return (
+        <optgroup key={s.id} label={s.name}>
+          {list.map(g => <option key={g.id} value={g.id}>{g.name} · {levelName(g.levelId)}</option>)}
+        </optgroup>
+      )
+    })
+
   const createGroup = async () => {
     if (!newGroup || !newGroup.name.trim() || !newGroup.levelId) return
     const school = data?.schools.find(s => s.id === newGroup.schoolId)
@@ -214,7 +227,7 @@ export default function EstructuraPage() {
                         className="text-sm bg-slate-100 rounded-full px-3 py-1.5 text-slate-600 border-0 focus:ring-2 focus:ring-chaski-primary/30"
                       >
                         <option value="">Asignar a grupo…</option>
-                        {data.groups.map(g => <option key={g.id} value={g.id}>{g.name} · {levelName(g.levelId)}</option>)}
+                        {groupOptions()}
                       </select>
                     </li>
                   ))}
@@ -241,14 +254,24 @@ export default function EstructuraPage() {
                     <span className="text-xs text-slate-500">Cursos con kit:</span>
                     {school.kitCourses!.map(c => {
                       const hasGroup = school.groups.some(g => g.levelId === c.levelId)
+                      if (hasGroup) {
+                        return (
+                          <span key={c.id} title="Hay un grupo de este nivel" className="text-[11px] rounded-full px-2 py-0.5 bg-slate-100 text-slate-600">
+                            {c.name}
+                          </span>
+                        )
+                      }
                       return (
-                        <span
+                        <button
                           key={c.id}
-                          title={hasGroup ? 'Hay un grupo de este nivel' : 'Falta crear un grupo de este nivel para inscribir estudiantes'}
-                          className={`text-[11px] rounded-full px-2 py-0.5 ${hasGroup ? 'bg-slate-100 text-slate-600' : 'bg-amber-100 text-amber-700'}`}
+                          type="button"
+                          disabled={saving}
+                          onClick={() => send('/api/admin/courses', 'POST', { name: c.name, levelId: c.levelId, schoolId: school.id, schoolName: school.name })}
+                          title="Crear el grupo de este nivel para poder asignar docentes y estudiantes"
+                          className="inline-flex items-center gap-0.5 text-[11px] rounded-full px-2 py-0.5 bg-amber-100 text-amber-700 hover:bg-amber-200 active:scale-95 transition-all disabled:opacity-50"
                         >
-                          {c.name}{hasGroup ? '' : ' · sin grupo'}
-                        </span>
+                          <Plus className="w-3 h-3" /> {c.name} · crear grupo
+                        </button>
                       )
                     })}
                   </div>
@@ -384,7 +407,7 @@ export default function EstructuraPage() {
                                         className="text-xs bg-slate-100 rounded-full px-2.5 py-1 text-slate-500 border-0"
                                       >
                                         <option value="">Mover a…</option>
-                                        {data.groups.filter(x => x.id !== g.id).map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
+                                        {groupOptions(g.id)}
                                       </select>
                                     </li>
                                   ))}
