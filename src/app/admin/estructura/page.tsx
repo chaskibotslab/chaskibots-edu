@@ -26,7 +26,7 @@ interface Estructura {
   programs: Ref[]
   groups: Group[]
   teachers: Ref[]
-  unassignedStudents: { id: string; name: string; levelId: string }[]
+  unassignedStudents: { id: string; name: string; levelId: string; schoolId: string; reason: string }[]
 }
 
 const NO_SCHOOL = '__sin_colegio__'
@@ -210,15 +210,15 @@ export default function EstructuraPage() {
             {data.unassignedStudents.length > 0 && (
               <section className="bg-white rounded-2xl border border-border-soft overflow-hidden">
                 <div className="px-4 py-3 border-b border-border-soft">
-                  <h2 className="text-sm font-semibold text-chaski-dark">Estudiantes sin grupo ({data.unassignedStudents.length})</h2>
-                  <p className="text-xs text-slate-500">No heredan colegio ni programas hasta que los asignes a un grupo.</p>
+                  <h2 className="text-sm font-semibold text-chaski-dark">Estudiantes por ubicar ({data.unassignedStudents.length})</h2>
+                  <p className="text-xs text-slate-500">Sin grupo, o en un grupo de otro colegio o nivel. Asígnalos al grupo correcto: su colegio y nivel se toman del grupo.</p>
                 </div>
                 <ul className="divide-y divide-border-soft">
                   {data.unassignedStudents.map(s => (
                     <li key={s.id} className="px-4 py-2.5 flex items-center gap-3">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-chaski-dark truncate">{s.name}</p>
-                        <p className="text-xs text-slate-400">{levelName(s.levelId)}</p>
+                        <p className="text-xs text-slate-400">{levelName(s.levelId)} · {data.schools.find(x => x.id === s.schoolId)?.name || 'sin colegio'} · <span className="text-amber-700">{s.reason}</span></p>
                       </div>
                       <select
                         disabled={saving}

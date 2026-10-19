@@ -24,6 +24,28 @@ async function targetIsAdmin(userId: string): Promise<boolean> {
   return isAdminRole(data?.[0]?.role)
 }
 
+// El grupo (courses_catalog) manda: nivel y colegio se toman de él. Antes se
+// guardaban tal como venían del formulario y una persona podía quedar en un
+// grupo de otro colegio o de otro nivel (ej. nivel "chaski1" de Chaski Bots LAb
+// dentro de un grupo de 1° BGU del Colegio Demo).
+async function alignWithGroup<T extends { courseId?: string; courseName?: string; levelId?: string; schoolId?: string; schoolName?: string }>(fields: T): Promise<T> {
+  if (!fields.courseId) return fields
+  const { supabaseAdmin } = await import('@/lib/supabase')
+  const { data: group } = await supabaseAdmin
+    .from('courses_catalog')
+    .select('name, level_id, school_id, school_name')
+    .eq('id', fields.courseId)
+    .maybeSingle()
+  if (!group) return fields
+  return {
+    ...fields,
+    courseName: group.name || fields.courseName,
+    levelId: group.level_id || fields.levelId,
+    schoolId: group.school_id || fields.schoolId,
+    schoolName: group.school_name || fields.schoolName,
+  }
+}
+
 const soloAdmin = () =>
   NextResponse.json({ success: false, error: 'Solo un administrador puede hacer esto' }, { status: 403 })
 
@@ -88,10 +110,7 @@ export async function POST(request: NextRequest) {
     const {
       action,
       name,
-      role, 
-      courseId, 
-      courseName, 
-      levelId, 
+      role,
       email,
       expiresAt,
       count,
@@ -99,11 +118,18 @@ export async function POST(request: NextRequest) {
       programId,
       programName
     } = body
+    const { courseId, courseName, levelId, schoolId, schoolName } = await alignWithGroup({
+      courseId: body.courseId as string | undefined,
+      courseName: body.courseName as string | undefined,
+      levelId: body.levelId as string | undefined,
+      schoolId: body.schoolId as string | undefined,
+      schoolName: body.schoolName as string | undefined,
+    })
 
     // Importar lista de nombres
     if (action === 'import') {
-      const { names, schoolId, schoolName } = body
-      
+      const { names } = body
+
       if (!names || !Array.isArray(names) || names.length === 0 || !levelId) {
         return NextResponse.json(
           { success: false, error: 'Se requiere una lista de nombres y nivel' },
@@ -199,9 +225,6 @@ export async function POST(request: NextRequest) {
     // No generar valores automáticos - dejar vacío si no se proporciona
     const finalCourseId = courseId || ''
     const finalCourseName = courseName || ''
-
-    // Obtener schoolId y schoolName del body
-    const { schoolId, schoolName } = body
 
     const result = await createCourseUser(
       name,
@@ -335,7 +358,10 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (action === 'update') {
-      const { name, email, levelId, role, courseId, courseName, schoolId, schoolName, programId, programName, expiresAt, accessCode } = body
+      const { name, email, role, programId, programName, expiresAt, accessCode } = body
+      const { levelId, courseId, courseName, schoolId, schoolName } = await alignWithGroup({
+        levelId: body.levelId, courseId: body.courseId, courseName: body.courseName, schoolId: body.schoolId, schoolName: body.schoolName,
+      })
       const result = await updateUser(userId, {
         name,
         email,

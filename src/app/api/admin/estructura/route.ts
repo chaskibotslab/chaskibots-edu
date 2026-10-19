@@ -94,10 +94,19 @@ export async function GET(request: NextRequest) {
       programs,
       groups,
       teachers: users.filter(u => u.role === 'teacher').map(u => ({ id: u.id, name: u.name })),
-      // Estudiantes cuyo curso no existe: hoy no heredan colegio ni programas.
+      // Estudiantes sin grupo válido, o cuyo grupo es de otro colegio o nivel:
+      // así no heredan bien colegio ni programas y ven cursos que no son suyos.
       unassignedStudents: users
-        .filter(u => u.role === 'student' && !groupIds.has(u.course_id))
-        .map(u => ({ id: u.id, name: u.name, levelId: u.level_id || '' })),
+        .filter(u => u.role === 'student')
+        .map(u => {
+          const group = groupRows.find(g => g.id === u.course_id)
+          let reason = ''
+          if (!group) reason = 'Sin grupo'
+          else if (u.school_id && group.school_id && u.school_id !== group.school_id) reason = 'Su grupo es de otro colegio'
+          else if (u.level_id && group.level_id && u.level_id !== group.level_id) reason = 'Su grupo es de otro nivel'
+          return { id: u.id, name: u.name, levelId: u.level_id || '', schoolId: u.school_id || '', reason }
+        })
+        .filter(u => u.reason),
     })
   } catch (error) {
     console.error('[Estructura] GET error:', error)

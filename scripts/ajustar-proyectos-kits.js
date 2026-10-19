@@ -1,8 +1,7 @@
 /**
  * Ajusta proyectos de los kits de la Academia para que cada clase tenga lógica
  * con las piezas que trae el kit:
- *  - 10mo: el riego principal queda con sensor, relé, bomba y 2 LEDs; el
- *    potenciómetro y el pulsador pasan al Mini invernadero.
+ *  - (10mo pasó al ESP32: ver scripts/decimo-esp32.js)
  *  - 1ro BGU: la estación muestra los datos en el celular (página web por WiFi)
  *    y con dos luces: la azul de la propia placa (todo normal) y un LED rojo (alerta).
  *  - Las prácticas que eran solo un pulsador ahora encienden un LED.
@@ -38,132 +37,12 @@ const buzzer = (nombre, pin) => [[nombre, '+', pin], [nombre, '-', 'GND']]
 const modulo = (nombre, v, senal, pin) => [[nombre, 'VCC', v], [nombre, 'GND', 'GND'], [nombre, senal, pin]]
 const pot = (nombre, v, pin) => [[nombre, 'Terminal A', v], [nombre, 'Wiper', pin], [nombre, 'Terminal B', 'GND']]
 
-const SUELO = modulo('SENSOR HUMEDAD SUELO', '5V', 'AOUT', 'A0')
-const RELE = modulo('MODULO RELE 1 CANAL', '5V', 'IN', 'D7')
 // LDR suelta de 2 patas en serie con la resistencia de 1 kΩ: la señal sale de la unión de las dos.
 const LDR_C3 = [['LDR + R1K (divisor)', 'Terminal superior', '3V3'], ['LDR + R1K (divisor)', 'Punto medio', 'GPIO0'], ['LDR + R1K (divisor)', 'Terminal inferior', 'GND']]
 const DHT_C3 = modulo('SENSOR DHT11', '3V3', 'DATA', 'GPIO3')
 
 const CAMBIOS = {
-  // ───────────── 10mo EGB — Riego ─────────────
-  'sistema-riego-automatico': {
-    descripcion: 'Un sensor mide la humedad de la tierra y enciende automáticamente una bomba de agua cuando la planta lo necesita. Un LED rojo avisa que está regando y uno verde que la tierra tiene suficiente agua.',
-    objetivos: [
-      'Leer un sensor analógico de humedad del suelo y relacionar el valor con el estado real de la tierra.',
-      'Controlar un actuador de mayor corriente (bomba de agua) de forma segura usando un módulo relé.',
-      'Elegir un límite de activación a partir de mediciones propias.',
-      'Mostrar el estado de un sistema automático con luces indicadoras.',
-    ],
-    conexiones: [
-      ...SUELO, ...RELE,
-      ['BOMBA DE AGUA 5V', '+ : va al NO del rele (comparte el USB-V8 con la placa)', 'USB-V8 compartido'],
-      ['BOMBA DE AGUA 5V', '- (GND comun con el Nano)', 'GND'],
-      ...led('LED ROJO (regando)', 'D9'), ...led('LED VERDE (tierra humeda)', 'D11'),
-    ],
-    codigo: `/*
-  Sistema de riego automatico para plantas
-  Kit 10mo EGB - Arduino Nano V3 (Micro-USB)
-  Academia Militar Lizardo Alfonzo Villamarin
-
-  Mide la humedad de la tierra. Si esta seca, enciende la bomba de
-  agua a traves del rele durante unos segundos y luego espera a que
-  el agua se reparta antes de volver a medir.
-  LED rojo = regando. LED verde = la tierra tiene suficiente agua.
-
-  ALIMENTACION: la placa y la bomba comparten el mismo cable USB-V8,
-  conectado a un cargador de celular de al menos 1A (no incluido). El
-  rele solo conmuta; no necesita fuente aparte.
-
-  NOTA: el valor crudo del sensor de humedad puede variar segun el
-  modelo (algunos dan un numero MAS ALTO cuando la tierra esta mas
-  SECA, y otros al reves). Prueba el tuyo e invierte la comparacion
-  si hace falta.
-*/
-
-const int SENSOR_HUMEDAD = A0;
-const int RELE_BOMBA = 7;
-const int LED_ROJO = 9;
-const int LED_VERDE = 11;
-
-// Usa el valor que anotaste en la practica del sensor para "tierra seca".
-const int UMBRAL_SECO = 600;
-const unsigned long TIEMPO_RIEGO_MS = 4000;
-const unsigned long TIEMPO_ESPERA_MS = 5000;
-
-void setup() {
-  pinMode(RELE_BOMBA, OUTPUT);
-  pinMode(LED_ROJO, OUTPUT);
-  pinMode(LED_VERDE, OUTPUT);
-  digitalWrite(RELE_BOMBA, LOW);
-  Serial.begin(9600);
-}
-
-void loop() {
-  int humedad = analogRead(SENSOR_HUMEDAD);
-  Serial.print("Humedad: ");
-  Serial.println(humedad);
-
-  if (humedad > UMBRAL_SECO) {
-    // Tierra seca: regar
-    digitalWrite(LED_VERDE, LOW);
-    digitalWrite(LED_ROJO, HIGH);
-    digitalWrite(RELE_BOMBA, HIGH);
-    delay(TIEMPO_RIEGO_MS);
-    digitalWrite(RELE_BOMBA, LOW);
-    digitalWrite(LED_ROJO, LOW);
-    delay(TIEMPO_ESPERA_MS); // el agua tarda en llegar al sensor
-  } else {
-    // Tierra humeda: todo bien
-    digitalWrite(LED_VERDE, HIGH);
-  }
-
-  delay(500);
-}
-`,
-  },
-
-  'practica-rele': { orden: -3 },
-
-  'practica-pulsador-manual': {
-    orden: -2,
-    titulo: 'Enciende una luz con el pulsador',
-    descripcion: 'Practica con un pulsador y un LED: la luz se enciende mientras mantienes presionado el botón. Es el mismo LED rojo que usará tu sistema de riego.',
-    objetivos: ['Leer una entrada digital con INPUT_PULLUP.', 'Encender un LED con su resistencia desde un pin de salida.'],
-    conexiones: [...pulsador('PULSADOR MANUAL', 'D2'), ...led('LED ROJO', 'D9')],
-    codigo: `/*
-  Practica: enciende una luz con el pulsador
-  Kit 10mo EGB - Arduino Nano V3 Micro-USB
-  El LED rojo (D9) es el mismo que usara el sistema de riego.
-*/
-const int PULSADOR = 2;
-const int LED = 9;
-
-void setup() {
-  pinMode(PULSADOR, INPUT_PULLUP);
-  pinMode(LED, OUTPUT);
-}
-
-void loop() {
-  bool presionado = (digitalRead(PULSADOR) == LOW);
-  digitalWrite(LED, presionado ? HIGH : LOW);
-}
-`,
-  },
-
-  'practica-potenciometro': {
-    orden: -1,
-    descripcion: 'Practica con el potenciómetro solo: gíralo y mira cómo cambia el valor en el Monitor Serial. Lo usarás en el proyecto adicional Mini invernadero.',
-  },
-
-  'control-nivel-agua': {
-    conexiones: [
-      ...modulo('SENSOR DE NIVEL (humedad)', '5V', 'AOUT', 'A0'), ...RELE,
-      ...buzzer('BUZZER ACTIVO', 'D8'), ...led('LED ROJO (nivel bajo)', 'D9'), ...led('LED VERDE (nivel ok)', 'D11'),
-    ],
-  },
-  'automatizacion-cultivos': {
-    conexiones: [...SUELO, ...RELE, ...buzzer('BUZZER ACTIVO', 'D8'), ...led('LED VERDE (cultivo ok)', 'D11')],
-  },
+  // 10mo EGB pasó al ESP32: su fuente ahora es scripts/decimo-esp32.js.
 
   // ───────────── 1ro BGU — Estación meteorológica ─────────────
   'practica-ldr': {
@@ -447,10 +326,6 @@ void loop() {
 
 // Textos del kit y notas de materiales, según la lista real de cada kit.
 const KITS = {
-  'kit-lv-decimo-egb': {
-    alimentacion: 'Cable USB V8 para programar y alimentar con un cargador de celular de al menos 1 A (cargador NO incluido). La bomba usa esa misma alimentación, pasando por el relé.',
-    notas: 'El módulo relé ya trae transistor y diodo. La bomba se alimenta del mismo USB que la placa a través del relé, con GND común con el Nano.',
-  },
 }
 const CANTIDADES = [['kit-lv-octavo-egb', 'pulsador', 1]]
 const NOTAS_MATERIAL = [
