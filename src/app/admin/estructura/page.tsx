@@ -72,6 +72,7 @@ export default function EstructuraPage() {
   const [openGroup, setOpenGroup] = useState<string | null>(null)
   const [newGroup, setNewGroup] = useState<{ schoolId: string; name: string; levelId: string } | null>(null)
   const [teacherPick, setTeacherPick] = useState<Record<string, string>>({})
+  const [openTeacher, setOpenTeacher] = useState<string | null>(null)
 
   useEffect(() => {
     if (isLoading) return
@@ -115,6 +116,12 @@ export default function EstructuraPage() {
   const levelName = useMemo(() => {
     const map = new Map((data?.levels || []).map(l => [l.id, l.name]))
     return (id: string) => map.get(id) || id || 'Sin nivel'
+  }, [data])
+
+  // Los niveles llegan ordenados por grado (Inicial 1 → 3ro BGU).
+  const levelOrder = useMemo(() => {
+    const map = new Map((data?.levels || []).map((l, i) => [l.id, i]))
+    return (id: string) => map.get(id) ?? 999
   }, [data])
 
   const sections = useMemo(() => {
@@ -206,6 +213,69 @@ export default function EstructuraPage() {
                 </div>
               ))}
             </div>
+
+            {data.teachers.length > 0 && (
+              <section className="bg-white rounded-2xl border border-border-soft overflow-hidden">
+                <div className="px-4 py-3 border-b border-border-soft">
+                  <h2 className="text-sm font-semibold text-chaski-dark">Docentes y sus grados</h2>
+                  <p className="text-xs text-slate-500">Toca un docente y marca los grados que enseña en cada colegio.</p>
+                </div>
+                <ul className="divide-y divide-border-soft">
+                  {data.teachers.map(t => {
+                    const open = openTeacher === t.id
+                    const assigned = data.groups.filter(g => g.teachers.some(x => x.teacherId === t.id))
+                    return (
+                      <li key={t.id}>
+                        <button
+                          onClick={() => setOpenTeacher(open ? null : t.id)}
+                          className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
+                        >
+                          <UserRound className="w-4 h-4 text-chaski-primary flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-chaski-dark truncate">{t.name}</p>
+                            <p className="text-xs text-slate-500 truncate">
+                              {assigned.length === 0 ? 'Sin grados asignados' : assigned.map(g => g.name).join(', ')}
+                            </p>
+                          </div>
+                          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+                        </button>
+                        {open && (
+                          <div className="px-4 pb-4 pt-1 space-y-3 bg-slate-50/60">
+                            {sections.filter(s => s.groups.length > 0).map(s => (
+                              <div key={s.id}>
+                                <p className="text-xs font-medium text-slate-500 mb-1.5">{s.name}</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {[...s.groups].sort((a, b) => levelOrder(a.levelId) - levelOrder(b.levelId)).map(g => {
+                                    const link = g.teachers.find(x => x.teacherId === t.id)
+                                    return (
+                                      <button
+                                        key={g.id}
+                                        type="button"
+                                        disabled={saving}
+                                        onClick={() => link
+                                          ? act({ action: 'unassignTeacher', assignmentId: link.assignmentId })
+                                          : act({ action: 'assignTeacher', groupId: g.id, teacherId: t.id, programIds: g.programIds })}
+                                        title={link ? 'Quitar este grado' : 'Asignar este grado'}
+                                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-all active:scale-95 disabled:opacity-50 ${
+                                          link ? 'bg-chaski-primary text-white shadow-sm' : 'bg-white border border-border-soft text-slate-500 hover:bg-slate-100'
+                                        }`}
+                                      >
+                                        {link ? '✓' : '+'} {g.name}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            ))}
+                            <p className="text-[11px] text-slate-400">Al asignar un grado, el docente enseña todos los programas activos de ese grupo. Puedes afinarlo abriendo el grupo abajo.</p>
+                          </div>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </section>
+            )}
 
             {data.unassignedStudents.length > 0 && (
               <section className="bg-white rounded-2xl border border-border-soft overflow-hidden">
