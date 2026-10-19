@@ -8,7 +8,6 @@ import { useAuth } from '@/components/AuthProvider'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import { useDynamicLevels } from '@/hooks/useDynamicLevels'
 import { ALL_COURSES } from '@/data/courses'
-import UsersManagerComponent from '@/components/admin/UsersManager'
 import {
   Users, BookOpen, Settings, LogOut, Home, Bell,
   Plus, Edit, Trash2, Eye, Lock, Unlock, Search,
@@ -16,7 +15,7 @@ import {
   BarChart3, Activity, Key, Mail, Save, X, Package, Brain, FileText, Monitor, Zap, Award
 } from 'lucide-react'
 
-type AdminTab = 'dashboard' | 'users' | 'logs' | 'settings'
+type AdminTab = 'dashboard' | 'logs'
 
 // Lookup estático de clases Tailwind completas y literales por color —
 // nunca interpolar `bg-${color}` en runtime, Tailwind JIT no lo compila.
@@ -155,9 +154,7 @@ export default function AdminPage() {
 
   const TABS: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'users', label: 'Usuarios', icon: Users },
     { id: 'logs', label: 'Actividad', icon: Activity },
-    { id: 'settings', label: 'Configuración', icon: Settings },
   ]
 
   return (
@@ -168,9 +165,7 @@ export default function AdminPage() {
           <div className="animate-slide-in-left">
             <h1 className="text-xl font-bold text-slate-900">
               {activeTab === 'dashboard' && 'Dashboard'}
-              {activeTab === 'users' && 'Gestión de Usuarios'}
               {activeTab === 'logs' && 'Registro de Actividad'}
-              {activeTab === 'settings' && 'Configuración'}
             </h1>
             <p className="text-sm text-slate-400">Resumen general de la plataforma</p>
           </div>
@@ -297,55 +292,38 @@ export default function AdminPage() {
                   <Zap className="w-5 h-5 text-chaski-primary" />
                   Herramientas de administración
                 </h3>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Personas y grupos</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Personas</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <QuickAction href="/admin/estructura" icon={GraduationCap} color="coral" title="Estructura Académica" description="Colegios, grupos, docentes y estudiantes" />
-                  <button onClick={() => setActiveTab('users')} className="text-left group rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:border-chaski-primary/50 hover:shadow-md transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-chaski-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Users className="w-6 h-6 text-chaski-primary" />
-                      </div>
-                      <div>
-                        <h4 className="text-slate-900 font-semibold">Usuarios</h4>
-                        <p className="text-slate-500 text-sm">Crear usuarios y códigos de acceso</p>
-                      </div>
-                    </div>
-                  </button>
+                  <QuickAction href="/admin/estructura" icon={GraduationCap} color="coral" title="Estructura académica" description="Grupos de cada colegio, sus docentes y estudiantes" />
+                  <QuickAction href="/admin/gestion" icon={Users} color="coral" title="Usuarios y códigos" description="Crear cuentas y entregar códigos de acceso" />
                 </div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Contenido de las clases</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Contenido para todos</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <QuickAction href="/admin/lecciones" icon={BookOpen} color="coral" title="Lecciones generales por grado" description="Robótica, IA y Hacking. Las ve todo estudiante de ese grado, de cualquier colegio" />
-                  <QuickAction href="/admin/simuladores" icon={Monitor} color="coral" title="Simuladores" description="Por nivel y programa" />
-                  <QuickAction href="/admin/academy" icon={GraduationCap} color="gold" title="Cursos en línea" description="Python, Hacking e IA paso a paso" />
-                  <QuickAction href="/admin/ia" icon={Brain} color="green" title="Actividades de IA" description="Actividades de IA por nivel" />
-                  <QuickAction href="/admin/proyectos" icon={Activity} color="coral" title="Proyectos Avanzados" description="Jetson, Raspberry, Digispark" />
+                  <QuickAction href="/admin/gestion?tab=levels" icon={Settings} color="slate" title="Grados y módulos" description="Qué grados existen y si muestran IA y Ciberseguridad" />
+                  <QuickAction href="/admin/simuladores" icon={Monitor} color="coral" title="Simuladores" description="Herramientas de práctica por grado y programa" />
+                  <QuickAction href="/admin/ia" icon={Brain} color="green" title="Actividades de IA" description="Actividades de inteligencia artificial por grado" />
+                  <QuickAction href="/admin/academy" icon={GraduationCap} color="gold" title="Cursos en línea" description="Python, Hacking e IA paso a paso, fuera de los grados" />
+                  <QuickAction href="/admin/proyectos" icon={Activity} color="coral" title="Proyectos avanzados" description="Jetson, Raspberry Pi, Digispark" />
                 </div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Kits y cursos por colegio</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Kits de los colegios</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <QuickAction href="/admin/academia" icon={BookOpen} color="coral" title="Proyectos del kit por colegio" description="Circuito, código y guía de cada kit. Solo los ve ese colegio y grado" />
-                  <QuickAction href="/admin/kits" icon={Package} color="green" title="Kits" description="Materiales, imágenes y precios" />
-                  <QuickAction href="/admin/cursos" icon={BookOpen} color="slate" title="Catálogo de cursos con kit" description="Une cada kit con su colegio (ej. 8vo EGB Academia)" />
-                  <QuickAction href="/admin/colegios" icon={GraduationCap} color="slate" title="Colegios" description="Datos del colegio y sus cursos con kit" />
+                  <QuickAction href="/admin/academia" icon={BookOpen} color="coral" title="Proyectos del kit por colegio" description="Circuito, código y guía. Solo los ve ese colegio y grado, en Mi kit" />
+                  <QuickAction href="/admin/kits" icon={Package} color="green" title="Kits y materiales" description="Piezas, placa, imágenes y precio de cada kit" />
+                  <QuickAction href="/admin/colegios" icon={GraduationCap} color="slate" title="Colegios" description="Datos del colegio y qué cursos con kit tiene" />
+                  <QuickAction href="/admin/cursos" icon={BookOpen} color="slate" title="Catálogo de cursos con kit" description="Lista de cursos (ej. 8vo EGB Academia) que luego se asignan a un colegio" />
                 </div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Evaluación</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <QuickAction href="/admin/tareas" icon={FileText} color="gold" title="Tareas" description="Crear y editar tareas" />
-                  <QuickAction href="/admin/calificar" icon={Award} color="gold" title="Calificar" description="Revisar y poner nota a las entregas" />
-                  <QuickAction href="/admin/entregas" icon={FileText} color="slate" title="Entregas" description="Listado completo de entregas" />
-                </div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 mt-6 first:mt-0">Avanzado</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <QuickAction href="/admin/gestion" icon={Settings} color="slate" title="Niveles" description="Lista de niveles y ajustes de base" />
+                  <QuickAction href="/admin/tareas" icon={FileText} color="gold" title="Tareas" description="Crear y publicar tareas" />
+                  <QuickAction href="/admin/calificar" icon={Award} color="gold" title="Entregas y calificación" description="Ver lo que entregaron los estudiantes y poner nota" />
+                  <QuickAction href="/admin/calificaciones" icon={Award} color="slate" title="Libreta de notas" description="Notas de cada estudiante por grado" />
                 </div>
               </div>
             </div>
           )}
 
           {/* Users Tab */}
-          {activeTab === 'users' && (
-            <UsersManagerComponent />
-          )}
-
           {/* Logs Tab */}
           {activeTab === 'logs' && (
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-fade-in">
@@ -408,73 +386,6 @@ export default function AdminPage() {
           )}
 
           {/* Settings Tab */}
-          {activeTab === 'settings' && (
-            <div className="space-y-6 animate-fade-in">
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-4">Configuración General</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-slate-600 text-sm mb-2">Nombre de la Plataforma</label>
-                    <input
-                      type="text"
-                      defaultValue="ChaskiBots EDU"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-600 text-sm mb-2">Email de Notificaciones</label>
-                    <input
-                      type="email"
-                      defaultValue="admin@chaskibots.com"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 focus:outline-none transition-all"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                    <div>
-                      <p className="text-slate-900 font-medium">Notificaciones de Acceso</p>
-                      <p className="text-slate-500 text-sm">Recibir email cuando alguien inicia sesión</p>
-                    </div>
-                    <button className="w-12 h-6 bg-chaski-primary rounded-full relative transition-colors">
-                      <span className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-4">Credenciales de Prueba</h3>
-                <div className="space-y-3">
-                  <div className="p-4 bg-slate-50 rounded-xl">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-slate-900 font-medium">Administrador</p>
-                        <p className="text-slate-500 text-sm">admin@chaskibots.com</p>
-                      </div>
-                      <code className="bg-chaski-primary/10 px-3 py-1 rounded-lg text-chaski-primary text-sm font-semibold">admin2024</code>
-                    </div>
-                  </div>
-                  <div className="p-4 bg-slate-50 rounded-xl">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-slate-900 font-medium">Profesor</p>
-                        <p className="text-slate-500 text-sm">profesor@chaskibots.com</p>
-                      </div>
-                      <code className="bg-hack-green/10 px-3 py-1 rounded-lg text-hack-green text-sm font-semibold">profe123</code>
-                    </div>
-                  </div>
-                  <div className="p-4 bg-slate-50 rounded-xl">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-slate-900 font-medium">Estudiante</p>
-                        <p className="text-slate-500 text-sm">estudiante@chaskibots.com</p>
-                      </div>
-                      <code className="bg-chaski-gold/10 px-3 py-1 rounded-lg text-chaski-gold text-sm font-semibold">estudiante123</code>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </main>
     </div>

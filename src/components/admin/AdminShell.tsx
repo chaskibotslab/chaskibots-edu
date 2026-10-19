@@ -7,8 +7,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import {
   LayoutDashboard, Users, School, BookOpen, GraduationCap,
-  Package, Monitor, Brain, ClipboardList, Inbox, Award,
-  CheckSquare, FolderKanban, ChevronLeft, ChevronRight,
+  Package, Monitor, Brain, ClipboardList, Award,
+  CheckSquare, FolderKanban, ChevronLeft, ChevronRight, SlidersHorizontal,
   Search, LogOut, Home, Menu, X, FileText, Camera
 } from 'lucide-react'
 
@@ -16,6 +16,7 @@ interface NavItem {
   href: string
   label: string
   icon: React.ComponentType<{ className?: string }>
+  hint?: string
 }
 
 interface NavGroup {
@@ -23,70 +24,75 @@ interface NavGroup {
   items: NavItem[]
 }
 
+// Ordenado por tarea. `hint` se muestra al pasar el mouse: dice qué hay y quién lo ve.
 const NAV_GROUPS: NavGroup[] = [
   {
     title: 'General',
     items: [
-      { href: '/admin', label: 'Inicio', icon: LayoutDashboard },
+      { href: '/admin', label: 'Inicio', icon: LayoutDashboard, hint: 'Resumen y actividad reciente' },
     ]
   },
   {
-    title: 'Personas y grupos',
+    title: 'Personas',
     items: [
-      { href: '/admin/estructura', label: 'Estructura académica', icon: School },
-      { href: '/admin/gestion', label: 'Usuarios', icon: Users },
+      { href: '/admin/estructura', label: 'Estructura académica', icon: School, hint: 'Grupos de cada colegio, sus docentes y estudiantes' },
+      { href: '/admin/gestion', label: 'Usuarios y códigos', icon: Users, hint: 'Crear cuentas y entregar códigos de acceso' },
     ]
   },
   {
-    title: 'Contenido',
+    title: 'Contenido para todos',
     items: [
-      { href: '/admin/lecciones', label: 'Lecciones generales por grado', icon: BookOpen },
-      { href: '/admin/academia', label: 'Proyectos del kit por colegio', icon: GraduationCap },
-      { href: '/admin/academy', label: 'Cursos en línea', icon: FileText },
-      { href: '/admin/simuladores', label: 'Simuladores', icon: Monitor },
-      { href: '/admin/ia', label: 'Actividades IA', icon: Brain },
-      { href: '/admin/proyectos', label: 'Proyectos avanzados', icon: FolderKanban },
-      { href: '/admin/experiencias', label: 'Galería de experiencias', icon: Camera },
+      { href: '/admin/lecciones', label: 'Lecciones generales por grado', icon: BookOpen, hint: 'Las ve todo estudiante de ese grado, de cualquier colegio' },
+      { href: '/admin/gestion?tab=levels', label: 'Grados y módulos', icon: SlidersHorizontal, hint: 'Qué grados existen y si muestran IA y Ciberseguridad' },
+      { href: '/admin/simuladores', label: 'Simuladores', icon: Monitor, hint: 'Herramientas de práctica por grado y programa' },
+      { href: '/admin/ia', label: 'Actividades de IA', icon: Brain, hint: 'Actividades de inteligencia artificial por grado' },
+      { href: '/admin/academy', label: 'Cursos en línea', icon: FileText, hint: 'Python, Hacking e IA paso a paso, fuera de los grados' },
+      { href: '/admin/proyectos', label: 'Proyectos avanzados', icon: FolderKanban, hint: 'Jetson, Raspberry Pi, Digispark' },
     ]
   },
   {
-    title: 'Kits y colegios',
+    title: 'Kits de los colegios',
     items: [
-      { href: '/admin/kits', label: 'Kits', icon: Package },
-      { href: '/admin/cursos', label: 'Catálogo de cursos con kit', icon: GraduationCap },
-      { href: '/admin/colegios', label: 'Colegios', icon: School },
+      { href: '/admin/academia', label: 'Proyectos del kit por colegio', icon: GraduationCap, hint: 'Circuito, código y guía. Solo los ve ese colegio y grado, en "Mi kit"' },
+      { href: '/admin/kits', label: 'Kits y materiales', icon: Package, hint: 'Piezas, placa, imágenes y precio de cada kit' },
+      { href: '/admin/colegios', label: 'Colegios', icon: School, hint: 'Datos del colegio y qué cursos con kit tiene' },
+      { href: '/admin/cursos', label: 'Catálogo de cursos con kit', icon: BookOpen, hint: 'Lista de cursos (ej. 8vo EGB Academia) que luego se asignan a un colegio' },
     ]
   },
   {
     title: 'Evaluación',
     items: [
-      { href: '/admin/tareas', label: 'Tareas', icon: ClipboardList },
-      { href: '/admin/calificar', label: 'Calificar entregas', icon: CheckSquare },
-      { href: '/admin/entregas', label: 'Entregas', icon: Inbox },
-      { href: '/admin/calificaciones', label: 'Libreta de notas', icon: Award },
+      { href: '/admin/tareas', label: 'Tareas', icon: ClipboardList, hint: 'Crear y publicar tareas' },
+      { href: '/admin/calificar', label: 'Entregas y calificación', icon: CheckSquare, hint: 'Ver lo que entregaron los estudiantes y poner nota' },
+      { href: '/admin/calificaciones', label: 'Libreta de notas', icon: Award, hint: 'Notas de cada estudiante por grado' },
+    ]
+  },
+  {
+    title: 'Sitio público',
+    items: [
+      { href: '/admin/experiencias', label: 'Galería de experiencias', icon: Camera, hint: 'Fotos y videos de la portada' },
     ]
   },
 ]
 
 const ROUTE_LABELS: Record<string, string> = {
   admin: 'Admin',
-  gestion: 'Usuarios',
+  gestion: 'Usuarios y códigos',
   estructura: 'Estructura académica',
   academia: 'Proyectos del kit por colegio',
   academy: 'Cursos en línea',
   colegios: 'Colegios',
   cursos: 'Catálogo de cursos con kit',
   lecciones: 'Lecciones generales por grado',
-  kits: 'Kits',
+  kits: 'Kits y materiales',
   editar: 'Editar lecciones',
   ficha: 'Ficha',
   simuladores: 'Simuladores',
-  ia: 'Actividades IA',
+  ia: 'Actividades de IA',
   experiencias: 'Galería de Experiencias',
   tareas: 'Tareas',
-  entregas: 'Entregas',
   calificaciones: 'Libreta de notas',
-  calificar: 'Calificar entregas',
+  calificar: 'Entregas y calificación',
   proyectos: 'Proyectos avanzados',
 }
 
@@ -127,12 +133,17 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     if (!query.trim()) return NAV_GROUPS
     const q = query.toLowerCase()
     return NAV_GROUPS
-      .map(g => ({ ...g, items: g.items.filter(i => i.label.toLowerCase().includes(q)) }))
+      .map(g => ({ ...g, items: g.items.filter(i => `${i.label} ${i.hint || ''}`.toLowerCase().includes(q)) }))
       .filter(g => g.items.length > 0)
   }, [query])
 
-  const isActive = (href: string) =>
-    href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href)
+  const isActive = (href: string) => {
+    const [path, query] = href.split('?')
+    if (path === '/admin') return pathname === '/admin'
+    if (!pathname?.startsWith(path)) return false
+    const current = typeof window === 'undefined' ? '' : window.location.search.replace(/^\?/, '')
+    return query ? current === query : !NAV_GROUPS.some(g => g.items.some(i => i.href.startsWith(`${path}?`) && current === i.href.split('?')[1]))
+  }
 
   const sidebarContent = (
     <>
@@ -180,7 +191,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                   <Link
                     key={item.href}
                     href={item.href}
-                    title={collapsed ? item.label : undefined}
+                    title={collapsed ? `${item.label}: ${item.hint || ''}` : item.hint}
                     className={`group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-all duration-150 ${
                       collapsed ? 'justify-center' : ''
                     } ${

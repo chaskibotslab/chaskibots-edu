@@ -349,7 +349,7 @@ export default function NivelPage() {
               <div className="mt-6 pt-4 border-t border-white/10 animate-fade-in">
                 <p className="px-2 mb-1 text-[10px] font-semibold uppercase tracking-wider text-white/30">Herramientas del Profesor</p>
                 <Link
-                  href={`/admin/entregas?levelId=${levelId}`}
+                  href={`/admin/calificar?levelId=${levelId}`}
                   className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] font-medium transition-all active:scale-[0.98] text-white/60 hover:bg-white/5 hover:text-white"
                 >
                   <GraduationCap className="w-[18px] h-[18px] text-white/30" />

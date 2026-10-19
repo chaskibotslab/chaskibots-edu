@@ -8,7 +8,7 @@ import {
   ArrowLeft, Search, Loader2, Clock, CheckCircle2, Award,
   User, FileText, ChevronRight, X, Star, Send,
   Image as ImageIcon, ExternalLink, Sparkles, Filter,
-  MessageSquare, Calendar, AlertCircle, Zap
+  MessageSquare, Calendar, AlertCircle, Zap, Trash2
 } from 'lucide-react'
 
 interface Submission {
@@ -79,6 +79,10 @@ export default function CalificarPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<Filter>('pending')
   const [search, setSearch] = useState('')
+  // Antes había dos páginas (Entregas y Calificar). Esta reúne las dos:
+  // filtro por grado (también desde ?levelId=) y opción de eliminar.
+  const [levelFilter, setLevelFilter] = useState('')
+  const [levelNames, setLevelNames] = useState<Record<string, string>>({})
   const [selected, setSelected] = useState<Submission | null>(null)
   const [newCount, setNewCount] = useState(0)
   const lastCount = useRef<number | null>(null)
@@ -121,6 +125,27 @@ export default function CalificarPage() {
     if (user) loadData()
   }, [user, loadData])
 
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('levelId')
+    if (fromUrl) setLevelFilter(fromUrl)
+    fetch('/api/levels')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setLevelNames(Object.fromEntries(data.map((l: any) => [l.id, l.name])))
+      })
+      .catch(() => {})
+  }, [])
+
+  // Solo los grados que tienen entregas (el servidor ya limita al docente a sus grados)
+  const levelOptions = useMemo(
+    () => Array.from(new Set(submissions.map(s => s.levelId).filter(Boolean))),
+    [submissions],
+  )
+  const scoped = useMemo(
+    () => (levelFilter ? submissions.filter(s => s.levelId === levelFilter) : submissions),
+    [submissions, levelFilter],
+  )
+
   // Refresco periódico. Antes era una suscripción Realtime con la clave
   // pública de Supabase, lo que obligaba a dejar la tabla submissions legible
   // para cualquiera en internet.
@@ -131,18 +156,18 @@ export default function CalificarPage() {
   }, [user, loadData])
 
   const stats = useMemo(() => ({
-    pending: submissions.filter(s => s.status !== 'graded').length,
-    graded: submissions.filter(s => s.status === 'graded').length,
-    today: submissions.filter(s => {
+    pending: scoped.filter(s => s.status !== 'graded').length,
+    graded: scoped.filter(s => s.status === 'graded').length,
+    today: scoped.filter(s => {
       const d = new Date(s.submittedAt)
       const now = new Date()
       return d.toDateString() === now.toDateString()
     }).length,
-    total: submissions.length,
-  }), [submissions])
+    total: scoped.length,
+  }), [scoped])
 
   const filtered = useMemo(() => {
-    return submissions
+    return scoped
       .filter(s => {
         if (filter === 'pending' && s.status === 'graded') return false
         if (filter === 'graded' && s.status !== 'graded') return false
@@ -158,7 +183,7 @@ export default function CalificarPage() {
         return true
       })
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
-  }, [submissions, tasks, filter, search])
+  }, [scoped, tasks, filter, search])
 
   if (isLoading || !user) {
     return (
@@ -178,7 +203,7 @@ export default function CalificarPage() {
               <ArrowLeft className="w-5 h-5 text-slate-700" />
             </Link>
             <div className="min-w-0">
-              <h1 className="text-xl font-bold text-slate-900 truncate">Calificar entregas</h1>
+              <h1 className="text-xl font-bold text-slate-900 truncate">Entregas y calificación</h1>
               <p className="text-xs text-slate-500 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                 En vivo · {stats.pending} pendientes
@@ -218,6 +243,18 @@ export default function CalificarPage() {
               className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
             />
           </div>
+          {levelOptions.length > 1 || levelFilter ? (
+            <select
+              value={levelFilter}
+              onChange={(e) => setLevelFilter(e.target.value)}
+              className="sm:w-56 px-4 py-3 bg-white border border-slate-200 rounded-2xl text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
+            >
+              <option value="">Todos los grados</option>
+              {(levelFilter && !levelOptions.includes(levelFilter) ? [levelFilter, ...levelOptions] : levelOptions).map(id => (
+                <option key={id} value={id}>{levelNames[id] || id}</option>
+              ))}
+            </select>
+          ) : null}
         </div>
 
         {/* Filter pills */}
@@ -283,6 +320,10 @@ export default function CalificarPage() {
           gradedBy={user.name}
           onClose={() => setSelected(null)}
           onGraded={() => {
+            setSelected(null)
+            loadData()
+          }}
+          onDeleted={() => {
             setSelected(null)
             loadData()
           }}
@@ -369,17 +410,33 @@ function SubmissionRow({ submission, task, onClick, style }: { submission: Submi
   )
 }
 
-function GradingSheet({ submission, task, gradedBy, onClose, onGraded }: {
+function GradingSheet({ submission, task, gradedBy, onClose, onGraded, onDeleted }: {
   submission: Submission
   task?: Task
   gradedBy: string
   onClose: () => void
   onGraded: () => void
+  onDeleted: () => void
 }) {
   const [grade, setGrade] = useState<number>(submission.grade ?? 100)
   const [feedback, setFeedback] = useState<string>(submission.feedback ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const handleDelete = async () => {
+    if (!window.confirm(`¿Eliminar la entrega de ${submission.studentName || 'este estudiante'}? No se puede deshacer.`)) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/submissions?id=${submission.id}`, { method: 'DELETE' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || 'No se pudo eliminar')
+      onDeleted()
+    } catch (err: any) {
+      setError(err.message)
+      setSaving(false)
+    }
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -580,6 +637,14 @@ function GradingSheet({ submission, task, gradedBy, onClose, onGraded }: {
 
         {/* Footer */}
         <div className="border-t border-slate-100 px-6 py-4 bg-white flex gap-3">
+          <button
+            onClick={handleDelete}
+            disabled={saving}
+            title="Eliminar entrega"
+            className="px-3 py-3 rounded-2xl text-red-500 hover:bg-red-50 transition-all active:scale-[0.98] disabled:opacity-50"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
           <button
             onClick={onClose}
             className="px-5 py-3 rounded-2xl text-slate-700 font-semibold hover:bg-slate-100 transition-all active:scale-[0.98]"

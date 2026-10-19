@@ -21,6 +21,11 @@ export default function GestionPage() {
   const { user, isAdmin, isAuthenticated, isLoading, logout } = useAuth()
   const [activeTab, setActiveTab] = useState<GestionTab>('users')
 
+  // El menú enlaza "Grados y módulos" como /admin/gestion?tab=levels
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('tab') === 'levels') setActiveTab('levels')
+  }, [])
+
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/login?redirect=/admin/gestion')
@@ -44,7 +49,7 @@ export default function GestionPage() {
 
   const tabs = [
     { id: 'users' as GestionTab, label: 'Usuarios', icon: Users },
-    { id: 'levels' as GestionTab, label: 'Niveles', icon: GraduationCap }
+    { id: 'levels' as GestionTab, label: 'Grados y módulos', icon: GraduationCap }
   ]
 
   return (
