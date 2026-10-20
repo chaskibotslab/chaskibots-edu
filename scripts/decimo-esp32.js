@@ -197,7 +197,7 @@ void loop() {
 
   'control-nivel-agua': {
     conexiones: [
-      ...modulo('SENSOR DE NIVEL (humedad)', '3V3', 'AOUT', 'GPIO34', 'ADC1, solo entrada'), ...RELE,
+      ...modulo('SENSOR DE NIVEL (humedad)', '3V3', 'AOUT', 'GPIO34', 'ADC1, solo entrada'), ...RELE, ...BOMBA,
       ...buzzer('BUZZER ACTIVO', 'GPIO13'), ...led('LED ROJO (nivel bajo)', 'GPIO25'), ...led('LED VERDE (nivel ok)', 'GPIO33'),
     ],
     codigo: `${CABECERA('Control de nivel de agua', ' - Proyecto adicional')}
@@ -253,6 +253,7 @@ void loop() {
       ['MODULO RELE 1 CANAL', 'GND', 'GND'],
       ['LED (estado)', 'Cátodo (-)', 'GND'],
       ['PULSADOR MANUAL', 'Pin 2', 'GND'],
+      ...BOMBA,
     ],
     codigo: `${CABECERA('Mini invernadero inteligente', ' - Proyecto adicional')}
 // Mismo armado del sistema de riego. Riega automaticamente segun el
@@ -282,7 +283,7 @@ void loop() {
   },
 
   'automatizacion-cultivos': {
-    conexiones: [...SUELO, ...RELE, ...buzzer('BUZZER ACTIVO', 'GPIO13'), ...led('LED VERDE (cultivo ok)', 'GPIO33')],
+    conexiones: [...SUELO, ...RELE, ...BOMBA, ...buzzer('BUZZER ACTIVO', 'GPIO13'), ...led('LED VERDE (cultivo ok)', 'GPIO33')],
     codigo: `${CABECERA('Automatizacion de cultivos', ' - Proyecto adicional')}
 // Mismo armado del sistema de riego. En vez de regar todo el tiempo
 // que la tierra este seca, riega por pulsos cortos cada cierto
@@ -389,3 +390,5 @@ for (const [slug, g] of Object.entries(guias)) {
 const out = path.join(__dirname, '..', 'supabase', 'migrations', '2026_10_decimo_esp32.sql')
 fs.writeFileSync(out, sql)
 console.log(`SQL generado: ${path.relative(process.cwd(), out)} (${Object.keys(PROYECTOS).length} proyectos)`)
+
+module.exports = { PROYECTOS }

@@ -214,12 +214,14 @@ INSERT INTO kit_conexiones (proyecto_id, componente, pin_componente, pin_placa, 
   ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'MODULO RELE 1 CANAL', 'VCC', 'VIN (5V)', NULL, 4),
   ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'MODULO RELE 1 CANAL', 'GND', 'GND', NULL, 5),
   ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'MODULO RELE 1 CANAL', 'IN', 'GPIO26', NULL, 6),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'BUZZER ACTIVO', '+', 'GPIO13', NULL, 7),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'BUZZER ACTIVO', '-', 'GND', NULL, 8),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'LED ROJO (nivel bajo)', 'Ánodo (+) via R330', 'GPIO25', NULL, 9),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'LED ROJO (nivel bajo)', 'Cátodo (-)', 'GND', NULL, 10),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'LED VERDE (nivel ok)', 'Ánodo (+) via R330', 'GPIO33', NULL, 11),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'LED VERDE (nivel ok)', 'Cátodo (-)', 'GND', NULL, 12);
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'BOMBA DE AGUA 5V', '+ : va al NO del rele (comparte el USB-V8 con la placa)', 'USB-V8 compartido', NULL, 7),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'BOMBA DE AGUA 5V', '- (GND comun con el ESP32)', 'GND', NULL, 8),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'BUZZER ACTIVO', '+', 'GPIO13', NULL, 9),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'BUZZER ACTIVO', '-', 'GND', NULL, 10),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'LED ROJO (nivel bajo)', 'Ánodo (+) via R330', 'GPIO25', NULL, 11),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'LED ROJO (nivel bajo)', 'Cátodo (-)', 'GND', NULL, 12),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'LED VERDE (nivel ok)', 'Ánodo (+) via R330', 'GPIO33', NULL, 13),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'control-nivel-agua'), 'LED VERDE (nivel ok)', 'Cátodo (-)', 'GND', NULL, 14);
 UPDATE kit_codigos SET contenido = $codigo$/*
   Control de nivel de agua
   Kit 10mo EGB - ESP32 DevKit V1 - Proyecto adicional
@@ -276,7 +278,9 @@ INSERT INTO kit_conexiones (proyecto_id, componente, pin_componente, pin_placa, 
   ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'mini-invernadero'), 'MODULO RELE 1 CANAL', 'VCC', 'VIN (5V)', NULL, 10),
   ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'mini-invernadero'), 'MODULO RELE 1 CANAL', 'GND', 'GND', NULL, 11),
   ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'mini-invernadero'), 'LED (estado)', 'Cátodo (-)', 'GND', NULL, 12),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'mini-invernadero'), 'PULSADOR MANUAL', 'Pin 2', 'GND', NULL, 13);
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'mini-invernadero'), 'PULSADOR MANUAL', 'Pin 2', 'GND', NULL, 13),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'mini-invernadero'), 'BOMBA DE AGUA 5V', '+ : va al NO del rele (comparte el USB-V8 con la placa)', 'USB-V8 compartido', NULL, 14),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'mini-invernadero'), 'BOMBA DE AGUA 5V', '- (GND comun con el ESP32)', 'GND', NULL, 15);
 UPDATE kit_codigos SET contenido = $codigo$/*
   Mini invernadero inteligente
   Kit 10mo EGB - ESP32 DevKit V1 - Proyecto adicional
@@ -316,10 +320,12 @@ INSERT INTO kit_conexiones (proyecto_id, componente, pin_componente, pin_placa, 
   ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'MODULO RELE 1 CANAL', 'VCC', 'VIN (5V)', NULL, 4),
   ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'MODULO RELE 1 CANAL', 'GND', 'GND', NULL, 5),
   ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'MODULO RELE 1 CANAL', 'IN', 'GPIO26', NULL, 6),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'BUZZER ACTIVO', '+', 'GPIO13', NULL, 7),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'BUZZER ACTIVO', '-', 'GND', NULL, 8),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'LED VERDE (cultivo ok)', 'Ánodo (+) via R330', 'GPIO33', NULL, 9),
-  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'LED VERDE (cultivo ok)', 'Cátodo (-)', 'GND', NULL, 10);
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'BOMBA DE AGUA 5V', '+ : va al NO del rele (comparte el USB-V8 con la placa)', 'USB-V8 compartido', NULL, 7),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'BOMBA DE AGUA 5V', '- (GND comun con el ESP32)', 'GND', NULL, 8),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'BUZZER ACTIVO', '+', 'GPIO13', NULL, 9),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'BUZZER ACTIVO', '-', 'GND', NULL, 10),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'LED VERDE (cultivo ok)', 'Ánodo (+) via R330', 'GPIO33', NULL, 11),
+  ((SELECT id FROM kit_proyectos WHERE kit_id = 'kit-lv-decimo-egb' AND slug = 'automatizacion-cultivos'), 'LED VERDE (cultivo ok)', 'Cátodo (-)', 'GND', NULL, 12);
 UPDATE kit_codigos SET contenido = $codigo$/*
   Automatizacion de cultivos
   Kit 10mo EGB - ESP32 DevKit V1 - Proyecto adicional
