@@ -74,6 +74,8 @@ export async function buildKitFichas(kitRows: any[]) {
         nombre: m?.nombre || km.material_id,
         categoria: m?.categoria || null,
         especificacion: m?.especificacion || null,
+        // Columna nueva (2026_10_materiales_foto.sql); vacía hasta subir fotos.
+        fotoUrl: m?.foto_url || null,
         cantidad: km.cantidad,
         nota: km.nota,
         incluido: km.incluido !== false,

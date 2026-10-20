@@ -1,5 +1,8 @@
 /**
- * Fotos de los kits desde la carpeta fotos/ del proyecto.
+ * Fotos de los kits desde las carpetas fotos/ y materiales/ del proyecto.
+ *
+ * materiales/: fotos con el nombre de la tienda; DESDE_MATERIALES dice a qué pieza y
+ * material va cada una (ver abajo). fotos/: nombres de LISTA.md; si coinciden, mandan.
  *
  *   node scripts/fotos-kits.js --lista   crea fotos/LISTA.md con el nombre exacto de cada foto
  *                                        (solo lee la plataforma; marca las que ya tienes)
@@ -119,16 +122,130 @@ const fotoDePieza = nombre => {
   return { key: undefined }
 }
 
-const EXT = ['.jpg', '.jpeg', '.png', '.webp']
-function fotosEnCarpeta() {
-  if (!fs.existsSync(DIR)) return new Map()
+const EXT = ['.jpg', '.jpeg', '.png', '.webp', '.avif']
+const MATERIALES_DIR = path.join(ROOT, 'materiales')
+
+// Carpeta materiales/: fotos con el nombre que traían de la tienda. Cada una va a las
+// piezas de las guías (pieza-…) y a los materiales del catálogo (columna materiales.foto_url).
+// [archivo sin extensión, en minúsculas] → [piezas de guía, materiales del catálogo]
+const DESDE_MATERIALES = [
+  ['ar0355-buzzer-pasivo-v1-1-1024x1024', ['buzzer-pasivo'], ['buzzer-pasivo']],
+  ['micro-servo-9g-sg90', ['servo-sg90'], ['servo-sg90']],
+  ['supermini-esp32-c3', ['esp32-c3'], ['board-esp32-c3']],
+  ['esp32', ['esp32-devkit'], ['board-esp32-devkit']],
+  ['arduino nano', ['arduino-nano'], ['board-nano-v3', 'board-nano-v3-microusb']],
+  ['arduino uno', ['arduino-uno'], ['board-uno-r3']],
+  ['bateria', [], ['bateria-9v']],
+  ['portabateria', [], ['portabateria-9v-broche', 'conector-bateria-9v']],
+  ['portabateriaconjack', [], ['portabateria-9v']],
+  ['boquilla', [], ['boquilla-e27']],
+  ['cable gemelo', [], ['cable-gemelo']],
+  ['cables jumper ok', ['cables-jumper'], ['jumper-mm', 'jumper-mh', 'jumper-hh']],
+  ['cable-usb-tipo-arduinouno', [], ['cable-usb-ab']],
+  ['cabletipoc', [], ['cable-usbc-datos']],
+  ['cablev8', [], ['cable-usb-v8']],
+  ['cautin', [], ['cautin']],
+  ['estaño', [], ['estano']],
+  ['enchufe', [], ['enchufe']],
+  ['dht11', ['sensor-dht11'], ['sensor-dht11-modulo']],
+  ['hc-sr501-pir-motion-sensor', ['sensor-pir'], ['sensor-pir-hcsr501']],
+  ['lcd16x2', ['lcd-16x2-i2c'], ['lcd-16x2-i2c']],
+  ['ldr', ['ldr'], ['ldr-2-patas']],
+  ['leds', ['leds-colores', 'led'], ['led-generico']],
+  ['manguera', [], ['manguera-silicona']],
+  ['md-rele-5v-1ch-optoacoplador', ['rele-optoacoplador', 'rele-1-canal'], ['rele-1canal-opto', 'rele-1canal']],
+  ['potenciometro ok', ['potenciometro-10k', 'potenciometro-5k'], ['potenciometro-10k', 'potenciometro-5k']],
+  ['protoboard', ['protoboard'], ['protoboard-400', 'protoboard']],
+  ['pulsador', ['pulsador'], ['pulsador']],
+  ['resistencia', ['resistencia-470', 'resistencia-1k', 'resistencia-330', 'resistencia-4k7', 'resistencia-22k', 'resistencias-surtidas'],
+    ['resistencia-470', 'resistencia-1k', 'resistencia-330', 'resistencia-4k7', 'resistencia-22k', 'resistencia-10k', 'resistencia-220-330', 'resistencia-led-kit7', 'resistencia-surtida']],
+  ['sensordehumedad', ['sensor-humedad-suelo'], ['sensor-humedad-suelo']],
+  ['sensorinfrarojo', [], ['sensor-ir-fc51']],
+  ['sensorultrasonico', ['sensor-ultrasonico-hcsr04', 'sensor-ultrasonico-hcsr04p'], ['sensor-ultrasonico-hcsr04', 'sensor-hcsr04p']],
+]
+// Versiones repetidas que no se usan: vale la que termina en "ok".
+const IGNORAR = ['cable-jumper-dupont-hembra-a-macho-20cm-20und', 'potenciometro']
+
+// Fotos armadas a partir de otras de materiales/.
+// La de los LED trae 5 colores en fila: se recorta cada uno (izq, der, alto en fracción de la foto).
+const RECORTES_LED = { rojo: [0.585, 0.765, 0.58], verde: [0.245, 0.425, 0.6], amarillo: [0.435, 0.59, 0.6], azul: [0.02, 0.235, 0.58] }
+const DERIVADAS = [
+  ...Object.entries(RECORTES_LED).map(([color, recorte]) => ({
+    id: `led-${color}`, de: ['leds'], recorte, materiales: [`led-${color}`],
+    // Ninguna guía nombra un LED azul suelto: ese solo va a la lista de materiales
+    piezas: color === 'azul' ? [] : [`led-${color}`],
+  })),
+  // La guía dice "Batería de 9 V con portabatería": las dos piezas juntas
+  { id: 'bateria-con-portabateria', de: ['bateria', 'portabateria'], piezas: ['bateria-9v'], materiales: [] },
+]
+
+function archivosEn(dir) {
   const map = new Map()
-  for (const f of fs.readdirSync(DIR)) {
-    const ext = path.extname(f).toLowerCase()
-    if (!EXT.includes(ext)) continue
-    map.set(path.basename(f, path.extname(f)).toLowerCase(), path.join(DIR, f))
+  if (!fs.existsSync(dir)) return map
+  for (const f of fs.readdirSync(dir)) {
+    if (!EXT.includes(path.extname(f).toLowerCase())) continue
+    map.set(path.basename(f, path.extname(f)).toLowerCase(), path.join(dir, f))
   }
   return map
+}
+
+const optimizar = img => img.rotate()
+  .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+  .flatten({ background: '#ffffff' })
+  .webp({ quality: 80 })
+  .toBuffer()
+
+// Todas las fotos a subir: { id, cargar(sharp) → Buffer, nombres: ['pieza-…', 'material-…', 'kit-…'] }
+function fuentes() {
+  const enMateriales = archivosEn(MATERIALES_DIR)
+  const lista = []
+  const ocupados = new Set()
+  // fotos/ manda: si tienes pieza-led-rojo.jpg ahí, gana sobre el recorte de materiales/
+  for (const [nombre, archivo] of archivosEn(DIR)) {
+    lista.push({ id: nombre, cargar: sharp => optimizar(sharp(archivo)), nombres: [nombre] })
+    ocupados.add(nombre)
+  }
+  const libres = ns => ns.filter(n => !ocupados.has(n))
+  for (const [archivo, piezas, mats] of DESDE_MATERIALES) {
+    const ruta = enMateriales.get(archivo)
+    if (!ruta) continue
+    const nombres = libres([...piezas.map(k => `pieza-${k}`), ...mats.map(m => `material-${m}`)])
+    if (nombres.length) lista.push({ id: `mat-${archivo.replace(/[^a-z0-9]+/g, '-')}`, cargar: sharp => optimizar(sharp(ruta)), nombres })
+  }
+  for (const d of DERIVADAS) {
+    const rutas = d.de.map(n => enMateriales.get(n))
+    if (rutas.some(r => !r)) continue
+    const nombres = libres([...d.piezas.map(k => `pieza-${k}`), ...d.materiales.map(m => `material-${m}`)])
+    if (!nombres.length) continue
+    lista.push({
+      id: `mat-${d.id}`,
+      nombres,
+      cargar: async sharp => {
+        if (d.recorte) {
+          const [izq, der, alto] = d.recorte
+          const m = await sharp(rutas[0]).metadata()
+          const width = Math.round((der - izq) * m.width)
+          return optimizar(sharp(await sharp(rutas[0])
+            .extract({ left: Math.round(izq * m.width), top: 0, width, height: Math.round(alto * m.height) })
+            .extend({ left: 40, right: 40, top: 10, bottom: 10, background: '#ffffff' })
+            .png().toBuffer()))
+        }
+        // Lado a lado, a la misma altura, sobre fondo blanco
+        const partes = await Promise.all(rutas.map(r => sharp(r).flatten({ background: '#ffffff' }).resize({ height: 700 }).png().toBuffer()))
+        const anchos = await Promise.all(partes.map(async b => (await sharp(b).metadata()).width))
+        const sep = 40
+        const total = anchos.reduce((a, w) => a + w, 0) + sep * (partes.length + 1)
+        let x = sep
+        const capas = partes.map((input, i) => { const c = { input, left: x, top: 40 }; x += anchos[i] + sep; return c })
+        return optimizar(sharp(await sharp({ create: { width: total, height: 780, channels: 3, background: '#ffffff' } }).composite(capas).png().toBuffer()))
+      },
+    })
+  }
+  const sinUsar = [...enMateriales.keys()].filter(n =>
+    !IGNORAR.includes(n) && !DESDE_MATERIALES.some(([a]) => a === n) && !DERIVADAS.some(d => d.de.includes(n)))
+  const descargasIncompletas = fs.existsSync(MATERIALES_DIR)
+    ? fs.readdirSync(MATERIALES_DIR).filter(f => /\.(crdownload|part|tmp)$/i.test(f)) : []
+  return { lista, sinUsar, descargasIncompletas }
 }
 
 // Solo se reemplaza una foto vacía o puesta por este script; nunca una puesta a mano.
@@ -137,27 +254,53 @@ const esNuestra = url => !url || url.startsWith(PUBLIC_PREFIX)
 async function main() {
   const proyectos = await rest('GET', 'kit_proyectos?select=id,kit_id,slug,titulo,tipo,orden,guia&kit_id=like.kit-lv-*&order=kit_id,orden')
   const kits = await rest('GET', 'kits?select=id,name,image_url&id=like.kit-lv-*')
-  const fotos = fotosEnCarpeta()
+  const { lista, sinUsar, descargasIncompletas } = fuentes()
+  const disponibles = new Set(lista.flatMap(f => f.nombres))
 
-  if (LISTA) return escribirLista(proyectos, kits, fotos)
-  if (fotos.size === 0) return console.log('La carpeta fotos/ no tiene fotos todavía. Usa --lista para ver los nombres.')
+  const avisos = () => {
+    if (sinUsar.length) console.log(`\nATENCIÓN, fotos de materiales/ que no sé a qué pieza corresponden (avísale a Claude):\n  ${sinUsar.join('\n  ')}`)
+    if (descargasIncompletas.length) console.log(`\nDescargas sin terminar en materiales/ (se ignoran): ${descargasIncompletas.join(', ')}`)
+  }
+
+  if (LISTA) { escribirLista(proyectos, kits, disponibles); return avisos() }
+  if (lista.length === 0) return console.log('No hay fotos en fotos/ ni en materiales/. Usa --lista para ver los nombres.')
+
+  // --prueba <carpeta>: procesa todo y deja los .webp ahí, sin subir nada
+  const iPrueba = process.argv.indexOf('--prueba')
+  if (iPrueba > -1) {
+    const destino = process.argv[iPrueba + 1]
+    fs.mkdirSync(destino, { recursive: true })
+    const sharp = require('sharp')
+    for (const f of lista) {
+      const buf = await f.cargar(sharp)
+      fs.writeFileSync(path.join(destino, `${f.id}.webp`), buf)
+      console.log(`${f.id}.webp  ${Math.round(buf.length / 1024)} KB → ${f.nombres.join(', ')}`)
+    }
+    return avisos()
+  }
+
+  // ¿Existe ya la columna materiales.foto_url? (supabase/migrations/2026_10_materiales_foto.sql)
+  let materiales = null
+  try { materiales = await rest('GET', 'materiales?select=id,foto_url') } catch {
+    console.log('AVISO: falta la columna de fotos de materiales. Ejecuta en Supabase supabase/migrations/2026_10_materiales_foto.sql y vuelve a correr este script. Por ahora solo se ponen las fotos de las guías.\n')
+  }
 
   const sharp = require('sharp')
   await asegurarBucket()
 
   const urls = new Map()
-  for (const [nombre, archivo] of fotos) {
-    const buf = await sharp(archivo).rotate().resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 }).toBuffer()
+  for (const f of lista) {
+    const buf = await f.cargar(sharp)
     const huella = crypto.createHash('sha1').update(buf).digest('hex').slice(0, 8)
-    const destino = `${nombre}-${huella}.webp`
-    const res = await fetch(`${URL_BASE}/storage/v1/object/${BUCKET}/${destino}`, {
+    const destino = `${f.id}-${huella}.webp`
+    const res = await fetch(`${URL_BASE}/storage/v1/object/${BUCKET}/${encodeURIComponent(destino)}`, {
       method: 'POST',
       headers: { ...auth, 'Content-Type': 'image/webp', 'x-upsert': 'true', 'Cache-Control': 'max-age=31536000' },
       body: buf,
     })
-    if (!res.ok) throw new Error(`No se pudo subir ${nombre}: ${res.status} ${(await res.text()).slice(0, 200)}`)
-    urls.set(nombre, PUBLIC_PREFIX + destino)
-    console.log(`subida  ${nombre}  (${Math.round(buf.length / 1024)} KB)`)
+    if (!res.ok) throw new Error(`No se pudo subir ${f.id}: ${res.status} ${(await res.text()).slice(0, 200)}`)
+    for (const n of f.nombres) urls.set(n, PUBLIC_PREFIX + encodeURIComponent(destino))
+    console.log(`subida  ${f.id}  (${Math.round(buf.length / 1024)} KB) → ${f.nombres.length} ${f.nombres.length === 1 ? 'lugar' : 'lugares'}`)
   }
 
   const cambiosGuia = []
@@ -169,9 +312,10 @@ async function main() {
     let cambio = false
     const poner = (obj, nombre) => {
       const url = urls.get(nombre)
-      if (!url || !obj || !esNuestra(obj.fotoUrl) || obj.fotoUrl === url) { if (url) usadas.add(nombre); return }
-      obj.fotoUrl = url
+      if (!url || !obj) return
       usadas.add(nombre)
+      if (!esNuestra(obj.fotoUrl) || obj.fotoUrl === url) return
+      obj.fotoUrl = url
       cambio = true
     }
     for (const pz of g.piezas || []) {
@@ -180,7 +324,7 @@ async function main() {
     }
     poner(g.reto, `proyecto-${base}`)
     ;(g.pasos || []).forEach((paso, i) => poner(paso, `paso-${base}--${i + 1}`))
-    if (cambio) cambiosGuia.push({ id: p.id, slug: p.slug, antes: p.guia, guia: g })
+    if (cambio) cambiosGuia.push({ id: p.id, antes: p.guia, guia: g })
   }
 
   const cambiosKit = []
@@ -192,18 +336,33 @@ async function main() {
     if (esNuestra(k.image_url) && k.image_url !== url) cambiosKit.push({ id: k.id, antes: k.image_url, image_url: url })
   }
 
+  const cambiosMaterial = []
+  for (const m of materiales || []) {
+    const nombre = `material-${m.id}`
+    const url = urls.get(nombre)
+    if (!url) continue
+    usadas.add(nombre)
+    if (esNuestra(m.foto_url) && m.foto_url !== url) cambiosMaterial.push({ id: m.id, antes: m.foto_url, foto_url: url })
+  }
+
   const dir = path.join(ROOT, 'backups')
   fs.mkdirSync(dir, { recursive: true })
   const copia = path.join(dir, `fotos-kits-${new Date().toISOString().replace(/[:.]/g, '-')}.json`)
-  fs.writeFileSync(copia, JSON.stringify({ guias: cambiosGuia.map(c => ({ id: c.id, guia: c.antes })), kits: cambiosKit.map(c => ({ id: c.id, image_url: c.antes })) }))
+  fs.writeFileSync(copia, JSON.stringify({
+    guias: cambiosGuia.map(c => ({ id: c.id, guia: c.antes })),
+    kits: cambiosKit.map(c => ({ id: c.id, image_url: c.antes })),
+    materiales: cambiosMaterial.map(c => ({ id: c.id, foto_url: c.antes })),
+  }))
 
   for (const c of cambiosGuia) await rest('PATCH', `kit_proyectos?id=eq.${c.id}`, { guia: c.guia })
   for (const c of cambiosKit) await rest('PATCH', `kits?id=eq.${c.id}`, { image_url: c.image_url })
+  for (const c of cambiosMaterial) await rest('PATCH', `materiales?id=eq.${encodeURIComponent(c.id)}`, { foto_url: c.foto_url })
 
-  console.log(`\nGuías actualizadas: ${cambiosGuia.length} · portadas de kit: ${cambiosKit.length}`)
-  const sinUso = [...fotos.keys()].filter(n => !usadas.has(n))
-  if (sinUso.length) console.log(`\nATENCIÓN, estas fotos no coinciden con ningún nombre de la lista (revisa cómo se escriben):\n  ${sinUso.join('\n  ')}`)
-  console.log(`Copia de lo anterior: ${path.relative(ROOT, copia)}`)
+  console.log(`\nGuías actualizadas: ${cambiosGuia.length} · portadas de kit: ${cambiosKit.length} · materiales con foto: ${cambiosMaterial.length}`)
+  const sinLugar = [...urls.keys()].filter(n => !usadas.has(n) && !(n.startsWith('material-') && !materiales))
+  if (sinLugar.length) console.log(`\nATENCIÓN, estos nombres no coinciden con ningún lugar (revisa cómo se escriben):\n  ${sinLugar.join('\n  ')}`)
+  avisos()
+  console.log(`\nCopia de lo anterior: ${path.relative(ROOT, copia)}`)
 }
 
 async function asegurarBucket() {
@@ -217,9 +376,9 @@ async function asegurarBucket() {
   if (!crear.ok) throw new Error(`No se pudo crear el almacenamiento ${BUCKET}: ${(await crear.text()).slice(0, 200)}`)
 }
 
-function escribirLista(proyectos, kits, fotos) {
+function escribirLista(proyectos, kits, disponibles) {
   fs.mkdirSync(DIR, { recursive: true })
-  const tiene = n => (fotos.has(n) ? '✅' : '⬜')
+  const tiene = n => (disponibles.has(n) ? '✅' : '⬜')
 
   const piezas = new Map() // key → { nombres, lugares, grados }
   const sinMapa = new Map()
@@ -294,7 +453,7 @@ Consejos: fondo blanco o liso, buena luz, la pieza ocupando casi toda la foto.
   const out = path.join(DIR, 'LISTA.md')
   fs.writeFileSync(out, md)
   console.log(`Lista creada: ${path.relative(ROOT, out)}`)
-  console.log(`${piezas.size} fotos de piezas · ${kits.length} portadas · fotos ya en la carpeta: ${fotos.size}`)
+  console.log(`${piezas.size} fotos de piezas · ${kits.length} portadas · fotos disponibles: ${disponibles.size}`)
   if (sinMapa.size) console.log(`Piezas sin nombre de foto: ${[...sinMapa.keys()].join(' | ')}`)
 }
 

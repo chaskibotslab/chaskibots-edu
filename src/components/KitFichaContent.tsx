@@ -13,6 +13,7 @@ export interface KitFichaMaterial {
   nombre: string
   categoria: string | null
   especificacion: string | null
+  fotoUrl?: string | null
   cantidad: number | null
   nota: string | null
   incluido: boolean
@@ -180,8 +181,17 @@ export function KitHeaderMateriales({ kit }: { kit: KitFichaDetalle }) {
               {kit.materiales.map((m, i) => (
                 <tr key={m.id} className={i % 2 === 1 ? 'bg-slate-50/50' : ''}>
                   <td className="px-4 py-3 text-slate-800 font-medium">
-                    {m.nombre}
-                    {m.nota && <span className="block text-xs text-slate-400 font-normal mt-0.5">{m.nota}</span>}
+                    <div className="flex items-center gap-3">
+                      {m.fotoUrl ? (
+                        <img src={m.fotoUrl} alt="" loading="lazy" className="w-12 h-12 object-contain rounded-lg bg-white border border-slate-100 flex-shrink-0" />
+                      ) : (
+                        <span className="w-12 h-12 rounded-lg bg-slate-50 border border-slate-100 flex-shrink-0" />
+                      )}
+                      <div className="min-w-0">
+                        {m.nombre}
+                        {m.nota && <span className="block text-xs text-slate-400 font-normal mt-0.5">{m.nota}</span>}
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-slate-500">
                     {m.categoria && (

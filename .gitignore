@@ -17,3 +17,5 @@ next-env.d.ts
 # Fotos de los kits: solo la lista va al repositorio (las fotos se suben a la plataforma)
 fotos/*
 !fotos/LISTA.md
+# Fotos de materiales con nombre de tienda (se suben a la plataforma, no al repositorio)
+materiales/
