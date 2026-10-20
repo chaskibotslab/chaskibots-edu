@@ -161,7 +161,15 @@ const DESDE_MATERIALES = [
     ['resistencia-470', 'resistencia-1k', 'resistencia-330', 'resistencia-4k7', 'resistencia-22k', 'resistencia-10k', 'resistencia-220-330', 'resistencia-led-kit7', 'resistencia-surtida']],
   ['sensordehumedad', ['sensor-humedad-suelo'], ['sensor-humedad-suelo']],
   ['sensorinfrarojo', [], ['sensor-ir-fc51']],
-  ['sensorultrasonico', ['sensor-ultrasonico-hcsr04', 'sensor-ultrasonico-hcsr04p'], ['sensor-ultrasonico-hcsr04', 'sensor-hcsr04p']],
+  ['3904', ['transistor-2n3904'], ['transistor-2n3904']],
+  ['cr2032', ['pila-cr2032'], ['pila-cr2032']],
+  ['led', ['led-blanco'], ['led-blanco']], // LED transparente: el blanco apagado
+  ['display 7 segmentos', ['display-7-segmentos'], ['display-7seg']],
+  ['dipswitch', ['dip-switch'], ['dip-switch']],
+  ['capacitor', ['condensadores'], ['condensador-470uf', 'condensador-100uf']],
+  ['cinta de cobre', ['cinta-cobre'], ['cinta-cobre']],
+  ['baso de agua', ['vaso-agua-sal'], []],
+  ['sensorultrasonico',['sensor-ultrasonico-hcsr04', 'sensor-ultrasonico-hcsr04p'], ['sensor-ultrasonico-hcsr04', 'sensor-hcsr04p']],
 ]
 // Versiones repetidas que no se usan: vale la que termina en "ok".
 const IGNORAR = ['cable-jumper-dupont-hembra-a-macho-20cm-20und', 'potenciometro']

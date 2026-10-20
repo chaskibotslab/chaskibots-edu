@@ -27,11 +27,11 @@ Consejos: fondo blanco o liso, buena luz, la pieza ocupando casi toda la foto.
 | ✅ | `pieza-esp32-devkit.jpg` | ESP32 DevKit V1 | 15 guías (10mo-egb, 2do-bgu, 3ro-bgu) |
 | ✅ | `pieza-resistencia-470.jpg` | Resistencia de 470 Ω / Resistencia de 470 Ω (para el LED) / Resistencia de 470 Ω (para la base) | 14 guías (2do-egb, 3ro-egb, 4to-egb, 5to-egb) |
 | ✅ | `pieza-led-rojo.jpg` | LED rojo con resistencia de 330 Ω / LED rojo / LED rojo (2) | 13 guías (inicial-2, 1ro-egb, 5to-egb, 6to-egb, 8vo-egb, 10mo-egb, 1ro-bgu) |
-| ⬜ | `pieza-transistor-2n3904.jpg` | Transistor 2N3904 / Cuatro transistores 2N3904 / Dos transistores 2N3904 | 11 guías (2do-egb, 4to-egb, 5to-egb, 6to-egb) |
+| ✅ | `pieza-transistor-2n3904.jpg` | Transistor 2N3904 / Cuatro transistores 2N3904 / Dos transistores 2N3904 | 11 guías (2do-egb, 4to-egb, 5to-egb, 6to-egb) |
 | ✅ | `pieza-resistencia-1k.jpg` | Resistencia de 1 kΩ (para la base) / Resistencia de 1 kΩ / Ocho resistencias de 1 kΩ | 11 guías (2do-egb, 4to-egb, 6to-egb, 7mo-egb) |
 | ✅ | `pieza-leds-colores.jpg` | LED rojo y LED verde / LED rojo, amarillo y verde / LED rojo, amarillo y verde con sus resistencias | 10 guías (1ro-egb, 3ro-egb, 5to-egb, 6to-egb, 8vo-egb, 10mo-egb) |
-| ⬜ | `pieza-pila-cr2032.jpg` | Pila de botón CR2032 | 9 guías (inicial-1, inicial-2, 1ro-egb) |
-| ⬜ | `pieza-cinta-cobre.jpg` | Cinta de cobre / Dos placas de cinta de cobre | 9 guías (inicial-1, inicial-2, 1ro-egb, 2do-egb) |
+| ✅ | `pieza-pila-cr2032.jpg` | Pila de botón CR2032 | 9 guías (inicial-1, inicial-2, 1ro-egb) |
+| ✅ | `pieza-cinta-cobre.jpg` | Cinta de cobre / Dos placas de cinta de cobre | 9 guías (inicial-1, inicial-2, 1ro-egb, 2do-egb) |
 | ✅ | `pieza-led-amarillo.jpg` | LED verde o amarillo / LED amarillo | 8 guías (inicial-1, 1ro-egb, 2do-egb) |
 | ✅ | `pieza-pulsador.jpg` | Pulsador | 7 guías (8vo-egb, 10mo-egb, 1ro-bgu, 2do-bgu) |
 | ✅ | `pieza-cables-jumper.jpg` | Cables jumper | 7 guías (5to-egb, 6to-egb, 8vo-egb, 9no-egb) |
@@ -40,25 +40,25 @@ Consejos: fondo blanco o liso, buena luz, la pieza ocupando casi toda la foto.
 | ✅ | `pieza-led.jpg` | LED / LED con resistencia de 330 Ω / LED de confirmación con resistencia de 330 Ω | 5 guías (3ro-egb, 9no-egb, 2do-bgu) |
 | ✅ | `pieza-arduino-uno.jpg` | Arduino UNO | 5 guías (8vo-egb) |
 | ✅ | `pieza-esp32-c3.jpg` | ESP32-C3 Super Mini | 5 guías (1ro-bgu) |
-| ⬜ | `pieza-led-blanco.jpg` | LED blanco | 4 guías (4to-egb) |
+| ✅ | `pieza-led-blanco.jpg` | LED blanco | 4 guías (4to-egb) |
 | ✅ | `pieza-ldr.jpg` | LDR (fotorresistencia) / LDR / LDR y resistencia de 1 kΩ | 4 guías (4to-egb, 1ro-bgu) |
 | ✅ | `pieza-arduino-nano.jpg` | Arduino Nano | 4 guías (9no-egb) |
 | ✅ | `pieza-resistencia-330.jpg` | Resistencia de 330 Ω / 3 resistencias de 330 Ω | 4 guías (8vo-egb, 9no-egb) |
 | ✅ | `pieza-sensor-dht11.jpg` | Sensor DHT11 (módulo de 3 pines) / Sensor DHT11 | 4 guías (1ro-bgu, 3ro-bgu) |
 | ⬜ | `pieza-sensor-luz-modulo.jpg` | Módulo sensor de luz (LDR) / Módulo sensor de luz | 4 guías (2do-bgu, 3ro-bgu) |
-| ⬜ | `pieza-display-7-segmentos.jpg` | Display de 7 segmentos (cátodo común) / Display de 7 segmentos | 4 guías (7mo-egb) |
+| ✅ | `pieza-display-7-segmentos.jpg` | Display de 7 segmentos (cátodo común) / Display de 7 segmentos | 4 guías (7mo-egb) |
 | ⬜ | `pieza-cartulina.jpg` | Cartulina y colores / Cartulina | 3 guías (inicial-1, inicial-2) |
 | ✅ | `pieza-servo-sg90.jpg` | Servomotor SG90 / Brazo del servo | 3 guías (9no-egb) |
 | ⬜ | `pieza-buzzer-activo.jpg` | Buzzer activo / LED de alerta con resistencia de 330 Ω y buzzer activo | 3 guías (1ro-bgu, 3ro-bgu) |
 | ⬜ | `pieza-boton-cartulina.jpg` | Botón de cartulina con cobre / Dos botones de cartulina con cobre / Tres botones de cartulina | 3 guías (1ro-egb) |
-| ⬜ | `pieza-condensadores.jpg` | Condensador de 470 μF / Dos condensadores de 470 μF y uno de 100 μF | 3 guías (6to-egb) |
+| ✅ | `pieza-condensadores.jpg` | Condensador de 470 μF / Dos condensadores de 470 μF y uno de 100 μF | 3 guías (6to-egb) |
 | ✅ | `pieza-potenciometro-5k.jpg` | Potenciómetro de 5 kΩ | 2 guías (3ro-egb, 4to-egb) |
 | ✅ | `pieza-sensor-humedad-suelo.jpg` | Sensor de humedad del suelo | 2 guías (10mo-egb) |
 | ✅ | `pieza-sensor-ultrasonico-hcsr04.jpg` | Sensor ultrasónico HC-SR04 | 2 guías (9no-egb) |
 | ✅ | `pieza-buzzer-pasivo.jpg` | Buzzer pasivo | 2 guías (8vo-egb) |
 | ✅ | `pieza-sensor-pir.jpg` | Sensor PIR HC-SR501 | 2 guías (2do-bgu) |
 | ✅ | `pieza-rele-optoacoplador.jpg` | Módulo relé con optoacoplador | 2 guías (2do-bgu) |
-| ⬜ | `pieza-dip-switch.jpg` | DIP switch de 8 interruptores / DIP switch | 2 guías (7mo-egb) |
+| ✅ | `pieza-dip-switch.jpg` | DIP switch de 8 interruptores / DIP switch | 2 guías (7mo-egb) |
 | ✅ | `pieza-sensor-ultrasonico-hcsr04p.jpg` | Sensor ultrasónico HC-SR04P | 2 guías (3ro-bgu) |
 | ✅ | `pieza-lcd-16x2-i2c.jpg` | Pantalla LCD 16x2 con módulo I2C / Pantalla LCD 16x2 con I2C | 2 guías (3ro-bgu) |
 | ✅ | `pieza-resistencia-4k7.jpg` | Resistencia de 4,7 kΩ | 1 guía (4to-egb) |
@@ -67,7 +67,7 @@ Consejos: fondo blanco o liso, buena luz, la pieza ocupando casi toda la foto.
 | ⬜ | `pieza-rele-y-bomba.jpg` | Módulo relé y bomba de agua | 1 guía (10mo-egb) |
 | ✅ | `pieza-led-verde.jpg` | LED verde | 1 guía (1ro-egb) |
 | ⬜ | `pieza-sondas.jpg` | Dos sondas | 1 guía (5to-egb) |
-| ⬜ | `pieza-vaso-agua-sal.jpg` | Vaso con agua y una pizca de sal | 1 guía (5to-egb) |
+| ✅ | `pieza-vaso-agua-sal.jpg` | Vaso con agua y una pizca de sal | 1 guía (5to-egb) |
 | ⬜ | `pieza-cinta-cobre-y-botella.jpg` | Cinta de cobre y botella transparente | 1 guía (5to-egb) |
 | ✅ | `pieza-resistencia-22k.jpg` | Tres resistencias de 22 kΩ | 1 guía (6to-egb) |
 | ⬜ | `pieza-carton-y-cables.jpg` | Cartón y cables jumper | 1 guía (6to-egb) |
