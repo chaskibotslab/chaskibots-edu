@@ -22,13 +22,31 @@ const headers = { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer 
 // Etiquetas de pines sin tilde heredadas de la carga inicial.
 const ETIQUETAS = [[/\bSenal\b/g, 'Señal'], [/\bAnodo\b/g, 'Ánodo'], [/\bCatodo\b/g, 'Cátodo']]
 
+// Las fotos y videos se ponen desde el editor o con scripts/fotos-kits.js, no en
+// los archivos de guías: al recargar una guía se conservan los que ya tenía.
+// Piezas por nombre; pasos por posición.
+function conservarFotos(nueva, actual) {
+  if (!actual) return nueva
+  const g = JSON.parse(JSON.stringify(nueva))
+  const media = (a, b) => {
+    if (!a || !b) return
+    if (!a.fotoUrl && b.fotoUrl) a.fotoUrl = b.fotoUrl
+    if (!a.videoUrl && b.videoUrl) a.videoUrl = b.videoUrl
+  }
+  media(g.reto, actual.reto)
+  for (const pz of g.piezas || []) media(pz, (actual.piezas || []).find(x => x.nombre === pz.nombre))
+  ;(g.pasos || []).forEach((paso, i) => media(paso, (actual.pasos || [])[i]))
+  return g
+}
+
 ;(async () => {
-  const proyectos = await (await fetch(`${base}kit_proyectos?select=id,slug&kit_id=eq.${kitId}`, { headers })).json()
+  const proyectos = await (await fetch(`${base}kit_proyectos?select=id,slug,guia&kit_id=eq.${kitId}`, { headers })).json()
   if (!Array.isArray(proyectos)) throw new Error(JSON.stringify(proyectos))
 
-  for (const [slug, guia] of Object.entries(guias)) {
+  for (const [slug, guiaArchivo] of Object.entries(guias)) {
     const p = proyectos.find(x => x.slug === slug)
     if (!p) { console.log('no existe el proyecto', slug); continue }
+    const guia = conservarFotos(guiaArchivo, p.guia)
     const r = await fetch(`${base}kit_proyectos?id=eq.${p.id}`, { method: 'PATCH', headers: { ...headers, Prefer: 'return=minimal' }, body: JSON.stringify({ guia }) })
     console.log(r.ok ? 'guía cargada ' : `ERROR ${r.status} ${(await r.text()).slice(0, 160)}`, slug)
   }

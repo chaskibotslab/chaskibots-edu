@@ -8,6 +8,9 @@
  *   a VIN (5 V del USB). Lecturas de 0 a 4095 (antes 0 a 1023), Serial a 115200.
  * Las conexiones conservan su orden: los pasos de las guías siguen apuntando bien.
  *
+ * OJO: el SQL reescribe las guías completas, sin las fotos. Si ya pusiste fotos,
+ * vuelve a ejecutar después node scripts/fotos-kits.js para recolocarlas.
+ *
  * Genera supabase/migrations/2026_10_decimo_esp32.sql para pegarlo en Supabase:
  *   node scripts/decimo-esp32.js
  */

@@ -110,6 +110,7 @@ export async function buildKitFichas(kitRows: any[]) {
       schoolName: schoolRow?.name || null,
       name: kitRow.name,
       description: kitRow.description,
+      imageUrl: kitRow.image_url || null,
       price: kitRow.price,
       proyectoPrincipal: kitRow.proyecto_principal,
       alimentacion: kitRow.alimentacion,

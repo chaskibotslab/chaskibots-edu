@@ -46,6 +46,7 @@ export interface KitFichaDetalle {
   schoolName: string | null
   name: string
   description: string | null
+  imageUrl?: string | null
   price: number | null
   proyectoPrincipal: string | null
   alimentacion: string | null
@@ -107,7 +108,12 @@ export function KitHeaderMateriales({ kit }: { kit: KitFichaDetalle }) {
       <header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-chaski-dark via-chaski-dark to-slate-800 p-6 sm:p-8 mb-8 shadow-lg">
         <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '18px 18px' }} />
         <div className="absolute -top-10 -right-10 w-56 h-56 bg-chaski-primary/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative">
+        <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
+          {/* Portada del kit (fotos/kit-<grado>.jpg vía scripts/fotos-kits.js) */}
+          {kit.imageUrl && (
+            <img src={kit.imageUrl} alt={kit.name} className="w-full sm:w-48 h-40 sm:h-36 object-contain rounded-2xl bg-white/95 p-2 sm:order-2 flex-shrink-0" />
+          )}
+          <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-white/10 text-white/80 ring-1 ring-white/15">{kit.levelId}</span>
             {kit.schoolName && (
@@ -119,6 +125,7 @@ export function KitHeaderMateriales({ kit }: { kit: KitFichaDetalle }) {
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 leading-tight">{kit.name}</h1>
           {kit.description && <p className="text-white/70 max-w-2xl leading-relaxed">{kit.description}</p>}
+          </div>
         </div>
       </header>
 
