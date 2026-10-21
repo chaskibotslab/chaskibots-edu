@@ -209,4 +209,5 @@ const server = http.createServer((req, res) => {
   })
 })
 
-server.listen(PORT, () => console.log(`[lab-compiler] escuchando en :${PORT}`))
+// '::' = IPv4 + IPv6: la red privada de Railway (*.railway.internal) usa IPv6.
+server.listen(PORT, '::', () => console.log(`[lab-compiler] escuchando en :${PORT}`))
