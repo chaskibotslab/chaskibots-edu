@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from './AuthProvider'
-import { Menu, X, User, LogOut, Settings, ChevronLeft, Home, BookOpen, Bot, Brain, Shield, GraduationCap, Box } from 'lucide-react'
+import { Menu, X, User, LogOut, Settings, ChevronLeft, Home, BookOpen, Bot, Brain, Shield, GraduationCap, Box, FlaskConical } from 'lucide-react'
 
 export default function Header() {
   const { user, logout, isAuthenticated, isAdmin } = useAuth()
@@ -34,6 +34,8 @@ export default function Header() {
     { href: '/hacking', label: 'Hacking Ético', icon: Shield },
     { href: '/ia', label: 'IA', icon: Brain },
     { href: '/diseno', label: 'Diseño 3D', icon: Box },
+    // Laboratorio de Robótica: solo aparece si está activado (ver src/modules/laboratorio/README.md)
+    ...(process.env.NEXT_PUBLIC_LAB_ENABLED === 'true' ? [{ href: '/laboratorio', label: 'Laboratorio', icon: FlaskConical }] : []),
   ]
 
   useEffect(() => {

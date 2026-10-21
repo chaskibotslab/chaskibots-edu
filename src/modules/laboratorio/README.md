@@ -72,6 +72,7 @@ El servicio compilador está en `services/lab-compiler/`.
 | Variable | Dónde | Para qué |
 |---|---|---|
 | `LAB_ENABLED` | plataforma | `true` activa `/laboratorio`. Con cualquier otro valor, la ruta da 404 y la plataforma queda idéntica. |
+| `NEXT_PUBLIC_LAB_ENABLED` | plataforma | `true` muestra «Laboratorio» en el menú superior. Se lee al compilar, así que hay que redeployar al cambiarla. |
 | `LAB_COMPILER_URL` | plataforma | URL del servicio compilador, por ejemplo la URL privada de Railway |
 | `LAB_COMPILER_KEY` | plataforma **y** compilador | Clave compartida (larga y aleatoria) |
 | `MAX_CONCURRENT`, `RATE_LIMIT_PER_MIN` | compilador | Opcionales: compilaciones simultáneas (2) y por usuario por minuto (12) |
@@ -101,5 +102,5 @@ Para regenerar los `.hex`, compila con el servicio compilador las plantillas de 
 ## Cómo revertir todo
 
 - **Apagar sin borrar nada:** `LAB_ENABLED=false` (o quitar la variable) y redeploy.
-- **Borrar el módulo:** eliminar `src/modules/laboratorio/`, `src/app/laboratorio/`, `src/app/api/lab/` y `services/lab-compiler/`. Luego quitar `avr8js` y `@dimforge/rapier3d-compat` de `package.json` y borrar el servicio compilador en Railway.
+- **Borrar el módulo:** quitar la línea de `src/modules` en `tailwind.config.ts` y la entrada «Laboratorio» de `src/components/Header.tsx`, eliminar `src/modules/laboratorio/`, `src/app/laboratorio/`, `src/app/api/lab/` y `services/lab-compiler/`. Luego quitar `avr8js` y `@dimforge/rapier3d-compat` de `package.json` y borrar el servicio compilador en Railway.
 - **Base de datos:** F1 no crea tablas. Las tablas `lab_*` de fases futuras traen su script `down`.

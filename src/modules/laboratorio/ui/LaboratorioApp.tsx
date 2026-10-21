@@ -173,7 +173,7 @@ export default function LaboratorioApp() {
         </div>
 
         <select
-          className="h-9 rounded-lg border border-white/10 bg-labdark-bg px-2 text-sm"
+          className="h-9 rounded-lg border border-white/10 bg-labdark-bg px-2 text-sm text-slate-200 [&_option]:bg-labdark-surface"
           value=""
           onChange={e => {
             const p = PLANTILLAS.find(x => x.id === e.target.value)
@@ -221,7 +221,7 @@ export default function LaboratorioApp() {
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <label className="flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-labdark-bg pl-2 text-sm">
             <MapIcon className="h-4 w-4 text-slate-400" />
-            <select className="h-full bg-transparent pr-2 outline-none" value={pistaId} onChange={e => cambiarPista(e.target.value)}>
+            <select className="h-full bg-transparent pr-2 text-slate-200 outline-none [&_option]:bg-labdark-surface" value={pistaId} onChange={e => cambiarPista(e.target.value)}>
               {PISTAS.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
               {pistaPropia && <option value="propia">{pistaPropia}</option>}
             </select>
@@ -232,7 +232,7 @@ export default function LaboratorioApp() {
           <input ref={archivoPista} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) subirPista(f); e.target.value = '' }} />
           <label className="flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-labdark-bg pl-2 text-sm" title="Gravedad">
             <Gauge className="h-4 w-4 text-slate-400" />
-            <select className="h-full bg-transparent pr-2 outline-none" value={gravedad} onChange={e => { const g = e.target.value as Gravedad; setGravedad(g); sim?.cambiarGravedad(g) }}>
+            <select className="h-full bg-transparent pr-2 text-slate-200 outline-none [&_option]:bg-labdark-surface" value={gravedad} onChange={e => { const g = e.target.value as Gravedad; setGravedad(g); sim?.cambiarGravedad(g) }}>
               {Object.entries(GRAVEDADES).map(([k, v]) => <option key={k} value={k}>{v.nombre} ({v.g} m/s²)</option>)}
             </select>
           </label>
