@@ -1,0 +1,39 @@
+// Proxy al servicio compilador (servicio separado en Railway).
+// La clave del compilador nunca llega al navegador: la agrega este servidor.
+import { NextResponse } from 'next/server'
+import { laboratorioActivo, sesionLaboratorio } from '@/modules/laboratorio/server/acceso'
+
+export const dynamic = 'force-dynamic'
+
+const PLACAS = new Set(['uno', 'nano', 'mega'])
+
+export async function POST(req: Request) {
+  if (!laboratorioActivo()) return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
+  const sesion = await sesionLaboratorio()
+  if (!sesion) return NextResponse.json({ error: 'Inicia sesión para compilar' }, { status: 401 })
+
+  const url = process.env.LAB_COMPILER_URL
+  const key = process.env.LAB_COMPILER_KEY
+  if (!url || !key) return NextResponse.json({ error: 'El compilador no está configurado' }, { status: 503 })
+
+  let body: { board?: unknown; code?: unknown }
+  try { body = await req.json() } catch { return NextResponse.json({ error: 'JSON inválido' }, { status: 400 }) }
+  const board = String(body.board ?? 'uno')
+  const code = String(body.code ?? '')
+  if (!PLACAS.has(board)) return NextResponse.json({ error: 'Placa no soportada' }, { status: 400 })
+  if (code.length > 64 * 1024) return NextResponse.json({ error: 'El código supera 64 KB' }, { status: 413 })
+
+  try {
+    const res = await fetch(`${url.replace(/\/$/, '')}/compile`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-lab-key': key, 'x-user-id': sesion.id },
+      body: JSON.stringify({ board, code }),
+      signal: AbortSignal.timeout(45_000), // incluye el arranque en frío del servicio dormido
+      cache: 'no-store',
+    })
+    const data = await res.json().catch(() => ({ error: 'Respuesta inválida del compilador' }))
+    return NextResponse.json(data, { status: res.status })
+  } catch {
+    return NextResponse.json({ error: 'No se pudo contactar al compilador. Intenta de nuevo en unos segundos.' }, { status: 502 })
+  }
+}
