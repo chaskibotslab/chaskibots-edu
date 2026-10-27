@@ -54,9 +54,10 @@ export const HCSR04: PiezaDef = {
   descripcion: 'Mide distancias con sonido, como un murciélago: de 2 a 400 cm.',
   enKits: true,
   modelo: 'proc:hcsr04',
+  glb: '/lab/modelos/hcsr04.glb',
   masa_g: 8.5,
   material: 'pcb',
-  colisionadores: [{ forma: 'caja', medidas: [15, 20, 45], centro: [7.5, 10, 0] }],
+  colisionadores: [{ forma: 'caja', medidas: [17.8, 26.2, 45], centro: [4.5, 13.1, 0] }],
   montajes: [],
   encaja: ['sensor-frontal', 'eje-servo'],
   pines: [
@@ -65,7 +66,7 @@ export const HCSR04: PiezaDef = {
     { nombre: 'ECHO', tipo: 'digital', ayuda: 'Queda en HIGH el tiempo que tarda el eco (58 µs por cm)' },
     { nombre: 'GND', tipo: 'gnd' },
   ],
-  comportamiento: { tipo: 'ultrasonido', alcance_max_cm: 400, apertura_grados: 15, origen: [15, 10, 0] },
+  comportamiento: { tipo: 'ultrasonido', alcance_max_cm: 400, apertura_grados: 15, origen: [13.4, 16, 0] },
   datos: [['Alcance', '2–400 cm'], ['Apertura', '≈ 15°'], ['Voltaje', '5 V'], ['Fórmula', 'cm = µs del eco ÷ 58']],
   fuente: 'HC-SR04, hoja de datos (ElecFreaks)',
 }

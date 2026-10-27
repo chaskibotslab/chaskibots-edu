@@ -6,9 +6,10 @@ export const L298N: PiezaDef = {
   familia: 'electronica',
   descripcion: 'Puente H doble: deja que el Arduino controle 2 motores (dirección con IN, velocidad con EN). Pierde ≈ 2 V.',
   modelo: 'proc:l298n',
+  glb: '/lab/modelos/l298n.glb',
   masa_g: 30,
   material: 'pcb',
-  colisionadores: [{ forma: 'caja', medidas: [43, 27, 43], centro: [0, 13.5, 0] }],
+  colisionadores: [{ forma: 'caja', medidas: [43.5, 15.3, 42.6], centro: [0, 7.65, 0] }],
   montajes: [],
   encaja: ['driver'],
   pines: [

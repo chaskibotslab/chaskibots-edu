@@ -100,8 +100,13 @@ export interface PiezaDef {
   descripcion: string
   /** Existe en los kits ChaskiBots (lista `materiales` de la plataforma). */
   enKits?: boolean
-  /** "proc:<nombre>" = modelo generado por código con medidas reales; o URL .glb. */
+  /** "proc:<nombre>" = modelo generado por código con medidas reales (también es el
+   *  respaldo mientras carga el modelo real y la clave para ubicar los pines). */
   modelo: string
+  /** Modelo 3D real (GLB ya preparado con scripts/preparar-modelos.mjs, en metros y en el marco de la pieza). */
+  glb?: string
+  /** Escala del modelo real (p. ej. la rueda de 48 mm usa el modelo de 65 mm reducido). */
+  escalaGlb?: number
   masa_g: number
   /** Material de la pieza (fricción, aspecto). Las variantes lo pueden cambiar. */
   material: MaterialFisico

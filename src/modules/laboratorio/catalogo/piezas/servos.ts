@@ -17,6 +17,7 @@ export const SG90: PiezaDef = {
   descripcion: 'Servo pequeño de engranajes plásticos. Gira de 0° a 180° a la posición que le pidas.',
   enKits: true,
   modelo: 'proc:servo',
+  glb: '/lab/modelos/sg90.glb',
   masa_g: 9,
   material: 'plastico',
   color: '#2563eb',

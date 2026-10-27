@@ -34,6 +34,7 @@ export const ARDUINO_UNO: PiezaDef = {
   descripcion: 'La placa más usada para aprender. Microcontrolador ATmega328P a 16 MHz y 5 V.',
   enKits: true,
   modelo: 'proc:arduino-uno',
+  glb: '/lab/modelos/arduino-uno.glb',
   masa_g: 25,
   material: 'pcb',
   colisionadores: [{ forma: 'caja', medidas: [68.6, 12, 53.4], centro: [0, 6, 0] }],

@@ -61,7 +61,7 @@ export function campoLibre(semilla = 7, cantidad = 9): ArenaDef {
     nombre: 'Campo libre con obstáculos',
     descripcion: 'Piso amplio con paredes y cajas para robots que esquivan obstáculos.',
     ancho, largo,
-    piso: { material: 'melamina', color: '#d9d4c7', reflectancia: 0.8 },
+    piso: { material: 'melamina', color: '#9c968a', reflectancia: 0.8 },
     objetos,
     paredes: true,
     inicio: { x: -1.2, z: 0, yaw: 0 },
