@@ -1,0 +1,10 @@
+{
+  "id": "bateria-2x18650",
+  "nombre": "Batería 2×18650 (7,4 V)",
+  "categoria": "alimentacion",
+  "modelo3D": "proc:bateria",
+  "masa_g": 105,
+  "dimensiones_mm": [77, 21, 41],
+  "pines": [ { "nombre": "+", "tipo": "alim" }, { "nombre": "-", "tipo": "alim" } ],
+  "comportamiento": { "tipo": "bateria", "voltaje": 7.4 }
+}

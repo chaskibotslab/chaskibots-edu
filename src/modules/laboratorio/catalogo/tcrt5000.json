@@ -1,0 +1,13 @@
+{
+  "id": "tcrt5000",
+  "nombre": "Sensor IR TCRT5000 (módulo)",
+  "categoria": "sensor",
+  "modelo3D": "proc:tcrt5000",
+  "masa_g": 4,
+  "dimensiones_mm": [32, 10, 14],
+  "pines": [
+    { "nombre": "VCC", "tipo": "alim" }, { "nombre": "GND", "tipo": "alim" },
+    { "nombre": "DO", "tipo": "digital" }, { "nombre": "AO", "tipo": "analogico" }
+  ],
+  "comportamiento": { "tipo": "ir-reflectivo", "umbral": 0.5, "altura_max_mm": 25, "radio_lectura_mm": 3 }
+}

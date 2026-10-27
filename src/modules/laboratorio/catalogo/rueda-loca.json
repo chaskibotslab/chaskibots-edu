@@ -1,0 +1,10 @@
+{
+  "id": "rueda-loca",
+  "nombre": "Rueda loca (bola)",
+  "categoria": "mecanica",
+  "modelo3D": "proc:rueda-loca",
+  "masa_g": 8,
+  "dimensiones_mm": [16, 20, 16],
+  "pines": [],
+  "comportamiento": { "tipo": "rueda-loca", "radio_mm": 8 }
+}

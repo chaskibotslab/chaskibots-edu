@@ -1,0 +1,25 @@
+{
+  "id": "l298n",
+  "nombre": "Driver de motores L298N",
+  "categoria": "driver",
+  "modelo3D": "proc:l298n",
+  "masa_g": 30,
+  "dimensiones_mm": [43, 27, 43],
+  "pines": [
+    { "nombre": "ENA", "tipo": "pwm" }, { "nombre": "IN1", "tipo": "digital" },
+    { "nombre": "IN2", "tipo": "digital" }, { "nombre": "IN3", "tipo": "digital" },
+    { "nombre": "IN4", "tipo": "digital" }, { "nombre": "ENB", "tipo": "pwm" },
+    { "nombre": "OUT1", "tipo": "potencia" }, { "nombre": "OUT2", "tipo": "potencia" },
+    { "nombre": "OUT3", "tipo": "potencia" }, { "nombre": "OUT4", "tipo": "potencia" },
+    { "nombre": "12V", "tipo": "alim" }, { "nombre": "5V", "tipo": "alim" },
+    { "nombre": "GND", "tipo": "alim" }
+  ],
+  "comportamiento": {
+    "tipo": "l298n",
+    "caida_v": 2,
+    "canales": [
+      { "en": "ENA", "in_a": "IN1", "in_b": "IN2", "out_a": "OUT1", "out_b": "OUT2" },
+      { "en": "ENB", "in_a": "IN3", "in_b": "IN4", "out_a": "OUT3", "out_b": "OUT4" }
+    ]
+  }
+}
