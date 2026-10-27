@@ -1,0 +1,72 @@
+import type { PiezaDef } from '../tipos'
+
+export const L298N: PiezaDef = {
+  id: 'l298n',
+  nombre: 'Driver de motores L298N',
+  familia: 'electronica',
+  descripcion: 'Puente H doble: deja que el Arduino controle 2 motores (dirección con IN, velocidad con EN). Pierde ≈ 2 V.',
+  modelo: 'proc:l298n',
+  masa_g: 30,
+  material: 'pcb',
+  colisionadores: [{ forma: 'caja', medidas: [43, 27, 43], centro: [0, 13.5, 0] }],
+  montajes: [],
+  encaja: ['driver'],
+  pines: [
+    { nombre: 'ENA', tipo: 'pwm', ayuda: 'Velocidad del motor A (PWM)' },
+    { nombre: 'IN1', tipo: 'digital', ayuda: 'Dirección del motor A' },
+    { nombre: 'IN2', tipo: 'digital', ayuda: 'Dirección del motor A' },
+    { nombre: 'IN3', tipo: 'digital', ayuda: 'Dirección del motor B' },
+    { nombre: 'IN4', tipo: 'digital', ayuda: 'Dirección del motor B' },
+    { nombre: 'ENB', tipo: 'pwm', ayuda: 'Velocidad del motor B (PWM)' },
+    { nombre: 'OUT1', tipo: 'potencia' },
+    { nombre: 'OUT2', tipo: 'potencia' },
+    { nombre: 'OUT3', tipo: 'potencia' },
+    { nombre: 'OUT4', tipo: 'potencia' },
+    { nombre: '12V', tipo: 'alim', ayuda: 'Entrada de la batería de motores' },
+    { nombre: '5V', tipo: 'alim', ayuda: 'Salida de 5 V (puede alimentar al Arduino)' },
+    { nombre: 'GND', tipo: 'gnd' },
+  ],
+  comportamiento: {
+    tipo: 'puente-h',
+    caida_v: 2,
+    canales: [
+      { en: 'ENA', in_a: 'IN1', in_b: 'IN2', out_a: 'OUT1', out_b: 'OUT2' },
+      { en: 'ENB', in_a: 'IN3', in_b: 'IN4', out_a: 'OUT3', out_b: 'OUT4' },
+    ],
+  },
+  datos: [['Motores', '2 (o 2 pares en paralelo)'], ['Corriente', 'hasta 2 A por canal'], ['Caída de voltaje', '≈ 2 V']],
+  fuente: 'STMicroelectronics L298, hoja de datos',
+}
+
+export const BATERIA_18650: PiezaDef = {
+  id: 'bateria-2x18650',
+  nombre: 'Batería 2×18650 (7,4 V)',
+  familia: 'electronica',
+  descripcion: 'Dos pilas de litio recargables en serie. Dan la corriente que piden los motores.',
+  modelo: 'proc:bateria-18650',
+  masa_g: 105,
+  material: 'plastico',
+  colisionadores: [{ forma: 'caja', medidas: [77, 21, 41], centro: [0, 10.5, 0] }],
+  montajes: [],
+  encaja: ['bateria'],
+  pines: [{ nombre: '+', tipo: 'alim' }, { nombre: '-', tipo: 'gnd' }],
+  comportamiento: { tipo: 'bateria', voltaje: 7.4, capacidad_mah: 2600, corriente_max_a: 5 },
+  datos: [['Voltaje', '7,4 V'], ['Capacidad', '2600 mAh'], ['Corriente máxima', '≈ 5 A']],
+}
+
+export const BATERIA_9V: PiezaDef = {
+  id: 'bateria-9v',
+  nombre: 'Batería 9 V con portapila',
+  familia: 'electronica',
+  descripcion: 'La de los kits. Sirve para el Arduino, pero da poca corriente: con varios motores el voltaje se cae.',
+  enKits: true,
+  modelo: 'proc:bateria-9v',
+  masa_g: 50,
+  material: 'plastico',
+  colisionadores: [{ forma: 'caja', medidas: [48.5, 17.5, 26.5], centro: [0, 8.75, 0] }],
+  montajes: [],
+  encaja: ['bateria'],
+  pines: [{ nombre: '+', tipo: 'alim' }, { nombre: '-', tipo: 'gnd' }],
+  comportamiento: { tipo: 'bateria', voltaje: 9, capacidad_mah: 500, corriente_max_a: 0.5 },
+  datos: [['Voltaje', '9 V'], ['Capacidad', '≈ 500 mAh'], ['Corriente máxima', '≈ 0,5 A (poca para motores)']],
+}
