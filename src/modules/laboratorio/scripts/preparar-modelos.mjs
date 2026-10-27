@@ -56,6 +56,47 @@ const MODELOS = {
     soloNodo: 'Roda.004', filtro: (x, y, z) => z > 0.045,
     origen: { x: 'todo-centro', y: 'todo-centro', z: 'todo-centro' }, maxTri: 6000,
   },
+  // Del paquete «Electronics Components» de Aficionado (@TECH_AR): cada módulo
+  // armado es un grupo con nombre. Cada uno trae su propia escala: se mide
+  // contra la pieza real.
+  'motor-tt': {
+    archivo: 'componentes-electronica.glb', soloNodo: 'YellowGearedMotor', ref: 'YellowGearedMotor',
+    // Acostado con el eje vertical: se pone con el eje en z, la caja reductora
+    // adelante y el motor atrás (−x). El eje está a 21,6 mm del centro.
+    giros: [['x', 90], ['z', 90], ['y', 180]], mmPorUnidad: 64.5 / 14.2,
+    origen: { x: 'todo-centro', y: 'todo-centro', z: 'todo-centro' }, corrimiento: [21.6, 0, 0], maxTri: 4000,
+  },
+  esp32: {
+    archivo: 'componentes-electronica.glb', soloNodo: 'esp32', ref: 'esp32',
+    giros: [['y', 90]], mmPorUnidad: 51.5 / 16.3,
+    origen: { x: 'ref-centro', y: 'ref-abajo', z: 'ref-centro' }, maxTri: 12000,
+  },
+  'ir-obstaculo': {
+    // Los LEDs quedan adelante (+x) y los pines atrás, en el origen.
+    archivo: 'componentes-electronica.glb', soloNodo: 'IR sensor', ref: 'IR sensor',
+    rot: [0, 180, 0], mmPorUnidad: 31 / 10.9,
+    origen: { x: 'todo-atras', y: 'ref-abajo', z: 'ref-centro' }, maxTri: 6000,
+  },
+  mpu6050: {
+    archivo: 'componentes-electronica.glb', soloNodo: 'MPU6050', ref: 'MPU6050',
+    rot: [0, 0, 0], mmPorUnidad: 21 / 5.0,
+    origen: { x: 'ref-centro', y: 'ref-abajo', z: 'ref-centro' }, maxTri: 4000,
+  },
+  drv8825: {
+    archivo: 'componentes-electronica.glb', soloNodo: 'DRV8825', ref: 'DRV8825',
+    rot: [0, 0, 0], mmPorUnidad: 20.3 / 4.8,
+    origen: { x: 'ref-centro', y: 'ref-abajo', z: 'ref-centro' }, maxTri: 6000,
+  },
+  joystick: {
+    archivo: 'componentes-electronica.glb', soloNodo: 'Cube.003', ref: 'Cube.003',
+    rot: [0, 0, 0], mmPorUnidad: 34 / 6.7,
+    origen: { x: 'ref-centro', y: 'ref-abajo', z: 'ref-centro' }, maxTri: 8000,
+  },
+  tb6612: {
+    archivo: 'componentes-electronica.glb', soloNodo: 'TB66012FNG', ref: 'TB66012FNG',
+    rot: [0, 0, 0], mmPorUnidad: 20.3 / 5.0,
+    origen: { x: 'ref-centro', y: 'ref-abajo', z: 'ref-centro' }, maxTri: 8000,
+  },
 }
 
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.encoder': MeshoptEncoder })
@@ -82,8 +123,10 @@ async function preparar(id, cfg) {
 
   // Nuevo nodo raíz con la rotación y la escala (mm → m).
   const pieza = doc.createNode(id)
-  const r = cfg.rot.map(g => (g * Math.PI) / 180)
-  const q = eulerXYZ(r[0], r[1], r[2])
+  // `giros`: lista de [eje, grados] aplicados en orden (el primero, primero).
+  const q = cfg.giros
+    ? cfg.giros.reduce((acc, [eje, g]) => mulQ(ejeAngulo(eje, (g * Math.PI) / 180), acc), [0, 0, 0, 1])
+    : eulerXYZ(...cfg.rot.map(g => (g * Math.PI) / 180))
   const s = cfg.mmPorUnidad / 1000
   pieza.setRotation(q).setScale([s, s, s])
   for (const n of escena.listChildren()) { escena.removeChild(n); pieza.addChild(n) }
@@ -100,10 +143,13 @@ async function preparar(id, cfg) {
     if (modo === 'ref-abajo' || modo === 'ref-atras') return bRef.min[i]
     if (modo === 'todo-abajo') return bTodo.min[i]
     if (modo === 'todo-centro') return (bTodo.min[i] + bTodo.max[i]) / 2
+    if (modo === 'todo-atras') return bTodo.min[i]
     return 0
   }
   const o = [eje('x', 0), eje('y', 1), eje('z', 2)]
-  pieza.setTranslation([-o[0], -o[1], -o[2]])
+  // `corrimiento` (mm): mueve el origen desde el punto calculado (p. ej. al eje del motor).
+  const c = (cfg.corrimiento ?? [0, 0, 0]).map(v => v / 1000)
+  pieza.setTranslation([-o[0] - c[0], -o[1] - c[1], -o[2] - c[2]])
 
   await doc.transform(
     dedup(), flatten(), join({ keepNamed: false }), weld({ tolerance: 0.0001 }),
@@ -166,6 +212,20 @@ function recortarTriangulos(doc, filtro) {
       compactPrimitive(p) // quita los vértices que ya no usa ningún triángulo
     }
   }
+}
+
+function ejeAngulo(eje, a) {
+  const s = Math.sin(a / 2)
+  return [eje === 'x' ? s : 0, eje === 'y' ? s : 0, eje === 'z' ? s : 0, Math.cos(a / 2)]
+}
+
+function mulQ(a, b) {
+  return [
+    a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1],
+    a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
+    a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3],
+    a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2],
+  ]
 }
 
 function eulerXYZ(x, y, z) {

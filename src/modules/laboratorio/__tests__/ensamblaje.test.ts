@@ -26,7 +26,7 @@ describe('catálogo de piezas', () => {
   it('cada pieza encaja en algún montaje que existe (salvo los chasis)', () => {
     const tipos = new Set<TipoMontaje>(LISTA_PIEZAS.flatMap(p => p.montajes.map(m => m.tipo)))
     for (const p of LISTA_PIEZAS) {
-      if (p.familia === 'chasis') { expect(p.encaja).toEqual([]); continue }
+      if (p.familia === 'chasis' || p.proximamente) continue
       expect(p.encaja.length, p.id).toBeGreaterThan(0)
       for (const t of p.encaja) expect(tipos.has(t), `${p.id} → ${t}`).toBe(true)
     }
@@ -187,6 +187,28 @@ describe('cableado automático y plan', () => {
     const ladoIzq = plan.motores.filter(m => m.etiqueta.includes('izquierdo'))
     expect(ladoIzq).toHaveLength(2)
     expect(new Set(ladoIzq.map(m => m.en))).toEqual(new Set(['D5']))
+  })
+
+  it('con un TB6612 el cableado alimenta VCC y STBY y los motores funcionan', () => {
+    let doc = construirSeguidor()
+    const driver = doc.piezas.find(p => p.pieza === 'l298n')!
+    doc = reemplazar(doc, driver.id, 'tb6612').doc
+    doc = { ...doc, cables: autocablear(doc).cables }
+    const plan = planDe(doc)
+    expect(plan.avisos).toEqual([])
+    expect(plan.caidaDriver).toBe(0.5)
+    const izq = plan.motores.find(m => m.etiqueta === 'Motor izquierdo')!
+    expect([izq.en, izq.inA, izq.inB, izq.polaridad]).toEqual(['D5', 'D7', 'D8', 1])
+    // Sin STBY a 5 V el driver queda apagado (como en la realidad) y se avisa.
+    const sinStby = { ...doc, cables: doc.cables.filter(c => !(c.de[1] === 'STBY' || c.a[1] === 'STBY')) }
+    const p2 = planDe(sinStby)
+    expect(p2.avisos.some(a => a.includes('STBY'))).toBe(true)
+    expect(p2.motores.every(m => m.polaridad === 0)).toBe(true)
+  })
+
+  it('las piezas «próximamente» se ven pero no se pueden encastrar', () => {
+    const doc = robotVacio('chasis-2wd')
+    expect(motivoNoEncastra(doc, 'esp32-devkit', 'chasis', 'placa')).toMatch(/F4/)
   })
 
   it('un sensor sin alimentación no funciona y se avisa', () => {

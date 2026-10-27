@@ -10,6 +10,7 @@ export const MOTOR_TT: PiezaDef = {
   familia: 'movimiento',
   descripcion: 'El motor amarillo de casi todos los kits. Lento pero con fuerza gracias a su reductora.',
   modelo: 'proc:motor-tt',
+  glb: '/lab/modelos/motor-tt.glb',
   masa_g: 30,
   material: 'plastico',
   colisionadores: [{ forma: 'caja', medidas: [65, 22, 19], centro: [-8, 0, 0] }],

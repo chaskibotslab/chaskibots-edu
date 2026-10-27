@@ -181,13 +181,34 @@ function PisoArena({ sim, version }: { sim: Simulacion; version: number }) {
     sim.colocarRobot({ x: e.point.x, z: e.point.z, yaw: sim.fisica.pose().yaw })
   }
 
+  const bajo = arena.mesa ? -arena.mesa.altura : 0
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.0005, 0]} receiveShadow onDoubleClick={colocar}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, bajo - 0.0005, 0]} receiveShadow onDoubleClick={arena.mesa ? undefined : colocar}>
         <planeGeometry args={[14, 14]} />
         <meshStandardMaterial color="#3a3f4b" roughness={0.95} />
       </mesh>
-      <gridHelper args={[14, 70, '#4b5262', '#434957']} />
+      <gridHelper args={[14, 70, '#4b5262', '#434957']} position={[0, bajo, 0]} />
+      {arena.mesa && (
+        <group>
+          <mesh position={[0, -0.02, 0]} castShadow receiveShadow>
+            <boxGeometry args={[arena.ancho, 0.04, arena.largo]} />
+            <meshStandardMaterial color="#8a6240" roughness={0.7} />
+          </mesh>
+          {[[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([sx, sz], i) => (
+            <mesh key={i} position={[sx * (arena.ancho / 2 - 0.05), bajo / 2 - 0.02, sz * (arena.largo / 2 - 0.05)]} castShadow>
+              <boxGeometry args={[0.05, -bajo - 0.04, 0.05]} />
+              <meshStandardMaterial color="#5b3f28" roughness={0.75} />
+            </mesh>
+          ))}
+        </group>
+      )}
+      {arena.meta && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[arena.meta.x, 0.0012, arena.meta.z]}>
+          <circleGeometry args={[arena.meta.radio, 48]} />
+          <meshStandardMaterial color="#16a34a" transparent opacity={0.75} roughness={0.6} />
+        </mesh>
+      )}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.0004, 0]} receiveShadow onDoubleClick={colocar}>
         <planeGeometry args={[arena.ancho, arena.largo]} />
         {textura

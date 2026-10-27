@@ -245,8 +245,8 @@ const DIFICULTAD = { inicial: 'bg-emerald-500/15 text-emerald-300', intermedio: 
 
 function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | null) => void; onCerrar: () => void }) {
   return (
-    <Modal titulo="¿Con qué robot empezamos?" onCerrar={onCerrar}>
-      <div className="grid gap-3 sm:grid-cols-2">
+    <Modal titulo="¿Con qué robot empezamos?" onCerrar={onCerrar} ancho="max-w-5xl">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {PREARMADOS.map(p => (
           <button key={p.id} onClick={() => onAbrir(p.construir(), p.id)} className="group rounded-xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-chaski-primary/50 hover:bg-chaski-primary/5">
             <div className="mb-2 flex items-center justify-between">
@@ -255,6 +255,12 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
             </div>
             <div className="font-semibold text-white">{p.nombre}</div>
             <p className="mt-1 text-xs leading-relaxed text-slate-400">{p.descripcion}</p>
+            <div className="mt-2 rounded-lg bg-black/20 p-2">
+              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Cómo piensa</div>
+              <ol className="list-decimal space-y-0.5 pl-4 text-[11px] leading-snug text-slate-300">
+                {p.logica.map((l, i) => <li key={i}>{l}</li>)}
+              </ol>
+            </div>
             <div className="mt-3 text-xs font-medium text-chaski-primary group-hover:underline">Abrir y modificar →</div>
           </button>
         ))}

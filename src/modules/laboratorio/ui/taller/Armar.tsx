@@ -78,6 +78,7 @@ export default function Armar(p: Props) {
   }, [doc, cambiar, avisar])
 
   const elegirPieza = (def: PiezaDef) => {
+    if (def.proximamente) { avisar('info', `${def.nombre}: ${def.proximamente}`); return }
     if (def.familia === 'chasis') {
       const raiz = doc.piezas.find(x => !x.padre)!
       if (raiz.pieza === def.id) { setSeleccion(raiz.id); return }
@@ -254,12 +255,14 @@ function TarjetaPieza({ def, elegida, enUso, onTocar, onArrastrar }: { def: Piez
   return (
     <button
       onClick={onTocar}
-      onPointerDown={e => { if (e.button === 0) onArrastrar(e.clientX, e.clientY) }}
-      className={`touch-none select-none rounded-xl border p-2 text-left transition ${elegida ? 'border-emerald-400/60 bg-emerald-500/10' : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'}`}
+      onPointerDown={e => { if (e.button === 0 && !def.proximamente) onArrastrar(e.clientX, e.clientY) }}
+      className={`touch-none select-none rounded-xl border p-2 text-left transition ${def.proximamente ? 'border-dashed border-white/10 bg-white/[0.02] opacity-60' : elegida ? 'border-emerald-400/60 bg-emerald-500/10' : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'}`}
     >
       <div className="flex items-start justify-between gap-1">
         <span className="text-xs font-semibold leading-tight text-white">{def.nombre}</span>
-        {def.enKits && <span className="shrink-0 rounded bg-chaski-primary/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-chaski-primary">En kits</span>}
+        {def.proximamente
+          ? <span className="shrink-0 rounded bg-sky-500/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-sky-300">Próximamente</span>
+          : def.enKits && <span className="shrink-0 rounded bg-chaski-primary/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-chaski-primary">En kits</span>}
       </div>
       <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-slate-400">{def.descripcion}</p>
       <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-500">
@@ -275,7 +278,7 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
   const def = pieza(inst.pieza)
   const mt = montajeDe(doc, inst)
   const v = datosVariante(def, inst.variante)
-  const alternativas = LISTA_PIEZAS.filter(x => x.id !== def.id && (mt ? x.encaja.includes(mt.tipo) : x.familia === 'chasis'))
+  const alternativas = LISTA_PIEZAS.filter(x => x.id !== def.id && !x.proximamente && (mt ? x.encaja.includes(mt.tipo) : x.familia === 'chasis'))
   const colgando = descendientes(doc, id).length - 1
   const credito = def.glb ? CREDITOS_MODELOS[def.glb.split('/').pop()!] : undefined
 

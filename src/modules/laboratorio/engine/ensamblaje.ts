@@ -207,7 +207,7 @@ export function avisosEnsamblaje(doc: RobotDoc): string[] {
   const tieneMcu = doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'mcu-avr')
   if (!tieneMcu) avisos.push('Falta la placa (Arduino): nadie va a controlar el robot')
   if (motores.length && !doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'puente-h')) {
-    avisos.push('Falta el driver de motores (L298N): el Arduino no puede mover motores directamente')
+    avisos.push('Falta el driver de motores (L298N o TB6612): el Arduino no puede mover motores directamente')
   }
   return avisos
 }
@@ -236,6 +236,7 @@ export function motivoNoEncastra(doc: RobotDoc, piezaId: string, instancia: stri
   if (!destino) return 'Esa pieza ya no está en el robot'
   const m = pieza(destino.pieza).montajes.find(x => x.id === montajeId)
   if (!m) return 'Ese punto de montaje no existe'
+  if (def.proximamente) return `${def.nombre}: ${def.proximamente}`
   if (!def.encaja.includes(m.tipo)) return `${def.nombre} no encaja en «${m.nombre}»`
   if (doc.piezas.some(p => p.padre?.instancia === instancia && p.padre.montaje === montajeId)) return `«${m.nombre}» ya está ocupado`
   if (def.comportamiento.tipo === 'mcu-avr' && doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'mcu-avr')) {
