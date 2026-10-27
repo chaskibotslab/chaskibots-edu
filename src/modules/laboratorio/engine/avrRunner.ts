@@ -36,6 +36,7 @@ export interface PinReport {
   level: 0 | 1      // nivel al final del paso
   duty: number      // fracción del tiempo en ALTO durante el paso (0–1) → PWM
   freqHz: number    // flancos de subida por segundo (0 si es fijo)
+  pulsoUs: number   // ancho del último pulso en ALTO terminado (µs): servos
 }
 
 export interface StepResult {
@@ -54,6 +55,8 @@ interface PinTrack {
   lastChange: number
   highAcc: number
   rises: number
+  lastRise: number
+  lastPulse: number
 }
 
 export class AvrRunner {
@@ -94,7 +97,7 @@ export class AvrRunner {
     // cada cambio y sumamos cuánto tiempo estuvo en ALTO.
     this.tracks = { B: [], C: [], D: [] }
     for (const [name, { port, bit }] of Object.entries(UNO_PINS)) {
-      this.tracks[port][bit] = { name, level: 0, lastChange: 0, highAcc: 0, rises: 0 }
+      this.tracks[port][bit] = { name, level: 0, lastChange: 0, highAcc: 0, rises: 0, lastRise: 0, lastPulse: 0 }
     }
     for (const p of ['B', 'C', 'D'] as PortName[]) {
       this.ports[p].addListener((value, oldValue) => this.onPortWrite(p, value, oldValue))
@@ -112,7 +115,7 @@ export class AvrRunner {
       if (t.level) t.highAcc += now - t.lastChange
       t.level = value & (1 << bit) ? 1 : 0
       t.lastChange = now
-      if (t.level) t.rises++
+      if (t.level) { t.rises++; t.lastRise = now } else if (t.lastRise) t.lastPulse = now - t.lastRise
       for (const l of this.edgeListeners) l(t.name, t.level, now)
     }
   }
@@ -175,6 +178,7 @@ export class AvrRunner {
           level: t.level,
           duty: ran > 0 ? t.highAcc / ran : t.level,
           freqHz: ran > 0 ? (t.rises * CPU_FREQ_HZ) / ran : 0,
+          pulsoUs: (t.lastPulse * 1e6) / CPU_FREQ_HZ,
         }
         t.highAcc = 0
         t.rises = 0
