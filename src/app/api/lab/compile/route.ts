@@ -23,17 +23,24 @@ export async function POST(req: Request) {
   if (!PLACAS.has(board)) return NextResponse.json({ error: 'Placa no soportada' }, { status: 400 })
   if (code.length > 64 * 1024) return NextResponse.json({ error: 'El código supera 64 KB' }, { status: 413 })
 
+  const destino = `${url.replace(/\/$/, '')}/compile`
   try {
-    const res = await fetch(`${url.replace(/\/$/, '')}/compile`, {
+    const res = await fetch(destino, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-lab-key': key, 'x-user-id': sesion.id },
       body: JSON.stringify({ board, code }),
       signal: AbortSignal.timeout(45_000), // incluye el arranque en frío del servicio dormido
       cache: 'no-store',
     })
-    const data = await res.json().catch(() => ({ error: 'Respuesta inválida del compilador' }))
+    const data = await res.json().catch(() => ({ error: `Respuesta inválida del compilador (HTTP ${res.status})` }))
+    if (!res.ok && !data.errors) console.error(`[lab] compilador respondió ${res.status}:`, data.error)
     return NextResponse.json(data, { status: res.status })
-  } catch {
-    return NextResponse.json({ error: 'No se pudo contactar al compilador. Intenta de nuevo en unos segundos.' }, { status: 502 })
+  } catch (err) {
+    // El motivo real (DNS, conexión rechazada, tiempo agotado…) va al registro
+    // del servidor y, resumido, a la pantalla para poder diagnosticar.
+    const e = err as Error & { cause?: { code?: string; message?: string } }
+    const motivo = e.cause?.code || e.name || 'desconocido'
+    console.error(`[lab] no se pudo contactar al compilador en ${destino}:`, e.name, e.message, e.cause)
+    return NextResponse.json({ error: `No se pudo contactar al compilador (${motivo}). Intenta de nuevo en unos segundos.` }, { status: 502 })
   }
 }
