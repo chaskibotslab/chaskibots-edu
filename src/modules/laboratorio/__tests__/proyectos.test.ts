@@ -85,7 +85,7 @@ describe('proyectos prearmados con su programa real', () => {
       prev = p
     })
     expect(recorrido).toBeGreaterThan(3)
-    expect(maxSeguidos / 60).toBeLessThan(1.5)   // ningún roce dura más de 1,5 s
+    expect(maxSeguidos / 60).toBeLessThan(3)     // ningún roce dura más de 3 s (escapar de un rincón lleva ~2 s)
     expect(roce / 1800).toBeLessThan(0.2)        // roza menos del 20 % del tiempo
     sim.liberar()
   }, 300_000)
