@@ -36,8 +36,15 @@ export class Mundo {
     this.world = new RAPIER.World({ x: 0, y: -this.g, z: 0 })
     this.world.timestep = SUBPASO
 
-    // Piso: más grande que la arena, la cara de arriba en y = 0.
-    this.world.createCollider(RAPIER.ColliderDesc.cuboid(20, 0.05, 20).setTranslation(0, -0.05, 0).setFriction(0.8))
+    if (arena.mesa) {
+      // Mesa: tablero del tamaño de la arena con la cara de arriba en y = 0;
+      // el piso del aula queda mucho más abajo.
+      this.world.createCollider(RAPIER.ColliderDesc.cuboid(arena.ancho / 2, 0.02, arena.largo / 2).setTranslation(0, -0.02, 0).setFriction(0.8))
+      this.world.createCollider(RAPIER.ColliderDesc.cuboid(20, 0.05, 20).setTranslation(0, -arena.mesa.altura - 0.05, 0).setFriction(0.8))
+    } else {
+      // Piso: más grande que la arena, la cara de arriba en y = 0.
+      this.world.createCollider(RAPIER.ColliderDesc.cuboid(20, 0.05, 20).setTranslation(0, -0.05, 0).setFriction(0.8))
+    }
 
     if (arena.paredes) {
       const h = 0.15, e = 0.02

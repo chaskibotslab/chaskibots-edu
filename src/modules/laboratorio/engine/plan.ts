@@ -85,22 +85,25 @@ export function planDe(doc: RobotDoc): SimPlan {
   const fuentes5v: [string, string][] = []
   const tierras: [string, string][] = []
   for (const p of doc.piezas) {
-    const c = pieza(p.pieza).comportamiento.tipo
-    if (c === 'mcu-avr') { fuentes5v.push([p.id, '5V']); tierras.push([p.id, 'GND']) }
-    if (c === 'puente-h') { fuentes5v.push([p.id, '5V']); tierras.push([p.id, 'GND']) }
-    if (c === 'bateria') tierras.push([p.id, '-'])
+    const c = pieza(p.pieza).comportamiento
+    if (c.tipo === 'mcu-avr') { fuentes5v.push([p.id, '5V']); tierras.push([p.id, 'GND']) }
+    if (c.tipo === 'puente-h') {
+      if (c.alim.salida5v) fuentes5v.push([p.id, c.alim.salida5v])
+      tierras.push([p.id, c.alim.gnd])
+    }
+    if (c.tipo === 'bateria') tierras.push([p.id, '-'])
   }
   const alimentado = (inst: string, vcc: string, gnd: string) =>
     fuentes5v.some(f => mismo([inst, vcc], f)) && tierras.some(t => mismo([inst, gnd], t))
 
-  // Batería: llega al driver (12V) o a la placa (VIN).
+  // Batería: llega a la entrada de motores del driver o a la placa (VIN).
   let voltajeBateria = 0
   for (const p of doc.piezas) {
     const c = pieza(p.pieza).comportamiento
     if (c.tipo !== 'bateria') continue
     const conectada = doc.piezas.some(d => {
-      const t = pieza(d.pieza).comportamiento.tipo
-      return (t === 'puente-h' && mismo([p.id, '+'], [d.id, '12V'])) || (t === 'mcu-avr' && mismo([p.id, '+'], [d.id, 'VIN']))
+      const t = pieza(d.pieza).comportamiento
+      return (t.tipo === 'puente-h' && mismo([p.id, '+'], [d.id, t.alim.motor])) || (t.tipo === 'mcu-avr' && mismo([p.id, '+'], [d.id, 'VIN']))
     })
     if (conectada) voltajeBateria = Math.max(voltajeBateria, c.voltaje)
     else avisos.push(`${p.etiqueta}: no está conectada`)
@@ -114,6 +117,12 @@ export function planDe(doc: RobotDoc): SimPlan {
     const c = pieza(d.pieza).comportamiento
     if (c.tipo !== 'puente-h') continue
     caidaDriver = c.caida_v
+    // TB6612: sin 5 V en la lógica (VCC) o con STBY en LOW, el driver no mueve nada.
+    const conCinco = (pin: string) => fuentes5v.some(f => mismo([d.id, pin], f))
+    const apagado =
+      (c.alim.vcc && !conCinco(c.alim.vcc) ? `${d.etiqueta}: le falta alimentar la lógica (${c.alim.vcc} a 5V)` : null) ??
+      (c.alim.standby && !conCinco(c.alim.standby) ? `${d.etiqueta}: ${c.alim.standby} debe ir a 5V; si no, el driver queda apagado` : null)
+    if (apagado) avisos.push(apagado)
     for (const canal of c.canales) {
       for (const m of doc.piezas) {
         const mc = pieza(m.pieza).comportamiento
@@ -127,7 +136,7 @@ export function planDe(doc: RobotDoc): SimPlan {
         if (!inA || !inB) avisos.push(`${m.etiqueta}: ${canal.in_a}/${canal.in_b} del driver no están conectados a la placa`)
         motores.push({
           instancia: m.id, etiqueta: m.etiqueta, driver: d.id,
-          en: pinPlaca(d.id, canal.en), inA, inB, polaridad,
+          en: pinPlaca(d.id, canal.en), inA, inB, polaridad: apagado ? 0 : polaridad,
           params: { vNominal: mc.v_nominal, rpmNoLoad: mc.rpm_sin_carga, stallTorque: mc.torque_bloqueo_nm, deadband: mc.zona_muerta_v, tau: mc.tau_s },
           rueda: rs.find(r => r.motor === m.id) ?? null,
         })

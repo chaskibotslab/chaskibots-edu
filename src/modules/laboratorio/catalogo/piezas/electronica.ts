@@ -34,9 +34,49 @@ export const L298N: PiezaDef = {
       { en: 'ENA', in_a: 'IN1', in_b: 'IN2', out_a: 'OUT1', out_b: 'OUT2' },
       { en: 'ENB', in_a: 'IN3', in_b: 'IN4', out_a: 'OUT3', out_b: 'OUT4' },
     ],
+    alim: { motor: '12V', gnd: 'GND', salida5v: '5V' },
   },
   datos: [['Motores', '2 (o 2 pares en paralelo)'], ['Corriente', 'hasta 2 A por canal'], ['Caída de voltaje', '≈ 2 V']],
   fuente: 'STMicroelectronics L298, hoja de datos',
+}
+
+export const TB6612: PiezaDef = {
+  id: 'tb6612',
+  nombre: 'Driver de motores TB6612FNG',
+  familia: 'electronica',
+  descripcion: 'Puente H doble moderno: mucho más chico y eficiente que el L298N (pierde ≈ 0,5 V en vez de 2 V). Necesita STBY en HIGH.',
+  modelo: 'proc:tb6612',
+  glb: '/lab/modelos/tb6612.glb',
+  masa_g: 3,
+  material: 'pcb',
+  colisionadores: [{ forma: 'caja', medidas: [20.3, 8.6, 20.3], centro: [0, 4.3, 0] }],
+  montajes: [],
+  encaja: ['driver'],
+  pines: [
+    { nombre: 'PWMA', tipo: 'pwm', ayuda: 'Velocidad del motor A (PWM)' },
+    { nombre: 'AIN1', tipo: 'digital', ayuda: 'Dirección del motor A' },
+    { nombre: 'AIN2', tipo: 'digital', ayuda: 'Dirección del motor A' },
+    { nombre: 'PWMB', tipo: 'pwm', ayuda: 'Velocidad del motor B (PWM)' },
+    { nombre: 'BIN1', tipo: 'digital', ayuda: 'Dirección del motor B' },
+    { nombre: 'BIN2', tipo: 'digital', ayuda: 'Dirección del motor B' },
+    { nombre: 'STBY', tipo: 'alim', ayuda: 'En HIGH el driver funciona; en LOW se apaga' },
+    { nombre: 'AO1', tipo: 'potencia' }, { nombre: 'AO2', tipo: 'potencia' },
+    { nombre: 'BO1', tipo: 'potencia' }, { nombre: 'BO2', tipo: 'potencia' },
+    { nombre: 'VM', tipo: 'alim', ayuda: 'Batería de motores (hasta 13,5 V)' },
+    { nombre: 'VCC', tipo: 'alim', ayuda: 'Lógica: 2,7–5,5 V desde la placa' },
+    { nombre: 'GND', tipo: 'gnd' },
+  ],
+  comportamiento: {
+    tipo: 'puente-h',
+    caida_v: 0.5,
+    canales: [
+      { en: 'PWMA', in_a: 'AIN1', in_b: 'AIN2', out_a: 'AO1', out_b: 'AO2' },
+      { en: 'PWMB', in_a: 'BIN1', in_b: 'BIN2', out_a: 'BO1', out_b: 'BO2' },
+    ],
+    alim: { motor: 'VM', gnd: 'GND', vcc: 'VCC', standby: 'STBY' },
+  },
+  datos: [['Motores', '2'], ['Corriente', '1,2 A por canal (pico 3,2 A)'], ['Caída de voltaje', '≈ 0,5 V'], ['Tamaño', '20 × 20 mm']],
+  fuente: 'Toshiba TB6612FNG, hoja de datos',
 }
 
 export const BATERIA_18650: PiezaDef = {

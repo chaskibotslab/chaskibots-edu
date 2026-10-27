@@ -38,7 +38,7 @@ const COLORES_CAJA = ['#c2410c', '#b45309', '#15803d', '#1d4ed8', '#7c3aed', '#b
  * Campo libre: piso de 4 × 3 m con paredes y cajas repartidas al azar (con
  * semilla), dejando libre la zona de salida.
  */
-export function campoLibre(semilla = 7, cantidad = 9): ArenaDef {
+export function campoLibre(semilla = 7, cantidad = 9, id = 'campo-libre'): ArenaDef {
   const ancho = 4, largo = 3
   const rnd = aleatorio(semilla)
   const objetos: ObjetoArena[] = []
@@ -57,8 +57,8 @@ export function campoLibre(semilla = 7, cantidad = 9): ArenaDef {
     })
   }
   return {
-    id: 'campo-libre',
-    nombre: 'Campo libre con obstáculos',
+    id,
+    nombre: id === 'campo-libre' ? 'Campo libre con obstáculos' : 'Campo con más obstáculos',
     descripcion: 'Piso amplio con paredes y cajas para robots que esquivan obstáculos.',
     ancho, largo,
     piso: { material: 'melamina', color: '#9c968a', reflectancia: 0.8 },
@@ -68,8 +68,57 @@ export function campoLibre(semilla = 7, cantidad = 9): ArenaDef {
   }
 }
 
+/** Óvalo con una barrera sobre la línea: para seguidores que deben frenar. */
+export function ovaloConBarrera(): ArenaDef {
+  const base = arenaDePista(PISTAS.find(p => p.id === 'ovalo')!)
+  return {
+    ...base,
+    id: 'ovalo-barrera',
+    nombre: 'Óvalo con barrera',
+    descripcion: 'La pista del óvalo con una caja sobre la línea: el robot debe frenar antes de chocar.',
+    objetos: [{ id: 'barrera', forma: 'caja', medidas: [0.05, 0.12, 0.22], x: 0.35, z: 0.55, color: '#dc2626', material: 'mdf' }],
+  }
+}
+
+/**
+ * Laberinto en serpentina de 4 pasillos de 60 cm (2,4 × 1,8 m). Se resuelve
+ * siguiendo siempre la pared derecha.
+ */
+export function laberinto(): ArenaDef {
+  const alto = 0.12, grueso = 0.02, color = '#e2e8f0'
+  const pared = (id: string, x: number, z1: number, z2: number): ObjetoArena => ({
+    id, forma: 'caja', medidas: [grueso, alto, z2 - z1], x, z: (z1 + z2) / 2, color, material: 'mdf',
+  })
+  return {
+    id: 'laberinto',
+    nombre: 'Laberinto',
+    descripcion: 'Cuatro pasillos en zigzag con paredes de 12 cm. La meta es el círculo verde.',
+    ancho: 2.4, largo: 1.8,
+    piso: { material: 'melamina', color: '#8a8f99', reflectancia: 0.8 },
+    objetos: [pared('pared-1', -0.6, -0.9, 0.3), pared('pared-2', 0, -0.3, 0.9), pared('pared-3', 0.6, -0.9, 0.3)],
+    paredes: true,
+    inicio: { x: -0.9, z: -0.65, yaw: -Math.PI / 2 },
+    meta: { x: 0.9, z: -0.6, radio: 0.15 },
+  }
+}
+
+/** Mesa de 1,2 × 0,8 m a 75 cm del suelo: el robot no debe caerse. */
+export function mesa(): ArenaDef {
+  return {
+    id: 'mesa',
+    nombre: 'Mesa (¡no te caigas!)',
+    descripcion: 'Un tablero elevado: si el robot pasa el borde, se cae al suelo.',
+    ancho: 1.2, largo: 0.8,
+    piso: { material: 'melamina', color: '#c8b08a', reflectancia: 0.75 },
+    objetos: [],
+    paredes: false,
+    mesa: { altura: 0.75 },
+    inicio: { x: -0.3, z: 0, yaw: 0.4 },
+  }
+}
+
 export function listaArenas(): ArenaDef[] {
-  return [...PISTAS.map(arenaDePista), campoLibre()]
+  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), mesa()]
 }
 
 export function arena(id: string): ArenaDef {

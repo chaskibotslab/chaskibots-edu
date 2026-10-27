@@ -72,12 +72,22 @@ export function autocablear(doc: RobotDoc): Cableado {
   }
 
   // Alimentación: batería → driver (o directo al Arduino si no hay driver).
-  if (bateria && driver) {
-    cable([bateria.id, '+'], [driver.id, '12V'], ROJO)
-    cable([bateria.id, '-'], [driver.id, 'GND'], NEGRO)
+  const dc = driver ? pieza(driver.pieza).comportamiento : null
+  const alim = dc?.tipo === 'puente-h' ? dc.alim : null
+  if (bateria && driver && alim) {
+    cable([bateria.id, '+'], [driver.id, alim.motor], ROJO)
+    cable([bateria.id, '-'], [driver.id, alim.gnd], NEGRO)
     if (mcu) {
-      cable([driver.id, '5V'], [mcu.id, '5V'], ROJO)
-      cable([driver.id, 'GND'], [mcu.id, 'GND'], NEGRO)
+      if (alim.salida5v) {
+        // L298N: su regulador de 5 V alimenta al Arduino.
+        cable([driver.id, alim.salida5v], [mcu.id, '5V'], ROJO)
+      } else {
+        // TB6612: la batería alimenta al Arduino por VIN y el Arduino da 5 V a la lógica.
+        cable([bateria.id, '+'], [mcu.id, 'VIN'], ROJO)
+      }
+      if (alim.vcc) cable([driver.id, alim.vcc], [mcu.id, '5V'], ROJO)
+      if (alim.standby) cable([driver.id, alim.standby], [mcu.id, '5V'], ROJO)
+      cable([driver.id, alim.gnd], [mcu.id, 'GND'], NEGRO)
     }
   } else if (bateria && mcu) {
     cable([bateria.id, '+'], [mcu.id, 'VIN'], ROJO)

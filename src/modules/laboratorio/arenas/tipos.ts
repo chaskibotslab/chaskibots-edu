@@ -37,5 +37,9 @@ export interface ArenaDef {
   objetos: ObjetoArena[]
   /** Paredes alrededor del borde. */
   paredes: boolean
+  /** Mesa elevada: fuera de ella no hay piso (el robot se cae). */
+  mesa?: { altura: number }
+  /** Zona de llegada (solo visual). */
+  meta?: { x: number; z: number; radio: number }
   inicio: Pose2D
 }

@@ -33,9 +33,10 @@ export const FC51: PiezaDef = {
   descripcion: 'Detecta si hay algo adelante (de 2 a 30 cm, se ajusta con su perilla). Su salida baja a LOW cuando ve algo.',
   enKits: true,
   modelo: 'proc:fc51',
+  glb: '/lab/modelos/ir-obstaculo.glb',
   masa_g: 3,
   material: 'pcb',
-  colisionadores: [{ forma: 'caja', medidas: [31, 7, 14], centro: [15.5, 3.5, 0] }],
+  colisionadores: [{ forma: 'caja', medidas: [31, 4, 9.6], centro: [15.5, 2, 0] }],
   montajes: [],
   encaja: ['sensor-frontal', 'eje-servo'],
   pines: [
@@ -43,7 +44,7 @@ export const FC51: PiezaDef = {
     { nombre: 'GND', tipo: 'gnd' },
     { nombre: 'OUT', tipo: 'digital', ayuda: 'LOW = hay obstáculo; HIGH = libre' },
   ],
-  comportamiento: { tipo: 'ir-obstaculo', alcance_mm: 200, origen: [31, 4, 0] },
+  comportamiento: { tipo: 'ir-obstaculo', alcance_mm: 200, origen: [31, 2, 0] },
   datos: [['Alcance', '2–30 cm (ajustable; aquí 20 cm)'], ['Salida', 'Digital, activa en LOW']],
 }
 

@@ -72,6 +72,15 @@ export interface PinDef {
 
 export interface CanalPuenteH { en: string; in_a: string; in_b: string; out_a: string; out_b: string }
 
+/** Pines de alimentación de un driver (cambian de nombre según el modelo). */
+export interface AlimDriver {
+  motor: string        // entrada de la batería de motores (L298N: 12V, TB6612: VM)
+  gnd: string
+  salida5v?: string    // salida de 5 V que puede alimentar la placa (L298N)
+  vcc?: string         // entrada de lógica que hay que alimentar con 5 V (TB6612)
+  standby?: string     // pin que debe estar en HIGH para que funcione (TB6612: STBY)
+}
+
 export type Comportamiento =
   | { tipo: 'mcu-avr'; chip: 'atmega328p'; frecuencia_hz: number; vLogica: 5 }
   | { tipo: 'chasis' }
@@ -79,11 +88,13 @@ export type Comportamiento =
   | { tipo: 'rueda'; radio_mm: number; ancho_mm: number }
   | { tipo: 'rueda-loca'; radio_mm: number }
   | { tipo: 'servo'; torque_kgcm: number; seg_por_60: number; angulo_max: number; corriente_a: number }
-  | { tipo: 'puente-h'; caida_v: number; canales: CanalPuenteH[] }
+  | { tipo: 'puente-h'; caida_v: number; canales: CanalPuenteH[]; alim: AlimDriver }
   | { tipo: 'bateria'; voltaje: number; capacidad_mah: number; corriente_max_a: number }
   | { tipo: 'ir-reflectivo'; umbral: number; altura_max_mm: number; radio_lectura_mm: number }
   | { tipo: 'ir-obstaculo'; alcance_mm: number; origen: V3 }
   | { tipo: 'ultrasonido'; alcance_max_cm: number; apertura_grados: number; origen: V3 }
+  /** Pieza que se ve en el catálogo pero todavía no se simula (llega en una fase futura). */
+  | { tipo: 'sin-simular' }
 
 export interface Variante {
   id: string
@@ -107,6 +118,8 @@ export interface PiezaDef {
   glb?: string
   /** Escala del modelo real (p. ej. la rueda de 48 mm usa el modelo de 65 mm reducido). */
   escalaGlb?: number
+  /** Se muestra en el cajón pero todavía no se puede usar: texto de cuándo llega. */
+  proximamente?: string
   masa_g: number
   /** Material de la pieza (fricción, aspecto). Las variantes lo pueden cambiar. */
   material: MaterialFisico

@@ -15,7 +15,7 @@ import type { Simulacion } from '../engine/simulation'
 import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
 import {
-  ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin,
+  ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, type SalidaPin,
 } from './modelos/Piezas3D'
 
 const m = (v: number) => v / 1000
@@ -203,18 +203,62 @@ function Nodo(p: NodoProps) {
   )
 }
 
-function Cable({ desde, hasta, color }: { desde: THREE.Vector3; hasta: THREE.Vector3; color: string }) {
+/** Una punta de cable: dónde está, hacia dónde sale y cómo termina. */
+interface Punta { pos: THREE.Vector3; dir: THREE.Vector3; tipo: SalidaPin['tipo'] }
+
+const LARGO_DUPONT = 0.014
+
+/**
+ * Cable con forma de cable real: sale recto en la dirección del pin (dentro de
+ * su conector Dupont, o del borne) y se curva hacia la otra punta como un
+ * cable semirrígido (curva de Bézier), cayendo un poco por su peso.
+ */
+function Cable({ a, b, color }: { a: Punta; b: Punta; color: string }) {
   const q = useCalidad()
-  const geo = useMemo(() => {
-    const a = desde.clone(), b = hasta.clone()
-    const medio = a.clone().lerp(b, 0.5)
-    medio.y = Math.max(a.y, b.y) + 0.006 + a.distanceTo(b) * 0.09
-    const curva = new THREE.CatmullRomCurve3([a, a.clone().lerp(medio, 0.5).setY(medio.y * 0.96), medio, b.clone().lerp(medio, 0.5).setY(medio.y * 0.96), b])
-    return new THREE.TubeGeometry(curva, q.nivel === 'baja' ? 12 : 28, 0.0007, 6, false)
-  }, [desde, hasta, q.nivel])
+  const datos = useMemo(() => {
+    const salida = (p: Punta) => p.pos.clone().addScaledVector(p.dir, p.tipo === 'dupont' ? LARGO_DUPONT : 0.004)
+    const p0 = salida(a), p3 = salida(b)
+    const L = p0.distanceTo(p3)
+    const tiron = Math.min(0.03, 0.008 + L * 0.25)
+    const p1 = p0.clone().addScaledVector(a.dir, tiron)
+    const p2 = p3.clone().addScaledVector(b.dir, tiron)
+    // Peso: la parte del medio cae un poco.
+    p1.y -= L * 0.05
+    p2.y -= L * 0.05
+    const curva = new THREE.CubicBezierCurve3(p0, p1, p2, p3)
+    const grueso = a.tipo !== 'dupont' && b.tipo !== 'dupont' ? 0.0009 : 0.00065
+    const tubo = new THREE.TubeGeometry(curva, q.nivel === 'baja' ? 14 : 36, grueso, q.nivel === 'baja' ? 5 : 8, false)
+    return { tubo, grueso }
+  }, [a, b, q.nivel])
   return (
-    <mesh geometry={geo}>
-      <meshStandardMaterial color={color} roughness={0.45} />
+    <group>
+      <mesh geometry={datos.tubo} castShadow={q.sombras}>
+        <meshStandardMaterial color={color} roughness={0.4} />
+      </mesh>
+      {[a, b].map((p, i) => (p.tipo === 'dupont' ? <ConectorDupont key={i} punta={p} /> : <Punta key={i} punta={p} color={color} grueso={datos.grueso} />))}
+    </group>
+  )
+}
+
+function ConectorDupont({ punta }: { punta: Punta }) {
+  const q = useMemo(() => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), punta.dir), [punta])
+  const centro = useMemo(() => punta.pos.clone().addScaledVector(punta.dir, LARGO_DUPONT / 2), [punta])
+  return (
+    <mesh position={centro} quaternion={q}>
+      <boxGeometry args={[0.0026, LARGO_DUPONT, 0.0026]} />
+      <meshStandardMaterial color="#141414" roughness={0.55} />
+    </mesh>
+  )
+}
+
+/** Punta pelada (borne de tornillo o soldadura): un poco de cobre a la vista. */
+function Punta({ punta, color, grueso }: { punta: Punta; color: string; grueso: number }) {
+  const q = useMemo(() => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), punta.dir), [punta])
+  const centro = useMemo(() => punta.pos.clone().addScaledVector(punta.dir, 0.002), [punta])
+  return (
+    <mesh position={centro} quaternion={q}>
+      <cylinderGeometry args={[grueso * 0.7, grueso * 0.7, 0.004, 6]} />
+      <meshStandardMaterial color={color === '#111827' ? '#b87333' : '#c98a4b'} metalness={0.9} roughness={0.3} />
     </mesh>
   )
 }
@@ -222,18 +266,25 @@ function Cable({ desde, hasta, color }: { desde: THREE.Vector3; hasta: THREE.Vec
 function Cables({ doc }: { doc: RobotDoc }) {
   const lista = useMemo(() => {
     const ps = poses(doc)
-    const punto = (inst: string, pin: string) => {
+    const punta = (inst: string, pin: string): Punta | null => {
       const p = doc.piezas.find(x => x.id === inst)
       const pose = ps.get(inst)
       if (!p || !pose) return null
-      const a = anclaPin(pieza(p.pieza).modelo, pin)
-      return a ? aRobot(pose, a).multiplyScalar(0.001) : null
+      const modelo = pieza(p.pieza).modelo
+      const a = anclaPin(modelo, pin)
+      if (!a) return null
+      const s = salidaPin(modelo, pin)
+      return {
+        pos: aRobot(pose, a).multiplyScalar(0.001),
+        dir: new THREE.Vector3(...s.dir).normalize().applyQuaternion(pose.rot),
+        tipo: s.tipo,
+      }
     }
     return doc.cables
-      .map(c => ({ c, a: punto(...c.de), b: punto(...c.a) }))
-      .filter(x => x.a && x.b) as { c: RobotDoc['cables'][number]; a: THREE.Vector3; b: THREE.Vector3 }[]
+      .map(c => ({ c, a: punta(...c.de), b: punta(...c.a) }))
+      .filter(x => x.a && x.b) as { c: RobotDoc['cables'][number]; a: Punta; b: Punta }[]
   }, [doc])
-  return <>{lista.map(({ c, a, b }, i) => <Cable key={i} desde={a} hasta={b} color={c.color} />)}</>
+  return <>{lista.map(({ c, a, b }, i) => <Cable key={i} a={a} b={b} color={c.color} />)}</>
 }
 
 /** Proyecta los marcadores a la pantalla cada cuadro (para soltar piezas arrastradas). */

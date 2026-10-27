@@ -45,3 +45,22 @@ export const ARDUINO_UNO: PiezaDef = {
   datos: [['Microcontrolador', 'ATmega328P'], ['Reloj', '16 MHz'], ['Voltaje lógico', '5 V'], ['Pines PWM', 'D3, D5, D6, D9, D10, D11'], ['Entradas analógicas', 'A0–A5 (10 bits)']],
   fuente: 'Arduino UNO R3, hoja de datos oficial',
 }
+
+export const ESP32: PiezaDef = {
+  id: 'esp32-devkit',
+  nombre: 'ESP32 DevKit V1',
+  familia: 'placa',
+  descripcion: 'La placa de los kits de BGU: doble núcleo a 240 MHz, WiFi y Bluetooth, lógica de 3,3 V.',
+  enKits: true,
+  proximamente: 'Se podrá programar en la fase F4 (simulador del ESP32).',
+  modelo: 'proc:esp32',
+  glb: '/lab/modelos/esp32.glb',
+  masa_g: 10,
+  material: 'pcb',
+  colisionadores: [{ forma: 'caja', medidas: [51.4, 6.3, 28.6], centro: [0, 3.2, 0] }],
+  montajes: [],
+  encaja: ['placa'],
+  pines: [],
+  comportamiento: { tipo: 'sin-simular' },
+  datos: [['Microcontrolador', 'ESP32 (Xtensa LX6, 2 núcleos)'], ['Reloj', '240 MHz'], ['Voltaje lógico', '3,3 V'], ['Conexión', 'WiFi + Bluetooth']],
+}

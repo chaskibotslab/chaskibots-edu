@@ -522,6 +522,15 @@ export function anclaPin(modelo: string, pin: string): V | null {
       if (i >= 0) return [1.9 + i * 2.55, 7, 19.6]
       return ({ OUT1: [-19.7, 9, 4.4], OUT2: [-19.7, 9, 8.7], OUT3: [19.4, 9, 8.4], OUT4: [19.4, 9, 3.6], '12V': [-14, 10, 17.9], GND: [-8.2, 10, 17.9], '5V': [-2.4, 10, 17.9] } as Record<string, V>)[pin] ?? null
     }
+    case 'proc:tb6612': {
+      // Dos filas de 8 pines (como el módulo de SparkFun).
+      const f1 = ['VM', 'VCC', 'GND', 'AO1', 'AO2', 'BO2', 'BO1', 'GND2']
+      const f2 = ['PWMA', 'AIN2', 'AIN1', 'STBY', 'BIN1', 'BIN2', 'PWMB', 'GND3']
+      const i1 = f1.indexOf(pin), i2 = f2.indexOf(pin)
+      if (i1 >= 0) return [-8.9 + i1 * 2.54, 3, -8.9]
+      if (i2 >= 0) return [-8.9 + i2 * 2.54, 3, 8.9]
+      return null
+    }
     case 'proc:bateria-18650': return pin === '+' ? [-38, 12, -6] : [-38, 12, 6]
     case 'proc:bateria-9v': return pin === '+' ? [26, 9, -5] : [26, 9, 5]
     case 'proc:motor-tt': return pin === 'M+' ? [-50, 4, 0] : [-50, -4, 0]
@@ -540,6 +549,26 @@ export function anclaPin(modelo: string, pin: string): V | null {
     }
   }
   return null
+}
+
+/** Hacia dónde sale el cable de cada pin (marco de la pieza) y cómo se conecta. */
+export interface SalidaPin { dir: V; tipo: 'dupont' | 'borne' | 'soldado' }
+
+export function salidaPin(modelo: string, pin: string): SalidaPin {
+  switch (modelo) {
+    case 'proc:l298n':
+      if (/^OUT[12]$/.test(pin)) return { dir: [-1, 0.25, 0], tipo: 'borne' }
+      if (/^OUT[34]$/.test(pin)) return { dir: [1, 0.25, 0], tipo: 'borne' }
+      if (pin === '12V' || pin === 'GND' || pin === '5V') return { dir: [0, 0.25, 1], tipo: 'borne' }
+      return { dir: [0, 1, 0], tipo: 'dupont' }
+    case 'proc:motor-tt': return { dir: [-1, 0, 0], tipo: 'soldado' }
+    case 'proc:bateria-18650': return { dir: [-1, 0.3, 0], tipo: 'soldado' }
+    case 'proc:bateria-9v': return { dir: [1, 0.3, 0], tipo: 'soldado' }
+    case 'proc:servo': return { dir: [1, 0, 0], tipo: 'dupont' }
+    case 'proc:fc51': return { dir: [-1, 0, 0], tipo: 'dupont' }
+    case 'proc:hcsr04': return { dir: [-1, 0, 0], tipo: 'dupont' }
+  }
+  return { dir: [0, 1, 0], tipo: 'dupont' }
 }
 
 // ---------------------------------------------------------------------------
