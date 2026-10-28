@@ -153,6 +153,57 @@ export const ArduinoUno = forwardRef(function ArduinoUno(_: object, refLed13: Re
   )
 })
 
+/** Pines del Nano por lado (USB hacia −x), según su serigrafía. */
+const NANO_ATRAS = ['D13', '3V3', 'AREF', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', '5V', 'RST', 'GND', 'VIN']
+const NANO_ADELANTE = ['D12', 'D11', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'GND', 'RST', 'D0', 'D1']
+
+export const ArduinoNano = forwardRef(function ArduinoNano(_: object, refLed13: Ref<THREE.MeshStandardMaterial>) {
+  const q = useCalidad()
+  return (
+    <group>
+      {[[-19, -6], [-19, 6], [19, -6], [19, 6]].map(([x, z], i) => <Separador key={i} pos={[x, -10, z]} alto={10} />)}
+      <mesh position={M(0, 0.8, 0)} castShadow={q.sombras} receiveShadow>
+        <boxGeometry args={[m(45), m(1.6), m(18)]} />
+        <meshStandardMaterial color="#1d4fb8" roughness={0.45} metalness={0.1} />
+      </mesh>
+      {/* Mini USB */}
+      <mesh position={M(-21, 3.2, 0)} castShadow={q.sombras}>
+        <boxGeometry args={[m(9), m(4), m(7.5)]} />
+        <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
+      </mesh>
+      {/* ATmega328P (TQFP) girado 45° */}
+      <mesh position={M(4, 2.1, 0)} rotation={[0, Math.PI / 4, 0]} castShadow={q.sombras}>
+        <boxGeometry args={[m(7), m(1.2), m(7)]} />
+        <meshStandardMaterial color="#141414" roughness={0.35} />
+      </mesh>
+      <mesh position={M(-9, 2.4, -2)}>
+        <boxGeometry args={[m(5), m(1.6), m(3)]} />
+        <meshStandardMaterial color="#141414" roughness={0.4} />
+      </mesh>
+      <mesh position={M(13, 2.3, 3)}>
+        <boxGeometry args={[m(5), m(1.4), m(2)]} />
+        <meshStandardMaterial color="#d4d4d8" metalness={0.95} roughness={0.15} />
+      </mesh>
+      {/* Botón de reset */}
+      <mesh position={M(-2, 2.6, -4.5)}>
+        <boxGeometry args={[m(3.5), m(2), m(3.5)]} />
+        <meshStandardMaterial color="#e5e7eb" roughness={0.5} />
+      </mesh>
+      {/* LED «L» (13) y LED de encendido */}
+      <mesh position={M(-14, 1.9, 4)}>
+        <boxGeometry args={[m(1.6), m(0.8), m(1)]} />
+        <meshStandardMaterial ref={refLed13} color="#78350f" emissive="#fb923c" emissiveIntensity={0} />
+      </mesh>
+      <mesh position={M(-14, 1.9, 6)}>
+        <boxGeometry args={[m(1.6), m(0.8), m(1)]} />
+        <meshStandardMaterial color="#14532d" emissive="#22c55e" emissiveIntensity={1.5} />
+      </mesh>
+      <Pines n={15} pos={[0, 1.6, -7.6]} />
+      <Pines n={15} pos={[0, 1.6, 7.6]} />
+    </group>
+  )
+})
+
 export function L298N() {
   const q = useCalidad()
   return (
@@ -517,6 +568,12 @@ export function anclaPin(modelo: string, pin: string): V | null {
       if (d) { const n = Number(d[1]); return [n >= 8 ? -1 + (13 - n) * 2.54 : 14.8 + (7 - n) * 2.54, 9, -24] }
       if (a) return [20.4 + Number(a[1]) * 2.54, 9, 23.6]
       return ({ '3V3': [5.4, 9, 23.6], '5V': [7.9, 9, 23.6], GND: [10.5, 9, 23.6], VIN: [15.4, 9, 23.6] } as Record<string, V>)[pin] ?? null
+    case 'proc:arduino-nano': {
+      const a = NANO_ATRAS.indexOf(pin), b = NANO_ADELANTE.indexOf(pin)
+      if (a >= 0) return [-17.8 + a * 2.54, 5, -7.6]
+      if (b >= 0) return [-17.8 + b * 2.54, 5, 7.6]
+      return null
+    }
     case 'proc:l298n': {
       const i = ['ENA', 'IN1', 'IN2', 'IN3', 'IN4', 'ENB'].indexOf(pin)
       if (i >= 0) return [1.9 + i * 2.55, 7, 19.6]

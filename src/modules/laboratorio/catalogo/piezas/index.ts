@@ -3,7 +3,7 @@
 // El test catalogo.test.ts revisa que la ficha sea coherente.
 
 import type { Familia, PiezaDef } from '../tipos'
-import { ARDUINO_UNO, ESP32 } from './placas'
+import { ARDUINO_UNO, ARDUINO_NANO, ESP32 } from './placas'
 import { CHASIS_2WD, CHASIS_4WD } from './chasis'
 import { MOTOR_TT, RUEDA_65, RUEDA_65_PLASTICO, RUEDA_48, RUEDA_LOCA } from './movimiento'
 import { SG90, MG90S } from './servos'
@@ -13,7 +13,7 @@ import { JOYSTICK, MPU6050, DRV8825 } from './futuras'
 
 export const LISTA_PIEZAS: PiezaDef[] = [
   CHASIS_2WD, CHASIS_4WD,
-  ARDUINO_UNO, ESP32,
+  ARDUINO_UNO, ARDUINO_NANO, ESP32,
   MOTOR_TT, RUEDA_65, RUEDA_65_PLASTICO, RUEDA_48, RUEDA_LOCA,
   SG90, MG90S,
   TCRT5000, FC51, HCSR04, JOYSTICK, MPU6050,

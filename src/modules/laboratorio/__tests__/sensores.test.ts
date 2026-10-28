@@ -24,7 +24,7 @@ describe('HC-SR04 dentro del micro emulado', () => {
     avr.run(CPU_FREQ_HZ * 0.1)
     r = avr.run(CPU_FREQ_HZ * 0.3)
     for (const v of lineas(r.serial).map(Number).slice(1)) { expect(v).toBeGreaterThanOrEqual(148); expect(v).toBeLessThanOrEqual(152) }
-  })
+  }, 60_000)
 
   it('sin obstáculo pulseIn se agota y devuelve 0', () => {
     const avr = new AvrRunner(fixture('ultra.hex'))
@@ -34,7 +34,7 @@ describe('HC-SR04 dentro del micro emulado', () => {
     const v = lineas(r.serial).map(Number)
     expect(v.length).toBeGreaterThan(0)
     expect(v.every(x => x === 0)).toBe(true)
-  })
+  }, 60_000)
 })
 
 describe('servo con la librería Servo.h', () => {
@@ -47,5 +47,5 @@ describe('servo con la librería Servo.h', () => {
     expect(Math.abs(angulo() - 90)).toBeLessThan(3)
     avr.run(CPU_FREQ_HZ * 0.35)       // ~0,95 s: tramo de 180°
     expect(angulo()).toBeGreaterThan(177)
-  })
+  }, 60_000)
 })

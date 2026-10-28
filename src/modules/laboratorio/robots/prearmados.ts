@@ -4,10 +4,11 @@
 
 import { autocablear, pinCodigo, pinDePlaca, type FilaPin } from '../engine/autocableado'
 import { pieza } from '../catalogo/piezas'
+import type { ProgramaBloques } from '../bloques/generador'
 import { encastrar, robotVacio } from '../engine/ensamblaje'
 import type { RobotDoc } from './doc'
 
-export interface PlantillaCodigo { id: string; nombre: string; descripcion: string; codigo: string }
+export interface PlantillaCodigo { id: string; nombre: string; descripcion: string; codigo: string; bloques?: ProgramaBloques }
 
 export interface Prearmado {
   id: string
