@@ -208,7 +208,7 @@ describe('cableado automático y plan', () => {
 
   it('las piezas «próximamente» se ven pero no se pueden encastrar', () => {
     const doc = robotVacio('chasis-2wd')
-    expect(motivoNoEncastra(doc, 'esp32-devkit', 'chasis', 'placa')).toMatch(/F4/)
+    expect(motivoNoEncastra(doc, 'mpu6050', 'chasis', 'frente')).toMatch(/F5/)
   })
 
   it('un sensor sin alimentación no funciona y se avisa', () => {
