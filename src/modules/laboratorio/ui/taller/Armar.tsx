@@ -42,7 +42,7 @@ interface Props {
 
 export default function Armar(p: Props) {
   const { doc, cambiar, avisar } = p
-  const [familia, setFamilia] = useState<Familia>('movimiento')
+  const [familia, setFamilia] = useState<Familia | 'robot'>('movimiento')
   const [elegida, setElegida] = useState<string | null>(null)
   const [seleccion, setSeleccion] = useState<string | null>(null)
   const [arrastre, setArrastre] = useState<{ pieza: string; x: number; y: number; x0: number; y0: number; iniciado: boolean } | null>(null)
@@ -57,6 +57,28 @@ export default function Armar(p: Props) {
 
   // Si la pieza seleccionada desaparece (deshacer, quitar), se limpia la selección.
   useEffect(() => { if (seleccion && !doc.piezas.some(x => x.id === seleccion)) setSeleccion(null) }, [doc, seleccion])
+
+  // Quita una pieza montada (y lo que cuelga de ella, avisando antes). El chasis no se quita.
+  const quitarPieza = useCallback((id: string) => {
+    const inst = doc.piezas.find(x => x.id === id)
+    if (!inst?.padre) return
+    const colgando = descendientes(doc, id).length - 1
+    if (colgando > 0 && !window.confirm(`También se quitarán ${colgando} pieza${colgando > 1 ? 's' : ''} que van montadas en ${inst.etiqueta}. ¿Seguir?`)) return
+    cambiar(quitar(doc, id), `Quitar ${inst.etiqueta}`)
+  }, [doc, cambiar])
+
+  // Supr / Retroceso quita la pieza seleccionada (salvo si se está escribiendo).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!seleccion || (e.key !== 'Delete' && e.key !== 'Backspace')) return
+      const t = e.target as HTMLElement | null
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
+      e.preventDefault()
+      quitarPieza(seleccion)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [seleccion, quitarPieza])
 
   const marcadores = useMemo<MarcadorMontaje[]>(() => {
     if (!elegida) return []
@@ -149,12 +171,32 @@ export default function Armar(p: Props) {
         {cajonAbierto && (
           <>
             <div className="flex gap-1 overflow-x-auto border-b border-white/10 p-2">
+              <button onClick={() => setFamilia('robot')} className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs ${familia === 'robot' ? 'bg-chaski-primary/20 text-chaski-primary' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>
+                <span className="mr-1">🤖</span>En el robot ({doc.piezas.length - 1})
+              </button>
               {FAMILIAS.map(f => (
                 <button key={f.id} onClick={() => setFamilia(f.id)} className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs ${familia === f.id ? 'bg-chaski-primary/20 text-chaski-primary' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>
                   <span className="mr-1">{ICONO_FAMILIA[f.id]}</span>{f.nombre}
                 </button>
               ))}
             </div>
+            {familia === 'robot' ? (
+              // Piezas montadas: tocar = seleccionar; papelera = quitar (con lo que cuelga de ella).
+              <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
+                {doc.piezas.filter(p => p.padre).map(p => (
+                  <li key={p.id} className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 text-xs ${seleccion === p.id ? 'border-chaski-primary/60 bg-chaski-primary/10' : 'border-white/10 bg-white/[0.03]'}`}>
+                    <button onClick={() => { setSeleccion(p.id); setElegida(null) }} className="min-w-0 flex-1 text-left">
+                      <div className="truncate font-medium text-white">{p.etiqueta}</div>
+                      <div className="truncate text-[10px] text-slate-500">{pieza(p.pieza).nombre}</div>
+                    </button>
+                    <button onClick={() => quitarPieza(p.id)} className="rounded-md p-1.5 text-red-300 hover:bg-red-500/15" title={`Quitar ${p.etiqueta}`} aria-label={`Quitar ${p.etiqueta}`}>
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </li>
+                ))}
+                <li className="px-1 pt-1 text-[10px] leading-snug text-slate-500">Para cambiar el chasis, elige otro en la pestaña «Chasis». Ctrl+Z deshace.</li>
+              </ul>
+            ) : (
             <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 gap-2 overflow-y-auto p-2 sm:grid-cols-3 lg:grid-cols-1">
               {[...piezasDe(familia)].sort((a, b) => Number(!!b.enKits) - Number(!!a.enKits)).map(def => (
                 <TarjetaPieza
@@ -169,6 +211,7 @@ export default function Armar(p: Props) {
                 />
               ))}
             </div>
+            )}
           </>
         )}
       </aside>
