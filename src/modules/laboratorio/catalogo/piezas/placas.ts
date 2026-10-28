@@ -46,6 +46,29 @@ export const ARDUINO_UNO: PiezaDef = {
   fuente: 'Arduino UNO R3, hoja de datos oficial',
 }
 
+export const ARDUINO_NANO: PiezaDef = {
+  id: 'arduino-nano',
+  nombre: 'Arduino Nano V3',
+  familia: 'placa',
+  descripcion: 'El mismo cerebro que el UNO (ATmega328P, 5 V) en una placa chiquita de 45 × 18 mm. Tiene dos entradas analógicas más: A6 y A7.',
+  enKits: true,
+  modelo: 'proc:arduino-nano',
+  masa_g: 7,
+  material: 'pcb',
+  colisionadores: [{ forma: 'caja', medidas: [45, 8, 18], centro: [0, 4, 0] }],
+  montajes: [],
+  encaja: ['placa'],
+  pines: [
+    ...pinesUno.filter(p => p.nombre !== '3V3'),
+    { nombre: 'A6', tipo: 'analogico', ayuda: 'Solo entrada analógica (no sirve como digital)' },
+    { nombre: 'A7', tipo: 'analogico', ayuda: 'Solo entrada analógica (no sirve como digital)' },
+    { nombre: '3V3', tipo: 'alim', ayuda: 'Salida de 3,3 V (poca corriente)' },
+  ],
+  comportamiento: { tipo: 'mcu-avr', chip: 'atmega328p', frecuencia_hz: 16_000_000, vLogica: 5 },
+  datos: [['Microcontrolador', 'ATmega328P'], ['Reloj', '16 MHz'], ['Voltaje lógico', '5 V'], ['Entradas analógicas', 'A0–A7 (A6 y A7 solo analógicas)'], ['Tamaño', '45 × 18 mm']],
+  fuente: 'Arduino Nano, hoja de datos oficial',
+}
+
 export const ESP32: PiezaDef = {
   id: 'esp32-devkit',
   nombre: 'ESP32 DevKit V1',

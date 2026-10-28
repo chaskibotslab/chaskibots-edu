@@ -15,7 +15,7 @@ import type { Simulacion } from '../engine/simulation'
 import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
 import {
-  ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, type SalidaPin,
+  ArduinoNano, ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, type SalidaPin,
 } from './modelos/Piezas3D'
 
 const m = (v: number) => v / 1000
@@ -80,6 +80,7 @@ function ModeloProc({ inst, def, refs, espaciadorLoca }: { inst: PiezaEnRobot; d
     case 'proc:chasis-2wd': return <Chasis largo={160} ancho={120} material={v.material} color={v.color ?? '#cfe6f7'} />
     case 'proc:chasis-4wd': return <Chasis largo={200} ancho={130} material={v.material} color={v.color ?? '#cfe6f7'} />
     case 'proc:arduino-uno': return <ArduinoUno ref={refs.led13} />
+    case 'proc:arduino-nano': return <ArduinoNano ref={refs.led13} />
     case 'proc:l298n': return <L298N />
     case 'proc:bateria-18650': return <Bateria18650 />
     case 'proc:bateria-9v': return <Bateria9V />

@@ -1,3 +1,5 @@
+import type { ProgramaBloques } from '../bloques/generador'
+
 // Documento de un robot (F2): árbol de piezas encastradas + cables + programa.
 // La posición de cada pieza NO se guarda: sale de los montajes (ver
 // engine/ensamblaje.ts). Así no puede haber piezas flotando y cambiar una
@@ -25,5 +27,9 @@ export interface RobotDoc {
   placa: 'uno'
   piezas: PiezaEnRobot[]
   cables: Cable[]
-  programa: { modo: 'codigo'; cpp: string }
+  /** 'auto' (por defecto): los cables se rehacen solos al cambiar piezas.
+   *  'manual': se respetan los del alumno y solo se conectan las piezas nuevas. */
+  cableado?: 'auto' | 'manual'
+  /** En bloques, `cpp` es el código generado (se rehace al cambiar bloques o cables). */
+  programa: { modo: 'codigo'; cpp: string } | { modo: 'bloques'; bloques: ProgramaBloques; cpp: string }
 }

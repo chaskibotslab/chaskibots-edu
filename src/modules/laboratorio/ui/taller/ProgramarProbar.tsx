@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
   Play, Square, Pause, RotateCcw, Upload, Gauge, Camera, Navigation, Map as MapIcon,
-  Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download,
+  Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download, Puzzle,
 } from 'lucide-react'
 import { Simulacion, type Telemetria } from '../../engine/simulation'
 import { GRAVEDADES, type Gravedad } from '../../engine/fisica/mundo'
@@ -21,6 +21,11 @@ import EditorCodigo, { type ErrorCompilacion } from '../EditorCodigo'
 import type { ModoCamara } from '../Escena3D'
 import type { NivelCalidad } from '../calidad'
 import { explicarError } from '../erroresCompilador'
+import { partesDe } from '../../bloques/generador'
+import { PROGRAMA_VACIO, SEGUIDOR_EN_BLOQUES } from '../../bloques/definiciones'
+
+const EditorBloques = dynamic(() => import('../../bloques/EditorBloques'), { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-[#121624]" /> })
+import { verificar } from '../../engine/verificacion'
 
 const EscenaArena = dynamic(() => import('../Escena3D').then(m => m.EscenaArena), { ssr: false })
 
@@ -32,7 +37,7 @@ interface Props {
   vista: 'programar' | 'probar'
   arenaInicial: string
   plantillas: PlantillaCodigo[]
-  onCodigo: (cpp: string) => void
+  onPrograma: (p: RobotDoc['programa']) => void
   nivel: NivelCalidad
   onNivel: (n: NivelCalidad) => void
 }
@@ -40,8 +45,29 @@ interface Props {
 /** Clave de la estructura del robot (sin el programa): si cambia, hay que rearmar la simulación. */
 const estructura = (d: RobotDoc) => JSON.stringify([d.piezas, d.cables])
 
-export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, onCodigo, nivel, onNivel }: Props) {
+export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, onPrograma, nivel, onNivel }: Props) {
   const codigo = doc.programa.cpp
+  const partes = useMemo(() => partesDe(doc), [doc])
+  const [versionBloques, setVersionBloques] = useState(0)
+  // Plantillas en bloques (🧩) solo en modo bloques, y las de código en modo código.
+  const plantillasVisibles = useMemo(() => {
+    const deBloques = [
+      { id: 'bloques-vacio', nombre: 'Empezar en blanco', descripcion: '', codigo: '', bloques: PROGRAMA_VACIO },
+      ...(partes.motores && partes.lineaIzq && partes.lineaDer ? [{ id: 'bloques-seguidor', nombre: 'Seguidor de línea', descripcion: '', codigo: '', bloques: SEGUIDOR_EN_BLOQUES }] : []),
+    ]
+    return doc.programa.modo === 'bloques' ? deBloques : plantillas
+  }, [doc.programa.modo, partes, plantillas])
+
+  const cambiarModo = (modo: 'bloques' | 'codigo') => {
+    if (modo === doc.programa.modo) return
+    if (modo === 'codigo') {
+      if (window.confirm('Vas a seguir en código C++. Los bloques no se pueden recuperar desde el código. ¿Seguir?')) onPrograma({ modo: 'codigo', cpp: codigo })
+      return
+    }
+    if (codigo.trim() && !window.confirm('Vas a empezar un programa nuevo con bloques (tu código actual se reemplaza). ¿Seguir?')) return
+    onPrograma({ modo: 'bloques', bloques: PROGRAMA_VACIO, cpp: '' })
+    setVersionBloques(v => v + 1)
+  }
   const [sim, setSim] = useState<Simulacion | null>(null)
   const [errores, setErrores] = useState<ErrorCompilacion[]>([])
   const [compilando, setCompilando] = useState(false)
@@ -76,13 +102,18 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
 
   const compilarYEjecutar = useCallback(async () => {
     if (!sim || compilando) return
+    const errorElectrico = verificar(doc).find(p => p.nivel === 'error')
+    if (errorElectrico) {
+      setAviso({ tipo: 'error', texto: `No se puede encender el robot: ${errorElectrico.texto} Corrígelo en la pestaña «Cablear».` })
+      return
+    }
     setCompilando(true)
     setAviso({ tipo: 'info', texto: 'Compilando con avr-gcc… (la primera vez puede tardar unos segundos)' })
     try {
       const res = await fetch('/api/lab/compile', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ board: 'uno', code: codigo }),
+        body: JSON.stringify({ board: doc.piezas.some(p => p.pieza === 'arduino-nano') ? 'nano' : 'uno', code: codigo }),
       })
       const data = await res.json()
       if (!res.ok && !data.errors) throw new Error(data.error || `Error ${res.status}`)
@@ -109,7 +140,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
     } finally {
       setCompilando(false)
     }
-  }, [sim, codigo, compilando])
+  }, [sim, codigo, compilando, doc])
 
   const cambiarArena = (id: string) => {
     if (id === 'propia' && imagenPropia) return
@@ -170,12 +201,16 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
           value=""
           onChange={e => {
             const p = plantillas.find(x => x.id === e.target.value)
-            if (p && (codigo.trim() === '' || window.confirm(`¿Reemplazar tu código por la plantilla «${p.nombre}»?`))) { onCodigo(p.codigo); setErrores([]) }
+            if (p && (codigo.trim() === '' || window.confirm(`¿Reemplazar tu programa por la plantilla «${p.nombre}»?`))) {
+              if (p.bloques) { onPrograma({ modo: 'bloques', bloques: p.bloques, cpp: '' }); setVersionBloques(v => v + 1) }
+              else onPrograma({ modo: 'codigo', cpp: p.codigo })
+              setErrores([])
+            }
           }}
-          title="Cargar una plantilla de código (usa los pines de tu robot)"
+          title="Cargar una plantilla (usa los pines de tu robot)"
         >
           <option value="" disabled>Plantillas…</option>
-          {plantillas.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+          {plantillasVisibles.map(p => <option key={p.id} value={p.id}>{p.bloques ? '🧩 ' : ''}{p.nombre}</option>)}
         </select>
 
         <button
@@ -248,13 +283,43 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
       {/* ---------- Cuerpo ---------- */}
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <div className={`min-h-0 flex-col border-white/10 lg:flex lg:w-[40%] lg:border-r ${vista === 'programar' ? 'flex flex-1 lg:flex-none' : 'hidden'}`}>
-          <div className="flex items-center justify-between border-b border-white/10 bg-labdark-bg2 px-3 py-1.5 text-xs text-slate-400">
-            <span className="flex items-center gap-1.5 font-mono"><FileCode2 className="h-3.5 w-3.5" /> {doc.nombre}.ino</span>
-            <span className="hidden sm:inline">Ctrl+Enter para ejecutar</span>
+          <div className="flex items-center justify-between gap-2 border-b border-white/10 bg-labdark-bg2 px-3 py-1.5 text-xs text-slate-400">
+            <div className="flex overflow-hidden rounded-lg border border-white/10">
+              {([['bloques', 'Bloques', Puzzle], ['codigo', 'Código', FileCode2]] as const).map(([modo, txt, Icon]) => (
+                <button key={modo} onClick={() => cambiarModo(modo)} className={`flex items-center gap-1 px-2.5 py-1 ${doc.programa.modo === modo ? 'bg-chaski-primary/20 text-chaski-primary' : 'hover:bg-white/5'}`}>
+                  <Icon className="h-3.5 w-3.5" /> {txt}
+                </button>
+              ))}
+            </div>
+            <span className="truncate font-mono">{doc.nombre}.ino</span>
+            <span className="hidden xl:inline">Ctrl+Enter para ejecutar</span>
           </div>
-          <div className="min-h-0 flex-1">
-            <EditorCodigo codigo={codigo} onChange={onCodigo} errores={errores} onEjecutar={compilarYEjecutar} />
-          </div>
+          {doc.programa.modo === 'bloques' ? (
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className="min-h-[260px] flex-[3]">
+                <EditorBloques
+                  key={versionBloques}
+                  programa={doc.programa.bloques}
+                  partes={partes}
+                  onCambio={bloques => onPrograma({ modo: 'bloques', bloques, cpp: codigo })}
+                />
+              </div>
+              <div className="flex min-h-[120px] flex-[2] flex-col border-t border-white/10 bg-[#0d101a]">
+                <div className="flex items-center justify-between px-3 py-1.5 text-[11px] text-slate-400">
+                  <span>Código Arduino que generan tus bloques</span>
+                  <button
+                    onClick={() => { if (window.confirm('Vas a seguir en código C++. Los bloques no se pueden recuperar desde el código. ¿Seguir?')) onPrograma({ modo: 'codigo', cpp: codigo }) }}
+                    className="rounded-md border border-white/10 px-2 py-0.5 text-slate-200 hover:bg-white/5"
+                  >Pasar a código →</button>
+                </div>
+                <pre className="min-h-0 flex-1 overflow-auto px-3 pb-2 font-mono text-[11px] leading-relaxed text-emerald-200/90">{codigo}</pre>
+              </div>
+            </div>
+          ) : (
+            <div className="min-h-0 flex-1">
+              <EditorCodigo codigo={codigo} onChange={cpp => onPrograma({ modo: 'codigo', cpp })} errores={errores} onEjecutar={compilarYEjecutar} />
+            </div>
+          )}
         </div>
 
         <div className={`min-h-0 flex-1 flex-col ${vista === 'probar' ? 'flex' : 'hidden lg:flex'}`}>

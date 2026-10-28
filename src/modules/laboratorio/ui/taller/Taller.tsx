@@ -6,7 +6,7 @@
 // El borrador se guarda en este navegador (en F3, en la cuenta).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Bot, Cable, Code2, Download, FileUp, FlaskConical, Hammer, LayoutGrid, Play, Printer, X } from 'lucide-react'
+import { Bot, Cable, CloudUpload, Code2, Download, FileUp, FlaskConical, FolderOpen, Hammer, LayoutGrid, Loader2, Play, Printer, X } from 'lucide-react'
 import { datosVariante, pieza } from '../../catalogo/piezas'
 import { autocablear } from '../../engine/autocableado'
 import { robotVacio, validar } from '../../engine/ensamblaje'
@@ -14,6 +14,9 @@ import type { RobotDoc } from '../../robots/doc'
 import { PREARMADOS, construirSeguidor, plantillasGenericas } from '../../robots/prearmados'
 import { calidadInicial, type NivelCalidad } from '../calidad'
 import Armar from './Armar'
+import MisRobots from './MisRobots'
+import { generarArduino } from '../../bloques/generador'
+import { PROGRAMA_VACIO } from '../../bloques/definiciones'
 import Cablear from './Cablear'
 import ProgramarProbar from './ProgramarProbar'
 
@@ -22,7 +25,7 @@ type Pestana = 'armar' | 'cablear' | 'programar' | 'probar'
 const CLAVE_BORRADOR = 'chaskibots-lab:robot-v2'
 const MAX_HISTORIAL = 80
 
-interface Borrador { doc: RobotDoc; prearmado: string | null }
+interface Borrador { doc: RobotDoc; prearmado: string | null; nubeId?: string | null }
 
 function leerBorrador(): Borrador | null {
   try {
@@ -36,7 +39,15 @@ function guardarBorrador(b: Borrador) {
   try { localStorage.setItem(CLAVE_BORRADOR, JSON.stringify(b)) } catch { /* modo privado: no pasa nada */ }
 }
 
-const conCables = (d: RobotDoc): RobotDoc => ({ ...d, cables: autocablear(d).cables })
+// Automático: se recablea todo. A mano: se respetan los cables y solo se conectan las piezas nuevas.
+const conCables = (d: RobotDoc): RobotDoc => sincronizar({ ...d, cables: autocablear(d, { conservar: d.cableado === 'manual' }).cables })
+
+/** En modo bloques, el código C++ se rehace con los pines actuales (cambian si cambian los cables). */
+function sincronizar(d: RobotDoc): RobotDoc {
+  if (d.programa.modo !== 'bloques') return d
+  const { cpp } = generarArduino(d.programa.bloques, d, autocablear(d, { conservar: true }).tabla)
+  return cpp === d.programa.cpp ? d : { ...d, programa: { ...d.programa, cpp } }
+}
 
 export default function Taller() {
   const [doc, setDoc] = useState<RobotDoc | null>(null)
@@ -46,6 +57,9 @@ export default function Taller() {
   const [pestana, setPestana] = useState<Pestana>('armar')
   const [galeria, setGaleria] = useState(false)
   const [materiales, setMateriales] = useState(false)
+  const [misRobots, setMisRobots] = useState(false)
+  const [nubeId, setNubeId] = useState<string | null>(null)
+  const [guardando, setGuardando] = useState(false)
   const [nivel, setNivel] = useState<NivelCalidad>('media')
   const [aviso, setAviso] = useState<{ tipo: 'ok' | 'error' | 'info'; texto: string } | null>(null)
   const archivo = useRef<HTMLInputElement>(null)
@@ -53,16 +67,16 @@ export default function Taller() {
   useEffect(() => {
     setNivel(calidadInicial())
     const b = leerBorrador()
-    if (b) { setDoc(b.doc); setPrearmado(b.prearmado) }
+    if (b) { setDoc(b.doc); setPrearmado(b.prearmado); setNubeId(b.nubeId ?? null) }
     else { setDoc(construirSeguidor()); setPrearmado('seguidor'); setGaleria(true) }
   }, [])
 
   // Guardar el borrador (con una pequeña espera para no escribir en cada tecla).
   useEffect(() => {
     if (!doc) return
-    const t = setTimeout(() => guardarBorrador({ doc, prearmado }), 400)
+    const t = setTimeout(() => guardarBorrador({ doc, prearmado, nubeId }), 400)
     return () => clearTimeout(t)
-  }, [doc, prearmado])
+  }, [doc, prearmado, nubeId])
 
   useEffect(() => {
     if (!aviso) return
@@ -75,10 +89,11 @@ export default function Taller() {
   const docActual = useRef<RobotDoc | null>(null)
   docActual.current = doc
 
-  const cambiar = useCallback((d: RobotDoc, texto?: string) => {
+  /** Cambia el robot (con deshacer). `recablear`: conectar solas las piezas nuevas (no al editar cables a mano). */
+  const cambiar = useCallback((d: RobotDoc, texto?: string, recablear = true) => {
     const actual = docActual.current
     if (actual) setPasado(p => [...p.slice(-MAX_HISTORIAL + 1), actual])
-    setDoc(conCables(d))
+    setDoc(recablear ? conCables(d) : sincronizar(d))
     setFuturo([])
     if (texto) setAviso({ tipo: 'info', texto })
   }, [])
@@ -96,10 +111,34 @@ export default function Taller() {
     setFuturo(f => f.slice(1))
   }
 
-  // Ctrl+Z / Ctrl+Y en el taller
+  // Guardar en la cuenta («Mis robots»): crea la primera vez y después actualiza.
+  const guardarNube = async () => {
+    if (!doc || guardando) return
+    setGuardando(true)
+    try {
+      const r = await fetch(nubeId ? `/api/lab/robots/${nubeId}` : '/api/lab/robots', {
+        method: nubeId ? 'PUT' : 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ nombre: doc.nombre, doc }),
+      })
+      const d = await r.json().catch(() => ({}))
+      if (r.status === 404 && nubeId) { setNubeId(null); avisar('info', 'Ese robot ya no estaba en tu cuenta: vuelve a guardar para crearlo de nuevo.'); return }
+      if (!r.ok) { avisar('error', d.error ?? 'No se pudo guardar'); return }
+      setNubeId(d.id)
+      avisar('ok', `«${doc.nombre}» guardado en tu cuenta`)
+    } catch {
+      avisar('error', 'Sin conexión: el robot sigue guardado en este navegador')
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  // Atajos: Ctrl+S guardar; Ctrl+Z / Ctrl+Y deshacer y rehacer en el taller.
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => {
-      if (pestana !== 'armar' || !(e.ctrlKey || e.metaKey)) return
+      if (!(e.ctrlKey || e.metaKey)) return
+      if (e.key === 's') { e.preventDefault(); guardarNube(); return }
+      if (pestana !== 'armar') return
       if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); deshacer() }
       if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) { e.preventDefault(); rehacer() }
     }
@@ -107,8 +146,9 @@ export default function Taller() {
     return () => window.removeEventListener('keydown', tecla)
   })
 
-  const abrir = (d: RobotDoc, id: string | null) => {
+  const abrir = (d: RobotDoc, id: string | null, idNube: string | null = null) => {
     setDoc(conCables(d))
+    setNubeId(idNube)
     setPrearmado(id)
     setPasado([]); setFuturo([])
     setGaleria(false)
@@ -117,7 +157,7 @@ export default function Taller() {
 
   const plantillas = useMemo(() => {
     if (!doc) return []
-    const { tabla } = autocablear(doc)
+    const { tabla } = autocablear(doc, { conservar: true })
     const pre = PREARMADOS.find(p => p.id === prearmado)
     return pre ? pre.plantillas(doc, tabla) : plantillasGenericas(doc, tabla)
   }, [doc, prearmado])
@@ -183,8 +223,14 @@ export default function Taller() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-1.5">
+          <button onClick={guardarNube} disabled={guardando} className="flex h-9 items-center gap-1.5 rounded-lg bg-white/10 px-3 text-sm font-medium text-white hover:bg-white/15 disabled:opacity-50" title="Guardar en tu cuenta (Ctrl+S)">
+            {guardando ? <Loader2 className="h-4 w-4 animate-spin" /> : <CloudUpload className="h-4 w-4" />} <span className="hidden md:inline">Guardar</span>
+          </button>
+          <button onClick={() => setMisRobots(true)} className="flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-labdark-bg px-3 text-sm hover:bg-white/5" title="Tus robots guardados">
+            <FolderOpen className="h-4 w-4" /> <span className="hidden lg:inline">Mis robots</span>
+          </button>
           <button onClick={() => setGaleria(true)} className="flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-labdark-bg px-3 text-sm hover:bg-white/5" title="Robots prearmados o empezar de cero">
-            <LayoutGrid className="h-4 w-4" /> <span className="hidden md:inline">Robots</span>
+            <LayoutGrid className="h-4 w-4" /> <span className="hidden md:inline">Proyectos</span>
           </button>
           <button onClick={exportar} className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-labdark-bg hover:bg-white/5" title="Descargar proyecto (.json)"><Download className="h-4 w-4" /></button>
           <button onClick={() => archivo.current?.click()} className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-labdark-bg hover:bg-white/5" title="Abrir proyecto (.json)"><FileUp className="h-4 w-4" /></button>
@@ -206,14 +252,14 @@ export default function Taller() {
           nivel={nivel} onNivel={setNivel} avisar={avisar} onListaMateriales={() => setMateriales(true)}
         />
       )}
-      {pestana === 'cablear' && <Cablear doc={doc} />}
+      {pestana === 'cablear' && <Cablear doc={doc} cambiar={cambiar} />}
       {(pestana === 'programar' || pestana === 'probar') && (
         <ProgramarProbar
           doc={doc}
           vista={pestana}
           arenaInicial={arenaInicial}
           plantillas={plantillas}
-          onCodigo={cpp => setDoc(d => (d ? { ...d, programa: { modo: 'codigo', cpp } } : d))}
+          onPrograma={p => setDoc(d => (d ? sincronizar({ ...d, programa: p }) : d))}
           nivel={nivel}
           onNivel={setNivel}
         />
@@ -221,6 +267,7 @@ export default function Taller() {
 
       {galeria && <Galeria onAbrir={abrir} onCerrar={() => setGaleria(false)} />}
       {materiales && <ListaMateriales doc={doc} onCerrar={() => setMateriales(false)} />}
+      {misRobots && <MisRobots actual={nubeId} onCerrar={() => setMisRobots(false)} onAbrir={(d, id) => { abrir(d, null, id); setMisRobots(false); avisar('ok', `«${d.nombre}» abierto`) }} />}
     </div>
   )
 }
@@ -270,7 +317,7 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
         <p className="mb-3 text-xs text-slate-400">Elige el chasis; después arrastra las piezas desde el cajón.</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {[['chasis-2wd', 'Chasis 2WD', 'Dos ruedas y rueda loca: gira fácil'], ['chasis-4wd', 'Chasis 4WD', 'Cuatro ruedas: más fuerza y tracción']].map(([id, n, d]) => (
-            <button key={id} onClick={() => onAbrir(robotVacio(id, 'acrilico', 'Mi robot'), null)} className="rounded-xl border border-dashed border-white/20 p-3 text-left hover:border-chaski-primary/50 hover:bg-white/[0.03]">
+            <button key={id} onClick={() => onAbrir({ ...robotVacio(id, 'acrilico', 'Mi robot'), programa: { modo: 'bloques', bloques: PROGRAMA_VACIO, cpp: '' } }, null)} className="rounded-xl border border-dashed border-white/20 p-3 text-left hover:border-chaski-primary/50 hover:bg-white/[0.03]">
               <div className="text-sm font-semibold text-white">{n}</div>
               <div className="text-xs text-slate-400">{d}</div>
             </button>

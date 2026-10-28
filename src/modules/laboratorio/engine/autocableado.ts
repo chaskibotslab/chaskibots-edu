@@ -37,8 +37,14 @@ export interface Cableado {
   avisos: string[]
 }
 
-export function autocablear(doc: RobotDoc): Cableado {
-  const cables: Cable[] = []
+/**
+ * Conecta las piezas a la placa. Con `conservar`, respeta los cables que ya
+ * hay (cableado a mano) y solo conecta las piezas que todavía no tienen
+ * ningún cable, usando pines libres.
+ */
+export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {}): Cableado {
+  const existentes = new Set(doc.piezas.map(p => p.id))
+  const cables: Cable[] = opciones.conservar ? doc.cables.filter(c => existentes.has(c.de[0]) && existentes.has(c.a[0])) : []
   const tabla: FilaPin[] = []
   const avisos: string[] = []
   const usados = new Set<string>(['D0', 'D1']) // Serial
@@ -52,11 +58,18 @@ export function autocablear(doc: RobotDoc): Cableado {
     .filter(p => pieza(p.pieza).comportamiento.tipo === tipo)
     .sort((a, b) => ps.get(a.id)!.pos.z - ps.get(b.id)!.pos.z) // de izquierda a derecha
 
-  const cable = (a: [string, string], b: [string, string], c?: string) =>
-    cables.push({ de: a, a: b, color: c ?? SENALES[color++ % SENALES.length] })
+  // Piezas que ya tienen cables (se dejan como están) y pines ya ocupados.
+  const cableadas = new Set(cables.flatMap(c => [c.de[0], c.a[0]]))
+  for (const c of cables) for (const [i, p] of [c.de, c.a]) if (i === mcu?.id) usados.add(p)
+  const nueva = (inst: string) => !cableadas.has(inst)
+
+  const cable = (a: [string, string], b: [string, string], c?: string) => {
+    const igual = (x: Cable) => (x.de.join() === a.join() && x.a.join() === b.join()) || (x.de.join() === b.join() && x.a.join() === a.join())
+    if (!cables.some(igual)) cables.push({ de: a, a: b, color: c ?? SENALES[(color++ + cables.length) % SENALES.length] })
+  }
 
   const tomar = (lista: string[], inst: string, etiqueta: string, pin: string, uso: string): string | null => {
-    if (!mcu) return null
+    if (!mcu || !nueva(inst)) return null
     const libre = lista.find(p => !usados.has(p))
     if (!libre) { avisos.push(`${etiqueta}: no quedan pines libres para ${pin}`); return null }
     usados.add(libre)
@@ -74,7 +87,9 @@ export function autocablear(doc: RobotDoc): Cableado {
   // Alimentación: batería → driver (o directo al Arduino si no hay driver).
   const dc = driver ? pieza(driver.pieza).comportamiento : null
   const alim = dc?.tipo === 'puente-h' ? dc.alim : null
-  if (bateria && driver && alim) {
+  // Solo si la batería o el driver son nuevos (no se rehace lo que el alumno cableó).
+  const alimNueva = (bateria && nueva(bateria.id)) || (driver && nueva(driver.id))
+  if (bateria && driver && alim && alimNueva) {
     cable([bateria.id, '+'], [driver.id, alim.motor], ROJO)
     cable([bateria.id, '-'], [driver.id, alim.gnd], NEGRO)
     if (mcu) {
@@ -89,7 +104,7 @@ export function autocablear(doc: RobotDoc): Cableado {
       if (alim.standby) cable([driver.id, alim.standby], [mcu.id, '5V'], ROJO)
       cable([driver.id, alim.gnd], [mcu.id, 'GND'], NEGRO)
     }
-  } else if (bateria && mcu) {
+  } else if (bateria && mcu && !driver && nueva(bateria.id)) {
     cable([bateria.id, '+'], [mcu.id, 'VIN'], ROJO)
     cable([bateria.id, '-'], [mcu.id, 'GND'], NEGRO)
   }
@@ -110,6 +125,7 @@ export function autocablear(doc: RobotDoc): Cableado {
         tomar(PREFERENCIAS.in, driver.id, `Driver: dirección lado ${g.lado}`, g.canal.in_a, `Dirección lado ${g.lado}`)
         tomar(PREFERENCIAS.in, driver.id, `Driver: dirección lado ${g.lado}`, g.canal.in_b, `Dirección lado ${g.lado}`)
         for (const m of g.motores) {
+          if (!nueva(m.id)) continue
           cable([driver.id, g.canal.out_a], [m.id, 'M+'], ROJO)
           cable([driver.id, g.canal.out_b], [m.id, 'M-'], NEGRO)
         }
@@ -118,22 +134,42 @@ export function autocablear(doc: RobotDoc): Cableado {
   }
 
   for (const s of de('ir-reflectivo')) {
+    if (!nueva(s.id)) continue
     alimentar(s.id, 'VCC', 'GND')
     tomar(PREFERENCIAS.lineaDigital, s.id, s.etiqueta, 'DO', 'Lectura digital: HIGH = línea negra')
     tomar(PREFERENCIAS.lineaAnalogica, s.id, s.etiqueta, 'AO', 'Lectura analógica del piso')
   }
   for (const s of de('ultrasonido')) {
+    if (!nueva(s.id)) continue
     alimentar(s.id, 'VCC', 'GND')
     tomar(PREFERENCIAS.trig, s.id, s.etiqueta, 'TRIG', 'Disparo del ultrasonido')
     tomar(PREFERENCIAS.echo, s.id, s.etiqueta, 'ECHO', 'Eco del ultrasonido (se mide con pulseIn)')
   }
   for (const s of de('ir-obstaculo')) {
+    if (!nueva(s.id)) continue
     alimentar(s.id, 'VCC', 'GND')
     tomar(PREFERENCIAS.obstaculo, s.id, s.etiqueta, 'OUT', 'LOW = hay obstáculo')
   }
   for (const s of de('servo')) {
+    if (!nueva(s.id)) continue
     alimentar(s.id, 'V+', 'GND')
     tomar(PREFERENCIAS.servo, s.id, s.etiqueta, 'SIG', 'Señal del servo')
+  }
+
+  // Tabla con TODOS los cables a pines de señal de la placa (también los hechos a mano).
+  if (mcu) {
+    const mcuPines = new Map(pieza(mcu.pieza).pines.map(p => [p.nombre, p]))
+    for (const c of cables) {
+      const [lado, otro] = c.de[0] === mcu.id ? [c.de, c.a] : c.a[0] === mcu.id ? [c.a, c.de] : [null, null]
+      if (!lado || !otro) continue
+      const pm = mcuPines.get(lado[1])
+      if (!pm || pm.tipo === 'alim' || pm.tipo === 'gnd') continue
+      if (tabla.some(f => f.instancia === otro[0] && f.pin === otro[1])) continue
+      const inst = doc.piezas.find(p => p.id === otro[0])
+      if (!inst) continue
+      const ayuda = pieza(inst.pieza).pines.find(p => p.nombre === otro[1])?.ayuda ?? ''
+      tabla.push({ instancia: otro[0], etiqueta: inst.etiqueta, pin: otro[1], placa: lado[1], uso: ayuda })
+    }
   }
 
   return { cables, tabla, avisos }
