@@ -142,8 +142,15 @@ function esquinas(c: Colisionador): Vector3[] {
   if (c.forma === 'caja') h = [c.medidas[0] / 2, c.medidas[1] / 2, c.medidas[2] / 2]
   else if (c.forma === 'esfera') h = [c.radio, c.radio, c.radio]
   else h = c.eje === 'x' ? [c.alto / 2, c.radio, c.radio] : c.eje === 'y' ? [c.radio, c.alto / 2, c.radio] : [c.radio, c.radio, c.alto / 2]
+  const giro = c.forma === 'caja' && c.rotacion
+    ? new Quaternion().setFromEuler(new Euler(grados(c.rotacion[0]), grados(c.rotacion[1]), grados(c.rotacion[2]), 'XYZ'))
+    : null
   const out: Vector3[] = []
-  for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) out.push(new Vector3(sx * h[0], sy * h[1], sz * h[2]).add(ce))
+  for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) {
+    const e = new Vector3(sx * h[0], sy * h[1], sz * h[2])
+    if (giro) e.applyQuaternion(giro)
+    out.push(e.add(ce))
+  }
   return out
 }
 

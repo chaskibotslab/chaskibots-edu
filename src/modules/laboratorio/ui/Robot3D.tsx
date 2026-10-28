@@ -17,6 +17,7 @@ import { useCalidad } from './calidad'
 import { infoPlaca } from '../engine/placa'
 import {
   ArduinoNano, ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
+  ChasisMinisumo, MotorN20, BateriaLipo,
 } from './modelos/Piezas3D'
 
 const m = (v: number) => v / 1000
@@ -31,9 +32,13 @@ interface Refs {
   led13: RefObject<THREE.MeshStandardMaterial>
 }
 
+/** Lo mínimo para animar un robot en la arena: su física, sus pines y sus sensores. */
+export type FuenteRobot = Pick<Simulacion, 'fisica' | 'pinesActuales' | 'lecturasActuales'>
+
 interface Props {
   doc: RobotDoc
-  sim?: Simulacion | null
+  /** De dónde sale la pose y el estado (la simulación del alumno o un rival). */
+  sim?: FuenteRobot | null
   seleccion?: string | null
   onSeleccionar?: (id: string | null) => void
   marcadores?: MarcadorMontaje[]
@@ -88,6 +93,9 @@ function ModeloProc({ inst, def, refs, espaciadorLoca }: { inst: PiezaEnRobot; d
     case 'proc:l298n': return <L298N />
     case 'proc:bateria-18650': return <Bateria18650 />
     case 'proc:bateria-9v': return <Bateria9V />
+    case 'proc:bateria-lipo': return <BateriaLipo />
+    case 'proc:chasis-minisumo': return <ChasisMinisumo material={v.material} color={v.color ?? '#1f2430'} />
+    case 'proc:motor-n20': return <MotorN20 />
     case 'proc:motor-tt': return <MotorTT />
     case 'proc:rueda': {
       const r = refs.ruedas.get(inst.id)

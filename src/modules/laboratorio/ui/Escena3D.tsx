@@ -162,6 +162,28 @@ export function EscenaTaller(p: PropsTaller) {
 // Arena de pruebas
 // ---------------------------------------------------------------------------
 
+/** Dohyo: plataforma negra con borde blanco y las dos líneas de salida (shikiri). */
+function Dohyo({ radio, borde, altura, onDoubleClick }: { radio: number; borde: number; altura: number; onDoubleClick: (e: ThreeEvent<MouseEvent>) => void }) {
+  return (
+    <group>
+      <mesh position={[0, -altura / 2, 0]} castShadow receiveShadow onDoubleClick={onDoubleClick}>
+        <cylinderGeometry args={[radio, radio, altura, 96]} />
+        <meshStandardMaterial color="#0b0b0e" roughness={0.55} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.0006, 0]} receiveShadow>
+        <ringGeometry args={[radio - borde, radio, 96]} />
+        <meshStandardMaterial color="#f5f5f4" roughness={0.6} />
+      </mesh>
+      {[-1, 1].map(s => (
+        <mesh key={s} rotation={[-Math.PI / 2, 0, 0]} position={[s * radio * 0.13, 0.0007, 0]}>
+          <planeGeometry args={[radio * 0.026, radio * 0.26]} />
+          <meshStandardMaterial color="#7c4a22" roughness={0.7} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 function PisoArena({ sim, version }: { sim: Simulacion; version: number }) {
   const { gl } = useThree()
   const arena = sim.arena
@@ -181,7 +203,7 @@ function PisoArena({ sim, version }: { sim: Simulacion; version: number }) {
     sim.colocarRobot({ x: e.point.x, z: e.point.z, yaw: sim.fisica.pose().yaw })
   }
 
-  const bajo = arena.mesa ? -arena.mesa.altura : 0
+  const bajo = arena.mesa ? -arena.mesa.altura : arena.dohyo ? -arena.dohyo.altura : 0
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, bajo - 0.0005, 0]} receiveShadow onDoubleClick={arena.mesa ? undefined : colocar}>
@@ -209,12 +231,13 @@ function PisoArena({ sim, version }: { sim: Simulacion; version: number }) {
           <meshStandardMaterial color="#16a34a" transparent opacity={0.75} roughness={0.6} />
         </mesh>
       )}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.0004, 0]} receiveShadow onDoubleClick={colocar}>
+      {arena.dohyo && <Dohyo {...arena.dohyo} onDoubleClick={colocar} />}
+      {!arena.dohyo && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.0004, 0]} receiveShadow onDoubleClick={colocar}>
         <planeGeometry args={[arena.ancho, arena.largo]} />
         {textura
           ? <meshStandardMaterial map={textura} roughness={0.8} />
           : <meshStandardMaterial color={arena.piso.color} roughness={0.75} />}
-      </mesh>
+      </mesh>}
       {arena.paredes && (() => {
         const W = arena.ancho / 2, L = arena.largo / 2, h = 0.15, e = 0.02
         return ([[0, -L - e, arena.ancho + 2 * e, e * 2], [0, L + e, arena.ancho + 2 * e, e * 2], [-W - e, 0, e * 2, arena.largo], [W + e, 0, e * 2, arena.largo]] as const).map(([x, z, a, b], i) => (
@@ -322,6 +345,7 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel }: {
       <PisoArena sim={sim} version={versionArena} />
       <Rastro sim={sim} version={versionArena} />
       <Robot3D doc={sim.doc} sim={sim} />
+      {sim.competencia && <Robot3D doc={sim.competencia.rival.doc} sim={sim.competencia.rival} />}
       <ControlCamara sim={sim} modo={modoCamara} />
     </Lienzo>
   )

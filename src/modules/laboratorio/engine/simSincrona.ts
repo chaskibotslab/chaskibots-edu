@@ -2,11 +2,14 @@
 // paso en el mismo hilo. La usan los tests de lazo cerrado (y en F6 el juez
 // que verifica entregas). El navegador usa simulation.ts, que reparte el
 // mismo trabajo entre un worker y la interfaz pero llama a las mismas
-// funciones (leerSensores, aplicarPines, Reloj).
+// funciones (leerSensores, aplicarPines, Reloj, Competencia).
 
+import { reflectanciaArena } from '../arenas'
 import type { ArenaDef } from '../arenas/tipos'
+import { construirMinisumo } from '../robots/prearmados'
 import type { RobotDoc } from '../robots/doc'
 import { AvrRunner, CPU_FREQ_HZ, type StepResult } from './avrRunner'
+import { Competencia, type NivelRival } from './competencia'
 import { Mundo, type Gravedad } from './fisica/mundo'
 import { Reloj, RobotFisico } from './fisica/robotFisico'
 import { Ultrasonidos } from './hcsr04'
@@ -19,8 +22,11 @@ export class SimSincrona {
   readonly robot: RobotFisico
   readonly plan: SimPlan
   readonly doc: RobotDoc
-  readonly avr: AvrRunner | null
-  private readonly us: Ultrasonidos | null
+  /** Combate de sumo (solo en arenas de competencia y si se pide un rival). */
+  readonly competencia: Competencia | null
+  avr: AvrRunner | null
+  private us: Ultrasonidos | null
+  private readonly hex: string | undefined
   private readonly reloj = new Reloj()
   private readonly reflectancia: FuncionReflectancia
   tiempo = 0
@@ -28,17 +34,29 @@ export class SimSincrona {
   ultimas: Entradas | null = null
   ultimoPaso: StepResult | null = null
 
-  constructor(doc: RobotDoc, arena: ArenaDef, opciones: { hex?: string; gravedad?: Gravedad; reflectancia?: FuncionReflectancia } = {}) {
+  constructor(doc: RobotDoc, arena: ArenaDef, opciones: { hex?: string; gravedad?: Gravedad; reflectancia?: FuncionReflectancia; rival?: NivelRival } = {}) {
     this.plan = planDe(doc)
     this.mundo = new Mundo(arena, opciones.gravedad ?? 'tierra')
     this.robot = new RobotFisico(this.mundo, doc, this.plan, arena.inicio)
-    this.reflectancia = opciones.reflectancia ?? (() => arena.piso.reflectancia)
-    this.avr = opciones.hex ? new AvrRunner(opciones.hex, infoPlaca(doc).chip) : null
-    this.us = this.avr ? new Ultrasonidos(this.avr) : null
+    this.reflectancia = opciones.reflectancia ?? reflectanciaArena(arena)
+    this.hex = opciones.hex
+    this.avr = null
+    this.us = null
     this.doc = doc
+    this.competencia = arena.competencia && opciones.rival
+      ? new Competencia(this.mundo, arena, this.robot, construirMinisumo('pla-rojo', 'Rival'), opciones.rival, this.reflectancia)
+      : null
+    this.encender()
+    this.competencia?.empezar()
   }
 
-  /** Avanza `dt` segundos (sensores → micro → actuadores → física). */
+  /** Enciende (o reinicia) el micro con el programa: como apretar RESET. */
+  private encender() {
+    this.avr = this.hex ? new AvrRunner(this.hex, infoPlaca(this.doc).chip) : null
+    this.us = this.avr ? new Ultrasonidos(this.avr) : null
+  }
+
+  /** Avanza `dt` segundos (sensores → micro → actuadores → física → juez). */
   paso(dt: number) {
     const e = leerSensores(this.plan, this.doc, this.robot, this.reflectancia)
     this.ultimas = e
@@ -53,7 +71,9 @@ export class SimSincrona {
       aplicarPines(this.plan, this.robot, r.pins)
       dtReal = r.cycles / CPU_FREQ_HZ
     }
-    this.reloj.avanzar(this.mundo, [this.robot], dtReal)
+    this.competencia?.antes()
+    this.reloj.avanzar(this.mundo, [this.robot, ...(this.competencia?.robots ?? [])], dtReal)
+    if (this.competencia?.despues(dtReal) === 'nueva-ronda') this.encender()
     this.tiempo += dtReal
   }
 

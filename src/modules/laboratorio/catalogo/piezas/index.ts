@@ -4,20 +4,20 @@
 
 import type { Familia, PiezaDef } from '../tipos'
 import { ARDUINO_UNO, ARDUINO_NANO, ESP32 } from './placas'
-import { CHASIS_2WD, CHASIS_4WD } from './chasis'
-import { MOTOR_TT, RUEDA_65, RUEDA_65_PLASTICO, RUEDA_48, RUEDA_LOCA } from './movimiento'
+import { CHASIS_2WD, CHASIS_4WD, CHASIS_MINISUMO } from './chasis'
+import { MOTOR_TT, RUEDA_65, RUEDA_65_PLASTICO, RUEDA_48, RUEDA_LOCA, MOTOR_N20, RUEDA_34 } from './movimiento'
 import { SG90, MG90S } from './servos'
 import { TCRT5000, FC51, HCSR04 } from './sensores'
-import { L298N, TB6612, BATERIA_18650, BATERIA_9V } from './electronica'
+import { L298N, TB6612, BATERIA_18650, BATERIA_9V, BATERIA_LIPO_2S } from './electronica'
 import { JOYSTICK, MPU6050, DRV8825 } from './futuras'
 
 export const LISTA_PIEZAS: PiezaDef[] = [
-  CHASIS_2WD, CHASIS_4WD,
+  CHASIS_2WD, CHASIS_4WD, CHASIS_MINISUMO,
   ARDUINO_UNO, ARDUINO_NANO, ESP32,
-  MOTOR_TT, RUEDA_65, RUEDA_65_PLASTICO, RUEDA_48, RUEDA_LOCA,
+  MOTOR_TT, RUEDA_65, RUEDA_65_PLASTICO, RUEDA_48, RUEDA_LOCA, MOTOR_N20, RUEDA_34,
   SG90, MG90S,
   TCRT5000, FC51, HCSR04, JOYSTICK, MPU6050,
-  L298N, TB6612, BATERIA_18650, BATERIA_9V, DRV8825,
+  L298N, TB6612, BATERIA_18650, BATERIA_9V, BATERIA_LIPO_2S, DRV8825,
 ]
 
 export const PIEZAS: Record<string, PiezaDef> = Object.fromEntries(LISTA_PIEZAS.map(p => [p.id, p]))

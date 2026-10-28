@@ -325,9 +325,9 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
       <div className="mt-5 border-t border-lab-borde/15 pt-4">
         <div className="mb-2 text-sm font-semibold text-white">Empezar desde cero</div>
         <p className="mb-3 text-xs text-slate-400">Elige el chasis; después arrastra las piezas desde el cajón.</p>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {[['chasis-2wd', 'Chasis 2WD', 'Dos ruedas y rueda loca: gira fácil'], ['chasis-4wd', 'Chasis 4WD', 'Cuatro ruedas: más fuerza y tracción']].map(([id, n, d]) => (
-            <button key={id} onClick={() => onAbrir({ ...robotVacio(id, 'acrilico', 'Mi robot'), programa: { modo: 'bloques', bloques: PROGRAMA_VACIO, cpp: '' } }, null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-white/[0.03]">
+        <div className="grid gap-2 sm:grid-cols-3">
+          {[['chasis-2wd', 'Chasis 2WD', 'Dos ruedas y rueda loca: gira fácil'], ['chasis-4wd', 'Chasis 4WD', 'Cuatro ruedas: más fuerza y tracción'], ['chasis-minisumo', 'Chasis minisumo', '10 × 10 cm con pala: para competir en el dohyo']].map(([id, n, d]) => (
+            <button key={id} onClick={() => onAbrir({ ...robotVacio(id, id === 'chasis-minisumo' ? 'pla' : 'acrilico', 'Mi robot'), programa: { modo: 'bloques', bloques: PROGRAMA_VACIO, cpp: '' } }, null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-white/[0.03]">
               <div className="text-sm font-semibold text-white">{n}</div>
               <div className="text-xs text-slate-400">{d}</div>
             </button>

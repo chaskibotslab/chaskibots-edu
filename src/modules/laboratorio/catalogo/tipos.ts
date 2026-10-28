@@ -56,10 +56,11 @@ export function friccion(rueda: MaterialFisico, piso: MaterialFisico): number {
   return MU[rueda]?.[piso] ?? 0.5
 }
 
+/** `friccion`: contra el piso u otros robots (por defecto 0,5); la pala de sumo usa poca. */
 export type Colisionador =
-  | { forma: 'caja'; medidas: V3; centro?: V3 }
-  | { forma: 'cilindro'; radio: number; alto: number; eje: 'x' | 'y' | 'z'; centro?: V3 }
-  | { forma: 'esfera'; radio: number; centro?: V3 }
+  | { forma: 'caja'; medidas: V3; centro?: V3; /** Giro de la caja (grados, orden XYZ). */ rotacion?: V3; friccion?: number }
+  | { forma: 'cilindro'; radio: number; alto: number; eje: 'x' | 'y' | 'z'; centro?: V3; friccion?: number }
+  | { forma: 'esfera'; radio: number; centro?: V3; friccion?: number }
 
 export type TipoPin = 'digital' | 'pwm' | 'analogico' | 'i2c' | 'alim' | 'gnd' | 'potencia'
 

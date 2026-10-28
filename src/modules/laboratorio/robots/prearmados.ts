@@ -755,6 +755,145 @@ export function construirRcEsp32(): RobotDoc {
   return a.terminar(codigoRc)
 }
 
+// ---------------------------------------------------------------------------
+// Minisumo (F5): Nano + TB6612 + LiPo, dos N20, pala de acero
+// ---------------------------------------------------------------------------
+
+function pinesMinisumo(tabla: FilaPin[], doc: RobotDoc) {
+  const us = doc.piezas.find(p => p.pieza === 'hcsr04')?.id ?? ''
+  const borde = (montaje: string) => pinCodigo(pinDePlaca(tabla, doc.piezas.find(p => p.padre?.montaje === montaje)?.id ?? '', 'DO'))
+  return {
+    TRIG: pinCodigo(pinDePlaca(tabla, us, 'TRIG')), ECHO: pinCodigo(pinDePlaca(tabla, us, 'ECHO')),
+    IR_IZQ: pinesObstaculo(tabla, doc, 'frente-izq'), IR_DER: pinesObstaculo(tabla, doc, 'frente-der'),
+    BORDE_IZQ: borde('piso-izq'), BORDE_DER: borde('piso-der'),
+  }
+}
+
+function codigoMinisumo(tabla: FilaPin[], doc: RobotDoc) {
+  const p = pinesMinisumo(tabla, doc)
+  return `// Minisumo: espera los 5 s del reglamento, busca al rival girando, lo
+// empuja con la pala y se aleja del borde blanco del dohyo.
+//  - Ultrasonido HC-SR04 al frente: ve al rival a distancia.
+//  - Dos FC-51 en las esquinas (LOW = hay algo cerca).
+//  - Dos TCRT5000 abajo: HIGH sobre el negro del dohyo, LOW sobre el borde blanco.
+
+const int TRIG = ${p.TRIG};
+const int ECHO = ${p.ECHO};
+const int IR_IZQ = ${p.IR_IZQ};
+const int IR_DER = ${p.IR_DER};
+const int BORDE_IZQ = ${p.BORDE_IZQ};
+const int BORDE_DER = ${p.BORDE_DER};
+
+${bloqueMotores(tabla, doc)}
+
+const int ATAQUE = 255;   // a todo lo que da: empujar
+const int BUSCAR = 150;   // girar buscando
+const int VER_CM = 60;    // a esta distancia (o menos) el rival está al frente
+const int MEMORIA_MS = 400; // sigue empujando un rato aunque deje de verlo
+
+// Pegado al rival el ultrasonido no mide (zona ciega de 2 cm): por eso el
+// robot "recuerda" que lo vio y sigue empujando.
+unsigned long atacarHasta = 0;
+
+${MEDIR_CM}
+
+void setup() {
+  pinMode(TRIG, OUTPUT); pinMode(ECHO, INPUT);
+  pinMode(IR_IZQ, INPUT); pinMode(IR_DER, INPUT);
+  pinMode(BORDE_IZQ, INPUT); pinMode(BORDE_DER, INPUT);
+  ${SETUP_MOTORES}
+  motores(0, 0);
+  Serial.begin(9600);
+  Serial.println("Esperando 5 s (reglamento)...");
+  delay(5000);              // ¡obligatorio! si se mueve antes, pierde la ronda
+  Serial.println("¡A pelear!");
+}
+
+void loop() {
+  // 1. Lo primero es no caerse: si un sensor ve el borde blanco, retroceder
+  //    y girar hacia el centro.
+  bool bordeIzq = digitalRead(BORDE_IZQ) == LOW;
+  bool bordeDer = digitalRead(BORDE_DER) == LOW;
+  if (bordeIzq || bordeDer) {
+    motores(-255, -255);                // un poquito atrás (atrás también hay borde)…
+    delay(120);
+    if (bordeIzq) motores(220, -220);   // …y girar en el lugar hacia el centro
+    else motores(-220, 220);
+    delay(300);
+    return;
+  }
+
+  // 2. ¿Dónde está el rival?
+  long cm = medirCm();
+  bool izq = digitalRead(IR_IZQ) == LOW;
+  bool der = digitalRead(IR_DER) == LOW;
+
+  if (cm < VER_CM) atacarHasta = millis() + MEMORIA_MS;
+
+  if (millis() < atacarHasta) {
+    // ¡Empujar! Si un IR lateral lo ve más de su lado, corregir hacia él
+    // para pegarle de frente (si no, la pala resbala y se dan vueltas).
+    if (izq && !der) motores(ATAQUE / 2, ATAQUE);
+    else if (der && !izq) motores(ATAQUE, ATAQUE / 2);
+    else motores(ATAQUE, ATAQUE);
+  }
+  else if (izq) motores(-BUSCAR, BUSCAR);            // a la izquierda: girar hacia él
+  else if (der) motores(BUSCAR, -BUSCAR);            // a la derecha
+  else motores(BUSCAR, -BUSCAR);                     // no se ve: buscar girando
+}
+`
+}
+
+function codigoLecturaMinisumo(tabla: FilaPin[], doc: RobotDoc) {
+  const p = pinesMinisumo(tabla, doc)
+  return `// Prueba de sensores del minisumo: mira los valores en el Monitor Serie
+// mientras mueves el robot (doble clic en el dohyo para ponerlo en otro lugar).
+
+const int TRIG = ${p.TRIG};
+const int ECHO = ${p.ECHO};
+const int IR_IZQ = ${p.IR_IZQ};
+const int IR_DER = ${p.IR_DER};
+const int BORDE_IZQ = ${p.BORDE_IZQ};
+const int BORDE_DER = ${p.BORDE_DER};
+
+${MEDIR_CM}
+
+void setup() {
+  pinMode(TRIG, OUTPUT); pinMode(ECHO, INPUT);
+  pinMode(IR_IZQ, INPUT); pinMode(IR_DER, INPUT);
+  pinMode(BORDE_IZQ, INPUT); pinMode(BORDE_DER, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.print("Frente: "); Serial.print(medirCm()); Serial.print(" cm");
+  Serial.print("  IR izq: "); Serial.print(digitalRead(IR_IZQ) == LOW ? "VE" : "--");
+  Serial.print("  IR der: "); Serial.print(digitalRead(IR_DER) == LOW ? "VE" : "--");
+  Serial.print("  Borde: "); Serial.print(digitalRead(BORDE_IZQ) == LOW ? "B" : "n");
+  Serial.println(digitalRead(BORDE_DER) == LOW ? "B" : "n");
+  delay(300);
+}
+`
+}
+
+/** Minisumo del alumno (y, con otra variante de chasis, el rival de práctica). */
+export function construirMinisumo(variante = 'pla', nombre = 'Minisumo'): RobotDoc {
+  const a = new Armador('chasis-minisumo', variante, nombre)
+  a.poner('arduino-nano', 'chasis', 'placa')
+  a.poner('tb6612', 'chasis', 'driver')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  const mi = a.poner('motor-n20', 'chasis', 'motor-izq')
+  const md = a.poner('motor-n20', 'chasis', 'motor-der')
+  a.poner('rueda-34', mi, 'eje')
+  a.poner('rueda-34', md, 'eje')
+  a.poner('hcsr04', 'chasis', 'frente')
+  a.poner('fc51', 'chasis', 'frente-izq')
+  a.poner('fc51', 'chasis', 'frente-der')
+  a.poner('tcrt5000', 'chasis', 'piso-izq')
+  a.poner('tcrt5000', 'chasis', 'piso-der')
+  return a.terminar(codigoMinisumo)
+}
+
 export const PREARMADOS: Prearmado[] = [
   {
     id: 'seguidor',
@@ -897,6 +1036,26 @@ export const PREARMADOS: Prearmado[] = [
     construir: construirRcEsp32,
     plantillas: (doc, tabla) => [
       { id: 'rc', nombre: 'Radiocontrol Bluetooth', descripcion: 'Obedece letras F B L R S', codigo: codigoRc(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'minisumo',
+    nombre: 'Minisumo',
+    descripcion: 'Robot de 10 × 10 cm con pala de acero, micromotores N20 y Arduino Nano. Pelea contra un rival de práctica en el dohyo: gana quien saque al otro (2 de 3 rondas).',
+    dificultad: 'intermedio',
+    logica: [
+      'Espera 5 s quieto al empezar cada ronda (reglamento).',
+      'Si un sensor de abajo ve el borde blanco: retrocede un poco y gira en el lugar hacia el centro.',
+      'Si el ultrasonido ve al rival a menos de 60 cm: ¡ataca a fondo! Y sigue empujando 0,4 s aunque deje de verlo (pegado al rival el ultrasonido no mide).',
+      'Mientras empuja, corrige hacia el lado donde el IR ve al rival para pegarle de frente.',
+      'Si lo ve un IR de costado, gira hacia ese lado; si no ve nada, busca girando.',
+    ],
+    arena: 'dohyo-minisumo',
+    construir: () => construirMinisumo(),
+    plantillas: (doc, tabla) => [
+      { id: 'minisumo', nombre: 'Minisumo (buscar y atacar)', descripcion: 'Espera, busca, ataca y evita el borde', codigo: codigoMinisumo(tabla, doc) },
+      { id: 'sensores', nombre: 'Prueba de sensores', descripcion: 'Distancia, IR y borde en el Monitor Serie', codigo: codigoLecturaMinisumo(tabla, doc) },
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
     ],
   },

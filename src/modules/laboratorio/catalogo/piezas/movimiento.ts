@@ -92,3 +92,39 @@ export const RUEDA_LOCA: PiezaDef = {
   comportamiento: { tipo: 'rueda-loca', radio_mm: 8 },
   datos: [['Bola', '16 mm de acero']],
 }
+
+// N20: origen sobre el eje en la cara de la reductora; el cuerpo (reductora
+// 9 mm + motor 15 mm) queda hacia −z y el eje sale 8 mm hacia +z.
+export const MOTOR_N20: PiezaDef = {
+  id: 'motor-n20',
+  nombre: 'Micromotor N20 1:100 (300 rpm)',
+  familia: 'movimiento',
+  descripcion: 'Motor metálico diminuto con reductora: el de los minisumos y robots pequeños. Rápido y liviano.',
+  modelo: 'proc:motor-n20',
+  masa_g: 10,
+  material: 'metal',
+  colisionadores: [{ forma: 'caja', medidas: [12, 10, 24], centro: [0, 0, -12] }],
+  montajes: [{ id: 'eje', tipo: 'eje-motor', nombre: 'Eje', posicion: [0, 0, 8] }],
+  encaja: ['soporte-motor'],
+  pines: [
+    { nombre: 'M+', tipo: 'potencia', ayuda: 'Terminal del motor (va a una salida del driver)' },
+    { nombre: 'M-', tipo: 'potencia', ayuda: 'Terminal del motor (va a la otra salida del driver)' },
+  ],
+  comportamiento: { tipo: 'motor-dc', v_nominal: 6, rpm_sin_carga: 300, torque_bloqueo_nm: 0.045, zona_muerta_v: 0.6, tau_s: 0.03, corriente_a: 0.1 },
+  datos: [['Voltaje', '3–6 V'], ['Velocidad', '≈ 300 rpm a 6 V'], ['Torque de bloqueo', '≈ 0,45 kg·cm'], ['Tamaño', '12 × 10 × 24 mm']],
+  fuente: 'Micromotor N20 con reductora 1:100, datos típicos de fabricante',
+}
+
+export const RUEDA_34: PiezaDef = {
+  ...ruedaBase,
+  id: 'rueda-34',
+  nombre: 'Rueda 34 mm de silicona',
+  descripcion: 'Rueda chica con llanta de silicona blanda: la que más agarra. Para minisumo y robots N20.',
+  modelo: 'proc:rueda',
+  masa_g: 6,
+  material: 'goma',
+  color: '#111827',
+  colisionadores: [{ forma: 'cilindro', radio: 17, alto: 12, eje: 'z' }],
+  comportamiento: { tipo: 'rueda', radio_mm: 17, ancho_mm: 12 },
+  datos: [['Diámetro', '34 mm'], ['Ancho', '12 mm'], ['Llanta', 'Silicona (agarra mucho)']],
+}
