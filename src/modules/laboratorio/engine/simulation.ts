@@ -20,6 +20,7 @@ import { Reloj, RobotFisico } from './fisica/robotFisico'
 import type { UltrasonidoPines } from './hcsr04'
 import { aplicarPines, leerSensores, type LecturaSensor } from './paso'
 import { planDe, type SimPlan } from './plan'
+import { infoPlaca } from './placa'
 import { MapaPista, type Pose2D } from './tracks'
 
 const MAX_PASO_S = 1 / 30      // como máximo 33 ms simulados por pedido al worker
@@ -120,7 +121,7 @@ export class Simulacion {
         else if (m.type === 'step') this.alTerminarPaso(m.result)
       }
       worker.onerror = ev => { this.falla(ev.message || 'Error en el microcontrolador'); reject(new Error(ev.message)) }
-      worker.postMessage({ type: 'load', hex } satisfies WorkerIn)
+      worker.postMessage({ type: 'load', hex, chip: infoPlaca(this.doc).chip } satisfies WorkerIn)
     })
   }
 
@@ -217,8 +218,22 @@ export class Simulacion {
 
   private pasoFisica(dt: number) {
     aplicarPines(this.plan, this.fisica, this.cargado ? this.pines : null)
+    // Manejo directo (sin programa): el control pone el voltaje de cada lado.
+    if (!this.cargado && this.manual) {
+      const vMax = Math.max(0, this.plan.voltajeBateria - this.plan.caidaDriver)
+      for (const r of this.fisica.ruedas) {
+        const m = this.plan.motores.find(x => x.instancia === r.motor)
+        if (!m?.driver || !m.polaridad) continue
+        r.volts = (m.rueda && m.rueda.centro.z < 0 ? this.manual.izq : this.manual.der) * vMax
+      }
+    }
     this.reloj.avanzar(this.mundo, [this.fisica], dt)
   }
+
+  /** Control directo de los motores sin programa (−1 a 1 por lado). */
+  private manual: { izq: number; der: number } | null = null
+  manejar(izq: number, der: number) { this.manual = izq || der ? { izq, der } : null }
+  get tieneProgramaCorriendo() { return this.cargado }
 
   private falla(msg: string) {
     this.estado = 'error'

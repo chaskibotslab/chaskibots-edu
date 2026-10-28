@@ -12,11 +12,11 @@
 // desincronizan aunque el navegador vaya lento. El eco de los HC-SR04 se
 // genera aquí, junto al CPU, porque dura microsegundos.
 
-import { AvrRunner } from './avrRunner'
+import { AvrRunner, type Chip } from './avrRunner'
 import { Ultrasonidos, type UltrasonidoPines } from './hcsr04'
 
 export type WorkerIn =
-  | { type: 'load'; hex: string }
+  | { type: 'load'; hex: string; chip: Chip }
   | { type: 'step'; cycles: number; digital: Record<string, boolean>; analog: Record<string, number>; ultrasonidos: UltrasonidoPines[]; serial?: string }
 
 export type WorkerOut =
@@ -32,7 +32,7 @@ ctx.onmessage = (e: MessageEvent<WorkerIn>) => {
   const msg = e.data
   try {
     if (msg.type === 'load') {
-      runner = new AvrRunner(msg.hex)
+      runner = new AvrRunner(msg.hex, msg.chip)
       ultrasonidos = new Ultrasonidos(runner)
       ctx.postMessage({ type: 'loaded' } satisfies WorkerOut)
       return

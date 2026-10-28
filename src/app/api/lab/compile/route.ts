@@ -2,10 +2,11 @@
 // La clave del compilador nunca llega al navegador: la agrega este servidor.
 import { NextResponse } from 'next/server'
 import { laboratorioActivo, sesionLaboratorio } from '@/modules/laboratorio/server/acceso'
+import { prepararSketchEsp32 } from '@/modules/laboratorio/esp32/capaEsp32'
 
 export const dynamic = 'force-dynamic'
 
-const PLACAS = new Set(['uno', 'nano', 'mega'])
+const PLACAS = new Set(['uno', 'nano', 'mega', 'esp32'])
 
 export async function POST(req: Request) {
   if (!laboratorioActivo()) return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
@@ -18,10 +19,17 @@ export async function POST(req: Request) {
 
   let body: { board?: unknown; code?: unknown }
   try { body = await req.json() } catch { return NextResponse.json({ error: 'JSON inválido' }, { status: 400 }) }
-  const board = String(body.board ?? 'uno')
-  const code = String(body.code ?? '')
+  let board = String(body.board ?? 'uno')
+  let code = String(body.code ?? '')
   if (!PLACAS.has(board)) return NextResponse.json({ error: 'Placa no soportada' }, { status: 400 })
   if (code.length > 64 * 1024) return NextResponse.json({ error: 'El código supera 64 KB' }, { status: 413 })
+  // ESP32: se compila sobre el ATmega2560 del simulador con la capa ESP32 delante.
+  if (board === 'esp32') {
+    const listo = prepararSketchEsp32(code)
+    if (listo.error) return NextResponse.json({ ok: false, errors: [{ line: 1, col: 1, severity: 'error', message: listo.error }] })
+    code = listo.codigo
+    board = 'mega'
+  }
 
   const destino = `${url.replace(/\/$/, '')}/compile`
   try {

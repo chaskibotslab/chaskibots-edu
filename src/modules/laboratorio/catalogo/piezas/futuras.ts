@@ -17,7 +17,7 @@ export const JOYSTICK: PiezaDef = {
   nombre: 'Joystick analógico KY-023',
   familia: 'sensor',
   descripcion: 'Palanca de dos ejes con botón: para manejar robots en vivo (radiocontrol).',
-  proximamente: 'Llega con el radiocontrol (fase F4).',
+  proximamente: 'Ya puedes manejar tus robots con el botón «Control» de la pestaña Probar (teclado, pantalla o control de videojuego). El joystick como pieza física llega con la estación de control.',
   modelo: 'proc:joystick',
   glb: '/lab/modelos/joystick.glb',
   masa_g: 12,

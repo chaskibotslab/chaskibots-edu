@@ -7,21 +7,12 @@
 import { pieza } from '../catalogo/piezas'
 import type { Cable, RobotDoc } from '../robots/doc'
 import { poses } from './ensamblaje'
+import { infoPlaca, mcuDe, pinCodigo } from './placa'
 
 const ROJO = '#ef4444'
 const NEGRO = '#111827'
 const SENALES = ['#a855f7', '#3b82f6', '#22c55e', '#f97316', '#eab308', '#f8fafc', '#06b6d4', '#ec4899', '#84cc16', '#f59e0b', '#14b8a6', '#8b5cf6']
 
-const PREFERENCIAS = {
-  en: ['D5', 'D6', 'D3', 'D11'],
-  in: ['D7', 'D8', 'D9', 'D10', 'D4', 'D12', 'D13', 'D2', 'D3', 'D11'],
-  lineaDigital: ['D2', 'D3', 'D4', 'D12', 'D13', 'D11'],
-  lineaAnalogica: ['A0', 'A1', 'A2', 'A3', 'A4', 'A5'],
-  obstaculo: ['D2', 'D3', 'D4', 'D12', 'D13', 'A2', 'A3', 'A4', 'A5'],
-  trig: ['D12', 'D4', 'D13', 'A2', 'A3', 'A4'],
-  echo: ['D11', 'D2', 'D3', 'D4', 'A3', 'A4', 'A5'],
-  servo: ['D3', 'D4', 'D13', 'D11', 'D12', 'A2', 'A3', 'A4', 'A5'],
-}
 
 export interface FilaPin {
   instancia: string
@@ -47,11 +38,13 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
   const cables: Cable[] = opciones.conservar ? doc.cables.filter(c => existentes.has(c.de[0]) && existentes.has(c.a[0])) : []
   const tabla: FilaPin[] = []
   const avisos: string[] = []
-  const usados = new Set<string>(['D0', 'D1']) // Serial
+  const info = infoPlaca(doc)
+  const PREFERENCIAS = info.preferencias
+  const usados = new Set<string>(info.reservados) // Serial
   let color = 0
   const ps = poses(doc)
 
-  const mcu = doc.piezas.find(p => pieza(p.pieza).comportamiento.tipo === 'mcu-avr')
+  const mcu = mcuDe(doc)
   const driver = doc.piezas.find(p => pieza(p.pieza).comportamiento.tipo === 'puente-h')
   const bateria = doc.piezas.find(p => pieza(p.pieza).comportamiento.tipo === 'bateria')
   const de = (tipo: string) => doc.piezas
@@ -80,7 +73,7 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
 
   const alimentar = (inst: string, vcc: string, gnd: string) => {
     if (!mcu) return
-    cable([inst, vcc], [mcu.id, '5V'], ROJO)
+    cable([inst, vcc], [mcu.id, vcc === 'V+' ? info.alimServo : info.alimSensores], ROJO)
     cable([inst, gnd], [mcu.id, 'GND'], NEGRO)
   }
 
@@ -95,13 +88,13 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
     if (mcu) {
       if (alim.salida5v) {
         // L298N: su regulador de 5 V alimenta al Arduino.
-        cable([driver.id, alim.salida5v], [mcu.id, '5V'], ROJO)
+        cable([driver.id, alim.salida5v], [mcu.id, info.placa === 'esp32' ? 'VIN' : '5V'], ROJO)
       } else {
         // TB6612: la batería alimenta al Arduino por VIN y el Arduino da 5 V a la lógica.
         cable([bateria.id, '+'], [mcu.id, 'VIN'], ROJO)
       }
-      if (alim.vcc) cable([driver.id, alim.vcc], [mcu.id, '5V'], ROJO)
-      if (alim.standby) cable([driver.id, alim.standby], [mcu.id, '5V'], ROJO)
+      if (alim.vcc) cable([driver.id, alim.vcc], [mcu.id, info.alimSensores], ROJO)
+      if (alim.standby) cable([driver.id, alim.standby], [mcu.id, info.alimSensores], ROJO)
       cable([driver.id, alim.gnd], [mcu.id, 'GND'], NEGRO)
     }
   } else if (bateria && mcu && !driver && nueva(bateria.id)) {
@@ -180,8 +173,4 @@ export function pinDePlaca(tabla: FilaPin[], instancia: string, pin: string): st
   return tabla.find(f => f.instancia === instancia && f.pin === pin)?.placa ?? null
 }
 
-/** Número de pin para el código Arduino: "D5" → "5", "A0" → "A0". */
-export function pinCodigo(placa: string | null): string {
-  if (!placa) return '-1'
-  return placa.startsWith('D') ? placa.slice(1) : placa
-}
+export { pinCodigo }

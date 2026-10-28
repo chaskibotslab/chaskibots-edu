@@ -6,6 +6,7 @@ import { autocablear, pinCodigo, pinDePlaca, type FilaPin } from '../engine/auto
 import { pieza } from '../catalogo/piezas'
 import type { ProgramaBloques } from '../bloques/generador'
 import { encastrar, robotVacio } from '../engine/ensamblaje'
+import { infoPlaca } from '../engine/placa'
 import type { RobotDoc } from './doc'
 
 export interface PlantillaCodigo { id: string; nombre: string; descripcion: string; codigo: string; bloques?: ProgramaBloques }
@@ -20,6 +21,11 @@ export interface Prearmado {
   arena: string
   construir: () => RobotDoc
   plantillas: (doc: RobotDoc, tabla: FilaPin[]) => PlantillaCodigo[]
+}
+
+/** En el ESP32 los servos usan la librería ESP32Servo (misma forma de uso). */
+function incluirServo(doc: RobotDoc) {
+  return infoPlaca(doc).placa === 'esp32' ? '#include <ESP32Servo.h>' : '#include <Servo.h>'
 }
 
 class Armador {
@@ -276,7 +282,7 @@ function codigoEvita(tabla: FilaPin[], doc: RobotDoc) {
   return `// Robot evita obstáculos: avanza mirando con el ultrasonido.
 // Si algo está cerca, retrocede, gira el "cuello" (servo) para mirar a cada
 // lado y se va hacia donde haya más espacio.
-#include <Servo.h>
+${incluirServo(doc)}
 
 const int TRIG = ${u.TRIG};
 const int ECHO = ${u.ECHO};
@@ -344,7 +350,7 @@ void loop() {
 function codigoLecturaUltrasonido(tabla: FilaPin[], doc: RobotDoc) {
   const u = pinesUltrasonido(tabla, doc)
   return `// Radar: el servo barre de 10° a 170° y el ultrasonido mide en cada ángulo
-#include <Servo.h>
+${incluirServo(doc)}
 
 const int TRIG = ${u.TRIG};
 const int ECHO = ${u.ECHO};
@@ -678,6 +684,77 @@ export function construirSeguidorFreno(): RobotDoc {
   return a.terminar(codigoSeguidorFreno)
 }
 
+// ---------------------------------------------------------------------------
+// ESP32: seguidor de línea y robot de radiocontrol por Bluetooth
+// ---------------------------------------------------------------------------
+
+export function construirSeguidorEsp32(): RobotDoc {
+  const a = new Armador('chasis-2wd', 'acrilico', 'Seguidor ESP32')
+  a.poner('esp32-devkit', 'chasis', 'placa')
+  a.poner('l298n', 'chasis', 'driver')
+  a.poner('bateria-2x18650', 'chasis', 'bateria')
+  const mi = a.poner('motor-tt', 'chasis', 'motor-izq')
+  const md = a.poner('motor-tt', 'chasis', 'motor-der')
+  a.poner('rueda-65', mi, 'eje')
+  a.poner('rueda-65', md, 'eje')
+  a.poner('rueda-loca', 'chasis', 'loca')
+  a.poner('tcrt5000', 'chasis', 'piso-izq')
+  a.poner('tcrt5000', 'chasis', 'piso-der')
+  return a.terminar(codigoSeguidor)
+}
+
+function codigoRc(tabla: FilaPin[], doc: RobotDoc) {
+  return `// Robot de radiocontrol por Bluetooth (ESP32).
+// El ESP32 tiene Bluetooth: desde el celular (o el control en pantalla del
+// laboratorio) llegan letras y el robot obedece:
+//   F = adelante   B = atrás   L = izquierda   R = derecha   S = parar
+//   0–9 = velocidad (0 = lenta, 9 = máxima)
+#include <BluetoothSerial.h>
+
+BluetoothSerial SerialBT;
+
+${bloqueMotores(tabla, doc)}
+
+int velocidad = 200;   // 0 a 255
+
+void setup() {
+  ${SETUP_MOTORES}
+  Serial.begin(115200);
+  SerialBT.begin("RobotChaski");   // nombre que verás en el celular
+  Serial.println("Listo: conéctate a RobotChaski por Bluetooth");
+}
+
+void loop() {
+  if (!SerialBT.available()) return;
+  char c = SerialBT.read();
+
+  if (c >= '0' && c <= '9') {            // un número cambia la velocidad
+    velocidad = map(c - '0', 0, 9, 90, 255);
+    return;
+  }
+  switch (c) {
+    case 'F': motores(velocidad, velocidad); break;
+    case 'B': motores(-velocidad, -velocidad); break;
+    case 'L': motores(-velocidad / 2, velocidad); break;
+    case 'R': motores(velocidad, -velocidad / 2); break;
+    case 'S': motores(0, 0); break;
+  }
+}
+`
+}
+
+export function construirRcEsp32(): RobotDoc {
+  const a = new Armador('chasis-4wd', 'pla', 'Robot RC Bluetooth')
+  a.poner('esp32-devkit', 'chasis', 'placa')
+  a.poner('l298n', 'chasis', 'driver')
+  a.poner('bateria-2x18650', 'chasis', 'bateria')
+  for (const m of ['motor-del-izq', 'motor-tra-izq', 'motor-del-der', 'motor-tra-der']) {
+    const id = a.poner('motor-tt', 'chasis', m)
+    a.poner('rueda-65', id, 'eje')
+  }
+  return a.terminar(codigoRc)
+}
+
 export const PREARMADOS: Prearmado[] = [
   {
     id: 'seguidor',
@@ -785,6 +862,41 @@ export const PREARMADOS: Prearmado[] = [
     construir: construirLaberinto,
     plantillas: (doc, tabla) => [
       { id: 'laberinto', nombre: 'Mano derecha', descripcion: 'Sigue la pared derecha', codigo: codigoLaberinto(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'seguidor-esp32',
+    nombre: 'Seguidor de línea con ESP32',
+    descripcion: 'El mismo seguidor, con la placa ESP32 de los kits de BGU (lógica de 3,3 V, PWM en cualquier GPIO).',
+    dificultad: 'intermedio',
+    logica: [
+      'Igual que el seguidor con Arduino: los sensores dan HIGH sobre la línea negra.',
+      'Los pines se llaman por su número de GPIO (por ejemplo GPIO14 → 14 en el código).',
+      'Los sensores se alimentan con 3V3: el ESP32 no soporta 5 V en sus pines.',
+    ],
+    arena: 'ovalo',
+    construir: construirSeguidorEsp32,
+    plantillas: (doc, tabla) => [
+      { id: 'seguidor', nombre: 'Seguidor de línea (ESP32)', descripcion: 'Lógica sí/no con los sensores digitales', codigo: codigoSeguidor(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+      { id: 'sensores', nombre: 'Lectura de sensores', descripcion: 'Valores de los IR en el Monitor Serie', codigo: codigoLecturaLinea(tabla, doc) },
+    ],
+  },
+  {
+    id: 'rc-esp32',
+    nombre: 'Robot RC por Bluetooth (ESP32)',
+    descripcion: 'Manéjalo con el control en pantalla, el teclado o un control de videojuego: el ESP32 recibe las órdenes por Bluetooth.',
+    dificultad: 'inicial',
+    logica: [
+      'El control envía una letra por Bluetooth: F, B, L, R o S.',
+      'El programa lee cada letra con SerialBT.read() y mueve los motores.',
+      'Un número del 0 al 9 cambia la velocidad.',
+    ],
+    arena: 'campo-libre',
+    construir: construirRcEsp32,
+    plantillas: (doc, tabla) => [
+      { id: 'rc', nombre: 'Radiocontrol Bluetooth', descripcion: 'Obedece letras F B L R S', codigo: codigoRc(tabla, doc) },
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
     ],
   },

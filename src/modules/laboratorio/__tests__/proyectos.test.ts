@@ -72,6 +72,36 @@ describe('proyectos prearmados con su programa real', () => {
     sim.liberar()
   }, 600_000)
 
+  it('«Seguidor ESP32»: el mismo código, en el ESP32 simulado, recorre el óvalo', () => {
+    const muestras = Array.from({ length: 3000 }, (_, i) => ovalo(i / 3000))
+    const cerca = (x: number, z: number) => Math.min(...muestras.map(([px, pz]) => Math.hypot(px - x, pz - z)))
+    const { sim } = preparar('seguidor-esp32', 'seguidoresp32.hex', { reflectancia: (x, z) => (cerca(x, z) < 0.0095 ? 0.07 : 0.95) })
+    let maxDesvio = 0
+    sim.correr(10, 1 / 60, s => {
+      const p = s.robot.puntoMundo({ x: 100, y: -35, z: 0 })
+      if (s.tiempo > 0.5) maxDesvio = Math.max(maxDesvio, cerca(p.x, p.z))
+    })
+    expect(sim.avr?.chip).toBe('atmega2560')
+    expect(maxDesvio).toBeLessThan(0.03)
+    expect(sim.robot.pose().velocidad).toBeGreaterThan(0.05)
+    sim.liberar()
+  }, 300_000)
+
+  it('«Robot RC Bluetooth»: obedece los comandos F y S', () => {
+    const { sim } = preparar('rc-esp32', 'rcesp32.hex')
+    sim.correr(0.5)
+    expect(sim.serial).toContain('RobotChaski')
+    const inicio = sim.robot.pose().pos.x
+    sim.avr!.serialWrite('F')
+    sim.correr(1.5)
+    const avance = sim.robot.pose().pos.x - inicio
+    expect(avance).toBeGreaterThan(0.25)          // fue hacia adelante (+x)
+    sim.avr!.serialWrite('S')
+    sim.correr(1)
+    expect(sim.robot.pose().velocidad).toBeLessThan(0.02)
+    sim.liberar()
+  }, 300_000)
+
   // El 4WD mide 17 cm de ancho con las ruedas y sus sensores no ven los
   // costados de las ruedas: como el robot real, a veces roza una caja al
   // pasar. Lo que se exige es que no se quede atascado y que explore.

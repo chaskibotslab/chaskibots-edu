@@ -7,6 +7,7 @@
 
 import { pieza } from '../catalogo/piezas'
 import { pinCodigo, pinDePlaca, type FilaPin } from '../engine/autocableado'
+import { infoPlaca } from '../engine/placa'
 import type { RobotDoc } from '../robots/doc'
 
 export interface BloqueJson {
@@ -214,7 +215,7 @@ export function generarArduino(programa: ProgramaBloques, doc: RobotDoc, tabla: 
 
   // ----- armar el sketch -----
   const lineas: string[] = ['// Programa hecho con bloques en ChaskiBots Lab', '']
-  if (usa.has('servo')) lineas.push('#include <Servo.h>', '')
+  if (usa.has('servo')) lineas.push(infoPlaca(doc).placa === 'esp32' ? '#include <ESP32Servo.h>' : '#include <Servo.h>', '')
   const constantes: string[] = []
   if (usa.has('motores')) {
     const d = doc.piezas.find(p => pieza(p.pieza).comportamiento.tipo === 'puente-h')!

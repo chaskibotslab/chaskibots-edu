@@ -14,8 +14,9 @@ import { hijos, poses, raiz, resumen, ruedas, ruedasLocas, aRobot } from '../eng
 import type { Simulacion } from '../engine/simulation'
 import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
+import { infoPlaca } from '../engine/placa'
 import {
-  ArduinoNano, ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, type SalidaPin,
+  ArduinoNano, ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
 } from './modelos/Piezas3D'
 
 const m = (v: number) => v / 1000
@@ -68,7 +69,10 @@ function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLo
   return (
     <Suspense fallback={<ModeloProc {...p} />}>
       <ModeloGlb url={p.def.glb} escala={p.def.escalaGlb} />
-      {p.def.comportamiento.tipo === 'mcu-avr' && <LedUno ref={p.refs.led13} />}
+      {c.tipo === 'mcu' && p.def.colisionadores[0]?.forma === 'caja' && (
+        <SeparadoresPlaca largo={p.def.colisionadores[0].medidas[0]} ancho={p.def.colisionadores[0].medidas[2]} />
+      )}
+      {p.def.id === 'arduino-uno' && <LedUno ref={p.refs.led13} />}
     </Suspense>
   )
 }
@@ -349,7 +353,7 @@ export default function Robot3D(props: Props) {
         const ref = refs.servos.get(s.instancia)?.current
         if (ref) ref.rotation.y = grados(s.angulo - 90)
       }
-      const d13 = sim.pinesActuales.D13
+      const d13 = sim.pinesActuales[infoPlaca(doc).pinLed]
       if (refs.led13.current) refs.led13.current.emissiveIntensity = d13?.mode === 'output' && d13.duty > 0.05 ? 3 * d13.duty + 0.5 : 0
       for (const l of sim.lecturasActuales) {
         if (l.tipo === 'linea') {

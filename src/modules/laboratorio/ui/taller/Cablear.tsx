@@ -11,6 +11,7 @@ import { pieza } from '../../catalogo/piezas'
 import type { PinDef } from '../../catalogo/tipos'
 import { autocablear } from '../../engine/autocableado'
 import { verificar } from '../../engine/verificacion'
+import { mcuDe } from '../../engine/placa'
 import type { Cable, RobotDoc } from '../../robots/doc'
 
 const ROJO = '#ef4444', NEGRO = '#111827'
@@ -31,13 +32,15 @@ function colorPara(a: PinDef, b: PinDef, usados: number) {
 /** Ubica la placa al centro y reparte las demás piezas a los costados. */
 function disponer(doc: RobotDoc): Tarjeta[] {
   const tarjetas: Tarjeta[] = []
-  const mcu = doc.piezas.find(p => pieza(p.pieza).comportamiento.tipo === 'mcu-avr')
+  const mcu = mcuDe(doc)
   const conPines = doc.piezas.filter(p => p.id !== mcu?.id && pieza(p.pieza).pines.length)
   const xPlaca = 2 * ANCHO_PIEZA + 120
   if (mcu) {
     const pines = pieza(mcu.pieza).pines
-    const izq = pines.filter(p => /^D\d+$/.test(p.nombre))
-    const der = pines.filter(p => !/^D\d+$/.test(p.nombre))
+    // Arduino: digitales a la izquierda; ESP32: la mitad de los pines a cada lado.
+    const esp = pines.some(p => p.nombre.startsWith('GPIO'))
+    const izq = esp ? pines.slice(0, Math.ceil(pines.length / 2)) : pines.filter(p => /^D\d+$/.test(p.nombre))
+    const der = esp ? pines.slice(Math.ceil(pines.length / 2)) : pines.filter(p => !/^D\d+$/.test(p.nombre))
     const alto = 46 + Math.max(izq.length, der.length) * PASO
     tarjetas.push({
       id: mcu.id, titulo: mcu.etiqueta, x: xPlaca, y: 20, ancho: ANCHO_PLACA, alto,

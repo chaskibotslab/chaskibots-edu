@@ -7,8 +7,8 @@ Cada fase se publica funcionando, con sus pruebas, antes de empezar la siguiente
 |---|---|---|
 | F1 | Arduino UNO emulado, física Rapier, editor C++ | Publicado 2026-10-27 |
 | F2 | Taller por piezas, modelos 3D reales, 7 proyectos con su lógica, cables Dupont, TB6612 | Publicado 2026-10-27 |
-| F3 | Cableado manual con verificación, bloques (Blockly → C++), Arduino Nano, «Mis robots» en la cuenta | En curso |
-| F4 | ESP32 programable, joystick, radiocontrol (teclado, táctil, control) | Pendiente |
+| F3 | Cableado manual con verificación, bloques (Blockly → C++), Arduino Nano, «Mis robots» en la cuenta | Publicado 2026-10-28 (falta pegar el SQL de `lab_robots`) |
+| F4 | ESP32 programable (capa ESP32 sobre ATmega2560), robots ESP32, control remoto (teclado, táctil, gamepad, Bluetooth) | Publicado 2026-10-28 |
 | F5 | Minisumo, sumo, soccer, rescate, lanzador, jueces, rivales, repeticiones | Pendiente |
 | F6 | Retos del docente con entrega verificable, torneos por curso | Pendiente |
 | F7 | Brazo robótico (servos articulados, pinza, paso a paso) | Pendiente |
