@@ -41,7 +41,7 @@ export const ARDUINO_UNO: PiezaDef = {
   montajes: [],
   encaja: ['placa'],
   pines: pinesUno,
-  comportamiento: { tipo: 'mcu-avr', chip: 'atmega328p', frecuencia_hz: 16_000_000, vLogica: 5 },
+  comportamiento: { tipo: 'mcu', placa: 'uno', frecuencia_hz: 16_000_000, vLogica: 5 },
   datos: [['Microcontrolador', 'ATmega328P'], ['Reloj', '16 MHz'], ['Voltaje lógico', '5 V'], ['Pines PWM', 'D3, D5, D6, D9, D10, D11'], ['Entradas analógicas', 'A0–A5 (10 bits)']],
   fuente: 'Arduino UNO R3, hoja de datos oficial',
 }
@@ -64,18 +64,32 @@ export const ARDUINO_NANO: PiezaDef = {
     { nombre: 'A7', tipo: 'analogico', ayuda: 'Solo entrada analógica (no sirve como digital)' },
     { nombre: '3V3', tipo: 'alim', ayuda: 'Salida de 3,3 V (poca corriente)' },
   ],
-  comportamiento: { tipo: 'mcu-avr', chip: 'atmega328p', frecuencia_hz: 16_000_000, vLogica: 5 },
+  comportamiento: { tipo: 'mcu', placa: 'nano', frecuencia_hz: 16_000_000, vLogica: 5 },
   datos: [['Microcontrolador', 'ATmega328P'], ['Reloj', '16 MHz'], ['Voltaje lógico', '5 V'], ['Entradas analógicas', 'A0–A7 (A6 y A7 solo analógicas)'], ['Tamaño', '45 × 18 mm']],
   fuente: 'Arduino Nano, hoja de datos oficial',
 }
+
+// ESP32 DevKit V1 (30 pines). Se simula a nivel de API Arduino sobre un
+// ATmega2560 (ver esp32/capaEsp32.ts): GPIOn del ESP32 = pin n.
+const ana = (g: number, extra = ''): PinDef => ({ nombre: `GPIO${g}`, tipo: 'analogico', ayuda: `GPIO${g} con ADC (0–4095)${extra}` })
+const gp = (g: number, extra = ''): PinDef => ({ nombre: `GPIO${g}`, tipo: 'pwm', ayuda: `GPIO${g}: digital y PWM${extra}` })
+const pinesEsp32: PinDef[] = [
+  ana(36, ' · solo entrada (VP)'), ana(39, ' · solo entrada (VN)'), ana(34, ' · solo entrada'), ana(35, ' · solo entrada'),
+  ana(32), ana(33), ana(25), ana(26), gp(27), gp(14), gp(12, ' · evita usarlo al encender'), gp(13),
+  gp(23), gp(22), gp(21, ' · SDA (I2C)'), gp(19), gp(18), gp(5), gp(17), gp(16), gp(4), gp(2, ' · LED azul de la placa'), gp(15),
+  { nombre: 'GPIO1', tipo: 'digital', ayuda: 'TX0 del Serial: mejor no usarlo' },
+  { nombre: 'GPIO3', tipo: 'digital', ayuda: 'RX0 del Serial: mejor no usarlo' },
+  { nombre: '3V3', tipo: 'alim', ayuda: 'Salida de 3,3 V para sensores' },
+  { nombre: 'VIN', tipo: 'alim', ayuda: '5 V (del USB) o entrada de 5–12 V' },
+  { nombre: 'GND', tipo: 'gnd', ayuda: 'Tierra (negativo común)' },
+]
 
 export const ESP32: PiezaDef = {
   id: 'esp32-devkit',
   nombre: 'ESP32 DevKit V1',
   familia: 'placa',
-  descripcion: 'La placa de los kits de BGU: doble núcleo a 240 MHz, WiFi y Bluetooth, lógica de 3,3 V.',
+  descripcion: 'La placa de los kits de BGU: doble núcleo a 240 MHz, WiFi y Bluetooth, lógica de 3,3 V. Cualquier GPIO de salida da PWM.',
   enKits: true,
-  proximamente: 'Se podrá programar en la fase F4 (simulador del ESP32).',
   modelo: 'proc:esp32',
   glb: '/lab/modelos/esp32.glb',
   masa_g: 10,
@@ -83,7 +97,10 @@ export const ESP32: PiezaDef = {
   colisionadores: [{ forma: 'caja', medidas: [51.4, 6.3, 28.6], centro: [0, 3.2, 0] }],
   montajes: [],
   encaja: ['placa'],
-  pines: [],
-  comportamiento: { tipo: 'sin-simular' },
-  datos: [['Microcontrolador', 'ESP32 (Xtensa LX6, 2 núcleos)'], ['Reloj', '240 MHz'], ['Voltaje lógico', '3,3 V'], ['Conexión', 'WiFi + Bluetooth']],
+  pines: pinesEsp32,
+  comportamiento: { tipo: 'mcu', placa: 'esp32', frecuencia_hz: 240_000_000, vLogica: 3.3 },
+  datos: [
+    ['Microcontrolador', 'ESP32 (Xtensa LX6, 2 núcleos)'], ['Reloj', '240 MHz'], ['Voltaje lógico', '3,3 V (¡no le pongas 5 V en un pin!)'],
+    ['Conexión', 'WiFi + Bluetooth (simulados)'], ['En el simulador', 'Se ejecuta tu mismo código Arduino; los int son de 16 bits (en la placa real, 32)'],
+  ],
 }

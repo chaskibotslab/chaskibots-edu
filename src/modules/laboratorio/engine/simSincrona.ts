@@ -12,6 +12,7 @@ import { Reloj, RobotFisico } from './fisica/robotFisico'
 import { Ultrasonidos } from './hcsr04'
 import { aplicarPines, leerSensores, type Entradas, type FuncionReflectancia } from './paso'
 import { planDe, type SimPlan } from './plan'
+import { infoPlaca } from './placa'
 
 export class SimSincrona {
   readonly mundo: Mundo
@@ -32,7 +33,7 @@ export class SimSincrona {
     this.mundo = new Mundo(arena, opciones.gravedad ?? 'tierra')
     this.robot = new RobotFisico(this.mundo, doc, this.plan, arena.inicio)
     this.reflectancia = opciones.reflectancia ?? (() => arena.piso.reflectancia)
-    this.avr = opciones.hex ? new AvrRunner(opciones.hex) : null
+    this.avr = opciones.hex ? new AvrRunner(opciones.hex, infoPlaca(doc).chip) : null
     this.us = this.avr ? new Ultrasonidos(this.avr) : null
     this.doc = doc
   }

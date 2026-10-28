@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
   Play, Square, Pause, RotateCcw, Upload, Gauge, Camera, Navigation, Map as MapIcon,
-  Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download, Puzzle,
+  Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download, Puzzle, Gamepad2,
 } from 'lucide-react'
 import { Simulacion, type Telemetria } from '../../engine/simulation'
 import { GRAVEDADES, type Gravedad } from '../../engine/fisica/mundo'
@@ -26,6 +26,8 @@ import { PROGRAMA_VACIO, SEGUIDOR_EN_BLOQUES } from '../../bloques/definiciones'
 
 const EditorBloques = dynamic(() => import('../../bloques/EditorBloques'), { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-[#121624]" /> })
 import { verificar } from '../../engine/verificacion'
+import { infoPlaca } from '../../engine/placa'
+import ControlRemoto from './ControlRemoto'
 
 const EscenaArena = dynamic(() => import('../Escena3D').then(m => m.EscenaArena), { ssr: false })
 
@@ -82,6 +84,8 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
   const [camara, setCamara] = useState<ModoCamara>('libre')
   const [versionArena, setVersionArena] = useState(0)
   const [pestana, setPestana] = useState<Pestana>('serial')
+  // El control remoto se abre solo si el programa usa Bluetooth.
+  const [control, setControl] = useState(() => /BluetoothSerial|SerialBT/.test(doc.programa.cpp))
   const serialRef = useRef<HTMLPreElement>(null)
   const archivoPista = useRef<HTMLInputElement>(null)
   const clave = estructura(doc)
@@ -113,7 +117,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
       const res = await fetch('/api/lab/compile', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ board: doc.piezas.some(p => p.pieza === 'arduino-nano') ? 'nano' : 'uno', code: codigo }),
+        body: JSON.stringify({ board: infoPlaca(doc).compilador, code: codigo }),
       })
       const data = await res.json()
       if (!res.ok && !data.errors) throw new Error(data.error || `Error ${res.status}`)
@@ -233,6 +237,9 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             </button>
           </>
         )}
+        <button onClick={() => setControl(c => !c)} className={`${boton} ${control ? 'border-chaski-primary/50 text-chaski-primary' : ''}`} title="Control remoto: manejar el robot con teclado, botones o un control">
+          <Gamepad2 className="h-4 w-4" /> <span className="hidden md:inline">Control</span>
+        </button>
         <button onClick={descargarIno} className={boton} title="Descargar el programa (.ino) para abrirlo en el Arduino IDE">
           <Download className="h-4 w-4" /> <span className="hidden md:inline">.ino</span>
         </button>
@@ -332,6 +339,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
               </div>
             )}
             {sim && <HUD tele={tele} />}
+            {sim && control && <ControlRemoto sim={sim} conPrograma={tele?.estado === 'corriendo' || tele?.estado === 'pausado'} onCerrar={() => setControl(false)} />}
             <div className="pointer-events-none absolute bottom-2 left-3 hidden text-[11px] text-slate-400/80 sm:block">
               Doble clic en el piso para mover el robot · arrastra para girar la cámara
             </div>
@@ -360,7 +368,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                       value={entrada}
                       onChange={e => setEntrada(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter') enviarSerial() }}
-                      placeholder="Enviar texto al Arduino…"
+                      placeholder="Enviar texto a la placa…"
                       className="h-8 min-w-0 flex-1 rounded-md border border-white/10 bg-labdark-void px-2 font-mono text-xs outline-none focus:border-chaski-primary/50"
                     />
                     <button onClick={enviarSerial} className="flex h-8 items-center gap-1 rounded-md bg-white/10 px-3 text-xs hover:bg-white/15"><Send className="h-3.5 w-3.5" /> Enviar</button>

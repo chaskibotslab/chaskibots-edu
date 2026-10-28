@@ -8,6 +8,7 @@ import type { V3 } from '../catalogo/tipos'
 import type { RobotDoc } from '../robots/doc'
 import type { MotorParams } from './bridge'
 import { poses, resumen, ruedas, type RuedaGeo } from './ensamblaje'
+import { infoPlaca, mcuDe } from './placa'
 
 const k = (inst: string, pin: string) => `${inst}.${pin}`
 
@@ -64,7 +65,8 @@ export interface SimPlan {
 export function planDe(doc: RobotDoc): SimPlan {
   const n = nets(doc)
   const avisos: string[] = []
-  const mcu = doc.piezas.find(p => pieza(p.pieza).comportamiento.tipo === 'mcu-avr') ?? null
+  const mcu = mcuDe(doc)
+  const info = infoPlaca(doc)
   const mcuPines = mcu ? pieza(mcu.pieza).pines : []
 
   const net = (inst: string, pin: string) => n.get(k(inst, pin)) ?? null
@@ -86,7 +88,7 @@ export function planDe(doc: RobotDoc): SimPlan {
   const tierras: [string, string][] = []
   for (const p of doc.piezas) {
     const c = pieza(p.pieza).comportamiento
-    if (c.tipo === 'mcu-avr') { fuentes5v.push([p.id, '5V']); tierras.push([p.id, 'GND']) }
+    if (c.tipo === 'mcu') { for (const f of info.fuentes) fuentes5v.push([p.id, f]); tierras.push([p.id, 'GND']) }
     if (c.tipo === 'puente-h') {
       if (c.alim.salida5v) fuentes5v.push([p.id, c.alim.salida5v])
       tierras.push([p.id, c.alim.gnd])
@@ -103,7 +105,7 @@ export function planDe(doc: RobotDoc): SimPlan {
     if (c.tipo !== 'bateria') continue
     const conectada = doc.piezas.some(d => {
       const t = pieza(d.pieza).comportamiento
-      return (t.tipo === 'puente-h' && mismo([p.id, '+'], [d.id, t.alim.motor])) || (t.tipo === 'mcu-avr' && mismo([p.id, '+'], [d.id, 'VIN']))
+      return (t.tipo === 'puente-h' && mismo([p.id, '+'], [d.id, t.alim.motor])) || (t.tipo === 'mcu' && mismo([p.id, '+'], [d.id, 'VIN']))
     })
     if (conectada) voltajeBateria = Math.max(voltajeBateria, c.voltaje)
     else avisos.push(`${p.etiqueta}: no está conectada`)

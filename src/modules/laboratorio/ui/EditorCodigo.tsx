@@ -36,6 +36,13 @@ const FUNCIONES: [string, string, string][] = [
   ['Serial.available', 'Serial.available()', 'Cuántos bytes llegaron por Serial'],
   ['Serial.read', 'Serial.read()', 'Lee un byte recibido'],
   ['Serial.parseInt', 'Serial.parseInt()', 'Lee un número entero recibido'],
+  ['servo.attach', 'attach(${1:pin});', 'Conecta el servo a un pin'],
+  ['servo.write', 'write(${1:90});', 'Mueve el servo a un ángulo de 0 a 180°'],
+  ['ledcAttach', 'ledcAttach(${1:pin}, ${2:5000}, ${3:8});', 'ESP32: prepara un pin para PWM (frecuencia y bits)'],
+  ['ledcWrite', 'ledcWrite(${1:pin}, ${2:128});', 'ESP32: ciclo de trabajo del PWM (0–255 con 8 bits)'],
+  ['SerialBT.begin', 'SerialBT.begin("${1:MiRobot}");', 'ESP32: activa el Bluetooth con ese nombre'],
+  ['SerialBT.available', 'SerialBT.available()', 'ESP32: cuántos datos llegaron por Bluetooth'],
+  ['SerialBT.read', 'SerialBT.read()', 'ESP32: lee un dato recibido por Bluetooth'],
 ]
 const CONSTANTES = ['HIGH', 'LOW', 'INPUT', 'OUTPUT', 'INPUT_PULLUP', 'LED_BUILTIN', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'true', 'false']
 

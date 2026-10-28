@@ -153,6 +153,16 @@ export const ArduinoUno = forwardRef(function ArduinoUno(_: object, refLed13: Re
   )
 })
 
+/** Pines del ESP32 DevKit V1 (30 pines) por lado, según su serigrafía. */
+const ESP32_A = ['EN', 'GPIO36', 'GPIO39', 'GPIO34', 'GPIO35', 'GPIO32', 'GPIO33', 'GPIO25', 'GPIO26', 'GPIO27', 'GPIO14', 'GPIO12', 'GPIO13', 'GND', 'VIN']
+const ESP32_B = ['GPIO23', 'GPIO22', 'GPIO1', 'GPIO3', 'GPIO21', 'GPIO19', 'GPIO18', 'GPIO5', 'GPIO17', 'GPIO16', 'GPIO4', 'GPIO2', 'GPIO15', 'GND2', '3V3']
+
+/** Separadores de bronce bajo una placa (los modelos reales no los traen). */
+export function SeparadoresPlaca({ largo, ancho }: { largo: number; ancho: number }) {
+  const x = largo / 2 - 4, z = ancho / 2 - 4
+  return <>{[[-x, -z], [-x, z], [x, -z], [x, z]].map(([px, pz], i) => <Separador key={i} pos={[px, -10, pz]} alto={10} />)}</>
+}
+
 /** Pines del Nano por lado (USB hacia −x), según su serigrafía. */
 const NANO_ATRAS = ['D13', '3V3', 'AREF', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', '5V', 'RST', 'GND', 'VIN']
 const NANO_ADELANTE = ['D12', 'D11', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'GND', 'RST', 'D0', 'D1']
@@ -568,6 +578,12 @@ export function anclaPin(modelo: string, pin: string): V | null {
       if (d) { const n = Number(d[1]); return [n >= 8 ? -1 + (13 - n) * 2.54 : 14.8 + (7 - n) * 2.54, 9, -24] }
       if (a) return [20.4 + Number(a[1]) * 2.54, 9, 23.6]
       return ({ '3V3': [5.4, 9, 23.6], '5V': [7.9, 9, 23.6], GND: [10.5, 9, 23.6], VIN: [15.4, 9, 23.6] } as Record<string, V>)[pin] ?? null
+    case 'proc:esp32': {
+      const a = ESP32_A.indexOf(pin), b = ESP32_B.indexOf(pin)
+      if (a >= 0) return [-17.8 + a * 2.54, 5, -11.4]
+      if (b >= 0) return [-17.8 + b * 2.54, 5, 11.4]
+      return null
+    }
     case 'proc:arduino-nano': {
       const a = NANO_ATRAS.indexOf(pin), b = NANO_ADELANTE.indexOf(pin)
       if (a >= 0) return [-17.8 + a * 2.54, 5, -7.6]

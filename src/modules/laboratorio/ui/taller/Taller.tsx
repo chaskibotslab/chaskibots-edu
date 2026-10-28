@@ -291,10 +291,17 @@ function Modal({ titulo, onCerrar, children, ancho = 'max-w-3xl' }: { titulo: st
 const DIFICULTAD = { inicial: 'bg-emerald-500/15 text-emerald-300', intermedio: 'bg-amber-500/15 text-amber-300', avanzado: 'bg-red-500/15 text-red-300' }
 
 function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | null) => void; onCerrar: () => void }) {
+  const [placa, setPlaca] = useState<'todas' | 'arduino' | 'esp32'>('todas')
+  const lista = PREARMADOS.filter(p => placa === 'todas' || (placa === 'esp32') === p.id.includes('esp32'))
   return (
     <Modal titulo="¿Con qué robot empezamos?" onCerrar={onCerrar} ancho="max-w-5xl">
+      <div className="mb-3 flex gap-1.5">
+        {([['todas', 'Todos'], ['arduino', 'Arduino'], ['esp32', 'ESP32']] as const).map(([id, txt]) => (
+          <button key={id} onClick={() => setPlaca(id)} className={`rounded-full px-3 py-1 text-xs font-medium ${placa === id ? 'bg-chaski-primary text-white' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>{txt}</button>
+        ))}
+      </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {PREARMADOS.map(p => (
+        {lista.map(p => (
           <button key={p.id} onClick={() => onAbrir(p.construir(), p.id)} className="group rounded-xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-chaski-primary/50 hover:bg-chaski-primary/5">
             <div className="mb-2 flex items-center justify-between">
               <Bot className="h-6 w-6 text-chaski-primary" />
