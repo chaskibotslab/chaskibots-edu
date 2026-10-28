@@ -9,7 +9,7 @@ import type { Monaco, OnMount } from '@monaco-editor/react'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
   ssr: false,
-  loading: () => <div className="h-full w-full animate-pulse bg-labdark-bg" />,
+  loading: () => <div className="h-full w-full animate-pulse bg-lab-fondo" />,
 })
 
 export interface ErrorCompilacion { line: number; col: number; severity: 'error' | 'warning'; message: string }
@@ -48,6 +48,46 @@ const CONSTANTES = ['HIGH', 'LOW', 'INPUT', 'OUTPUT', 'INPUT_PULLUP', 'LED_BUILT
 
 let autocompletadoRegistrado = false
 function registrarArduino(monaco: Monaco) {
+  // Tema «Noche de taller»: mismo azul tinta que el laboratorio (tema.css).
+  monaco.editor.defineTheme('chaski-noche', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [
+      { token: 'comment', foreground: '6B7AA6', fontStyle: 'italic' },
+      { token: 'keyword', foreground: 'B4A5FF' },
+      { token: 'keyword.directive', foreground: 'F07A63' },
+      { token: 'type', foreground: '5EEAD4' },
+      { token: 'string', foreground: 'F5C46B' },
+      { token: 'number', foreground: '67E8F9' },
+      { token: 'identifier', foreground: 'E2E8F0' },
+      { token: 'delimiter', foreground: '94A3C8' },
+      { token: 'operator', foreground: 'F59E8B' },
+    ],
+    colors: {
+      'editor.background': '#0B0F1C',
+      'editor.foreground': '#E2E8F0',
+      'editor.lineHighlightBackground': '#151C33',
+      'editor.lineHighlightBorder': '#00000000',
+      'editorLineNumber.foreground': '#3A4670',
+      'editorLineNumber.activeForeground': '#B4A5FF',
+      'editor.selectionBackground': '#9380FA40',
+      'editor.inactiveSelectionBackground': '#9380FA22',
+      'editorCursor.foreground': '#B4A5FF',
+      'editorIndentGuide.background1': '#1A2140',
+      'editorIndentGuide.activeBackground1': '#3A4670',
+      'editorBracketMatch.background': '#5EEAD420',
+      'editorBracketMatch.border': '#5EEAD480',
+      'editorWidget.background': '#131A2E',
+      'editorWidget.border': '#2A3460',
+      'editorSuggestWidget.background': '#131A2E',
+      'editorSuggestWidget.border': '#2A3460',
+      'editorSuggestWidget.selectedBackground': '#9380FA33',
+      'editorHoverWidget.background': '#131A2E',
+      'editorHoverWidget.border': '#2A3460',
+      'scrollbarSlider.background': '#3A467055',
+      'scrollbarSlider.hoverBackground': '#9380FA66',
+    },
+  })
   if (autocompletadoRegistrado) return
   autocompletadoRegistrado = true
   monaco.languages.registerCompletionItemProvider('cpp', {
@@ -111,7 +151,7 @@ export default function EditorCodigo({
     <MonacoEditor
       height="100%"
       language="cpp"
-      theme="vs-dark"
+      theme="chaski-noche"
       value={codigo}
       onChange={v => onChange(v ?? '')}
       beforeMount={registrarArduino}

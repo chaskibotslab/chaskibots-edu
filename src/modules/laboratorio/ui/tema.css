@@ -1,0 +1,145 @@
+/* Cromática del laboratorio de robótica.
+   Superficies azul tinta en capas + un acento que cambia con cada paso:
+   Armar (coral ChaskiBots), Cablear (ámbar, como los cables), Programar
+   (violeta) y Probar (esmeralda). Los colores son tripletes RGB para poder
+   usarlos con opacidad en Tailwind (bg-lab-acento/20). */
+
+.lab-tema {
+  --lab-vacio: 7 10 19;
+  --lab-fondo: 11 15 28;
+  --lab-fondo2: 15 20 37;
+  --lab-superficie: 19 25 45;
+  --lab-elevado: 28 36 64;
+  --lab-borde: 148 163 214;
+  --lab-dato: 94 234 212;
+
+  --paso-armar: 240 122 99;
+  --paso-cablear: 245 184 61;
+  --paso-programar: 147 128 250;
+  --paso-probar: 45 212 160;
+
+  --lab-acento: var(--paso-armar);
+  --lab-acento-2: 251 163 122;
+  --lab-sobreacento: 255 255 255;
+
+  background:
+    radial-gradient(1200px 520px at 12% -10%, rgb(var(--lab-acento) / 0.10), transparent 60%),
+    radial-gradient(900px 480px at 100% 110%, rgb(var(--lab-dato) / 0.06), transparent 60%),
+    rgb(var(--lab-vacio));
+  color: rgb(226 232 240);
+}
+.lab-tema[data-paso='cablear'] { --lab-acento: var(--paso-cablear); --lab-acento-2: 253 214 99; --lab-sobreacento: 31 20 3; }
+.lab-tema[data-paso='programar'] { --lab-acento: var(--paso-programar); --lab-acento-2: 196 140 252; --lab-sobreacento: 255 255 255; }
+.lab-tema[data-paso='probar'] { --lab-acento: var(--paso-probar); --lab-acento-2: 103 232 249; --lab-sobreacento: 2 22 16; }
+
+/* Barra superior: vidrio oscuro con un filo del color del paso. */
+.lab-barra {
+  position: relative;
+  background: linear-gradient(180deg, rgb(var(--lab-superficie) / 0.92), rgb(var(--lab-fondo2) / 0.92));
+  backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid rgb(var(--lab-borde) / 0.12);
+}
+.lab-barra::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(var(--lab-acento) / 0.7) 30%, rgb(var(--lab-acento-2) / 0.5) 70%, transparent);
+  pointer-events: none;
+}
+
+/* Paneles laterales y modales. */
+.lab-panel {
+  background: linear-gradient(180deg, rgb(var(--lab-superficie)), rgb(var(--lab-fondo2)));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03);
+}
+.lab-vidrio {
+  background: rgb(var(--lab-superficie) / 0.78);
+  backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgb(var(--lab-borde) / 0.14);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 18px 40px -18px rgb(0 0 0 / 0.7);
+}
+
+/* Botón principal: degradado del acento con brillo superior. */
+.lab-primario {
+  background: linear-gradient(135deg, rgb(var(--lab-acento)), rgb(var(--lab-acento-2)));
+  color: rgb(var(--lab-sobreacento));
+  box-shadow: 0 8px 22px -10px rgb(var(--lab-acento) / 0.8), inset 0 1px 0 rgb(255 255 255 / 0.28);
+  transition: filter 0.15s, transform 0.1s;
+}
+.lab-primario:hover:not(:disabled) { filter: brightness(1.08) saturate(1.05); }
+.lab-primario:active:not(:disabled) { transform: scale(0.98); }
+
+/* Pasos: cada uno conserva su color aunque no esté activo. */
+.lab-paso { --c: var(--paso-armar); position: relative; color: rgb(203 213 225); transition: background 0.2s, color 0.2s; }
+.lab-paso[data-id='cablear'] { --c: var(--paso-cablear); }
+.lab-paso[data-id='programar'] { --c: var(--paso-programar); }
+.lab-paso[data-id='probar'] { --c: var(--paso-probar); }
+.lab-paso:hover { background: rgb(var(--c) / 0.08); color: white; }
+.lab-paso .lab-paso-num { background: rgb(var(--c) / 0.16); color: rgb(var(--c)); box-shadow: inset 0 0 0 1px rgb(var(--c) / 0.35); }
+.lab-paso[aria-current='step'] {
+  color: white;
+  background: linear-gradient(180deg, rgb(var(--c) / 0.22), rgb(var(--c) / 0.08));
+  box-shadow: inset 0 0 0 1px rgb(var(--c) / 0.45), 0 6px 20px -10px rgb(var(--c) / 0.9);
+}
+.lab-paso[aria-current='step'] .lab-paso-num { background: rgb(var(--c)); color: rgb(10 12 20); box-shadow: 0 0 12px rgb(var(--c) / 0.6); }
+.lab-paso[aria-current='step'] svg { color: rgb(var(--c)); }
+
+/* Familias del cajón de piezas. */
+.lab-fam { --f: 148 163 184; }
+.lab-fam[data-fam='chasis'] { --f: 214 168 120; }
+.lab-fam[data-fam='placa'] { --f: 59 160 246; }
+.lab-fam[data-fam='movimiento'] { --f: 250 204 21; }
+.lab-fam[data-fam='servo'] { --f: 96 165 250; }
+.lab-fam[data-fam='sensor'] { --f: 45 212 191; }
+.lab-fam[data-fam='electronica'] { --f: 248 113 113; }
+.lab-fam[data-fam='robot'] { --f: var(--lab-acento); }
+
+.lab-fam-chip { background: rgb(255 255 255 / 0.04); color: rgb(203 213 225); box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.10); }
+.lab-fam-chip:hover { background: rgb(var(--f) / 0.10); }
+.lab-fam-chip[aria-pressed='true'] { background: rgb(var(--f) / 0.18); color: rgb(var(--f)); box-shadow: inset 0 0 0 1px rgb(var(--f) / 0.45); }
+
+.lab-tarjeta {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgb(var(--f) / 0.07), rgb(255 255 255 / 0.015) 55%);
+  border: 1px solid rgb(var(--lab-borde) / 0.12);
+  transition: border-color 0.15s, background 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.lab-tarjeta::before {
+  content: '';
+  position: absolute;
+  inset: 8px auto 8px 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: rgb(var(--f));
+  box-shadow: 0 0 10px rgb(var(--f) / 0.6);
+}
+.lab-tarjeta:hover { border-color: rgb(var(--f) / 0.45); box-shadow: 0 10px 24px -16px rgb(var(--f) / 0.9); }
+.lab-tarjeta[data-elegida='true'] { border-color: rgb(var(--f) / 0.8); background: linear-gradient(135deg, rgb(var(--f) / 0.18), rgb(var(--f) / 0.04)); }
+
+/* Fondo de las escenas 3D (el lienzo es transparente). */
+.lab-escena {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 38%, rgb(46 56 92), transparent 75%),
+    linear-gradient(180deg, rgb(24 31 56), rgb(10 13 24));
+}
+
+/* Lecturas numéricas (velocidad, peso, pines): cian técnico. */
+.lab-dato { color: rgb(var(--lab-dato)); font-variant-numeric: tabular-nums; }
+
+/* Barras de desplazamiento discretas. */
+.lab-tema ::-webkit-scrollbar { width: 8px; height: 8px; }
+.lab-tema ::-webkit-scrollbar-thumb { background: rgb(var(--lab-borde) / 0.18); border-radius: 8px; }
+.lab-tema ::-webkit-scrollbar-thumb:hover { background: rgb(var(--lab-acento) / 0.45); }
+.lab-tema ::-webkit-scrollbar-track { background: transparent; }
+
+/* Esquema de cableado: papel de plano con puntos y cuadrícula mayor. */
+.lab-plano {
+  background-color: rgb(var(--lab-fondo));
+  background-image:
+    radial-gradient(rgb(var(--lab-borde) / 0.16) 1px, transparent 1.2px),
+    linear-gradient(rgb(var(--lab-borde) / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--lab-borde) / 0.05) 1px, transparent 1px);
+  background-size: 16px 16px, 80px 80px, 80px 80px;
+}
