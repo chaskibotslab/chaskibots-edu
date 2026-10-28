@@ -97,6 +97,42 @@ export function Chasis({ largo, ancho, material, color }: { largo: number; ancho
   )
 }
 
+/** Chasis de minisumo: placa de 76 × 96 mm, pala de acero inclinada y laterales. */
+export function ChasisMinisumo({ material, color }: { material: MaterialFisico; color: string }) {
+  const q = useCalidad()
+  const pala = (37 * Math.PI) / 180
+  return (
+    <group>
+      <RoundedBox args={[m(76), m(3), m(96)]} radius={m(1)} smoothness={2} castShadow={q.sombras} receiveShadow>
+        <MaterialChasis material={material} color={color} />
+      </RoundedBox>
+      {/* Pala de acero pulido con su filo */}
+      <mesh position={M(48, -14.8, 0)} rotation={[0, 0, -pala]} castShadow={q.sombras} receiveShadow>
+        <boxGeometry args={[m(30), m(1.5), m(96)]} />
+        <meshStandardMaterial color="#d7dce3" metalness={0.95} roughness={0.18} />
+      </mesh>
+      <mesh position={M(60, -23.9, 0)}>
+        <boxGeometry args={[m(1.2), m(0.6), m(96)]} />
+        <meshStandardMaterial color="#f1f5f9" metalness={1} roughness={0.08} />
+      </mesh>
+      {/* Laterales que sostienen la pala */}
+      {[-47, 47].map(z => (
+        <mesh key={z} position={M(40, -10, z)} castShadow={q.sombras}>
+          <boxGeometry args={[m(14), m(14), m(2)]} />
+          <MaterialChasis material={material} color={color} />
+        </mesh>
+      ))}
+      {/* Tornillos */}
+      {[[-32, -42], [-32, 42], [30, -42], [30, 42]].map(([x, z], i) => (
+        <mesh key={i} position={M(x, 2, z)}>
+          <cylinderGeometry args={[m(2.2), m(2.2), m(1.2), 12]} />
+          <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Placas y electrónica
 // ---------------------------------------------------------------------------
@@ -287,6 +323,29 @@ export function Bateria18650() {
   )
 }
 
+export function BateriaLipo() {
+  const q = useCalidad()
+  return (
+    <group>
+      <RoundedBox args={[m(40), m(12), m(18)]} radius={m(1.5)} position={M(0, 6, 0)} castShadow={q.sombras}>
+        <meshPhysicalMaterial color="#1e3a8a" roughness={0.35} clearcoat={0.6} />
+      </RoundedBox>
+      {/* Etiqueta */}
+      <mesh position={M(0, 12.05, 0)} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[m(30), m(12)]} />
+        <meshStandardMaterial color="#facc15" roughness={0.6} />
+      </mesh>
+      {/* Cables rojo y negro */}
+      {[[-3, '#dc2626'], [3, NEGRO]].map(([z, c]) => (
+        <mesh key={z as number} position={M(-23, 6, z as number)} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[m(1), m(1), m(8), 8]} />
+          <meshStandardMaterial color={c as string} roughness={0.5} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 export function Bateria9V() {
   const q = useCalidad()
   return (
@@ -333,6 +392,31 @@ export function MotorTT() {
       <mesh position={M(0, 0, 13)} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[m(2.7), m(2.7), m(12), 12]} />
         <meshStandardMaterial color="#fde68a" roughness={0.4} />
+      </mesh>
+    </group>
+  )
+}
+
+/** Micromotor N20: reductora dorada + motor plateado hacia −z, eje hacia +z. */
+export function MotorN20() {
+  const q = useCalidad()
+  return (
+    <group>
+      <mesh position={M(0, 0, -4.5)} castShadow={q.sombras}>
+        <boxGeometry args={[m(12), m(10), m(9)]} />
+        <meshStandardMaterial color="#d4a72c" metalness={0.85} roughness={0.3} />
+      </mesh>
+      <mesh position={M(0, 0, -16.5)} rotation={[Math.PI / 2, 0, 0]} castShadow={q.sombras}>
+        <cylinderGeometry args={[m(5.6), m(5.6), m(15), q.segmentos]} />
+        <meshStandardMaterial color={METAL} metalness={0.92} roughness={0.22} />
+      </mesh>
+      <mesh position={M(0, 0, -24.5)}>
+        <boxGeometry args={[m(9), m(7), m(1.5)]} />
+        <meshStandardMaterial color="#111827" roughness={0.6} />
+      </mesh>
+      <mesh position={M(0, 0, 4)} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[m(1.5), m(1.5), m(8), 10]} />
+        <meshStandardMaterial color={METAL} metalness={0.95} roughness={0.2} />
       </mesh>
     </group>
   )
@@ -607,6 +691,8 @@ export function anclaPin(modelo: string, pin: string): V | null {
     case 'proc:bateria-18650': return pin === '+' ? [-38, 12, -6] : [-38, 12, 6]
     case 'proc:bateria-9v': return pin === '+' ? [26, 9, -5] : [26, 9, 5]
     case 'proc:motor-tt': return pin === 'M+' ? [-50, 4, 0] : [-50, -4, 0]
+    case 'proc:motor-n20': return pin === 'M+' ? [2.5, 0, -25] : [-2.5, 0, -25]
+    case 'proc:bateria-lipo': return pin === '+' ? [-26, 6, -3] : [-26, 6, 3]
     case 'proc:servo': return [31, 2, pin === 'GND' ? -1.2 : pin === 'V+' ? 0 : 1.2]
     case 'proc:tcrt5000': {
       const i = ['VCC', 'GND', 'DO', 'AO'].indexOf(pin)
@@ -635,6 +721,8 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
       if (pin === '12V' || pin === 'GND' || pin === '5V') return { dir: [0, 0.25, 1], tipo: 'borne' }
       return { dir: [0, 1, 0], tipo: 'dupont' }
     case 'proc:motor-tt': return { dir: [-1, 0, 0], tipo: 'soldado' }
+    case 'proc:motor-n20': return { dir: [0, 0, -1], tipo: 'soldado' }
+    case 'proc:bateria-lipo': return { dir: [-1, 0.2, 0], tipo: 'soldado' }
     case 'proc:bateria-18650': return { dir: [-1, 0.3, 0], tipo: 'soldado' }
     case 'proc:bateria-9v': return { dir: [1, 0.3, 0], tipo: 'soldado' }
     case 'proc:servo': return { dir: [1, 0, 0], tipo: 'dupont' }

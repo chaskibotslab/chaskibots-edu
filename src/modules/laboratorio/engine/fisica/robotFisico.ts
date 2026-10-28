@@ -57,6 +57,10 @@ export interface ServoFisico { instancia: string; angulo: number; objetivo: numb
 const mm = (v: { x: number; y: number; z: number }): V3 => ({ x: v.x / 1000, y: v.y / 1000, z: v.z / 1000 })
 
 function rotacionColisionador(c: Colisionador): TQ {
+  if (c.forma === 'caja') {
+    const r = c.rotacion ?? [0, 0, 0]
+    return new TQ().setFromEuler(new Euler((r[0] * Math.PI) / 180, (r[1] * Math.PI) / 180, (r[2] * Math.PI) / 180, 'XYZ'))
+  }
   // Los cilindros de Rapier van a lo largo de +y.
   if (c.forma !== 'cilindro' || c.eje === 'y') return new TQ()
   return new TQ().setFromEuler(c.eje === 'x' ? new Euler(0, 0, Math.PI / 2) : new Euler(Math.PI / 2, 0, 0))
@@ -156,8 +160,10 @@ export class RobotFisico {
       const q = pose.rot.clone().multiply(rotacionColisionador(c))
       desc.setTranslation((pose.pos.x + off.x) / 1000, (pose.pos.y + off.y) / 1000, (pose.pos.z + off.z) / 1000)
         .setRotation({ x: q.x, y: q.y, z: q.z, w: q.w })
-        .setFriction(0.5)
+        .setFriction(c.friccion ?? 0.5)
         .setMass(masa / cs.length)
+      // Una pala de poca fricción manda: si no, Rapier promedia con el piso.
+      if (c.friccion !== undefined) desc.setFrictionCombineRule(RAPIER.CoefficientCombineRule.Min)
       this.mundo.world.createCollider(desc, this.body)
     }
   }

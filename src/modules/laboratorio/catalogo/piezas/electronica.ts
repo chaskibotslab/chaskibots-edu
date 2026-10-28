@@ -111,3 +111,19 @@ export const BATERIA_9V: PiezaDef = {
   comportamiento: { tipo: 'bateria', voltaje: 9, capacidad_mah: 500, corriente_max_a: 0.5 },
   datos: [['Voltaje', '9 V'], ['Capacidad', '≈ 500 mAh'], ['Corriente máxima', '≈ 0,5 A (poca para motores)']],
 }
+
+export const BATERIA_LIPO_2S: PiezaDef = {
+  id: 'bateria-lipo-2s',
+  nombre: 'Batería LiPo 2S 300 mAh (7,4 V)',
+  familia: 'electronica',
+  descripcion: 'Liviana y potente: la de los robots de competencia. Da mucha corriente aunque sea chica.',
+  modelo: 'proc:bateria-lipo',
+  masa_g: 18,
+  material: 'plastico',
+  colisionadores: [{ forma: 'caja', medidas: [40, 12, 18], centro: [0, 6, 0] }],
+  montajes: [],
+  encaja: ['bateria'],
+  pines: [{ nombre: '+', tipo: 'alim' }, { nombre: '-', tipo: 'gnd' }],
+  comportamiento: { tipo: 'bateria', voltaje: 7.4, capacidad_mah: 300, corriente_max_a: 6 },
+  datos: [['Voltaje', '7,4 V (2 celdas)'], ['Capacidad', '300 mAh'], ['Descarga', '20C ≈ 6 A'], ['Medidas', '40 × 18 × 12 mm']],
+}

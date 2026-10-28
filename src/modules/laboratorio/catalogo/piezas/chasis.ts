@@ -83,3 +83,44 @@ export const CHASIS_4WD: PiezaDef = {
   comportamiento: { tipo: 'chasis' },
   datos: [['Medidas', '200 × 130 mm'], ['Tracción', '4 ruedas motrices']],
 }
+
+// Minisumo: 76 × 96 mm + pala de acero de 1,5 mm que baja hasta el piso
+// (de x = 36 a x = 60). Con la pala el robot mide 98 × 96 mm: entra en el
+// cuadrado de 10 × 10 cm del reglamento. Motores N20 debajo, ruedas de 34 mm
+// (el piso queda en y = −24,5). Masa = placa + pala (25 g).
+const PISO_MINISUMO = -24.5
+export const CHASIS_MINISUMO: PiezaDef = {
+  id: 'chasis-minisumo',
+  nombre: 'Chasis minisumo con pala',
+  familia: 'chasis',
+  descripcion: 'Base de 10 × 10 cm con pala de acero al frente: mete la pala debajo del rival, lo levanta y le quita tracción.',
+  modelo: 'proc:chasis-minisumo',
+  masa_g: 47,
+  material: 'pla',
+  variantes: [
+    { id: 'pla', nombre: 'Impreso en 3D (PLA negro)', material: 'pla', masa_g: 47, color: '#1f2430' },
+    { id: 'pla-rojo', nombre: 'Impreso en 3D (PLA rojo)', material: 'pla', masa_g: 47, color: '#b91c1c' },
+    { id: 'aluminio', nombre: 'Aluminio 3 mm', material: 'aluminio', masa_g: 84, color: '#c3c8cd' },
+  ],
+  colisionadores: [
+    { forma: 'caja', medidas: [76, 3, 96] },
+    // Pala: 30 mm inclinada 37°, el filo a medio milímetro del piso.
+    { forma: 'caja', medidas: [30, 1.5, 96], centro: [48, -14.8, 0], rotacion: [0, 0, -37], friccion: 0.15 },
+  ],
+  montajes: [
+    { id: 'placa', tipo: 'placa', nombre: 'Placa', posicion: [-14, ARRIBA, 0], rotacionesPermitidas: [0, 180] },
+    { id: 'driver', tipo: 'driver', nombre: 'Driver', posicion: [-22, ARRIBA, -24], rotacionesPermitidas: [0, 90, 180, 270] },
+    { id: 'bateria', tipo: 'bateria', nombre: 'Batería', posicion: [-16, ARRIBA, 24] },
+    { id: 'motor-izq', tipo: 'soporte-motor', nombre: 'Motor izquierdo', posicion: [-4, -7.5, -33], rotacion: COLGADO },
+    { id: 'motor-der', tipo: 'soporte-motor', nombre: 'Motor derecho', posicion: [-4, -7.5, 33] },
+    { id: 'frente', tipo: 'sensor-frontal', nombre: 'Sensor frontal', posicion: [22, ARRIBA, 0] },
+    { id: 'frente-izq', tipo: 'sensor-frontal', nombre: 'Sensor frontal izquierdo', posicion: [30, ARRIBA, -31], rotacion: [0, 15, 0] },
+    { id: 'frente-der', tipo: 'sensor-frontal', nombre: 'Sensor frontal derecho', posicion: [30, ARRIBA, 31], rotacion: [0, -15, 0] },
+    { id: 'piso-izq', tipo: 'sensor-piso', nombre: 'Sensor de borde izquierdo', posicion: [28, PISO_MINISUMO + 12.5, -38] },
+    { id: 'piso-der', tipo: 'sensor-piso', nombre: 'Sensor de borde derecho', posicion: [28, PISO_MINISUMO + 12.5, 38] },
+  ],
+  encaja: [],
+  pines: [],
+  comportamiento: { tipo: 'chasis' },
+  datos: [['Medidas', '98 × 96 mm con pala'], ['Pala', 'Acero 1,5 mm, 37°'], ['Tracción', '2 motores N20 + ruedas de 34 mm'], ['Reglamento', 'Minisumo: ≤ 10 × 10 cm, ≤ 500 g']],
+}

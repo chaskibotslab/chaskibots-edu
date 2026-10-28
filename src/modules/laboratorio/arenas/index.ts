@@ -118,11 +118,57 @@ export function mesa(): ArenaDef {
 }
 
 export function listaArenas(): ArenaDef[] {
-  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), mesa()]
+  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), mesa(), dohyo('minisumo'), dohyo('sumo')]
 }
 
 export function arena(id: string): ArenaDef {
   const a = listaArenas().find(x => x.id === id)
   if (!a) throw new Error(`Arena desconocida: ${id}`)
   return a
+}
+
+/**
+ * Dohyo de sumo: negro con borde blanco (los sensores de piso lo ven) y
+ * elevado (si el robot sale, cae al piso). Las salidas cambian en cada ronda:
+ * frente a frente, de costado y de espaldas.
+ */
+export function dohyo(categoria: 'minisumo' | 'sumo'): ArenaDef {
+  const mini = categoria === 'minisumo'
+  const radio = mini ? 0.385 : 0.77
+  const d = mini ? 0.13 : 0.25        // distancia del centro a cada robot
+  const lado = radio * 2 + 0.6
+  return {
+    id: mini ? 'dohyo-minisumo' : 'dohyo-sumo',
+    nombre: mini ? 'Minisumo (dohyo 77 cm)' : 'Sumo (dohyo 154 cm)',
+    descripcion: mini
+      ? 'Dojo de 77 cm con borde blanco. Robots de hasta 10 × 10 cm y 500 g. Gana quien saque al otro: 2 de 3 rondas.'
+      : 'Dojo de 154 cm con borde blanco. Robots de hasta 20 × 20 cm y 3 kg. Gana quien saque al otro: 2 de 3 rondas.',
+    ancho: lado, largo: lado,
+    piso: { material: 'melamina', color: '#0b0b0e', reflectancia: 0.05 },
+    objetos: [],
+    paredes: false,
+    dohyo: { radio, borde: mini ? 0.025 : 0.05, altura: mini ? 0.025 : 0.05 },
+    competencia: {
+      tipo: 'sumo', categoria,
+      maxLadoMm: mini ? 100 : 200, maxMasaG: mini ? 500 : 3000,
+      espera: 5, duracionRonda: 60, puntosParaGanar: 2,
+      salidas: [
+        { nombre: 'Frente a frente', alumno: { x: -d, z: 0, yaw: 0 }, rival: { x: d, z: 0, yaw: Math.PI } },
+        { nombre: 'De costado', alumno: { x: -d, z: 0, yaw: Math.PI / 2 }, rival: { x: d, z: 0, yaw: -Math.PI / 2 } },
+        { nombre: 'De espaldas', alumno: { x: -d, z: 0, yaw: Math.PI }, rival: { x: d, z: 0, yaw: 0 } },
+      ],
+    },
+    inicio: { x: -d, z: 0, yaw: 0 },
+  }
+}
+
+/** Lo que ven los sensores de piso en arenas sin pista dibujada (dohyo: negro con borde blanco). */
+export function reflectanciaArena(a: ArenaDef): (x: number, z: number) => number {
+  const d = a.dohyo
+  if (!d) return () => a.piso.reflectancia
+  return (x, z) => {
+    const r = Math.hypot(x, z)
+    if (r > d.radio) return 0.3                       // piso del aula, más abajo
+    return r >= d.radio - d.borde ? 0.92 : a.piso.reflectancia
+  }
 }

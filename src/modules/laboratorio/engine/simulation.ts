@@ -10,8 +10,11 @@
 // salta pasos) y la interfaz muestra la "velocidad de simulación" en %.
 // Es la misma lógica que simSincrona.ts (tests), repartida entre worker e interfaz.
 
+import { reflectanciaArena } from '../arenas'
 import type { ArenaDef } from '../arenas/tipos'
 import type { RobotDoc } from '../robots/doc'
+import { construirMinisumo } from '../robots/prearmados'
+import { Competencia, type EstadoCombate, type NivelRival } from './competencia'
 import { CPU_FREQ_HZ, type PinReport, type StepResult } from './avrRunner'
 import type { WorkerIn, WorkerOut } from './avr.worker'
 import { avisosEnsamblaje } from './ensamblaje'
@@ -39,6 +42,8 @@ export interface Telemetria {
   servos: { instancia: string; angulo: number }[]
   velocidadRobot: number
   avisos: string[]
+  /** Solo en arenas de competencia (sumo, minisumo). */
+  combate?: EstadoCombate
   error?: string
 }
 
@@ -52,6 +57,11 @@ export class Simulacion {
   mapa: MapaPista | null = null
   private gravedad: Gravedad = 'tierra'
   private reloj = new Reloj()
+  /** Combate con rival y juez (arenas de competencia). */
+  competencia: Competencia | null = null
+  private nivelRival: NivelRival = 'cazador'
+  /** Programa cargado: hace falta para reiniciar el micro en cada ronda. */
+  private hex: string | null = null
 
   private worker: Worker | null = null
   private cargado = false
@@ -98,19 +108,44 @@ export class Simulacion {
     this.mundo = new Mundo(arena, this.gravedad)
     this.fisica = new RobotFisico(this.mundo, this.doc, this.plan, arena.inicio)
     this.reloj = new Reloj()
+    this.competencia = arena.competencia
+      ? new Competencia(this.mundo, arena, this.fisica, construirMinisumo('pla-rojo', 'Rival'), this.nivelRival, this.reflectancia())
+      : null
+  }
+
+  /** Lo que ven los sensores de piso: la imagen de la pista o el piso de la arena. */
+  private reflectancia() {
+    const mapa = this.mapa
+    return mapa ? (x: number, z: number, r: number) => mapa.reflectancia(x, z, r) : reflectanciaArena(this.arena)
+  }
+
+  get rival(): NivelRival { return this.nivelRival }
+
+  /** Cambia el rival de práctica; si hay un programa corriendo, empieza un combate nuevo. */
+  elegirRival(n: NivelRival) {
+    this.nivelRival = n
+    this.cambiarArena(this.arena)
+    if (this.cargado && this.hex) void this.cargarPrograma(this.hex)
   }
 
   // ---------------- programa ----------------
 
   async cargarPrograma(hex: string): Promise<void> {
+    this.hex = hex
+    this.tiempoSim = 0
+    if (this.competencia) this.competencia.empezar()
+    else this.fisica.colocar(this.arena.inicio)
+    return this.encender(hex)
+  }
+
+  /** Arranca el micro con el programa (como enchufar la placa o apretar RESET). */
+  private async encender(hex: string): Promise<void> {
     this.worker?.terminate()
     this.cargado = false
     this.pendiente = false
     this.estado = 'cargando'
     this.error = undefined
-    this.tiempoSim = 0
     this.pines = {}
-    this.fisica.colocar(this.arena.inicio)
     const worker = new Worker(new URL('./avr.worker.ts', import.meta.url))
     this.worker = worker
     await new Promise<void>((resolve, reject) => {
@@ -132,6 +167,8 @@ export class Simulacion {
     this.pendiente = false
     this.pines = {}
     this.estado = 'sin-programa'
+    this.hex = null
+    this.competencia?.detener()
     for (const r of this.fisica.ruedas) r.volts = 0
   }
 
@@ -207,10 +244,7 @@ export class Simulacion {
   }
 
   private leerSensores() {
-    const refl = this.mapa
-      ? (x: number, z: number, r: number) => this.mapa!.reflectancia(x, z, r)
-      : () => this.arena.piso.reflectancia
-    const e = leerSensores(this.plan, this.doc, this.fisica, refl)
+    const e = leerSensores(this.plan, this.doc, this.fisica, this.reflectancia())
     this.sensores = e.lecturas
     this.ultrasonidos = e.ultrasonidos
     return e
@@ -227,7 +261,11 @@ export class Simulacion {
         r.volts = (m.rueda && m.rueda.centro.z < 0 ? this.manual.izq : this.manual.der) * vMax
       }
     }
-    this.reloj.avanzar(this.mundo, [this.fisica], dt)
+    const c = this.competencia
+    c?.antes()
+    this.reloj.avanzar(this.mundo, [this.fisica, ...(c?.robots ?? [])], dt)
+    // Nueva ronda: los robots ya están en sus salidas; el programa vuelve a empezar.
+    if (c?.despues(dt) === 'nueva-ronda' && this.hex) this.encender(this.hex).catch(() => {})
   }
 
   /** Control directo de los motores sin programa (−1 a 1 por lado). */
@@ -267,6 +305,7 @@ export class Simulacion {
       velocidadRobot: pose.velocidad,
       avisos: this.avisos,
       error: this.error,
+      combate: this.competencia ? { ...this.competencia.estado, marcador: { ...this.competencia.estado.marcador } } : undefined,
     })
   }
 
