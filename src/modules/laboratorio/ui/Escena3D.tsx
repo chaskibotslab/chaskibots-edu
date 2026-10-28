@@ -29,7 +29,7 @@ function Estudio({ intensidad = 1 }: { intensidad?: number }) {
 function Luces({ sombras, tamSombra, alcance }: { sombras: boolean; tamSombra: number; alcance: number }) {
   return (
     <>
-      <hemisphereLight args={['#eef2ff', '#2b2f3a', 0.35]} />
+      <hemisphereLight args={['#e8eeff', '#2a2f48', 0.38]} />
       <directionalLight
         position={[2.5, 4, 1.5]}
         intensity={1.8}
@@ -54,7 +54,8 @@ function Lienzo({ nivel, onNivel, children, camara }: { nivel: NivelCalidad; onN
       shadows={q.sombras ? 'soft' : false}
       dpr={q.dpr}
       camera={{ position: camara, fov: 40, near: 0.005, far: 60 }}
-      gl={{ antialias: nivel !== 'baja', powerPreference: 'high-performance' }}
+      className="lab-escena"
+      gl={{ antialias: nivel !== 'baja', powerPreference: 'high-performance', alpha: true }}
     >
       <PerformanceMonitor
         onDecline={() => onNivel(nivel === 'alta' ? 'media' : 'baja')}
@@ -139,7 +140,6 @@ export function EscenaTaller(p: PropsTaller) {
   const q = CALIDADES[p.nivel]
   return (
     <Lienzo nivel={p.nivel} onNivel={p.onNivel} camara={[0.2, 0.16, 0.24]}>
-      <color attach="background" args={['#1a1d27']} />
       <Estudio />
       <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={0.5} />
       <Mesa />
@@ -316,8 +316,7 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel }: {
   const q = CALIDADES[nivel]
   return (
     <Lienzo nivel={nivel} onNivel={onNivel} camara={[-1.1, 0.9, 1.3]}>
-      <color attach="background" args={['#10131F']} />
-      <fog attach="fog" args={['#10131F', 6, 16]} />
+      <fog attach="fog" args={['#121830', 6, 16]} />
       <Estudio intensidad={0.6} />
       <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={2.2} />
       <PisoArena sim={sim} version={versionArena} />

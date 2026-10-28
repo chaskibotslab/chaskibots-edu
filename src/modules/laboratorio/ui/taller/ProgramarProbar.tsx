@@ -194,14 +194,14 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
   }
 
   const corriendo = tele?.estado === 'corriendo' || tele?.estado === 'pausado'
-  const boton = 'flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-labdark-bg px-3 text-sm hover:bg-white/5'
+  const boton = 'flex h-9 items-center gap-1.5 rounded-lg border border-lab-borde/15 bg-lab-fondo px-3 text-sm hover:bg-white/5'
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {/* ---------- Barra ---------- */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-white/10 bg-labdark-surface px-3 py-2">
+      <div className="lab-panel flex flex-wrap items-center gap-2 border-b border-lab-borde/15 px-3 py-2">
         <select
-          className="h-9 max-w-[11rem] rounded-lg border border-white/10 bg-labdark-bg px-2 text-sm text-slate-200 [&_option]:bg-labdark-surface"
+          className="h-9 max-w-[11rem] rounded-lg border border-lab-borde/15 bg-lab-fondo px-2 text-sm text-slate-200 [&_option]:bg-lab-superficie"
           value=""
           onChange={e => {
             const p = plantillas.find(x => x.id === e.target.value)
@@ -220,7 +220,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
         <button
           onClick={compilarYEjecutar}
           disabled={!sim || compilando}
-          className="flex h-9 items-center gap-2 rounded-lg bg-chaski-primary px-4 text-sm font-semibold text-white shadow-lg shadow-chaski-primary/20 transition hover:bg-chaski-secondary active:scale-[0.98] disabled:opacity-50"
+          className="lab-primario flex h-9 items-center gap-2 rounded-lg px-4 text-sm font-semibold disabled:opacity-50"
           title="Compilar y ejecutar (Ctrl+Enter)"
         >
           {compilando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
@@ -237,7 +237,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             </button>
           </>
         )}
-        <button onClick={() => setControl(c => !c)} className={`${boton} ${control ? 'border-chaski-primary/50 text-chaski-primary' : ''}`} title="Control remoto: manejar el robot con teclado, botones o un control">
+        <button onClick={() => setControl(c => !c)} className={`${boton} ${control ? 'border-lab-acento/50 text-lab-acento' : ''}`} title="Control remoto: manejar el robot con teclado, botones o un control">
           <Gamepad2 className="h-4 w-4" /> <span className="hidden md:inline">Control</span>
         </button>
         <button onClick={descargarIno} className={boton} title="Descargar el programa (.ino) para abrirlo en el Arduino IDE">
@@ -248,15 +248,15 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
           <button onClick={() => sim?.colocarRobot()} className={boton} title="Volver a la salida">
             <RotateCcw className="h-4 w-4" /> <span className="hidden md:inline">Salida</span>
           </button>
-          <button onClick={() => girarRobot(Math.PI / 12)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-labdark-bg hover:bg-white/5" title="Girar el robot 15° a la izquierda">
+          <button onClick={() => girarRobot(Math.PI / 12)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 bg-lab-fondo hover:bg-white/5" title="Girar el robot 15° a la izquierda">
             <RotateCcw className="h-4 w-4 -scale-x-100 rotate-180" />
           </button>
-          <button onClick={() => girarRobot(-Math.PI / 12)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-labdark-bg hover:bg-white/5" title="Girar el robot 15° a la derecha">
+          <button onClick={() => girarRobot(-Math.PI / 12)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 bg-lab-fondo hover:bg-white/5" title="Girar el robot 15° a la derecha">
             <RotateCw className="h-4 w-4" />
           </button>
-          <label className="flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-labdark-bg pl-2 text-sm">
+          <label className="flex h-9 items-center gap-1.5 rounded-lg border border-lab-borde/15 bg-lab-fondo pl-2 text-sm">
             <MapIcon className="h-4 w-4 text-slate-400" />
-            <select className="h-full max-w-[10rem] bg-transparent pr-2 text-slate-200 outline-none [&_option]:bg-labdark-surface" value={imagenPropia ? 'propia' : arena.id} onChange={e => cambiarArena(e.target.value)}>
+            <select className="h-full max-w-[10rem] bg-transparent pr-2 text-slate-200 outline-none [&_option]:bg-lab-superficie" value={imagenPropia ? 'propia' : arena.id} onChange={e => cambiarArena(e.target.value)}>
               {arenas.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)}
               {imagenPropia && <option value="propia">{imagenPropia.nombre}</option>}
             </select>
@@ -265,15 +265,15 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             <Upload className="h-4 w-4" /> <span className="hidden md:inline">Pista</span>
           </button>
           <input ref={archivoPista} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) subirPista(f); e.target.value = '' }} />
-          <label className="flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-labdark-bg pl-2 text-sm" title="Gravedad">
+          <label className="flex h-9 items-center gap-1.5 rounded-lg border border-lab-borde/15 bg-lab-fondo pl-2 text-sm" title="Gravedad">
             <Gauge className="h-4 w-4 text-slate-400" />
-            <select className="h-full bg-transparent pr-2 text-slate-200 outline-none [&_option]:bg-labdark-surface" value={gravedad} onChange={e => { const g = e.target.value as Gravedad; setGravedad(g); sim?.cambiarGravedad(g) }}>
+            <select className="h-full bg-transparent pr-2 text-slate-200 outline-none [&_option]:bg-lab-superficie" value={gravedad} onChange={e => { const g = e.target.value as Gravedad; setGravedad(g); sim?.cambiarGravedad(g) }}>
               {Object.entries(GRAVEDADES).map(([k, v]) => <option key={k} value={k}>{v.nombre}</option>)}
             </select>
           </label>
-          <div className="flex h-9 overflow-hidden rounded-lg border border-white/10 text-sm">
+          <div className="flex h-9 overflow-hidden rounded-lg border border-lab-borde/15 text-sm">
             {([['libre', 'Libre', Camera], ['seguir', 'Seguir', Navigation], ['arriba', 'Arriba', MapIcon]] as const).map(([id, txt, Icon]) => (
-              <button key={id} onClick={() => setCamara(id)} title={`Cámara: ${txt}`} className={`flex items-center gap-1 px-2.5 ${camara === id ? 'bg-chaski-primary/20 text-chaski-primary' : 'bg-labdark-bg hover:bg-white/5'}`}>
+              <button key={id} onClick={() => setCamara(id)} title={`Cámara: ${txt}`} className={`flex items-center gap-1 px-2.5 ${camara === id ? 'bg-lab-acento/20 text-lab-acento' : 'bg-lab-fondo hover:bg-white/5'}`}>
                 <Icon className="h-3.5 w-3.5" /> <span className="hidden xl:inline">{txt}</span>
               </button>
             ))}
@@ -289,11 +289,11 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
 
       {/* ---------- Cuerpo ---------- */}
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <div className={`min-h-0 flex-col border-white/10 lg:flex lg:w-[40%] lg:border-r ${vista === 'programar' ? 'flex flex-1 lg:flex-none' : 'hidden'}`}>
-          <div className="flex items-center justify-between gap-2 border-b border-white/10 bg-labdark-bg2 px-3 py-1.5 text-xs text-slate-400">
-            <div className="flex overflow-hidden rounded-lg border border-white/10">
+        <div className={`min-h-0 flex-col border-lab-borde/15 lg:flex lg:w-[40%] lg:border-r ${vista === 'programar' ? 'flex flex-1 lg:flex-none' : 'hidden'}`}>
+          <div className="flex items-center justify-between gap-2 border-b border-lab-borde/15 bg-lab-fondo2 px-3 py-1.5 text-xs text-slate-400">
+            <div className="flex overflow-hidden rounded-lg border border-lab-borde/15">
               {([['bloques', 'Bloques', Puzzle], ['codigo', 'Código', FileCode2]] as const).map(([modo, txt, Icon]) => (
-                <button key={modo} onClick={() => cambiarModo(modo)} className={`flex items-center gap-1 px-2.5 py-1 ${doc.programa.modo === modo ? 'bg-chaski-primary/20 text-chaski-primary' : 'hover:bg-white/5'}`}>
+                <button key={modo} onClick={() => cambiarModo(modo)} className={`flex items-center gap-1 px-2.5 py-1 ${doc.programa.modo === modo ? 'bg-lab-acento/20 text-lab-acento' : 'hover:bg-white/5'}`}>
                   <Icon className="h-3.5 w-3.5" /> {txt}
                 </button>
               ))}
@@ -311,12 +311,12 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                   onCambio={bloques => onPrograma({ modo: 'bloques', bloques, cpp: codigo })}
                 />
               </div>
-              <div className="flex min-h-[120px] flex-[2] flex-col border-t border-white/10 bg-[#0d101a]">
+              <div className="flex min-h-[120px] flex-[2] flex-col border-t border-lab-borde/15 bg-[#0d101a]">
                 <div className="flex items-center justify-between px-3 py-1.5 text-[11px] text-slate-400">
                   <span>Código Arduino que generan tus bloques</span>
                   <button
                     onClick={() => { if (window.confirm('Vas a seguir en código C++. Los bloques no se pueden recuperar desde el código. ¿Seguir?')) onPrograma({ modo: 'codigo', cpp: codigo }) }}
-                    className="rounded-md border border-white/10 px-2 py-0.5 text-slate-200 hover:bg-white/5"
+                    className="rounded-md border border-lab-borde/15 px-2 py-0.5 text-slate-200 hover:bg-white/5"
                   >Pasar a código →</button>
                 </div>
                 <pre className="min-h-0 flex-1 overflow-auto px-3 pb-2 font-mono text-[11px] leading-relaxed text-emerald-200/90">{codigo}</pre>
@@ -345,14 +345,14 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             </div>
           </div>
 
-          <div className="flex min-h-[180px] flex-[2] flex-col border-t border-white/10 bg-labdark-bg">
-            <div className="flex border-b border-white/10 text-xs">
+          <div className="flex min-h-[180px] flex-[2] flex-col border-t border-lab-borde/15 bg-lab-fondo">
+            <div className="flex border-b border-lab-borde/15 text-xs">
               {([
                 ['serial', 'Monitor serie', Terminal],
                 ['pines', 'Pines y sensores', CircuitBoard],
                 ['problemas', `Problemas${errores.length || tele?.avisos.length ? ` (${errores.length + (tele?.avisos.length ?? 0)})` : ''}`, AlertTriangle],
               ] as const).map(([id, txt, Icon]) => (
-                <button key={id} onClick={() => setPestana(id)} className={`flex items-center gap-1.5 border-b-2 px-3 py-2 ${pestana === id ? 'border-chaski-primary text-white' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
+                <button key={id} onClick={() => setPestana(id)} className={`flex items-center gap-1.5 border-b-2 px-3 py-2 ${pestana === id ? 'border-lab-acento text-white' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
                   <Icon className="h-3.5 w-3.5" /> {txt}
                 </button>
               ))}
@@ -363,13 +363,13 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                   <pre ref={serialRef} className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap px-3 py-2 font-mono text-xs text-emerald-300">
                     {serial || <span className="text-slate-500">Lo que tu programa envíe con Serial.print aparece aquí.</span>}
                   </pre>
-                  <div className="flex gap-2 border-t border-white/10 p-2">
+                  <div className="flex gap-2 border-t border-lab-borde/15 p-2">
                     <input
                       value={entrada}
                       onChange={e => setEntrada(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter') enviarSerial() }}
                       placeholder="Enviar texto a la placa…"
-                      className="h-8 min-w-0 flex-1 rounded-md border border-white/10 bg-labdark-void px-2 font-mono text-xs outline-none focus:border-chaski-primary/50"
+                      className="h-8 min-w-0 flex-1 rounded-md border border-lab-borde/15 bg-lab-vacio px-2 font-mono text-xs outline-none focus:border-lab-acento/50"
                     />
                     <button onClick={enviarSerial} className="flex h-8 items-center gap-1 rounded-md bg-white/10 px-3 text-xs hover:bg-white/15"><Send className="h-3.5 w-3.5" /> Enviar</button>
                     <button onClick={() => setSerial('')} className="flex h-8 w-8 items-center justify-center rounded-md bg-white/5 hover:bg-white/10" title="Limpiar"><Trash2 className="h-3.5 w-3.5" /></button>
@@ -385,7 +385,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                   {errores.length === 0 && !tele?.avisos.length ? (
                     <p className="text-slate-500">Sin problemas. Los errores del compilador aparecen aquí y subrayados en el editor.</p>
                   ) : errores.map((e, i) => (
-                    <div key={i} className="flex gap-2 border-b border-white/5 py-1.5">
+                    <div key={i} className="flex gap-2 border-b border-lab-borde/10 py-1.5">
                       <span className={e.severity === 'error' ? 'text-red-400' : 'text-amber-400'}>{e.severity === 'error' ? 'Error' : 'Aviso'}</span>
                       <span className="font-mono text-slate-400">línea {e.line}</span>
                       <span className="text-slate-200">{e.message}</span>
@@ -416,20 +416,20 @@ function HUD({ tele }: { tele: Telemetria | null }) {
   return (
     <>
       <div className="pointer-events-none absolute left-3 top-3 space-y-1.5">
-        <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/50 px-2.5 py-1.5 text-xs backdrop-blur">
+        <div className="flex items-center gap-2 rounded-lg lab-vidrio px-2.5 py-1.5 text-xs backdrop-blur">
           <span className={`h-2 w-2 rounded-full ${estado.cls}`} />
           <span className="font-medium text-white">{estado.txt}</span>
           {tele.estado !== 'sin-programa' && <span className="font-mono text-slate-400">t = {tele.tiempoSim.toFixed(1)} s</span>}
         </div>
         {tele.estado === 'corriendo' && (
-          <div className={`rounded-lg border border-white/10 bg-black/50 px-2.5 py-1.5 font-mono text-[11px] backdrop-blur ${lento ? 'text-amber-300' : 'text-slate-300'}`}>
+          <div className={`rounded-lg lab-vidrio px-2.5 py-1.5 font-mono text-[11px] backdrop-blur ${lento ? 'text-amber-300' : 'text-slate-300'}`}>
             {tele.mhz.toFixed(1)} MHz · velocidad {tele.velocidadPct.toFixed(0)}%
           </div>
         )}
         {tele.error && <div className="rounded-lg bg-red-500/20 px-2.5 py-1.5 text-xs text-red-300">{tele.error}</div>}
       </div>
 
-      <div className="pointer-events-none absolute right-3 top-3 hidden w-56 space-y-2 rounded-xl border border-white/10 bg-black/50 p-3 text-xs backdrop-blur sm:block">
+      <div className="pointer-events-none absolute right-3 top-3 hidden w-56 space-y-2 rounded-xl lab-vidrio p-3 text-xs backdrop-blur sm:block">
         <div className="flex items-center justify-between">
           <span className="text-slate-400">Velocidad</span>
           <span className="font-mono text-white">{(tele.velocidadRobot * 100).toFixed(1)} cm/s</span>
@@ -444,7 +444,7 @@ function HUD({ tele }: { tele: Telemetria | null }) {
                     Línea
                   </div>
                   <div className="font-mono text-[11px]">
-                    <span className={s.digital ? 'text-chaski-primary' : 'text-slate-300'}>{s.pinDigital ?? '—'}={s.digital ? 1 : 0}</span>
+                    <span className={s.digital ? 'text-lab-acento' : 'text-slate-300'}>{s.pinDigital ?? '—'}={s.digital ? 1 : 0}</span>
                     {s.adc !== null && <span className="ml-1 text-slate-400">{s.adc}</span>}
                   </div>
                 </>
@@ -458,7 +458,7 @@ function HUD({ tele }: { tele: Telemetria | null }) {
               {s.tipo === 'obstaculo' && (
                 <>
                   <div className="mb-1 text-[10px] text-slate-400">IR obstáculo</div>
-                  <div className={`font-mono text-[11px] ${s.detecta ? 'text-chaski-primary' : 'text-slate-300'}`}>{s.detecta ? 'detecta' : 'libre'}</div>
+                  <div className={`font-mono text-[11px] ${s.detecta ? 'text-lab-acento' : 'text-slate-300'}`}>{s.detecta ? 'detecta' : 'libre'}</div>
                 </>
               )}
             </div>
@@ -505,7 +505,7 @@ function PanelPines({ tele }: { tele: Telemetria | null }) {
         const esPwm = salida && p.duty > 0.01 && p.duty < 0.99 && p.freqHz > 50
         const esServo = salida && p.pulsoUs > 400 && p.pulsoUs < 2600 && p.freqHz > 30 && p.freqHz < 70
         return (
-          <div key={n} className={`rounded-md border px-2 py-1.5 text-[11px] ${salida ? 'border-chaski-primary/30 bg-chaski-primary/5' : 'border-white/10 bg-white/[0.02]'}`}>
+          <div key={n} className={`rounded-md border px-2 py-1.5 text-[11px] ${salida ? 'border-lab-acento/30 bg-lab-acento/5' : 'border-lab-borde/15 bg-white/[0.02]'}`}>
             <div className="flex items-center justify-between">
               <span className="font-mono font-semibold text-white">{n}{pwm.has(n) && <span className="ml-0.5 text-[9px] text-slate-500">~</span>}</span>
               <span className={`h-2 w-2 rounded-full ${p?.level ? 'bg-emerald-400 shadow-[0_0_6px] shadow-emerald-400' : 'bg-slate-600'}`} />
@@ -515,7 +515,7 @@ function PanelPines({ tele }: { tele: Telemetria | null }) {
             </div>
             {esPwm && !esServo && (
               <div className="mt-1 h-1 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full bg-chaski-primary" style={{ width: `${p.duty * 100}%` }} />
+                <div className="h-full bg-lab-acento" style={{ width: `${p.duty * 100}%` }} />
               </div>
             )}
           </div>
