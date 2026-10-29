@@ -10,7 +10,7 @@ import { createContext, useContext, useMemo, useRef, type ReactNode } from 'reac
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { PiezaDef } from '../../catalogo/tipos'
-import { RESISTENCIAS } from '../../catalogo/piezas/circuito'
+import { BASURERO, BISAGRA_BASURERO, POSTE_SERVO, RESISTENCIAS } from '../../catalogo/piezas/circuito'
 import { LUZ_INICIAL, PERILLA_INICIAL, type EstadoCircuito } from '../../engine/circuito'
 import { useCalidad } from '../calidad'
 
@@ -367,7 +367,76 @@ export function Ldr({ inst }: { inst: string }) {
   )
 }
 
-const MODELOS_CIRCUITO = new Set(['proc:protoboard', 'proc:led', 'proc:led-rgb', 'proc:resistencia', 'proc:pulsador', 'proc:buzzer', 'proc:potenciometro', 'proc:ldr'])
+// ---------------------------------------------------------------------------
+// Maqueta del basurero (E2)
+// ---------------------------------------------------------------------------
+
+/** Basurero: paredes delgadas (se ve por dentro con la tapa abierta) y el poste del servo. */
+export function Basurero() {
+  const q = useCalidad()
+  const { lado: L, alto: H } = BASURERO
+  const e = 2.5
+  const verde = <meshStandardMaterial color="#15803d" roughness={0.55} />
+  return (
+    <group>
+      <mesh position={M(0, e / 2, 0)} receiveShadow>
+        <boxGeometry args={[m(L), m(e), m(L)]} />
+        {verde}
+      </mesh>
+      {([[L / 2 - e / 2, 0, e, L], [-L / 2 + e / 2, 0, e, L], [0, L / 2 - e / 2, L, e], [0, -L / 2 + e / 2, L, e]] as const).map(([x, z, a, b], i) => (
+        <mesh key={i} position={M(x, H / 2, z)} castShadow={q.sombras} receiveShadow>
+          <boxGeometry args={[m(a), m(H), m(b)]} />
+          {verde}
+        </mesh>
+      ))}
+      {/* Interior más oscuro y una bolsa de basura */}
+      <mesh position={M(0, 30, 0)}>
+        <boxGeometry args={[m(L - 2 * e - 1), m(50), m(L - 2 * e - 1)]} />
+        <meshStandardMaterial color="#1f2937" roughness={0.9} />
+      </mesh>
+      {/* Símbolo de reciclaje en el frente (tres flechas en triángulo) */}
+      <group position={M(L / 2 + 0.2, 72, 0)} rotation={[0, Math.PI / 2, 0]}>
+        {[0, 1, 2].map(i => (
+          <mesh key={i} rotation={[0, 0, (i * 2 * Math.PI) / 3]} position={M(0, 0, 0)}>
+            <ringGeometry args={[m(9), m(12), 16, 1, Math.PI / 6 + 0.25, (2 * Math.PI) / 3 - 0.5]} />
+            <meshStandardMaterial color="#f0fdf4" side={THREE.DoubleSide} />
+          </mesh>
+        ))}
+      </group>
+      {/* Poste que sostiene el servo junto a la bisagra */}
+      <mesh position={M(POSTE_SERVO.x, POSTE_SERVO.alto / 2, POSTE_SERVO.z)} castShadow={q.sombras}>
+        <boxGeometry args={[m(10), m(POSTE_SERVO.alto), m(10)]} />
+        <meshStandardMaterial color="#a8a29e" roughness={0.6} />
+      </mesh>
+      {/* Bisagra (a lo largo del borde de atrás) */}
+      <mesh position={M(0, H + 1.5, BISAGRA_BASURERO[2])} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[m(2), m(2), m(L), 12]} />
+        <meshStandardMaterial color="#d4d4d8" metalness={0.8} roughness={0.3} />
+      </mesh>
+    </group>
+  )
+}
+
+/** Tapa (marco del eje del servo acostado; ver TAPA_BASURERO). */
+export function TapaBasurero() {
+  const q = useCalidad()
+  const A = BASURERO.lado + 4
+  return (
+    <group>
+      <mesh position={M(A / 2, A / 2, 1.5)} castShadow={q.sombras}>
+        <boxGeometry args={[m(A), m(A), m(3)]} />
+        <meshStandardMaterial color="#166534" roughness={0.5} />
+      </mesh>
+      {/* Manija del lado de afuera, cerca del borde que se levanta */}
+      <mesh position={M(A - 12, A / 2, -2.5)}>
+        <boxGeometry args={[m(5), m(30), m(5)]} />
+        <meshStandardMaterial color="#e5e7eb" roughness={0.5} />
+      </mesh>
+    </group>
+  )
+}
+
+const MODELOS_CIRCUITO = new Set(['proc:protoboard', 'proc:led', 'proc:led-rgb', 'proc:resistencia', 'proc:pulsador', 'proc:buzzer', 'proc:potenciometro', 'proc:ldr', 'proc:basurero', 'proc:tapa-basurero'])
 export const esModeloCircuito = (modelo: string) => MODELOS_CIRCUITO.has(modelo)
 
 /** Dibuja cualquier componente del circuito según su modelo; null si no es de la protoboard. */
@@ -382,6 +451,8 @@ export function ModeloCircuito({ def, inst }: { def: PiezaDef; inst: string }) {
     case 'proc:buzzer': return <Buzzer inst={inst} activo={c.tipo === 'buzzer' && c.activo} />
     case 'proc:potenciometro': return <Potenciometro inst={inst} />
     case 'proc:ldr': return <Ldr inst={inst} />
+    case 'proc:basurero': return <Basurero />
+    case 'proc:tapa-basurero': return <TapaBasurero />
   }
   return null
 }

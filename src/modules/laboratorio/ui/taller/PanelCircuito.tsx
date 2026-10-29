@@ -1,14 +1,15 @@
 'use client'
 
 // Panel de la mesa de electrónica en «Probar»: lo que el alumno toca (pulsadores,
-// perillas, luz sobre la LDR) y lo que el circuito muestra (LED y buzzers).
+// perillas, luz sobre la LDR, la mano frente al sensor ultrasónico) y lo que el
+// circuito muestra (LED, buzzers, distancia medida y ángulo de cada servo).
 // Los pulsadores también se presionan haciendo clic sobre ellos en 3D, o con
 // las teclas 1, 2, 3… mientras se mantienen apretadas.
 
 import { useEffect, useMemo, useState } from 'react'
-import { Moon, Sun, Volume2, VolumeX } from 'lucide-react'
+import { Hand, Moon, Sun, Volume2, VolumeX } from 'lucide-react'
 import { pieza } from '../../catalogo/piezas'
-import { LUZ_INICIAL, PERILLA_INICIAL } from '../../engine/circuito'
+import { LUZ_INICIAL, MANO_MAX_CM, MANO_MIN_CM, PERILLA_INICIAL } from '../../engine/circuito'
 import type { Simulacion, Telemetria } from '../../engine/simulation'
 
 interface Props {
@@ -44,7 +45,10 @@ export default function PanelCircuito({ sim, tele, silencio, onSilencio, onGesto
     return () => { window.removeEventListener('keydown', bajar); window.removeEventListener('keyup', subir) }
   }, [sim, botones, onGesto])
 
-  if (!plan) return null
+  const ultrasonido = sim.plan.ultrasonidos[0]
+  const servos = sim.plan.servos
+  if (!plan && !ultrasonido && !servos.length) return null
+  const controles = plan?.controles ?? []
   const estado = tele?.circuito
   const etiqueta = new Map(sim.doc.piezas.map(p => [p.id, p]))
   const leds = sim.doc.piezas.filter(p => ['led', 'led-rgb'].includes(pieza(p.pieza).comportamiento.tipo))
@@ -52,10 +56,11 @@ export default function PanelCircuito({ sim, tele, silencio, onSilencio, onGesto
 
   return (
     <div className="absolute right-3 top-3 z-10 w-60 max-w-[calc(100%-1.5rem)] space-y-2.5 rounded-xl lab-vidrio p-3 text-xs">
-      {plan.controles.length > 0 && (
+      {(controles.length > 0 || ultrasonido) && (
         <div className="space-y-2">
           <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Tú controlas</div>
-          {plan.controles.map(c => {
+          {ultrasonido && <ControlMano sim={sim} tele={tele} onGesto={onGesto} onCambio={() => refrescar(x => x + 1)} />}
+          {controles.map(c => {
             if (c.tipo === 'pulsador') {
               const n = botones.indexOf(c) + 1
               const presionado = !!sim.controles.botones[c.inst]
@@ -126,6 +131,24 @@ export default function PanelCircuito({ sim, tele, silencio, onSilencio, onGesto
         </div>
       )}
 
+      {servos.length > 0 && (
+        <div>
+          <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Servo</div>
+          {servos.map(sv => {
+            const a = tele?.servos.find(x => x.instancia === sv.instancia)?.angulo ?? 90
+            return (
+              <div key={sv.instancia} className="flex items-center gap-2 text-[11px] text-slate-300">
+                <span className="min-w-0 flex-1 truncate">{etiqueta.get(sv.instancia)?.etiqueta}</span>
+                <span className="relative h-3 w-6 shrink-0 overflow-hidden" aria-hidden>
+                  <span className="absolute bottom-0 left-1/2 h-0.5 w-3 origin-left rounded bg-lab-acento" style={{ transform: `rotate(${-a}deg)` }} />
+                </span>
+                <span className="w-9 text-right font-mono text-slate-200">{Math.round(a)}°</span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
       {buzzers.length > 0 && (
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
@@ -139,6 +162,35 @@ export default function PanelCircuito({ sim, tele, silencio, onSilencio, onGesto
           </button>
         </div>
       )}
+    </div>
+  )
+}
+
+/** La mano frente al sensor ultrasónico: a la derecha del todo no hay mano («lejos»). */
+function ControlMano({ sim, tele, onGesto, onCambio }: { sim: Simulacion; tele: Telemetria | null; onGesto: () => void; onCambio: () => void }) {
+  const mano = sim.controles.mano ?? null
+  const lejos = MANO_MAX_CM + 1
+  const medida = tele?.sensores.find(l => l.tipo === 'ultrasonido')
+  const cm = medida?.tipo === 'ultrasonido' ? medida.cm : null
+  const poner = (v: number | null) => { onGesto(); sim.ponerMano(v); onCambio() }
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-slate-300">
+        <span className="flex items-center gap-1.5"><Hand className="h-3.5 w-3.5 text-amber-300" /> Mano frente al sensor</span>
+        <span className="font-mono text-slate-400">{mano === null ? 'lejos' : `${mano} cm`}</span>
+      </div>
+      <input
+        type="range" min={MANO_MIN_CM} max={lejos} step={1} value={mano ?? lejos}
+        onChange={e => { const v = Number(e.target.value); poner(v >= lejos ? null : v) }}
+        className="h-1.5 w-full cursor-pointer accent-[rgb(var(--lab-acento))]"
+        aria-label="Distancia de la mano al sensor"
+      />
+      <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-slate-400">
+        <span>El sensor mide: <span className="font-mono text-slate-200">{cm === null ? 'sin eco' : `${cm.toFixed(0)} cm`}</span></span>
+        <button onClick={() => poner(mano === null ? 10 : null)} className="rounded border border-lab-borde/20 bg-white/5 px-1.5 py-0.5 text-slate-200 hover:bg-white/10">
+          {mano === null ? 'Acercar' : 'Quitar'}
+        </button>
+      </div>
     </div>
   )
 }

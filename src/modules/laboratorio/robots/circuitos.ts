@@ -1,6 +1,7 @@
-// Proyectos de la mesa de electrónica (E1): los del kit de 8vo EGB (semáforo
-// inteligente) con los mismos pines y el mismo código que la clase, y algunos
-// extra con las mismas piezas. Se arman con las operaciones del taller, así
+// Proyectos de la mesa de electrónica: los de los kits con los mismos pines y
+// el mismo código que la clase (E1: 8vo EGB, semáforo inteligente con UNO;
+// E2: 9no EGB, basurero inteligente con Nano, HC-SR04 y servo) y algunos extra
+// con las mismas piezas. Se arman con las operaciones del taller, así
 // que el alumno los puede abrir, cambiar y volver a cablear.
 
 import { pinCodigo, pinDePlaca, type FilaPin } from '../engine/autocableado'
@@ -24,6 +25,29 @@ class Banco {
   }
   cable(a: [string, string], b: [string, string], color: string) {
     this.doc = { ...this.doc, cables: [...this.doc.cables, { de: a, a: b, color }] }
+  }
+  /** Encastra una pieza en cualquier montaje (la maqueta, el sensor de la maqueta, el eje del servo…). */
+  montar(piezaId: string, padre: string, montaje: string) {
+    const r = encastrar(this.doc, piezaId, padre, montaje)
+    this.doc = r.doc
+    return r.id
+  }
+  /** HC-SR04: 5 V y tierra de la placa; TRIG y ECHO a los pines del kit de 9no. */
+  ultrasonido(padre = 'protoboard', montaje = 'sensor', trig = 'D9', echo = 'D10') {
+    const u = this.montar('hcsr04', padre, montaje)
+    this.cable([u, 'VCC'], ['placa', '5V'], ROJO)
+    this.cable([u, 'TRIG'], ['placa', trig], '#ea580c')
+    this.cable([u, 'ECHO'], ['placa', echo], '#9333ea')
+    this.cable([u, 'GND'], ['placa', 'GND'], NEGRO)
+    return u
+  }
+  /** Servo SG90: marrón a tierra, rojo a 5 V y naranja (señal) al pin PWM. */
+  servo(padre = 'protoboard', montaje = 'servo', senal = 'D6') {
+    const sv = this.montar('sg90', padre, montaje)
+    this.cable([sv, 'GND'], ['placa', 'GND'], '#7c2d12')
+    this.cable([sv, 'V+'], ['placa', '5V'], ROJO)
+    this.cable([sv, 'SIG'], ['placa', senal], '#0891b2')
+    return sv
   }
   /** LED con su resistencia: ánodo al pin, cátodo → resistencia → tierra. */
   ledConResistencia(led: string, huecoLed: number, pin: string, color: string, resistencia = 'resistencia-330') {
@@ -359,6 +383,367 @@ void loop() {
 `
 
 // ---------------------------------------------------------------------------
+// Códigos del kit de 9no (Arduino Nano V3), tal como están en la plataforma
+// ---------------------------------------------------------------------------
+
+const LED_TAPA = `/*
+  Practica: enciende el LED indicador
+  Kit 9no EGB - Arduino Nano V3
+  Mismo pin que usara el basurero inteligente (D8).
+*/
+const int LED = 8;
+
+void setup() {
+  pinMode(LED, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(LED, HIGH);
+  delay(500);
+  digitalWrite(LED, LOW);
+  delay(500);
+}
+`
+
+const MIDE_DISTANCIA = `/*
+  Practica: mide distancia con el sensor ultrasonico
+  Kit 9no EGB - Arduino Nano V3
+  Mismos pines que usara el basurero inteligente (D9 y D10). Abre el
+  Monitor Serial (9600 baudios) para ver la distancia en centimetros.
+*/
+const int TRIG = 9;
+const int ECHO = 10;
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  long duracion = pulseIn(ECHO, HIGH, 25000);
+  long distanciaCm = duracion / 58;
+
+  Serial.print("Distancia: ");
+  Serial.print(distanciaCm);
+  Serial.println(" cm");
+  delay(300);
+}
+`
+
+const MUEVE_SERVO = `/*
+  Practica: mueve el servomotor
+  Kit 9no EGB - Arduino Nano V3
+  Mismo pin que usara el basurero inteligente (D6). El servo gira de
+  0 a 90 grados y vuelve, una y otra vez.
+*/
+#include <Servo.h>
+
+const int SERVO_PIN = 6;
+Servo motor;
+
+void setup() {
+  motor.attach(SERVO_PIN);
+}
+
+void loop() {
+  motor.write(0);
+  delay(800);
+  motor.write(90);
+  delay(800);
+}
+`
+
+export const BASURERO = `/*
+  Basurero inteligente con apertura automatica
+  Kit 9no EGB - Arduino Nano V3
+  Academia Militar Lizardo Alfonzo Villamarin
+
+  Un sensor ultrasonico mide la distancia a la mano o al objeto. Si
+  esta lo bastante cerca, el servomotor abre la tapa y un LED
+  parpadea para confirmar (este kit no incluye buzzer: la
+  confirmacion es visual).
+*/
+
+#include <Servo.h>
+
+const int TRIG = 9;
+const int ECHO = 10;
+const int SERVO_PIN = 6;
+const int LED_TAPA = 8;
+
+const int DISTANCIA_APERTURA_CM = 15;
+const int ANGULO_CERRADO = 0;
+const int ANGULO_ABIERTO = 90;
+const unsigned long TIEMPO_ABIERTA_MS = 3000;
+
+Servo tapa;
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(LED_TAPA, OUTPUT);
+  tapa.attach(SERVO_PIN);
+  tapa.write(ANGULO_CERRADO);
+  Serial.begin(9600);
+}
+
+void loop() {
+  long distancia = medirDistanciaCm();
+  if (distancia > 0 && distancia <= DISTANCIA_APERTURA_CM) {
+    abrirTapa();
+  }
+}
+
+long medirDistanciaCm() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long duracion = pulseIn(ECHO, HIGH, 25000);
+  if (duracion == 0) return -1;
+  return duracion / 58;
+}
+
+void abrirTapa() {
+  tapa.write(ANGULO_ABIERTO);
+  parpadearConfirmacion();
+  delay(TIEMPO_ABIERTA_MS);
+  tapa.write(ANGULO_CERRADO);
+  digitalWrite(LED_TAPA, LOW);
+  delay(500);
+}
+
+void parpadearConfirmacion() {
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(LED_TAPA, HIGH);
+    delay(100);
+    digitalWrite(LED_TAPA, LOW);
+    delay(100);
+  }
+  digitalWrite(LED_TAPA, HIGH);
+}
+`
+
+const CONTADOR = `/*
+  Contador de personas
+  Kit 9no EGB - Arduino Nano V3 - Proyecto adicional
+  Mismo armado del basurero inteligente (sin el servo). Cada vez que
+  algo pasa frente al sensor, suma 1 al contador, lo muestra por el
+  Monitor Serial y el LED confirma (este kit no trae buzzer).
+*/
+const int TRIG = 9;
+const int ECHO = 10;
+const int LED_CONTADOR = 8;
+
+const int DISTANCIA_DETECCION_CM = 20;
+int contador = 0;
+bool detectadoAntes = false;
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(LED_CONTADOR, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  long distancia = medirDistanciaCm();
+  bool detectadoAhora = (distancia > 0 && distancia <= DISTANCIA_DETECCION_CM);
+
+  if (detectadoAhora && !detectadoAntes) {
+    contador++;
+    Serial.print("Personas contadas: ");
+    Serial.println(contador);
+    digitalWrite(LED_CONTADOR, HIGH);
+  } else if (!detectadoAhora) {
+    digitalWrite(LED_CONTADOR, LOW);
+  }
+
+  detectadoAntes = detectadoAhora;
+  delay(150);
+}
+
+long medirDistanciaCm() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long duracion = pulseIn(ECHO, HIGH, 25000);
+  if (duracion == 0) return -1;
+  return duracion / 58;
+}
+`
+
+const DISPENSADOR = `/*
+  Dispensador automatico
+  Kit 9no EGB - Arduino Nano V3 - Proyecto adicional
+  Mismo armado del basurero inteligente. Al acercar la mano, el
+  servomotor abre la compuerta un momento y el LED confirma (sin
+  buzzer).
+*/
+#include <Servo.h>
+
+const int TRIG = 9;
+const int ECHO = 10;
+const int SERVO_PIN = 6;
+const int LED_CONFIRMA = 8;
+
+const int DISTANCIA_CM = 10;
+const unsigned long TIEMPO_ABIERTO_MS = 1000;
+
+Servo compuerta;
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(LED_CONFIRMA, OUTPUT);
+  compuerta.attach(SERVO_PIN);
+  compuerta.write(0);
+}
+
+void loop() {
+  long distancia = medirDistanciaCm();
+  if (distancia > 0 && distancia <= DISTANCIA_CM) {
+    compuerta.write(90);
+    digitalWrite(LED_CONFIRMA, HIGH);
+    delay(TIEMPO_ABIERTO_MS);
+    compuerta.write(0);
+    digitalWrite(LED_CONFIRMA, LOW);
+    delay(1000);
+  }
+}
+
+long medirDistanciaCm() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long duracion = pulseIn(ECHO, HIGH, 25000);
+  if (duracion == 0) return -1;
+  return duracion / 58;
+}
+`
+
+const PUERTA = `/*
+  Puerta automatica
+  Kit 9no EGB - Arduino Nano V3 - Proyecto adicional
+  Mismo armado del basurero inteligente. La puerta se abre cuando
+  alguien se acerca y se mantiene abierta mientras siga cerca.
+*/
+#include <Servo.h>
+
+const int TRIG = 9;
+const int ECHO = 10;
+const int SERVO_PIN = 6;
+const int LED_PUERTA_ABIERTA = 8;
+
+const int DISTANCIA_CM = 30;
+
+Servo puerta;
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(LED_PUERTA_ABIERTA, OUTPUT);
+  puerta.attach(SERVO_PIN);
+  puerta.write(0);
+}
+
+void loop() {
+  long distancia = medirDistanciaCm();
+  bool hayAlguien = (distancia > 0 && distancia <= DISTANCIA_CM);
+
+  puerta.write(hayAlguien ? 90 : 0);
+  digitalWrite(LED_PUERTA_ABIERTA, hayAlguien ? HIGH : LOW);
+  delay(200);
+}
+
+long medirDistanciaCm() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long duracion = pulseIn(ECHO, HIGH, 25000);
+  if (duracion == 0) return -1;
+  return duracion / 58;
+}
+`
+
+const ALARMA_PROXIMIDAD = `/*
+  Alarma de proximidad (visual con LEDs)
+  Kit 9no EGB - Arduino Nano V3 - Proyecto adicional
+  Un LED parpadea mas rapido mientras mas cerca esta un objeto del
+  sensor (este kit no tiene buzzer: la alarma es 100% visual). El
+  potenciometro ajusta la sensibilidad y el pulsador enciende/apaga
+  la alarma.
+*/
+const int TRIG = 9;
+const int ECHO = 10;
+const int LED_ALARMA = 8;
+const int POTENCIOMETRO = A0;
+const int PULSADOR_ON_OFF = 2;
+
+bool alarmaEncendida = true;
+bool pulsadorAntes = false;
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(LED_ALARMA, OUTPUT);
+  pinMode(PULSADOR_ON_OFF, INPUT_PULLUP);
+}
+
+void loop() {
+  bool pulsadorAhora = (digitalRead(PULSADOR_ON_OFF) == LOW);
+  if (pulsadorAhora && !pulsadorAntes) {
+    alarmaEncendida = !alarmaEncendida;
+    delay(50);
+  }
+  pulsadorAntes = pulsadorAhora;
+
+  if (!alarmaEncendida) {
+    digitalWrite(LED_ALARMA, LOW);
+    return;
+  }
+
+  long distancia = medirDistanciaCm();
+  int sensibilidadCm = map(analogRead(POTENCIOMETRO), 0, 1023, 10, 100);
+
+  if (distancia > 0 && distancia <= sensibilidadCm) {
+    int pausa = map(distancia, 0, sensibilidadCm, 50, 400); // mas cerca = parpadeo mas rapido
+    digitalWrite(LED_ALARMA, HIGH);
+    delay(pausa / 2);
+    digitalWrite(LED_ALARMA, LOW);
+    delay(pausa / 2);
+  } else {
+    digitalWrite(LED_ALARMA, LOW);
+  }
+}
+
+long medirDistanciaCm() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long duracion = pulseIn(ECHO, HIGH, 25000);
+  if (duracion == 0) return -1;
+  return duracion / 58;
+}
+`
+
+// ---------------------------------------------------------------------------
 // Armado de cada proyecto
 // ---------------------------------------------------------------------------
 
@@ -455,6 +840,76 @@ export function construirReflejos(): RobotDoc {
   return b.terminar(REFLEJOS)
 }
 
+// Kit de 9no: todo con Arduino Nano y los pines de la guía (LED D8, TRIG D9,
+// ECHO D10, servo D6, potenciómetro A0, pulsador D2).
+const NANO = 'arduino-nano'
+const D8 = '#4f46e5'
+
+export function construirLedTapa(): RobotDoc {
+  const b = new Banco('LED indicador', NANO)
+  b.ledConResistencia('led-verde', 2, 'D8', D8)
+  return b.terminar(LED_TAPA)
+}
+
+export function construirMideDistancia(): RobotDoc {
+  const b = new Banco('Mide distancia', NANO)
+  b.ultrasonido()
+  return b.terminar(MIDE_DISTANCIA)
+}
+
+export function construirMueveServo(): RobotDoc {
+  const b = new Banco('Mueve el servomotor', NANO)
+  b.servo()
+  return b.terminar(MUEVE_SERVO)
+}
+
+export function construirBasurero(): RobotDoc {
+  const b = new Banco('Basurero inteligente', NANO)
+  const basurero = b.montar('maqueta-basurero', 'protoboard', 'maqueta')
+  b.ultrasonido(basurero, 'sensor')
+  const sv = b.servo(basurero, 'servo')
+  b.montar('tapa-basurero', sv, 'eje')
+  b.ledConResistencia('led-verde', 2, 'D8', D8)
+  return b.terminar(BASURERO)
+}
+
+export function construirContador(): RobotDoc {
+  const b = new Banco('Contador de personas', NANO)
+  b.ultrasonido()
+  b.ledConResistencia('led-amarillo', 2, 'D8', D8)
+  return b.terminar(CONTADOR)
+}
+
+export function construirDispensador(): RobotDoc {
+  const b = new Banco('Dispensador automático', NANO)
+  b.ultrasonido()
+  b.servo()
+  b.ledConResistencia('led-verde', 2, 'D8', D8)
+  return b.terminar(DISPENSADOR)
+}
+
+export function construirPuerta(): RobotDoc {
+  const b = new Banco('Puerta automática', NANO)
+  b.ultrasonido()
+  b.servo()
+  b.ledConResistencia('led-verde', 2, 'D8', D8)
+  return b.terminar(PUERTA)
+}
+
+export function construirAlarmaProximidad(): RobotDoc {
+  const b = new Banco('Alarma de proximidad', NANO)
+  b.ultrasonido()
+  b.ledConResistencia('led-rojo', 2, 'D8', D8)
+  const pt = b.poner('potenciometro-10k', 5)
+  b.cable([pt, '1'], ['placa', '5V'], ROJO)
+  b.cable([pt, 'W'], ['placa', 'A0'], '#22c55e')
+  b.cable([pt, '2'], ['placa', 'GND'], NEGRO)
+  const p = b.poner('pulsador', 7)
+  b.cable([p, '1'], ['placa', 'D2'], '#3b82f6')
+  b.cable([p, '2'], ['placa', 'GND'], NEGRO)
+  return b.terminar(ALARMA_PROXIMIDAD)
+}
+
 // ---------------------------------------------------------------------------
 // Plantillas para cualquier circuito (usan los pines que tenga cada uno)
 // ---------------------------------------------------------------------------
@@ -498,6 +953,20 @@ export function plantillasCircuito(doc: RobotDoc, tabla: FilaPin[]): PlantillaCo
       codigo: `// Muestra en el Monitor Serie lo que lee la entrada analógica.\nconst int SENSOR = ${pin(a.p.id, a.pin)};\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int valor = analogRead(SENSOR);   // 0 a 1023\n  Serial.println(valor);\n  delay(200);\n}\n`,
     })
   }
+  const ultras = de('ultrasonido').filter(u => pinDePlaca(tabla, u.id, 'TRIG') && pinDePlaca(tabla, u.id, 'ECHO'))
+  if (ultras.length) {
+    out.push({
+      id: 'distancia', nombre: 'Medir distancia', descripcion: 'HC-SR04 en el Monitor Serie',
+      codigo: MIDE_DISTANCIA.replace('const int TRIG = 9;', `const int TRIG = ${pin(ultras[0].id, 'TRIG')};`).replace('const int ECHO = 10;', `const int ECHO = ${pin(ultras[0].id, 'ECHO')};`),
+    })
+  }
+  const servos = de('servo').filter(sv => pinDePlaca(tabla, sv.id, 'SIG'))
+  if (servos.length) {
+    out.push({
+      id: 'servo', nombre: 'Mover el servo', descripcion: 'De 0° a 90° y de vuelta',
+      codigo: MUEVE_SERVO.replace('const int SERVO_PIN = 6;', `const int SERVO_PIN = ${pin(servos[0].id, 'SIG')};`),
+    })
+  }
   out.push({ id: 'blink', nombre: 'Blink (LED de la placa)', descripcion: 'El LED «L» del pin 13', codigo: `void setup() {\n  pinMode(LED_BUILTIN, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_BUILTIN, HIGH);\n  delay(500);\n  digitalWrite(LED_BUILTIN, LOW);\n  delay(500);\n}\n` })
   return out
 }
@@ -507,6 +976,7 @@ export function plantillasCircuito(doc: RobotDoc, tabla: FilaPin[]): PlantillaCo
 // ---------------------------------------------------------------------------
 
 const KIT_8VO = 'Kit 8vo EGB · Semáforo'
+const KIT_9NO = 'Kit 9no EGB · Basurero'
 
 const conPlantillas = (principal: { id: string; nombre: string; descripcion: string; codigo: string }[]) =>
   (doc: RobotDoc, tabla: FilaPin[]) => [...principal, ...plantillasCircuito(doc, tabla).filter(p => !principal.some(x => x.id === p.id))]
@@ -551,6 +1021,70 @@ export const PROYECTOS_CIRCUITO: Prearmado[] = [
     logica: ['Verde 5 s, mirando el botón todo el tiempo (millis)', 'Si un peatón presiona, lo anota y corta el verde', 'Amarillo 1,5 s', 'Rojo 4 s; si había peatón, tres pitidos para cruzar'],
     construir: construirSemaforo,
     plantillas: conPlantillas([{ id: 'semaforo', nombre: 'Semáforo inteligente (kit)', descripcion: 'Con paso peatonal y aviso sonoro', codigo: SEMAFORO }, { id: 'tres-leds', nombre: 'Solo la secuencia', descripcion: 'Sin botón ni buzzer', codigo: TRES_LEDS }]),
+  },
+  {
+    id: 'led-tapa', categoria: 'electronica', kit: KIT_9NO,
+    nombre: 'LED indicador', dificultad: 'inicial', arena: 'mesa-electronica',
+    descripcion: 'Práctica con el Arduino Nano: el LED del pin 8 parpadea. Es el que después avisa que la tapa del basurero está abierta.',
+    logica: ['Pin 8 en HIGH: el LED se enciende', 'Espera medio segundo', 'Pin 8 en LOW: se apaga', 'Vuelve a empezar'],
+    construir: construirLedTapa,
+    plantillas: conPlantillas([{ id: 'led-tapa', nombre: 'Parpadeo (kit)', descripcion: 'El LED del pin 8', codigo: LED_TAPA }]),
+  },
+  {
+    id: 'mide-distancia', categoria: 'electronica', kit: KIT_9NO,
+    nombre: 'Mide distancia con el ultrasónico', dificultad: 'inicial', arena: 'mesa-electronica',
+    descripcion: 'El HC-SR04 mide a qué distancia está tu mano. Acércala o aléjala con el control del panel y mira los centímetros en el Monitor Serie.',
+    logica: ['Un pulso de 10 µs en TRIG dispara el sonido', 'pulseIn mide cuánto tarda el eco en ECHO', 'Microsegundos ÷ 58 = centímetros', 'Lo escribe en el Monitor Serie'],
+    construir: construirMideDistancia,
+    plantillas: conPlantillas([{ id: 'mide-distancia', nombre: 'Medir distancia (kit)', descripcion: 'Centímetros en el Monitor Serie', codigo: MIDE_DISTANCIA }]),
+  },
+  {
+    id: 'mueve-servo', categoria: 'electronica', kit: KIT_9NO,
+    nombre: 'Mueve el servomotor', dificultad: 'inicial', arena: 'mesa-electronica',
+    descripcion: 'El servo SG90 va de 0° a 90° y vuelve, una y otra vez. Así abrirá la tapa del basurero.',
+    logica: ['La librería Servo genera los pulsos', 'write(0): el brazo va a 0°', 'Espera 0,8 s', 'write(90): va a 90° y repite'],
+    construir: construirMueveServo,
+    plantillas: conPlantillas([{ id: 'mueve-servo', nombre: 'Mover el servo (kit)', descripcion: '0° ↔ 90°', codigo: MUEVE_SERVO }]),
+  },
+  {
+    id: 'basurero', categoria: 'electronica', kit: KIT_9NO,
+    nombre: 'Basurero inteligente', dificultad: 'intermedio', arena: 'mesa-electronica',
+    descripcion: 'El proyecto del kit de 9no: acerca la mano y la tapa se abre sola. El LED parpadea para confirmar y queda encendido mientras la tapa está abierta.',
+    logica: ['Mide la distancia con el ultrasónico todo el tiempo', 'Si hay algo a 15 cm o menos, el servo abre la tapa (90°)', 'El LED parpadea 3 veces y queda encendido', 'A los 3 s cierra la tapa (0°) y apaga el LED'],
+    construir: construirBasurero,
+    plantillas: conPlantillas([{ id: 'basurero', nombre: 'Basurero inteligente (kit)', descripcion: 'Tapa automática con aviso del LED', codigo: BASURERO }]),
+  },
+  {
+    id: 'contador-personas', categoria: 'electronica', kit: KIT_9NO,
+    nombre: 'Contador de personas', dificultad: 'intermedio', arena: 'mesa-electronica',
+    descripcion: 'Cada vez que pasa algo frente al sensor suma 1. Acerca y aleja la mano: el total aparece en el Monitor Serie y el LED confirma.',
+    logica: ['Mide la distancia cada 0,15 s', 'Algo a 20 cm o menos = alguien pasando', 'Solo cuenta cuando recién aparece (no mientras sigue ahí)', 'Muestra el total y enciende el LED'],
+    construir: construirContador,
+    plantillas: conPlantillas([{ id: 'contador-personas', nombre: 'Contador de personas (kit)', descripcion: 'Cuenta en el Monitor Serie', codigo: CONTADOR }]),
+  },
+  {
+    id: 'dispensador', categoria: 'electronica', kit: KIT_9NO,
+    nombre: 'Dispensador automático', dificultad: 'intermedio', arena: 'mesa-electronica',
+    descripcion: 'Al acercar la mano a 10 cm o menos, el servo abre la compuerta un segundo y el LED confirma, como un dispensador de gel.',
+    logica: ['Mide la distancia', 'Si la mano está a 10 cm o menos, abre la compuerta (90°) y prende el LED', 'Espera 1 s y cierra', 'Espera 1 s más antes de volver a medir'],
+    construir: construirDispensador,
+    plantillas: conPlantillas([{ id: 'dispensador', nombre: 'Dispensador (kit)', descripcion: 'Compuerta de 1 s', codigo: DISPENSADOR }]),
+  },
+  {
+    id: 'puerta-automatica', categoria: 'electronica', kit: KIT_9NO,
+    nombre: 'Puerta automática', dificultad: 'inicial', arena: 'mesa-electronica',
+    descripcion: 'La puerta (el servo) se abre cuando alguien está a 30 cm o menos y se queda abierta mientras siga cerca.',
+    logica: ['Mide la distancia cada 0,2 s', '¿Hay alguien a 30 cm o menos?', 'Sí: puerta a 90° y LED encendido', 'No: puerta a 0° y LED apagado'],
+    construir: construirPuerta,
+    plantillas: conPlantillas([{ id: 'puerta-automatica', nombre: 'Puerta automática (kit)', descripcion: 'Abierta mientras haya alguien', codigo: PUERTA }]),
+  },
+  {
+    id: 'alarma-proximidad', categoria: 'electronica', kit: KIT_9NO,
+    nombre: 'Alarma de proximidad', dificultad: 'intermedio', arena: 'mesa-electronica',
+    descripcion: 'El LED parpadea más rápido cuanto más cerca está tu mano. La perilla cambia desde qué distancia se activa y el pulsador enciende o apaga la alarma.',
+    logica: ['El pulsador prende o apaga la alarma', 'La perilla fija el alcance: de 10 a 100 cm', 'Si hay algo dentro del alcance, el LED parpadea', 'Más cerca = parpadeo más rápido (map)'],
+    construir: construirAlarmaProximidad,
+    plantillas: conPlantillas([{ id: 'alarma-proximidad', nombre: 'Alarma de proximidad (kit)', descripcion: 'Parpadeo según la distancia', codigo: ALARMA_PROXIMIDAD }]),
   },
   {
     id: 'pot-brillo', categoria: 'electronica',

@@ -52,6 +52,11 @@ export const PROTOBOARD: PiezaDef = {
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Lugar de la placa', posicion: [-127, 0, 0], rotacionesPermitidas: [0, 180] },
     ...huecos(),
+    // Módulos (E2): el HC-SR04 pinchado en el borde derecho, mirando hacia afuera (+x);
+    // un servo sobre la mesa, detrás de la protoboard; y la maqueta del proyecto a la derecha.
+    { id: 'sensor', tipo: 'sensor-frontal', nombre: 'Borde derecho (sensor)', posicion: [74, ALTO_PROTOBOARD, 0] },
+    { id: 'servo', tipo: 'soporte-servo', nombre: 'Detrás de la protoboard (servo)', posicion: [30, 0, -50] },
+    { id: 'maqueta', tipo: 'maqueta', nombre: 'Junto a la protoboard (maqueta)', posicion: [175, 0, 0] },
   ],
   encaja: [],
   pines: [],
@@ -232,4 +237,70 @@ export const LDR: PiezaDef = {
   datos: [['Con luz', '≈ 1 kΩ'], ['A oscuras', '≈ 1 MΩ'], ['Tipo', 'GL5528']],
 }
 
-export const PIEZAS_CIRCUITO: PiezaDef[] = [...LEDS, LED_RGB, ...RESISTENCIAS_PIEZAS, PULSADOR, BUZZER_PASIVO, BUZZER_ACTIVO, POTENCIOMETRO, LDR]
+// ---------------------------------------------------------------------------
+// Maqueta del basurero (E2, kit de 9no)
+// ---------------------------------------------------------------------------
+// Marco: origen en el centro de la base; el sensor va en la cara +x (la mano
+// llega por ese lado). La tapa cuelga de una bisagra en el borde de atrás
+// (−z), arriba, a lo largo de x: así se levanta de frente a la cámara. El
+// servo va acostado en un poste, en la esquina de atrás junto al sensor, con
+// su eje en la línea de la bisagra; la tapa se encastra en ese eje: con el
+// servo en 0° la tapa está cerrada (horizontal) y en 90° abierta (vertical),
+// como en el kit.
+
+/** Medidas del basurero (mm): base cuadrada y alto. */
+export const BASURERO = { lado: 100, alto: 110 }
+/** Eje del servo = punta de la bisagra de la tapa (esquina de atrás del lado del sensor, apenas sobre el borde). */
+export const BISAGRA_BASURERO: [number, number, number] = [52, 113, -52]
+/** Poste que sostiene el servo (x, z) y su alto (hasta la base del servo acostado). */
+export const POSTE_SERVO = { x: 68.5, z: -52, alto: 95 }
+
+export const MAQUETA_BASURERO: PiezaDef = {
+  id: 'maqueta-basurero',
+  nombre: 'Basurero (maqueta)',
+  familia: 'circuito',
+  descripcion: 'Un basurero pequeño para el proyecto de 9no: el sensor ultrasónico va en el frente y el servo, de costado junto a la bisagra, abre la tapa.',
+  modelo: 'proc:basurero',
+  masa_g: 120,
+  material: 'plastico',
+  color: '#15803d',
+  colisionadores: [
+    { forma: 'caja', medidas: [BASURERO.lado, BASURERO.alto, BASURERO.lado], centro: [0, BASURERO.alto / 2, 0] },
+    // Poste del servo.
+    { forma: 'caja', medidas: [10, POSTE_SERVO.alto, 10], centro: [POSTE_SERVO.x, POSTE_SERVO.alto / 2, POSTE_SERVO.z] },
+  ],
+  montajes: [
+    { id: 'sensor', tipo: 'sensor-frontal', nombre: 'Frente del basurero', posicion: [BASURERO.lado / 2 + 1, 40, 0] },
+    // Servo acostado (girado 90° en z): su +y (el eje) apunta a −x y su +x hacia
+    // arriba. El eje (6 mm en x y 28 mm en y, en el marco del servo) cae justo en la bisagra.
+    { id: 'servo', tipo: 'soporte-servo', nombre: 'Soporte del servo (bisagra)', posicion: [BISAGRA_BASURERO[0] + 28, BISAGRA_BASURERO[1] - 6, BISAGRA_BASURERO[2]], rotacion: [0, 0, 90] },
+  ],
+  encaja: ['maqueta'],
+  pines: [],
+  comportamiento: { tipo: 'maqueta' },
+  datos: [['Medidas', '100 × 100 × 110 mm'], ['Tapa', 'Con bisagra atrás, la mueve un servo'], ['Sensor', 'En el frente, mirando hacia afuera']],
+}
+
+/**
+ * Tapa del basurero. Marco = el del eje del servo acostado: el ancho va a lo
+ * largo del eje (+y), el largo hacia +x (vertical cuando el servo está en 90°)
+ * y el grosor hacia +z (queda abajo cuando la tapa se cierra).
+ */
+export const TAPA_BASURERO: PiezaDef = {
+  id: 'tapa-basurero',
+  nombre: 'Tapa del basurero',
+  familia: 'circuito',
+  descripcion: 'Va en el eje del servo: con 0° queda cerrada y con 90° abierta.',
+  modelo: 'proc:tapa-basurero',
+  masa_g: 15,
+  material: 'plastico',
+  color: '#166534',
+  colisionadores: [{ forma: 'caja', medidas: [BASURERO.lado + 4, BASURERO.lado + 4, 3], centro: [(BASURERO.lado + 4) / 2, (BASURERO.lado + 4) / 2, 1.5] }],
+  montajes: [],
+  encaja: ['eje-servo'],
+  pines: [],
+  comportamiento: { tipo: 'maqueta' },
+  datos: [['Medidas', '104 × 104 × 3 mm'], ['Cerrada', 'Servo en 0°'], ['Abierta', 'Servo en 90°']],
+}
+
+export const PIEZAS_CIRCUITO: PiezaDef[] = [...LEDS, LED_RGB, ...RESISTENCIAS_PIEZAS, PULSADOR, BUZZER_PASIVO, BUZZER_ACTIVO, POTENCIOMETRO, LDR, MAQUETA_BASURERO, TAPA_BASURERO]

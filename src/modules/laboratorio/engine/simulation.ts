@@ -206,6 +206,12 @@ export class Simulacion {
     if (!this.cargado) this.leerSensores()
   }
 
+  /** Acercar o alejar la mano del sensor ultrasónico (cm; null = quitarla). */
+  ponerMano(cm: number | null) {
+    this.controles.mano = cm
+    if (!this.cargado) this.leerSensores()
+  }
+
   pausar() { if (this.cargado) { this.corriendo = false; this.estado = 'pausado' } }
   continuar() { if (this.cargado) { this.corriendo = true; this.estado = 'corriendo'; this.ultimoCuadro = performance.now() } }
   get pausado() { return !this.corriendo }
@@ -275,7 +281,7 @@ export class Simulacion {
 
   private leerSensores() {
     const circuito = this.circuito && { plan: this.circuito, pines: this.cargado ? this.pines : null, controles: this.controles, quemados: this.quemados }
-    const e = leerSensores(this.plan, this.doc, this.fisica, this.reflectancia(), circuito)
+    const e = leerSensores(this.plan, this.doc, this.fisica, this.reflectancia(), circuito, this.controles.mano ?? null)
     this.sensores = e.lecturas
     this.ultrasonidos = e.ultrasonidos
     if (e.circuito) {

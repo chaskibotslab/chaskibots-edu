@@ -44,20 +44,32 @@ export interface EntornoCircuito {
   quemados: Set<string>
 }
 
-export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, reflectancia: FuncionReflectancia, circuito?: EntornoCircuito | null): Entradas {
+/** Origen y dirección (mundo) de un sensor, desde un punto y un eje de su marco. */
+function rayoDesde(ps: ReturnType<typeof poses>, fisica: RobotFisico, instancia: string, origen: [number, number, number], eje: { x: number; y: number; z: number }) {
+  const pose = ps.get(instancia)!
+  const o = fisica.puntoMundo(aRobot(pose, origen))
+  const d = fisica.direccionMundo(rotar(pose.rot, eje))
+  return { o, d }
+}
+
+/** Hacia dónde mira el primer sensor ultrasónico (mundo): ahí se pone la mano de la mesa de electrónica. */
+export function rayoUltrasonido(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico) {
+  const s = plan.ultrasonidos[0]
+  return s ? rayoDesde(poses(doc, fisica.angulosServo()), fisica, s.instancia, s.origen, { x: 1, y: 0, z: 0 }) : null
+}
+
+/**
+ * `mano`: distancia (cm) de la mano que el alumno pone delante del primer
+ * sensor ultrasónico (mesa de electrónica). Siempre está en el eje del
+ * sensor, así que el eco vuelve de ella si está más cerca que lo demás.
+ */
+export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, reflectancia: FuncionReflectancia, circuito?: EntornoCircuito | null, mano: number | null = null): Entradas {
   const digital: Record<string, boolean> = {}
   const analog: Record<string, number> = {}
   const ultrasonidos: UltrasonidoPines[] = []
   const lecturas: LecturaSensor[] = []
   const ps = poses(doc, fisica.angulosServo())
-
-  /** Origen y dirección (mundo) de un sensor, desde un punto y un eje de su marco. */
-  const rayoDe = (instancia: string, origen: [number, number, number], eje: { x: number; y: number; z: number }) => {
-    const pose = ps.get(instancia)!
-    const o = fisica.puntoMundo(aRobot(pose, origen))
-    const d = fisica.direccionMundo(rotar(pose.rot, eje))
-    return { o, d }
-  }
+  const rayoDe = (instancia: string, origen: [number, number, number], eje: { x: number; y: number; z: number }) => rayoDesde(ps, fisica, instancia, origen, eje)
 
   for (const s of plan.lineas) {
     const { o, d } = rayoDe(s.instancia, [0, 0, 0], { x: 0, y: -1, z: 0 })
@@ -75,7 +87,7 @@ export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, 
     })
   }
 
-  for (const s of plan.ultrasonidos) {
+  plan.ultrasonidos.forEach((s, n) => {
     // Cono de 5 rayos en el plano horizontal del sensor; vale el eco más cercano.
     let min: number | null = null
     for (let i = -2; i <= 2; i++) {
@@ -84,10 +96,11 @@ export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, 
       const t = fisica.rayo(o, d, s.alcanceCm / 100)
       if (t !== null && (min === null || t < min)) min = t
     }
+    if (n === 0 && mano !== null && mano <= s.alcanceCm && (min === null || mano / 100 < min)) min = mano / 100
     const cm = min === null ? null : min * 100
     if (s.trig && s.echo) ultrasonidos.push({ trig: s.trig, echo: s.echo, cm })
     lecturas.push({ tipo: 'ultrasonido', instancia: s.instancia, cm })
-  }
+  })
 
   for (const s of plan.obstaculos) {
     const { o, d } = rayoDe(s.instancia, s.origen, { x: 1, y: 0, z: 0 })

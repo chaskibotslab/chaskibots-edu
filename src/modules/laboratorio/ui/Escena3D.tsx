@@ -9,6 +9,8 @@ import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { ContactShadows, Environment, Lightformer, OrbitControls, PerformanceMonitor } from '@react-three/drei'
 import * as THREE from 'three'
 import Robot3D, { type MarcadorMontaje } from './Robot3D'
+import Mano3D from './modelos/Mano3D'
+import { resumen } from '../engine/ensamblaje'
 import type { Simulacion } from '../engine/simulation'
 import type { RobotDoc } from '../robots/doc'
 import { CALIDADES, CalidadContexto, type NivelCalidad } from './calidad'
@@ -304,12 +306,19 @@ function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
   const banco = !!sim.arena.banco
   useEffect(() => {
     const p = sim.fisica.body.translation()
+    // Mesa de electrónica: encuadrar todo lo que hay (protoboard, placa y, si está, la maqueta).
+    // Con sensor ultrasónico, también el lugar de la mano; y un margen a la derecha para el panel.
+    const r = banco ? resumen(sim.doc) : null
+    const minX = r ? r.min.x : 0
+    const maxX = r ? r.max.x + (sim.plan.ultrasonidos.length ? 130 : 0) + 40 : 0
+    const cx = (minX + maxX) / 2000
+    const k = r ? Math.max(1, (maxX - minX) / 1000 / 0.28) : 1
     if (modo === 'arriba') {
       // En la mesa de electrónica, «arriba» es mirar la protoboard desde encima.
-      if (banco) { camera.position.set(p.x - 0.04, 0.36, p.z + 0.001); controles.current?.target.set(p.x - 0.04, 0, p.z) }
+      if (banco) { camera.position.set(p.x + cx, 0.36 * k, p.z + 0.001); controles.current?.target.set(p.x + cx, 0, p.z) }
       else { camera.position.set(0, Math.max(sim.arena.ancho, sim.arena.largo) * 0.95, 0.001); controles.current?.target.set(0, 0, 0) }
     } else if (modo === 'libre') {
-      if (banco) { camera.position.set(p.x - 0.05, 0.16, p.z + 0.2); controles.current?.target.set(p.x - 0.04, 0.005, p.z) }
+      if (banco) { camera.position.set(p.x + cx - 0.01, 0.16 * k, p.z + 0.2 * k); controles.current?.target.set(p.x + cx, 0.005 * k, p.z) }
       else { camera.position.set(p.x - 0.6, 0.55, p.z + 0.6); controles.current?.target.set(p.x, 0.03, p.z) }
     }
     controles.current?.update()
@@ -350,6 +359,7 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel }: {
       <PisoArena sim={sim} version={versionArena} />
       {!sim.arena.banco && <Rastro sim={sim} version={versionArena} />}
       <Robot3D doc={sim.doc} sim={sim} />
+      {sim.arena.banco && sim.plan.ultrasonidos.length > 0 && <Mano3D sim={sim} />}
       {sim.competencia && <Robot3D doc={sim.competencia.rival.doc} sim={sim.competencia.rival} />}
       <ControlCamara sim={sim} modo={modoCamara} />
     </Lienzo>

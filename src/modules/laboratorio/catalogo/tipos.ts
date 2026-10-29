@@ -35,6 +35,7 @@ export type TipoMontaje =
   | 'soporte-servo'
   | 'eje-servo'       // lo que gira con el servo
   | 'protoboard'      // LED, resistencia, pulsador… pinchados en la protoboard
+  | 'maqueta'         // maqueta del proyecto (basurero…) junto a la protoboard
 
 export interface PuntoMontaje {
   id: string
@@ -107,6 +108,8 @@ export type Comportamiento =
   | { tipo: 'buzzer'; activo: boolean; ohm: number }
   | { tipo: 'potenciometro'; ohm: number }
   | { tipo: 'ldr'; ohmLuz: number; ohmOscuro: number }
+  /** Maqueta del proyecto (basurero, su tapa): no tiene pines, solo se ve y se mueve con el servo. */
+  | { tipo: 'maqueta' }
   /** Pieza que se ve en el catálogo pero todavía no se simula (llega en una fase futura). */
   | { tipo: 'sin-simular' }
 

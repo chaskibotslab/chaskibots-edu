@@ -278,8 +278,11 @@ function etiquetaPara(doc: RobotDoc, def: PiezaDef, instancia: string, m: PuntoM
   const corto = def.nombre.split(' ')[0]
   // En el chasis, el nombre del montaje ya describe la pieza ("Motor izquierdo");
   // la placa y el driver se llaman por su modelo.
+  // En la maqueta (basurero) cada pieza se llama por lo que es: «Sensor ultrasónico HC-SR04».
+  if (pieza(destino.pieza).comportamiento.tipo === 'maqueta') return def.nombre
   if (!destino.padre) {
-    if (m.tipo === 'protoboard') {
+    // En la mesa de electrónica, también lo que va junto a la protoboard (sensor, servo, maqueta).
+    if (m.tipo === 'protoboard' || (pieza(destino.pieza).comportamiento.tipo === 'protoboard' && m.tipo !== 'placa')) {
       // En la protoboard se llaman por lo que son: «LED rojo», «LED rojo 2»…
       const iguales = doc.piezas.filter(p => p.pieza === def.id).length
       return iguales ? `${def.nombre} ${iguales + 1}` : def.nombre

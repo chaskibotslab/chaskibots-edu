@@ -111,7 +111,8 @@ describe('proyectos de electrónica', () => {
     for (const p of PROYECTOS_CIRCUITO) {
       const doc = p.construir()
       expect(verificar(doc).map(x => x.texto), p.id).toEqual([])
-      const plan = planCircuito(doc)!
+      const plan = planCircuito(doc)
+      if (!plan) continue // solo módulos (sensor, servo): no hay circuito en la protoboard
       // Con todos los pines en HIGH ningún LED se quema.
       const altos = Object.fromEntries(plan.pines.map(x => [x.pin, salida(1)]))
       expect(resolverCircuito(plan, altos, sinTocar, new Set()).quemados, p.id).toEqual([])

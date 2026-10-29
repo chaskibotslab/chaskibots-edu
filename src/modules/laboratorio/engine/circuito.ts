@@ -65,7 +65,13 @@ export interface ControlesCircuito {
   botones: Record<string, boolean>
   /** 0–1: giro del potenciómetro o luz sobre la LDR. */
   perillas: Record<string, number>
+  /** Mano delante del (primer) sensor ultrasónico de la mesa: distancia en cm; sin valor = no hay mano. */
+  mano?: number | null
 }
+
+/** Distancias que se pueden elegir para la mano (cm). */
+export const MANO_MIN_CM = 2
+export const MANO_MAX_CM = 60
 
 export interface EstadoCircuito {
   /** Brillo 0–1 de cada LED (un valor; tres en el RGB). */
