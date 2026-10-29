@@ -8,6 +8,7 @@
 
 import type { RobotDoc } from '../robots/doc'
 import type { PinReport } from './avrRunner'
+import { resolverCircuito, type ControlesCircuito, type EstadoCircuito, type PlanCircuito } from './circuito'
 import { irAnalogVolts, irDigital, l298nChannel, servoPulseToAngle, voltsToAdc } from './bridge'
 import { aRobot, poses } from './ensamblaje'
 import type { RobotFisico } from './fisica/robotFisico'
@@ -25,12 +26,25 @@ export type LecturaSensor =
 
 export interface Entradas {
   digital: Record<string, boolean>
+  /** Entradas del circuito que dependen del pull-up: [sin, con] (ver AvrRunner.setDigitalInputDoble). */
+  dobles: Record<string, [boolean, boolean]>
   analog: Record<string, number>
   ultrasonidos: UltrasonidoPines[]
   lecturas: LecturaSensor[]
+  /** Estado del circuito de la protoboard (LED, pulsadores…), si hay. */
+  circuito: EstadoCircuito | null
 }
 
-export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, reflectancia: FuncionReflectancia): Entradas {
+/** Lo que hace falta para resolver el circuito: su plan, los pines del último paso y lo que toca el alumno. */
+export interface EntornoCircuito {
+  plan: PlanCircuito
+  pines: Record<string, PinReport> | null
+  controles: ControlesCircuito
+  /** LED quemados en esta corrida (se agregan los que se queman ahora). */
+  quemados: Set<string>
+}
+
+export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, reflectancia: FuncionReflectancia, circuito?: EntornoCircuito | null): Entradas {
   const digital: Record<string, boolean> = {}
   const analog: Record<string, number> = {}
   const ultrasonidos: UltrasonidoPines[] = []
@@ -82,7 +96,15 @@ export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, 
     lecturas.push({ tipo: 'obstaculo', instancia: s.instancia, detecta, pin: s.out })
   }
 
-  return { digital, analog, ultrasonidos, lecturas }
+  // Circuito: sus entradas se resuelven con los pines del paso anterior (un paso = pocos ms).
+  let estado: EstadoCircuito | null = null
+  if (circuito) {
+    estado = resolverCircuito(circuito.plan, circuito.pines, circuito.controles, circuito.quemados)
+    for (const q of estado.quemados) circuito.quemados.add(q)
+    Object.assign(analog, estado.analog)
+  }
+
+  return { digital, dobles: estado?.entradas ?? {}, analog, ultrasonidos, lecturas, circuito: estado }
 }
 
 

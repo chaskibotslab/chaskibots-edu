@@ -23,7 +23,7 @@ export interface InfoPlaca {
   alimServo: string
   /** Pines de la placa que dan alimentación a otras piezas. */
   fuentes: string[]
-  preferencias: Record<'en' | 'in' | 'lineaDigital' | 'lineaAnalogica' | 'obstaculo' | 'trig' | 'echo' | 'servo', string[]>
+  preferencias: Record<'en' | 'in' | 'lineaDigital' | 'lineaAnalogica' | 'obstaculo' | 'trig' | 'echo' | 'servo' | 'led' | 'boton' | 'buzzer' | 'analogica', string[]>
   /** Pines que no se usan solos (Serial). */
   reservados: string[]
 }
@@ -37,6 +37,11 @@ const ARDUINO_PREF: InfoPlaca['preferencias'] = {
   trig: ['D12', 'D4', 'D13', 'A2', 'A3', 'A4'],
   echo: ['D11', 'D2', 'D3', 'D4', 'A3', 'A4', 'A5'],
   servo: ['D3', 'D4', 'D13', 'D11', 'D12', 'A2', 'A3', 'A4', 'A5'],
+  // Mesa de electrónica: como en el kit de 8vo (LED en D8–D10, pulsador en D2, buzzer en D7).
+  led: ['D8', 'D9', 'D10', 'D11', 'D12', 'D13', 'D6', 'D5', 'D3', 'D4'],
+  boton: ['D2', 'D3', 'D4', 'D12', 'D11', 'D13'],
+  buzzer: ['D7', 'D6', 'D5', 'D4', 'D12'],
+  analogica: ['A0', 'A1', 'A2', 'A3', 'A4', 'A5'],
 }
 
 // ESP32 DevKit V1: cualquier GPIO de salida da PWM (LEDC); 34–39 son solo
@@ -50,6 +55,10 @@ const ESP32_PREF: InfoPlaca['preferencias'] = {
   trig: ['GPIO5', 'GPIO18'],
   echo: ['GPIO19', 'GPIO21'],
   servo: ['GPIO23', 'GPIO22', 'GPIO13'],
+  led: ['GPIO25', 'GPIO26', 'GPIO27', 'GPIO14', 'GPIO12', 'GPIO13', 'GPIO33'],
+  boton: ['GPIO4', 'GPIO16', 'GPIO17', 'GPIO18', 'GPIO19'],
+  buzzer: ['GPIO23', 'GPIO22', 'GPIO21'],
+  analogica: ['GPIO34', 'GPIO35', 'GPIO32', 'GPIO33', 'GPIO36', 'GPIO39'],
 }
 
 const INFO: Record<Placa, InfoPlaca> = {

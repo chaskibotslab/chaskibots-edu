@@ -13,7 +13,7 @@ import {
 import { FAMILIAS, type Familia, type PiezaDef } from '../../catalogo/tipos'
 import { LISTA_PIEZAS, datosVariante, pieza, piezasDe } from '../../catalogo/piezas'
 import {
-  avisosEnsamblaje, descendientes, encastrar, girar, montajeDe, montajesLibres, motivoNoEncastra, quitar, reemplazar, resumen, cambiarVariante,
+  avisosEnsamblaje, descendientes, esBanco, encastrar, girar, montajeDe, montajesLibres, motivoNoEncastra, quitar, reemplazar, resumen, cambiarVariante,
 } from '../../engine/ensamblaje'
 import type { RobotDoc } from '../../robots/doc'
 import { CREDITOS_MODELOS } from '../../catalogo/creditosModelos'
@@ -25,7 +25,7 @@ const EscenaTaller = dynamic(() => import('../Escena3D').then(m => m.EscenaTalle
   loading: () => <div className="flex h-full items-center justify-center gap-2 text-sm text-slate-400"><Loader2 className="h-5 w-5 animate-spin" /> Preparando el taller…</div>,
 })
 
-const ICONO_FAMILIA: Record<Familia, string> = { chasis: '🛠️', placa: '🧠', movimiento: '⚙️', servo: '🦾', sensor: '👁️', electronica: '🔋' }
+const ICONO_FAMILIA: Record<Familia, string> = { chasis: '🛠️', placa: '🧠', movimiento: '⚙️', servo: '🦾', sensor: '👁️', electronica: '🔋', circuito: '💡' }
 
 interface Props {
   doc: RobotDoc
@@ -42,7 +42,10 @@ interface Props {
 
 export default function Armar(p: Props) {
   const { doc, cambiar, avisar } = p
-  const [familia, setFamilia] = useState<Familia | 'robot'>('movimiento')
+  const banco = esBanco(doc)
+  const [familia, setFamilia] = useState<Familia | 'robot'>(banco ? 'circuito' : 'movimiento')
+  // Al abrir otro proyecto, el cajón se abre en lo que más se usa: componentes o motores.
+  useEffect(() => { setFamilia(f => (f === 'robot' ? f : banco ? 'circuito' : f === 'circuito' ? 'movimiento' : f)) }, [banco])
   const [elegida, setElegida] = useState<string | null>(null)
   const [seleccion, setSeleccion] = useState<string | null>(null)
   const [arrastre, setArrastre] = useState<{ pieza: string; x: number; y: number; x0: number; y0: number; iniciado: boolean } | null>(null)

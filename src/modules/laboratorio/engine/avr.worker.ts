@@ -17,7 +17,7 @@ import { Ultrasonidos, type UltrasonidoPines } from './hcsr04'
 
 export type WorkerIn =
   | { type: 'load'; hex: string; chip: Chip }
-  | { type: 'step'; cycles: number; digital: Record<string, boolean>; analog: Record<string, number>; ultrasonidos: UltrasonidoPines[]; serial?: string }
+  | { type: 'step'; cycles: number; digital: Record<string, boolean>; dobles?: Record<string, [boolean, boolean]>; analog: Record<string, number>; ultrasonidos: UltrasonidoPines[]; serial?: string }
 
 export type WorkerOut =
   | { type: 'loaded' }
@@ -39,6 +39,7 @@ ctx.onmessage = (e: MessageEvent<WorkerIn>) => {
     }
     if (msg.type === 'step' && runner) {
       for (const [pin, v] of Object.entries(msg.digital)) runner.setDigitalInput(pin, v)
+      for (const [pin, [sin, con]] of Object.entries(msg.dobles ?? {})) runner.setDigitalInputDoble(pin, sin, con)
       for (const [pin, v] of Object.entries(msg.analog)) runner.setAnalogInput(pin, v)
       ultrasonidos?.actualizar(msg.ultrasonidos)
       if (msg.serial) runner.serialWrite(msg.serial)

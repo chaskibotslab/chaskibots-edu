@@ -8,6 +8,8 @@ import type { ProgramaBloques } from '../bloques/generador'
 import { encastrar, robotVacio } from '../engine/ensamblaje'
 import { infoPlaca } from '../engine/placa'
 import type { RobotDoc } from './doc'
+import { PROYECTOS_CIRCUITO, plantillasCircuito } from './circuitos'
+import { esBanco } from '../engine/ensamblaje'
 
 export interface PlantillaCodigo { id: string; nombre: string; descripcion: string; codigo: string; bloques?: ProgramaBloques }
 
@@ -19,6 +21,10 @@ export interface Prearmado {
   /** Cómo piensa el robot, paso a paso (se muestra en la galería). */
   logica: string[]
   arena: string
+  /** Robot o proyecto de la mesa de electrónica (por defecto, robot). */
+  categoria?: 'robot' | 'electronica'
+  /** Kit de la plataforma al que corresponde (se muestra en la galería). */
+  kit?: string
   construir: () => RobotDoc
   plantillas: (doc: RobotDoc, tabla: FilaPin[]) => PlantillaCodigo[]
 }
@@ -1059,10 +1065,12 @@ export const PREARMADOS: Prearmado[] = [
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
     ],
   },
+  ...PROYECTOS_CIRCUITO,
 ]
 
 /** Plantillas genéricas para un robot armado desde cero. */
 export function plantillasGenericas(doc: RobotDoc, tabla: FilaPin[]): PlantillaCodigo[] {
+  if (esBanco(doc)) return plantillasCircuito(doc, tabla)
   const out: PlantillaCodigo[] = []
   if (driverDe(doc)) out.push({ id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) })
   if (doc.piezas.some(p => p.padre?.montaje === 'piso-izq') && doc.piezas.some(p => p.padre?.montaje === 'piso-der')) {

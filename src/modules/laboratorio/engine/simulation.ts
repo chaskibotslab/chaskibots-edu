@@ -17,6 +17,7 @@ import { construirMinisumo } from '../robots/prearmados'
 import { Competencia, type EstadoCombate, type NivelRival } from './competencia'
 import { CPU_FREQ_HZ, type PinReport, type StepResult } from './avrRunner'
 import type { WorkerIn, WorkerOut } from './avr.worker'
+import { planCircuito, type ControlesCircuito, type EstadoCircuito, type PlanCircuito } from './circuito'
 import { avisosEnsamblaje } from './ensamblaje'
 import { Mundo, iniciarRapier, type Gravedad } from './fisica/mundo'
 import { Reloj, RobotFisico } from './fisica/robotFisico'
@@ -44,6 +45,8 @@ export interface Telemetria {
   avisos: string[]
   /** Solo en arenas de competencia (sumo, minisumo). */
   combate?: EstadoCombate
+  /** Solo si hay componentes en la protoboard. */
+  circuito?: EstadoCircuito
   error?: string
 }
 
@@ -62,6 +65,14 @@ export class Simulacion {
   private nivelRival: NivelRival = 'cazador'
   /** Programa cargado: hace falta para reiniciar el micro en cada ronda. */
   private hex: string | null = null
+  /** Circuito de la protoboard (null si el robot no tiene componentes sueltos). */
+  readonly circuito: PlanCircuito | null
+  /** Pulsadores presionados y perillas, tal como los deja el alumno en «Probar». */
+  readonly controles: ControlesCircuito = { botones: {}, perillas: {} }
+  private quemados = new Set<string>()
+  /** Lo que pasó en el circuito durante esta corrida (LED quemados). */
+  private avisosCircuito: string[] = []
+  private estadoCircuito: EstadoCircuito | null = null
 
   private worker: Worker | null = null
   private cargado = false
@@ -85,10 +96,13 @@ export class Simulacion {
   onSerial: (texto: string) => void = () => {}
   onTelemetria: (t: Telemetria) => void = () => {}
   onArenaCambiada: () => void = () => {}
+  /** En cada paso: lo que suena (buzzers). Lo usa el audio de la interfaz. */
+  onSonidos: (s: EstadoCircuito['sonidos']) => void = () => {}
 
   constructor(doc: RobotDoc) {
     this.doc = doc
     this.plan = planDe(doc)
+    this.circuito = planCircuito(doc)
     this.avisos = Array.from(new Set([...avisosEnsamblaje(doc), ...this.plan.avisos]))
   }
 
@@ -133,6 +147,8 @@ export class Simulacion {
   async cargarPrograma(hex: string): Promise<void> {
     this.hex = hex
     this.tiempoSim = 0
+    this.quemados = new Set() // como cambiar los LED quemados antes de volver a probar
+    this.avisosCircuito = []
     if (this.competencia) this.competencia.empezar()
     else this.fisica.colocar(this.arena.inicio)
     return this.encender(hex)
@@ -168,6 +184,7 @@ export class Simulacion {
     this.pines = {}
     this.estado = 'sin-programa'
     this.hex = null
+    this.onSonidos([])
     this.competencia?.detener()
     for (const r of this.fisica.ruedas) r.volts = 0
   }
@@ -175,6 +192,19 @@ export class Simulacion {
   /** Estado de pines y sensores del último paso (para animar LEDs en 3D). */
   get pinesActuales(): Record<string, PinReport> { return this.cargado ? this.pines : {} }
   get lecturasActuales(): LecturaSensor[] { return this.sensores }
+  get circuitoActual(): EstadoCircuito | null { return this.estadoCircuito }
+
+  /** Presionar o soltar un pulsador de la protoboard. */
+  presionar(inst: string, presionado: boolean) {
+    this.controles.botones[inst] = presionado
+    if (!this.cargado) this.leerSensores() // que el LED responda aunque no haya programa
+  }
+
+  /** Girar un potenciómetro o cambiar la luz sobre una LDR (0–1). */
+  ajustar(inst: string, valor: number) {
+    this.controles.perillas[inst] = valor
+    if (!this.cargado) this.leerSensores()
+  }
 
   pausar() { if (this.cargado) { this.corriendo = false; this.estado = 'pausado' } }
   continuar() { if (this.cargado) { this.corriendo = true; this.estado = 'corriendo'; this.ultimoCuadro = performance.now() } }
@@ -222,9 +252,9 @@ export class Simulacion {
     if (this.pendiente || !this.worker || !this.corriendo) return
     const dt = Math.min(this.atraso, MAX_PASO_S)
     if (dt < 0.002) return
-    const { digital, analog } = this.leerSensores()
+    const { digital, dobles, analog } = this.leerSensores()
     this.pendiente = true
-    const msg: WorkerIn = { type: 'step', cycles: Math.round(dt * CPU_FREQ_HZ), digital, analog, ultrasonidos: this.ultrasonidos }
+    const msg: WorkerIn = { type: 'step', cycles: Math.round(dt * CPU_FREQ_HZ), digital, dobles, analog, ultrasonidos: this.ultrasonidos }
     if (this.serialPendiente) { msg.serial = this.serialPendiente; this.serialPendiente = '' }
     this.worker.postMessage(msg)
   }
@@ -244,9 +274,15 @@ export class Simulacion {
   }
 
   private leerSensores() {
-    const e = leerSensores(this.plan, this.doc, this.fisica, this.reflectancia())
+    const circuito = this.circuito && { plan: this.circuito, pines: this.cargado ? this.pines : null, controles: this.controles, quemados: this.quemados }
+    const e = leerSensores(this.plan, this.doc, this.fisica, this.reflectancia(), circuito)
     this.sensores = e.lecturas
     this.ultrasonidos = e.ultrasonidos
+    if (e.circuito) {
+      this.estadoCircuito = e.circuito
+      this.avisosCircuito.push(...e.circuito.avisos)
+      this.onSonidos(e.circuito.sonidos)
+    }
     return e
   }
 
@@ -303,13 +339,15 @@ export class Simulacion {
       })),
       servos: Array.from(this.fisica.servos.values()).map(s => ({ instancia: s.instancia, angulo: s.angulo })),
       velocidadRobot: pose.velocidad,
-      avisos: this.avisos,
+      avisos: this.avisosCircuito.length ? [...this.avisos, ...this.avisosCircuito] : this.avisos,
       error: this.error,
+      circuito: this.estadoCircuito ?? undefined,
       combate: this.competencia ? { ...this.competencia.estado, marcador: { ...this.competencia.estado.marcador } } : undefined,
     })
   }
 
   liberar() {
+    this.onSonidos([])
     cancelAnimationFrame(this.raf)
     this.worker?.terminate()
     this.mundo?.liberar()

@@ -117,8 +117,24 @@ export function mesa(): ArenaDef {
   }
 }
 
+/** Mesa de electrónica: el escritorio donde está la protoboard (no hay nada que recorrer). */
+export function mesaElectronica(): ArenaDef {
+  return {
+    id: 'mesa-electronica',
+    nombre: 'Mesa de electrónica',
+    descripcion: 'El escritorio con la protoboard y la placa.',
+    ancho: 0.9, largo: 0.6,
+    piso: { material: 'melamina', color: '#8a6240', reflectancia: 0.5 },
+    objetos: [],
+    paredes: false,
+    banco: true,
+    // La protoboard queda al centro de la vista (la placa va a su izquierda).
+    inicio: { x: 0.05, z: 0, yaw: 0 },
+  }
+}
+
 export function listaArenas(): ArenaDef[] {
-  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), mesa(), dohyo('minisumo'), dohyo('sumo')]
+  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), mesa(), dohyo('minisumo'), dohyo('sumo'), mesaElectronica()]
 }
 
 export function arena(id: string): ArenaDef {

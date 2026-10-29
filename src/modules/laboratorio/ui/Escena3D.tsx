@@ -203,6 +203,9 @@ function PisoArena({ sim, version }: { sim: Simulacion; version: number }) {
     sim.colocarRobot({ x: e.point.x, z: e.point.z, yaw: sim.fisica.pose().yaw })
   }
 
+  // Mesa de electrónica: el mismo escritorio con tapete de corte del taller.
+  if (arena.banco) return <Mesa />
+
   const bajo = arena.mesa ? -arena.mesa.altura : arena.dohyo ? -arena.dohyo.altura : 0
   return (
     <group>
@@ -298,17 +301,19 @@ function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
   const deseada = useMemo(() => new THREE.Vector3(), [])
   const objetivo = useMemo(() => new THREE.Vector3(), [])
 
+  const banco = !!sim.arena.banco
   useEffect(() => {
+    const p = sim.fisica.body.translation()
     if (modo === 'arriba') {
-      camera.position.set(0, Math.max(sim.arena.ancho, sim.arena.largo) * 0.95, 0.001)
-      controles.current?.target.set(0, 0, 0)
+      // En la mesa de electrónica, «arriba» es mirar la protoboard desde encima.
+      if (banco) { camera.position.set(p.x - 0.04, 0.36, p.z + 0.001); controles.current?.target.set(p.x - 0.04, 0, p.z) }
+      else { camera.position.set(0, Math.max(sim.arena.ancho, sim.arena.largo) * 0.95, 0.001); controles.current?.target.set(0, 0, 0) }
     } else if (modo === 'libre') {
-      const p = sim.fisica.body.translation()
-      camera.position.set(p.x - 0.6, 0.55, p.z + 0.6)
-      controles.current?.target.set(p.x, 0.03, p.z)
+      if (banco) { camera.position.set(p.x - 0.05, 0.16, p.z + 0.2); controles.current?.target.set(p.x - 0.04, 0.005, p.z) }
+      else { camera.position.set(p.x - 0.6, 0.55, p.z + 0.6); controles.current?.target.set(p.x, 0.03, p.z) }
     }
     controles.current?.update()
-  }, [modo, camera, sim])
+  }, [modo, camera, sim, banco])
 
   useFrame(() => {
     if (modo !== 'seguir' || !sim.fisica) return
@@ -328,8 +333,8 @@ function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
       makeDefault
       enableRotate={modo !== 'arriba'}
       maxPolarAngle={Math.PI / 2 - 0.05}
-      minDistance={0.12}
-      maxDistance={7}
+      minDistance={banco ? 0.05 : 0.12}
+      maxDistance={banco ? 1.2 : 7}
       enableDamping
     />
   )
@@ -343,7 +348,7 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel }: {
       <Estudio intensidad={0.6} />
       <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={2.2} />
       <PisoArena sim={sim} version={versionArena} />
-      <Rastro sim={sim} version={versionArena} />
+      {!sim.arena.banco && <Rastro sim={sim} version={versionArena} />}
       <Robot3D doc={sim.doc} sim={sim} />
       {sim.competencia && <Robot3D doc={sim.competencia.rival.doc} sim={sim.competencia.rival} />}
       <ControlCamara sim={sim} modo={modoCamara} />

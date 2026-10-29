@@ -43,6 +43,8 @@ export interface ArenaDef {
   dohyo?: { radio: number; borde: number; altura: number }
   /** Arena de competencia: reglamento, salidas por ronda y juez (engine/competencia.ts). */
   competencia?: ReglamentoSumo
+  /** Mesa de electrónica: cámara de cerca, sin rastro ni controles del robot. */
+  banco?: boolean
   /** Zona de llegada (solo visual). */
   meta?: { x: number; z: number; radio: number }
   inicio: Pose2D

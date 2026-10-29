@@ -29,7 +29,9 @@ import { verificar } from '../../engine/verificacion'
 import { infoPlaca } from '../../engine/placa'
 import ControlRemoto from './ControlRemoto'
 import { NIVELES_RIVAL, revisarReglamento, type NivelRival } from '../../engine/competencia'
-import { resumen } from '../../engine/ensamblaje'
+import { esBanco, resumen } from '../../engine/ensamblaje'
+import PanelCircuito from './PanelCircuito'
+import { SonidoBuzzers } from '../sonido'
 import type { ReglamentoSumo } from '../../arenas/tipos'
 
 const EscenaArena = dynamic(() => import('../Escena3D').then(m => m.EscenaArena), { ssr: false })
@@ -80,8 +82,15 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
   const [tele, setTele] = useState<Telemetria | null>(null)
   const [serial, setSerial] = useState('')
   const [entrada, setEntrada] = useState('')
-  const arenas = useMemo(() => listaArenas(), [])
+  // Mesa de electrónica: solo su escritorio; robots: las pistas y arenas.
+  const banco = esBanco(doc)
+  const arenas = useMemo(() => listaArenas().filter(a => !!a.banco === banco), [banco])
   const [arena, setArena] = useState<ArenaDef>(() => arenas.find(a => a.id === arenaInicial) ?? arenas[0])
+  const sonido = useRef<SonidoBuzzers | null>(null)
+  const [silencio, setSilencio] = useState(false)
+  const activarSonido = useCallback(() => { (sonido.current ??= new SonidoBuzzers()).activar() }, [])
+  useEffect(() => () => { sonido.current?.cerrar(); sonido.current = null }, [])
+  useEffect(() => { if (sonido.current) sonido.current.silencio = silencio }, [silencio])
   const [imagenPropia, setImagenPropia] = useState<{ nombre: string; img: HTMLImageElement } | null>(null)
   const [gravedad, setGravedad] = useState<Gravedad>('tierra')
   const [camara, setCamara] = useState<ModoCamara>('libre')
@@ -99,6 +108,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
     s.onTelemetria = setTele
     s.onSerial = t => setSerial(prev => (prev + t).slice(-MAX_SERIAL))
     s.onArenaCambiada = () => setVersionArena(v => v + 1)
+    s.onSonidos = l => sonido.current?.actualizar(l)
     let vivo = true
     s.iniciar(arena, gravedad, imagenPropia?.img).then(() => { if (vivo) { setSim(s); setVersionArena(v => v + 1) } })
     return () => { vivo = false; s.liberar(); setSim(null) }
@@ -115,6 +125,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
       return
     }
     setCompilando(true)
+    activarSonido()
     setAviso({ tipo: 'info', texto: 'Compilando con avr-gcc… (la primera vez puede tardar unos segundos)' })
     try {
       const res = await fetch('/api/lab/compile', {
@@ -147,7 +158,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
     } finally {
       setCompilando(false)
     }
-  }, [sim, codigo, compilando, doc])
+  }, [sim, codigo, compilando, doc, activarSonido])
 
   const cambiarArena = (id: string) => {
     if (id === 'propia' && imagenPropia) return
@@ -240,14 +251,17 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             </button>
           </>
         )}
-        <button onClick={() => setControl(c => !c)} className={`${boton} ${control ? 'border-lab-acento/50 text-lab-acento' : ''}`} title="Control remoto: manejar el robot con teclado, botones o un control">
-          <Gamepad2 className="h-4 w-4" /> <span className="hidden md:inline">Control</span>
-        </button>
+        {!banco && (
+          <button onClick={() => setControl(c => !c)} className={`${boton} ${control ? 'border-lab-acento/50 text-lab-acento' : ''}`} title="Control remoto: manejar el robot con teclado, botones o un control">
+            <Gamepad2 className="h-4 w-4" /> <span className="hidden md:inline">Control</span>
+          </button>
+        )}
         <button onClick={descargarIno} className={boton} title="Descargar el programa (.ino) para abrirlo en el Arduino IDE">
           <Download className="h-4 w-4" /> <span className="hidden md:inline">.ino</span>
         </button>
 
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          {!banco && <>
           <button onClick={() => sim?.colocarRobot()} className={boton} title="Volver a la salida">
             <RotateCcw className="h-4 w-4" /> <span className="hidden md:inline">Salida</span>
           </button>
@@ -274,8 +288,9 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
               {Object.entries(GRAVEDADES).map(([k, v]) => <option key={k} value={k}>{v.nombre}</option>)}
             </select>
           </label>
+          </>}
           <div className="flex h-9 overflow-hidden rounded-lg border border-lab-borde/15 text-sm">
-            {([['libre', 'Libre', Camera], ['seguir', 'Seguir', Navigation], ['arriba', 'Arriba', MapIcon]] as const).map(([id, txt, Icon]) => (
+            {([['libre', 'Libre', Camera], ['seguir', 'Seguir', Navigation], ['arriba', 'Arriba', MapIcon]] as const).filter(([id]) => !banco || id !== 'seguir').map(([id, txt, Icon]) => (
               <button key={id} onClick={() => setCamara(id)} title={`Cámara: ${txt}`} className={`flex items-center gap-1 px-2.5 ${camara === id ? 'bg-lab-acento/20 text-lab-acento' : 'bg-lab-fondo hover:bg-white/5'}`}>
                 <Icon className="h-3.5 w-3.5" /> <span className="hidden xl:inline">{txt}</span>
               </button>
@@ -341,11 +356,12 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                 <Loader2 className="h-5 w-5 animate-spin" /> Preparando física…
               </div>
             )}
-            {sim && <HUD tele={tele} />}
+            {sim && <HUD tele={tele} robot={!banco} />}
+            {sim && banco && <PanelCircuito sim={sim} tele={tele} silencio={silencio} onSilencio={setSilencio} onGesto={activarSonido} />}
             {sim && arena.competencia && <Combate sim={sim} tele={tele} reglamento={arena.competencia} doc={doc} />}
             {sim && control && <ControlRemoto sim={sim} conPrograma={tele?.estado === 'corriendo' || tele?.estado === 'pausado'} onCerrar={() => setControl(false)} />}
             <div className="pointer-events-none absolute bottom-2 left-3 hidden text-[11px] text-slate-400/80 sm:block">
-              Doble clic en el piso para mover el robot · arrastra para girar la cámara
+              {banco ? 'Haz clic en el pulsador para presionarlo · arrastra para girar la cámara' : 'Doble clic en el piso para mover el robot · arrastra para girar la cámara'}
             </div>
           </div>
 
@@ -407,7 +423,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
 
 // ---------- Indicadores sobre la escena ----------
 
-function HUD({ tele }: { tele: Telemetria | null }) {
+function HUD({ tele, robot = true }: { tele: Telemetria | null; robot?: boolean }) {
   if (!tele) return null
   const estado = {
     'sin-programa': { txt: 'Sin programa', cls: 'bg-slate-500' },
@@ -433,7 +449,7 @@ function HUD({ tele }: { tele: Telemetria | null }) {
         {tele.error && <div className="rounded-lg bg-red-500/20 px-2.5 py-1.5 text-xs text-red-300">{tele.error}</div>}
       </div>
 
-      <div className="pointer-events-none absolute right-3 top-3 hidden w-56 space-y-2 rounded-xl lab-vidrio p-3 text-xs backdrop-blur sm:block">
+      {robot && <div className="pointer-events-none absolute right-3 top-3 hidden w-56 space-y-2 rounded-xl lab-vidrio p-3 text-xs backdrop-blur sm:block">
         <div className="flex items-center justify-between">
           <span className="text-slate-400">Velocidad</span>
           <span className="font-mono text-white">{(tele.velocidadRobot * 100).toFixed(1)} cm/s</span>
@@ -489,7 +505,7 @@ function HUD({ tele }: { tele: Telemetria | null }) {
             </div>
           </div>
         ))}
-      </div>
+      </div>}
     </>
   )
 }

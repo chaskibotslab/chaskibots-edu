@@ -34,6 +34,12 @@ export function raiz(doc: RobotDoc): PiezaEnRobot {
   return r[0]
 }
 
+/** Mesa de electrónica: la base es una protoboard (no un chasis con ruedas). */
+export function esBanco(doc: RobotDoc): boolean {
+  const r = doc.piezas.find(p => !p.padre)
+  return !!r && pieza(r.pieza).comportamiento.tipo === 'protoboard'
+}
+
 export function hijos(doc: RobotDoc, id: string) {
   return doc.piezas.filter(p => p.padre?.instancia === id)
 }
@@ -198,6 +204,11 @@ export function resumen(doc: RobotDoc, ps = poses(doc)): Resumen {
 /** Avisos de armado que el alumno debe ver (no impiden probar). */
 export function avisosEnsamblaje(doc: RobotDoc): string[] {
   const avisos: string[] = []
+  if (esBanco(doc)) {
+    // En la mesa de electrónica no hay ruedas ni motores: solo hace falta la placa.
+    if (!doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'mcu')) avisos.push('Falta la placa (Arduino o ESP32): nadie va a controlar el circuito')
+    return avisos
+  }
   const ps = poses(doc)
   const rs = ruedas(doc, ps)
   const motores = doc.piezas.filter(p => pieza(p.pieza).comportamiento.tipo === 'motor-dc')
@@ -267,7 +278,14 @@ function etiquetaPara(doc: RobotDoc, def: PiezaDef, instancia: string, m: PuntoM
   const corto = def.nombre.split(' ')[0]
   // En el chasis, el nombre del montaje ya describe la pieza ("Motor izquierdo");
   // la placa y el driver se llaman por su modelo.
-  if (!destino.padre) return m.tipo === 'placa' || m.tipo === 'driver' ? def.nombre : m.nombre
+  if (!destino.padre) {
+    if (m.tipo === 'protoboard') {
+      // En la protoboard se llaman por lo que son: «LED rojo», «LED rojo 2»…
+      const iguales = doc.piezas.filter(p => p.pieza === def.id).length
+      return iguales ? `${def.nombre} ${iguales + 1}` : def.nombre
+    }
+    return m.tipo === 'placa' || m.tipo === 'driver' ? def.nombre : m.nombre
+  }
   // Colgando de otra pieza: "Rueda del motor izquierdo", "Sensor del servo".
   return `${corto} del ${destino.etiqueta.charAt(0).toLowerCase()}${destino.etiqueta.slice(1)}`
 }
@@ -348,6 +366,12 @@ export function girar(doc: RobotDoc, id: string): RobotDoc {
 
 export function cambiarVariante(doc: RobotDoc, id: string, variante: string): RobotDoc {
   return { ...doc, piezas: doc.piezas.map(x => (x.id === id ? { ...x, variante } : x)) }
+}
+
+/** Mesa de electrónica nueva: protoboard con la placa al lado. */
+export function bancoVacio(placa = 'arduino-uno', nombre = 'Mi circuito'): RobotDoc {
+  const d = robotVacio('protoboard-830', undefined, nombre)
+  return { ...d, piezas: [{ ...d.piezas[0], id: 'protoboard', etiqueta: 'Protoboard' }, { id: 'placa', pieza: placa, etiqueta: pieza(placa).nombre, padre: { instancia: 'protoboard', montaje: 'placa' } }] }
 }
 
 /** Robot nuevo con solo un chasis. */

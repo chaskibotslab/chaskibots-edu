@@ -10,15 +10,16 @@
 
 export type V3 = [number, number, number]
 
-export type Familia = 'placa' | 'chasis' | 'movimiento' | 'servo' | 'sensor' | 'electronica'
+export type Familia = 'placa' | 'chasis' | 'movimiento' | 'servo' | 'sensor' | 'electronica' | 'circuito'
 
 export const FAMILIAS: { id: Familia; nombre: string }[] = [
-  { id: 'chasis', nombre: 'Chasis' },
+  { id: 'chasis', nombre: 'Chasis y bases' },
   { id: 'placa', nombre: 'Placas' },
   { id: 'movimiento', nombre: 'Motores y ruedas' },
   { id: 'servo', nombre: 'Servos' },
   { id: 'sensor', nombre: 'Sensores' },
   { id: 'electronica', nombre: 'Electrónica' },
+  { id: 'circuito', nombre: 'Componentes' },
 ]
 
 /** Tipos de punto de montaje: una pieza solo encastra donde su tipo coincide. */
@@ -33,6 +34,7 @@ export type TipoMontaje =
   | 'sensor-frontal'  // sensores que miran hacia adelante (distancia, obstáculos)
   | 'soporte-servo'
   | 'eje-servo'       // lo que gira con el servo
+  | 'protoboard'      // LED, resistencia, pulsador… pinchados en la protoboard
 
 export interface PuntoMontaje {
   id: string
@@ -95,6 +97,16 @@ export type Comportamiento =
   | { tipo: 'ir-reflectivo'; umbral: number; altura_max_mm: number; radio_lectura_mm: number }
   | { tipo: 'ir-obstaculo'; alcance_mm: number; origen: V3 }
   | { tipo: 'ultrasonido'; alcance_max_cm: number; apertura_grados: number; origen: V3 }
+  /** Base de la mesa de electrónica: protoboard con lugar para la placa al lado. */
+  | { tipo: 'protoboard' }
+  // Componentes del circuito (engine/circuito.ts los resuelve con análisis nodal).
+  | { tipo: 'led'; color: string; vf: number }
+  | { tipo: 'led-rgb'; vf: [number, number, number] }
+  | { tipo: 'resistencia'; ohm: number }
+  | { tipo: 'pulsador' }
+  | { tipo: 'buzzer'; activo: boolean; ohm: number }
+  | { tipo: 'potenciometro'; ohm: number }
+  | { tipo: 'ldr'; ohmLuz: number; ohmOscuro: number }
   /** Pieza que se ve en el catálogo pero todavía no se simula (llega en una fase futura). */
   | { tipo: 'sin-simular' }
 

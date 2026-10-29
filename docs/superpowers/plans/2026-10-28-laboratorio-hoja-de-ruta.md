@@ -9,7 +9,8 @@ Cada fase se publica funcionando, con sus pruebas, antes de empezar la siguiente
 | F2 | Taller por piezas, modelos 3D reales, 7 proyectos con su lógica, cables Dupont, TB6612 | Publicado 2026-10-27 |
 | F3 | Cableado manual con verificación, bloques (Blockly → C++), Arduino Nano, «Mis robots» en la cuenta | Publicado 2026-10-28 (SQL de `lab_robots` pegado) |
 | F4 | ESP32 programable (capa ESP32 sobre ATmega2560), robots ESP32, control remoto (teclado, táctil, gamepad, Bluetooth) | Publicado 2026-10-28 |
-| F5 | Minisumo, sumo, soccer, rescate, lanzador, jueces, rivales, repeticiones | En curso: F5.1 minisumo |
+| F5 | Minisumo, sumo, soccer, rescate, lanzador, jueces, rivales, repeticiones | F5.1 minisumo publicado 2026-10-28; sigue F5.2 |
+| E | Mesa de electrónica: protoboard, componentes y los proyectos de los kits (semáforo, basurero, riego, estación, domótica, monitoreo) | En curso: E1 semáforo (8vo) |
 | F6 | Retos del docente con entrega verificable, torneos por curso | Pendiente |
 | F7 | Brazo robótico (servos articulados, pinza, paso a paso) | Pendiente |
 
@@ -20,6 +21,27 @@ Cada fase se publica funcionando, con sus pruebas, antes de empezar la siguiente
 3. **F5.3 Repeticiones**: grabar las poses de cada robot y volver a ver el combate.
 4. **F5.4 Soccer**: pelota, arcos, juez de goles.
 5. **F5.5 Rescate y lanzador**.
+
+## E, mesa de electrónica, por pasos
+
+Pedido del usuario (2026-10-28): muchos más componentes electrónicos y proyectos
+como los de los kits (semáforo con microcontrolador y más). La mesa reutiliza
+todo el taller: la protoboard es la «base» (como un chasis), los componentes se
+pinchan en sus huecos, se cablean, se programan y se prueban con el micro
+emulado. `engine/circuito.ts` resuelve el circuito por análisis nodal (LED que
+se queman sin resistencia, pull-up, divisores de voltaje, PWM, tone).
+
+1. **E1 Semáforo (8vo)** (hecho, sin publicar): protoboard, LED de 5 colores, LED RGB, resistencias 220/330/1k/10k, pulsador, buzzer pasivo y activo, potenciómetro, LDR; panel «Tú controlas» (pulsadores con clic o teclas, perillas, luz), audio del buzzer; proyectos del kit (primer LED, pulsador, buzzer, tres LED, semáforo inteligente) y extra (perilla y brillo, luz nocturna, RGB, juego de reflejos); pruebas con el semáforo real compilado.
+2. **E2 Basurero (9no)**: HC-SR04 y servo en la mesa (montajes para módulos), tapa que se abre, mano que se acerca.
+3. **E3 Riego (10mo, ESP32)**: sensor de humedad del suelo, relé, bomba de agua (maceta que se seca y se riega).
+4. **E4 Estación meteorológica (1ro BGU, ESP32-C3)**: DHT11 (protocolo de un cable emulado), temperatura y humedad ajustables.
+5. **E5 Domótica (2do BGU)**: PIR, relé con foco, LDR.
+6. **E6 Monitoreo (3ro BGU)**: pantalla LCD 16×2 I2C (TWI emulado).
+7. **E7 Extras**: semáforo doble (cruce), display de 7 segmentos, dado, piano, tira NeoPixel, OLED.
+
+Modelos 3D: los componentes simples se dibujan por código con medidas reales;
+para los módulos (relé, DHT11, LCD…) conviene descargarlos de Sketchfab
+(falta `SKETCHFAB_API_TOKEN` en `.env.local`).
 
 ## F3, por pasos
 

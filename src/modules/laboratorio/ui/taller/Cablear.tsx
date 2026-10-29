@@ -12,6 +12,7 @@ import type { PinDef } from '../../catalogo/tipos'
 import { autocablear } from '../../engine/autocableado'
 import { verificar } from '../../engine/verificacion'
 import { mcuDe } from '../../engine/placa'
+import { esBanco } from '../../engine/ensamblaje'
 import type { Cable, RobotDoc } from '../../robots/doc'
 
 const ROJO = '#ef4444', NEGRO = '#111827'
@@ -51,7 +52,8 @@ function disponer(doc: RobotDoc): Tarjeta[] {
     })
   }
   // Sensores y servos a la izquierda de la placa; driver, motores y batería a la derecha.
-  const aLaIzquierda = (t: string) => ['ir-reflectivo', 'ir-obstaculo', 'ultrasonido', 'servo'].includes(t)
+  // Mesa de electrónica: LED, resistencias, pulsadores y buzzers también, cerca de los pines digitales.
+  const aLaIzquierda = (t: string) => ['ir-reflectivo', 'ir-obstaculo', 'ultrasonido', 'servo', 'led', 'led-rgb', 'resistencia', 'pulsador', 'buzzer'].includes(t)
   const columnas = [
     { piezas: conPines.filter(p => aLaIzquierda(pieza(p.pieza).comportamiento.tipo)), x: [20, ANCHO_PIEZA + 60], lado: 'der' as const },
     { piezas: conPines.filter(p => !aLaIzquierda(pieza(p.pieza).comportamiento.tipo)), x: [xPlaca + ANCHO_PLACA + 100, xPlaca + ANCHO_PLACA + ANCHO_PIEZA + 140], lado: 'izq' as const },
@@ -188,7 +190,7 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
       <aside className="max-h-[45vh] w-full overflow-y-auto border-t border-lab-borde/15 bg-lab-superficie p-3 text-xs lg:max-h-none lg:w-96 lg:border-l lg:border-t-0">
         <h3 className="mb-2 text-sm font-semibold text-white">Revisión del cableado</h3>
         {problemas.length === 0 ? (
-          <div className="mb-3 flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-emerald-300"><CheckCircle2 className="h-4 w-4" /> Todo bien: el robot está listo para probar.</div>
+          <div className="mb-3 flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-emerald-300"><CheckCircle2 className="h-4 w-4" /> Todo bien: {esBanco(doc) ? 'el circuito' : 'el robot'} está listo para probar.</div>
         ) : (
           <div className="mb-3 space-y-1.5">
             {errores.length > 0 && <p className="text-red-300">Corrige los errores (rojo) antes de probar: en la vida real algo se quemaría o no funcionaría.</p>}
