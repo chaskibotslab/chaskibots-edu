@@ -223,6 +223,9 @@ function Nodo(p: NodoProps) {
 interface Punta { pos: THREE.Vector3; dir: THREE.Vector3; tipo: SalidaPin['tipo'] }
 
 const LARGO_DUPONT = 0.014
+/** Conector de la punta macho pinchada en la protoboard (más corto). */
+const LARGO_MACHO = 0.006
+const largoConector = (t: Punta['tipo']) => (t === 'dupont' ? LARGO_DUPONT : t === 'macho' ? LARGO_MACHO : 0)
 
 /**
  * Cable con forma de cable real: sale recto en la dirección del pin (dentro de
@@ -232,7 +235,7 @@ const LARGO_DUPONT = 0.014
 function Cable({ a, b, color }: { a: Punta; b: Punta; color: string }) {
   const q = useCalidad()
   const datos = useMemo(() => {
-    const salida = (p: Punta) => p.pos.clone().addScaledVector(p.dir, p.tipo === 'dupont' ? LARGO_DUPONT : 0.004)
+    const salida = (p: Punta) => p.pos.clone().addScaledVector(p.dir, largoConector(p.tipo) || 0.004)
     const p0 = salida(a), p3 = salida(b)
     const L = p0.distanceTo(p3)
     const tiron = Math.min(0.03, 0.008 + L * 0.25)
@@ -242,7 +245,8 @@ function Cable({ a, b, color }: { a: Punta; b: Punta; color: string }) {
     p1.y -= L * 0.05
     p2.y -= L * 0.05
     const curva = new THREE.CubicBezierCurve3(p0, p1, p2, p3)
-    const grueso = a.tipo !== 'dupont' && b.tipo !== 'dupont' ? 0.0009 : 0.00065
+    const conector = (t: Punta['tipo']) => t === 'dupont' || t === 'macho'
+    const grueso = !conector(a.tipo) && !conector(b.tipo) ? 0.0009 : 0.00065
     const tubo = new THREE.TubeGeometry(curva, q.nivel === 'baja' ? 14 : 36, grueso, q.nivel === 'baja' ? 5 : 8, false)
     return { tubo, grueso }
   }, [a, b, q.nivel])
@@ -251,17 +255,17 @@ function Cable({ a, b, color }: { a: Punta; b: Punta; color: string }) {
       <mesh geometry={datos.tubo} castShadow={q.sombras}>
         <meshStandardMaterial color={color} roughness={0.4} />
       </mesh>
-      {[a, b].map((p, i) => (p.tipo === 'dupont' ? <ConectorDupont key={i} punta={p} /> : <Punta key={i} punta={p} color={color} grueso={datos.grueso} />))}
+      {[a, b].map((p, i) => (largoConector(p.tipo) ? <ConectorDupont key={i} punta={p} largo={largoConector(p.tipo)} /> : <Punta key={i} punta={p} color={color} grueso={datos.grueso} />))}
     </group>
   )
 }
 
-function ConectorDupont({ punta }: { punta: Punta }) {
+function ConectorDupont({ punta, largo }: { punta: Punta; largo: number }) {
   const q = useMemo(() => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), punta.dir), [punta])
-  const centro = useMemo(() => punta.pos.clone().addScaledVector(punta.dir, LARGO_DUPONT / 2), [punta])
+  const centro = useMemo(() => punta.pos.clone().addScaledVector(punta.dir, largo / 2), [punta, largo])
   return (
     <mesh position={centro} quaternion={q}>
-      <boxGeometry args={[0.0026, LARGO_DUPONT, 0.0026]} />
+      <boxGeometry args={[largo === LARGO_DUPONT ? 0.0026 : 0.0022, largo, largo === LARGO_DUPONT ? 0.0026 : 0.0022]} />
       <meshStandardMaterial color="#141414" roughness={0.55} />
     </mesh>
   )

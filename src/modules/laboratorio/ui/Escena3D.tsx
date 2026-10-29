@@ -309,7 +309,7 @@ function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
       if (banco) { camera.position.set(p.x - 0.04, 0.36, p.z + 0.001); controles.current?.target.set(p.x - 0.04, 0, p.z) }
       else { camera.position.set(0, Math.max(sim.arena.ancho, sim.arena.largo) * 0.95, 0.001); controles.current?.target.set(0, 0, 0) }
     } else if (modo === 'libre') {
-      if (banco) { camera.position.set(p.x - 0.05, 0.2, p.z + 0.24); controles.current?.target.set(p.x - 0.04, 0.005, p.z) }
+      if (banco) { camera.position.set(p.x - 0.05, 0.16, p.z + 0.2); controles.current?.target.set(p.x - 0.04, 0.005, p.z) }
       else { camera.position.set(p.x - 0.6, 0.55, p.z + 0.6); controles.current?.target.set(p.x, 0.03, p.z) }
     }
     controles.current?.update()

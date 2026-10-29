@@ -712,7 +712,8 @@ export function anclaPin(modelo: string, pin: string): V | null {
 }
 
 /** Hacia dónde sale el cable de cada pin (marco de la pieza) y cómo se conecta. */
-export interface SalidaPin { dir: V; tipo: 'dupont' | 'borne' | 'soldado' }
+/** 'macho': la punta de un jumper pinchada en la protoboard (conector corto). */
+export interface SalidaPin { dir: V; tipo: 'dupont' | 'macho' | 'borne' | 'soldado' }
 
 export function salidaPin(modelo: string, pin: string): SalidaPin {
   switch (modelo) {
@@ -730,6 +731,7 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
     case 'proc:fc51': return { dir: [-1, 0, 0], tipo: 'dupont' }
     case 'proc:hcsr04': return { dir: [-1, 0, 0], tipo: 'dupont' }
   }
+  if (anclaCircuito(modelo, pin)) return { dir: [0, 1, 0], tipo: 'macho' }
   return { dir: [0, 1, 0], tipo: 'dupont' }
 }
 
