@@ -6,10 +6,10 @@
 // El borrador se guarda en este navegador (en F3, en la cuenta).
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Bot, Cable, CloudUpload, Code2, Download, FileUp, FlaskConical, FolderOpen, Hammer, LayoutGrid, Loader2, Play, Printer, X } from 'lucide-react'
+import { Bot, Cable, Lightbulb, CloudUpload, Code2, Download, FileUp, FlaskConical, FolderOpen, Hammer, LayoutGrid, Loader2, Play, Printer, X } from 'lucide-react'
 import { datosVariante, pieza } from '../../catalogo/piezas'
 import { autocablear } from '../../engine/autocableado'
-import { robotVacio, validar } from '../../engine/ensamblaje'
+import { bancoVacio, esBanco, robotVacio, validar } from '../../engine/ensamblaje'
 import type { RobotDoc } from '../../robots/doc'
 import { PREARMADOS, construirSeguidor, plantillasGenericas } from '../../robots/prearmados'
 import { calidadInicial, type NivelCalidad } from '../calidad'
@@ -195,7 +195,8 @@ export default function Taller() {
   const pestanas: [Pestana, string, typeof Hammer][] = [
     ['armar', 'Armar', Hammer], ['cablear', 'Cablear', Cable], ['programar', 'Programar', Code2], ['probar', 'Probar', Play],
   ]
-  const arenaInicial = PREARMADOS.find(p => p.id === prearmado)?.arena ?? (doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'ultrasonido') ? 'campo-libre' : 'ovalo')
+  const arenaInicial = PREARMADOS.find(p => p.id === prearmado)?.arena
+    ?? (esBanco(doc) ? 'mesa-electronica' : doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'ultrasonido') ? 'campo-libre' : 'ovalo')
 
   return (
     <div data-paso={pestana} className="lab-tema flex h-[calc(100dvh-4rem)] min-h-[560px] flex-col text-slate-200">
@@ -294,23 +295,38 @@ function Modal({ titulo, onCerrar, children, ancho = 'max-w-3xl' }: { titulo: st
 const DIFICULTAD = { inicial: 'bg-emerald-500/15 text-emerald-300', intermedio: 'bg-amber-500/15 text-amber-300', avanzado: 'bg-red-500/15 text-red-300' }
 
 function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | null) => void; onCerrar: () => void }) {
+  const [categoria, setCategoria] = useState<'robot' | 'electronica'>('robot')
   const [placa, setPlaca] = useState<'todas' | 'arduino' | 'esp32'>('todas')
-  const lista = PREARMADOS.filter(p => placa === 'todas' || (placa === 'esp32') === p.id.includes('esp32'))
+  const lista = PREARMADOS
+    .filter(p => (p.categoria ?? 'robot') === categoria)
+    .filter(p => placa === 'todas' || (placa === 'esp32') === p.id.includes('esp32'))
+  const Icono = categoria === 'robot' ? Bot : Lightbulb
   return (
-    <Modal titulo="¿Con qué robot empezamos?" onCerrar={onCerrar} ancho="max-w-5xl">
-      <div className="mb-3 flex gap-1.5">
-        {([['todas', 'Todos'], ['arduino', 'Arduino'], ['esp32', 'ESP32']] as const).map(([id, txt]) => (
-          <button key={id} onClick={() => setPlaca(id)} className={`rounded-full px-3 py-1 text-xs font-medium ${placa === id ? 'lab-primario' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>{txt}</button>
-        ))}
+    <Modal titulo={categoria === 'robot' ? '¿Con qué robot empezamos?' : '¿Qué circuito armamos?'} onCerrar={onCerrar} ancho="max-w-5xl">
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <div className="flex overflow-hidden rounded-lg border border-lab-borde/20 text-sm">
+          {([['robot', 'Robots', Bot], ['electronica', 'Electrónica', Lightbulb]] as const).map(([id, txt, I]) => (
+            <button key={id} onClick={() => setCategoria(id)} className={`flex items-center gap-1.5 px-3 py-1.5 font-medium ${categoria === id ? 'bg-lab-acento/20 text-lab-acento' : 'text-slate-300 hover:bg-white/5'}`}>
+              <I className="h-4 w-4" /> {txt}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-1.5">
+          {([['todas', 'Todos'], ['arduino', 'Arduino'], ['esp32', 'ESP32']] as const).map(([id, txt]) => (
+            <button key={id} onClick={() => setPlaca(id)} className={`rounded-full px-3 py-1 text-xs font-medium ${placa === id ? 'lab-primario' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>{txt}</button>
+          ))}
+        </div>
       </div>
+      {lista.length === 0 && <p className="mb-3 text-sm text-slate-400">Todavía no hay proyectos de esta placa en esta sección.</p>}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {lista.map(p => (
           <button key={p.id} onClick={() => onAbrir(p.construir(), p.id)} className="group rounded-xl border border-lab-borde/15 bg-white/[0.03] p-4 text-left transition hover:border-lab-acento/50 hover:bg-lab-acento/5">
             <div className="mb-2 flex items-center justify-between">
-              <Bot className="h-6 w-6 text-lab-acento" />
+              <Icono className="h-6 w-6 text-lab-acento" />
               <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${DIFICULTAD[p.dificultad]}`}>{p.dificultad}</span>
             </div>
             <div className="font-semibold text-white">{p.nombre}</div>
+            {p.kit && <div className="mt-0.5 inline-block rounded bg-chaski-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-chaski-primary">{p.kit}</div>}
             <p className="mt-1 text-xs leading-relaxed text-slate-400">{p.descripcion}</p>
             <div className="mt-2 rounded-lg bg-black/20 p-2">
               <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Cómo piensa</div>
@@ -324,6 +340,17 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
       </div>
       <div className="mt-5 border-t border-lab-borde/15 pt-4">
         <div className="mb-2 text-sm font-semibold text-white">Empezar desde cero</div>
+        {categoria === 'electronica' ? (<>
+        <p className="mb-3 text-xs text-slate-400">Una protoboard con la placa al lado; después pincha LED, resistencias, pulsadores… desde el cajón «Componentes».</p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {([['arduino-uno', 'Protoboard + Arduino UNO', 'Como en el kit de 8vo'], ['arduino-nano', 'Protoboard + Arduino Nano', 'La misma placa, más chiquita'], ['esp32-devkit', 'Protoboard + ESP32', 'Trabaja con 3,3 V']] as const).map(([placaId, n, d]) => (
+            <button key={placaId} onClick={() => onAbrir(bancoVacio(placaId, 'Mi circuito'), null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-white/[0.03]">
+              <div className="text-sm font-semibold text-white">{n}</div>
+              <div className="text-xs text-slate-400">{d}</div>
+            </button>
+          ))}
+        </div>
+        </>) : (<>
         <p className="mb-3 text-xs text-slate-400">Elige el chasis; después arrastra las piezas desde el cajón.</p>
         <div className="grid gap-2 sm:grid-cols-3">
           {[['chasis-2wd', 'Chasis 2WD', 'Dos ruedas y rueda loca: gira fácil'], ['chasis-4wd', 'Chasis 4WD', 'Cuatro ruedas: más fuerza y tracción'], ['chasis-minisumo', 'Chasis minisumo', '10 × 10 cm con pala: para competir en el dohyo']].map(([id, n, d]) => (
@@ -333,6 +360,7 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
             </button>
           ))}
         </div>
+        </>)}
       </div>
     </Modal>
   )

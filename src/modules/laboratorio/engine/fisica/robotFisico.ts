@@ -28,7 +28,7 @@ import { datosVariante, pieza } from '../../catalogo/piezas'
 import { friccion, type Colisionador } from '../../catalogo/tipos'
 import type { RobotDoc } from '../../robots/doc'
 import { motorStep, type MotorParams } from '../bridge'
-import { poses, ruedasLocas, type Pose } from '../ensamblaje'
+import { poses, resumen, ruedasLocas, type Pose } from '../ensamblaje'
 import type { SimPlan } from '../plan'
 import type { Pose2D } from '../tracks'
 import { Mundo, SUBPASO } from './mundo'
@@ -90,7 +90,8 @@ export class RobotFisico {
     let bajo = Infinity
     for (const m of plan.motores) if (m.rueda) bajo = Math.min(bajo, m.rueda.centro.y - m.rueda.radio)
     for (const l of Array.from(locas.values())) bajo = Math.min(bajo, l.centroBola.y - l.radio)
-    if (!isFinite(bajo)) bajo = -30
+    // Sin ruedas (mesa de electrónica): se apoya en lo más bajo de sus piezas.
+    if (!isFinite(bajo)) bajo = resumen(doc, ps).min.y
     this.alturaApoyo = -bajo / 1000 + COMPRESION
 
     this.body = world.createRigidBody(

@@ -25,7 +25,7 @@ export function pinesDelCodigo(cpp: string, esp32 = false): Set<string> {
   for (const m of Array.from(sinComentarios.matchAll(/\b(\w+)\s*=\s*(A?\d+)\b/g))) constantes.set(m[1], m[2])
   for (const m of Array.from(sinComentarios.matchAll(/#define\s+(\w+)\s+(A?\d+)\b/g))) constantes.set(m[1], m[2])
   const usados = new Set<string>()
-  const llamadas = /\b(?:pinMode|digitalRead|digitalWrite|analogRead|analogWrite|pulseIn|attach)\s*\(\s*(\w+)/g
+  const llamadas = /\b(?:pinMode|digitalRead|digitalWrite|analogRead|analogWrite|pulseIn|attach|tone|noTone)\s*\(\s*(\w+)/g
   for (const m of Array.from(sinComentarios.matchAll(llamadas))) {
     const v = constantes.get(m[1]) ?? m[1]
     // En el ESP32 el número es el GPIO; en Arduino, 14–19 son A0–A5.
@@ -106,6 +106,26 @@ export function verificar(doc: RobotDoc): Problema[] {
       const g = grupos.get(n.get(clave(d.id, canal.en)) ?? '') ?? []
       const sinPwm = g.find(k => rol.get(k) === 'senal-placa')
       if (sinPwm) out.push({ nivel: 'advertencia', texto: `${canal.en} (velocidad) va a ${nombre(sinPwm)}, que no tiene PWM (~): el motor solo podrá ir a fondo o apagado. Usa D3, D5, D6, D9, D10 o D11.`, pines: [clave(d.id, canal.en), sinPwm] })
+    }
+  }
+
+  // LED sin resistencia en serie: al encenderlo pasa demasiada corriente y se quema.
+  for (const p of doc.piezas) {
+    const c = pieza(p.pieza).comportamiento
+    if (c.tipo !== 'led' && c.tipo !== 'led-rgb') continue
+    // En serie = la resistencia comparte el cable con la pata del LED (no cuenta si ese cable es la tierra o los 5 V).
+    const conResistencia = (pin: string) => {
+      const g = grupos.get(n.get(clave(p.id, pin)) ?? '') ?? []
+      if (g.some(k => rol.get(k) === 'tierra' || rol.get(k) === 'fuente')) return false
+      return g.some(k => {
+        const d = doc.piezas.find(x => x.id === k.split('.')[0])
+        return !!d && pieza(d.pieza).comportamiento.tipo === 'resistencia'
+      })
+    }
+    const anodos = c.tipo === 'led' ? ['A'] : ['R', 'G', 'B']
+    const conectado = n.has(clave(p.id, 'K')) && anodos.some(a => n.has(clave(p.id, a)))
+    if (conectado && !conResistencia('K') && anodos.some(a => n.has(clave(p.id, a)) && !conResistencia(a))) {
+      out.push({ nivel: 'advertencia', texto: `${p.etiqueta} no tiene resistencia en serie: en la vida real se quema al encenderlo. Pon una de 220 Ω o 330 Ω entre la pata corta y tierra.`, pines: [clave(p.id, 'K')] })
     }
   }
 

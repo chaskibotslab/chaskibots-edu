@@ -10,6 +10,7 @@ import { RoundedBox, useGLTF } from '@react-three/drei'
 import type * as THREE from 'three'
 import type { MaterialFisico } from '../../catalogo/tipos'
 import { useCalidad } from '../calidad'
+import { anclaCircuito } from './Circuito3D'
 
 const m = (v: number) => v / 1000
 type V = [number, number, number]
@@ -707,7 +708,7 @@ export function anclaPin(modelo: string, pin: string): V | null {
       return i >= 0 ? [-3, 3, 4.1 - i * 2.5] : null
     }
   }
-  return null
+  return anclaCircuito(modelo, pin)
 }
 
 /** Hacia dónde sale el cable de cada pin (marco de la pieza) y cómo se conecta. */

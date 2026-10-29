@@ -93,6 +93,7 @@
 .lab-fam[data-fam='servo'] { --f: 96 165 250; }
 .lab-fam[data-fam='sensor'] { --f: 45 212 191; }
 .lab-fam[data-fam='electronica'] { --f: 248 113 113; }
+.lab-fam[data-fam='circuito'] { --f: 251 146 60; }
 .lab-fam[data-fam='robot'] { --f: var(--lab-acento); }
 
 .lab-fam-chip { background: rgb(255 255 255 / 0.04); color: rgb(203 213 225); box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.10); }

@@ -149,6 +149,58 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
     tomar(PREFERENCIAS.servo, s.id, s.etiqueta, 'SIG', 'Señal del servo')
   }
 
+  // Mesa de electrónica: cada componente a un pin libre y a tierra, de izquierda
+  // a derecha. Cada LED lleva en serie una resistencia libre (si no hay, va
+  // directo a tierra y la verificación avisa que se va a quemar).
+  if (mcu) {
+    const enOrden = (tipo: string) => doc.piezas
+      .filter(p => pieza(p.pieza).comportamiento.tipo === tipo)
+      .sort((a, b) => ps.get(a.id)!.pos.x - ps.get(b.id)!.pos.x || ps.get(a.id)!.pos.z - ps.get(b.id)!.pos.z)
+    const ohm = (id: string) => { const c = pieza(doc.piezas.find(p => p.id === id)!.pieza).comportamiento; return c.tipo === 'resistencia' ? c.ohm : 0 }
+    const libres = enOrden('resistencia').filter(r => nueva(r.id))
+    /** Une (inst, pin) con tierra a través de una resistencia libre (la más parecida a lo que se pide). */
+    const aTierra = (inst: string, pin: string, para: 'led' | 'divisor') => {
+      const i = para === 'led' ? libres.findIndex(r => ohm(r.id) <= 1000) : libres.findIndex(r => ohm(r.id) >= 1000)
+      const r = libres.splice(i >= 0 ? i : 0, 1)[0]
+      if (!r) { cable([inst, pin], [mcu.id, 'GND'], NEGRO); return }
+      cable([inst, pin], [r.id, '1'])
+      cable([r.id, '2'], [mcu.id, 'GND'], NEGRO)
+    }
+    for (const l of enOrden('led')) {
+      if (!nueva(l.id)) continue
+      tomar(PREFERENCIAS.led, l.id, l.etiqueta, 'A', 'HIGH enciende el LED')
+      aTierra(l.id, 'K', 'led')
+    }
+    for (const l of enOrden('led-rgb')) {
+      if (!nueva(l.id)) continue
+      for (const [pin, color] of [['R', 'rojo'], ['G', 'verde'], ['B', 'azul']]) tomar(PREFERENCIAS.en, l.id, l.etiqueta, pin, `Brillo del ${color} (analogWrite 0–255)`)
+      aTierra(l.id, 'K', 'led')
+    }
+    for (const b of enOrden('pulsador')) {
+      if (!nueva(b.id)) continue
+      tomar(PREFERENCIAS.boton, b.id, b.etiqueta, '1', 'Con INPUT_PULLUP: presionado = LOW')
+      cable([b.id, '2'], [mcu.id, 'GND'], NEGRO)
+    }
+    for (const z of enOrden('buzzer')) {
+      if (!nueva(z.id)) continue
+      const c = pieza(z.pieza).comportamiento
+      tomar(PREFERENCIAS.buzzer, z.id, z.etiqueta, '+', c.tipo === 'buzzer' && c.activo ? 'HIGH = suena' : 'Suena con tone(pin, frecuencia)')
+      cable([z.id, '-'], [mcu.id, 'GND'], NEGRO)
+    }
+    for (const pt of enOrden('potenciometro')) {
+      if (!nueva(pt.id)) continue
+      cable([pt.id, '1'], [mcu.id, info.alimSensores], ROJO)
+      tomar(PREFERENCIAS.analogica, pt.id, pt.etiqueta, 'W', 'Posición de la perilla (analogRead)')
+      cable([pt.id, '2'], [mcu.id, 'GND'], NEGRO)
+    }
+    for (const l of enOrden('ldr')) {
+      if (!nueva(l.id)) continue
+      cable([l.id, '1'], [mcu.id, info.alimSensores], ROJO)
+      tomar(PREFERENCIAS.analogica, l.id, l.etiqueta, '2', 'Luz (analogRead): más luz, número más alto')
+      aTierra(l.id, '2', 'divisor')
+    }
+  }
+
   // Tabla con TODOS los cables a pines de señal de la placa (también los hechos a mano).
   if (mcu) {
     const mcuPines = new Map(pieza(mcu.pieza).pines.map(p => [p.nombre, p]))

@@ -105,6 +105,8 @@ export class AvrRunner {
   /** PWM y servos que informa la capa ESP32 (pin → valor). */
   private pwmCapa = new Map<string, number>()
   private servoCapa = new Map<string, number>()
+  /** Entradas que dependen del pull-up interno: [sin pull-up, con pull-up]. */
+  private dobles = new Map<string, [boolean, boolean]>()
 
   constructor(hex: string, chip: Chip = 'atmega328p') {
     this.chip = chip
@@ -131,6 +133,18 @@ export class AvrRunner {
       ? { A: portAConfig, B: portBConfig, C: portCConfig, D: portDConfig, E: portEConfig, F: portFConfig, G: portGConfig, H: portHConfig, J: portJConfig, K: portKConfig, L: portLConfig }
       : { B: portBConfig, C: portCConfig, D: portDConfig }
     for (const [p, cfg] of Object.entries(configs) as [PortName, AVRPortConfig][]) this.ports[p] = new AVRIOPort(this.cpu, cfg)
+    // avr8js no aplica el pull-up interno al leer una entrada: cuando el sketch
+    // cambia DDR o PORT (pinMode), se vuelve a poner el nivel que corresponde.
+    for (const [p, cfg] of Object.entries(configs) as [PortName, AVRPortConfig][]) {
+      for (const dir of [cfg.DDR, cfg.PORT]) {
+        const original = this.cpu.writeHooks[dir]
+        this.cpu.writeHooks[dir] = (...args) => {
+          const r = original(...args)
+          if (this.dobles.size) this.reaplicar(p)
+          return r
+        }
+      }
+    }
 
     // Serial: cada byte que transmite el USART va al monitor serial.
     this.usart = new AVRUSART(this.cpu, mega ? usart0Mega : usart0Config, CPU_FREQ_HZ)
@@ -185,6 +199,28 @@ export class AvrRunner {
   setDigitalInput(pin: string, high: boolean) {
     const p = this.pinMap[pin]
     if (p) this.ports[p.port]!.setPin(p.bit, high)
+  }
+
+  /**
+   * Entrada de un circuito (pulsador, pin al aire): el nivel depende de si el
+   * pin tiene el pull-up interno activado (INPUT_PULLUP) en el momento de leer.
+   */
+  setDigitalInputDoble(pin: string, sinPullup: boolean, conPullup: boolean) {
+    if (!this.pinMap[pin]) return
+    this.dobles.set(pin, [sinPullup, conPullup])
+    this.aplicarDoble(pin)
+  }
+
+  private aplicarDoble(pin: string) {
+    const v = this.dobles.get(pin)
+    const p = this.pinMap[pin]
+    if (!v || !p) return
+    const puerto = this.ports[p.port]!
+    puerto.setPin(p.bit, puerto.pinState(p.bit) === PinState.InputPullUp ? v[1] : v[0])
+  }
+
+  private reaplicar(puerto: PortName) {
+    this.dobles.forEach((_, pin) => { if (this.pinMap[pin].port === puerto) this.aplicarDoble(pin) })
   }
 
   /**

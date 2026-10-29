@@ -19,6 +19,7 @@ import {
   ArduinoNano, ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
   ChasisMinisumo, MotorN20, BateriaLipo,
 } from './modelos/Piezas3D'
+import { CircuitoVivoContexto, ModeloCircuito, esModeloCircuito, type CircuitoVivo } from './modelos/Circuito3D'
 
 const m = (v: number) => v / 1000
 
@@ -34,6 +35,7 @@ interface Refs {
 
 /** Lo mínimo para animar un robot en la arena: su física, sus pines y sus sensores. */
 export type FuenteRobot = Pick<Simulacion, 'fisica' | 'pinesActuales' | 'lecturasActuales'>
+  & Partial<Pick<Simulacion, 'circuitoActual' | 'controles' | 'presionar'>>
 
 interface Props {
   doc: RobotDoc
@@ -85,6 +87,7 @@ function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLo
 function ModeloProc({ inst, def, refs, espaciadorLoca }: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number }) {
   const v = datosVariante(def, inst.variante)
   const c = def.comportamiento
+  if (esModeloCircuito(def.modelo)) return <ModeloCircuito def={def} inst={inst.id} />
   switch (def.modelo) {
     case 'proc:chasis-2wd': return <Chasis largo={160} ancho={120} material={v.material} color={v.color ?? '#cfe6f7'} />
     case 'proc:chasis-4wd': return <Chasis largo={200} ancho={130} material={v.material} color={v.color ?? '#cfe6f7'} />
@@ -379,12 +382,22 @@ export default function Robot3D(props: Props) {
     }
   })
 
+  // Lo que leen los componentes de la protoboard en cada cuadro (LED, pulsador, perillas).
+  const vivo = useMemo<CircuitoVivo>(() => ({
+    estado: () => sim?.circuitoActual ?? null,
+    perilla: inst => sim?.controles?.perillas[inst],
+    boton: inst => !!sim?.controles?.botones[inst],
+    presionar: sim?.presionar ? (inst, v) => sim.presionar!(inst, v) : undefined,
+  }), [sim])
+
   const r = raiz(doc)
   return (
-    <group ref={grupo} onPointerMissed={() => props.onSeleccionar?.(null)}>
-      <Nodo {...props} inst={r} refs={refs} espaciadores={datos.espaciadores} porInstancia={porInstancia} />
-      {cables && !props.explosion && <Cables doc={doc} />}
-      {props.posMarcadores && <ProyectarMarcadores doc={doc} marcadores={marcadores} destino={props.posMarcadores} raizRef={grupo} />}
-    </group>
+    <CircuitoVivoContexto.Provider value={vivo}>
+      <group ref={grupo} onPointerMissed={() => props.onSeleccionar?.(null)}>
+        <Nodo {...props} inst={r} refs={refs} espaciadores={datos.espaciadores} porInstancia={porInstancia} />
+        {cables && !props.explosion && <Cables doc={doc} />}
+        {props.posMarcadores && <ProyectarMarcadores doc={doc} marcadores={marcadores} destino={props.posMarcadores} raizRef={grupo} />}
+      </group>
+    </CircuitoVivoContexto.Provider>
   )
 }
