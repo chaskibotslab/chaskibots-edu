@@ -4,9 +4,11 @@
 // buzzer de 12 mm, potenciómetro de 10 kΩ, LDR de 5 mm) y los usa
 // engine/circuito.ts para resolver el circuito.
 //
-// Marco de cada componente: origen en la superficie de la protoboard, patas a
-// lo largo de x. Al lado de cada pata (en la misma tira de 5 huecos, 5,08 mm
-// hacia afuera) va el cable: ahí están sus pines (ver anclaPin en Piezas3D).
+// Marco de cada componente: origen en un agujero de la protoboard (la fila más
+// cerca de la canaleta), patas a lo largo de x, cada una en su propia columna.
+// El cable de cada pin entra en la misma tira de 5 agujeros, 3 agujeros hacia
+// afuera (−z): así la pata y su cable quedan unidos por dentro, como en la
+// protoboard real. PATAS_CIRCUITO dice dónde cae cada pata.
 //
 // Los pines de los componentes son 'digital' aunque vayan a tierra o a 5 V:
 // 'gnd' y 'alim' quedan para las placas y baterías (la verificación los usa
@@ -16,9 +18,42 @@ import type { PiezaDef, PuntoMontaje } from '../tipos'
 
 /** Alto de la protoboard (mm): los componentes se apoyan sobre su cara de arriba. */
 export const ALTO_PROTOBOARD = 8.5
-/** Huecos para componentes: 8 columnas × 2 mitades (arriba y abajo de la canaleta). */
+/** Distancia entre agujeros (mm). */
+export const PASO_PROTOBOARD = 2.54
+/** x de la columna k (0–62) de la protoboard. */
+export const xColumna = (k: number) => -78.7 + k * PASO_PROTOBOARD
+/** |z| de la fila i (0–4) de una tira: 0 es la más cercana a la canaleta. */
+export const zFila = (i: number) => 3.81 + i * PASO_PROTOBOARD
+/** Huecos para componentes: 8 lugares × 2 mitades (arriba y abajo de la canaleta). */
 export const COLUMNAS_PROTOBOARD = 8
-const PASO_COLUMNA = 18
+/** Cada lugar está 7 columnas después del anterior: los componentes no comparten tiras. */
+const PRIMERA_COLUMNA = 6
+const COLUMNAS_ENTRE_LUGARES = 7
+/** z (marco del componente) donde entran los cables: fila 3 de la misma tira. */
+export const Z_CABLE_PROTOBOARD = -3 * PASO_PROTOBOARD
+
+/**
+ * Patas de cada componente en el marco de su hueco (mm): todas caen en agujeros.
+ * Los que tienen patas a medio paso del centro (LED, buzzer, pulsador) se corren
+ * 1,27 mm (ver CENTRO_CIRCUITO) para que sus patas entren en los agujeros.
+ */
+export const PATAS_CIRCUITO: Record<string, { pin: string; x: number; z: number }[]> = {
+  'proc:led': [{ pin: 'A', x: 0, z: 0 }, { pin: 'K', x: 2.54, z: 0 }],
+  'proc:led-rgb': [{ pin: 'R', x: -2.54, z: 0 }, { pin: 'K', x: 0, z: 0 }, { pin: 'G', x: 2.54, z: 0 }, { pin: 'B', x: 5.08, z: 0 }],
+  'proc:resistencia': [{ pin: '1', x: -5.08, z: 0 }, { pin: '2', x: 5.08, z: 0 }],
+  // Pulsador de 4 patas: las dos de cada lado van en la misma tira (están unidas por dentro).
+  'proc:pulsador': [{ pin: '1', x: -2.54, z: 0 }, { pin: '1', x: -2.54, z: -2.54 }, { pin: '2', x: 5.08, z: 0 }, { pin: '2', x: 5.08, z: -2.54 }],
+  'proc:buzzer': [{ pin: '+', x: -2.54, z: 0 }, { pin: '-', x: 5.08, z: 0 }],
+  'proc:potenciometro': [{ pin: '1', x: -5.08, z: 0 }, { pin: 'W', x: 0, z: 0 }, { pin: '2', x: 5.08, z: 0 }],
+  'proc:ldr': [{ pin: '1', x: -2.54, z: 0 }, { pin: '2', x: 2.54, z: 0 }],
+}
+/** Dónde va el centro del cuerpo de cada componente respecto a su hueco (x, z en mm). */
+export const CENTRO_CIRCUITO: Record<string, [number, number]> = {
+  'proc:led': [1.27, 0],
+  'proc:led-rgb': [1.27, 0],
+  'proc:pulsador': [1.27, -1.27],
+  'proc:buzzer': [1.27, 0],
+}
 
 function huecos(): PuntoMontaje[] {
   const out: PuntoMontaje[] = []
@@ -29,7 +64,7 @@ function huecos(): PuntoMontaje[] {
         id: `hueco-${n}`,
         tipo: 'protoboard',
         nombre: `${fila === 0 ? 'Arriba' : 'Abajo'}, columna ${c + 1}`,
-        posicion: [-63 + c * PASO_COLUMNA, ALTO_PROTOBOARD, fila === 0 ? -7.6 : 7.6],
+        posicion: [xColumna(PRIMERA_COLUMNA + c * COLUMNAS_ENTRE_LUGARES), ALTO_PROTOBOARD, fila === 0 ? -zFila(0) : zFila(0)],
         // Abajo de la canaleta el componente mira al revés: sus cables salen hacia el borde.
         rotacion: fila === 0 ? [0, 0, 0] : [0, 180, 0],
       })
@@ -52,9 +87,11 @@ export const PROTOBOARD: PiezaDef = {
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Lugar de la placa', posicion: [-127, 0, 0], rotacionesPermitidas: [0, 180] },
     ...huecos(),
-    // Módulos (E2): el HC-SR04 pinchado en el borde derecho, mirando hacia afuera (+x);
+    // Módulos (E2): el HC-SR04 parado sobre la mesa a la derecha, mirando hacia afuera (+x),
+    // con sus 4 cables hembra directo a la placa (pinchado en la protoboard sus 4 pines
+    // quedarían en la misma tira y se unirían);
     // un servo sobre la mesa, detrás de la protoboard; y la maqueta del proyecto a la derecha.
-    { id: 'sensor', tipo: 'sensor-frontal', nombre: 'Borde derecho (sensor)', posicion: [74, ALTO_PROTOBOARD, 0] },
+    { id: 'sensor', tipo: 'sensor-frontal', nombre: 'A la derecha de la protoboard (sensor)', posicion: [105, 0, 0] },
     { id: 'servo', tipo: 'soporte-servo', nombre: 'Detrás de la protoboard (servo)', posicion: [30, 0, -50] },
     { id: 'maqueta', tipo: 'maqueta', nombre: 'Junto a la protoboard (maqueta)', posicion: [175, 0, 0] },
     // Batería sobre la mesa, adelante, con los bornes hacia la protoboard: para

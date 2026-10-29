@@ -10,7 +10,7 @@ import { createContext, useContext, useMemo, useRef, type ReactNode } from 'reac
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { PiezaDef } from '../../catalogo/tipos'
-import { BASURERO, BISAGRA_BASURERO, POSTE_SERVO, RESISTENCIAS } from '../../catalogo/piezas/circuito'
+import { BASURERO, BISAGRA_BASURERO, CENTRO_CIRCUITO, PATAS_CIRCUITO, POSTE_SERVO, RESISTENCIAS, xColumna, zFila, Z_CABLE_PROTOBOARD } from '../../catalogo/piezas/circuito'
 import { LUZ_INICIAL, PERILLA_INICIAL, type EstadoCircuito } from '../../engine/circuito'
 import { useCalidad } from '../calidad'
 
@@ -19,8 +19,6 @@ type V = [number, number, number]
 const M = (...v: V): V => [m(v[0]), m(v[1]), m(v[2])]
 
 const PASO = 2.54
-/** Los cables entran en la misma tira de 5 huecos, 2 huecos hacia afuera de la pata. */
-const Z_CABLE = -2 * PASO
 const PATA = '#cbd5e1'
 
 // ---------------------------------------------------------------------------
@@ -62,13 +60,13 @@ function texturaProtoboard(): THREE.CanvasTexture {
   g.fillRect(0, Z(-1.6), c.width, 3.2 * E)
   // Tiras de 5 huecos a cada lado de la canaleta (63 columnas).
   for (let col = 0; col < 63; col++) {
-    const x = -78.7 + col * PASO
-    for (let i = 0; i < 5; i++) { hueco(x, -3.81 - i * PASO); hueco(x, 3.81 + i * PASO) }
+    const x = xColumna(col)
+    for (let i = 0; i < 5; i++) { hueco(x, -zFila(i)); hueco(x, zFila(i)) }
   }
   // Rieles de alimentación: grupos de 5 con un espacio.
   for (const lado of [-1, 1]) {
     for (let k = 0; k < 50; k++) {
-      const x = -74 + (k + Math.floor(k / 5)) * PASO
+      const x = xColumna(2 + k + Math.floor(k / 5))
       hueco(x, lado * 19.6); hueco(x, lado * 22.1)
     }
     // Línea roja (+) por fuera y azul (−) por dentro, como en la protoboard real.
@@ -79,7 +77,7 @@ function texturaProtoboard(): THREE.CanvasTexture {
   g.fillStyle = '#71717a'
   g.font = `${1.6 * E}px sans-serif`
   g.textAlign = 'center'
-  for (let col = 0; col < 63; col += 5) g.fillText(String(col + 1), X(-78.7 + col * PASO), Z(-15.6))
+  for (let col = 0; col < 63; col += 5) g.fillText(String(col + 1), X(xColumna(col)), Z(-15.6))
   const t = new THREE.CanvasTexture(c)
   t.colorSpace = THREE.SRGBColorSpace
   t.anisotropy = 8
@@ -156,7 +154,7 @@ export function Led({ inst, color }: { inst: string; color: string }) {
   const material = <meshPhysicalMaterial ref={mat} color={color} emissive={color} emissiveIntensity={0} transparent opacity={0.9} roughness={0.15} clearcoat={1} />
   return (
     <group>
-      <Pata x={-1.27} /><Pata x={1.27} alto={3.5} />
+      <Pata x={-1.27} alto={3.5} /><Pata x={1.27} />
       <CapsulaLed color={color} material={material} />
       {q.nivel !== 'baja' && <pointLight ref={luz} color={color} intensity={0} distance={0.09} decay={2} position={M(0, 10, 0)} />}
     </group>
@@ -235,7 +233,7 @@ export function Pulsador({ inst }: { inst: string }) {
       onPointerOver={() => { if (interactivo) document.body.style.cursor = 'pointer' }}
       onPointerOut={() => { document.body.style.cursor = '' }}
     >
-      {[-3.25, 3.25].flatMap(x => [-2.25, 2.25].map(z => <Pata key={`${x}${z}`} x={x} z={z} alto={1} />))}
+      {[-3.81, 3.81].flatMap(x => [-1.27, 1.27].map(z => <Pata key={`${x}${z}`} x={x} z={z} alto={1} />))}
       <mesh position={M(0, 2.2, 0)} castShadow={q.sombras}>
         <boxGeometry args={[m(6), m(3.4), m(6)]} />
         <meshStandardMaterial color="#1c1c1f" roughness={0.6} />
@@ -441,6 +439,13 @@ export const esModeloCircuito = (modelo: string) => MODELOS_CIRCUITO.has(modelo)
 
 /** Dibuja cualquier componente del circuito según su modelo; null si no es de la protoboard. */
 export function ModeloCircuito({ def, inst }: { def: PiezaDef; inst: string }) {
+  const modelo = <ModeloCentrado def={def} inst={inst} />
+  const centro = CENTRO_CIRCUITO[def.modelo]
+  // Los de patas a medio paso se corren para que sus patas entren en los agujeros.
+  return centro ? <group position={M(centro[0], 0, centro[1])}>{modelo}</group> : modelo
+}
+
+function ModeloCentrado({ def, inst }: { def: PiezaDef; inst: string }) {
   const c = def.comportamiento
   switch (def.modelo) {
     case 'proc:protoboard': return <Protoboard />
@@ -459,17 +464,6 @@ export function ModeloCircuito({ def, inst }: { def: PiezaDef; inst: string }) {
 
 /** Dónde entra el cable de cada pin (al lado de su pata, en la misma tira de la protoboard). */
 export function anclaCircuito(modelo: string, pin: string): V | null {
-  const x = (lista: string[], xs: number[]) => { const i = lista.indexOf(pin); return i >= 0 ? xs[i] : null }
-  let px: number | null = null
-  switch (modelo) {
-    case 'proc:led': px = x(['A', 'K'], [-1.27, 1.27]); break
-    case 'proc:led-rgb': px = x(['R', 'K', 'G', 'B'], [-3.81, -1.27, 1.27, 3.81]); break
-    case 'proc:resistencia': px = x(['1', '2'], [-2 * PASO, 2 * PASO]); break
-    case 'proc:pulsador': px = x(['1', '2'], [-3.81, 3.81]); break
-    case 'proc:buzzer': px = x(['+', '-'], [-3.81, 3.81]); break
-    case 'proc:potenciometro': px = x(['1', 'W', '2'], [-2 * PASO, 0, 2 * PASO]); break
-    case 'proc:ldr': px = x(['1', '2'], [-PASO, PASO]); break
-    default: return null
-  }
-  return px === null ? null : [px, 0.3, Z_CABLE]
+  const pata = PATAS_CIRCUITO[modelo]?.find(p => p.pin === pin)
+  return pata ? [pata.x, 0.3, Z_CABLE_PROTOBOARD] : null
 }
