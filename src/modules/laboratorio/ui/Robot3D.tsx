@@ -10,7 +10,7 @@ import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { datosVariante, pieza } from '../catalogo/piezas'
 import { grados, type PiezaDef, type PuntoMontaje } from '../catalogo/tipos'
-import { hijos, poses, raiz, resumen, ruedas, ruedasLocas, aRobot } from '../engine/ensamblaje'
+import { hijos, montajeDe, poses, raiz, resumen, ruedas, ruedasLocas, aRobot } from '../engine/ensamblaje'
 import type { Simulacion } from '../engine/simulation'
 import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
@@ -61,7 +61,7 @@ function matrizMontaje(mt: PuntoMontaje, giro = 0) {
 }
 
 /** Modelo real (GLB) si la pieza lo tiene; mientras carga se ve el hecho por código. */
-function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number }) {
+function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number; bajoChasis?: number }) {
   if (!p.def.glb) return <ModeloProc {...p} />
   const c = p.def.comportamiento
   if (c.tipo === 'rueda') {
@@ -85,7 +85,7 @@ function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLo
   )
 }
 
-function ModeloProc({ inst, def, refs, espaciadorLoca }: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number }) {
+function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number; bajoChasis?: number }) {
   const v = datosVariante(def, inst.variante)
   const c = def.comportamiento
   if (esModeloCircuito(def.modelo)) return <ModeloCircuito def={def} inst={inst.id} />
@@ -114,7 +114,8 @@ function ModeloProc({ inst, def, refs, espaciadorLoca }: { inst: PiezaEnRobot; d
     case 'proc:servo': return <Servo color={v.color ?? '#2563eb'} />
     case 'proc:tcrt5000': {
       if (!refs.ledsIr.has(inst.id)) refs.ledsIr.set(inst.id, createRef())
-      return <TCRT5000 ref={refs.ledsIr.get(inst.id)} alturaSoporte={25} />
+      // El soporte sube desde el sensor (8,6 mm) hasta la cara de abajo del chasis (3 mm de espesor).
+      return <TCRT5000 ref={refs.ledsIr.get(inst.id)} alturaSoporte={Math.max(1, bajoChasis - 1.5 - 8.6)} />
     }
     case 'proc:fc51': {
       if (!refs.ledsObs.has(inst.id)) refs.ledsObs.set(inst.id, createRef())
@@ -185,7 +186,7 @@ function Nodo(p: NodoProps) {
   return (
     <group>
       <group onClick={click}>
-        <Modelo inst={inst} def={def} refs={refs} espaciadorLoca={p.espaciadores.get(inst.id) ?? 0} />
+        <Modelo inst={inst} def={def} refs={refs} espaciadorLoca={p.espaciadores.get(inst.id) ?? 0} bajoChasis={-(montajeDe(doc, inst)?.posicion[1] ?? -35)} />
         {seleccion === inst.id && <Seleccion def={def} />}
       </group>
       {(p.porInstancia.get(inst.id) ?? []).map(mk => (

@@ -11,6 +11,7 @@ import type * as THREE from 'three'
 import type { MaterialFisico } from '../../catalogo/tipos'
 import { useCalidad } from '../calidad'
 import { anclaCircuito } from './Circuito3D'
+import { PLACA_PISO, SEPARADORES_PISO } from '../../catalogo/piezas/chasis'
 
 const m = (v: number) => v / 1000
 type V = [number, number, number]
@@ -205,8 +206,8 @@ export function PisoArriba({ alto, color }: { alto: number; color: string }) {
   const q = useCalidad()
   return (
     <group>
-      {[[-28, -36], [-28, 36], [28, -36], [28, 36]].map(([x, z], i) => <Separador key={i} pos={[x, 0, z]} alto={alto} />)}
-      <RoundedBox args={[m(64), m(3), m(80)]} radius={m(1)} position={M(0, alto + 1.5, 0)} castShadow={q.sombras} receiveShadow>
+      {SEPARADORES_PISO.map(([x, z], i) => <Separador key={i} pos={[x, 0, z]} alto={alto} />)}
+      <RoundedBox args={[m(PLACA_PISO[0]), m(3), m(PLACA_PISO[1])]} radius={m(1)} position={M(0, alto + 1.5, 0)} castShadow={q.sombras} receiveShadow>
         <meshStandardMaterial color={color} roughness={0.55} />
       </RoundedBox>
     </group>

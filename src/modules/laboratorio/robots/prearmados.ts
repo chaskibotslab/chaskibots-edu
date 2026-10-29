@@ -900,6 +900,114 @@ export function construirMinisumo(variante = 'pla', nombre = 'Minisumo'): RobotD
   return a.terminar(codigoMinisumo)
 }
 
+/**
+ * Minisumo con ESP32: la placa no cabe abajo junto a la LiPo y el ultrasonido,
+ * así que la placa y el driver suben al piso de arriba. El ultrasonido queda
+ * abajo, a la altura del rival (arriba, su haz pasaría por encima). Driver
+ * TB6612: el L298N también cabe arriba, pero pierde 2 V y no empuja al rival.
+ */
+export function construirMinisumoEsp32(): RobotDoc {
+  const a = new Armador('chasis-minisumo', 'aluminio', 'Minisumo ESP32')
+  const mi = a.poner('motor-n20', 'chasis', 'motor-izq')
+  const md = a.poner('motor-n20', 'chasis', 'motor-der')
+  a.poner('rueda-34', mi, 'eje')
+  a.poner('rueda-34', md, 'eje')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  a.poner('hcsr04', 'chasis', 'frente')
+  const piso = a.poner('piso-arriba-minisumo', 'chasis', 'arriba')
+  a.poner('esp32-devkit', piso, 'placa')
+  a.poner('tb6612', piso, 'driver')
+  a.poner('fc51', 'chasis', 'frente-izq')
+  a.poner('fc51', 'chasis', 'frente-der')
+  a.poner('tcrt5000', 'chasis', 'piso-izq')
+  a.poner('tcrt5000', 'chasis', 'piso-der')
+  return a.terminar(codigoMinisumo)
+}
+
+// ---------------------------------------------------------------------------
+// Evita obstáculos con IR: el más simple, sin servo ni ultrasonido
+// ---------------------------------------------------------------------------
+
+function codigoEvitaIr(tabla: FilaPin[], doc: RobotDoc) {
+  return `// Evita obstáculos con dos sensores IR (FC-51) al frente.
+// Cada FC-51 da LOW cuando tiene algo cerca (unos 20 cm) y HIGH si no.
+
+const int IR_IZQ = ${pinesObstaculo(tabla, doc, 'frente-izq')};
+const int IR_DER = ${pinesObstaculo(tabla, doc, 'frente-der')};
+
+${bloqueMotores(tabla, doc)}
+
+const int AVANCE = 160;
+const int GIRO = 180;
+
+void setup() {
+  pinMode(IR_IZQ, INPUT);
+  pinMode(IR_DER, INPUT);
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+}
+
+void loop() {
+  bool izq = digitalRead(IR_IZQ) == LOW;
+  bool der = digitalRead(IR_DER) == LOW;
+
+  if (izq && der) {
+    // Pared al frente: retrocede un poco y da media vuelta.
+    Serial.println("Obstaculo al frente");
+    motores(-AVANCE, -AVANCE);
+    delay(300);
+    motores(GIRO, -GIRO);
+    delay(450);
+  } else if (izq) {
+    Serial.println("Obstaculo a la izquierda");
+    motores(GIRO, -GIRO);     // gira a la derecha, lejos del obstáculo
+  } else if (der) {
+    Serial.println("Obstaculo a la derecha");
+    motores(-GIRO, GIRO);     // gira a la izquierda
+  } else {
+    motores(AVANCE, AVANCE);  // camino libre: adelante
+  }
+}
+`
+}
+
+function codigoLecturaIr(tabla: FilaPin[], doc: RobotDoc) {
+  return `// Prueba de los dos FC-51: acerca una caja (o mueve el robot) y mira el Monitor Serie.
+
+const int IR_IZQ = ${pinesObstaculo(tabla, doc, 'frente-izq')};
+const int IR_DER = ${pinesObstaculo(tabla, doc, 'frente-der')};
+
+void setup() {
+  pinMode(IR_IZQ, INPUT);
+  pinMode(IR_DER, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.print("Izquierdo: ");
+  Serial.print(digitalRead(IR_IZQ) == LOW ? "ve algo" : "libre");
+  Serial.print("   Derecho: ");
+  Serial.println(digitalRead(IR_DER) == LOW ? "ve algo" : "libre");
+  delay(300);
+}
+`
+}
+
+export function construirEvitaIr(): RobotDoc {
+  const a = new Armador('chasis-2wd', 'pla', 'Evita obstáculos IR')
+  a.poner('arduino-uno', 'chasis', 'placa')
+  a.poner('l298n', 'chasis', 'driver')
+  a.poner('bateria-2x18650', 'chasis', 'bateria')
+  const mi = a.poner('motor-tt', 'chasis', 'motor-izq')
+  const md = a.poner('motor-tt', 'chasis', 'motor-der')
+  a.poner('rueda-65', mi, 'eje')
+  a.poner('rueda-65', md, 'eje')
+  a.poner('rueda-loca', 'chasis', 'loca')
+  a.poner('fc51', 'chasis', 'frente-izq')
+  a.poner('fc51', 'chasis', 'frente-der')
+  return a.terminar(codigoEvitaIr)
+}
+
 export const PREARMADOS: Prearmado[] = [
   {
     id: 'seguidor',
@@ -1062,6 +1170,45 @@ export const PREARMADOS: Prearmado[] = [
     plantillas: (doc, tabla) => [
       { id: 'minisumo', nombre: 'Minisumo (buscar y atacar)', descripcion: 'Espera, busca, ataca y evita el borde', codigo: codigoMinisumo(tabla, doc) },
       { id: 'sensores', nombre: 'Prueba de sensores', descripcion: 'Distancia, IR y borde en el Monitor Serie', codigo: codigoLecturaMinisumo(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'minisumo-esp32',
+    nombre: 'Minisumo ESP32 (dos pisos)',
+    descripcion: 'El minisumo con ESP32. La placa y el driver no caben abajo junto a la batería y los sensores: suben al piso de arriba, sobre separadores de latón.',
+    dificultad: 'avanzado',
+    logica: [
+      'El mismo programa del minisumo: espera 5 s, busca girando, ataca y evita el borde.',
+      'Abajo: motores N20, LiPo 2S, el ultrasonido al frente (a la altura del rival), dos FC-51 en las esquinas y dos TCRT5000 mirando el piso.',
+      'Arriba, sobre separadores de 24 mm: el ESP32 y el driver TB6612.',
+      'Prueba a cambiar el TB6612 por un L298N: también cabe arriba, pero pierde 2 V (los N20 reciben 5,4 V en vez de 6,9 V), empuja menos y no saca al rival.',
+      'Con dos pilas 18650 no cabe el ultrasonido abajo, y arriba su haz pasaría por encima de un rival bajo: por eso los minisumos usan LiPo.',
+    ],
+    arena: 'dohyo-minisumo',
+    construir: construirMinisumoEsp32,
+    plantillas: (doc, tabla) => [
+      { id: 'minisumo', nombre: 'Minisumo (buscar y atacar)', descripcion: 'Espera, busca, ataca y evita el borde', codigo: codigoMinisumo(tabla, doc) },
+      { id: 'sensores', nombre: 'Prueba de sensores', descripcion: 'Distancia, IR y borde en el Monitor Serie', codigo: codigoLecturaMinisumo(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'evita-ir',
+    nombre: 'Evita obstáculos IR',
+    descripcion: 'El evita obstáculos más simple: dos sensores infrarrojos FC-51 al frente, sin servo ni ultrasonido. Ideal para empezar.',
+    dificultad: 'inicial',
+    logica: [
+      'Cada FC-51 da LOW cuando tiene algo cerca.',
+      'Si ninguno ve nada, avanza.',
+      'Si lo ve el izquierdo, gira a la derecha (y al revés).',
+      'Si los dos lo ven, hay una pared al frente: retrocede y da media vuelta.',
+    ],
+    arena: 'campo-libre',
+    construir: construirEvitaIr,
+    plantillas: (doc, tabla) => [
+      { id: 'evita-ir', nombre: 'Evita obstáculos (2 IR)', descripcion: 'Avanza y esquiva con los FC-51', codigo: codigoEvitaIr(tabla, doc) },
+      { id: 'sensores', nombre: 'Prueba de los IR', descripcion: 'Qué ve cada sensor en el Monitor Serie', codigo: codigoLecturaIr(tabla, doc) },
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
     ],
   },

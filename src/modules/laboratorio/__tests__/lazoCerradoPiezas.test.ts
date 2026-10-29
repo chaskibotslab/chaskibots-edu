@@ -9,7 +9,7 @@ import { iniciarRapier } from '../engine/fisica/mundo'
 import { SimSincrona } from '../engine/simSincrona'
 import { PISTAS, ovalo, curvas } from '../engine/tracks'
 import { arenaDePista, campoLibre } from '../arenas'
-import { construirEvitaObstaculos, construirSeguidor } from '../robots/prearmados'
+import { construirEvitaIr, construirEvitaObstaculos, construirSeguidor } from '../robots/prearmados'
 
 const CINTA = 0.019
 const fixture = (n: string) => fs.readFileSync(path.join(__dirname, 'fixtures', n), 'utf8')
@@ -82,6 +82,24 @@ describe('lazo cerrado con robots armados por piezas', () => {
       minDist = Math.min(minDist, arena.ancho / 2 - Math.abs(p.x), arena.largo / 2 - Math.abs(p.z))
     })
     expect(sim.serial).toContain('Distancia')
+    expect(recorrido).toBeGreaterThan(3)
+    expect(minDist).toBeGreaterThan(radio * 0.5)
+    sim.liberar()
+  }, 240_000)
+
+  it('el evita obstáculos IR (dos FC-51) recorre el campo libre sin chocar', () => {
+    const arena = campoLibre(7)
+    const sim = new SimSincrona(construirEvitaIr(), arena, { hex: fixture('evitair.hex') })
+    const radio = 0.11
+    let minDist = Infinity, recorrido = 0
+    let prev = { x: arena.inicio.x, z: arena.inicio.z }
+    sim.correr(30, 1 / 60, s => {
+      const p = s.robot.pose().pos
+      recorrido += Math.hypot(p.x - prev.x, p.z - prev.z)
+      prev = { x: p.x, z: p.z }
+      for (const o of arena.objetos) minDist = Math.min(minDist, Math.hypot(p.x - o.x, p.z - o.z) - (o.medidas[0] / 2) * Math.SQRT2)
+      minDist = Math.min(minDist, arena.ancho / 2 - Math.abs(p.x), arena.largo / 2 - Math.abs(p.z))
+    })
     expect(recorrido).toBeGreaterThan(3)
     expect(minDist).toBeGreaterThan(radio * 0.5)
     sim.liberar()

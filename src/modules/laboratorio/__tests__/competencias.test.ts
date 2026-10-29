@@ -11,7 +11,7 @@ import { planDe } from '../engine/plan'
 import { resumen } from '../engine/ensamblaje'
 import { verificar } from '../engine/verificacion'
 import { dohyo, reflectanciaArena } from '../arenas'
-import { construirMinisumo } from '../robots/prearmados'
+import { construirMinisumo, construirMinisumoEsp32 } from '../robots/prearmados'
 
 const hex = fs.readFileSync(path.join(__dirname, 'fixtures', 'minisumo.hex'), 'utf8')
 
@@ -90,6 +90,22 @@ describe('competencias (F5)', () => {
     expect(c.estado.fase).toBe('final')
     expect(c.estado.marcador).toEqual({ alumno: 2, rival: 0 })
     expect(sim.serial).toContain('A pelear')
+    sim.liberar()
+  }, 600_000)
+
+  it('el minisumo ESP32 de dos pisos cumple el reglamento y gana al rival quieto', () => {
+    const doc = construirMinisumoEsp32()
+    const r = resumen(doc)
+    const reglas = revisarReglamento(dohyo('minisumo').competencia!, { largo: r.max.x - r.min.x, ancho: r.max.z - r.min.z, masa: r.masa_g })
+    expect(reglas.every(x => x.ok)).toBe(true)
+    expect(verificar(doc).filter(p => p.nivel === 'error')).toEqual([])
+    expect(planDe(doc).avisos).toEqual([])
+    const hexEsp32 = fs.readFileSync(path.join(__dirname, 'fixtures', 'minisumoesp32.hex'), 'utf8')
+    const sim = new SimSincrona(doc, dohyo('minisumo'), { hex: hexEsp32, rival: 'quieto' })
+    const c = sim.competencia!
+    sim.correr(40)
+    expect(sim.avr?.chip).toBe('atmega2560')
+    expect(c.estado.marcador.alumno).toBeGreaterThan(c.estado.marcador.rival)
     sim.liberar()
   }, 600_000)
 })

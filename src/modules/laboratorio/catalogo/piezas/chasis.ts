@@ -108,9 +108,13 @@ export const CHASIS_MINISUMO: PiezaDef = {
     { forma: 'caja', medidas: [30, 1.5, 96], centro: [48, -14.8, 0], rotacion: [0, 0, -37], friccion: 0.15 },
   ],
   montajes: [
-    { id: 'placa', tipo: 'placa', nombre: 'Placa', posicion: [-14, ARRIBA, 0], rotacionesPermitidas: [0, 180] },
+    { id: 'placa', tipo: 'placa', nombre: 'Placa', posicion: [-14, ARRIBA + 10, 0], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver', posicion: [-22, ARRIBA, -24], rotacionesPermitidas: [0, 90, 180, 270] },
     { id: 'bateria', tipo: 'bateria', nombre: 'Batería', posicion: [-16, ARRIBA, 24] },
+    // Una batería grande (2×18650) no cabe al costado sin tocar la rueda: va al centro,
+    // entre las ruedas (sin pasarse de los 10 cm), y la placa y el driver suben al
+    // piso de arriba. Ahí ya no cabe el ultrasonido al frente: quedan los FC-51.
+    { id: 'bateria-centro', tipo: 'bateria', nombre: 'Batería (al centro, entre las ruedas)', posicion: [1, ARRIBA, 0] },
     { id: 'motor-izq', tipo: 'soporte-motor', nombre: 'Motor izquierdo', posicion: [-4, -7.5, -33], rotacion: COLGADO },
     { id: 'motor-der', tipo: 'soporte-motor', nombre: 'Motor derecho', posicion: [-4, -7.5, 33] },
     { id: 'frente', tipo: 'sensor-frontal', nombre: 'Sensor frontal', posicion: [22, ARRIBA, 0] },
@@ -118,7 +122,7 @@ export const CHASIS_MINISUMO: PiezaDef = {
     { id: 'frente-der', tipo: 'sensor-frontal', nombre: 'Sensor frontal derecho', posicion: [30, ARRIBA, 31], rotacion: [0, -15, 0] },
     { id: 'piso-izq', tipo: 'sensor-piso', nombre: 'Sensor de borde izquierdo', posicion: [28, PISO_MINISUMO + 12.5, -38] },
     { id: 'piso-der', tipo: 'sensor-piso', nombre: 'Sensor de borde derecho', posicion: [28, PISO_MINISUMO + 12.5, 38] },
-    { id: 'arriba', tipo: 'piso', nombre: 'Piso de arriba', posicion: [-14, ARRIBA, 0] },
+    { id: 'arriba', tipo: 'piso', nombre: 'Piso de arriba', posicion: [-10, ARRIBA, 0] },
   ],
   encaja: [],
   pines: [],
@@ -126,11 +130,14 @@ export const CHASIS_MINISUMO: PiezaDef = {
   datos: [['Medidas', '98 × 96 mm con pala'], ['Pala', 'Acero 1,5 mm, 37°'], ['Tracción', '2 motores N20 + ruedas de 34 mm'], ['Reglamento', 'Minisumo: ≤ 10 × 10 cm, ≤ 500 g']],
 }
 
-// Piso de arriba del minisumo: placa de 64 × 80 × 3 mm sobre cuatro
+// Piso de arriba del minisumo: placa de 56 × 80 × 3 mm sobre cuatro
 // separadores de latón M3 de 24 mm (más altos que el L298N y que el pack de
 // 18650). Sirve cuando abajo no cabe todo: la placa (ESP32, UNO) o el driver
 // suben aquí. Marco: origen sobre la cara de arriba del chasis.
 export const SEPARADOR_PISO = 24
+/** Largo × ancho de la placa del piso (mm) y dónde van sus 4 separadores. */
+export const PLACA_PISO: [number, number] = [56, 80]
+export const SEPARADORES_PISO: [number, number][] = [[-24, -36], [-24, 36], [24, -36], [24, 36]]
 const ARRIBA_PISO = SEPARADOR_PISO + 3
 export const PISO_ARRIBA_MINISUMO: PiezaDef = {
   id: 'piso-arriba-minisumo',
@@ -141,13 +148,17 @@ export const PISO_ARRIBA_MINISUMO: PiezaDef = {
   masa_g: 16,
   material: 'pla',
   color: '#334155',
-  colisionadores: [{ forma: 'caja', medidas: [64, 3, 80], centro: [0, SEPARADOR_PISO + 1.5, 0] }],
+  colisionadores: [
+    { forma: 'caja', medidas: [PLACA_PISO[0], 3, PLACA_PISO[1]], centro: [0, SEPARADOR_PISO + 1.5, 0] },
+    // Los 4 separadores: lo que va abajo no puede pasar por donde están.
+    ...SEPARADORES_PISO.map(([x, z]) => ({ forma: 'caja' as const, medidas: [5, SEPARADOR_PISO, 5] as [number, number, number], centro: [x, SEPARADOR_PISO / 2, z] as [number, number, number] })),
+  ],
   montajes: [
-    { id: 'placa', tipo: 'placa', nombre: 'Placa (arriba)', posicion: [0, ARRIBA_PISO, -18], rotacionesPermitidas: [0, 180] },
+    { id: 'placa', tipo: 'placa', nombre: 'Placa (arriba)', posicion: [0, ARRIBA_PISO + 10, -18], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver (arriba)', posicion: [0, ARRIBA_PISO, 20], rotacionesPermitidas: [0, 90, 180, 270] },
   ],
   encaja: ['piso'],
   pines: [],
   comportamiento: { tipo: 'chasis' },
-  datos: [['Medidas', '64 × 80 × 3 mm'], ['Separadores', '4 de latón M3 × 24 mm'], ['Masa', '16 g con tornillos']],
+  datos: [['Medidas', '56 × 80 × 3 mm'], ['Separadores', '4 de latón M3 × 24 mm'], ['Masa', '16 g con tornillos']],
 }

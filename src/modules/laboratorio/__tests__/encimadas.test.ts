@@ -7,15 +7,41 @@ describe('piezas encimadas', () => {
     for (const p of PREARMADOS) expect(avisosEnsamblaje(p.construir()).filter(a => a.includes('encimad')), p.id).toEqual([])
   })
 
-  it('en el minisumo el ESP32 y el L298N no caben juntos abajo; con el piso de arriba, sí', () => {
+  it('minisumo con ESP32 y L298N: abajo no caben; con el piso de arriba, sí', () => {
+    let d = robotVacio('chasis-minisumo')
+    const p = (id: string, padre: string, m: string) => { const r = encastrar(d, id, padre, m); d = r.doc; return r.id }
+    const mi = p('motor-n20', 'chasis', 'motor-izq'), md = p('motor-n20', 'chasis', 'motor-der')
+    p('rueda-34', mi, 'eje'); p('rueda-34', md, 'eje')
+    // El L298N toca la rueda: el aviso dice qué hacer.
+    expect(motivoNoEncastra(d, 'l298n', 'chasis', 'driver')).toMatch(/chocaría con Rueda.*Piso de arriba/)
+    // El pack de 18650 al costado también: el aviso propone el centro.
+    expect(motivoNoEncastra(d, 'bateria-2x18650', 'chasis', 'bateria')).toMatch(/chocaría con Rueda.*«Batería \(al centro/)
+    p('bateria-lipo-2s', 'chasis', 'bateria')
+    p('hcsr04', 'chasis', 'frente')
+    const piso = p('piso-arriba-minisumo', 'chasis', 'arriba')
+    p('l298n', piso, 'driver')
+    p('esp32-devkit', piso, 'placa')
+    p('fc51', 'chasis', 'frente-izq'); p('fc51', 'chasis', 'frente-der')
+    p('tcrt5000', 'chasis', 'piso-izq'); p('tcrt5000', 'chasis', 'piso-der')
+    expect(avisosEnsamblaje(d).filter(a => a.includes('encimad'))).toEqual([])
+  })
+
+  it('el pack de 18650 cabe al centro, con la placa y el driver arriba', () => {
+    let d = robotVacio('chasis-minisumo')
+    const p = (id: string, padre: string, m: string) => { const r = encastrar(d, id, padre, m); d = r.doc; return r.id }
+    const mi = p('motor-n20', 'chasis', 'motor-izq'), md = p('motor-n20', 'chasis', 'motor-der')
+    p('rueda-34', mi, 'eje'); p('rueda-34', md, 'eje')
+    p('bateria-2x18650', 'chasis', 'bateria-centro')
+    const piso = p('piso-arriba-minisumo', 'chasis', 'arriba')
+    p('l298n', piso, 'driver')
+    p('esp32-devkit', piso, 'placa')
+    expect(avisosEnsamblaje(d).filter(a => a.includes('encimad'))).toEqual([])
+  })
+
+  it('los separadores del piso de arriba no dejan poner el L298N debajo', () => {
     let d = robotVacio('chasis-minisumo')
     d = encastrar(d, 'l298n', 'chasis', 'driver').doc
-    expect(motivoNoEncastra(d, 'esp32-devkit', 'chasis', 'placa')).toMatch(/no cabe ahí: chocaría con .*L298N.*Piso de arriba/)
-    const piso = encastrar(d, 'piso-arriba-minisumo', 'chasis', 'arriba')
-    d = piso.doc
-    expect(motivoNoEncastra(d, 'esp32-devkit', piso.id, 'placa')).toBeNull()
-    d = encastrar(d, 'esp32-devkit', piso.id, 'placa').doc
-    expect(motivoNoEncastra(d, 'bateria-2x18650', 'chasis', 'bateria')).toBeNull()
+    expect(motivoNoEncastra(d, 'piso-arriba-minisumo', 'chasis', 'arriba')).toMatch(/chocaría con .*L298N\. Cambia de lugar/)
   })
 })
 

@@ -322,14 +322,26 @@ export function motivoNoEncastra(doc: RobotDoc, piezaId: string, instancia: stri
     return 'El robot ya tiene una placa'
   }
   // No cabe: chocaría con otra pieza (pasa en chasis chicos con piezas grandes).
-  const prueba: RobotDoc = { ...doc, piezas: [...doc.piezas, { id: '__nueva__', pieza: piezaId, etiqueta: def.nombre, padre: { instancia, montaje: montajeId } }] }
-  const choque = encimadas(prueba).find(([a, b]) => a.id === '__nueva__' || b.id === '__nueva__')
-  if (choque) {
-    const otra = choque[0].id === '__nueva__' ? choque[1] : choque[0]
-    const conPiso = pieza(raiz(doc).pieza).montajes.some(x => x.tipo === 'piso') && !doc.piezas.some(p => pieza(p.pieza).encaja.includes('piso'))
-    return `${def.nombre} no cabe ahí: chocaría con ${otra.etiqueta}.${conPiso ? ' Agrega el «Piso de arriba» (en Chasis y bases) para subir la placa o el driver.' : ' Prueba en otro lugar.'}`
+  const otra = chocaria(doc, piezaId, instancia, montajeId)
+  if (otra) {
+    // Sugiere un lugar donde sí cabe; si no hay y el chasis admite un piso de arriba, ese piso.
+    const ocupados = new Set(doc.piezas.filter(p => p.padre).map(p => `${p.padre!.instancia}/${p.padre!.montaje}`))
+    const libre = doc.piezas.flatMap(p => pieza(p.pieza).montajes.map(mm => ({ p, mm })))
+      .find(({ p, mm }) => def.encaja.includes(mm.tipo) && !ocupados.has(`${p.id}/${mm.id}`) && !(p.id === instancia && mm.id === montajeId) && !chocaria(doc, piezaId, p.id, mm.id))
+    const conPiso = !def.encaja.includes('piso') && pieza(raiz(doc).pieza).montajes.some(x => x.tipo === 'piso') && !doc.piezas.some(p => pieza(p.pieza).encaja.includes('piso'))
+    const consejo = libre ? ` Ponla en «${libre.mm.nombre}».`
+      : conPiso ? ' Agrega el «Piso de arriba» (en Chasis y bases) y sube ahí la placa o el driver para hacer lugar.'
+      : ' Cambia de lugar la otra pieza o prueba en otro montaje.'
+    return `${def.nombre} no cabe ahí: chocaría con ${otra.etiqueta}.${consejo}`
   }
   return null
+}
+
+/** Con qué pieza chocaría `piezaId` puesta en ese montaje (null = cabe). */
+function chocaria(doc: RobotDoc, piezaId: string, instancia: string, montajeId: string): PiezaEnRobot | null {
+  const prueba: RobotDoc = { ...doc, piezas: [...doc.piezas, { id: '__nueva__', pieza: piezaId, etiqueta: pieza(piezaId).nombre, padre: { instancia, montaje: montajeId } }] }
+  const choque = encimadas(prueba).find(([a, b]) => a.id === '__nueva__' || b.id === '__nueva__')
+  return choque ? (choque[0].id === '__nueva__' ? choque[1] : choque[0]) : null
 }
 
 function slug(s: string) {
