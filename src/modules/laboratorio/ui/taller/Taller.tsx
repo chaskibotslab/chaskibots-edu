@@ -159,7 +159,9 @@ export default function Taller() {
     if (!doc) return []
     const { tabla } = autocablear(doc, { conservar: true })
     const pre = PREARMADOS.find(p => p.id === prearmado)
-    return pre ? pre.plantillas(doc, tabla) : plantillasGenericas(doc, tabla)
+    // Las del proyecto primero; después, los ejemplos de cada pieza que tenga el robot.
+    const propias = pre ? pre.plantillas(doc, tabla) : []
+    return [...propias, ...plantillasGenericas(doc, tabla).filter(g => !propias.some(x => x.id === g.id))]
   }, [doc, prearmado])
 
   const exportar = () => {

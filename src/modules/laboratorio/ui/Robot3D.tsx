@@ -16,9 +16,10 @@ import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
 import { infoPlaca } from '../engine/placa'
 import {
-  ArduinoNano, ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
+  ArduinoNano, ArduinoUno, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
   ChasisMinisumo, MotorN20, BateriaLipo,
 } from './modelos/Piezas3D'
+import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
 import { CircuitoVivoContexto, ModeloCircuito, esModeloCircuito, type CircuitoVivo } from './modelos/Circuito3D'
 
 const m = (v: number) => v / 1000
@@ -97,6 +98,7 @@ function ModeloProc({ inst, def, refs, espaciadorLoca }: { inst: PiezaEnRobot; d
     case 'proc:bateria-18650': return <Bateria18650 />
     case 'proc:bateria-9v': return <Bateria9V />
     case 'proc:bateria-lipo': return <BateriaLipo />
+    case 'proc:piso-arriba': return <PisoArriba alto={SEPARADOR_PISO} color={v.color ?? '#334155'} />
     case 'proc:chasis-minisumo': return <ChasisMinisumo material={v.material} color={v.color ?? '#1f2430'} />
     case 'proc:motor-n20': return <MotorN20 />
     case 'proc:motor-tt': return <MotorTT />

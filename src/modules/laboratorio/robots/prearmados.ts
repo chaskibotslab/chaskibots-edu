@@ -1079,6 +1079,115 @@ export function plantillasGenericas(doc: RobotDoc, tabla: FilaPin[]): PlantillaC
   if (doc.piezas.some(p => p.pieza === 'hcsr04') && doc.piezas.some(p => p.pieza === 'sg90' || p.pieza === 'mg90s')) {
     out.push({ id: 'evita', nombre: 'Evita obstáculos', descripcion: 'Ultrasonido sobre servo', codigo: codigoEvita(tabla, doc) })
   }
+  if (doc.piezas.some(p => p.pieza === 'chasis-minisumo')) {
+    out.push({ id: 'minisumo', nombre: 'Minisumo (buscar y atacar)', descripcion: 'Espera, busca, ataca y evita el borde', codigo: codigoMinisumo(tabla, doc) })
+  }
+  out.push(...ejemplosPorPieza(doc, tabla))
   out.push({ id: 'blink', nombre: 'Blink (LED 13)', descripcion: 'Primer programa', codigo: BLINK })
+  return out
+}
+
+/**
+ * Un ejemplo corto para cada sensor y servo conectado: el alumno ve cómo se
+ * lee o se mueve esa pieza con los pines de SU robot (Monitor Serie).
+ */
+export function ejemplosPorPieza(doc: RobotDoc, tabla: FilaPin[]): PlantillaCodigo[] {
+  const out: PlantillaCodigo[] = []
+  const pin = (inst: string, p: string) => pinDePlaca(tabla, inst, p)
+  const nombre = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_|_$/g, '')
+  for (const p of doc.piezas) {
+    const c = pieza(p.pieza).comportamiento
+    if (c.tipo === 'ultrasonido') {
+      const trig = pin(p.id, 'TRIG'), echo = pin(p.id, 'ECHO')
+      if (!trig || !echo) continue
+      out.push({
+        id: `leer-${p.id}`, nombre: `Leer: ${p.etiqueta}`, descripcion: 'Distancia en cm en el Monitor Serie',
+        codigo: `// ${p.etiqueta}: muestra la distancia en el Monitor Serie.
+const int TRIG = ${pinCodigo(trig)};
+const int ECHO = ${pinCodigo(echo)};
+
+${MEDIR_CM}
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.print("Distancia: ");
+  Serial.print(medirCm());
+  Serial.println(" cm");
+  delay(200);
+}
+`,
+      })
+    } else if (c.tipo === 'ir-reflectivo') {
+      const d = pin(p.id, 'DO'), a = pin(p.id, 'AO')
+      if (!d && !a) continue
+      const n = nombre(p.etiqueta)
+      out.push({
+        id: `leer-${p.id}`, nombre: `Leer: ${p.etiqueta}`, descripcion: 'Negro o blanco debajo del sensor',
+        codigo: `// ${p.etiqueta}: dice si debajo hay negro (línea) o blanco.
+${d ? `const int ${n} = ${pinCodigo(d)};   // DO: HIGH = negro
+` : ''}${a ? `const int ${n}_A = ${pinCodigo(a)};  // AO: más alto = más oscuro
+` : ''}
+void setup() {
+${d ? `  pinMode(${n}, INPUT);
+` : ''}  Serial.begin(9600);
+}
+
+void loop() {
+${d ? `  Serial.print(digitalRead(${n}) == HIGH ? "negro" : "blanco");
+` : ''}${a ? `  Serial.print("  valor: ");
+  Serial.print(analogRead(${n}_A));
+` : ''}  Serial.println();
+  delay(200);
+}
+`,
+      })
+    } else if (c.tipo === 'ir-obstaculo') {
+      const o = pin(p.id, 'OUT')
+      if (!o) continue
+      const n = nombre(p.etiqueta)
+      out.push({
+        id: `leer-${p.id}`, nombre: `Leer: ${p.etiqueta}`, descripcion: '¿Hay algo cerca?',
+        codigo: `// ${p.etiqueta}: avisa si hay algo adelante (LOW = hay obstáculo).
+const int ${n} = ${pinCodigo(o)};
+
+void setup() {
+  pinMode(${n}, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.println(digitalRead(${n}) == LOW ? "hay algo" : "libre");
+  delay(200);
+}
+`,
+      })
+    } else if (c.tipo === 'servo') {
+      const sig = pin(p.id, 'SIG')
+      if (!sig) continue
+      out.push({
+        id: `mover-${p.id}`, nombre: `Mover: ${p.etiqueta}`, descripcion: 'De 0° a 180° y de vuelta',
+        codigo: `// ${p.etiqueta}: barre de 0° a 180° y vuelve, de a 10°.
+#include <Servo.h>
+
+Servo servo;
+
+void setup() {
+  servo.attach(${pinCodigo(sig)});
+  Serial.begin(9600);
+}
+
+void loop() {
+  for (int a = 0; a <= 180; a += 10) { servo.write(a); Serial.println(a); delay(150); }
+  for (int a = 180; a >= 0; a -= 10) { servo.write(a); Serial.println(a); delay(150); }
+}
+`,
+      })
+    }
+  }
   return out
 }

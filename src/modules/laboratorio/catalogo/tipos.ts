@@ -36,6 +36,7 @@ export type TipoMontaje =
   | 'eje-servo'       // lo que gira con el servo
   | 'protoboard'      // LED, resistencia, pulsador… pinchados en la protoboard
   | 'maqueta'         // maqueta del proyecto (basurero…) junto a la protoboard
+  | 'piso'            // segundo piso sobre separadores (cuando abajo no cabe todo)
 
 export interface PuntoMontaje {
   id: string

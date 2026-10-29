@@ -108,7 +108,8 @@ export function planDe(doc: RobotDoc): SimPlan {
       return (t.tipo === 'puente-h' && mismo([p.id, '+'], [d.id, t.alim.motor])) || (t.tipo === 'mcu' && mismo([p.id, '+'], [d.id, 'VIN']))
     })
     if (conectada) voltajeBateria = Math.max(voltajeBateria, c.voltaje)
-    else avisos.push(`${p.etiqueta}: no está conectada`)
+    // En la mesa de electrónica la pila puede alimentar el circuito directamente.
+    else if (!doc.cables.some(cb => [cb.de, cb.a].some(([i, pin]) => i === p.id && pin === '+'))) avisos.push(`${p.etiqueta}: no está conectada`)
   }
 
   const rs = ruedas(doc, poses(doc))

@@ -201,12 +201,73 @@ export function resumen(doc: RobotDoc, ps = poses(doc)): Resumen {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Piezas encimadas: dos piezas no pueden ocupar el mismo lugar
+// ---------------------------------------------------------------------------
+
+/** Caja orientada (mm, marco del robot): centro, ejes y medias medidas. */
+interface Caja { c: Vector3; ejes: Vector3[]; h: number[] }
+
+function cajasDe(def: PiezaDef, pose: Pose): Caja[] {
+  return def.colisionadores.map(col => {
+    let h: number[]
+    if (col.forma === 'caja') h = col.medidas.map(x => x / 2)
+    else if (col.forma === 'esfera') h = [col.radio, col.radio, col.radio]
+    else h = col.eje === 'x' ? [col.alto / 2, col.radio, col.radio] : col.eje === 'y' ? [col.radio, col.alto / 2, col.radio] : [col.radio, col.radio, col.alto / 2]
+    const q = pose.rot.clone()
+    if (col.forma === 'caja' && col.rotacion) q.multiply(new Quaternion().setFromEuler(new Euler(grados(col.rotacion[0]), grados(col.rotacion[1]), grados(col.rotacion[2]), 'XYZ')))
+    return {
+      c: aRobot(pose, col.centro ?? [0, 0, 0]),
+      ejes: [new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)].map(v => v.applyQuaternion(q)),
+      h,
+    }
+  })
+}
+
+/** Cuánto se meten dos cajas una en la otra (mm; 0 = no se tocan), por ejes separadores. */
+function penetracion(a: Caja, b: Caja): number {
+  const d = b.c.clone().sub(a.c)
+  const ejes = [...a.ejes, ...b.ejes]
+  for (const u of a.ejes) for (const v of b.ejes) { const x = u.clone().cross(v); if (x.lengthSq() > 1e-6) ejes.push(x.normalize()) }
+  let min = Infinity
+  for (const e of ejes) {
+    const ra = a.h.reduce((s, h, i) => s + h * Math.abs(a.ejes[i].dot(e)), 0)
+    const rb = b.h.reduce((s, h, i) => s + h * Math.abs(b.ejes[i].dot(e)), 0)
+    const p = ra + rb - Math.abs(d.dot(e))
+    if (p <= 0) return 0
+    min = Math.min(min, p)
+  }
+  return min
+}
+
+/** Margen: piezas que apenas se rozan (tornillos, cables, separadores) no cuentan. */
+const MARGEN_ENCIMADO = 1.5
+
+/** Pares de piezas que ocupan el mismo lugar (las que cuelgan una de la otra no cuentan). */
+export function encimadas(doc: RobotDoc, ps = poses(doc)): [PiezaEnRobot, PiezaEnRobot][] {
+  // La rueda loca se simula como una bola aparte (con sus separadores): su caja no cuenta.
+  const piezas = doc.piezas.filter(p => pieza(p.pieza).comportamiento.tipo !== 'rueda-loca')
+  const linaje = new Map(piezas.map(p => [p.id, new Set(descendientes(doc, p.id))]))
+  const cajas = new Map(piezas.map(p => [p.id, cajasDe(pieza(p.pieza), ps.get(p.id)!)]))
+  const out: [PiezaEnRobot, PiezaEnRobot][] = []
+  piezas.forEach((a, i) => {
+    for (const b of piezas.slice(i + 1)) {
+      if (linaje.get(a.id)!.has(b.id) || linaje.get(b.id)!.has(a.id)) continue
+      if (cajas.get(a.id)!.some(x => cajas.get(b.id)!.some(y => penetracion(x, y) > MARGEN_ENCIMADO))) out.push([a, b])
+    }
+  })
+  return out
+}
+
 /** Avisos de armado que el alumno debe ver (no impiden probar). */
 export function avisosEnsamblaje(doc: RobotDoc): string[] {
   const avisos: string[] = []
+  for (const [a, b] of encimadas(doc)) avisos.push(`${a.etiqueta} y ${b.etiqueta} están encimados: cambia uno de lugar`)
   if (esBanco(doc)) {
-    // En la mesa de electrónica no hay ruedas ni motores: solo hace falta la placa.
-    if (!doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'mcu')) avisos.push('Falta la placa (Arduino o ESP32): nadie va a controlar el circuito')
+    // En la mesa de electrónica no hay ruedas ni motores: hace falta la placa o, para
+    // un circuito sin programa, una batería.
+    const tiene = (t: string) => doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === t)
+    if (!tiene('mcu') && !tiene('bateria')) avisos.push('Falta la placa (Arduino o ESP32) o una batería: el circuito no tiene de dónde sacar corriente')
     return avisos
   }
   const ps = poses(doc)
@@ -259,6 +320,14 @@ export function motivoNoEncastra(doc: RobotDoc, piezaId: string, instancia: stri
   if (doc.piezas.some(p => p.padre?.instancia === instancia && p.padre.montaje === montajeId)) return `«${m.nombre}» ya está ocupado`
   if (def.comportamiento.tipo === 'mcu' && doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'mcu')) {
     return 'El robot ya tiene una placa'
+  }
+  // No cabe: chocaría con otra pieza (pasa en chasis chicos con piezas grandes).
+  const prueba: RobotDoc = { ...doc, piezas: [...doc.piezas, { id: '__nueva__', pieza: piezaId, etiqueta: def.nombre, padre: { instancia, montaje: montajeId } }] }
+  const choque = encimadas(prueba).find(([a, b]) => a.id === '__nueva__' || b.id === '__nueva__')
+  if (choque) {
+    const otra = choque[0].id === '__nueva__' ? choque[1] : choque[0]
+    const conPiso = pieza(raiz(doc).pieza).montajes.some(x => x.tipo === 'piso') && !doc.piezas.some(p => pieza(p.pieza).encaja.includes('piso'))
+    return `${def.nombre} no cabe ahí: chocaría con ${otra.etiqueta}.${conPiso ? ' Agrega el «Piso de arriba» (en Chasis y bases) para subir la placa o el driver.' : ' Prueba en otro lugar.'}`
   }
   return null
 }

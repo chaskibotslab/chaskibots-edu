@@ -16,6 +16,8 @@ import type { RobotDoc } from '../robots/doc'
 import { CALIDADES, CalidadContexto, type NivelCalidad } from './calidad'
 
 export type ModoCamara = 'libre' | 'seguir' | 'arriba'
+/** Pedido de zoom desde los botones (+/−): cada pedido nuevo (n distinto) acerca o aleja la cámara. */
+export interface PedidoZoom { n: number; factor: number }
 
 function Estudio({ intensidad = 1 }: { intensidad?: number }) {
   return (
@@ -297,7 +299,7 @@ function Rastro({ sim, version }: { sim: Simulacion; version: number }) {
   return <primitive object={linea} />
 }
 
-function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
+function ControlCamara({ sim, modo, zoom }: { sim: Simulacion; modo: ModoCamara; zoom?: PedidoZoom }) {
   const controles = useRef<React.ElementRef<typeof OrbitControls>>(null)
   const { camera } = useThree()
   const deseada = useMemo(() => new THREE.Vector3(), [])
@@ -324,6 +326,17 @@ function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
     controles.current?.update()
   }, [modo, camera, sim, banco])
 
+  // Botones de zoom: acercar o alejar la cámara hacia lo que mira (dentro de los límites).
+  useEffect(() => {
+    const c = controles.current
+    if (!zoom?.n || !c) return
+    const t = c.target
+    const v = camera.position.clone().sub(t)
+    const d = Math.min(c.maxDistance, Math.max(c.minDistance, v.length() * zoom.factor))
+    camera.position.copy(t).add(v.setLength(d))
+    c.update()
+  }, [zoom, camera])
+
   useFrame(() => {
     if (modo !== 'seguir' || !sim.fisica) return
     const p = sim.fisica.body.translation()
@@ -349,7 +362,7 @@ function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
   )
 }
 
-export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel }: { sim: Simulacion; modoCamara: ModoCamara; versionArena: number; nivel: NivelCalidad; onNivel: (n: NivelCalidad) => void }) {
+export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel, zoom }: { sim: Simulacion; modoCamara: ModoCamara; versionArena: number; nivel: NivelCalidad; onNivel: (n: NivelCalidad) => void; zoom?: PedidoZoom }) {
   const q = CALIDADES[nivel]
   return (
     <Lienzo nivel={nivel} onNivel={onNivel} camara={[-1.1, 0.9, 1.3]}>
@@ -361,7 +374,7 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel }: {
       <Robot3D doc={sim.doc} sim={sim} />
       {sim.arena.banco && sim.plan.ultrasonidos.length > 0 && <Mano3D sim={sim} />}
       {sim.competencia && <Robot3D doc={sim.competencia.rival.doc} sim={sim.competencia.rival} />}
-      <ControlCamara sim={sim} modo={modoCamara} />
+      <ControlCamara sim={sim} modo={modoCamara} zoom={zoom} />
     </Lienzo>
   )
 }

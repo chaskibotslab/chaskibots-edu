@@ -200,6 +200,19 @@ export function SeparadoresPlaca({ largo, ancho }: { largo: number; ancho: numbe
   return <>{[[-x, -z], [-x, z], [x, -z], [x, z]].map(([px, pz], i) => <Separador key={i} pos={[px, -10, pz]} alto={10} />)}</>
 }
 
+/** Piso de arriba del minisumo: placa sobre cuatro separadores de latón (ver PISO_ARRIBA_MINISUMO). */
+export function PisoArriba({ alto, color }: { alto: number; color: string }) {
+  const q = useCalidad()
+  return (
+    <group>
+      {[[-28, -36], [-28, 36], [28, -36], [28, 36]].map(([x, z], i) => <Separador key={i} pos={[x, 0, z]} alto={alto} />)}
+      <RoundedBox args={[m(64), m(3), m(80)]} radius={m(1)} position={M(0, alto + 1.5, 0)} castShadow={q.sombras} receiveShadow>
+        <meshStandardMaterial color={color} roughness={0.55} />
+      </RoundedBox>
+    </group>
+  )
+}
+
 /** Pines del Nano por lado (USB hacia −x), según su serigrafía. */
 const NANO_ATRAS = ['D13', '3V3', 'AREF', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', '5V', 'RST', 'GND', 'VIN']
 const NANO_ADELANTE = ['D12', 'D11', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'GND', 'RST', 'D0', 'D1']

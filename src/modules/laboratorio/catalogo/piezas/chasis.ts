@@ -118,9 +118,36 @@ export const CHASIS_MINISUMO: PiezaDef = {
     { id: 'frente-der', tipo: 'sensor-frontal', nombre: 'Sensor frontal derecho', posicion: [30, ARRIBA, 31], rotacion: [0, -15, 0] },
     { id: 'piso-izq', tipo: 'sensor-piso', nombre: 'Sensor de borde izquierdo', posicion: [28, PISO_MINISUMO + 12.5, -38] },
     { id: 'piso-der', tipo: 'sensor-piso', nombre: 'Sensor de borde derecho', posicion: [28, PISO_MINISUMO + 12.5, 38] },
+    { id: 'arriba', tipo: 'piso', nombre: 'Piso de arriba', posicion: [-14, ARRIBA, 0] },
   ],
   encaja: [],
   pines: [],
   comportamiento: { tipo: 'chasis' },
   datos: [['Medidas', '98 × 96 mm con pala'], ['Pala', 'Acero 1,5 mm, 37°'], ['Tracción', '2 motores N20 + ruedas de 34 mm'], ['Reglamento', 'Minisumo: ≤ 10 × 10 cm, ≤ 500 g']],
+}
+
+// Piso de arriba del minisumo: placa de 64 × 80 × 3 mm sobre cuatro
+// separadores de latón M3 de 24 mm (más altos que el L298N y que el pack de
+// 18650). Sirve cuando abajo no cabe todo: la placa (ESP32, UNO) o el driver
+// suben aquí. Marco: origen sobre la cara de arriba del chasis.
+export const SEPARADOR_PISO = 24
+const ARRIBA_PISO = SEPARADOR_PISO + 3
+export const PISO_ARRIBA_MINISUMO: PiezaDef = {
+  id: 'piso-arriba-minisumo',
+  nombre: 'Piso de arriba (minisumo)',
+  familia: 'chasis',
+  descripcion: 'Una segunda base sobre separadores de 24 mm. Cuando la placa, el driver y la batería no caben juntos en el minisumo, sube la placa o el driver aquí.',
+  modelo: 'proc:piso-arriba',
+  masa_g: 16,
+  material: 'pla',
+  color: '#334155',
+  colisionadores: [{ forma: 'caja', medidas: [64, 3, 80], centro: [0, SEPARADOR_PISO + 1.5, 0] }],
+  montajes: [
+    { id: 'placa', tipo: 'placa', nombre: 'Placa (arriba)', posicion: [0, ARRIBA_PISO, -18], rotacionesPermitidas: [0, 180] },
+    { id: 'driver', tipo: 'driver', nombre: 'Driver (arriba)', posicion: [0, ARRIBA_PISO, 20], rotacionesPermitidas: [0, 90, 180, 270] },
+  ],
+  encaja: ['piso'],
+  pines: [],
+  comportamiento: { tipo: 'chasis' },
+  datos: [['Medidas', '64 × 80 × 3 mm'], ['Separadores', '4 de latón M3 × 24 mm'], ['Masa', '16 g con tornillos']],
 }

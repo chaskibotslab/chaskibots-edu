@@ -57,6 +57,9 @@ export const PROTOBOARD: PiezaDef = {
     { id: 'sensor', tipo: 'sensor-frontal', nombre: 'Borde derecho (sensor)', posicion: [74, ALTO_PROTOBOARD, 0] },
     { id: 'servo', tipo: 'soporte-servo', nombre: 'Detrás de la protoboard (servo)', posicion: [30, 0, -50] },
     { id: 'maqueta', tipo: 'maqueta', nombre: 'Junto a la protoboard (maqueta)', posicion: [175, 0, 0] },
+    // Batería sobre la mesa, adelante, con los bornes hacia la protoboard: para
+    // probar circuitos sin placa (LED + resistencia + pila).
+    { id: 'bateria', tipo: 'bateria', nombre: 'Delante de la protoboard (batería)', posicion: [-40, 0, 72], rotacion: [0, 90, 0] },
   ],
   encaja: [],
   pines: [],

@@ -840,6 +840,26 @@ export function construirReflejos(): RobotDoc {
   return b.terminar(REFLEJOS)
 }
 
+// Sin placa: la pila alimenta el circuito (no hace falta programa).
+const LED_PILA = `// Este circuito no necesita programa: la pila de 9 V lo alimenta.
+// Prueba cambiar la resistencia de 1 kΩ por una de 220 Ω (brilla más)
+// o por una de 10 kΩ (casi no brilla). Sin resistencia, el LED se quema.
+void setup() {}
+void loop() {}
+`
+
+export function construirLedPila(): RobotDoc {
+  const b = new Banco('LED con pila')
+  b.doc = { ...b.doc, piezas: b.doc.piezas.filter(p => p.id !== 'placa') }
+  const pila = b.montar('bateria-9v', 'protoboard', 'bateria')
+  const r = b.poner('resistencia-1000', 2)
+  const l = b.poner('led-rojo', 10)
+  b.cable([pila, '+'], [r, '1'], ROJO)
+  b.cable([r, '2'], [l, 'A'], GRIS)
+  b.cable([l, 'K'], [pila, '-'], NEGRO)
+  return b.terminar(LED_PILA)
+}
+
 // Kit de 9no: todo con Arduino Nano y los pines de la guía (LED D8, TRIG D9,
 // ECHO D10, servo D6, potenciómetro A0, pulsador D2).
 const NANO = 'arduino-nano'
@@ -1085,6 +1105,14 @@ export const PROYECTOS_CIRCUITO: Prearmado[] = [
     logica: ['El pulsador prende o apaga la alarma', 'La perilla fija el alcance: de 10 a 100 cm', 'Si hay algo dentro del alcance, el LED parpadea', 'Más cerca = parpadeo más rápido (map)'],
     construir: construirAlarmaProximidad,
     plantillas: conPlantillas([{ id: 'alarma-proximidad', nombre: 'Alarma de proximidad (kit)', descripcion: 'Parpadeo según la distancia', codigo: ALARMA_PROXIMIDAD }]),
+  },
+  {
+    id: 'led-pila', categoria: 'electronica',
+    nombre: 'LED con pila (sin Arduino)', dificultad: 'inicial', arena: 'mesa-electronica',
+    descripcion: 'El circuito más simple: una pila de 9 V, una resistencia y un LED. No hace falta programa: entra a «Probar» y el LED ya está encendido. Cambia la resistencia y mira qué pasa.',
+    logica: ['La corriente sale del + de la pila', 'Pasa por la resistencia, que la frena', 'Entra al LED por la pata larga y lo enciende', 'Vuelve al − de la pila'],
+    construir: construirLedPila,
+    plantillas: conPlantillas([]),
   },
   {
     id: 'pot-brillo', categoria: 'electronica',
