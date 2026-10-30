@@ -1,4 +1,4 @@
-// Descarga modelos GRATUITOS de Sketchfab (GLB) con su licencia, para el
+// Descarga modelos GRATUITOS (nunca de pago) de Sketchfab (GLB) con su licencia, para el
 // laboratorio. La clave de API se lee de .env.local (SKETCHFAB_API_TOKEN) y
 // nunca se imprime. Solo baja modelos descargables con licencia que permita
 // usarlos en la plataforma (CC0, CC BY, CC BY-SA); los NC/ND se informan y
@@ -55,6 +55,8 @@ function registrarLicencia(m, archivo) {
 async function bajar(uid) {
   const m = await api(`/models/${uid}`)
   const lic = m.license?.slug
+  // Solo diseños gratis: los de la tienda (con precio) se saltan aunque se puedan comprar.
+  if (m.price || m.isPurchasable) return console.log(`  ✗ ${m.name}: es de pago`)
   if (!m.isDownloadable) return console.log(`  ✗ ${m.name}: no es descargable`)
   if (!PERMITIDAS.has(lic)) return console.log(`  ✗ ${m.name}: licencia ${m.license?.label ?? '?'} (no permitida para la plataforma)`)
   const d = await api(`/models/${uid}/download`)
