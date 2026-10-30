@@ -11,20 +11,6 @@ const futura = {
   comportamiento: { tipo: 'sin-simular' as const },
 }
 
-export const JOYSTICK: PiezaDef = {
-  ...futura,
-  id: 'joystick',
-  nombre: 'Joystick analógico KY-023',
-  familia: 'sensor',
-  descripcion: 'Palanca de dos ejes con botón: para manejar robots en vivo (radiocontrol).',
-  proximamente: 'Ya puedes manejar tus robots con el botón «Control» de la pestaña Probar (teclado, pantalla o control de videojuego). El joystick como pieza física llega con la estación de control.',
-  modelo: 'proc:joystick',
-  glb: '/lab/modelos/joystick.glb',
-  masa_g: 12,
-  colisionadores: [{ forma: 'caja', medidas: [29.6, 22.3, 37.8], centro: [0, 11, 0] }],
-  datos: [['Ejes', 'X e Y analógicos (0–1023)'], ['Botón', 'Al presionar la palanca']],
-}
-
 export const MPU6050: PiezaDef = {
   ...futura,
   id: 'mpu6050',

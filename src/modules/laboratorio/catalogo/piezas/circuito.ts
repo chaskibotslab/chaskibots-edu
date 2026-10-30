@@ -135,6 +135,8 @@ export const PROTOBOARD: PiezaDef = {
     // Batería sobre la mesa, adelante, con los bornes hacia la protoboard: para
     // probar circuitos sin placa (LED + resistencia + pila).
     { id: 'bateria', tipo: 'bateria', nombre: 'Delante de la protoboard (batería)', posicion: [-40, 0, 72], rotacion: [0, 90, 0] },
+    // Joystick sobre la mesa, adelante a la derecha, con sus pines hacia la protoboard.
+    { id: 'modulo', tipo: 'modulo-mesa', nombre: 'Delante de la protoboard, a la derecha (joystick)', posicion: [45, 0, 75], rotacion: [0, 180, 0] },
   ],
   encaja: [],
   // Los rieles: el + y el − de cada lado. Una batería o la placa los alimenta

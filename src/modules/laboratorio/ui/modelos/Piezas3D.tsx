@@ -214,6 +214,28 @@ export function PisoArriba({ alto, color }: { alto: number; color: string }) {
   )
 }
 
+/** Joystick KY-023 hecho por código (respaldo del modelo real): placa, base y palanca. */
+export function Joystick() {
+  const q = useCalidad()
+  return (
+    <group>
+      <mesh position={M(0, 0.8, -2)} castShadow={q.sombras}>
+        <boxGeometry args={[m(26), m(1.6), m(34)]} />
+        <meshStandardMaterial color="#111" roughness={0.5} />
+      </mesh>
+      <mesh position={M(0, 7, -4)} castShadow={q.sombras}>
+        <boxGeometry args={[m(16), m(11), m(16)]} />
+        <meshStandardMaterial color="#1f2937" roughness={0.5} />
+      </mesh>
+      <mesh position={M(0, 16, -4)} castShadow={q.sombras}>
+        <cylinderGeometry args={[m(9), m(10), m(5), q.segmentos]} />
+        <meshStandardMaterial color="#27272a" roughness={0.6} />
+      </mesh>
+      <Pines n={5} pos={[0, 1.6, 15.5]} />
+    </group>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Arduino Mega 2560 (largo a lo largo de z, USB hacia −z)
 // ---------------------------------------------------------------------------
@@ -855,6 +877,11 @@ export function anclaPin(modelo: string, pin: string): V | null {
       const i = ['VCC', 'TRIG', 'ECHO', 'GND'].indexOf(pin)
       return i >= 0 ? [-3, 3, 4.1 - i * 2.5] : null
     }
+    case 'proc:joystick': {
+      // Tira de 5 pines en ángulo del borde +z, en el orden de la serigrafía.
+      const i = ['GND', '+5V', 'VRx', 'VRy', 'SW'].indexOf(pin)
+      return i >= 0 ? [-5.08 + i * 2.54, 1.5, 17.5] : null
+    }
   }
   return anclaCircuito(modelo, pin)
 }
@@ -880,6 +907,7 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
     case 'proc:servo': return { dir: [1, 0, 0], tipo: 'dupont' }
     case 'proc:fc51': return { dir: [-1, 0, 0], tipo: 'dupont' }
     case 'proc:hcsr04': return { dir: [-1, 0, 0], tipo: 'dupont' }
+    case 'proc:joystick': return { dir: [0, 0, 1], tipo: 'dupont' }
   }
   if (anclaCircuito(modelo, pin)) return { dir: [0, 1, 0], tipo: 'macho' }
   return { dir: [0, 1, 0], tipo: 'dupont' }

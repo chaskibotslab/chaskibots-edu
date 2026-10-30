@@ -71,3 +71,31 @@ export const HCSR04: PiezaDef = {
   datos: [['Alcance', '2–400 cm'], ['Apertura', '≈ 15°'], ['Voltaje', '5 V'], ['Fórmula', 'cm = µs del eco ÷ 58']],
   fuente: 'HC-SR04, hoja de datos (ElecFreaks)',
 }
+
+/**
+ * Joystick KY-023 (modelo real del paquete «Electronics Components»): dos
+ * potenciómetros de 10 kΩ (ejes X e Y) y un botón al presionar la palanca.
+ * Sus pines salen por el borde +z, en el orden de la serigrafía.
+ */
+export const JOYSTICK: PiezaDef = {
+  id: 'joystick',
+  nombre: 'Joystick analógico KY-023',
+  familia: 'sensor',
+  descripcion: 'Palanca de dos ejes con botón. Cada eje es un potenciómetro: en el centro analogRead da unos 512, y de 0 a 1023 hacia cada lado. El botón (SW) va a tierra al presionar la palanca: se lee con INPUT_PULLUP.',
+  modelo: 'proc:joystick',
+  glb: '/lab/modelos/joystick.glb',
+  masa_g: 12,
+  material: 'pcb',
+  colisionadores: [{ forma: 'caja', medidas: [29.6, 22.3, 37.8], centro: [0, 11, -2] }],
+  montajes: [],
+  encaja: ['modulo-mesa'],
+  pines: [
+    { nombre: 'GND', tipo: 'gnd', ayuda: 'Tierra' },
+    { nombre: '+5V', tipo: 'alim', ayuda: 'Alimentación: 5 V (o 3,3 V en el ESP32 y la Pico)' },
+    { nombre: 'VRx', tipo: 'analogico', ayuda: 'Eje X: a una entrada analógica' },
+    { nombre: 'VRy', tipo: 'analogico', ayuda: 'Eje Y: a una entrada analógica' },
+    { nombre: 'SW', tipo: 'digital', ayuda: 'Botón: a un pin digital con INPUT_PULLUP (presionado = LOW)' },
+  ],
+  comportamiento: { tipo: 'joystick', ohm: 10000 },
+  datos: [['Ejes', 'X e Y analógicos (0–1023, centro ≈ 512)'], ['Botón', 'Al presionar la palanca (SW a tierra)'], ['Alimentación', '3,3–5 V']],
+}

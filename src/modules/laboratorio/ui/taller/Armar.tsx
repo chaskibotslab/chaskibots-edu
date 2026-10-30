@@ -40,8 +40,8 @@ interface Props {
   onListaMateriales: () => void
 }
 
-/** En la mesa, la pila de 9 V también aparece en «Componentes» (junto a la fuente MB102 y el portapilas). */
-const BATERIAS_MESA = [pieza('bateria-9v')]
+/** En la mesa, la pila de 9 V y el joystick también aparecen en «Componentes». */
+const EXTRAS_MESA = [pieza('bateria-9v'), pieza('joystick')]
 
 /** Base del robot (chasis o protoboard): se cambia, no se encastra. El «piso de arriba» es de la familia pero se encastra. */
 const esBase = (def: PiezaDef) => def.familia === 'chasis' && !def.encaja.length
@@ -207,7 +207,7 @@ export default function Armar(p: Props) {
               </ul>
             ) : (
             <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 gap-2 overflow-y-auto p-2 sm:grid-cols-3 lg:grid-cols-1">
-              {[...piezasDe(familia), ...(banco && familia === 'circuito' ? BATERIAS_MESA : [])].sort((a, b) => Number(!!b.enKits) - Number(!!a.enKits)).map(def => (
+              {[...piezasDe(familia), ...(banco && familia === 'circuito' ? EXTRAS_MESA : [])].sort((a, b) => Number(!!b.enKits) - Number(!!a.enKits)).map(def => (
                 <TarjetaPieza
                   key={def.id}
                   def={def}

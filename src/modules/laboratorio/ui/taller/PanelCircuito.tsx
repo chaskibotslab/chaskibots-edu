@@ -4,12 +4,13 @@
 // perillas, luz sobre la LDR, la mano frente al sensor ultrasónico) y lo que el
 // circuito muestra (LED, buzzers, distancia medida y ángulo de cada servo).
 // Los pulsadores también se presionan haciendo clic sobre ellos en 3D, o con
-// las teclas 1, 2, 3… mientras se mantienen apretadas.
+// las teclas 1, 2, 3… mientras se mantienen apretadas. El joystick se mueve
+// arrastrando su palanca o con las flechas, y vuelve al centro al soltarlo.
 
 import { useEffect, useMemo, useState } from 'react'
 import { Hand, Moon, Sun, Volume2, VolumeX } from 'lucide-react'
 import { pieza } from '../../catalogo/piezas'
-import { LUZ_INICIAL, MANO_MAX_CM, MANO_MIN_CM, PERILLA_INICIAL } from '../../engine/circuito'
+import { ejeJoystick, LUZ_INICIAL, MANO_MAX_CM, MANO_MIN_CM, PERILLA_INICIAL } from '../../engine/circuito'
 import type { Simulacion, Telemetria } from '../../engine/simulation'
 
 interface Props {
@@ -45,6 +46,27 @@ export default function PanelCircuito({ sim, tele, silencio, onSilencio, onGesto
     return () => { window.removeEventListener('keydown', bajar); window.removeEventListener('keyup', subir) }
   }, [sim, botones, onGesto])
 
+  // Flechas: llevan la palanca del (primer) joystick a ese lado mientras se mantienen.
+  const joystick = plan?.controles.find(c => c.tipo === 'joystick')
+  useEffect(() => {
+    if (!joystick) return
+    const ejes: Record<string, ['x' | 'y', number]> = { ArrowLeft: ['x', 0], ArrowRight: ['x', 1], ArrowDown: ['y', 0], ArrowUp: ['y', 1] }
+    const tecla = (abajo: boolean) => (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
+      const eje = ejes[e.key]
+      if (!eje) return
+      e.preventDefault()
+      if (abajo) onGesto()
+      sim.ajustar(ejeJoystick(joystick.inst, eje[0]), abajo ? eje[1] : PERILLA_INICIAL)
+      refrescar(x => x + 1)
+    }
+    const bajar = tecla(true), subir = tecla(false)
+    window.addEventListener('keydown', bajar)
+    window.addEventListener('keyup', subir)
+    return () => { window.removeEventListener('keydown', bajar); window.removeEventListener('keyup', subir) }
+  }, [sim, joystick, onGesto])
+
   const ultrasonido = sim.plan.ultrasonidos[0]
   const servos = sim.plan.servos
   if (!plan && !ultrasonido && !servos.length) return null
@@ -61,6 +83,7 @@ export default function PanelCircuito({ sim, tele, silencio, onSilencio, onGesto
           <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Tú controlas</div>
           {ultrasonido && <ControlMano sim={sim} tele={tele} onGesto={onGesto} onCambio={() => refrescar(x => x + 1)} />}
           {controles.map(c => {
+            if (c.tipo === 'joystick') return <ControlJoystick key={c.inst} sim={sim} inst={c.inst} etiqueta={c.etiqueta} onGesto={onGesto} onCambio={() => refrescar(x => x + 1)} />
             if (c.tipo === 'pulsador') {
               const n = botones.indexOf(c) + 1
               const presionado = !!sim.controles.botones[c.inst]
@@ -167,6 +190,57 @@ export default function PanelCircuito({ sim, tele, silencio, onSilencio, onGesto
 }
 
 /** La mano frente al sensor ultrasónico: a la derecha del todo no hay mano («lejos»). */
+/** Palanca del joystick: se arrastra dentro del círculo y vuelve al centro al soltarla, como la real. */
+function ControlJoystick({ sim, inst, etiqueta, onGesto, onCambio }: { sim: Simulacion; inst: string; etiqueta: string; onGesto: () => void; onCambio: () => void }) {
+  const x = sim.controles.perillas[ejeJoystick(inst, 'x')] ?? PERILLA_INICIAL
+  const y = sim.controles.perillas[ejeJoystick(inst, 'y')] ?? PERILLA_INICIAL
+  const presionado = !!sim.controles.botones[inst]
+  const poner = (nx: number, ny: number) => {
+    sim.ajustar(ejeJoystick(inst, 'x'), nx)
+    sim.ajustar(ejeJoystick(inst, 'y'), ny)
+    onCambio()
+  }
+  const mover = (e: React.PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    const limitar = (v: number) => Math.min(1, Math.max(0, v))
+    poner(limitar((e.clientX - r.left) / r.width), limitar(1 - (e.clientY - r.top) / r.height))
+  }
+  const boton = (v: boolean) => { if (v) onGesto(); sim.presionar(inst, v); onCambio() }
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-slate-300">
+        <span>{etiqueta}</span>
+        <span className="font-mono text-[10px] text-slate-400">X {Math.round(x * 1023)} · Y {Math.round(y * 1023)}</span>
+      </div>
+      <div className="flex items-center gap-3">
+        <div
+          onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); onGesto(); mover(e) }}
+          onPointerMove={e => { if (e.buttons) mover(e) }}
+          onPointerUp={() => poner(PERILLA_INICIAL, PERILLA_INICIAL)}
+          onPointerCancel={() => poner(PERILLA_INICIAL, PERILLA_INICIAL)}
+          className="relative h-24 w-24 shrink-0 cursor-grab touch-none select-none rounded-full border border-lab-borde/25 bg-black/30"
+          role="application"
+          aria-label={`Palanca de ${etiqueta}: arrástrala o usa las flechas`}
+        >
+          <span className="absolute left-1/2 top-0 h-full w-px bg-white/10" />
+          <span className="absolute left-0 top-1/2 h-px w-full bg-white/10" />
+          <span className="absolute h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-slate-300 shadow-lg" style={{ left: `${x * 100}%`, top: `${(1 - y) * 100}%` }} />
+        </div>
+        <button
+          onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); boton(true) }}
+          onPointerUp={() => boton(false)}
+          onPointerCancel={() => boton(false)}
+          className={`touch-none select-none rounded-lg border px-2.5 py-2 font-medium ${presionado ? 'border-red-400/60 bg-red-500/25 text-white' : 'border-lab-borde/20 bg-white/5 text-slate-200 hover:bg-white/10'}`}
+        >
+          SW
+          <div className="text-[9px] font-normal text-slate-400">{presionado ? 'presionado' : 'mantén'}</div>
+        </button>
+      </div>
+      <p className="mt-1 text-[10px] text-slate-500">Arrastra la palanca o usa las flechas del teclado.</p>
+    </div>
+  )
+}
+
 function ControlMano({ sim, tele, onGesto, onCambio }: { sim: Simulacion; tele: Telemetria | null; onGesto: () => void; onCambio: () => void }) {
   const mano = sim.controles.mano ?? null
   const lejos = MANO_MAX_CM + 1

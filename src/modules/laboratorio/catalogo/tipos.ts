@@ -38,6 +38,7 @@ export type TipoMontaje =
   | 'maqueta'         // maqueta del proyecto (basurero…) junto a la protoboard
   | 'piso'            // segundo piso sobre separadores (cuando abajo no cabe todo)
   | 'fuente-protoboard' // fuente MB102 pinchada en los rieles de la protoboard
+  | 'modulo-mesa'     // módulo sobre la mesa junto a la protoboard (joystick)
 
 export interface PuntoMontaje {
   id: string
@@ -110,6 +111,8 @@ export type Comportamiento =
   | { tipo: 'buzzer'; activo: boolean; ohm: number }
   | { tipo: 'potenciometro'; ohm: number }
   | { tipo: 'ldr'; ohmLuz: number; ohmOscuro: number }
+  /** Joystick de dos ejes (dos potenciómetros) con botón que une SW a tierra. */
+  | { tipo: 'joystick'; ohm: number }
   /** Maqueta del proyecto (basurero, su tapa): no tiene pines, solo se ve y se mueve con el servo. */
   | { tipo: 'maqueta' }
   /** Pieza que se ve en el catálogo pero todavía no se simula (llega en una fase futura). */

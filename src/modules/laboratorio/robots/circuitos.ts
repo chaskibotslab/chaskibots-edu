@@ -945,6 +945,57 @@ export function construirMegaBarra(): RobotDoc {
 }
 const SENAL_MEGA = ['#3b82f6', '#06b6d4', '#14b8a6', '#84cc16', '#eab308', '#f97316', '#ec4899']
 
+const JOYSTICK_LEDS = `// Joystick: cuatro LEDs muestran hacia dónde mueves la palanca.
+// Cada eje es un potenciómetro: al centro lee unos 512; de 0 a 1023 hacia cada lado.
+const int EJE_X = A0;
+const int EJE_Y = A1;
+const int BOTON = 2;        // SW: va a tierra al presionar la palanca
+const int ARRIBA = 8;
+const int ABAJO = 9;
+const int IZQUIERDA = 10;
+const int DERECHA = 11;
+
+void setup() {
+  pinMode(ARRIBA, OUTPUT);
+  pinMode(ABAJO, OUTPUT);
+  pinMode(IZQUIERDA, OUTPUT);
+  pinMode(DERECHA, OUTPUT);
+  pinMode(BOTON, INPUT_PULLUP);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int x = analogRead(EJE_X);
+  int y = analogRead(EJE_Y);
+  bool presionado = digitalRead(BOTON) == LOW;   // presionado: se encienden todos
+
+  digitalWrite(DERECHA, x > 700 || presionado);
+  digitalWrite(IZQUIERDA, x < 300 || presionado);
+  digitalWrite(ARRIBA, y > 700 || presionado);
+  digitalWrite(ABAJO, y < 300 || presionado);
+
+  Serial.print("X: ");
+  Serial.print(x);
+  Serial.print("  Y: ");
+  Serial.print(y);
+  Serial.println(presionado ? "  (botón)" : "");
+  delay(100);
+}
+`
+
+export function construirJoystickLeds(): RobotDoc {
+  const b = new Banco('Joystick y LEDs')
+  const colores = ['#3b82f6', '#22c55e', '#f97316', '#ec4899']
+  ;(['led-verde', 'led-verde', 'led-amarillo', 'led-amarillo'] as const).forEach((led, i) => b.ledConResistencia(led, i + 1, `D${8 + i}`, colores[i]))
+  const j = b.montar('joystick', 'protoboard', 'modulo')
+  b.cable([j, 'GND'], ['placa', 'GND'], NEGRO)
+  b.cable([j, '+5V'], ['placa', '5V'], ROJO)
+  b.cable([j, 'VRx'], ['placa', 'A0'], '#a855f7')
+  b.cable([j, 'VRy'], ['placa', 'A1'], '#06b6d4')
+  b.cable([j, 'SW'], ['placa', 'D2'], '#eab308')
+  return b.terminar(JOYSTICK_LEDS)
+}
+
 // Sin Arduino: la pila (o la fuente) alimenta los rieles y los componentes
 // toman de ahí la corriente, como se arma en la protoboard real.
 const P = 'protoboard'
@@ -1250,6 +1301,14 @@ export const PROYECTOS_CIRCUITO: Prearmado[] = [
     logica: ['El pulsador prende o apaga la alarma', 'La perilla fija el alcance: de 10 a 100 cm', 'Si hay algo dentro del alcance, el LED parpadea', 'Más cerca = parpadeo más rápido (map)'],
     construir: construirAlarmaProximidad,
     plantillas: conPlantillas([{ id: 'alarma-proximidad', nombre: 'Alarma de proximidad (kit)', descripcion: 'Parpadeo según la distancia', codigo: ALARMA_PROXIMIDAD }]),
+  },
+  {
+    id: 'joystick-leds', categoria: 'electronica',
+    nombre: 'Joystick: hacia dónde va la palanca', dificultad: 'intermedio', arena: 'mesa-electronica',
+    descripcion: 'Un joystick KY-023 y cuatro LEDs: se enciende el LED del lado hacia donde mueves la palanca, y los cuatro al presionarla. Mueve la palanca en el panel o con las flechas del teclado.',
+    logica: ['Cada eje es un potenciómetro: analogRead da 0–1023 y unos 512 al centro', 'Pasado 700 (o bajo 300) la palanca está inclinada hacia ese lado', 'El botón (SW) va a tierra: con INPUT_PULLUP, presionado se lee LOW'],
+    construir: construirJoystickLeds,
+    plantillas: conPlantillas([{ id: 'joystick-leds', nombre: 'Joystick y LEDs', descripcion: 'Cuatro direcciones y el botón', codigo: JOYSTICK_LEDS }]),
   },
   {
     id: 'pico-parpadeo', categoria: 'electronica',

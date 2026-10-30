@@ -10,7 +10,8 @@ import { infoPlaca, pinCodigo } from '../engine/placa'
 import { anclaPin } from '../ui/modelos/Piezas3D'
 import { pieza } from '../catalogo/piezas'
 import { bancoVacio, encimadas } from '../engine/ensamblaje'
-import { construirMegaBarra, construirPicoParpadeo, construirPicoPerilla } from '../robots/circuitos'
+import { construirJoystickLeds, construirMegaBarra, construirPicoParpadeo, construirPicoPerilla } from '../robots/circuitos'
+import { ejeJoystick } from '../engine/circuito'
 import type { RobotDoc } from '../robots/doc'
 
 // Raspberry Pi Pico y Arduino Mega: los .hex se compilaron con arduino-cli
@@ -104,5 +105,36 @@ describe('Arduino Mega (programa real en el ATmega2560 emulado)', () => {
     s.controles.perillas[pt] = 1
     s.correr(0.3)
     expect(encendidos()).toBe(7)
+  })
+})
+
+describe('joystick KY-023 en la mesa (programa real en el ATmega328P)', () => {
+  beforeAll(async () => { await iniciarRapier() })
+
+  it('cada eje es un potenciómetro y SW va a tierra al presionar', () => {
+    const doc = construirJoystickLeds()
+    expect(verificar(doc).map(p => p.texto)).toEqual([])
+    expect(encimadas(doc)).toEqual([])
+    const s = new SimSincrona(doc, mesaElectronica(), { hex: hex('joystick') })
+    const j = idDe(doc, 'joystick')[0]
+    const [arriba, abajo, izq, der] = doc.piezas.filter(p => pieza(p.pieza).comportamiento.tipo === 'led').map(p => p.id)
+    const prendidos = () => [arriba, abajo, izq, der].map(id => brillo(s, id) > 0.3)
+    s.correr(0.3)
+    expect(prendidos()).toEqual([false, false, false, false])   // al centro
+    s.controles.perillas[ejeJoystick(j, 'x')] = 1
+    s.correr(0.3)
+    expect(prendidos()).toEqual([false, false, false, true])
+    s.controles.perillas[ejeJoystick(j, 'x')] = 0.5
+    s.controles.perillas[ejeJoystick(j, 'y')] = 0
+    s.correr(0.3)
+    expect(prendidos()).toEqual([false, true, false, false])
+    s.controles.botones[j] = true
+    s.correr(0.3)
+    expect(prendidos()).toEqual([true, true, true, true])
+    expect(s.serial).toMatch(/X: 10\d\d/)
+  })
+
+  it('cada pin del joystick tiene dónde dibujar su cable', () => {
+    for (const p of pieza('joystick').pines) expect(anclaPin('proc:joystick', p.nombre)).not.toBeNull()
   })
 })

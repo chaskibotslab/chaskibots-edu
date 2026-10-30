@@ -16,7 +16,7 @@ import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
 import { infoPlaca } from '../engine/placa'
 import {
-  ArduinoMega, ArduinoNano, ArduinoUno, Pico, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
+  ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
   ChasisMinisumo, MotorN20, BateriaLipo,
 } from './modelos/Piezas3D'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
@@ -125,6 +125,7 @@ function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst:
       return <FC51 ref={refs.ledsObs.get(inst.id)} />
     }
     case 'proc:hcsr04': return <HCSR04 />
+    case 'proc:joystick': return <Joystick />
   }
   return (
     <mesh>
