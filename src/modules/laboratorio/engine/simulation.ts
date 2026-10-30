@@ -104,6 +104,14 @@ export class Simulacion {
     this.plan = planDe(doc)
     this.circuito = planCircuito(doc)
     this.avisos = Array.from(new Set([...avisosEnsamblaje(doc), ...this.plan.avisos]))
+    // Circuito sin placa: empieza con la pila desconectada; «Encender» la conecta.
+    if (this.circuito && !this.plan.mcu) this.controles.pilaApagada = true
+  }
+
+  /** Conectar o desconectar la pila (o el interruptor de la fuente) de un circuito sin placa. */
+  conectarPila(encendido: boolean) {
+    this.controles.pilaApagada = !encendido
+    if (!this.cargado) this.leerSensores()
   }
 
   async iniciar(arena: ArenaDef, gravedad: Gravedad, imagen?: CanvasImageSource) {

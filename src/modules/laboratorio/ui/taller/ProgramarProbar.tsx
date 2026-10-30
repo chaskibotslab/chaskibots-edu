@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
   Play, Square, Pause, RotateCcw, Upload, Gauge, Camera, Navigation, Map as MapIcon,
-  CheckCircle2, Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download, Puzzle, Gamepad2,
+  CheckCircle2, Power, Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download, Puzzle, Gamepad2,
   Maximize2, Minimize2, ZoomIn, ZoomOut, Eye, EyeOff,
 } from 'lucide-react'
 import { pieza } from '../../catalogo/piezas'
@@ -88,6 +88,8 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
   const banco = esBanco(doc)
   // Circuito sin placa (pila o fuente + componentes): no hay nada que programar, ya funciona.
   const sinPlaca = banco && !mcuDe(doc)
+  const [encendido, setEncendido] = useState(false)
+  useEffect(() => { setEncendido(false) }, [sim])
   const conPulsador = doc.piezas.some(p => ['pulsador', 'joystick'].includes(pieza(p.pieza).comportamiento.tipo))
   const arenas = useMemo(() => listaArenas().filter(a => !!a.banco === banco), [banco])
   const [arena, setArena] = useState<ArenaDef>(() => arenas.find(a => a.id === arenaInicial) ?? arenas[0])
@@ -224,11 +226,17 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
     <div className="flex min-h-0 flex-1 flex-col">
       {/* ---------- Barra ---------- */}
       <div className="lab-panel flex flex-wrap items-center gap-2 border-b border-lab-borde/15 px-3 py-2">
-        {sinPlaca ? (
-          <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-sm text-emerald-200">
-            <CheckCircle2 className="h-4 w-4" /> Circuito sin placa: no lleva programa, ya está funcionando.
-          </div>
-        ) : (<>
+        {sinPlaca ? (<>
+          <button
+            onClick={() => { if (!sim) return; activarSonido(); sim.conectarPila(!!sim.controles.pilaApagada); setEncendido(!sim.controles.pilaApagada) }}
+            disabled={!sim}
+            className={`flex h-9 items-center gap-2 rounded-lg px-4 text-sm font-semibold disabled:opacity-50 ${encendido ? 'border border-red-500/40 bg-red-500/15 text-red-200 hover:bg-red-500/25' : 'lab-primario'}`}
+            title={encendido ? 'Desconectar la pila' : 'Conectar la pila y encender el circuito'}
+          >
+            <Power className="h-4 w-4" /> {encendido ? 'Apagar' : 'Encender'}
+          </button>
+          <span className="text-xs text-slate-400">Circuito sin placa: no lleva programa. {encendido ? 'La pila está conectada.' : 'Presiona «Encender» para conectar la pila.'}</span>
+        </>) : (<>
         <select
           className="h-9 max-w-[11rem] rounded-lg border border-lab-borde/15 bg-lab-fondo px-2 text-sm text-slate-200 [&_option]:bg-lab-superficie"
           value=""
@@ -326,7 +334,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
         {sinPlaca ? (
           <div className={`min-h-0 flex-col gap-3 overflow-y-auto border-lab-borde/15 p-4 text-sm text-slate-300 lg:w-[32%] lg:border-r ${ampliada ? 'hidden' : `lg:flex ${vista === 'programar' ? 'flex flex-1 lg:flex-none' : 'hidden'}`}`}>
             <h3 className="text-base font-semibold text-white">Este circuito no tiene placa</h3>
-            <p>La pila (o la fuente) le da la corriente directo: no hay Arduino que programar. Apenas entras a «Probar», el circuito ya está encendido.</p>
+            <p>La pila (o la fuente) le da la corriente directo: no hay Arduino que programar. Presiona <b className="text-white">Encender</b>: es como conectar el clip de la pila (o el interruptor de la fuente).</p>
             <div className="rounded-lg bg-black/20 p-3">
               <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Cómo va la corriente</div>
               <ol className="list-decimal space-y-1 pl-4 text-[13px]">
@@ -396,7 +404,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                 <Loader2 className="h-5 w-5 animate-spin" /> Preparando física…
               </div>
             )}
-            {sim && <HUD tele={tele} robot={!banco && datos} sinPlaca={sinPlaca} />}
+            {sim && <HUD tele={tele} robot={!banco && datos} sinPlaca={sinPlaca} encendido={encendido} />}
             {sim && banco && <PanelCircuito sim={sim} tele={tele} silencio={silencio} onSilencio={setSilencio} onGesto={activarSonido} />}
             {sim && arena.competencia && <Combate sim={sim} tele={tele} reglamento={arena.competencia} doc={doc} compacto={!datos} />}
             {sim && (
@@ -477,10 +485,11 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
 
 // ---------- Indicadores sobre la escena ----------
 
-function HUD({ tele, robot = true, sinPlaca = false }: { tele: Telemetria | null; robot?: boolean; sinPlaca?: boolean }) {
+function HUD({ tele, robot = true, sinPlaca = false, encendido = false }: { tele: Telemetria | null; robot?: boolean; sinPlaca?: boolean; encendido?: boolean }) {
   if (!tele) return null
+  const sinProgramaTxt = !sinPlaca ? { txt: 'Sin programa', cls: 'bg-slate-500' } : encendido ? { txt: 'Encendido (pila conectada)', cls: 'bg-emerald-400' } : { txt: 'Apagado: presiona «Encender»', cls: 'bg-slate-500' }
   const estado = {
-    'sin-programa': sinPlaca ? { txt: 'Funcionando (sin placa)', cls: 'bg-emerald-400' } : { txt: 'Sin programa', cls: 'bg-slate-500' },
+    'sin-programa': sinProgramaTxt,
     cargando: { txt: 'Cargando…', cls: 'bg-sky-400' },
     corriendo: { txt: 'Ejecutando', cls: 'bg-emerald-400 animate-pulse' },
     pausado: { txt: 'En pausa', cls: 'bg-amber-400' },

@@ -476,7 +476,7 @@ export function FuenteMb102({ inst }: { inst: string }) {
   const q = useCalidad()
   const vivo = useContext(CircuitoVivoContexto)
   const led = useRef<THREE.MeshStandardMaterial>(null)
-  useFrame(() => { if (led.current) led.current.emissiveIntensity = vivo.estado() ? 2.5 : 0 })
+  useFrame(() => { const e = vivo.estado(); if (led.current) led.current.emissiveIntensity = e && !e.apagada ? 2.5 : 0 })
   const Y = 10 // cara de abajo de la placa
   return (
     <group>

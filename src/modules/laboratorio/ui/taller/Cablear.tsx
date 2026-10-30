@@ -3,10 +3,11 @@
 // Pestaña «Cablear»: esquema 2D del robot. La placa va al centro con sus pines
 // y cada pieza a un costado; un cable se hace tocando un pin y luego otro
 // (con mouse o con el dedo). Tocar un cable lo selecciona para quitarlo.
+// Cada bloque se puede arrastrar para ordenar el esquema a gusto.
 // La verificación eléctrica corre en vivo y marca los pines con problemas.
 
-import { useMemo, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Info, Trash2, Wand2, XCircle } from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
+import { AlertTriangle, CheckCircle2, Info, LayoutGrid, Trash2, Wand2, XCircle } from 'lucide-react'
 import { pieza } from '../../catalogo/piezas'
 import type { PinDef } from '../../catalogo/tipos'
 import { autocablear } from '../../engine/autocableado'
@@ -102,7 +103,35 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
   const [elegido, setElegido] = useState<[string, string] | null>(null)
   const [cableSel, setCableSel] = useState<number | null>(null)
   const [resaltar, setResaltar] = useState<string[]>([])
-  const tarjetas = useMemo(() => disponer(doc), [doc])
+  // Bloques movidos por el alumno (desplazamiento desde su lugar automático).
+  const [movidas, setMovidas] = useState<Record<string, { dx: number; dy: number }>>({})
+  const svg = useRef<SVGSVGElement>(null)
+  const arrastre = useRef<{ id: string; x: number; y: number; dx: number; dy: number } | null>(null)
+  const base = useMemo(() => disponer(doc), [doc])
+  const tarjetas = useMemo(() => base.map(t => {
+    const m = movidas[t.id]
+    return m ? { ...t, x: t.x + m.dx, y: t.y + m.dy, pines: t.pines.map(p => ({ ...p, x: p.x + m.dx, y: p.y + m.dy })) } : t
+  }), [base, movidas])
+  /** Punto del puntero en coordenadas del esquema. */
+  const enEsquema = (e: React.PointerEvent) => {
+    const ctm = svg.current?.getScreenCTM()
+    if (!ctm) return { x: e.clientX, y: e.clientY }
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse())
+    return { x: p.x, y: p.y }
+  }
+  const empezarArrastre = (id: string) => (e: React.PointerEvent) => {
+    e.stopPropagation()
+    ;(e.currentTarget as Element).setPointerCapture(e.pointerId)
+    const p = enEsquema(e)
+    arrastre.current = { id, x: p.x, y: p.y, dx: movidas[id]?.dx ?? 0, dy: movidas[id]?.dy ?? 0 }
+  }
+  const arrastrar = (e: React.PointerEvent) => {
+    const a = arrastre.current
+    if (!a) return
+    const p = enEsquema(e)
+    setMovidas(m => ({ ...m, [a.id]: { dx: a.dx + p.x - a.x, dy: a.dy + p.y - a.y } }))
+  }
+  const soltar = () => { arrastre.current = null }
   const problemas = useMemo(() => verificar(doc), [doc])
   const { tabla } = useMemo(() => autocablear(doc, { conservar: true }), [doc])
   const posPin = useMemo(() => {
@@ -113,8 +142,10 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
   }, [tarjetas])
   const conProblema = useMemo(() => new Set([...problemas.flatMap(p => p.pines), ...resaltar]), [problemas, resaltar])
   const errores = problemas.filter(p => p.nivel === 'error')
-  const ancho = Math.max(...tarjetas.map(t => t.x + t.ancho)) + 20
-  const alto = Math.max(...tarjetas.map(t => t.y + t.alto)) + 20
+  // El esquema crece para que un bloque arrastrado nunca quede fuera (y no se achica: no cambia el zoom).
+  const ancho = Math.max(...[...base, ...tarjetas].map(t => t.x + t.ancho)) + 20
+  const alto = Math.max(...[...base, ...tarjetas].map(t => t.y + t.alto)) + 20
+  const minX = Math.min(0, ...tarjetas.map(t => t.x - 20)), minY = Math.min(0, ...tarjetas.map(t => t.y - 20))
 
   const pinDef = (inst: string, pin: string) => pieza(doc.piezas.find(p => p.id === inst)!.pieza).pines.find(p => p.nombre === pin)!
 
@@ -157,9 +188,14 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
             {doc.cableado === 'manual' ? 'Cableado a mano' : 'Cableado automático'}
           </span>
           <span className="text-slate-400">
-            {elegido ? <>Ahora toca el otro pin para unir <b className="text-white">{elegido[1]}</b> · toca el mismo para cancelar</> : 'Toca un pin y luego otro para poner un cable. Toca un cable para quitarlo.'}
+            {elegido ? <>Ahora toca el otro pin para unir <b className="text-white">{elegido[1]}</b> · toca el mismo para cancelar</> : 'Toca un pin y luego otro para poner un cable. Toca un cable para quitarlo. Arrastra un bloque para moverlo.'}
           </span>
           <div className="ml-auto flex gap-1.5">
+            {Object.keys(movidas).length > 0 && (
+              <button onClick={() => setMovidas({})} className="flex items-center gap-1 rounded-lg border border-lab-borde/15 px-2.5 py-1.5 hover:bg-white/5" title="Volver a poner los bloques en su lugar">
+                <LayoutGrid className="h-3.5 w-3.5" /> Ordenar bloques
+              </button>
+            )}
             <button
               onClick={() => { if (window.confirm('¿Reemplazar todos los cables por el cableado automático?')) cambiar({ ...doc, cableado: 'auto', cables: autocablear(doc).cables }, 'Cableado automático', false) }}
               className="flex items-center gap-1 rounded-lg border border-lab-borde/15 px-2.5 py-1.5 hover:bg-white/5"
@@ -170,7 +206,7 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
             ><Trash2 className="h-3.5 w-3.5" /> Quitar todos</button>
           </div>
         </div>
-        <svg viewBox={`0 0 ${ancho} ${alto}`} className="h-auto min-w-[760px] w-full" onClick={() => { setCableSel(null) }}>
+        <svg ref={svg} viewBox={`${minX} ${minY} ${ancho - minX} ${alto - minY}`} className="h-auto min-w-[760px] w-full touch-none" onClick={() => { setCableSel(null) }} onPointerMove={arrastrar} onPointerUp={soltar} onPointerCancel={soltar}>
           {/* Uniones por dentro de la protoboard */}
           {internas.map((c, i) => {
             const d = curva(c)
@@ -194,9 +230,9 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
           {/* Piezas */}
           {tarjetas.map(t => t.rieles ? (
             <g key={t.id}>
-              <rect x={t.x} y={t.y} width={t.ancho} height={t.alto} rx={10} fill="#ecebe4" stroke="rgba(255,255,255,.25)" />
-              <text x={t.x + t.ancho / 2} y={t.y + 22} textAnchor="middle" fill="#1f2937" fontSize={13} fontWeight={700}>{t.titulo}</text>
-              <text x={t.x + t.ancho / 2} y={t.y + 38} textAnchor="middle" fill="#57534e" fontSize={10}>{internas.length ? 'Punteado: la fuente está pinchada en los rieles' : 'Cada riel une todos sus agujeros'}</text>
+              <rect x={t.x} y={t.y} width={t.ancho} height={t.alto} rx={10} fill="#ecebe4" stroke="rgba(255,255,255,.25)" className="cursor-move" onPointerDown={empezarArrastre(t.id)}><title>Arrástralo para moverlo</title></rect>
+              <text x={t.x + t.ancho / 2} y={t.y + 22} pointerEvents="none" textAnchor="middle" fill="#1f2937" fontSize={13} fontWeight={700}>{t.titulo}</text>
+              <text x={t.x + t.ancho / 2} y={t.y + 38} pointerEvents="none" textAnchor="middle" fill="#57534e" fontSize={10}>{internas.length ? 'Punteado: la fuente está pinchada en los rieles' : 'Cada riel une todos sus agujeros'}</text>
               {t.pines.filter(p => p.lado === 'izq').map(p => {
                 const k = `${t.id}.${p.pin.nombre}`
                 const mas = p.pin.nombre.startsWith('+')
@@ -216,8 +252,8 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
             </g>
           ) : (
             <g key={t.id}>
-              <rect x={t.x} y={t.y} width={t.ancho} height={t.alto} rx={10} fill={t.ancho === ANCHO_PLACA ? '#0e5c63' : '#1c2233'} stroke="rgba(255,255,255,.15)" />
-              <text x={t.x + t.ancho / 2} y={t.y + 22} textAnchor="middle" fill="#fff" fontSize={13} fontWeight={600}>{t.titulo.length > 24 ? t.titulo.slice(0, 23) + '…' : t.titulo}</text>
+              <rect x={t.x} y={t.y} width={t.ancho} height={t.alto} rx={10} fill={t.ancho === ANCHO_PLACA ? '#0e5c63' : '#1c2233'} stroke="rgba(255,255,255,.15)" className="cursor-move" onPointerDown={empezarArrastre(t.id)}><title>Arrástralo para moverlo</title></rect>
+              <text x={t.x + t.ancho / 2} y={t.y + 22} pointerEvents="none" textAnchor="middle" fill="#fff" fontSize={13} fontWeight={600}>{t.titulo.length > 24 ? t.titulo.slice(0, 23) + '…' : t.titulo}</text>
               {t.pines.map(p => {
                 const k = `${t.id}.${p.pin.nombre}`
                 const sel = elegido && elegido[0] === t.id && elegido[1] === p.pin.nombre

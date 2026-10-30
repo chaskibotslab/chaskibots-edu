@@ -119,6 +119,15 @@ describe('rieles de la protoboard y circuitos sin Arduino', () => {
     expect(verificar(doc)).toEqual([])
   })
 
+  it('con la pila desconectada el LED está apagado; al conectarla se enciende', () => {
+    const doc = construirLedPila()
+    const led = idDe(doc, 'led-rojo')
+    const apagada = resolverCircuito(planCircuito(doc)!, {}, { ...sinTocar, pilaApagada: true }, new Set())
+    expect(apagada.leds[led][0]).toBe(0)
+    expect(apagada.apagada).toBe(true)
+    expect(brillo(doc, { ...sinTocar, pilaApagada: false })[led][0]).toBeGreaterThan(0.5)
+  })
+
   it('la fuente MB102 une sus pines con los cuatro rieles por dentro', () => {
     const doc = construirBotonSinArduino()
     const n = nets(doc)
