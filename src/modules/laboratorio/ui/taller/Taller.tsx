@@ -294,14 +294,18 @@ function Modal({ titulo, onCerrar, children, ancho = 'max-w-3xl' }: { titulo: st
   )
 }
 
+type PlacaGaleria = 'arduino' | 'esp32' | 'pico' | 'mega'
+/** Placa de un proyecto de la galería, por su id ('rc-esp32', 'pico-perilla'…). */
+const placaDe = (id: string): PlacaGaleria => (id.includes('esp32') ? 'esp32' : id.startsWith('pico') ? 'pico' : id.startsWith('mega') ? 'mega' : 'arduino')
+
 const DIFICULTAD = { inicial: 'bg-emerald-500/15 text-emerald-300', intermedio: 'bg-amber-500/15 text-amber-300', avanzado: 'bg-red-500/15 text-red-300' }
 
 function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | null) => void; onCerrar: () => void }) {
   const [categoria, setCategoria] = useState<'robot' | 'electronica'>('robot')
-  const [placa, setPlaca] = useState<'todas' | 'arduino' | 'esp32'>('todas')
+  const [placa, setPlaca] = useState<'todas' | PlacaGaleria>('todas')
   const lista = PREARMADOS
     .filter(p => (p.categoria ?? 'robot') === categoria)
-    .filter(p => placa === 'todas' || (placa === 'esp32') === p.id.includes('esp32'))
+    .filter(p => placa === 'todas' || placaDe(p.id) === placa)
   const Icono = categoria === 'robot' ? Bot : Lightbulb
   return (
     <Modal titulo={categoria === 'robot' ? '¿Con qué robot empezamos?' : '¿Qué circuito armamos?'} onCerrar={onCerrar} ancho="max-w-5xl">
@@ -314,7 +318,7 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
           ))}
         </div>
         <div className="flex gap-1.5">
-          {([['todas', 'Todos'], ['arduino', 'Arduino'], ['esp32', 'ESP32']] as const).map(([id, txt]) => (
+          {([['todas', 'Todos'], ['arduino', 'Arduino'], ['esp32', 'ESP32'], ['pico', 'Raspberry Pi Pico'], ['mega', 'Mega']] as const).map(([id, txt]) => (
             <button key={id} onClick={() => setPlaca(id)} className={`rounded-full px-3 py-1 text-xs font-medium ${placa === id ? 'lab-primario' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>{txt}</button>
           ))}
         </div>
@@ -345,7 +349,11 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
         {categoria === 'electronica' ? (<>
         <p className="mb-3 text-xs text-slate-400">Una protoboard con la placa al lado; después pincha LED, resistencias, pulsadores… desde el cajón «Componentes».</p>
         <div className="grid gap-2 sm:grid-cols-3">
-          {([['arduino-uno', 'Protoboard + Arduino UNO', 'Como en el kit de 8vo'], ['arduino-nano', 'Protoboard + Arduino Nano', 'La misma placa, más chiquita'], ['esp32-devkit', 'Protoboard + ESP32', 'Trabaja con 3,3 V']] as const).map(([placaId, n, d]) => (
+          {([
+            ['arduino-uno', 'Protoboard + Arduino UNO', 'Como en el kit de 8vo'], ['arduino-nano', 'Protoboard + Arduino Nano', 'La misma placa, más chiquita'],
+            ['esp32-devkit', 'Protoboard + ESP32', 'Trabaja con 3,3 V'], ['raspberry-pico', 'Protoboard + Raspberry Pi Pico', 'RP2040, 3,3 V, en C++'],
+            ['arduino-mega', 'Protoboard + Arduino Mega', '54 pines y 16 analógicas'],
+          ] as const).map(([placaId, n, d]) => (
             <button key={placaId} onClick={() => onAbrir(bancoVacio(placaId, 'Mi circuito'), null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-white/[0.03]">
               <div className="text-sm font-semibold text-white">{n}</div>
               <div className="text-xs text-slate-400">{d}</div>

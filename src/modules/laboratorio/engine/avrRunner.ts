@@ -1,5 +1,6 @@
 // Emulación REAL de un AVR con avr8js: ATmega328P (Arduino UNO / Nano) o
-// ATmega2560 (base del ESP32 simulado, ver esp32/capaEsp32.ts).
+// ATmega2560 (Arduino Mega, y base del ESP32 y la Raspberry Pi Pico
+// simulados, ver esp32/capaEsp32.ts y esp32/capasPlacas.ts).
 //
 // Importante: aquí NO se interpreta el código del estudiante. El servicio
 // compilador lo convierte con avr-gcc en el mismo binario (.hex) que se
@@ -15,13 +16,14 @@ import {
   CPU, avrInstruction, AVRTimer, timer0Config, timer1Config, timer2Config,
   AVRIOPort, portAConfig, portBConfig, portCConfig, portDConfig, portEConfig, portFConfig, portGConfig,
   portHConfig, portJConfig, portKConfig, portLConfig, AVRUSART, usart0Config,
-  AVRADC, adcConfig, PinState, type AVRPortConfig,
+  AVRADC, adcConfig, ADCMuxInputType, PinState, type AVRPortConfig,
 } from 'avr8js'
 import { parseIntelHex } from './hex'
 
 export const CPU_FREQ_HZ = 16_000_000
 
-export type Chip = 'atmega328p' | 'atmega2560'
+/** 'atmega2560' es el del ESP32 (pines GPIOn); las otras dos placas sobre el 2560 nombran sus pines a su manera. */
+export type Chip = 'atmega328p' | 'atmega2560' | 'atmega2560-pico' | 'atmega2560-mega'
 export type PortName = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'J' | 'K' | 'L'
 
 // Pines del UNO/Nano → (puerto, bit) del ATmega328P.
@@ -43,17 +45,46 @@ const MEGA: [PortName, number][] = [
   ['G', 1], ['G', 0], ['L', 7], ['L', 6], ['L', 5], ['L', 4], ['L', 3], ['L', 2], ['L', 1], ['L', 0],
   ['B', 3], ['B', 2], ['B', 1], ['B', 0],
 ]
-export const ESP32_PINS: Record<string, { port: PortName; bit: number }> = {}
-MEGA.forEach(([port, bit], n) => { ESP32_PINS[`GPIO${n}`] = { port, bit } })
+// A0–A15 del Mega (también son los pines 54–69): puertos F y K.
+const MEGA_ANALOG: [PortName, number][] = [0, 1, 2, 3, 4, 5, 6, 7].map(b => ['F', b] as [PortName, number]).concat([0, 1, 2, 3, 4, 5, 6, 7].map(b => ['K', b]))
 
-/** GPIO analógicos del ESP32 → canal del ADC del Mega (A0–A7). Igual que en la capa C++. */
-export const ESP32_ADC: Record<string, number> = { GPIO36: 0, GPIO39: 1, GPIO34: 2, GPIO35: 3, GPIO32: 4, GPIO33: 5, GPIO25: 6, GPIO26: 7 }
+/** Nombre del pin n del Mega en cada placa que se simula sobre él. */
+const NOMBRE_PIN: Record<Exclude<Chip, 'atmega328p'>, (n: number) => string | null> = {
+  'atmega2560': n => (n < 54 ? `GPIO${n}` : null),
+  'atmega2560-pico': n => (n <= 28 ? `GP${n}` : null),
+  'atmega2560-mega': n => (n < 54 ? `D${n}` : n < 70 ? `A${n - 54}` : null),
+}
+
+function pinesMega(chip: Exclude<Chip, 'atmega328p'>) {
+  const out: Record<string, { port: PortName; bit: number }> = {}
+  ;[...MEGA, ...MEGA_ANALOG].forEach(([port, bit], n) => {
+    const nombre = NOMBRE_PIN[chip](n)
+    if (nombre) out[nombre] = { port, bit }
+  })
+  return out
+}
+
+/** Pin analógico → canal del ADC del Mega. ESP32 y Pico: igual que en sus capas C++. */
+const ADC_MEGA: Record<Exclude<Chip, 'atmega328p'>, Record<string, number>> = {
+  'atmega2560': { GPIO36: 0, GPIO39: 1, GPIO34: 2, GPIO35: 3, GPIO32: 4, GPIO33: 5, GPIO25: 6, GPIO26: 7 },
+  'atmega2560-pico': { GP26: 0, GP27: 1, GP28: 2 },
+  'atmega2560-mega': Object.fromEntries(Array.from({ length: 16 }, (_, i) => [`A${i}`, i])),
+}
 
 // En el ATmega2560 los vectores de interrupción están en otras direcciones
 // (vector n → dirección 2n): se ajustan las configuraciones de avr8js.
 const timer0Mega = { ...timer0Config, compAInterrupt: 42, compBInterrupt: 44, ovfInterrupt: 46 }
+// Timer2 da tone(); sus salidas de comparación no se usan (el PWM lo informa la capa).
+const timer2Mega = { ...timer2Config, compAInterrupt: 26, compBInterrupt: 28, ovfInterrupt: 30, compPortA: 0, compPortB: 0 }
 const usart0Mega = { ...usart0Config, rxCompleteInterrupt: 50, dataRegisterEmptyInterrupt: 52, txCompleteInterrupt: 54 }
-const adcMega = { ...adcConfig, adcInterrupt: 58 }
+// ADC de 16 canales: A8–A15 se eligen con el bit MUX5 (ADCSRB), que avr8js suma como 0x20.
+const adcMega = {
+  ...adcConfig, adcInterrupt: 58, numChannels: 16, muxInputMask: 0x3f,
+  muxChannels: {
+    ...adcConfig.muxChannels,
+    ...Object.fromEntries(Array.from({ length: 8 }, (_, i) => [0x20 + i, { type: ADCMuxInputType.SingleEnded, channel: 8 + i }])),
+  },
+}
 
 // Canal de la capa ESP32 hacia el simulador: registros de uso general del AVR.
 // La capa escribe pin (GPIOR1) y valor (GPIOR2) y luego el comando (GPIOR0).
@@ -110,19 +141,20 @@ export class AvrRunner {
 
   constructor(hex: string, chip: Chip = 'atmega328p') {
     this.chip = chip
-    const mega = chip === 'atmega2560'
+    const mega = chip !== 'atmega328p'
     // Flash: 32 KB (328P) o 256 KB (2560). avr8js la quiere como palabras de 16 bits.
     const flash = parseIntelHex(hex, mega ? 0x40000 : 0x8000)
     // En el 2560 la RAM va de 0x200 a 0x21FF (hay más registros de E/S abajo):
     // avr8js suma 0x100 de registros, así que hacen falta 0x2100 bytes.
     this.cpu = new CPU(new Uint16Array(flash.buffer), mega ? 0x2100 : 2048)
-    this.pinMap = mega ? ESP32_PINS : UNO_PINS
+    this.pinMap = chip === 'atmega328p' ? UNO_PINS : pinesMega(chip)
 
     // Timers: Timer0 da millis()/delay() y el PWM de D5/D6; Timer1 el de D9/D10;
     // Timer2 el de D3/D11 (y tone()). Sin ellos, analogWrite no haría nada.
-    // En el 2560 basta Timer0 (el PWM y los servos los informa la capa ESP32).
+    // En el 2560 bastan Timer0 y Timer2 (el PWM y los servos los informa la capa de la placa).
     if (mega) {
       new AVRTimer(this.cpu, timer0Mega)
+      new AVRTimer(this.cpu, timer2Mega)
     } else {
       new AVRTimer(this.cpu, timer0Config)
       new AVRTimer(this.cpu, timer1Config)
@@ -163,10 +195,11 @@ export class AvrRunner {
       this.ports[p]!.addListener((value, oldValue) => this.onPortWrite(p, value, oldValue))
     }
 
-    if (mega) {
-      // La capa ESP32 escribe pin y valor y, al escribir el comando, se aplica.
+    if (chip !== 'atmega328p') {
+      // La capa de la placa escribe pin y valor y, al escribir el comando, se aplica.
+      const nombre = NOMBRE_PIN[chip]
       this.cpu.writeHooks[GPIOR0] = cmd => {
-        const pin = `GPIO${this.cpu.data[GPIOR1]}`
+        const pin = nombre(this.cpu.data[GPIOR1]) ?? ''
         const valor = this.cpu.data[GPIOR2]
         if (cmd === CMD_PWM) this.pwmCapa.set(pin, valor / 255)
         else if (cmd === CMD_SERVO) this.servoCapa.set(pin, valor * 10)
@@ -224,14 +257,15 @@ export class AvrRunner {
   }
 
   /**
-   * Voltaje que ve analogRead. UNO/Nano: A0–A7 con 0–5 V → 0–1023.
-   * ESP32: GPIO analógicos con 0–3,3 V; la capa multiplica por 4 (12 bits),
-   * así que 3,3 V se inyectan como 5 V para que dé 4092 ≈ 4095.
+   * Voltaje que ve analogRead. UNO/Nano/Mega: con 0–5 V → 0–1023.
+   * ESP32 y Pico: con 0–3,3 V; sus capas escalan a 12 bits, así que 3,3 V
+   * se inyectan como 5 V para que den el máximo.
    */
   setAnalogInput(pin: string, volts: number) {
-    if (this.chip === 'atmega2560') {
-      const c = ESP32_ADC[pin]
-      if (c !== undefined) this.adc.channelValues[c] = Math.min(5, (volts * 5) / 3.3)
+    if (this.chip !== 'atmega328p') {
+      const c = ADC_MEGA[this.chip][pin]
+      const v = this.chip === 'atmega2560-mega' ? volts : (volts * 5) / 3.3
+      if (c !== undefined) this.adc.channelValues[c] = Math.min(5, v)
       return
     }
     const m = /^A(\d)$/.exec(pin)

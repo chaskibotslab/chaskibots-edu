@@ -848,6 +848,103 @@ void setup() {}
 void loop() {}
 `
 
+// ---------------------------------------------------------------------------
+// Raspberry Pi Pico y Arduino Mega
+// ---------------------------------------------------------------------------
+
+const PICO_PARPADEO = `// Raspberry Pi Pico: el LED de GP15 y el de la placa (GP25) se turnan.
+const int LED = 15;   // en la Pico el número es el del GP
+
+void setup() {
+  pinMode(LED, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);   // LED_BUILTIN = GP25
+}
+
+void loop() {
+  digitalWrite(LED, HIGH);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  digitalWrite(LED, LOW);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(500);
+}
+`
+
+const PICO_PERILLA = `// Raspberry Pi Pico: la perilla (en GP26 = A0) regula el brillo del LED.
+// El ADC de la Pico es de 12 bits: con analogReadResolution(12) lee de 0 a 4095.
+const int PERILLA = A0;   // GP26
+const int LED = 15;       // en la Pico todos los GP tienen PWM
+
+void setup() {
+  Serial.begin(115200);
+  analogReadResolution(12);
+  pinMode(LED, OUTPUT);
+}
+
+void loop() {
+  int lectura = analogRead(PERILLA);          // 0 a 4095
+  int brillo = map(lectura, 0, 4095, 0, 255);
+  analogWrite(LED, brillo);
+  Serial.print("Perilla: ");
+  Serial.print(lectura);
+  Serial.print("  voltaje: ");
+  Serial.println(lectura * 3.3 / 4095);
+  delay(100);
+}
+`
+
+const MEGA_BARRA = `// Arduino Mega: barra de 7 LEDs que sube con la perilla.
+// Usa los pines que el UNO no tiene: D22–D28 y la entrada analógica A8.
+const int PERILLA = A8;
+const int PRIMER_LED = 22;
+const int CANTIDAD = 7;
+
+void setup() {
+  for (int i = 0; i < CANTIDAD; i++) pinMode(PRIMER_LED + i, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int lectura = analogRead(PERILLA);                  // 0 a 1023
+  int encendidos = map(lectura, 0, 1023, 0, CANTIDAD);
+  for (int i = 0; i < CANTIDAD; i++) {
+    digitalWrite(PRIMER_LED + i, i < encendidos ? HIGH : LOW);
+  }
+  Serial.print("LEDs encendidos: ");
+  Serial.println(encendidos);
+  delay(50);
+}
+`
+
+export function construirPicoParpadeo(): RobotDoc {
+  const b = new Banco('Pico: primer LED', 'raspberry-pico')
+  b.ledConResistencia('led-rojo', 2, 'GP15', '#ef4444', 'resistencia-220')
+  return b.terminar(PICO_PARPADEO)
+}
+
+export function construirPicoPerilla(): RobotDoc {
+  const b = new Banco('Pico: perilla y brillo', 'raspberry-pico')
+  b.ledConResistencia('led-verde', 2, 'GP15', '#22c55e', 'resistencia-220')
+  const pt = b.poner('potenciometro-10k', 5)
+  // En la Pico la perilla va a 3,3 V: su ADC no aguanta 5 V.
+  b.cable([pt, '1'], ['placa', '3V3'], ROJO)
+  b.cable([pt, 'W'], ['placa', 'GP26'], '#a855f7')
+  b.cable([pt, '2'], ['placa', 'GND'], NEGRO)
+  return b.terminar(PICO_PERILLA)
+}
+
+export function construirMegaBarra(): RobotDoc {
+  const b = new Banco('Mega: barra de LEDs', 'arduino-mega')
+  const colores = ['led-verde', 'led-verde', 'led-verde', 'led-amarillo', 'led-amarillo', 'led-rojo', 'led-rojo']
+  colores.forEach((led, i) => b.ledConResistencia(led, i + 1, `D${22 + i}`, SENAL_MEGA[i], 'resistencia-330'))
+  const pt = b.poner('potenciometro-10k', 16)
+  b.cable([pt, '1'], ['placa', '5V'], ROJO)
+  b.cable([pt, 'W'], ['placa', 'A8'], '#a855f7')
+  b.cable([pt, '2'], ['placa', 'GND'], NEGRO)
+  return b.terminar(MEGA_BARRA)
+}
+const SENAL_MEGA = ['#3b82f6', '#06b6d4', '#14b8a6', '#84cc16', '#eab308', '#f97316', '#ec4899']
+
 // Sin Arduino: la pila (o la fuente) alimenta los rieles y los componentes
 // toman de ahí la corriente, como se arma en la protoboard real.
 const P = 'protoboard'
@@ -1153,6 +1250,30 @@ export const PROYECTOS_CIRCUITO: Prearmado[] = [
     logica: ['El pulsador prende o apaga la alarma', 'La perilla fija el alcance: de 10 a 100 cm', 'Si hay algo dentro del alcance, el LED parpadea', 'Más cerca = parpadeo más rápido (map)'],
     construir: construirAlarmaProximidad,
     plantillas: conPlantillas([{ id: 'alarma-proximidad', nombre: 'Alarma de proximidad (kit)', descripcion: 'Parpadeo según la distancia', codigo: ALARMA_PROXIMIDAD }]),
+  },
+  {
+    id: 'pico-parpadeo', categoria: 'electronica',
+    nombre: 'Raspberry Pi Pico: primer LED', dificultad: 'inicial', arena: 'mesa-electronica',
+    descripcion: 'La Raspberry Pi Pico programada en C++ como un Arduino: un LED en GP15 y el LED verde de la placa (GP25) se turnan cada medio segundo.',
+    logica: ['En la Pico el número de pin es el del GP: GP15 → 15', 'LED_BUILTIN es el LED de la placa (GP25)', 'digitalWrite y delay funcionan igual que en Arduino'],
+    construir: construirPicoParpadeo,
+    plantillas: conPlantillas([{ id: 'pico-parpadeo', nombre: 'Parpadeo (Pico)', descripcion: 'GP15 y GP25 se turnan', codigo: PICO_PARPADEO }]),
+  },
+  {
+    id: 'pico-perilla', categoria: 'electronica',
+    nombre: 'Raspberry Pi Pico: perilla y brillo', dificultad: 'intermedio', arena: 'mesa-electronica',
+    descripcion: 'La perilla en GP26 (A0) se lee con 12 bits (0 a 4095) y regula el brillo del LED de GP15 con PWM. La Pico trabaja con 3,3 V: la perilla va a 3V3, no a 5 V.',
+    logica: ['analogReadResolution(12) da lecturas de 0 a 4095', 'map la pasa a 0–255', 'analogWrite regula el brillo (en la Pico, cualquier GP tiene PWM)'],
+    construir: construirPicoPerilla,
+    plantillas: conPlantillas([{ id: 'pico-perilla', nombre: 'Perilla → brillo (Pico)', descripcion: 'ADC de 12 bits y PWM', codigo: PICO_PERILLA }]),
+  },
+  {
+    id: 'mega-barra', categoria: 'electronica',
+    nombre: 'Arduino Mega: barra de LEDs', dificultad: 'intermedio', arena: 'mesa-electronica',
+    descripcion: 'Siete LEDs en D22–D28 y una perilla en A8: pines que el UNO no tiene. Al girar la perilla se encienden más LEDs, como un medidor de nivel.',
+    logica: ['analogRead(A8) lee la perilla: 0 a 1023', 'map la pasa a 0–7 LEDs', 'Un for enciende los primeros y apaga el resto'],
+    construir: construirMegaBarra,
+    plantillas: conPlantillas([{ id: 'mega-barra', nombre: 'Barra de nivel (Mega)', descripcion: 'D22–D28 y A8', codigo: MEGA_BARRA }]),
   },
   {
     id: 'boton-sin-arduino', categoria: 'electronica',

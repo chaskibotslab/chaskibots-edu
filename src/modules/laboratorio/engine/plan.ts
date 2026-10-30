@@ -95,7 +95,7 @@ export function planDe(doc: RobotDoc): SimPlan {
   const tierras: [string, string][] = []
   for (const p of doc.piezas) {
     const c = pieza(p.pieza).comportamiento
-    if (c.tipo === 'mcu') { for (const f of info.fuentes) fuentes5v.push([p.id, f]); tierras.push([p.id, 'GND']) }
+    if (c.tipo === 'mcu') { for (const f of Object.keys(info.fuentes)) fuentes5v.push([p.id, f]); tierras.push([p.id, 'GND']) }
     if (c.tipo === 'puente-h') {
       if (c.alim.salida5v) fuentes5v.push([p.id, c.alim.salida5v])
       tierras.push([p.id, c.alim.gnd])

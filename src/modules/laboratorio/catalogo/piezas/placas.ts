@@ -69,6 +69,76 @@ export const ARDUINO_NANO: PiezaDef = {
   fuente: 'Arduino Nano, hoja de datos oficial',
 }
 
+// Arduino Mega 2560: el chip que emula el simulador. Marco: el largo va a lo
+// largo de z (USB hacia −z) para que entre al lado de la protoboard.
+const PWM_MEGA = (n: number) => (n >= 2 && n <= 13) || (n >= 44 && n <= 46)
+const AYUDA_MEGA: Record<number, string> = {
+  0: 'RX0 del Serial: mejor no usarlo', 1: 'TX0 del Serial: mejor no usarlo', 13: 'Tiene el LED «L» de la placa',
+  20: 'SDA (I2C)', 21: 'SCL (I2C)', 2: 'PWM (~), con interrupción', 3: 'PWM (~), con interrupción',
+}
+const pinesMega: PinDef[] = [
+  ...Array.from({ length: 54 }, (_, n): PinDef => ({ nombre: `D${n}`, tipo: PWM_MEGA(n) ? 'pwm' : 'digital', ayuda: AYUDA_MEGA[n] ?? (PWM_MEGA(n) ? 'Digital con PWM (~)' : undefined) })),
+  ...Array.from({ length: 16 }, (_, n): PinDef => ({ nombre: `A${n}`, tipo: 'analogico', ayuda: n === 0 ? 'Entrada analógica 0–5 V → 0–1023' : undefined })),
+  { nombre: '5V', tipo: 'alim', ayuda: 'Salida de 5 V para sensores' },
+  { nombre: '3V3', tipo: 'alim', ayuda: 'Salida de 3,3 V (poca corriente)' },
+  { nombre: 'VIN', tipo: 'alim', ayuda: 'Entrada de 7–12 V (batería)' },
+  { nombre: 'GND', tipo: 'gnd', ayuda: 'Tierra (negativo común)' },
+]
+
+export const ARDUINO_MEGA: PiezaDef = {
+  id: 'arduino-mega',
+  nombre: 'Arduino Mega 2560',
+  familia: 'placa',
+  descripcion: 'La hermana grande del UNO: el mismo lenguaje y 5 V, pero con 54 pines digitales (15 con PWM), 16 entradas analógicas y 4 puertos serie. Para proyectos con muchos sensores, LEDs o motores.',
+  modelo: 'proc:arduino-mega',
+  masa_g: 37,
+  material: 'pcb',
+  colisionadores: [{ forma: 'caja', medidas: [53.3, 12, 101.6], centro: [0, 6, 0] }],
+  montajes: [],
+  encaja: ['placa'],
+  pines: pinesMega,
+  comportamiento: { tipo: 'mcu', placa: 'mega', frecuencia_hz: 16_000_000, vLogica: 5 },
+  datos: [
+    ['Microcontrolador', 'ATmega2560'], ['Reloj', '16 MHz'], ['Voltaje lógico', '5 V'], ['Pines digitales', 'D0–D53 (PWM: D2–D13, D44–D46)'],
+    ['Entradas analógicas', 'A0–A15 (10 bits)'], ['Memoria', '256 KB de programa, 8 KB de RAM'],
+  ],
+  fuente: 'Arduino Mega 2560 Rev3, hoja de datos oficial',
+}
+
+// Raspberry Pi Pico (RP2040). Se programa en C++ con el core arduino-pico y se
+// simula a nivel de API Arduino sobre el ATmega2560 (ver esp32/capasPlacas.ts).
+const gpPico = (g: number, extra = ''): PinDef => ({ nombre: `GP${g}`, tipo: 'pwm', ayuda: `GP${g}: digital y PWM${extra}` })
+const adcPico = (g: number, canal: number): PinDef => ({ nombre: `GP${g}`, tipo: 'analogico', ayuda: `GP${g} = A${canal} (ADC${canal}): entrada analógica 0–3,3 V, también digital` })
+const pinesPico: PinDef[] = [
+  ...Array.from({ length: 23 }, (_, g) => gpPico(g, g === 0 ? ' · TX de Serial1' : g === 1 ? ' · RX de Serial1' : g === 4 ? ' · SDA (I2C0)' : g === 5 ? ' · SCL (I2C0)' : '')),
+  adcPico(26, 0), adcPico(27, 1), adcPico(28, 2),
+  { nombre: '3V3', tipo: 'alim', ayuda: '3V3(OUT): salida de 3,3 V para sensores' },
+  { nombre: 'VBUS', tipo: 'alim', ayuda: '5 V del USB: para servos y módulos de 5 V' },
+  { nombre: 'VSYS', tipo: 'alim', ayuda: 'Entrada de 1,8–5,5 V (batería)' },
+  { nombre: 'GND', tipo: 'gnd', ayuda: 'Tierra (negativo común)' },
+]
+
+export const RASPBERRY_PICO: PiezaDef = {
+  id: 'raspberry-pico',
+  nombre: 'Raspberry Pi Pico',
+  familia: 'placa',
+  descripcion: 'Placa de Raspberry Pi con el chip RP2040 (dos núcleos a 133 MHz). Lógica de 3,3 V, PWM en todos sus pines y tres entradas analógicas (GP26–GP28). Aquí se programa en C++ como un Arduino.',
+  modelo: 'proc:pico',
+  masa_g: 3,
+  material: 'pcb',
+  colisionadores: [{ forma: 'caja', medidas: [51, 4, 21], centro: [0, 2, 0] }],
+  montajes: [],
+  encaja: ['placa'],
+  pines: pinesPico,
+  comportamiento: { tipo: 'mcu', placa: 'pico', frecuencia_hz: 133_000_000, vLogica: 3.3 },
+  datos: [
+    ['Microcontrolador', 'RP2040 (2 núcleos ARM Cortex-M0+)'], ['Reloj', '133 MHz'], ['Voltaje lógico', '3,3 V (¡no le pongas 5 V en un pin!)'],
+    ['Entradas analógicas', 'GP26–GP28 = A0–A2 (12 bits con analogReadResolution(12))'], ['LED de la placa', 'GP25 (LED_BUILTIN)'],
+    ['En el simulador', 'Tu código Arduino (core arduino-pico); MicroPython todavía no. Los int son de 16 bits (en la placa real, 32)'],
+  ],
+  fuente: 'Raspberry Pi Pico, hoja de datos oficial',
+}
+
 // ESP32 DevKit V1 (30 pines). Se simula a nivel de API Arduino sobre un
 // ATmega2560 (ver esp32/capaEsp32.ts): GPIOn del ESP32 = pin n.
 const ana = (g: number, extra = ''): PinDef => ({ nombre: `GPIO${g}`, tipo: 'analogico', ayuda: `GPIO${g} con ADC (0–4095)${extra}` })

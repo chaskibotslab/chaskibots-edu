@@ -24,7 +24,7 @@ import { pieza } from '../catalogo/piezas'
 import type { RobotDoc } from '../robots/doc'
 import type { PinReport } from './avrRunner'
 import { nets } from './plan'
-import { infoPlaca, mcuDe } from './placa'
+import { datosPlaca, infoPlaca, mcuDe } from './placa'
 
 /** Resistencia interna de un pin de salida del ATmega328P (Ω). */
 const R_PIN = 25
@@ -144,8 +144,8 @@ export function planCircuito(doc: RobotDoc): PlanCircuito | null {
       if (!k || tierras.has(k) || !indice.has(k) || !usados.has(indice.get(k)!)) continue
       const nd = indice.get(k)!
       if (c.tipo === 'mcu') {
-        const v = pin.nombre === '5V' ? 5 : pin.nombre === '3V3' ? 3.3 : pin.nombre === 'VIN' && c.placa === 'esp32' ? 5 : null
-        if (v !== null) fuentes.push({ nodo: nd, v })
+        const v = datosPlaca(c.placa).fuentes[pin.nombre]
+        if (v !== undefined) fuentes.push({ nodo: nd, v })
         else if (pin.tipo !== 'alim' && p.id === mcu?.id) pines.push({ pin: pin.nombre, nodo: nd })
       } else if (c.tipo === 'bateria' && pin.nombre === '+') fuentes.push({ nodo: nd, v: c.voltaje })
     }

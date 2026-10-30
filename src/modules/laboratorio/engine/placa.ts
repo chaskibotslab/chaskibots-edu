@@ -7,22 +7,26 @@ import { pieza } from '../catalogo/piezas'
 import type { RobotDoc } from '../robots/doc'
 import type { Chip } from './avrRunner'
 
-export type Placa = 'uno' | 'nano' | 'esp32'
+export type Placa = 'uno' | 'nano' | 'mega' | 'esp32' | 'pico'
 
 export interface InfoPlaca {
   placa: Placa
   nombre: string
   chip: Chip
-  /** Placa que se pide al compilador (el ESP32 se compila sobre el ATmega2560). */
-  compilador: 'uno' | 'nano' | 'esp32'
+  /** Placa que se pide al compilador (ESP32, Pico y Mega se compilan sobre el ATmega2560 con su capa). */
+  compilador: Placa
   vLogica: 5 | 3.3
+  /** Cómo se llaman sus pines en el código: «5» → D5, GPIO5 o GP5. */
+  prefijoPin: 'D' | 'GPIO' | 'GP'
+  /** Todos sus pines de salida dan PWM (ESP32, Pico); si no, solo los marcados ~. */
+  pwmEnTodos: boolean
   pinLed: string
   /** Pin de la placa que alimenta sensores (5 V en Arduino, 3,3 V en ESP32). */
   alimSensores: string
   /** Pin que alimenta servos (siempre 5 V: en el ESP32, VIN = 5 V del USB). */
   alimServo: string
-  /** Pines de la placa que dan alimentación a otras piezas. */
-  fuentes: string[]
+  /** Pines de la placa que dan alimentación a otras piezas, con su voltaje. */
+  fuentes: Record<string, number>
   preferencias: Record<'en' | 'in' | 'lineaDigital' | 'lineaAnalogica' | 'obstaculo' | 'trig' | 'echo' | 'servo' | 'led' | 'boton' | 'buzzer' | 'analogica', string[]>
   /** Pines que no se usan solos (Serial). */
   reservados: string[]
@@ -61,20 +65,49 @@ const ESP32_PREF: InfoPlaca['preferencias'] = {
   analogica: ['GPIO34', 'GPIO35', 'GPIO32', 'GPIO33', 'GPIO36', 'GPIO39'],
 }
 
+// Raspberry Pi Pico: PWM en cualquier GP; ADC solo en GP26–GP28.
+const PICO_PREF: InfoPlaca['preferencias'] = {
+  en: ['GP14', 'GP15'],
+  in: ['GP10', 'GP11', 'GP12', 'GP13', 'GP8', 'GP9'],
+  lineaDigital: ['GP2', 'GP3', 'GP4'],
+  lineaAnalogica: ['GP26', 'GP27', 'GP28'],
+  obstaculo: ['GP2', 'GP3', 'GP4', 'GP5'],
+  trig: ['GP6', 'GP20'],
+  echo: ['GP7', 'GP21'],
+  servo: ['GP16', 'GP17', 'GP18'],
+  led: ['GP15', 'GP14', 'GP13', 'GP12', 'GP11', 'GP10', 'GP9'],
+  boton: ['GP16', 'GP17', 'GP18', 'GP19', 'GP20'],
+  buzzer: ['GP22', 'GP21', 'GP20'],
+  analogica: ['GP26', 'GP27', 'GP28'],
+}
+
+const ARDUINO_5V = { '5V': 5, '3V3': 3.3 }
+
 const INFO: Record<Placa, InfoPlaca> = {
   uno: {
-    placa: 'uno', nombre: 'Arduino UNO', chip: 'atmega328p', compilador: 'uno', vLogica: 5, pinLed: 'D13',
-    alimSensores: '5V', alimServo: '5V', fuentes: ['5V', '3V3'], preferencias: ARDUINO_PREF, reservados: ['D0', 'D1'],
+    placa: 'uno', nombre: 'Arduino UNO', chip: 'atmega328p', compilador: 'uno', vLogica: 5, prefijoPin: 'D', pwmEnTodos: false, pinLed: 'D13',
+    alimSensores: '5V', alimServo: '5V', fuentes: ARDUINO_5V, preferencias: ARDUINO_PREF, reservados: ['D0', 'D1'],
   },
   nano: {
-    placa: 'nano', nombre: 'Arduino Nano', chip: 'atmega328p', compilador: 'nano', vLogica: 5, pinLed: 'D13',
-    alimSensores: '5V', alimServo: '5V', fuentes: ['5V', '3V3'], preferencias: ARDUINO_PREF, reservados: ['D0', 'D1'],
+    placa: 'nano', nombre: 'Arduino Nano', chip: 'atmega328p', compilador: 'nano', vLogica: 5, prefijoPin: 'D', pwmEnTodos: false, pinLed: 'D13',
+    alimSensores: '5V', alimServo: '5V', fuentes: ARDUINO_5V, preferencias: ARDUINO_PREF, reservados: ['D0', 'D1'],
+  },
+  mega: {
+    placa: 'mega', nombre: 'Arduino Mega', chip: 'atmega2560-mega', compilador: 'mega', vLogica: 5, prefijoPin: 'D', pwmEnTodos: false, pinLed: 'D13',
+    alimSensores: '5V', alimServo: '5V', fuentes: ARDUINO_5V, preferencias: ARDUINO_PREF, reservados: ['D0', 'D1'],
   },
   esp32: {
-    placa: 'esp32', nombre: 'ESP32', chip: 'atmega2560', compilador: 'esp32', vLogica: 3.3, pinLed: 'GPIO2',
-    alimSensores: '3V3', alimServo: 'VIN', fuentes: ['3V3', 'VIN'], preferencias: ESP32_PREF, reservados: ['GPIO1', 'GPIO3'],
+    placa: 'esp32', nombre: 'ESP32', chip: 'atmega2560', compilador: 'esp32', vLogica: 3.3, prefijoPin: 'GPIO', pwmEnTodos: true, pinLed: 'GPIO2',
+    alimSensores: '3V3', alimServo: 'VIN', fuentes: { '3V3': 3.3, VIN: 5 }, preferencias: ESP32_PREF, reservados: ['GPIO1', 'GPIO3'],
+  },
+  pico: {
+    placa: 'pico', nombre: 'Raspberry Pi Pico', chip: 'atmega2560-pico', compilador: 'pico', vLogica: 3.3, prefijoPin: 'GP', pwmEnTodos: true, pinLed: 'GP25',
+    alimSensores: '3V3', alimServo: 'VBUS', fuentes: { '3V3': 3.3, VBUS: 5 }, preferencias: PICO_PREF, reservados: [],
   },
 }
+
+/** Datos de una placa por su id ('uno', 'esp32'…). */
+export const datosPlaca = (placa: Placa): InfoPlaca => INFO[placa]
 
 /** Instancia de la placa (el «cerebro») del robot. */
 export function mcuDe(doc: RobotDoc) {
@@ -87,9 +120,9 @@ export function infoPlaca(doc: RobotDoc): InfoPlaca {
   return INFO[c?.tipo === 'mcu' ? c.placa : 'uno']
 }
 
-/** Número de pin para el código: "D5" → "5", "GPIO25" → "25", "A0" → "A0". */
+/** Número de pin para el código: "D5" → "5", "GPIO25" → "25", "GP15" → "15", "A0" → "A0". */
 export function pinCodigo(pin: string | null): string {
   if (!pin) return '-1'
-  if (pin.startsWith('GPIO')) return pin.slice(4)
-  return pin.startsWith('D') ? pin.slice(1) : pin
+  const m = /^(?:GPIO|GP|D)(\d+)$/.exec(pin)
+  return m ? m[1] : pin
 }

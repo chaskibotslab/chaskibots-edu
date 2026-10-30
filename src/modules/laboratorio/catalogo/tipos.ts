@@ -89,7 +89,7 @@ export interface AlimDriver {
 
 export type Comportamiento =
   /** El «cerebro»: la placa define qué se emula y cómo se compila (engine/placa.ts). */
-  | { tipo: 'mcu'; placa: 'uno' | 'nano' | 'esp32'; frecuencia_hz: number; vLogica: 5 | 3.3 }
+  | { tipo: 'mcu'; placa: 'uno' | 'nano' | 'mega' | 'esp32' | 'pico'; frecuencia_hz: number; vLogica: 5 | 3.3 }
   | { tipo: 'chasis' }
   | { tipo: 'motor-dc'; v_nominal: number; rpm_sin_carga: number; torque_bloqueo_nm: number; zona_muerta_v: number; tau_s: number; corriente_a: number }
   | { tipo: 'rueda'; radio_mm: number; ancho_mm: number }

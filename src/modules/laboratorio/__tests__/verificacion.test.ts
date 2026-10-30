@@ -60,6 +60,6 @@ describe('verificación eléctrica', () => {
     const pines = pinesDelCodigo('const int ENA = 5, IN1 = 7;\n#define SENSOR A2\nvoid setup(){ pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); analogRead(SENSOR); pinMode(13, OUTPUT); }')
     // D13 (LED de la placa) se lista; la verificación lo ignora según la placa.
     expect(Array.from(pines).sort()).toEqual(['A2', 'D13', 'D5', 'D7'])
-    expect(Array.from(pinesDelCodigo('pinMode(18, OUTPUT);', true))).toEqual(['GPIO18'])
+    expect(Array.from(pinesDelCodigo('pinMode(18, OUTPUT);', { placa: 'esp32', prefijoPin: 'GPIO' }))).toEqual(['GPIO18'])
   })
 })

@@ -6,7 +6,7 @@
 import { pieza } from '../catalogo/piezas'
 import type { RobotDoc } from '../robots/doc'
 import { nets, planDe } from './plan'
-import { infoPlaca, mcuDe } from './placa'
+import { datosPlaca, infoPlaca, mcuDe, type InfoPlaca } from './placa'
 
 export interface Problema {
   nivel: 'error' | 'advertencia'
@@ -18,7 +18,7 @@ export interface Problema {
 const clave = (inst: string, pin: string) => `${inst}.${pin}`
 
 /** Pines del código: números o constantes usadas en pinMode/digitalRead/digitalWrite/analogRead/analogWrite/attach. */
-export function pinesDelCodigo(cpp: string, esp32 = false): Set<string> {
+export function pinesDelCodigo(cpp: string, info: Pick<InfoPlaca, 'placa' | 'prefijoPin'> = { placa: 'uno', prefijoPin: 'D' }): Set<string> {
   const sinComentarios = cpp.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
   const constantes = new Map<string, string>()
   // Cualquier «NOMBRE = número», también en listas (const int ENA = 5, IN1 = 7;).
@@ -28,9 +28,11 @@ export function pinesDelCodigo(cpp: string, esp32 = false): Set<string> {
   const llamadas = /\b(?:pinMode|digitalRead|digitalWrite|analogRead|analogWrite|pulseIn|attach|tone|noTone)\s*\(\s*(\w+)/g
   for (const m of Array.from(sinComentarios.matchAll(llamadas))) {
     const v = constantes.get(m[1]) ?? m[1]
-    // En el ESP32 el número es el GPIO; en Arduino, 14–19 son A0–A5.
-    if (/^\d+$/.test(v)) usados.add(esp32 ? `GPIO${v}` : Number(v) >= 14 && Number(v) <= 19 ? `A${Number(v) - 14}` : `D${v}`)
-    else if (/^A\d$/.test(v)) usados.add(v)
+    // En el ESP32 y la Pico el número es el GPIO; en el UNO y el Nano 14–19 son A0–A5 (en el Mega, 54–69 son A0–A15).
+    const n = Number(v)
+    const primeraA = info.placa === 'mega' ? 54 : 14
+    if (/^\d+$/.test(v)) usados.add(info.prefijoPin !== 'D' ? `${info.prefijoPin}${v}` : n >= primeraA && n < primeraA + (info.placa === 'mega' ? 16 : 6) ? `A${n - primeraA}` : `D${v}`)
+    else if (/^A\d+$/.test(v)) usados.add(info.placa === 'pico' ? `GP${26 + Number(v.slice(1))}` : v)
   }
   return usados
 }
@@ -52,9 +54,9 @@ export function verificar(doc: RobotDoc): Problema[] {
       const k = clave(p.id, pin.nombre)
       if (pin.tipo === 'gnd') rol.set(k, 'tierra')
       else if (c.tipo === 'bateria' && pin.nombre === '+') rol.set(k, 'bateria+')
-      else if (c.tipo === 'mcu' && (pin.nombre === '5V' || pin.nombre === '3V3' || (c.placa === 'esp32' && pin.nombre === 'VIN'))) rol.set(k, 'fuente')
+      else if (c.tipo === 'mcu' && pin.nombre in datosPlaca(c.placa).fuentes) rol.set(k, 'fuente')
       else if (c.tipo === 'puente-h' && pin.nombre === c.alim.salida5v) rol.set(k, 'fuente')
-      else if (c.tipo === 'mcu' && pin.tipo !== 'alim') rol.set(k, pin.tipo === 'pwm' || c.placa === 'esp32' ? 'pwm-placa' : 'senal-placa')
+      else if (c.tipo === 'mcu' && pin.tipo !== 'alim') rol.set(k, pin.tipo === 'pwm' || datosPlaca(c.placa).pwmEnTodos ? 'pwm-placa' : 'senal-placa')
       else if (c.tipo === 'motor-dc') rol.set(k, 'motor')
       else if (pin.tipo === 'analogico' && c.tipo !== 'mcu') rol.set(k, 'salida-analogica')
       else rol.set(k, 'otro')
@@ -136,7 +138,7 @@ export function verificar(doc: RobotDoc): Problema[] {
   const mcu = mcuDe(doc)
   const info = infoPlaca(doc)
   if (mcu && doc.programa.cpp.trim()) {
-    for (const pin of Array.from(pinesDelCodigo(doc.programa.cpp, info.placa === 'esp32'))) {
+    for (const pin of Array.from(pinesDelCodigo(doc.programa.cpp, info))) {
       if (pin === info.pinLed) continue // LED de la placa: no necesita cable
       if (!n.has(clave(mcu.id, pin))) out.push({ nivel: 'advertencia', texto: `Tu programa usa el pin ${pin}, pero no hay ningún cable en ${pin}.`, pines: [clave(mcu.id, pin)] })
     }
@@ -149,11 +151,11 @@ export function verificar(doc: RobotDoc): Problema[] {
       const vcc = def.pines.find(x => x.nombre === 'VCC' || x.nombre === 'V+')
       if (!vcc || def.comportamiento.tipo === 'servo') continue
       const g = grupos.get(n.get(clave(p.id, vcc.nombre)) ?? '') ?? []
-      const a5v = g.some(k => k === clave(mcu.id, 'VIN') || /\.(5V)$/.test(k))
+      const a5v = g.some(k => Object.entries(info.fuentes).some(([f, v]) => v === 5 && k === clave(mcu.id, f)) || /\.(5V)$/.test(k))
       if (!a5v) continue
       const salidas = def.pines.filter(x => ['DO', 'AO', 'OUT', 'ECHO'].includes(x.nombre)).map(x => clave(p.id, x.nombre))
-      const aGpio = salidas.find(k => (grupos.get(n.get(k) ?? '') ?? []).some(m => m.startsWith(mcu.id + '.GPIO')))
-      if (aGpio) out.push({ nivel: 'advertencia', texto: `${p.etiqueta} está alimentado con 5 V y su señal va a un GPIO del ESP32, que trabaja con 3,3 V: en la vida real lo puede dañar. Aliméntalo desde 3V3.`, pines: [aGpio] })
+      const aGpio = salidas.find(k => (grupos.get(n.get(k) ?? '') ?? []).some(m => m.startsWith(`${mcu.id}.${info.prefijoPin}`)))
+      if (aGpio) out.push({ nivel: 'advertencia', texto: `${p.etiqueta} está alimentado con 5 V y su señal va a un pin del ${info.nombre}, que trabaja con 3,3 V: en la vida real lo puede dañar. Aliméntalo desde 3V3.`, pines: [aGpio] })
     }
   }
 

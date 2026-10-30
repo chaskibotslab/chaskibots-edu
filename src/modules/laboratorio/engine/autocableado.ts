@@ -88,7 +88,7 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
     if (mcu) {
       if (alim.salida5v) {
         // L298N: su regulador de 5 V alimenta al Arduino.
-        cable([driver.id, alim.salida5v], [mcu.id, info.placa === 'esp32' ? 'VIN' : '5V'], ROJO)
+        cable([driver.id, alim.salida5v], [mcu.id, info.alimServo], ROJO)
       } else {
         // TB6612: la batería alimenta al Arduino por VIN y el Arduino da 5 V a la lógica.
         cable([bateria.id, '+'], [mcu.id, 'VIN'], ROJO)

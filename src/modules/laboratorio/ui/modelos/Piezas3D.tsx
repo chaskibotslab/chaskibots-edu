@@ -214,6 +214,133 @@ export function PisoArriba({ alto, color }: { alto: number; color: string }) {
   )
 }
 
+// ---------------------------------------------------------------------------
+// Arduino Mega 2560 (largo a lo largo de z, USB hacia −z)
+// ---------------------------------------------------------------------------
+
+/** Pines del Mega por borde, como en su serigrafía (z de la primera de cada grupo). */
+const MEGA_ATRAS: [number, string[]][] = [
+  [-24, ['D13', 'D12', 'D11', 'D10', 'D9', 'D8']],
+  [-7.4, ['D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D0']],
+  [14, ['D14', 'D15', 'D16', 'D17', 'D18', 'D19', 'D20', 'D21']],
+]
+const MEGA_ADELANTE: [number, string[]][] = [
+  [-22, ['3V3', '5V', 'GND', 'GND2', 'VIN']],
+  [-6, ['A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7']],
+  [15, ['A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15']],
+]
+
+function anclaMega(pin: string): V | null {
+  for (const [z0, lista] of MEGA_ATRAS) { const i = lista.indexOf(pin); if (i >= 0) return [-24.1, 9, z0 + i * 2.54] }
+  for (const [z0, lista] of MEGA_ADELANTE) { const i = lista.indexOf(pin); if (i >= 0) return [24.1, 9, z0 + i * 2.54] }
+  // Doble fila del extremo: D22–D53 (pares en una fila, impares en la otra).
+  const d = /^D(\d+)$/.exec(pin)
+  if (d && Number(d[1]) >= 22) { const k = Number(d[1]) - 22; return [-19 + Math.floor(k / 2) * 2.54, 9, k % 2 ? 47.6 : 45.1] }
+  return null
+}
+
+export const ArduinoMega = forwardRef(function ArduinoMega(_: object, refLed13: Ref<THREE.MeshStandardMaterial>) {
+  const q = useCalidad()
+  return (
+    <group>
+      <SeparadoresPlaca largo={53.3} ancho={101.6} />
+      <mesh position={M(0, 0.8, 0)} castShadow={q.sombras} receiveShadow>
+        <boxGeometry args={[m(53.3), m(1.6), m(101.6)]} />
+        <meshStandardMaterial color="#0f6aa8" roughness={0.45} metalness={0.1} />
+      </mesh>
+      {/* USB-B y conector de alimentación en el extremo −z */}
+      <mesh position={M(-14, 7, -46)} castShadow={q.sombras}>
+        <boxGeometry args={[m(12), m(11), m(16)]} />
+        <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
+      </mesh>
+      <mesh position={M(16, 6.5, -46)} castShadow={q.sombras}>
+        <boxGeometry args={[m(9), m(11), m(14)]} />
+        <meshStandardMaterial color={NEGRO} roughness={0.5} />
+      </mesh>
+      {/* ATmega2560 (TQFP de 100 patas) girado 45° */}
+      <mesh position={M(4, 2.2, 6)} rotation={[0, Math.PI / 4, 0]} castShadow={q.sombras}>
+        <boxGeometry args={[m(14), m(1.2), m(14)]} />
+        <meshStandardMaterial color="#141414" roughness={0.35} />
+      </mesh>
+      <mesh position={M(-6, 2.2, -30)}>
+        <boxGeometry args={[m(6), m(1.2), m(6)]} />
+        <meshStandardMaterial color="#141414" roughness={0.35} />
+      </mesh>
+      {/* Cristal y botón de reset */}
+      <mesh position={M(12, 2.3, -24)}>
+        <boxGeometry args={[m(2.2), m(1.4), m(5)]} />
+        <meshStandardMaterial color="#d4d4d8" metalness={0.95} roughness={0.15} />
+      </mesh>
+      <mesh position={M(-18, 2.6, -36)}>
+        <boxGeometry args={[m(4), m(2), m(4)]} />
+        <meshStandardMaterial color="#e5e7eb" roughness={0.5} />
+      </mesh>
+      {/* Conectores hembra por los bordes y la doble fila del extremo */}
+      {MEGA_ATRAS.map(([z0, l]) => <Pines key={z0} n={l.length} pos={[-24.1, 1.6, z0 + (l.length - 1) * 1.27]} horizontal="z" />)}
+      {MEGA_ADELANTE.map(([z0, l]) => <Pines key={z0} n={l.length} pos={[24.1, 1.6, z0 + (l.length - 1) * 1.27]} horizontal="z" />)}
+      <Pines n={16} pos={[-19 + 7.5 * 2.54, 1.6, 45.1]} />
+      <Pines n={16} pos={[-19 + 7.5 * 2.54, 1.6, 47.6]} />
+      <mesh position={M(-18, 1.9, -12)}>
+        <boxGeometry args={[m(1.6), m(0.8), m(3)]} />
+        <meshStandardMaterial ref={refLed13} color="#78350f" emissive="#fb923c" emissiveIntensity={0} />
+      </mesh>
+      <mesh position={M(18, 1.9, -30)}>
+        <boxGeometry args={[m(1.6), m(0.8), m(3)]} />
+        <meshStandardMaterial color="#14532d" emissive="#22c55e" emissiveIntensity={1.5} />
+      </mesh>
+    </group>
+  )
+})
+
+// ---------------------------------------------------------------------------
+// Raspberry Pi Pico (USB hacia −x)
+// ---------------------------------------------------------------------------
+
+/** Pines 1–20 (lado −z) y 40–21 (lado +z) de la Pico, según su serigrafía. */
+const PICO_1_20 = ['GP0', 'GP1', 'GND', 'GP2', 'GP3', 'GP4', 'GP5', 'GND', 'GP6', 'GP7', 'GP8', 'GP9', 'GND', 'GP10', 'GP11', 'GP12', 'GP13', 'GND', 'GP14', 'GP15']
+const PICO_40_21 = ['VBUS', 'VSYS', 'GND', '3V3_EN', '3V3', 'ADC_VREF', 'GP28', 'AGND', 'GP27', 'GP26', 'RUN', 'GP22', 'GND', 'GP21', 'GP20', 'GP19', 'GP18', 'GND', 'GP17', 'GP16']
+
+export const Pico = forwardRef(function Pico(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
+  const q = useCalidad()
+  return (
+    <group>
+      <mesh position={M(0, 0.5, 0)} castShadow={q.sombras} receiveShadow>
+        <boxGeometry args={[m(51), m(1), m(21)]} />
+        <meshStandardMaterial color="#1f7a3f" roughness={0.5} metalness={0.1} />
+      </mesh>
+      {/* Bordes almenados (castellated) dorados */}
+      {[-8.89, 8.89].flatMap(z => Array.from({ length: 20 }, (_, i) => (
+        <mesh key={`${z}${i}`} position={M(-24.13 + i * 2.54, 1.05, z)}>
+          <cylinderGeometry args={[m(0.8), m(0.8), m(0.1), 10]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.25} />
+        </mesh>
+      )))}
+      {/* Micro USB, RP2040, memoria flash y botón BOOTSEL */}
+      <mesh position={M(-24, 2.4, 0)} castShadow={q.sombras}>
+        <boxGeometry args={[m(5.5), m(2.8), m(8)]} />
+        <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
+      </mesh>
+      <mesh position={M(2, 1.5, 0)} castShadow={q.sombras}>
+        <boxGeometry args={[m(7), m(1), m(7)]} />
+        <meshStandardMaterial color="#141414" roughness={0.35} />
+      </mesh>
+      <mesh position={M(13, 1.6, 0)}>
+        <boxGeometry args={[m(5), m(1.2), m(6)]} />
+        <meshStandardMaterial color="#1f1f1f" roughness={0.4} />
+      </mesh>
+      <mesh position={M(-12, 2.2, 3)}>
+        <boxGeometry args={[m(4), m(2.4), m(3.2)]} />
+        <meshStandardMaterial color="#f5f5f4" roughness={0.5} />
+      </mesh>
+      {/* LED de GP25 junto al USB */}
+      <mesh position={M(-19, 1.4, -5)}>
+        <boxGeometry args={[m(1.6), m(0.8), m(1)]} />
+        <meshStandardMaterial ref={refLed} color="#14532d" emissive="#4ade80" emissiveIntensity={0} />
+      </mesh>
+    </group>
+  )
+})
+
 /** Pines del Nano por lado (USB hacia −x), según su serigrafía. */
 const NANO_ATRAS = ['D13', '3V3', 'AREF', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', '5V', 'RST', 'GND', 'VIN']
 const NANO_ADELANTE = ['D12', 'D11', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'GND', 'RST', 'D0', 'D1']
@@ -677,6 +804,13 @@ export function anclaPin(modelo: string, pin: string): V | null {
       if (d) { const n = Number(d[1]); return [n >= 8 ? -1 + (13 - n) * 2.54 : 14.8 + (7 - n) * 2.54, 9, -24] }
       if (a) return [20.4 + Number(a[1]) * 2.54, 9, 23.6]
       return ({ '3V3': [5.4, 9, 23.6], '5V': [7.9, 9, 23.6], GND: [10.5, 9, 23.6], VIN: [15.4, 9, 23.6] } as Record<string, V>)[pin] ?? null
+    case 'proc:arduino-mega': return anclaMega(pin)
+    case 'proc:pico': {
+      const a = PICO_1_20.indexOf(pin), b = PICO_40_21.indexOf(pin)
+      if (a >= 0) return [-24.13 + a * 2.54, 1, -8.89]
+      if (b >= 0) return [-24.13 + b * 2.54, 1, 8.89]
+      return null
+    }
     case 'proc:esp32': {
       const a = ESP32_A.indexOf(pin), b = ESP32_B.indexOf(pin)
       if (a >= 0) return [-17.8 + a * 2.54, 5, -11.4]
