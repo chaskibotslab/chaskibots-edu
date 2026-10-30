@@ -8,9 +8,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
   Play, Square, Pause, RotateCcw, Upload, Gauge, Camera, Navigation, Map as MapIcon,
-  Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download, Puzzle, Gamepad2,
+  CheckCircle2, Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download, Puzzle, Gamepad2,
   Maximize2, Minimize2, ZoomIn, ZoomOut, Eye, EyeOff,
 } from 'lucide-react'
+import { pieza } from '../../catalogo/piezas'
 import { Simulacion, type Telemetria } from '../../engine/simulation'
 import { GRAVEDADES, type Gravedad } from '../../engine/fisica/mundo'
 import { arenaDePista, listaArenas } from '../../arenas'
@@ -27,7 +28,7 @@ import { PROGRAMA_VACIO, SEGUIDOR_EN_BLOQUES } from '../../bloques/definiciones'
 
 const EditorBloques = dynamic(() => import('../../bloques/EditorBloques'), { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-[#121624]" /> })
 import { verificar } from '../../engine/verificacion'
-import { infoPlaca } from '../../engine/placa'
+import { infoPlaca, mcuDe } from '../../engine/placa'
 import ControlRemoto from './ControlRemoto'
 import { NIVELES_RIVAL, revisarReglamento, type NivelRival } from '../../engine/competencia'
 import { esBanco, resumen } from '../../engine/ensamblaje'
@@ -85,6 +86,9 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
   const [entrada, setEntrada] = useState('')
   // Mesa de electrónica: solo su escritorio; robots: las pistas y arenas.
   const banco = esBanco(doc)
+  // Circuito sin placa (pila o fuente + componentes): no hay nada que programar, ya funciona.
+  const sinPlaca = banco && !mcuDe(doc)
+  const conPulsador = doc.piezas.some(p => ['pulsador', 'joystick'].includes(pieza(p.pieza).comportamiento.tipo))
   const arenas = useMemo(() => listaArenas().filter(a => !!a.banco === banco), [banco])
   const [arena, setArena] = useState<ArenaDef>(() => arenas.find(a => a.id === arenaInicial) ?? arenas[0])
   const sonido = useRef<SonidoBuzzers | null>(null)
@@ -220,6 +224,11 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
     <div className="flex min-h-0 flex-1 flex-col">
       {/* ---------- Barra ---------- */}
       <div className="lab-panel flex flex-wrap items-center gap-2 border-b border-lab-borde/15 px-3 py-2">
+        {sinPlaca ? (
+          <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-sm text-emerald-200">
+            <CheckCircle2 className="h-4 w-4" /> Circuito sin placa: no lleva programa, ya está funcionando.
+          </div>
+        ) : (<>
         <select
           className="h-9 max-w-[11rem] rounded-lg border border-lab-borde/15 bg-lab-fondo px-2 text-sm text-slate-200 [&_option]:bg-lab-superficie"
           value=""
@@ -265,6 +274,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
         <button onClick={descargarIno} className={boton} title="Descargar el programa (.ino) para abrirlo en el Arduino IDE">
           <Download className="h-4 w-4" /> <span className="hidden md:inline">.ino</span>
         </button>
+        </>)}
 
         <div className="ml-auto flex flex-wrap items-center gap-2">
           {!banco && <>
@@ -313,6 +323,29 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
 
       {/* ---------- Cuerpo ---------- */}
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        {sinPlaca ? (
+          <div className={`min-h-0 flex-col gap-3 overflow-y-auto border-lab-borde/15 p-4 text-sm text-slate-300 lg:w-[32%] lg:border-r ${ampliada ? 'hidden' : `lg:flex ${vista === 'programar' ? 'flex flex-1 lg:flex-none' : 'hidden'}`}`}>
+            <h3 className="text-base font-semibold text-white">Este circuito no tiene placa</h3>
+            <p>La pila (o la fuente) le da la corriente directo: no hay Arduino que programar. Apenas entras a «Probar», el circuito ya está encendido.</p>
+            <div className="rounded-lg bg-black/20 p-3">
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Cómo va la corriente</div>
+              <ol className="list-decimal space-y-1 pl-4 text-[13px]">
+                <li>Sale del <b className="text-red-300">+</b> de la pila al <b className="text-red-300">riel + (línea roja)</b> de la protoboard.</li>
+                <li>Del riel pasa por los componentes: resistencia, LED{conPulsador ? ', pulsador' : ''}…</li>
+                <li>Vuelve por el <b className="text-sky-300">riel − (línea azul)</b> al <b className="text-sky-300">−</b> de la pila.</li>
+              </ol>
+            </div>
+            <div className="rounded-lg bg-black/20 p-3">
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Prueba</div>
+              <ul className="list-disc space-y-1 pl-4 text-[13px]">
+                {conPulsador && <li>Presiona el pulsador (en la escena o en el panel).</li>}
+                <li>En «Armar», cambia la resistencia por otra: con menos ohmios el LED brilla más; sin resistencia se quema.</li>
+                <li>En «Cablear», quita el cable del riel −: el circuito se abre y el LED se apaga.</li>
+                <li>Si quieres programarlo, agrega una placa (Arduino, ESP32, Pico…) desde «Armar».</li>
+              </ul>
+            </div>
+          </div>
+        ) : (
         <div className={`min-h-0 flex-col border-lab-borde/15 lg:w-[40%] lg:border-r ${ampliada ? 'hidden' : `lg:flex ${vista === 'programar' ? 'flex flex-1 lg:flex-none' : 'hidden'}`}`}>
           <div className="flex items-center justify-between gap-2 border-b border-lab-borde/15 bg-lab-fondo2 px-3 py-1.5 text-xs text-slate-400">
             <div className="flex overflow-hidden rounded-lg border border-lab-borde/15">
@@ -352,6 +385,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             </div>
           )}
         </div>
+        )}
 
         <div className={`min-h-0 flex-1 flex-col ${vista === 'probar' || ampliada ? 'flex' : 'hidden lg:flex'}`}>
           <div className="relative min-h-[300px] flex-[3]">
@@ -362,7 +396,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                 <Loader2 className="h-5 w-5 animate-spin" /> Preparando física…
               </div>
             )}
-            {sim && <HUD tele={tele} robot={!banco && datos} />}
+            {sim && <HUD tele={tele} robot={!banco && datos} sinPlaca={sinPlaca} />}
             {sim && banco && <PanelCircuito sim={sim} tele={tele} silencio={silencio} onSilencio={setSilencio} onGesto={activarSonido} />}
             {sim && arena.competencia && <Combate sim={sim} tele={tele} reglamento={arena.competencia} doc={doc} compacto={!datos} />}
             {sim && (
@@ -381,11 +415,11 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             )}
             {sim && control && <ControlRemoto sim={sim} conPrograma={tele?.estado === 'corriendo' || tele?.estado === 'pausado'} onCerrar={() => setControl(false)} />}
             <div className="pointer-events-none absolute bottom-2 left-3 hidden text-[11px] text-slate-400/80 sm:block">
-              {banco ? 'Haz clic en el pulsador para presionarlo · arrastra para girar la cámara' : 'Doble clic en el piso para mover el robot · arrastra para girar la cámara'}
+              {banco ? `${conPulsador ? 'Haz clic en el pulsador para presionarlo · ' : ''}arrastra para girar la cámara` : 'Doble clic en el piso para mover el robot · arrastra para girar la cámara'}
             </div>
           </div>
 
-          <div className={`min-h-[180px] flex-[2] flex-col border-t border-lab-borde/15 bg-lab-fondo ${ampliada ? 'hidden' : 'flex'}`}>
+          <div className={`min-h-[180px] flex-[2] flex-col border-t border-lab-borde/15 bg-lab-fondo ${ampliada || sinPlaca ? 'hidden' : 'flex'}`}>
             <div className="flex border-b border-lab-borde/15 text-xs">
               {([
                 ['serial', 'Monitor serie', Terminal],
@@ -443,10 +477,10 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
 
 // ---------- Indicadores sobre la escena ----------
 
-function HUD({ tele, robot = true }: { tele: Telemetria | null; robot?: boolean }) {
+function HUD({ tele, robot = true, sinPlaca = false }: { tele: Telemetria | null; robot?: boolean; sinPlaca?: boolean }) {
   if (!tele) return null
   const estado = {
-    'sin-programa': { txt: 'Sin programa', cls: 'bg-slate-500' },
+    'sin-programa': sinPlaca ? { txt: 'Funcionando (sin placa)', cls: 'bg-emerald-400' } : { txt: 'Sin programa', cls: 'bg-slate-500' },
     cargando: { txt: 'Cargando…', cls: 'bg-sky-400' },
     corriendo: { txt: 'Ejecutando', cls: 'bg-emerald-400 animate-pulse' },
     pausado: { txt: 'En pausa', cls: 'bg-amber-400' },
