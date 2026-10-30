@@ -4,9 +4,11 @@
 // buzzer de 12 mm, potenciómetro de 10 kΩ, LDR de 5 mm) y los usa
 // engine/circuito.ts para resolver el circuito.
 //
-// Marco de cada componente: origen en la superficie de la protoboard, patas a
-// lo largo de x. Al lado de cada pata (en la misma tira de 5 huecos, 5,08 mm
-// hacia afuera) va el cable: ahí están sus pines (ver anclaPin en Piezas3D).
+// Marco de cada componente: origen en un agujero de la protoboard (la fila más
+// cerca de la canaleta), patas a lo largo de x, cada una en su propia columna.
+// El cable de cada pin entra en la misma tira de 5 agujeros, 3 agujeros hacia
+// afuera (−z): así la pata y su cable quedan unidos por dentro, como en la
+// protoboard real. PATAS_CIRCUITO dice dónde cae cada pata.
 //
 // Los pines de los componentes son 'digital' aunque vayan a tierra o a 5 V:
 // 'gnd' y 'alim' quedan para las placas y baterías (la verificación los usa
@@ -16,9 +18,78 @@ import type { PiezaDef, PuntoMontaje } from '../tipos'
 
 /** Alto de la protoboard (mm): los componentes se apoyan sobre su cara de arriba. */
 export const ALTO_PROTOBOARD = 8.5
-/** Huecos para componentes: 8 columnas × 2 mitades (arriba y abajo de la canaleta). */
+/** Distancia entre agujeros (mm). */
+export const PASO_PROTOBOARD = 2.54
+/** x de la columna k (0–62) de la protoboard. */
+export const xColumna = (k: number) => -78.7 + k * PASO_PROTOBOARD
+/** |z| de la fila i (0–4) de una tira: 0 es la más cercana a la canaleta. */
+export const zFila = (i: number) => 3.81 + i * PASO_PROTOBOARD
+/** Huecos para componentes: 8 lugares × 2 mitades (arriba y abajo de la canaleta). */
 export const COLUMNAS_PROTOBOARD = 8
-const PASO_COLUMNA = 18
+/** Cada lugar está 7 columnas después del anterior: los componentes no comparten tiras. */
+const PRIMERA_COLUMNA = 6
+const COLUMNAS_ENTRE_LUGARES = 7
+/** z (marco del componente) donde entran los cables: fila 3 de la misma tira. */
+export const Z_CABLE_PROTOBOARD = -3 * PASO_PROTOBOARD
+
+// Rieles de alimentación: a cada lado, una fila + (roja, por fuera) y una −
+// (azul, por dentro) de 50 agujeros unidos a lo largo, en grupos de 5. Cada
+// riel es un pin de la protoboard: todo lo que se conecta a él queda unido.
+/** Agujeros de cada riel. */
+export const AGUJEROS_RIEL = 50
+/** x del agujero k (0–49) de un riel. */
+export const xRiel = (k: number) => xColumna(2 + k + Math.floor(k / 5))
+/** Los cuatro rieles: nombre del pin, polaridad y z (arriba = −z, el lado de la fila 0). */
+export const RIELES = [
+  { pin: '+ arriba', signo: '+', z: -22.1 },
+  { pin: '- arriba', signo: '-', z: -19.6 },
+  { pin: '+ abajo', signo: '+', z: 22.1 },
+  { pin: '- abajo', signo: '-', z: 19.6 },
+] as const
+
+/**
+ * Agujero del riel donde entra un cable: el libre más cercano a x (mm, marco
+ * de la protoboard). `usados` guarda los ya ocupados de cada riel.
+ */
+export function agujeroRiel(pin: string, x: number, usados: Map<string, Set<number>>): [number, number] | null {
+  const riel = RIELES.find(r => r.pin === pin)
+  if (!riel) return null
+  const ocupados = usados.get(pin) ?? new Set<number>()
+  let mejor = -1
+  for (let k = 0; k < AGUJEROS_RIEL; k++) {
+    if (ocupados.has(k)) continue
+    if (mejor < 0 || Math.abs(xRiel(k) - x) < Math.abs(xRiel(mejor) - x)) mejor = k
+  }
+  if (mejor < 0) return null
+  usados.set(pin, ocupados.add(mejor))
+  return [xRiel(mejor), riel.z]
+}
+
+/** Fuente MB102: sus patas entran en los dos últimos agujeros de cada riel (mm, marco de la protoboard). */
+export const X_FUENTE_PROTOBOARD = xRiel(AGUJEROS_RIEL - 2)
+
+/**
+ * Patas de cada componente en el marco de su hueco (mm): todas caen en agujeros.
+ * Los que tienen patas a medio paso del centro (LED, buzzer, pulsador) se corren
+ * 1,27 mm (ver CENTRO_CIRCUITO) para que sus patas entren en los agujeros.
+ */
+export const PATAS_CIRCUITO: Record<string, { pin: string; x: number; z: number }[]> = {
+  'proc:led': [{ pin: 'A', x: 0, z: 0 }, { pin: 'K', x: 2.54, z: 0 }],
+  'proc:led-rgb': [{ pin: 'R', x: -2.54, z: 0 }, { pin: 'K', x: 0, z: 0 }, { pin: 'G', x: 2.54, z: 0 }, { pin: 'B', x: 5.08, z: 0 }],
+  'proc:resistencia': [{ pin: '1', x: -5.08, z: 0 }, { pin: '2', x: 5.08, z: 0 }],
+  // Pulsador de 4 patas: las dos de cada lado van en la misma tira (están unidas por dentro).
+  'proc:pulsador': [{ pin: '1', x: -2.54, z: 0 }, { pin: '1', x: -2.54, z: -2.54 }, { pin: '2', x: 5.08, z: 0 }, { pin: '2', x: 5.08, z: -2.54 }],
+  'proc:buzzer': [{ pin: '+', x: -2.54, z: 0 }, { pin: '-', x: 5.08, z: 0 }],
+  'proc:potenciometro': [{ pin: '1', x: -5.08, z: 0 }, { pin: 'W', x: 0, z: 0 }, { pin: '2', x: 5.08, z: 0 }],
+  'proc:ldr': [{ pin: '1', x: -2.54, z: 0 }, { pin: '2', x: 2.54, z: 0 }],
+}
+/** Dónde va el centro del cuerpo de cada componente respecto a su hueco (x, z en mm). */
+export const CENTRO_CIRCUITO: Record<string, [number, number]> = {
+  'proc:led': [1.27, 0],
+  'proc:led-rgb': [1.27, 0],
+  'proc:pulsador': [1.27, -1.27],
+  'proc:buzzer': [1.27, 0],
+}
 
 function huecos(): PuntoMontaje[] {
   const out: PuntoMontaje[] = []
@@ -29,7 +100,7 @@ function huecos(): PuntoMontaje[] {
         id: `hueco-${n}`,
         tipo: 'protoboard',
         nombre: `${fila === 0 ? 'Arriba' : 'Abajo'}, columna ${c + 1}`,
-        posicion: [-63 + c * PASO_COLUMNA, ALTO_PROTOBOARD, fila === 0 ? -7.6 : 7.6],
+        posicion: [xColumna(PRIMERA_COLUMNA + c * COLUMNAS_ENTRE_LUGARES), ALTO_PROTOBOARD, fila === 0 ? -zFila(0) : zFila(0)],
         // Abajo de la canaleta el componente mira al revés: sus cables salen hacia el borde.
         rotacion: fila === 0 ? [0, 0, 0] : [0, 180, 0],
       })
@@ -50,13 +121,77 @@ export const PROTOBOARD: PiezaDef = {
   color: '#f4f4f0',
   colisionadores: [{ forma: 'caja', medidas: [165, ALTO_PROTOBOARD, 55], centro: [0, ALTO_PROTOBOARD / 2, 0] }],
   montajes: [
+    // Fuente MB102 en el extremo derecho, con sus patas en los cuatro rieles.
+    { id: 'fuente', tipo: 'fuente-protoboard', nombre: 'Extremo derecho, en los rieles (fuente)', posicion: [X_FUENTE_PROTOBOARD, ALTO_PROTOBOARD, 0] },
     { id: 'placa', tipo: 'placa', nombre: 'Lugar de la placa', posicion: [-127, 0, 0], rotacionesPermitidas: [0, 180] },
     ...huecos(),
+    // Módulos (E2): el HC-SR04 parado sobre la mesa a la derecha, mirando hacia afuera (+x),
+    // con sus 4 cables hembra directo a la placa (pinchado en la protoboard sus 4 pines
+    // quedarían en la misma tira y se unirían);
+    // un servo sobre la mesa, detrás de la protoboard; y la maqueta del proyecto a la derecha.
+    { id: 'sensor', tipo: 'sensor-frontal', nombre: 'A la derecha de la protoboard (sensor)', posicion: [105, 0, 0] },
+    { id: 'servo', tipo: 'soporte-servo', nombre: 'Detrás de la protoboard (servo)', posicion: [30, 0, -50] },
+    { id: 'maqueta', tipo: 'maqueta', nombre: 'Junto a la protoboard (maqueta)', posicion: [175, 0, 0] },
+    // Batería sobre la mesa, adelante, con los bornes hacia la protoboard: para
+    // probar circuitos sin placa (LED + resistencia + pila).
+    { id: 'bateria', tipo: 'bateria', nombre: 'Delante de la protoboard (batería)', posicion: [-40, 0, 72], rotacion: [0, 90, 0] },
+    // Joystick sobre la mesa, adelante a la derecha, con sus pines hacia la protoboard.
+    { id: 'modulo', tipo: 'modulo-mesa', nombre: 'Delante de la protoboard, a la derecha (joystick)', posicion: [45, 0, 75], rotacion: [0, 180, 0] },
   ],
   encaja: [],
-  pines: [],
+  // Los rieles: el + y el − de cada lado. Una batería o la placa los alimenta
+  // con un cable y los componentes toman de ahí la corriente.
+  pines: RIELES.map(r => ({
+    nombre: r.pin,
+    tipo: 'digital' as const,
+    ayuda: `Riel ${r.signo === '+' ? '+ (línea roja)' : '− (línea azul)'} de ${r.pin.endsWith('arriba') ? 'arriba' : 'abajo'}: los 50 agujeros están unidos. ${r.signo === '+' ? 'Llévale el + de la pila o el 5V de la placa' : 'Llévale el − de la pila o el GND de la placa'}.`,
+  })),
   comportamiento: { tipo: 'protoboard' },
-  datos: [['Puntos', '830 (630 + 200 de los rieles)'], ['Medidas', '165 × 55 × 8,5 mm'], ['Tiras', '5 huecos unidos por dentro, a cada lado de la canaleta']],
+  datos: [['Puntos', '830 (630 + 200 de los rieles)'], ['Medidas', '165 × 55 × 8,5 mm'], ['Tiras', '5 huecos unidos por dentro, a cada lado de la canaleta'], ['Rieles', '+ y − arriba y abajo: 50 agujeros unidos a lo largo']],
+}
+
+/**
+ * Fuente para protoboard MB102: se pincha en el extremo de la protoboard y
+ * alimenta los cuatro rieles con 5 V (entra una pila de 9 V o un cargador
+ * por su conector). Marco: origen en el agujero 48 de los rieles; la placa
+ * sale 8 mm por fuera del borde, como la real.
+ */
+export const FUENTE_MB102: PiezaDef = {
+  id: 'fuente-mb102',
+  nombre: 'Fuente para protoboard MB102 (5 V)',
+  familia: 'circuito',
+  descripcion: 'Se pincha en el extremo de la protoboard y deja los rieles + con 5 V y los − a tierra. Así se prueban circuitos sin Arduino: solo hay que llevar cables desde los rieles a cada componente.',
+  modelo: 'proc:fuente-mb102',
+  masa_g: 12,
+  material: 'pcb',
+  color: '#1d4ed8',
+  colisionadores: [{ forma: 'caja', medidas: [33, 14, 53], centro: [0.5, 9, 0] }],
+  montajes: [],
+  encaja: ['fuente-protoboard'],
+  pines: [
+    { nombre: '+', tipo: 'alim', ayuda: 'Salida de 5 V: ya está unida a los dos rieles +' },
+    { nombre: '-', tipo: 'gnd', ayuda: 'Tierra: ya está unida a los dos rieles −' },
+  ],
+  unePinesConPadre: [['+', '+ arriba'], ['+', '+ abajo'], ['-', '- arriba'], ['-', '- abajo']],
+  comportamiento: { tipo: 'bateria', voltaje: 5, capacidad_mah: 1000, corriente_max_a: 0.7 },
+  datos: [['Salida', '5 V (o 3,3 V con su puente)'], ['Corriente', 'hasta 700 mA'], ['Entrada', '6,5–12 V (pila de 9 V o cargador) o USB']],
+}
+
+/** Portapilas para dos pilas AA (3 V): sobre la mesa, con sus cables a los rieles. */
+export const PORTAPILAS_AA: PiezaDef = {
+  id: 'portapilas-2aa',
+  nombre: 'Portapilas 2×AA (3 V)',
+  familia: 'circuito',
+  descripcion: 'Dos pilas AA en serie: 1,5 V + 1,5 V = 3 V. Va sobre la mesa y sus cables (rojo +, negro −) se pinchan en los rieles de la protoboard.',
+  modelo: 'proc:portapilas-2aa',
+  masa_g: 55,
+  material: 'plastico',
+  colisionadores: [{ forma: 'caja', medidas: [58, 15, 32], centro: [0, 7.5, 0] }],
+  montajes: [],
+  encaja: ['bateria'],
+  pines: [{ nombre: '+', tipo: 'alim', ayuda: 'Cable rojo: positivo (3 V)' }, { nombre: '-', tipo: 'gnd', ayuda: 'Cable negro: negativo' }],
+  comportamiento: { tipo: 'bateria', voltaje: 3, capacidad_mah: 2000, corriente_max_a: 1 },
+  datos: [['Voltaje', '3 V (2 × 1,5 V)'], ['Capacidad', '≈ 2000 mAh'], ['Ojo', 'Un LED azul o blanco (3 V) casi no prende con ella']],
 }
 
 const LED_COLORES = [
@@ -232,4 +367,70 @@ export const LDR: PiezaDef = {
   datos: [['Con luz', '≈ 1 kΩ'], ['A oscuras', '≈ 1 MΩ'], ['Tipo', 'GL5528']],
 }
 
-export const PIEZAS_CIRCUITO: PiezaDef[] = [...LEDS, LED_RGB, ...RESISTENCIAS_PIEZAS, PULSADOR, BUZZER_PASIVO, BUZZER_ACTIVO, POTENCIOMETRO, LDR]
+// ---------------------------------------------------------------------------
+// Maqueta del basurero (E2, kit de 9no)
+// ---------------------------------------------------------------------------
+// Marco: origen en el centro de la base; el sensor va en la cara +x (la mano
+// llega por ese lado). La tapa cuelga de una bisagra en el borde de atrás
+// (−z), arriba, a lo largo de x: así se levanta de frente a la cámara. El
+// servo va acostado en un poste, en la esquina de atrás junto al sensor, con
+// su eje en la línea de la bisagra; la tapa se encastra en ese eje: con el
+// servo en 0° la tapa está cerrada (horizontal) y en 90° abierta (vertical),
+// como en el kit.
+
+/** Medidas del basurero (mm): base cuadrada y alto. */
+export const BASURERO = { lado: 100, alto: 110 }
+/** Eje del servo = punta de la bisagra de la tapa (esquina de atrás del lado del sensor, apenas sobre el borde). */
+export const BISAGRA_BASURERO: [number, number, number] = [52, 113, -52]
+/** Poste que sostiene el servo (x, z) y su alto (hasta la base del servo acostado). */
+export const POSTE_SERVO = { x: 68.5, z: -52, alto: 95 }
+
+export const MAQUETA_BASURERO: PiezaDef = {
+  id: 'maqueta-basurero',
+  nombre: 'Basurero (maqueta)',
+  familia: 'circuito',
+  descripcion: 'Un basurero pequeño para el proyecto de 9no: el sensor ultrasónico va en el frente y el servo, de costado junto a la bisagra, abre la tapa.',
+  modelo: 'proc:basurero',
+  masa_g: 120,
+  material: 'plastico',
+  color: '#15803d',
+  colisionadores: [
+    { forma: 'caja', medidas: [BASURERO.lado, BASURERO.alto, BASURERO.lado], centro: [0, BASURERO.alto / 2, 0] },
+    // Poste del servo.
+    { forma: 'caja', medidas: [10, POSTE_SERVO.alto, 10], centro: [POSTE_SERVO.x, POSTE_SERVO.alto / 2, POSTE_SERVO.z] },
+  ],
+  montajes: [
+    { id: 'sensor', tipo: 'sensor-frontal', nombre: 'Frente del basurero', posicion: [BASURERO.lado / 2 + 1, 40, 0] },
+    // Servo acostado (girado 90° en z): su +y (el eje) apunta a −x y su +x hacia
+    // arriba. El eje (6 mm en x y 28 mm en y, en el marco del servo) cae justo en la bisagra.
+    { id: 'servo', tipo: 'soporte-servo', nombre: 'Soporte del servo (bisagra)', posicion: [BISAGRA_BASURERO[0] + 28, BISAGRA_BASURERO[1] - 6, BISAGRA_BASURERO[2]], rotacion: [0, 0, 90] },
+  ],
+  encaja: ['maqueta'],
+  pines: [],
+  comportamiento: { tipo: 'maqueta' },
+  datos: [['Medidas', '100 × 100 × 110 mm'], ['Tapa', 'Con bisagra atrás, la mueve un servo'], ['Sensor', 'En el frente, mirando hacia afuera']],
+}
+
+/**
+ * Tapa del basurero. Marco = el del eje del servo acostado: el ancho va a lo
+ * largo del eje (+y), el largo hacia +x (vertical cuando el servo está en 90°)
+ * y el grosor hacia +z (queda abajo cuando la tapa se cierra).
+ */
+export const TAPA_BASURERO: PiezaDef = {
+  id: 'tapa-basurero',
+  nombre: 'Tapa del basurero',
+  familia: 'circuito',
+  descripcion: 'Va en el eje del servo: con 0° queda cerrada y con 90° abierta.',
+  modelo: 'proc:tapa-basurero',
+  masa_g: 15,
+  material: 'plastico',
+  color: '#166534',
+  colisionadores: [{ forma: 'caja', medidas: [BASURERO.lado + 4, BASURERO.lado + 4, 3], centro: [(BASURERO.lado + 4) / 2, (BASURERO.lado + 4) / 2, 1.5] }],
+  montajes: [],
+  encaja: ['eje-servo'],
+  pines: [],
+  comportamiento: { tipo: 'maqueta' },
+  datos: [['Medidas', '104 × 104 × 3 mm'], ['Cerrada', 'Servo en 0°'], ['Abierta', 'Servo en 90°']],
+}
+
+export const PIEZAS_CIRCUITO: PiezaDef[] = [...LEDS, LED_RGB, ...RESISTENCIAS_PIEZAS, PULSADOR, BUZZER_PASIVO, BUZZER_ACTIVO, POTENCIOMETRO, LDR, FUENTE_MB102, PORTAPILAS_AA, MAQUETA_BASURERO, TAPA_BASURERO]

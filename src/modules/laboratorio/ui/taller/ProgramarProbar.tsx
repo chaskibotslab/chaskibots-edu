@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic'
 import {
   Play, Square, Pause, RotateCcw, Upload, Gauge, Camera, Navigation, Map as MapIcon,
   Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download, Puzzle, Gamepad2,
+  Maximize2, Minimize2, ZoomIn, ZoomOut, Eye, EyeOff,
 } from 'lucide-react'
 import { Simulacion, type Telemetria } from '../../engine/simulation'
 import { GRAVEDADES, type Gravedad } from '../../engine/fisica/mundo'
@@ -18,7 +19,7 @@ import type { Pista } from '../../engine/tracks'
 import type { RobotDoc } from '../../robots/doc'
 import type { PlantillaCodigo } from '../../robots/prearmados'
 import EditorCodigo, { type ErrorCompilacion } from '../EditorCodigo'
-import type { ModoCamara } from '../Escena3D'
+import type { ModoCamara, PedidoZoom } from '../Escena3D'
 import type { NivelCalidad } from '../calidad'
 import { explicarError } from '../erroresCompilador'
 import { partesDe } from '../../bloques/generador'
@@ -94,6 +95,11 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
   const [imagenPropia, setImagenPropia] = useState<{ nombre: string; img: HTMLImageElement } | null>(null)
   const [gravedad, setGravedad] = useState<Gravedad>('tierra')
   const [camara, setCamara] = useState<ModoCamara>('libre')
+  const [zoom, setZoom] = useState<PedidoZoom>({ n: 0, factor: 1 })
+  // Vista ampliada: la escena ocupa todo (sin editor ni monitor). Datos: recuadros sobre la escena;
+  // en pantallas chicas empiezan ocultos para que se vea la arena.
+  const [ampliada, setAmpliada] = useState(false)
+  const [datos, setDatos] = useState(() => typeof window === 'undefined' || window.innerWidth >= 1500)
   const [versionArena, setVersionArena] = useState(0)
   const [pestana, setPestana] = useState<Pestana>('serial')
   // El control remoto se abre solo si el programa usa Bluetooth.
@@ -307,7 +313,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
 
       {/* ---------- Cuerpo ---------- */}
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <div className={`min-h-0 flex-col border-lab-borde/15 lg:flex lg:w-[40%] lg:border-r ${vista === 'programar' ? 'flex flex-1 lg:flex-none' : 'hidden'}`}>
+        <div className={`min-h-0 flex-col border-lab-borde/15 lg:w-[40%] lg:border-r ${ampliada ? 'hidden' : `lg:flex ${vista === 'programar' ? 'flex flex-1 lg:flex-none' : 'hidden'}`}`}>
           <div className="flex items-center justify-between gap-2 border-b border-lab-borde/15 bg-lab-fondo2 px-3 py-1.5 text-xs text-slate-400">
             <div className="flex overflow-hidden rounded-lg border border-lab-borde/15">
               {([['bloques', 'Bloques', Puzzle], ['codigo', 'Código', FileCode2]] as const).map(([modo, txt, Icon]) => (
@@ -347,25 +353,39 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
           )}
         </div>
 
-        <div className={`min-h-0 flex-1 flex-col ${vista === 'probar' ? 'flex' : 'hidden lg:flex'}`}>
+        <div className={`min-h-0 flex-1 flex-col ${vista === 'probar' || ampliada ? 'flex' : 'hidden lg:flex'}`}>
           <div className="relative min-h-[300px] flex-[3]">
             {sim ? (
-              <EscenaArena sim={sim} modoCamara={camara} versionArena={versionArena} nivel={nivel} onNivel={onNivel} />
+              <EscenaArena sim={sim} modoCamara={camara} versionArena={versionArena} nivel={nivel} onNivel={onNivel} zoom={zoom} />
             ) : (
               <div className="flex h-full items-center justify-center gap-2 text-sm text-slate-400">
                 <Loader2 className="h-5 w-5 animate-spin" /> Preparando física…
               </div>
             )}
-            {sim && <HUD tele={tele} robot={!banco} />}
+            {sim && <HUD tele={tele} robot={!banco && datos} />}
             {sim && banco && <PanelCircuito sim={sim} tele={tele} silencio={silencio} onSilencio={setSilencio} onGesto={activarSonido} />}
-            {sim && arena.competencia && <Combate sim={sim} tele={tele} reglamento={arena.competencia} doc={doc} />}
+            {sim && arena.competencia && <Combate sim={sim} tele={tele} reglamento={arena.competencia} doc={doc} compacto={!datos} />}
+            {sim && (
+              <div className="absolute bottom-2 right-3 z-20 flex items-center gap-1.5">
+                {([
+                  ['Acercar', ZoomIn, () => setZoom(z => ({ n: z.n + 1, factor: 0.75 }))],
+                  ['Alejar', ZoomOut, () => setZoom(z => ({ n: z.n + 1, factor: 1 / 0.75 }))],
+                  ...(!banco ? [[datos ? 'Ocultar datos' : 'Mostrar datos', datos ? EyeOff : Eye, () => setDatos(x => !x)] as const] : []),
+                  [ampliada ? 'Achicar la vista' : 'Ampliar la vista', ampliada ? Minimize2 : Maximize2, () => setAmpliada(x => !x)],
+                ] as const).map(([txt, Icon, accion]) => (
+                  <button key={txt} onClick={accion} title={txt} aria-label={txt} className="flex h-9 w-9 items-center justify-center rounded-lg lab-vidrio text-slate-200 hover:text-white">
+                    <Icon className="h-4 w-4" />
+                  </button>
+                ))}
+              </div>
+            )}
             {sim && control && <ControlRemoto sim={sim} conPrograma={tele?.estado === 'corriendo' || tele?.estado === 'pausado'} onCerrar={() => setControl(false)} />}
             <div className="pointer-events-none absolute bottom-2 left-3 hidden text-[11px] text-slate-400/80 sm:block">
               {banco ? 'Haz clic en el pulsador para presionarlo · arrastra para girar la cámara' : 'Doble clic en el piso para mover el robot · arrastra para girar la cámara'}
             </div>
           </div>
 
-          <div className="flex min-h-[180px] flex-[2] flex-col border-t border-lab-borde/15 bg-lab-fondo">
+          <div className={`min-h-[180px] flex-[2] flex-col border-t border-lab-borde/15 bg-lab-fondo ${ampliada ? 'hidden' : 'flex'}`}>
             <div className="flex border-b border-lab-borde/15 text-xs">
               {([
                 ['serial', 'Monitor serie', Terminal],
@@ -549,7 +569,8 @@ function PanelPines({ tele }: { tele: Telemetria | null }) {
 // Combate (sumo / minisumo): marcador, cuenta regresiva, rival y reglamento
 // ---------------------------------------------------------------------------
 
-function Combate({ sim, tele, reglamento, doc }: { sim: Simulacion; tele: Telemetria | null; reglamento: ReglamentoSumo; doc: RobotDoc }) {
+/** Marcador del combate. `compacto`: solo una línea arriba, para que se vea el dohyo. */
+function Combate({ sim, tele, reglamento, doc, compacto = false }: { sim: Simulacion; tele: Telemetria | null; reglamento: ReglamentoSumo; doc: RobotDoc; compacto?: boolean }) {
   const [rival, setRival] = useState<NivelRival>(sim.rival)
   const reglas = useMemo(() => {
     const r = resumen(doc)
@@ -564,6 +585,21 @@ function Combate({ sim, tele, reglamento, doc }: { sim: Simulacion; tele: Teleme
         : c.fase === 'combate' ? `¡En juego! Quedan ${Math.ceil(c.restante)} s`
           : c.fase === 'pausa' ? c.ultima?.motivo ?? ''
             : c.ganador === 'alumno' ? '¡Ganaste el combate! 🏆' : c.ganador === 'rival' ? 'Ganó el rival. Mejora tu programa y prueba otra vez.' : 'Empate'
+  const cuenta = c.fase === 'cuenta' && c.restante > 0 && (
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <div key={Math.ceil(c.restante)} className="lab-dato animate-ping-once font-mono text-8xl font-black drop-shadow-[0_0_24px_rgba(94,234,212,0.6)]">{Math.ceil(c.restante)}</div>
+    </div>
+  )
+  if (compacto) return (
+    <>
+      <div className="pointer-events-none absolute left-1/2 top-3 z-10 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-2.5 rounded-full lab-vidrio px-3 py-1 text-xs">
+        <span className="lab-dato font-mono text-base font-bold">{c.marcador.alumno}</span>
+        <span className="truncate text-slate-200">{c.fase === 'final' ? (c.ganador === 'alumno' ? '¡Ganaste! 🏆' : c.ganador === 'rival' ? 'Ganó el rival' : 'Empate') : `Ronda ${c.ronda}/${reglamento.salidas.length}`}</span>
+        <span className="font-mono text-base font-bold text-red-300">{c.marcador.rival}</span>
+      </div>
+      {cuenta}
+    </>
+  )
   return (
     <>
       <div className="absolute left-1/2 top-3 z-10 w-[min(22rem,calc(100%-1.5rem))] -translate-x-1/2 rounded-xl lab-vidrio p-2.5 text-xs">
@@ -600,11 +636,7 @@ function Combate({ sim, tele, reglamento, doc }: { sim: Simulacion; tele: Teleme
         </div>
         {!valido && <ul className="mt-1.5 space-y-0.5 text-[11px] text-red-300">{reglas.filter(x => !x.ok).map(x => <li key={x.texto}>✗ {x.texto}</li>)}</ul>}
       </div>
-      {c.fase === 'cuenta' && c.restante > 0 && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div key={Math.ceil(c.restante)} className="lab-dato animate-ping-once font-mono text-8xl font-black drop-shadow-[0_0_24px_rgba(94,234,212,0.6)]">{Math.ceil(c.restante)}</div>
-        </div>
-      )}
+      {cuenta}
     </>
   )
 }

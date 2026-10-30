@@ -25,8 +25,10 @@ const ANCHO_PLACA = 190
 interface Tarjeta { id: string; titulo: string; x: number; y: number; ancho: number; alto: number; pines: { pin: PinDef; x: number; y: number; lado: 'izq' | 'der' }[] }
 
 function colorPara(a: PinDef, b: PinDef, usados: number) {
-  if (a.tipo === 'gnd' || b.tipo === 'gnd') return NEGRO
-  if (a.tipo === 'alim' || b.tipo === 'alim' || a.tipo === 'potencia') return ROJO
+  // Los rieles de la protoboard se llaman «+ arriba», «- abajo»…
+  const riel = (p: PinDef, signo: string) => p.nombre.startsWith(`${signo} `)
+  if (a.tipo === 'gnd' || b.tipo === 'gnd' || riel(a, '-') || riel(b, '-')) return NEGRO
+  if (a.tipo === 'alim' || b.tipo === 'alim' || a.tipo === 'potencia' || riel(a, '+') || riel(b, '+')) return ROJO
   return SENALES[usados % SENALES.length]
 }
 
@@ -38,8 +40,8 @@ function disponer(doc: RobotDoc): Tarjeta[] {
   const xPlaca = 2 * ANCHO_PIEZA + 120
   if (mcu) {
     const pines = pieza(mcu.pieza).pines
-    // Arduino: digitales a la izquierda; ESP32: la mitad de los pines a cada lado.
-    const esp = pines.some(p => p.nombre.startsWith('GPIO'))
+    // Arduino: digitales a la izquierda; ESP32 y Pico: la mitad de los pines a cada lado.
+    const esp = !pines.some(p => /^D\d+$/.test(p.nombre))
     const izq = esp ? pines.slice(0, Math.ceil(pines.length / 2)) : pines.filter(p => /^D\d+$/.test(p.nombre))
     const der = esp ? pines.slice(Math.ceil(pines.length / 2)) : pines.filter(p => !/^D\d+$/.test(p.nombre))
     const alto = 46 + Math.max(izq.length, der.length) * PASO

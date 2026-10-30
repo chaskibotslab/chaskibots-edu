@@ -40,6 +40,12 @@ interface Props {
   onListaMateriales: () => void
 }
 
+/** En la mesa, la pila de 9 V y el joystick también aparecen en «Componentes». */
+const EXTRAS_MESA = [pieza('bateria-9v'), pieza('joystick')]
+
+/** Base del robot (chasis o protoboard): se cambia, no se encastra. El «piso de arriba» es de la familia pero se encastra. */
+const esBase = (def: PiezaDef) => def.familia === 'chasis' && !def.encaja.length
+
 export default function Armar(p: Props) {
   const { doc, cambiar, avisar } = p
   const banco = esBanco(doc)
@@ -104,7 +110,7 @@ export default function Armar(p: Props) {
 
   const elegirPieza = (def: PiezaDef) => {
     if (def.proximamente) { avisar('info', `${def.nombre}: ${def.proximamente}`); return }
-    if (def.familia === 'chasis') {
+    if (esBase(def)) {
       const raiz = doc.piezas.find(x => !x.padre)!
       if (raiz.pieza === def.id) { setSeleccion(raiz.id); return }
       const { doc: d, quitadas } = reemplazar(doc, raiz.id, def.id)
@@ -201,7 +207,7 @@ export default function Armar(p: Props) {
               </ul>
             ) : (
             <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 gap-2 overflow-y-auto p-2 sm:grid-cols-3 lg:grid-cols-1">
-              {[...piezasDe(familia)].sort((a, b) => Number(!!b.enKits) - Number(!!a.enKits)).map(def => (
+              {[...piezasDe(familia), ...(banco && familia === 'circuito' ? EXTRAS_MESA : [])].sort((a, b) => Number(!!b.enKits) - Number(!!a.enKits)).map(def => (
                 <TarjetaPieza
                   key={def.id}
                   def={def}
@@ -209,7 +215,7 @@ export default function Armar(p: Props) {
                   enUso={doc.piezas.some(x => x.pieza === def.id)}
                   onTocar={() => { if (!recienArrastrado.current) elegirPieza(def) }}
                   onArrastrar={(x, y) => {
-                    if (def.familia !== 'chasis') setArrastre({ pieza: def.id, x, y, x0: x, y0: y, iniciado: false })
+                    if (!esBase(def)) setArrastre({ pieza: def.id, x, y, x0: x, y0: y, iniciado: false })
                   }}
                 />
               ))}
@@ -326,7 +332,7 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
   const def = pieza(inst.pieza)
   const mt = montajeDe(doc, inst)
   const v = datosVariante(def, inst.variante)
-  const alternativas = LISTA_PIEZAS.filter(x => x.id !== def.id && !x.proximamente && (mt ? x.encaja.includes(mt.tipo) : x.familia === 'chasis'))
+  const alternativas = LISTA_PIEZAS.filter(x => x.id !== def.id && !x.proximamente && (mt ? x.encaja.includes(mt.tipo) : esBase(x)))
   const colgando = descendientes(doc, id).length - 1
   const credito = def.glb ? CREDITOS_MODELOS[def.glb.split('/').pop()!] : undefined
 

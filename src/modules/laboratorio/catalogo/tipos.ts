@@ -35,6 +35,10 @@ export type TipoMontaje =
   | 'soporte-servo'
   | 'eje-servo'       // lo que gira con el servo
   | 'protoboard'      // LED, resistencia, pulsador… pinchados en la protoboard
+  | 'maqueta'         // maqueta del proyecto (basurero…) junto a la protoboard
+  | 'piso'            // segundo piso sobre separadores (cuando abajo no cabe todo)
+  | 'fuente-protoboard' // fuente MB102 pinchada en los rieles de la protoboard
+  | 'modulo-mesa'     // módulo sobre la mesa junto a la protoboard (joystick)
 
 export interface PuntoMontaje {
   id: string
@@ -86,7 +90,7 @@ export interface AlimDriver {
 
 export type Comportamiento =
   /** El «cerebro»: la placa define qué se emula y cómo se compila (engine/placa.ts). */
-  | { tipo: 'mcu'; placa: 'uno' | 'nano' | 'esp32'; frecuencia_hz: number; vLogica: 5 | 3.3 }
+  | { tipo: 'mcu'; placa: 'uno' | 'nano' | 'mega' | 'esp32' | 'pico'; frecuencia_hz: number; vLogica: 5 | 3.3 }
   | { tipo: 'chasis' }
   | { tipo: 'motor-dc'; v_nominal: number; rpm_sin_carga: number; torque_bloqueo_nm: number; zona_muerta_v: number; tau_s: number; corriente_a: number }
   | { tipo: 'rueda'; radio_mm: number; ancho_mm: number }
@@ -107,6 +111,10 @@ export type Comportamiento =
   | { tipo: 'buzzer'; activo: boolean; ohm: number }
   | { tipo: 'potenciometro'; ohm: number }
   | { tipo: 'ldr'; ohmLuz: number; ohmOscuro: number }
+  /** Joystick de dos ejes (dos potenciómetros) con botón que une SW a tierra. */
+  | { tipo: 'joystick'; ohm: number }
+  /** Maqueta del proyecto (basurero, su tapa): no tiene pines, solo se ve y se mueve con el servo. */
+  | { tipo: 'maqueta' }
   /** Pieza que se ve en el catálogo pero todavía no se simula (llega en una fase futura). */
   | { tipo: 'sin-simular' }
 
@@ -146,6 +154,9 @@ export interface PiezaDef {
   /** En qué tipos de montaje encastra esta pieza (vacío = solo como raíz). */
   encaja: TipoMontaje[]
   pines: PinDef[]
+  /** Pines que quedan unidos por dentro con pines del padre al encastrarla
+   *  ([pin propio, pin del padre]): la fuente MB102 pinchada en los rieles. */
+  unePinesConPadre?: [string, string][]
   comportamiento: Comportamiento
   /** Datos técnicos para la ficha (texto libre). */
   datos?: [string, string][]

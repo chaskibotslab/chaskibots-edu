@@ -14,32 +14,12 @@
 //     remoto en pantalla); WiFi está simulado (siempre «conectado»).
 // Límite conocido: en el AVR, `int` es de 16 bits (en el ESP32, 32).
 
-const CAPA = String.raw`// ===== Capa ESP32 del simulador ChaskiBots Lab (no forma parte de tu programa) =====
-#include <Arduino.h>
-
-#undef LED_BUILTIN
-#define LED_BUILTIN 2
-
-static inline void cb_avisar(uint8_t cmd, uint8_t pin, uint8_t valor) { GPIOR1 = pin; GPIOR2 = valor; GPIOR0 = cmd; }
-
-static inline int8_t cb_canal(uint8_t g) {
-  switch (g) { case 36: return 0; case 39: return 1; case 34: return 2; case 35: return 3;
-               case 32: return 4; case 33: return 5; case 25: return 6; case 26: return 7; }
-  return -1;
-}
-static inline int cb_analogRead(uint8_t g) {
-  int8_t c = cb_canal(g);
-  if (c < 0) return digitalRead(g) ? 4095 : 0;
-  return analogRead(A0 + c) * 4;
-}
-#define analogRead(p) cb_analogRead(p)
-#define analogReadResolution(b)
-#define analogSetAttenuation(a)
-#define analogSetPinAttenuation(p, a)
-
-static uint8_t cb_bits_pin[54];
-static uint8_t cb_canal_pin[16];
-static uint8_t cb_canal_bits[16];
+/**
+ * Lo que comparten las placas simuladas sobre el ATmega2560 (ESP32, Pico,
+ * Mega): PWM en cualquier pin y servos, avisados al simulador por los
+ * registros GPIOR (ver engine/avrRunner.ts).
+ */
+export const CB_PWM = String.raw`static inline void cb_avisar(uint8_t cmd, uint8_t pin, uint8_t valor) { GPIOR1 = pin; GPIOR2 = valor; GPIOR0 = cmd; }
 
 static inline void cb_pwm(uint8_t pin, uint32_t duty, uint8_t bits) {
   if (pin > 53) return;
@@ -49,26 +29,9 @@ static inline void cb_pwm(uint8_t pin, uint32_t duty, uint8_t bits) {
   pinMode(pin, OUTPUT);
   cb_avisar(1, pin, (uint8_t)((duty * 255UL) / maximo));
 }
+`
 
-// LEDC del core 3.x
-static inline bool ledcAttach(uint8_t pin, uint32_t freq, uint8_t bits) { if (pin < 54) cb_bits_pin[pin] = bits; pinMode(pin, OUTPUT); return true; }
-static inline bool ledcAttachChannel(uint8_t pin, uint32_t freq, uint8_t bits, uint8_t canal) { if (canal < 16) { cb_canal_pin[canal] = pin + 1; cb_canal_bits[canal] = bits; } return ledcAttach(pin, freq, bits); }
-static inline bool ledcDetach(uint8_t pin) { return true; }
-// LEDC del core 2.x
-static inline uint32_t ledcSetup(uint8_t canal, uint32_t freq, uint8_t bits) { if (canal < 16) cb_canal_bits[canal] = bits; return freq; }
-static inline void ledcAttachPin(uint8_t pin, uint8_t canal) { if (canal < 16) cb_canal_pin[canal] = pin + 1; pinMode(pin, OUTPUT); }
-static inline void ledcDetachPin(uint8_t pin) {}
-// ledcWrite recibe un canal (core 2.x, si se usó ledcAttachPin) o un pin (core 3.x).
-static inline bool ledcWrite(uint8_t pinOCanal, uint32_t duty) {
-  if (pinOCanal < 16 && cb_canal_pin[pinOCanal]) cb_pwm(cb_canal_pin[pinOCanal] - 1, duty, cb_canal_bits[pinOCanal]);
-  else cb_pwm(pinOCanal, duty, pinOCanal < 54 && cb_bits_pin[pinOCanal] ? cb_bits_pin[pinOCanal] : 8);
-  return true;
-}
-#define analogWrite(p, v) cb_pwm((p), (v), 8)
-
-// ESP32Servo
-class ESP32PWM { public: static void allocateTimer(int) {} };
-class CbServo {
+export const CB_SERVO = String.raw`class CbServo {
  public:
   void setPeriodHertz(int) {}
   int attach(int pin) { return attach(pin, 544, 2400); }
@@ -88,7 +51,53 @@ class CbServo {
   void avisar() { if (_pin >= 0) cb_avisar(2, _pin, (uint8_t)constrain(_us / 10, 0, 255)); }
 };
 #define Servo CbServo
+`
 
+const CAPA = String.raw`// ===== Capa ESP32 del simulador ChaskiBots Lab (no forma parte de tu programa) =====
+#include <Arduino.h>
+
+#undef LED_BUILTIN
+#define LED_BUILTIN 2
+
+${CB_PWM}
+static inline int8_t cb_canal(uint8_t g) {
+  switch (g) { case 36: return 0; case 39: return 1; case 34: return 2; case 35: return 3;
+               case 32: return 4; case 33: return 5; case 25: return 6; case 26: return 7; }
+  return -1;
+}
+static inline int cb_analogRead(uint8_t g) {
+  int8_t c = cb_canal(g);
+  if (c < 0) return digitalRead(g) ? 4095 : 0;
+  return analogRead(A0 + c) * 4;
+}
+#define analogRead(p) cb_analogRead(p)
+#define analogReadResolution(b)
+#define analogSetAttenuation(a)
+#define analogSetPinAttenuation(p, a)
+
+static uint8_t cb_bits_pin[54];
+static uint8_t cb_canal_pin[16];
+static uint8_t cb_canal_bits[16];
+
+// LEDC del core 3.x
+static inline bool ledcAttach(uint8_t pin, uint32_t freq, uint8_t bits) { if (pin < 54) cb_bits_pin[pin] = bits; pinMode(pin, OUTPUT); return true; }
+static inline bool ledcAttachChannel(uint8_t pin, uint32_t freq, uint8_t bits, uint8_t canal) { if (canal < 16) { cb_canal_pin[canal] = pin + 1; cb_canal_bits[canal] = bits; } return ledcAttach(pin, freq, bits); }
+static inline bool ledcDetach(uint8_t pin) { return true; }
+// LEDC del core 2.x
+static inline uint32_t ledcSetup(uint8_t canal, uint32_t freq, uint8_t bits) { if (canal < 16) cb_canal_bits[canal] = bits; return freq; }
+static inline void ledcAttachPin(uint8_t pin, uint8_t canal) { if (canal < 16) cb_canal_pin[canal] = pin + 1; pinMode(pin, OUTPUT); }
+static inline void ledcDetachPin(uint8_t pin) {}
+// ledcWrite recibe un canal (core 2.x, si se usó ledcAttachPin) o un pin (core 3.x).
+static inline bool ledcWrite(uint8_t pinOCanal, uint32_t duty) {
+  if (pinOCanal < 16 && cb_canal_pin[pinOCanal]) cb_pwm(cb_canal_pin[pinOCanal] - 1, duty, cb_canal_bits[pinOCanal]);
+  else cb_pwm(pinOCanal, duty, pinOCanal < 54 && cb_bits_pin[pinOCanal] ? cb_bits_pin[pinOCanal] : 8);
+  return true;
+}
+#define analogWrite(p, v) cb_pwm((p), (v), 8)
+
+// ESP32Servo
+class ESP32PWM { public: static void allocateTimer(int) {} };
+${CB_SERVO}
 // BluetoothSerial: mismo canal que Serial (control remoto en pantalla y monitor).
 class BluetoothSerial {
  public:

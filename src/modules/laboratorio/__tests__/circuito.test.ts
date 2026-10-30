@@ -9,7 +9,10 @@ import { bancoVacio, encastrar } from '../engine/ensamblaje'
 import { verificar } from '../engine/verificacion'
 import { SimSincrona } from '../engine/simSincrona'
 import { mesaElectronica } from '../arenas'
-import { construirPotBrillo, construirSemaforo, construirLuzNocturna, PROYECTOS_CIRCUITO } from '../robots/circuitos'
+import { construirPotBrillo, construirSemaforo, construirLuzNocturna, construirLedPila, construirBotonSinArduino, construirDosPilas, PROYECTOS_CIRCUITO } from '../robots/circuitos'
+import { agujeroRiel, xRiel } from '../catalogo/piezas/circuito'
+import { encimadas } from '../engine/ensamblaje'
+import { nets } from '../engine/plan'
 import type { RobotDoc } from '../robots/doc'
 
 const salida = (level: 0 | 1, duty: number = level, freqHz = 0): PinReport => ({ mode: 'output', level, duty, freqHz, pulsoUs: 0 })
@@ -106,12 +109,72 @@ describe('circuito de la protoboard', () => {
   })
 })
 
+describe('rieles de la protoboard y circuitos sin Arduino', () => {
+  const brillo = (doc: RobotDoc, controles = sinTocar) => resolverCircuito(planCircuito(doc)!, {}, controles, new Set()).leds
+
+  it('la pila de 9 V en los rieles enciende el LED (sin placa ni programa)', () => {
+    const doc = construirLedPila()
+    expect(doc.piezas.some(p => p.id === 'placa')).toBe(false)
+    expect(brillo(doc)[idDe(doc, 'led-rojo')][0]).toBeGreaterThan(0.5)
+    expect(verificar(doc)).toEqual([])
+  })
+
+  it('la fuente MB102 une sus pines con los cuatro rieles por dentro', () => {
+    const doc = construirBotonSinArduino()
+    const n = nets(doc)
+    const f = idDe(doc, 'fuente-mb102')
+    expect(n.get(`protoboard.+ arriba`)).toBe(n.get(`${f}.+`))
+    expect(n.get(`protoboard.+ abajo`)).toBe(n.get(`${f}.+`))
+    expect(n.get(`protoboard.- abajo`)).toBe(n.get(`${f}.-`))
+    expect(n.get(`protoboard.+ arriba`)).not.toBe(n.get(`protoboard.- arriba`))
+  })
+
+  it('con la fuente, el LED se enciende solo mientras se presiona el pulsador', () => {
+    const doc = construirBotonSinArduino()
+    const led = idDe(doc, 'led-verde')
+    expect(brillo(doc)[led][0]).toBe(0)
+    expect(brillo(doc, { botones: { [idDe(doc, 'pulsador')]: true }, perillas: {} })[led][0]).toBeGreaterThan(0.5)
+  })
+
+  it('con 3 V (dos AA) el LED rojo brilla y el azul casi no', () => {
+    const doc = construirDosPilas()
+    const b = brillo(doc)
+    expect(b[idDe(doc, 'led-rojo')][0]).toBeGreaterThan(0.5)
+    expect(b[idDe(doc, 'led-azul')][0]).toBeLessThan(0.1)
+  })
+
+  it('un cable del riel + al − con la pila puesta es un cortocircuito', () => {
+    const doc = construirLedPila()
+    const malo = { ...doc, cables: [...doc.cables, { de: ['protoboard', '+ abajo'] as [string, string], a: ['protoboard', '- abajo'] as [string, string], color: '#f00' }] }
+    expect(verificar(malo).some(p => p.nivel === 'error' && p.texto.startsWith('Cortocircuito'))).toBe(true)
+  })
+
+  it('la fuente no se encima con los componentes de la izquierda, pero sí con los del lugar 8', () => {
+    let d = bancoVacio()
+    d = encastrar(d, 'fuente-mb102', 'protoboard', 'fuente').doc
+    for (const h of [1, 7, 9, 15]) d = encastrar(d, 'resistencia-330', 'protoboard', `hueco-${h}`).doc
+    d = encastrar(d, 'hcsr04', 'protoboard', 'sensor').doc
+    expect(encimadas(d)).toEqual([])
+    expect(() => encastrar(d, 'resistencia-330', 'protoboard', 'hueco-8')).toThrow()
+  })
+
+  it('cada cable entra en su propio agujero del riel, el más cercano a su otra punta', () => {
+    const usados = new Map<string, Set<number>>()
+    const a = agujeroRiel('+ abajo', 0, usados)!, b = agujeroRiel('+ abajo', 0, usados)!
+    expect(a[0]).not.toBe(b[0])
+    expect(Math.abs(a[0])).toBeLessThan(5)
+    expect(a[1]).toBe(22.1)
+    expect(agujeroRiel('- arriba', 500, usados)![0]).toBe(xRiel(49))
+  })
+})
+
 describe('proyectos de electrónica', () => {
   it('todos quedan bien cableados: sin errores ni advertencias, y cada LED con su resistencia', () => {
     for (const p of PROYECTOS_CIRCUITO) {
       const doc = p.construir()
       expect(verificar(doc).map(x => x.texto), p.id).toEqual([])
-      const plan = planCircuito(doc)!
+      const plan = planCircuito(doc)
+      if (!plan) continue // solo módulos (sensor, servo): no hay circuito en la protoboard
       // Con todos los pines en HIGH ningún LED se quema.
       const altos = Object.fromEntries(plan.pines.map(x => [x.pin, salida(1)]))
       expect(resolverCircuito(plan, altos, sinTocar, new Set()).quemados, p.id).toEqual([])

@@ -10,7 +10,7 @@ Cada fase se publica funcionando, con sus pruebas, antes de empezar la siguiente
 | F3 | Cableado manual con verificación, bloques (Blockly → C++), Arduino Nano, «Mis robots» en la cuenta | Publicado 2026-10-28 (SQL de `lab_robots` pegado) |
 | F4 | ESP32 programable (capa ESP32 sobre ATmega2560), robots ESP32, control remoto (teclado, táctil, gamepad, Bluetooth) | Publicado 2026-10-28 |
 | F5 | Minisumo, sumo, soccer, rescate, lanzador, jueces, rivales, repeticiones | F5.1 minisumo publicado 2026-10-28; sigue F5.2 |
-| E | Mesa de electrónica: protoboard, componentes y los proyectos de los kits (semáforo, basurero, riego, estación, domótica, monitoreo) | En curso: E1 semáforo (8vo) |
+| E | Mesa de electrónica: protoboard, componentes y los proyectos de los kits (semáforo, basurero, riego, estación, domótica, monitoreo) | E1 semáforo (8vo) publicado; E2 basurero (9no) hecho |
 | F6 | Retos del docente con entrega verificable, torneos por curso | Pendiente |
 | F7 | Brazo robótico (servos articulados, pinza, paso a paso) | Pendiente |
 
@@ -31,8 +31,8 @@ pinchan en sus huecos, se cablean, se programan y se prueban con el micro
 emulado. `engine/circuito.ts` resuelve el circuito por análisis nodal (LED que
 se queman sin resistencia, pull-up, divisores de voltaje, PWM, tone).
 
-1. **E1 Semáforo (8vo)** (hecho, sin publicar): protoboard, LED de 5 colores, LED RGB, resistencias 220/330/1k/10k, pulsador, buzzer pasivo y activo, potenciómetro, LDR; panel «Tú controlas» (pulsadores con clic o teclas, perillas, luz), audio del buzzer; proyectos del kit (primer LED, pulsador, buzzer, tres LED, semáforo inteligente) y extra (perilla y brillo, luz nocturna, RGB, juego de reflejos); pruebas con el semáforo real compilado.
-2. **E2 Basurero (9no)**: HC-SR04 y servo en la mesa (montajes para módulos), tapa que se abre, mano que se acerca.
+1. **E1 Semáforo (8vo)** (publicado el 29/10): protoboard, LED de 5 colores, LED RGB, resistencias 220/330/1k/10k, pulsador, buzzer pasivo y activo, potenciómetro, LDR; panel «Tú controlas» (pulsadores con clic o teclas, perillas, luz), audio del buzzer; proyectos del kit (primer LED, pulsador, buzzer, tres LED, semáforo inteligente) y extra (perilla y brillo, luz nocturna, RGB, juego de reflejos); pruebas con el semáforo real compilado.
+2. **E2 Basurero (9no)** (hecho): con Arduino Nano y los pines del kit. La protoboard tiene lugares para el HC-SR04 (borde derecho), un servo (detrás) y una maqueta (a la derecha). La maqueta del basurero lleva el sensor en el frente y el servo acostado en la bisagra; la tapa va en su eje (0° cerrada, 90° abierta). En «Probar», la mano se acerca o se aleja con un control y el sensor mide su distancia. Proyectos del kit: LED indicador, mide distancia, mueve el servo, basurero inteligente, contador de personas, dispensador, puerta automática y alarma de proximidad. La prueba corre el basurero real compilado.
 3. **E3 Riego (10mo, ESP32)**: sensor de humedad del suelo, relé, bomba de agua (maceta que se seca y se riega).
 4. **E4 Estación meteorológica (1ro BGU, ESP32-C3)**: DHT11 (protocolo de un cable emulado), temperatura y humedad ajustables.
 5. **E5 Domótica (2do BGU)**: PIR, relé con foco, LDR.

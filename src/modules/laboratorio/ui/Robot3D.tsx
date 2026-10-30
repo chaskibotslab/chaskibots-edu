@@ -10,15 +10,17 @@ import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { datosVariante, pieza } from '../catalogo/piezas'
 import { grados, type PiezaDef, type PuntoMontaje } from '../catalogo/tipos'
-import { hijos, poses, raiz, resumen, ruedas, ruedasLocas, aRobot } from '../engine/ensamblaje'
+import { hijos, montajeDe, poses, raiz, resumen, ruedas, ruedasLocas, aRobot } from '../engine/ensamblaje'
 import type { Simulacion } from '../engine/simulation'
 import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
 import { infoPlaca } from '../engine/placa'
 import {
-  ArduinoNano, ArduinoUno, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
+  ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
   ChasisMinisumo, MotorN20, BateriaLipo,
 } from './modelos/Piezas3D'
+import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
+import { ALTO_PROTOBOARD, agujeroRiel } from '../catalogo/piezas/circuito'
 import { CircuitoVivoContexto, ModeloCircuito, esModeloCircuito, type CircuitoVivo } from './modelos/Circuito3D'
 
 const m = (v: number) => v / 1000
@@ -60,7 +62,7 @@ function matrizMontaje(mt: PuntoMontaje, giro = 0) {
 }
 
 /** Modelo real (GLB) si la pieza lo tiene; mientras carga se ve el hecho por código. */
-function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number }) {
+function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number; bajoChasis?: number }) {
   if (!p.def.glb) return <ModeloProc {...p} />
   const c = p.def.comportamiento
   if (c.tipo === 'rueda') {
@@ -84,7 +86,7 @@ function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLo
   )
 }
 
-function ModeloProc({ inst, def, refs, espaciadorLoca }: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number }) {
+function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number; bajoChasis?: number }) {
   const v = datosVariante(def, inst.variante)
   const c = def.comportamiento
   if (esModeloCircuito(def.modelo)) return <ModeloCircuito def={def} inst={inst.id} />
@@ -93,10 +95,13 @@ function ModeloProc({ inst, def, refs, espaciadorLoca }: { inst: PiezaEnRobot; d
     case 'proc:chasis-4wd': return <Chasis largo={200} ancho={130} material={v.material} color={v.color ?? '#cfe6f7'} />
     case 'proc:arduino-uno': return <ArduinoUno ref={refs.led13} />
     case 'proc:arduino-nano': return <ArduinoNano ref={refs.led13} />
+    case 'proc:arduino-mega': return <ArduinoMega ref={refs.led13} />
+    case 'proc:pico': return <Pico ref={refs.led13} />
     case 'proc:l298n': return <L298N />
     case 'proc:bateria-18650': return <Bateria18650 />
     case 'proc:bateria-9v': return <Bateria9V />
     case 'proc:bateria-lipo': return <BateriaLipo />
+    case 'proc:piso-arriba': return <PisoArriba alto={SEPARADOR_PISO} color={v.color ?? '#334155'} />
     case 'proc:chasis-minisumo': return <ChasisMinisumo material={v.material} color={v.color ?? '#1f2430'} />
     case 'proc:motor-n20': return <MotorN20 />
     case 'proc:motor-tt': return <MotorTT />
@@ -112,13 +117,15 @@ function ModeloProc({ inst, def, refs, espaciadorLoca }: { inst: PiezaEnRobot; d
     case 'proc:servo': return <Servo color={v.color ?? '#2563eb'} />
     case 'proc:tcrt5000': {
       if (!refs.ledsIr.has(inst.id)) refs.ledsIr.set(inst.id, createRef())
-      return <TCRT5000 ref={refs.ledsIr.get(inst.id)} alturaSoporte={25} />
+      // El soporte sube desde el sensor (8,6 mm) hasta la cara de abajo del chasis (3 mm de espesor).
+      return <TCRT5000 ref={refs.ledsIr.get(inst.id)} alturaSoporte={Math.max(1, bajoChasis - 1.5 - 8.6)} />
     }
     case 'proc:fc51': {
       if (!refs.ledsObs.has(inst.id)) refs.ledsObs.set(inst.id, createRef())
       return <FC51 ref={refs.ledsObs.get(inst.id)} />
     }
     case 'proc:hcsr04': return <HCSR04 />
+    case 'proc:joystick': return <Joystick />
   }
   return (
     <mesh>
@@ -183,7 +190,7 @@ function Nodo(p: NodoProps) {
   return (
     <group>
       <group onClick={click}>
-        <Modelo inst={inst} def={def} refs={refs} espaciadorLoca={p.espaciadores.get(inst.id) ?? 0} />
+        <Modelo inst={inst} def={def} refs={refs} espaciadorLoca={p.espaciadores.get(inst.id) ?? 0} bajoChasis={-(montajeDe(doc, inst)?.posicion[1] ?? -35)} />
         {seleccion === inst.id && <Seleccion def={def} />}
       </group>
       {(p.porInstancia.get(inst.id) ?? []).map(mk => (
@@ -300,8 +307,24 @@ function Cables({ doc }: { doc: RobotDoc }) {
         tipo: s.tipo,
       }
     }
+    // Riel de la protoboard: el cable entra en el agujero libre más cercano a su otra punta.
+    const usados = new Map<string, Set<number>>()
+    const base = raiz(doc)
+    const poseBase = ps.get(base.id)
+    const enRiel = (inst: string, pin: string, otra: Punta | null): Punta | null => {
+      if (!poseBase || inst !== base.id) return null
+      // Un puente entre dos rieles va al principio de la protoboard.
+      const x = otra ? otra.pos.clone().multiplyScalar(1000).sub(poseBase.pos).applyQuaternion(poseBase.rot.clone().invert()).x : -70
+      const h = agujeroRiel(pin, x, usados)
+      if (!h) return null
+      return { pos: aRobot(poseBase, [h[0], ALTO_PROTOBOARD + 0.3, h[1]]).multiplyScalar(0.001), dir: new THREE.Vector3(0, 1, 0).applyQuaternion(poseBase.rot), tipo: 'macho' }
+    }
     return doc.cables
-      .map(c => ({ c, a: punta(...c.de), b: punta(...c.a) }))
+      .map(c => {
+        const pa = punta(...c.de), pb = punta(...c.a)
+        const a = pa ?? enRiel(...c.de, pb)
+        return { c, a, b: pb ?? enRiel(...c.a, a) }
+      })
       .filter(x => x.a && x.b) as { c: RobotDoc['cables'][number]; a: Punta; b: Punta }[]
   }, [doc])
   return <>{lista.map(({ c, a, b }, i) => <Cable key={i} a={a} b={b} color={c.color} />)}</>

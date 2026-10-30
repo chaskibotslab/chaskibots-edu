@@ -66,7 +66,7 @@ export class SimSincrona {
   paso(dt: number) {
     const pines = this.ultimoPaso?.pins ?? null
     const e = leerSensores(this.plan, this.doc, this.robot, this.reflectancia,
-      this.circuito && { plan: this.circuito, pines, controles: this.controles, quemados: this.quemados })
+      this.circuito && { plan: this.circuito, pines, controles: this.controles, quemados: this.quemados }, this.controles.mano ?? null)
     this.ultimas = e
     let dtReal = dt
     if (this.avr) {

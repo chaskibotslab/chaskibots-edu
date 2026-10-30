@@ -24,7 +24,7 @@ import { pieza } from '../catalogo/piezas'
 import type { RobotDoc } from '../robots/doc'
 import type { PinReport } from './avrRunner'
 import { nets } from './plan'
-import { infoPlaca, mcuDe } from './placa'
+import { datosPlaca, infoPlaca, mcuDe } from './placa'
 
 /** Resistencia interna de un pin de salida del ATmega328P (Ω). */
 const R_PIN = 25
@@ -58,14 +58,20 @@ export interface PlanCircuito {
   pines: { pin: string; nodo: number }[]
   elementos: Elemento[]
   /** Controles que el alumno maneja en «Probar»: pulsadores y perillas (potenciómetro, luz de la LDR). */
-  controles: { inst: string; etiqueta: string; tipo: 'pulsador' | 'potenciometro' | 'ldr' }[]
+  controles: { inst: string; etiqueta: string; tipo: 'pulsador' | 'potenciometro' | 'ldr' | 'joystick' }[]
 }
 
 export interface ControlesCircuito {
   botones: Record<string, boolean>
   /** 0–1: giro del potenciómetro o luz sobre la LDR. */
   perillas: Record<string, number>
+  /** Mano delante del (primer) sensor ultrasónico de la mesa: distancia en cm; sin valor = no hay mano. */
+  mano?: number | null
 }
+
+/** Distancias que se pueden elegir para la mano (cm). */
+export const MANO_MIN_CM = 2
+export const MANO_MAX_CM = 60
 
 export interface EstadoCircuito {
   /** Brillo 0–1 de cada LED (un valor; tres en el RGB). */
@@ -84,10 +90,12 @@ export const PERILLA_INICIAL = 0.5
 export const LUZ_INICIAL = 0.6
 
 const clave = (inst: string, pin: string) => `${inst}.${pin}`
+/** Perilla de un eje del joystick (en `ControlesCircuito.perillas`). */
+export const ejeJoystick = (inst: string, eje: 'x' | 'y') => `${inst}:${eje}`
 
 export function planCircuito(doc: RobotDoc): PlanCircuito | null {
   const piezas = doc.piezas.map(p => ({ p, def: pieza(p.pieza) }))
-  const conCircuito = piezas.filter(({ def }) => ['led', 'led-rgb', 'resistencia', 'pulsador', 'buzzer', 'potenciometro', 'ldr'].includes(def.comportamiento.tipo))
+  const conCircuito = piezas.filter(({ def }) => ['led', 'led-rgb', 'resistencia', 'pulsador', 'buzzer', 'potenciometro', 'ldr', 'joystick'].includes(def.comportamiento.tipo))
   if (!conCircuito.length) return null
 
   const red = nets(doc)
@@ -123,6 +131,13 @@ export function planCircuito(doc: RobotDoc): PlanCircuito | null {
     } else if (c.tipo === 'ldr') {
       elementos.push({ t: 'ldr', inst: p.id, a: nodo(p.id, '1'), b: nodo(p.id, '2'), luz: c.ohmLuz, oscuro: c.ohmOscuro })
       controles.push({ inst: p.id, etiqueta: p.etiqueta, tipo: 'ldr' })
+    } else if (c.tipo === 'joystick') {
+      // Cada eje es una perilla «inst:x» / «inst:y» (0,5 = palanca al centro).
+      for (const eje of ['x', 'y'] as const) {
+        elementos.push({ t: 'pot', inst: ejeJoystick(p.id, eje), a: nodo(p.id, '+5V'), w: nodo(p.id, eje === 'x' ? 'VRx' : 'VRy'), b: nodo(p.id, 'GND'), ohm: c.ohm })
+      }
+      elementos.push({ t: 'boton', inst: p.id, a: nodo(p.id, 'SW'), b: nodo(p.id, 'GND') })
+      controles.push({ inst: p.id, etiqueta: p.etiqueta, tipo: 'joystick' })
     }
   }
 
@@ -138,8 +153,8 @@ export function planCircuito(doc: RobotDoc): PlanCircuito | null {
       if (!k || tierras.has(k) || !indice.has(k) || !usados.has(indice.get(k)!)) continue
       const nd = indice.get(k)!
       if (c.tipo === 'mcu') {
-        const v = pin.nombre === '5V' ? 5 : pin.nombre === '3V3' ? 3.3 : pin.nombre === 'VIN' && c.placa === 'esp32' ? 5 : null
-        if (v !== null) fuentes.push({ nodo: nd, v })
+        const v = datosPlaca(c.placa).fuentes[pin.nombre]
+        if (v !== undefined) fuentes.push({ nodo: nd, v })
         else if (pin.tipo !== 'alim' && p.id === mcu?.id) pines.push({ pin: pin.nombre, nodo: nd })
       } else if (c.tipo === 'bateria' && pin.nombre === '+') fuentes.push({ nodo: nd, v: c.voltaje })
     }

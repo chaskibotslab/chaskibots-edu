@@ -9,11 +9,15 @@ import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { ContactShadows, Environment, Lightformer, OrbitControls, PerformanceMonitor } from '@react-three/drei'
 import * as THREE from 'three'
 import Robot3D, { type MarcadorMontaje } from './Robot3D'
+import Mano3D from './modelos/Mano3D'
+import { resumen } from '../engine/ensamblaje'
 import type { Simulacion } from '../engine/simulation'
 import type { RobotDoc } from '../robots/doc'
 import { CALIDADES, CalidadContexto, type NivelCalidad } from './calidad'
 
 export type ModoCamara = 'libre' | 'seguir' | 'arriba'
+/** Pedido de zoom desde los botones (+/−): cada pedido nuevo (n distinto) acerca o aleja la cámara. */
+export interface PedidoZoom { n: number; factor: number }
 
 function Estudio({ intensidad = 1 }: { intensidad?: number }) {
   return (
@@ -295,7 +299,7 @@ function Rastro({ sim, version }: { sim: Simulacion; version: number }) {
   return <primitive object={linea} />
 }
 
-function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
+function ControlCamara({ sim, modo, zoom }: { sim: Simulacion; modo: ModoCamara; zoom?: PedidoZoom }) {
   const controles = useRef<React.ElementRef<typeof OrbitControls>>(null)
   const { camera } = useThree()
   const deseada = useMemo(() => new THREE.Vector3(), [])
@@ -304,16 +308,34 @@ function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
   const banco = !!sim.arena.banco
   useEffect(() => {
     const p = sim.fisica.body.translation()
+    // Mesa de electrónica: encuadrar todo lo que hay (protoboard, placa y, si está, la maqueta).
+    // Con sensor ultrasónico, también el lugar de la mano; y un margen a la derecha para el panel.
+    const r = banco ? resumen(sim.doc) : null
+    const minX = r ? r.min.x : 0
+    const maxX = r ? r.max.x + (sim.plan.ultrasonidos.length ? 130 : 0) + 40 : 0
+    const cx = (minX + maxX) / 2000
+    const k = r ? Math.max(1, (maxX - minX) / 1000 / 0.28) : 1
     if (modo === 'arriba') {
       // En la mesa de electrónica, «arriba» es mirar la protoboard desde encima.
-      if (banco) { camera.position.set(p.x - 0.04, 0.36, p.z + 0.001); controles.current?.target.set(p.x - 0.04, 0, p.z) }
+      if (banco) { camera.position.set(p.x + cx, 0.36 * k, p.z + 0.001); controles.current?.target.set(p.x + cx, 0, p.z) }
       else { camera.position.set(0, Math.max(sim.arena.ancho, sim.arena.largo) * 0.95, 0.001); controles.current?.target.set(0, 0, 0) }
     } else if (modo === 'libre') {
-      if (banco) { camera.position.set(p.x - 0.05, 0.16, p.z + 0.2); controles.current?.target.set(p.x - 0.04, 0.005, p.z) }
+      if (banco) { camera.position.set(p.x + cx - 0.01, 0.16 * k, p.z + 0.2 * k); controles.current?.target.set(p.x + cx, 0.005 * k, p.z) }
       else { camera.position.set(p.x - 0.6, 0.55, p.z + 0.6); controles.current?.target.set(p.x, 0.03, p.z) }
     }
     controles.current?.update()
   }, [modo, camera, sim, banco])
+
+  // Botones de zoom: acercar o alejar la cámara hacia lo que mira (dentro de los límites).
+  useEffect(() => {
+    const c = controles.current
+    if (!zoom?.n || !c) return
+    const t = c.target
+    const v = camera.position.clone().sub(t)
+    const d = Math.min(c.maxDistance, Math.max(c.minDistance, v.length() * zoom.factor))
+    camera.position.copy(t).add(v.setLength(d))
+    c.update()
+  }, [zoom, camera])
 
   useFrame(() => {
     if (modo !== 'seguir' || !sim.fisica) return
@@ -340,7 +362,7 @@ function ControlCamara({ sim, modo }: { sim: Simulacion; modo: ModoCamara }) {
   )
 }
 
-export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel }: { sim: Simulacion; modoCamara: ModoCamara; versionArena: number; nivel: NivelCalidad; onNivel: (n: NivelCalidad) => void }) {
+export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel, zoom }: { sim: Simulacion; modoCamara: ModoCamara; versionArena: number; nivel: NivelCalidad; onNivel: (n: NivelCalidad) => void; zoom?: PedidoZoom }) {
   const q = CALIDADES[nivel]
   return (
     <Lienzo nivel={nivel} onNivel={onNivel} camara={[-1.1, 0.9, 1.3]}>
@@ -350,8 +372,9 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel }: {
       <PisoArena sim={sim} version={versionArena} />
       {!sim.arena.banco && <Rastro sim={sim} version={versionArena} />}
       <Robot3D doc={sim.doc} sim={sim} />
+      {sim.arena.banco && sim.plan.ultrasonidos.length > 0 && <Mano3D sim={sim} />}
       {sim.competencia && <Robot3D doc={sim.competencia.rival.doc} sim={sim.competencia.rival} />}
-      <ControlCamara sim={sim} modo={modoCamara} />
+      <ControlCamara sim={sim} modo={modoCamara} zoom={zoom} />
     </Lienzo>
   )
 }

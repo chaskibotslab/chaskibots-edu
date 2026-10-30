@@ -3,18 +3,18 @@
 // El test catalogo.test.ts revisa que la ficha sea coherente.
 
 import type { Familia, PiezaDef } from '../tipos'
-import { ARDUINO_UNO, ARDUINO_NANO, ESP32 } from './placas'
-import { CHASIS_2WD, CHASIS_4WD, CHASIS_MINISUMO } from './chasis'
+import { ARDUINO_UNO, ARDUINO_NANO, ARDUINO_MEGA, ESP32, RASPBERRY_PICO } from './placas'
+import { CHASIS_2WD, CHASIS_4WD, CHASIS_MINISUMO, PISO_ARRIBA_MINISUMO } from './chasis'
 import { MOTOR_TT, RUEDA_65, RUEDA_65_PLASTICO, RUEDA_48, RUEDA_LOCA, MOTOR_N20, RUEDA_34 } from './movimiento'
 import { SG90, MG90S } from './servos'
-import { TCRT5000, FC51, HCSR04 } from './sensores'
+import { TCRT5000, FC51, HCSR04, JOYSTICK } from './sensores'
 import { L298N, TB6612, BATERIA_18650, BATERIA_9V, BATERIA_LIPO_2S } from './electronica'
-import { JOYSTICK, MPU6050, DRV8825 } from './futuras'
+import { MPU6050, DRV8825 } from './futuras'
 import { PROTOBOARD, PIEZAS_CIRCUITO } from './circuito'
 
 export const LISTA_PIEZAS: PiezaDef[] = [
-  CHASIS_2WD, CHASIS_4WD, CHASIS_MINISUMO, PROTOBOARD,
-  ARDUINO_UNO, ARDUINO_NANO, ESP32,
+  CHASIS_2WD, CHASIS_4WD, CHASIS_MINISUMO, PISO_ARRIBA_MINISUMO, PROTOBOARD,
+  ARDUINO_UNO, ARDUINO_NANO, ARDUINO_MEGA, ESP32, RASPBERRY_PICO,
   MOTOR_TT, RUEDA_65, RUEDA_65_PLASTICO, RUEDA_48, RUEDA_LOCA, MOTOR_N20, RUEDA_34,
   SG90, MG90S,
   TCRT5000, FC51, HCSR04, JOYSTICK, MPU6050,
