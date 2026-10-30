@@ -741,6 +741,8 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
     case 'proc:bateria-lipo': return { dir: [-1, 0.2, 0], tipo: 'soldado' }
     case 'proc:bateria-18650': return { dir: [-1, 0.3, 0], tipo: 'soldado' }
     case 'proc:bateria-9v': return { dir: [1, 0.3, 0], tipo: 'soldado' }
+    case 'proc:portapilas-2aa': return { dir: [1, 0.3, 0], tipo: 'soldado' }
+    case 'proc:fuente-mb102': return { dir: [0, 1, 0], tipo: 'dupont' }
     case 'proc:servo': return { dir: [1, 0, 0], tipo: 'dupont' }
     case 'proc:fc51': return { dir: [-1, 0, 0], tipo: 'dupont' }
     case 'proc:hcsr04': return { dir: [-1, 0, 0], tipo: 'dupont' }

@@ -434,7 +434,7 @@ export function TapaBasurero() {
   )
 }
 
-const MODELOS_CIRCUITO = new Set(['proc:protoboard', 'proc:led', 'proc:led-rgb', 'proc:resistencia', 'proc:pulsador', 'proc:buzzer', 'proc:potenciometro', 'proc:ldr', 'proc:basurero', 'proc:tapa-basurero'])
+const MODELOS_CIRCUITO = new Set(['proc:protoboard', 'proc:led', 'proc:led-rgb', 'proc:resistencia', 'proc:pulsador', 'proc:buzzer', 'proc:potenciometro', 'proc:ldr', 'proc:basurero', 'proc:tapa-basurero', 'proc:fuente-mb102', 'proc:portapilas-2aa'])
 export const esModeloCircuito = (modelo: string) => MODELOS_CIRCUITO.has(modelo)
 
 /** Dibuja cualquier componente del circuito según su modelo; null si no es de la protoboard. */
@@ -458,12 +458,109 @@ function ModeloCentrado({ def, inst }: { def: PiezaDef; inst: string }) {
     case 'proc:ldr': return <Ldr inst={inst} />
     case 'proc:basurero': return <Basurero />
     case 'proc:tapa-basurero': return <TapaBasurero />
+    case 'proc:fuente-mb102': return <FuenteMb102 inst={inst} />
+    case 'proc:portapilas-2aa': return <PortapilasAA />
   }
   return null
 }
 
+// ---------------------------------------------------------------------------
+// Fuentes de la mesa: MB102 en los rieles y portapilas de 2 AA
+// ---------------------------------------------------------------------------
+
+/** Patas de la MB102 (x, z en su marco): dos por riel, en los agujeros 48 y 49. */
+const PATAS_MB102: [number, number][] = [0, PASO].flatMap(x => [-22.1, -19.6, 19.6, 22.1].map(z => [x, z] as [number, number]))
+
+/** Fuente MB102: placa azul sobre patas largas, con conector de 9 V, USB, interruptor y LED verde. */
+export function FuenteMb102({ inst }: { inst: string }) {
+  const q = useCalidad()
+  const vivo = useContext(CircuitoVivoContexto)
+  const led = useRef<THREE.MeshStandardMaterial>(null)
+  useFrame(() => { if (led.current) led.current.emissiveIntensity = vivo.estado() ? 2.5 : 0 })
+  const Y = 10 // cara de abajo de la placa
+  return (
+    <group>
+      {PATAS_MB102.map(([x, z]) => (
+        <mesh key={`${x}${z}`} position={M(x, Y / 2, z)}>
+          <boxGeometry args={[m(0.64), m(Y), m(0.64)]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.3} />
+        </mesh>
+      ))}
+      {/* Separadores negros de los conectores */}
+      {[-20.85, 20.85].map(z => (
+        <mesh key={z} position={M(1.27, Y - 1.25, z)}>
+          <boxGeometry args={[m(5.1), m(2.5), m(5.1)]} />
+          <meshStandardMaterial color="#111" roughness={0.6} />
+        </mesh>
+      ))}
+      <mesh position={M(0.5, Y + 0.8, 0)} castShadow={q.sombras}>
+        <boxGeometry args={[m(33), m(1.6), m(53)]} />
+        <meshStandardMaterial color="#1d4ed8" roughness={0.55} />
+      </mesh>
+      {/* Conector de 9 V (plug) y USB, del lado de afuera */}
+      <mesh position={M(10, Y + 7, -12)} castShadow={q.sombras}>
+        <boxGeometry args={[m(14), m(11), m(9)]} />
+        <meshStandardMaterial color="#18181b" roughness={0.5} />
+      </mesh>
+      <mesh position={M(12, Y + 5.5, 10)}>
+        <boxGeometry args={[m(14), m(7), m(13)]} />
+        <meshStandardMaterial color="#cbd5e1" metalness={0.85} roughness={0.25} />
+      </mesh>
+      {/* Interruptor y reguladores */}
+      <mesh position={M(-2, Y + 3.5, -14)}>
+        <boxGeometry args={[m(6), m(4), m(10)]} />
+        <meshStandardMaterial color="#e5e7eb" roughness={0.5} />
+      </mesh>
+      {[-4, 6].map(z => (
+        <mesh key={z} position={M(-8, Y + 2.4, z)}>
+          <boxGeometry args={[m(6.5), m(1.6), m(3.5)]} />
+          <meshStandardMaterial color="#27272a" roughness={0.4} />
+        </mesh>
+      ))}
+      {/* Puentes amarillos de 5 V / 3,3 V */}
+      {[-17, 17].map(z => (
+        <mesh key={z} position={M(-12, Y + 3.2, z)}>
+          <boxGeometry args={[m(2.5), m(3.6), m(5)]} />
+          <meshStandardMaterial color="#facc15" roughness={0.5} />
+        </mesh>
+      ))}
+      <mesh position={M(-1, Y + 2.1, 3)}>
+        <boxGeometry args={[m(1.6), m(1), m(3)]} />
+        <meshStandardMaterial ref={led} color="#14532d" emissive="#22c55e" emissiveIntensity={0} />
+      </mesh>
+    </group>
+  )
+}
+
+/** Portapilas de dos AA, con las pilas a la vista. */
+export function PortapilasAA() {
+  const q = useCalidad()
+  return (
+    <group>
+      <mesh position={M(0, 4, 0)} castShadow={q.sombras}>
+        <boxGeometry args={[m(58), m(8), m(32)]} />
+        <meshStandardMaterial color="#18181b" roughness={0.6} />
+      </mesh>
+      {[-7.5, 7.5].map((z, i) => (
+        <group key={z} position={M(0, 8, z)} rotation={[0, 0, Math.PI / 2]}>
+          <mesh>
+            <cylinderGeometry args={[m(7), m(7), m(48), q.segmentos]} />
+            <meshStandardMaterial color={i ? '#16a34a' : '#ca8a04'} metalness={0.3} roughness={0.4} />
+          </mesh>
+          <mesh position={M(0, i ? -24.5 : 24.5, 0)}>
+            <cylinderGeometry args={[m(2.5), m(2.5), m(1.5), 12]} />
+            <meshStandardMaterial color="#cbd5e1" metalness={0.9} roughness={0.25} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  )
+}
+
 /** Dónde entra el cable de cada pin (al lado de su pata, en la misma tira de la protoboard). */
 export function anclaCircuito(modelo: string, pin: string): V | null {
+  if (modelo === 'proc:fuente-mb102') return pin === '+' ? [-12, 12, -10] : pin === '-' ? [-12, 12, -7.5] : null
+  if (modelo === 'proc:portapilas-2aa') return pin === '+' ? [29, 6, -5] : pin === '-' ? [29, 6, 5] : null
   const pata = PATAS_CIRCUITO[modelo]?.find(p => p.pin === pin)
   return pata ? [pata.x, 0.3, Z_CABLE_PROTOBOARD] : null
 }

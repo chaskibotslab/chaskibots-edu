@@ -12,7 +12,9 @@ import { infoPlaca, mcuDe } from './placa'
 
 const k = (inst: string, pin: string) => `${inst}.${pin}`
 
-/** Agrupa los pines unidos por cables (directa o indirectamente) en "nets". */
+/** Agrupa los pines unidos por cables (directa o indirectamente) en "nets".
+ *  También une los pines que una pieza conecta por dentro con su padre (la
+ *  fuente pinchada en los rieles de la protoboard). */
 export function nets(doc: RobotDoc): Map<string, string> {
   const parent = new Map<string, string>()
   const find = (x: string): string => {
@@ -23,9 +25,14 @@ export function nets(doc: RobotDoc): Map<string, string> {
     parent.set(x, r)
     return r
   }
-  for (const c of doc.cables) {
-    const a = find(k(...c.de)), b = find(k(...c.a))
+  const unir = (x: string, y: string) => {
+    const a = find(x), b = find(y)
     if (a !== b) parent.set(a, b)
+  }
+  for (const c of doc.cables) unir(k(...c.de), k(...c.a))
+  for (const p of doc.piezas) {
+    if (!p.padre) continue
+    for (const [propio, delPadre] of pieza(p.pieza).unePinesConPadre ?? []) unir(k(p.id, propio), k(p.padre.instancia, delPadre))
   }
   const out = new Map<string, string>()
   for (const x of Array.from(parent.keys())) out.set(x, find(x))
@@ -108,8 +115,14 @@ export function planDe(doc: RobotDoc): SimPlan {
       return (t.tipo === 'puente-h' && mismo([p.id, '+'], [d.id, t.alim.motor])) || (t.tipo === 'mcu' && mismo([p.id, '+'], [d.id, 'VIN']))
     })
     if (conectada) voltajeBateria = Math.max(voltajeBateria, c.voltaje)
-    // En la mesa de electrónica la pila puede alimentar el circuito directamente.
-    else if (!doc.cables.some(cb => [cb.de, cb.a].some(([i, pin]) => i === p.id && pin === '+'))) avisos.push(`${p.etiqueta}: no está conectada`)
+    // En la mesa de electrónica la pila (o la fuente) alimenta el circuito directamente,
+    // también a través de los rieles: cuenta si su + llega a alguna otra pieza.
+    else {
+      const red = n.get(k(p.id, '+'))
+      const raiz = doc.piezas.find(d => !d.padre)?.id
+      const usa = !!red && Array.from(n.entries()).some(([x, r]) => r === red && ![p.id, raiz].includes(x.slice(0, x.indexOf('.'))))
+      if (!usa) avisos.push(`${p.etiqueta}: no está conectada`)
+    }
   }
 
   const rs = ruedas(doc, poses(doc))

@@ -848,16 +848,64 @@ void setup() {}
 void loop() {}
 `
 
+// Sin Arduino: la pila (o la fuente) alimenta los rieles y los componentes
+// toman de ahí la corriente, como se arma en la protoboard real.
+const P = 'protoboard'
+
 export function construirLedPila(): RobotDoc {
   const b = new Banco('LED con pila')
   b.doc = { ...b.doc, piezas: b.doc.piezas.filter(p => p.id !== 'placa') }
-  const pila = b.montar('bateria-9v', 'protoboard', 'bateria')
-  const r = b.poner('resistencia-1000', 2)
-  const l = b.poner('led-rojo', 10)
-  b.cable([pila, '+'], [r, '1'], ROJO)
+  const pila = b.montar('bateria-9v', P, 'bateria')
+  const r = b.poner('resistencia-1000', 10)
+  const l = b.poner('led-rojo', 12)
+  b.cable([pila, '+'], [P, '+ abajo'], ROJO)
+  b.cable([pila, '-'], [P, '- abajo'], NEGRO)
+  b.cable([P, '+ abajo'], [r, '1'], ROJO)
   b.cable([r, '2'], [l, 'A'], GRIS)
-  b.cable([l, 'K'], [pila, '-'], NEGRO)
+  b.cable([l, 'K'], [P, '- abajo'], NEGRO)
   return b.terminar(LED_PILA)
+}
+
+const SIN_PROGRAMA = `// Este circuito no necesita programa: la fuente de la protoboard lo alimenta.
+// Entra a «Probar» y presiona el botón en la escena (o en el panel).
+`
+
+/** Fuente MB102 en los rieles, un pulsador y un LED: se enciende solo mientras presionas. */
+export function construirBotonSinArduino(): RobotDoc {
+  const b = new Banco('Botón y LED con fuente')
+  b.doc = { ...b.doc, piezas: b.doc.piezas.filter(p => p.id !== 'placa') }
+  b.montar('fuente-mb102', P, 'fuente')
+  const s = b.poner('pulsador', 2)
+  const r = b.poner('resistencia-330', 4)
+  const l = b.poner('led-verde', 6)
+  b.cable([P, '+ arriba'], [s, '1'], ROJO)
+  b.cable([s, '2'], [r, '1'], GRIS)
+  b.cable([r, '2'], [l, 'A'], GRIS)
+  b.cable([l, 'K'], [P, '- arriba'], NEGRO)
+  return b.terminar(SIN_PROGRAMA)
+}
+
+const DOS_PILAS = `// Este circuito no necesita programa: el portapilas lo alimenta.
+// Entra a «Probar»: el rojo brilla y el azul apenas, porque 3 V no le alcanzan.
+`
+
+/** Portapilas de 2 AA (3 V) con LED rojo y azul en paralelo: el azul (3 V) casi no prende. */
+export function construirDosPilas(): RobotDoc {
+  const b = new Banco('LED con dos pilas AA')
+  b.doc = { ...b.doc, piezas: b.doc.piezas.filter(p => p.id !== 'placa') }
+  const pila = b.montar('portapilas-2aa', P, 'bateria')
+  b.cable([pila, '+'], [P, '+ abajo'], ROJO)
+  b.cable([pila, '-'], [P, '- abajo'], NEGRO)
+  for (const [led, hueco] of [['led-rojo', 10], ['led-azul', 13]] as const) {
+    const r = b.poner('resistencia-220', hueco)
+    const l = b.poner(led, hueco + 1)
+    b.cable([P, '+ abajo'], [r, '1'], ROJO)
+    b.cable([r, '2'], [l, 'A'], GRIS)
+    b.cable([l, 'K'], [P, '- abajo'], NEGRO)
+  }
+  return b.terminar(DOS_PILAS)
+// Entra a «Probar» y presiona el botón en la escena (o en el panel).', '
+// Entra a «Probar»: el rojo brilla y el azul apenas, porque 3 V no le alcanzan.'))
 }
 
 // Kit de 9no: todo con Arduino Nano y los pines de la guía (LED D8, TRIG D9,
@@ -1107,10 +1155,26 @@ export const PROYECTOS_CIRCUITO: Prearmado[] = [
     plantillas: conPlantillas([{ id: 'alarma-proximidad', nombre: 'Alarma de proximidad (kit)', descripcion: 'Parpadeo según la distancia', codigo: ALARMA_PROXIMIDAD }]),
   },
   {
+    id: 'boton-sin-arduino', categoria: 'electronica',
+    nombre: 'Botón y LED con fuente (sin Arduino)', dificultad: 'inicial', arena: 'mesa-electronica',
+    descripcion: 'La fuente MB102 pinchada en la protoboard alimenta los rieles. Un pulsador, una resistencia y un LED: mientras presionas, el LED se enciende. Sin programa.',
+    logica: ['La fuente deja 5 V en el riel + y tierra en el −', 'Del riel + la corriente pasa por el pulsador (solo si está presionado)', 'Sigue por la resistencia y el LED', 'Vuelve al riel −'],
+    construir: construirBotonSinArduino,
+    plantillas: conPlantillas([]),
+  },
+  {
+    id: 'dos-pilas', categoria: 'electronica',
+    nombre: 'Dos pilas AA: LED rojo y azul', dificultad: 'inicial', arena: 'mesa-electronica',
+    descripcion: 'Un portapilas de 3 V en los rieles y dos LED en paralelo. El rojo necesita 2 V y brilla; el azul necesita 3 V y casi no prende. ¿Por qué los kits usan 5 V?',
+    logica: ['Cada LED necesita un voltaje para encender: rojo 2 V, azul 3 V', 'Con 3 V al rojo le sobra 1 V para su resistencia: pasa corriente', 'Al azul no le sobra nada: casi no pasa corriente', 'Cambia la pila por la de 9 V y compara'],
+    construir: construirDosPilas,
+    plantillas: conPlantillas([]),
+  },
+  {
     id: 'led-pila', categoria: 'electronica',
     nombre: 'LED con pila (sin Arduino)', dificultad: 'inicial', arena: 'mesa-electronica',
-    descripcion: 'El circuito más simple: una pila de 9 V, una resistencia y un LED. No hace falta programa: entra a «Probar» y el LED ya está encendido. Cambia la resistencia y mira qué pasa.',
-    logica: ['La corriente sale del + de la pila', 'Pasa por la resistencia, que la frena', 'Entra al LED por la pata larga y lo enciende', 'Vuelve al − de la pila'],
+    descripcion: 'El circuito más simple: una pila de 9 V, una resistencia y un LED. Los cables de la pila van a los rieles + y − de la protoboard. No hace falta programa: entra a «Probar» y el LED ya está encendido. Cambia la resistencia y mira qué pasa.',
+    logica: ['La pila deja su + en el riel rojo y su − en el azul', 'Del riel + la corriente pasa por la resistencia, que la frena', 'Entra al LED por la pata larga y lo enciende', 'Sale por la pata corta al riel − y vuelve a la pila'],
     construir: construirLedPila,
     plantillas: conPlantillas([]),
   },

@@ -32,6 +32,42 @@ const COLUMNAS_ENTRE_LUGARES = 7
 /** z (marco del componente) donde entran los cables: fila 3 de la misma tira. */
 export const Z_CABLE_PROTOBOARD = -3 * PASO_PROTOBOARD
 
+// Rieles de alimentación: a cada lado, una fila + (roja, por fuera) y una −
+// (azul, por dentro) de 50 agujeros unidos a lo largo, en grupos de 5. Cada
+// riel es un pin de la protoboard: todo lo que se conecta a él queda unido.
+/** Agujeros de cada riel. */
+export const AGUJEROS_RIEL = 50
+/** x del agujero k (0–49) de un riel. */
+export const xRiel = (k: number) => xColumna(2 + k + Math.floor(k / 5))
+/** Los cuatro rieles: nombre del pin, polaridad y z (arriba = −z, el lado de la fila 0). */
+export const RIELES = [
+  { pin: '+ arriba', signo: '+', z: -22.1 },
+  { pin: '- arriba', signo: '-', z: -19.6 },
+  { pin: '+ abajo', signo: '+', z: 22.1 },
+  { pin: '- abajo', signo: '-', z: 19.6 },
+] as const
+
+/**
+ * Agujero del riel donde entra un cable: el libre más cercano a x (mm, marco
+ * de la protoboard). `usados` guarda los ya ocupados de cada riel.
+ */
+export function agujeroRiel(pin: string, x: number, usados: Map<string, Set<number>>): [number, number] | null {
+  const riel = RIELES.find(r => r.pin === pin)
+  if (!riel) return null
+  const ocupados = usados.get(pin) ?? new Set<number>()
+  let mejor = -1
+  for (let k = 0; k < AGUJEROS_RIEL; k++) {
+    if (ocupados.has(k)) continue
+    if (mejor < 0 || Math.abs(xRiel(k) - x) < Math.abs(xRiel(mejor) - x)) mejor = k
+  }
+  if (mejor < 0) return null
+  usados.set(pin, ocupados.add(mejor))
+  return [xRiel(mejor), riel.z]
+}
+
+/** Fuente MB102: sus patas entran en los dos últimos agujeros de cada riel (mm, marco de la protoboard). */
+export const X_FUENTE_PROTOBOARD = xRiel(AGUJEROS_RIEL - 2)
+
 /**
  * Patas de cada componente en el marco de su hueco (mm): todas caen en agujeros.
  * Los que tienen patas a medio paso del centro (LED, buzzer, pulsador) se corren
@@ -85,6 +121,8 @@ export const PROTOBOARD: PiezaDef = {
   color: '#f4f4f0',
   colisionadores: [{ forma: 'caja', medidas: [165, ALTO_PROTOBOARD, 55], centro: [0, ALTO_PROTOBOARD / 2, 0] }],
   montajes: [
+    // Fuente MB102 en el extremo derecho, con sus patas en los cuatro rieles.
+    { id: 'fuente', tipo: 'fuente-protoboard', nombre: 'Extremo derecho, en los rieles (fuente)', posicion: [X_FUENTE_PROTOBOARD, ALTO_PROTOBOARD, 0] },
     { id: 'placa', tipo: 'placa', nombre: 'Lugar de la placa', posicion: [-127, 0, 0], rotacionesPermitidas: [0, 180] },
     ...huecos(),
     // Módulos (E2): el HC-SR04 parado sobre la mesa a la derecha, mirando hacia afuera (+x),
@@ -99,9 +137,59 @@ export const PROTOBOARD: PiezaDef = {
     { id: 'bateria', tipo: 'bateria', nombre: 'Delante de la protoboard (batería)', posicion: [-40, 0, 72], rotacion: [0, 90, 0] },
   ],
   encaja: [],
-  pines: [],
+  // Los rieles: el + y el − de cada lado. Una batería o la placa los alimenta
+  // con un cable y los componentes toman de ahí la corriente.
+  pines: RIELES.map(r => ({
+    nombre: r.pin,
+    tipo: 'digital' as const,
+    ayuda: `Riel ${r.signo === '+' ? '+ (línea roja)' : '− (línea azul)'} de ${r.pin.endsWith('arriba') ? 'arriba' : 'abajo'}: los 50 agujeros están unidos. ${r.signo === '+' ? 'Llévale el + de la pila o el 5V de la placa' : 'Llévale el − de la pila o el GND de la placa'}.`,
+  })),
   comportamiento: { tipo: 'protoboard' },
-  datos: [['Puntos', '830 (630 + 200 de los rieles)'], ['Medidas', '165 × 55 × 8,5 mm'], ['Tiras', '5 huecos unidos por dentro, a cada lado de la canaleta']],
+  datos: [['Puntos', '830 (630 + 200 de los rieles)'], ['Medidas', '165 × 55 × 8,5 mm'], ['Tiras', '5 huecos unidos por dentro, a cada lado de la canaleta'], ['Rieles', '+ y − arriba y abajo: 50 agujeros unidos a lo largo']],
+}
+
+/**
+ * Fuente para protoboard MB102: se pincha en el extremo de la protoboard y
+ * alimenta los cuatro rieles con 5 V (entra una pila de 9 V o un cargador
+ * por su conector). Marco: origen en el agujero 48 de los rieles; la placa
+ * sale 8 mm por fuera del borde, como la real.
+ */
+export const FUENTE_MB102: PiezaDef = {
+  id: 'fuente-mb102',
+  nombre: 'Fuente para protoboard MB102 (5 V)',
+  familia: 'circuito',
+  descripcion: 'Se pincha en el extremo de la protoboard y deja los rieles + con 5 V y los − a tierra. Así se prueban circuitos sin Arduino: solo hay que llevar cables desde los rieles a cada componente.',
+  modelo: 'proc:fuente-mb102',
+  masa_g: 12,
+  material: 'pcb',
+  color: '#1d4ed8',
+  colisionadores: [{ forma: 'caja', medidas: [33, 14, 53], centro: [0.5, 9, 0] }],
+  montajes: [],
+  encaja: ['fuente-protoboard'],
+  pines: [
+    { nombre: '+', tipo: 'alim', ayuda: 'Salida de 5 V: ya está unida a los dos rieles +' },
+    { nombre: '-', tipo: 'gnd', ayuda: 'Tierra: ya está unida a los dos rieles −' },
+  ],
+  unePinesConPadre: [['+', '+ arriba'], ['+', '+ abajo'], ['-', '- arriba'], ['-', '- abajo']],
+  comportamiento: { tipo: 'bateria', voltaje: 5, capacidad_mah: 1000, corriente_max_a: 0.7 },
+  datos: [['Salida', '5 V (o 3,3 V con su puente)'], ['Corriente', 'hasta 700 mA'], ['Entrada', '6,5–12 V (pila de 9 V o cargador) o USB']],
+}
+
+/** Portapilas para dos pilas AA (3 V): sobre la mesa, con sus cables a los rieles. */
+export const PORTAPILAS_AA: PiezaDef = {
+  id: 'portapilas-2aa',
+  nombre: 'Portapilas 2×AA (3 V)',
+  familia: 'circuito',
+  descripcion: 'Dos pilas AA en serie: 1,5 V + 1,5 V = 3 V. Va sobre la mesa y sus cables (rojo +, negro −) se pinchan en los rieles de la protoboard.',
+  modelo: 'proc:portapilas-2aa',
+  masa_g: 55,
+  material: 'plastico',
+  colisionadores: [{ forma: 'caja', medidas: [58, 15, 32], centro: [0, 7.5, 0] }],
+  montajes: [],
+  encaja: ['bateria'],
+  pines: [{ nombre: '+', tipo: 'alim', ayuda: 'Cable rojo: positivo (3 V)' }, { nombre: '-', tipo: 'gnd', ayuda: 'Cable negro: negativo' }],
+  comportamiento: { tipo: 'bateria', voltaje: 3, capacidad_mah: 2000, corriente_max_a: 1 },
+  datos: [['Voltaje', '3 V (2 × 1,5 V)'], ['Capacidad', '≈ 2000 mAh'], ['Ojo', 'Un LED azul o blanco (3 V) casi no prende con ella']],
 }
 
 const LED_COLORES = [
@@ -343,4 +431,4 @@ export const TAPA_BASURERO: PiezaDef = {
   datos: [['Medidas', '104 × 104 × 3 mm'], ['Cerrada', 'Servo en 0°'], ['Abierta', 'Servo en 90°']],
 }
 
-export const PIEZAS_CIRCUITO: PiezaDef[] = [...LEDS, LED_RGB, ...RESISTENCIAS_PIEZAS, PULSADOR, BUZZER_PASIVO, BUZZER_ACTIVO, POTENCIOMETRO, LDR, MAQUETA_BASURERO, TAPA_BASURERO]
+export const PIEZAS_CIRCUITO: PiezaDef[] = [...LEDS, LED_RGB, ...RESISTENCIAS_PIEZAS, PULSADOR, BUZZER_PASIVO, BUZZER_ACTIVO, POTENCIOMETRO, LDR, FUENTE_MB102, PORTAPILAS_AA, MAQUETA_BASURERO, TAPA_BASURERO]

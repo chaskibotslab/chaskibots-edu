@@ -37,6 +37,7 @@ export type TipoMontaje =
   | 'protoboard'      // LED, resistencia, pulsador… pinchados en la protoboard
   | 'maqueta'         // maqueta del proyecto (basurero…) junto a la protoboard
   | 'piso'            // segundo piso sobre separadores (cuando abajo no cabe todo)
+  | 'fuente-protoboard' // fuente MB102 pinchada en los rieles de la protoboard
 
 export interface PuntoMontaje {
   id: string
@@ -150,6 +151,9 @@ export interface PiezaDef {
   /** En qué tipos de montaje encastra esta pieza (vacío = solo como raíz). */
   encaja: TipoMontaje[]
   pines: PinDef[]
+  /** Pines que quedan unidos por dentro con pines del padre al encastrarla
+   *  ([pin propio, pin del padre]): la fuente MB102 pinchada en los rieles. */
+  unePinesConPadre?: [string, string][]
   comportamiento: Comportamiento
   /** Datos técnicos para la ficha (texto libre). */
   datos?: [string, string][]

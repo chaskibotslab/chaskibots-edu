@@ -25,8 +25,10 @@ const ANCHO_PLACA = 190
 interface Tarjeta { id: string; titulo: string; x: number; y: number; ancho: number; alto: number; pines: { pin: PinDef; x: number; y: number; lado: 'izq' | 'der' }[] }
 
 function colorPara(a: PinDef, b: PinDef, usados: number) {
-  if (a.tipo === 'gnd' || b.tipo === 'gnd') return NEGRO
-  if (a.tipo === 'alim' || b.tipo === 'alim' || a.tipo === 'potencia') return ROJO
+  // Los rieles de la protoboard se llaman «+ arriba», «- abajo»…
+  const riel = (p: PinDef, signo: string) => p.nombre.startsWith(`${signo} `)
+  if (a.tipo === 'gnd' || b.tipo === 'gnd' || riel(a, '-') || riel(b, '-')) return NEGRO
+  if (a.tipo === 'alim' || b.tipo === 'alim' || a.tipo === 'potencia' || riel(a, '+') || riel(b, '+')) return ROJO
   return SENALES[usados % SENALES.length]
 }
 

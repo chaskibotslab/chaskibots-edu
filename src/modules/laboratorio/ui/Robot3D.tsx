@@ -20,6 +20,7 @@ import {
   ChasisMinisumo, MotorN20, BateriaLipo,
 } from './modelos/Piezas3D'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
+import { ALTO_PROTOBOARD, agujeroRiel } from '../catalogo/piezas/circuito'
 import { CircuitoVivoContexto, ModeloCircuito, esModeloCircuito, type CircuitoVivo } from './modelos/Circuito3D'
 
 const m = (v: number) => v / 1000
@@ -303,8 +304,24 @@ function Cables({ doc }: { doc: RobotDoc }) {
         tipo: s.tipo,
       }
     }
+    // Riel de la protoboard: el cable entra en el agujero libre más cercano a su otra punta.
+    const usados = new Map<string, Set<number>>()
+    const base = raiz(doc)
+    const poseBase = ps.get(base.id)
+    const enRiel = (inst: string, pin: string, otra: Punta | null): Punta | null => {
+      if (!poseBase || inst !== base.id) return null
+      // Un puente entre dos rieles va al principio de la protoboard.
+      const x = otra ? otra.pos.clone().multiplyScalar(1000).sub(poseBase.pos).applyQuaternion(poseBase.rot.clone().invert()).x : -70
+      const h = agujeroRiel(pin, x, usados)
+      if (!h) return null
+      return { pos: aRobot(poseBase, [h[0], ALTO_PROTOBOARD + 0.3, h[1]]).multiplyScalar(0.001), dir: new THREE.Vector3(0, 1, 0).applyQuaternion(poseBase.rot), tipo: 'macho' }
+    }
     return doc.cables
-      .map(c => ({ c, a: punta(...c.de), b: punta(...c.a) }))
+      .map(c => {
+        const pa = punta(...c.de), pb = punta(...c.a)
+        const a = pa ?? enRiel(...c.de, pb)
+        return { c, a, b: pb ?? enRiel(...c.a, a) }
+      })
       .filter(x => x.a && x.b) as { c: RobotDoc['cables'][number]; a: Punta; b: Punta }[]
   }, [doc])
   return <>{lista.map(({ c, a, b }, i) => <Cable key={i} a={a} b={b} color={c.color} />)}</>
