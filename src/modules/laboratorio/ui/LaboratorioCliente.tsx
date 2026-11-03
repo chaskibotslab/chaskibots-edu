@@ -9,7 +9,7 @@ import './tema.css'
 const Taller = dynamic(() => import('./taller/Taller'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[calc(100dvh-4rem)] lab-tema items-center justify-center gap-2 text-sm text-slate-400">
+    <div className="flex h-[calc(100dvh-4rem)] lab-tema items-center justify-center gap-2 text-sm text-lab-suave">
       <Loader2 className="h-5 w-5 animate-spin" /> Cargando laboratorio…
     </div>
   ),

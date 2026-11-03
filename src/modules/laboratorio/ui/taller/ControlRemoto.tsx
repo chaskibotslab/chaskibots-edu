@@ -132,7 +132,7 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, fase, onCer
       onPointerDown={e => { e.preventDefault(); (e.target as HTMLElement).setPointerCapture?.(e.pointerId); setDir(d) }}
       onPointerUp={() => setDir('S')}
       onPointerCancel={() => setDir('S')}
-      className={`flex h-12 w-12 touch-none select-none items-center justify-center rounded-xl border text-white transition ${efectiva === d ? 'border-lab-acento bg-lab-acento/40' : 'border-lab-borde/20 bg-white/10 hover:bg-white/20'} ${clase}`}
+      className={`flex h-12 w-12 touch-none select-none items-center justify-center rounded-xl border text-lab-tinta transition ${efectiva === d ? 'border-lab-acento bg-lab-acento/40' : 'border-lab-borde/20 bg-lab-tinta/[0.07] hover:bg-lab-tinta/[0.13]'} ${clase}`}
       aria-label={d}
     >
       <Icon className="h-6 w-6" />
@@ -140,32 +140,32 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, fase, onCer
   )
 
   return (
-    <div className="pointer-events-auto absolute bottom-3 left-3 z-10 max-h-[calc(100%-1.5rem)] w-56 overflow-y-auto rounded-2xl lab-vidrio p-3 text-xs text-slate-200 backdrop-blur">
+    <div className="pointer-events-auto absolute bottom-3 left-3 z-10 max-h-[calc(100%-1.5rem)] w-56 overflow-y-auto rounded-2xl lab-vidrio p-3 text-xs text-lab-tinta backdrop-blur">
       <div className="mb-2 flex items-center justify-between">
-        <span className="flex items-center gap-1.5 font-semibold text-white"><Gamepad2 className="h-4 w-4 text-lab-acento" /> Control remoto</span>
-        <button onClick={onCerrar} className="rounded p-0.5 text-slate-400 hover:bg-white/10" aria-label="Cerrar"><X className="h-4 w-4" /></button>
+        <span className="flex items-center gap-1.5 font-semibold text-lab-tinta"><Gamepad2 className="h-4 w-4 text-lab-acento" /> Control remoto</span>
+        <button onClick={onCerrar} className="rounded p-0.5 text-lab-suave hover:bg-lab-tinta/[0.07]" aria-label="Cerrar"><X className="h-4 w-4" /></button>
       </div>
-      <p className="mb-2 leading-snug text-slate-400">
-        {quieto && fase === 'cuenta' ? <b className="text-amber-300">Espera la cuenta: el robot obedece cuando empiece la ronda.</b>
+      <p className="mb-2 leading-snug text-lab-suave">
+        {quieto && fase === 'cuenta' ? <b className="text-amber-700">Espera la cuenta: el robot obedece cuando empiece la ronda.</b>
           : quieto ? <>La ronda terminó: el robot está detenido.</>
-          : conPrograma && !leeLetras ? <b className="text-amber-300">Este programa es autónomo y no obedece al control. Para manejarlo, carga la plantilla «Manejar con el teclado (RC)».</b>
-          : conPrograma ? <>Envía letras a tu programa (como una app del celular): <b className="text-slate-200">F B L R S</b> y la velocidad 0–9.</>
+          : conPrograma && !leeLetras ? <b className="text-amber-700">Este programa es autónomo y no obedece al control. Para manejarlo, carga la plantilla «Manejar con el teclado (RC)».</b>
+          : conPrograma ? <>Envía letras a tu programa (como una app del celular): <b className="text-lab-tinta">F B L R S</b> y la velocidad 0–9.</>
           : fase ? <>Práctica libre: para pelear con el rival, presiona «Compilar y ejecutar».</>
           : <>Manejo directo de los motores (no hay programa corriendo).</>}
       </p>
       <div className="mx-auto grid w-fit grid-cols-3 gap-1.5">
         <span />{boton('F', ArrowUp)}<span />
         {boton('L', ArrowLeft)}
-        <button onClick={() => setDir('S')} className="flex h-12 w-12 items-center justify-center rounded-xl border border-lab-borde/20 bg-white/5 text-slate-300 hover:bg-white/15" aria-label="Parar"><Square className="h-5 w-5" /></button>
+        <button onClick={() => setDir('S')} className="flex h-12 w-12 items-center justify-center rounded-xl border border-lab-borde/20 bg-lab-tinta/[0.04] text-lab-tinta2 hover:bg-lab-tinta/10" aria-label="Parar"><Square className="h-5 w-5" /></button>
         {boton('R', ArrowRight)}
         <span />{boton('B', ArrowDown)}<span />
       </div>
       <label className="mt-2 flex items-center gap-2">
-        <span className="text-slate-400">Velocidad</span>
-        <input type="range" min={0} max={9} value={vel} onChange={e => setVel(Number(e.target.value))} className="flex-1 accent-[#E57361]" />
-        <span className="w-3 font-mono text-white">{vel}</span>
+        <span className="text-lab-suave">Velocidad</span>
+        <input type="range" min={0} max={9} value={vel} onChange={e => setVel(Number(e.target.value))} className="flex-1 accent-[rgb(var(--lab-acento))]" />
+        <span className="w-3 font-mono text-lab-tinta">{vel}</span>
       </label>
-      <p className="mt-1.5 text-[10px] leading-snug text-slate-500">Teclado: flechas o WASD (dos a la vez: curva) · Espacio frena · 0–9 velocidad{mando ? ` · Control: ${mando}` : ' · o conecta un control de videojuego'}</p>
+      <p className="mt-1.5 text-[10px] leading-snug text-lab-tenue">Teclado: flechas o WASD (dos a la vez: curva) · Espacio frena · 0–9 velocidad{mando ? ` · Control: ${mando}` : ' · o conecta un control de videojuego'}</p>
     </div>
   )
 }

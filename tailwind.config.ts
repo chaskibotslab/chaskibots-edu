@@ -73,8 +73,12 @@ const config: Config = {
           void: '#0D0F1A',
         },
         // Laboratorio de robótica: tokens de src/modules/laboratorio/ui/tema.css
-        // (el acento cambia con el paso: armar, cablear, programar, probar).
+        // (tema claro tipo cuaderno, un solo color de acento).
         lab: {
+          tinta: 'rgb(var(--lab-tinta) / <alpha-value>)',
+          tinta2: 'rgb(var(--lab-tinta2) / <alpha-value>)',
+          suave: 'rgb(var(--lab-suave) / <alpha-value>)',
+          tenue: 'rgb(var(--lab-tenue) / <alpha-value>)',
           vacio: 'rgb(var(--lab-vacio) / <alpha-value>)',
           fondo: 'rgb(var(--lab-fondo) / <alpha-value>)',
           fondo2: 'rgb(var(--lab-fondo2) / <alpha-value>)',

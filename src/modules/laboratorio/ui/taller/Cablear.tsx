@@ -184,25 +184,25 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
       {/* ---------- Esquema ---------- */}
       <div className="lab-plano relative min-h-[320px] flex-1 overflow-auto">
         <div className="sticky left-0 top-0 z-10 flex flex-wrap items-center gap-2 border-b border-lab-borde/15 bg-lab-superficie/90 px-3 py-2 text-xs backdrop-blur">
-          <span className={`rounded-full px-2 py-0.5 font-semibold ${doc.cableado === 'manual' ? 'bg-amber-500/15 text-amber-300' : 'bg-sky-500/15 text-sky-300'}`}>
+          <span className={`rounded-full px-2 py-0.5 font-semibold ${doc.cableado === 'manual' ? 'bg-amber-500/15 text-amber-700' : 'bg-sky-500/15 text-sky-700'}`}>
             {doc.cableado === 'manual' ? 'Cableado a mano' : 'Cableado automático'}
           </span>
-          <span className="text-slate-400">
-            {elegido ? <>Ahora toca el otro pin para unir <b className="text-white">{elegido[1]}</b> · toca el mismo para cancelar</> : 'Toca un pin y luego otro para poner un cable. Toca un cable para quitarlo. Arrastra un bloque para moverlo.'}
+          <span className="text-lab-suave">
+            {elegido ? <>Ahora toca el otro pin para unir <b className="text-lab-tinta">{elegido[1]}</b> · toca el mismo para cancelar</> : 'Toca un pin y luego otro para poner un cable. Toca un cable para quitarlo. Arrastra un bloque para moverlo.'}
           </span>
           <div className="ml-auto flex gap-1.5">
             {Object.keys(movidas).length > 0 && (
-              <button onClick={() => setMovidas({})} className="flex items-center gap-1 rounded-lg border border-lab-borde/15 px-2.5 py-1.5 hover:bg-white/5" title="Volver a poner los bloques en su lugar">
+              <button onClick={() => setMovidas({})} className="flex items-center gap-1 rounded-lg border border-lab-borde/15 px-2.5 py-1.5 hover:bg-lab-tinta/[0.04]" title="Volver a poner los bloques en su lugar">
                 <LayoutGrid className="h-3.5 w-3.5" /> Ordenar bloques
               </button>
             )}
             <button
               onClick={() => { if (window.confirm('¿Reemplazar todos los cables por el cableado automático?')) cambiar({ ...doc, cableado: 'auto', cables: autocablear(doc).cables }, 'Cableado automático', false) }}
-              className="flex items-center gap-1 rounded-lg border border-lab-borde/15 px-2.5 py-1.5 hover:bg-white/5"
+              className="flex items-center gap-1 rounded-lg border border-lab-borde/15 px-2.5 py-1.5 hover:bg-lab-tinta/[0.04]"
             ><Wand2 className="h-3.5 w-3.5" /> Conectar automáticamente</button>
             <button
               onClick={() => { if (window.confirm('¿Quitar todos los cables?')) cambiar({ ...doc, cableado: 'manual', cables: [] }, 'Sin cables', false) }}
-              className="flex items-center gap-1 rounded-lg border border-red-500/30 px-2.5 py-1.5 text-red-300 hover:bg-red-500/10"
+              className="flex items-center gap-1 rounded-lg border border-red-500/30 px-2.5 py-1.5 text-red-700 hover:bg-red-500/10"
             ><Trash2 className="h-3.5 w-3.5" /> Quitar todos</button>
           </div>
         </div>
@@ -277,44 +277,44 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
           ))}
         </svg>
         {cableSel !== null && doc.cables[cableSel] && (
-          <div className="fixed bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-full lab-vidrio px-4 py-2 text-xs text-white backdrop-blur">
+          <div className="fixed bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-full lab-vidrio px-4 py-2 text-xs text-lab-tinta backdrop-blur">
             <span className="font-mono">{doc.cables[cableSel].de[1]} → {doc.cables[cableSel].a[1]}</span>
-            <button onClick={() => quitarCable(cableSel)} className="flex items-center gap-1 rounded-full bg-red-500/20 px-2.5 py-1 text-red-200 hover:bg-red-500/30"><Trash2 className="h-3.5 w-3.5" /> Quitar cable</button>
+            <button onClick={() => quitarCable(cableSel)} className="flex items-center gap-1 rounded-full bg-red-500/20 px-2.5 py-1 text-red-700 hover:bg-red-500/30"><Trash2 className="h-3.5 w-3.5" /> Quitar cable</button>
           </div>
         )}
       </div>
 
       {/* ---------- Revisión y tabla ---------- */}
       <aside className="max-h-[45vh] w-full overflow-y-auto border-t border-lab-borde/15 bg-lab-superficie p-3 text-xs lg:max-h-none lg:w-96 lg:border-l lg:border-t-0">
-        <h3 className="mb-2 text-sm font-semibold text-white">Revisión del cableado</h3>
+        <h3 className="mb-2 text-sm font-semibold text-lab-tinta">Revisión del cableado</h3>
         {problemas.length === 0 ? (
-          <div className="mb-3 flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-emerald-300"><CheckCircle2 className="h-4 w-4" /> Todo bien: {esBanco(doc) ? 'el circuito' : 'el robot'} está listo para probar.</div>
+          <div className="mb-3 flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-emerald-700"><CheckCircle2 className="h-4 w-4" /> Todo bien: {esBanco(doc) ? 'el circuito' : 'el robot'} está listo para probar.</div>
         ) : (
           <div className="mb-3 space-y-1.5">
-            {errores.length > 0 && <p className="text-red-300">Corrige los errores (rojo) antes de probar: en la vida real algo se quemaría o no funcionaría.</p>}
+            {errores.length > 0 && <p className="text-red-700">Corrige los errores (rojo) antes de probar: en la vida real algo se quemaría o no funcionaría.</p>}
             {problemas.map((p, i) => (
               <button key={i} onMouseEnter={() => setResaltar(p.pines)} onMouseLeave={() => setResaltar([])} onClick={() => setResaltar(p.pines)}
-                className={`flex w-full gap-2 rounded-lg px-2.5 py-2 text-left leading-snug ${p.nivel === 'error' ? 'bg-red-500/10 text-red-200' : 'bg-amber-500/10 text-amber-200'}`}>
+                className={`flex w-full gap-2 rounded-lg px-2.5 py-2 text-left leading-snug ${p.nivel === 'error' ? 'bg-red-500/10 text-red-700' : 'bg-amber-500/10 text-amber-700'}`}>
                 {p.nivel === 'error' ? <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> : <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />} {p.texto}
               </button>
             ))}
           </div>
         )}
-        <h3 className="mb-1.5 mt-4 text-sm font-semibold text-white">Tabla de pines (para tu código)</h3>
-        {tabla.length === 0 ? <p className="text-slate-500">Todavía no hay piezas conectadas a la placa.</p> : (
+        <h3 className="mb-1.5 mt-4 text-sm font-semibold text-lab-tinta">Tabla de pines (para tu código)</h3>
+        {tabla.length === 0 ? <p className="text-lab-tenue">Todavía no hay piezas conectadas a la placa.</p> : (
           <table className="w-full">
             <tbody>
               {tabla.map((f, i) => (
                 <tr key={i} className="border-t border-lab-borde/10">
-                  <td className="py-1 pr-2 text-slate-300">{f.etiqueta}</td>
-                  <td className="py-1 pr-2 font-mono text-white">{f.pin}</td>
+                  <td className="py-1 pr-2 text-lab-tinta2">{f.etiqueta}</td>
+                  <td className="py-1 pr-2 font-mono text-lab-tinta">{f.pin}</td>
                   <td className="py-1 font-mono text-lab-acento">{f.placa}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
-        <p className="mt-3 flex gap-1.5 text-slate-500"><Info className="h-3.5 w-3.5 shrink-0" /> Colores de los pines: <span className="text-sky-400">digital</span>, <span className="text-purple-400">PWM ~</span>, <span className="text-lime-400">analógico</span>, <span className="text-red-400">alimentación</span>, <span className="text-gray-400">tierra</span>.</p>
+        <p className="mt-3 flex gap-1.5 text-lab-tenue"><Info className="h-3.5 w-3.5 shrink-0" /> Colores de los pines: <span className="text-sky-600">digital</span>, <span className="text-purple-600">PWM ~</span>, <span className="text-lime-600">analógico</span>, <span className="text-red-600">alimentación</span>, <span className="text-lab-suave">tierra</span>.</p>
       </aside>
     </div>
   )

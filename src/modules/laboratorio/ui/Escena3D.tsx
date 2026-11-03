@@ -215,9 +215,9 @@ function PisoArena({ sim, version }: { sim: Simulacion; version: number }) {
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, bajo - 0.0005, 0]} receiveShadow onDoubleClick={arena.mesa ? undefined : colocar}>
         <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial color="#3a3f4b" roughness={0.95} />
+        <meshStandardMaterial color="#c3cbd6" roughness={0.95} />
       </mesh>
-      <gridHelper args={[14, 70, '#4b5262', '#434957']} position={[0, bajo, 0]} />
+      <gridHelper args={[14, 70, '#a7b1bf', '#b4bdca']} position={[0, bajo, 0]} />
       {arena.mesa && (
         <group>
           <mesh position={[0, -0.02, 0]} castShadow receiveShadow>
@@ -319,7 +319,7 @@ function Rastro({ sim, version }: { sim: Simulacion; version: number }) {
     const geo = new THREE.BufferGeometry()
     geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAX * 3), 3))
     geo.setDrawRange(0, 0)
-    const mat = new THREE.LineBasicMaterial({ color: '#E57361', transparent: true, opacity: 0.8 })
+    const mat = new THREE.LineBasicMaterial({ color: '#2563eb', transparent: true, opacity: 0.8 })
     return new THREE.Line(geo, mat)
   }, [])
   const n = useRef(0)
@@ -412,7 +412,7 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel, zoo
   const q = CALIDADES[nivel]
   return (
     <Lienzo nivel={nivel} onNivel={onNivel} camara={[-1.1, 0.9, 1.3]}>
-      <fog attach="fog" args={['#121830', 6, 16]} />
+      <fog attach="fog" args={['#cbd5e1', 6, 16]} />
       <Estudio intensidad={0.6} />
       <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={2.2} />
       <PisoArena sim={sim} version={versionArena} />

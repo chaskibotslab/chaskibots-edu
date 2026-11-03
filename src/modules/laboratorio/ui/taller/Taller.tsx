@@ -201,20 +201,20 @@ export default function Taller() {
     ?? (esBanco(doc) ? 'mesa-electronica' : doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'ultrasonido') ? 'campo-libre' : 'ovalo')
 
   return (
-    <div data-paso={pestana} className="lab-tema flex h-[calc(100dvh-4rem)] min-h-[560px] flex-col text-slate-200">
+    <div data-paso={pestana} className="lab-tema flex h-[calc(100dvh-4rem)] min-h-[560px] flex-col text-lab-tinta">
       {/* ---------- Encabezado ---------- */}
       <div className="lab-barra z-10 flex flex-wrap items-center gap-2 px-3 py-2">
         <div className="mr-1 flex items-center gap-2">
           <div className="lab-primario flex h-8 w-8 items-center justify-center rounded-lg"><FlaskConical className="h-4 w-4" /></div>
           <div className="hidden leading-tight sm:block">
-            <div className="text-sm font-semibold text-white">Laboratorio de Robótica</div>
-            <div className="text-[11px] text-slate-400">Arma, cablea, programa y prueba</div>
+            <div className="text-sm font-semibold text-lab-tinta">Laboratorio de Robótica</div>
+            <div className="text-[11px] text-lab-suave">Arma, cablea, programa y prueba</div>
           </div>
         </div>
         <input
           value={doc.nombre}
           onChange={e => setDoc({ ...doc, nombre: e.target.value.slice(0, 40) })}
-          className="h-9 w-36 rounded-lg border border-lab-borde/15 bg-lab-fondo px-2 text-sm font-medium text-white outline-none focus:border-lab-acento/50 sm:w-44"
+          className="h-9 w-36 rounded-lg border border-lab-borde/15 bg-lab-fondo px-2 text-sm font-medium text-lab-tinta outline-none focus:border-lab-acento/50 sm:w-44"
           aria-label="Nombre del robot"
         />
         <nav aria-label="Pasos" className="order-last flex w-full items-center gap-1 overflow-x-auto sm:order-none sm:w-auto">
@@ -232,20 +232,20 @@ export default function Taller() {
           <button onClick={guardarNube} disabled={guardando} className="lab-primario flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold disabled:opacity-50" title="Guardar en tu cuenta (Ctrl+S)">
             {guardando ? <Loader2 className="h-4 w-4 animate-spin" /> : <CloudUpload className="h-4 w-4" />} <span className="hidden md:inline">Guardar</span>
           </button>
-          <button onClick={() => setMisRobots(true)} className="flex h-9 items-center gap-1.5 rounded-lg border border-lab-borde/15 bg-lab-fondo px-3 text-sm hover:bg-white/5" title="Tus robots guardados">
+          <button onClick={() => setMisRobots(true)} className="flex h-9 items-center gap-1.5 rounded-lg border border-lab-borde/15 bg-lab-fondo px-3 text-sm hover:bg-lab-tinta/[0.04]" title="Tus robots guardados">
             <FolderOpen className="h-4 w-4" /> <span className="hidden lg:inline">Mis robots</span>
           </button>
-          <button onClick={() => setGaleria(true)} className="flex h-9 items-center gap-1.5 rounded-lg border border-lab-borde/15 bg-lab-fondo px-3 text-sm hover:bg-white/5" title="Robots prearmados o empezar de cero">
+          <button onClick={() => setGaleria(true)} className="flex h-9 items-center gap-1.5 rounded-lg border border-lab-borde/15 bg-lab-fondo px-3 text-sm hover:bg-lab-tinta/[0.04]" title="Robots prearmados o empezar de cero">
             <LayoutGrid className="h-4 w-4" /> <span className="hidden md:inline">Proyectos</span>
           </button>
-          <button onClick={exportar} className="flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 bg-lab-fondo hover:bg-white/5" title="Descargar proyecto (.json)"><Download className="h-4 w-4" /></button>
-          <button onClick={() => archivo.current?.click()} className="flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 bg-lab-fondo hover:bg-white/5" title="Abrir proyecto (.json)"><FileUp className="h-4 w-4" /></button>
+          <button onClick={exportar} className="flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 bg-lab-fondo hover:bg-lab-tinta/[0.04]" title="Descargar proyecto (.json)"><Download className="h-4 w-4" /></button>
+          <button onClick={() => archivo.current?.click()} className="flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 bg-lab-fondo hover:bg-lab-tinta/[0.04]" title="Abrir proyecto (.json)"><FileUp className="h-4 w-4" /></button>
           <input ref={archivo} type="file" accept="application/json,.json" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) importar(f); e.target.value = '' }} />
         </div>
       </div>
 
       {aviso && (
-        <div className={`border-b px-4 py-1.5 text-xs ${aviso.tipo === 'error' ? 'border-red-500/30 bg-red-500/10 text-red-300' : aviso.tipo === 'ok' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-sky-500/30 bg-sky-500/10 text-sky-300'}`}>
+        <div className={`border-b px-4 py-1.5 text-xs ${aviso.tipo === 'error' ? 'border-red-500/30 bg-red-500/10 text-red-700' : aviso.tipo === 'ok' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700' : 'border-sky-500/30 bg-sky-500/10 text-sky-700'}`}>
           {aviso.texto}
         </div>
       )}
@@ -282,11 +282,11 @@ export default function Taller() {
 
 function Modal({ titulo, onCerrar, children, ancho = 'max-w-3xl' }: { titulo: string; onCerrar: () => void; children: React.ReactNode; ancho?: string }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-4" onClick={onCerrar}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center sm:p-4" onClick={onCerrar}>
       <div className={`max-h-[90dvh] w-full ${ancho} overflow-y-auto rounded-t-2xl lab-vidrio p-4 sm:rounded-2xl sm:p-6`} onClick={e => e.stopPropagation()}>
         <div className="mb-4 flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold text-white">{titulo}</h2>
-          <button onClick={onCerrar} className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10" aria-label="Cerrar"><X className="h-5 w-5" /></button>
+          <h2 className="text-lg font-semibold text-lab-tinta">{titulo}</h2>
+          <button onClick={onCerrar} className="rounded-lg p-1.5 text-lab-suave hover:bg-lab-tinta/[0.07]" aria-label="Cerrar"><X className="h-5 w-5" /></button>
         </div>
         {children}
       </div>
@@ -298,7 +298,7 @@ type PlacaGaleria = 'arduino' | 'esp32' | 'pico' | 'mega'
 /** Placa de un proyecto de la galería, por su id ('rc-esp32', 'pico-perilla'…). */
 const placaDe = (id: string): PlacaGaleria => (id.includes('esp32') ? 'esp32' : id.startsWith('pico') ? 'pico' : id.startsWith('mega') ? 'mega' : 'arduino')
 
-const DIFICULTAD = { inicial: 'bg-emerald-500/15 text-emerald-300', intermedio: 'bg-amber-500/15 text-amber-300', avanzado: 'bg-red-500/15 text-red-300' }
+const DIFICULTAD = { inicial: 'bg-emerald-500/15 text-emerald-700', intermedio: 'bg-amber-500/15 text-amber-700', avanzado: 'bg-red-500/15 text-red-700' }
 
 function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | null) => void; onCerrar: () => void }) {
   const [categoria, setCategoria] = useState<'robot' | 'electronica'>('robot')
@@ -315,35 +315,35 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
       <div className="mb-3 flex flex-wrap items-center gap-3">
         <div className="flex overflow-hidden rounded-lg border border-lab-borde/20 text-sm">
           {([['robot', 'Robots', Bot], ['electronica', 'Electrónica', Lightbulb]] as const).map(([id, txt, I]) => (
-            <button key={id} onClick={() => setCategoria(id)} className={`flex items-center gap-1.5 px-3 py-1.5 font-medium ${categoria === id ? 'bg-lab-acento/20 text-lab-acento' : 'text-slate-300 hover:bg-white/5'}`}>
+            <button key={id} onClick={() => setCategoria(id)} className={`flex items-center gap-1.5 px-3 py-1.5 font-medium ${categoria === id ? 'bg-lab-acento/20 text-lab-acento' : 'text-lab-tinta2 hover:bg-lab-tinta/[0.04]'}`}>
               <I className="h-4 w-4" /> {txt}
             </button>
           ))}
         </div>
         <div className="flex gap-1.5">
           {([['todas', 'Todos'], ['arduino', 'Arduino'], ['esp32', 'ESP32'], ['pico', 'Raspberry Pi Pico'], ['mega', 'Mega']] as const).map(([id, txt]) => (
-            <button key={id} onClick={() => setPlaca(id)} className={`rounded-full px-3 py-1 text-xs font-medium ${placa === id ? 'lab-primario' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>{txt}</button>
+            <button key={id} onClick={() => setPlaca(id)} className={`rounded-full px-3 py-1 text-xs font-medium ${placa === id ? 'lab-primario' : 'bg-lab-tinta/[0.04] text-lab-tinta2 hover:bg-lab-tinta/[0.07]'}`}>{txt}</button>
           ))}
         </div>
       </div>
-      {lista.length === 0 && <p className="mb-3 text-sm text-slate-400">Todavía no hay proyectos de esta placa en esta sección.</p>}
+      {lista.length === 0 && <p className="mb-3 text-sm text-lab-suave">Todavía no hay proyectos de esta placa en esta sección.</p>}
       {grupos.map(g => (
       <section key={g.nombre} className="mb-5">
-      <h3 className="mb-2 text-sm font-semibold text-white">{g.nombre} <span className="font-normal text-slate-500">· {g.proyectos.length}</span></h3>
+      <h3 className="mb-2 text-sm font-semibold text-lab-tinta">{g.nombre} <span className="font-normal text-lab-tenue">· {g.proyectos.length}</span></h3>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {g.proyectos.map(p => (
-          <button key={p.id} onClick={() => onAbrir(p.construir(), p.id)} className="group rounded-xl border border-lab-borde/15 bg-white/[0.03] p-4 text-left transition hover:border-lab-acento/50 hover:bg-lab-acento/5">
+          <button key={p.id} onClick={() => onAbrir(p.construir(), p.id)} className="group rounded-xl border border-lab-borde/15 bg-lab-superficie p-4 text-left transition hover:border-lab-acento/50 hover:bg-lab-acento/5">
             <div className="mb-2 flex items-center justify-between">
               <Icono className="h-6 w-6 text-lab-acento" />
               <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${DIFICULTAD[p.dificultad]}`}>{p.dificultad}</span>
             </div>
-            <div className="font-semibold text-white">{p.nombre}</div>
+            <div className="font-semibold text-lab-tinta">{p.nombre}</div>
             {p.kit && <div className="mt-0.5 inline-block rounded bg-chaski-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-chaski-primary">{p.kit}</div>}
-            {p.tema && <div className="mt-0.5 text-[10px] text-slate-500">{p.tema}</div>}
-            <p className="mt-1 text-xs leading-relaxed text-slate-400">{p.descripcion}</p>
-            <div className="mt-2 rounded-lg bg-black/20 p-2">
-              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Cómo piensa</div>
-              <ol className="list-decimal space-y-0.5 pl-4 text-[11px] leading-snug text-slate-300">
+            {p.tema && <div className="mt-0.5 text-[10px] text-lab-tenue">{p.tema}</div>}
+            <p className="mt-1 text-xs leading-relaxed text-lab-suave">{p.descripcion}</p>
+            <div className="mt-2 rounded-lg bg-lab-fondo2 p-2">
+              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-lab-tenue">Cómo piensa</div>
+              <ol className="list-decimal space-y-0.5 pl-4 text-[11px] leading-snug text-lab-tinta2">
                 {p.logica.map((l, i) => <li key={i}>{l}</li>)}
               </ol>
             </div>
@@ -354,28 +354,28 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
       </section>
       ))}
       <div className="mt-5 border-t border-lab-borde/15 pt-4">
-        <div className="mb-2 text-sm font-semibold text-white">Empezar desde cero</div>
+        <div className="mb-2 text-sm font-semibold text-lab-tinta">Empezar desde cero</div>
         {categoria === 'electronica' ? (<>
-        <p className="mb-3 text-xs text-slate-400">Una protoboard con la placa al lado; después pincha LED, resistencias, pulsadores… desde el cajón «Componentes».</p>
+        <p className="mb-3 text-xs text-lab-suave">Una protoboard con la placa al lado; después pincha LED, resistencias, pulsadores… desde el cajón «Componentes».</p>
         <div className="grid gap-2 sm:grid-cols-3">
           {([
             ['arduino-uno', 'Protoboard + Arduino UNO', 'Como en el kit de 8vo'], ['arduino-nano', 'Protoboard + Arduino Nano', 'La misma placa, más chiquita'],
             ['esp32-devkit', 'Protoboard + ESP32', 'Trabaja con 3,3 V'], ['raspberry-pico', 'Protoboard + Raspberry Pi Pico', 'RP2040, 3,3 V, en C++'],
             ['arduino-mega', 'Protoboard + Arduino Mega', '54 pines y 16 analógicas'],
           ] as const).map(([placaId, n, d]) => (
-            <button key={placaId} onClick={() => onAbrir(bancoVacio(placaId, 'Mi circuito'), null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-white/[0.03]">
-              <div className="text-sm font-semibold text-white">{n}</div>
-              <div className="text-xs text-slate-400">{d}</div>
+            <button key={placaId} onClick={() => onAbrir(bancoVacio(placaId, 'Mi circuito'), null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-lab-superficie">
+              <div className="text-sm font-semibold text-lab-tinta">{n}</div>
+              <div className="text-xs text-lab-suave">{d}</div>
             </button>
           ))}
         </div>
         </>) : (<>
-        <p className="mb-3 text-xs text-slate-400">Elige el chasis; después arrastra las piezas desde el cajón.</p>
+        <p className="mb-3 text-xs text-lab-suave">Elige el chasis; después arrastra las piezas desde el cajón.</p>
         <div className="grid gap-2 sm:grid-cols-3">
           {[['chasis-2wd', 'Chasis 2WD', 'Dos ruedas y rueda loca: gira fácil'], ['chasis-4wd', 'Chasis 4WD', 'Cuatro ruedas: más fuerza y tracción'], ['chasis-minisumo', 'Chasis minisumo', '10 × 10 cm con pala: para competir en el dohyo']].map(([id, n, d]) => (
-            <button key={id} onClick={() => onAbrir({ ...robotVacio(id, id === 'chasis-minisumo' ? 'pla' : 'acrilico', 'Mi robot'), programa: { modo: 'bloques', bloques: PROGRAMA_VACIO, cpp: '' } }, null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-white/[0.03]">
-              <div className="text-sm font-semibold text-white">{n}</div>
-              <div className="text-xs text-slate-400">{d}</div>
+            <button key={id} onClick={() => onAbrir({ ...robotVacio(id, id === 'chasis-minisumo' ? 'pla' : 'acrilico', 'Mi robot'), programa: { modo: 'bloques', bloques: PROGRAMA_VACIO, cpp: '' } }, null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-lab-superficie">
+              <div className="text-sm font-semibold text-lab-tinta">{n}</div>
+              <div className="text-xs text-lab-suave">{d}</div>
             </button>
           ))}
         </div>
@@ -402,20 +402,20 @@ function ListaMateriales({ doc, onCerrar }: { doc: RobotDoc; onCerrar: () => voi
   return (
     <Modal titulo={`Lista de materiales · ${doc.nombre}`} onCerrar={onCerrar} ancho="max-w-xl">
       <table className="w-full text-sm">
-        <thead className="text-left text-xs text-slate-400"><tr><th className="py-1.5">Cant.</th><th>Pieza</th><th className="text-right">Peso</th></tr></thead>
+        <thead className="text-left text-xs text-lab-suave"><tr><th className="py-1.5">Cant.</th><th>Pieza</th><th className="text-right">Peso</th></tr></thead>
         <tbody>
           {filas.map(f => (
             <tr key={f.nombre} className="border-t border-lab-borde/10">
-              <td className="py-1.5 font-mono text-white">{f.cantidad}×</td>
-              <td className="text-slate-200">{f.nombre}{f.enKits && <span className="ml-2 rounded bg-chaski-primary/15 px-1 py-0.5 text-[9px] font-bold uppercase text-chaski-primary">En kits</span>}</td>
-              <td className="text-right font-mono text-slate-400">{(f.cantidad * f.masa).toFixed(0)} g</td>
+              <td className="py-1.5 font-mono text-lab-tinta">{f.cantidad}×</td>
+              <td className="text-lab-tinta">{f.nombre}{f.enKits && <span className="ml-2 rounded bg-chaski-primary/15 px-1 py-0.5 text-[9px] font-bold uppercase text-chaski-primary">En kits</span>}</td>
+              <td className="text-right font-mono text-lab-suave">{(f.cantidad * f.masa).toFixed(0)} g</td>
             </tr>
           ))}
-          <tr className="border-t border-lab-borde/15 font-semibold"><td /><td className="py-2 text-white">Total</td><td className="text-right font-mono text-white">{total.toFixed(0)} g</td></tr>
+          <tr className="border-t border-lab-borde/15 font-semibold"><td /><td className="py-2 text-lab-tinta">Total</td><td className="text-right font-mono text-lab-tinta">{total.toFixed(0)} g</td></tr>
         </tbody>
       </table>
-      <p className="mt-2 text-xs text-slate-500">Más los cables Dupont: {doc.cables.length} conexiones.</p>
-      <button onClick={() => window.print()} className="mt-4 flex items-center gap-2 rounded-lg border border-lab-borde/15 px-3 py-2 text-sm hover:bg-white/5"><Printer className="h-4 w-4" /> Imprimir</button>
+      <p className="mt-2 text-xs text-lab-tenue">Más los cables Dupont: {doc.cables.length} conexiones.</p>
+      <button onClick={() => window.print()} className="mt-4 flex items-center gap-2 rounded-lg border border-lab-borde/15 px-3 py-2 text-sm hover:bg-lab-tinta/[0.04]"><Printer className="h-4 w-4" /> Imprimir</button>
     </Modal>
   )
 }

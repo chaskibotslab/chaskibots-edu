@@ -22,7 +22,7 @@ import type { NivelCalidad } from '../calidad'
 
 const EscenaTaller = dynamic(() => import('../Escena3D').then(m => m.EscenaTaller), {
   ssr: false,
-  loading: () => <div className="flex h-full items-center justify-center gap-2 text-sm text-slate-400"><Loader2 className="h-5 w-5 animate-spin" /> Preparando el taller…</div>,
+  loading: () => <div className="flex h-full items-center justify-center gap-2 text-sm text-lab-suave"><Loader2 className="h-5 w-5 animate-spin" /> Preparando el taller…</div>,
 })
 
 const ICONO_FAMILIA: Record<Familia, string> = { chasis: '🛠️', placa: '🧠', movimiento: '⚙️', servo: '🦾', sensor: '👁️', electronica: '🔋', circuito: '💡' }
@@ -173,7 +173,7 @@ export default function Armar(p: Props) {
     <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row">
       {/* ---------- Cajón de piezas ---------- */}
       <aside className={`order-2 lab-panel flex flex-col border-lab-borde/15 lg:order-1 lg:w-72 lg:border-r ${cajonAbierto ? 'max-h-[44vh] lg:max-h-none' : ''}`}>
-        <button onClick={() => setCajonAbierto(a => !a)} className="flex items-center justify-between border-b border-lab-borde/15 px-3 py-2 text-sm font-semibold text-white lg:pointer-events-none">
+        <button onClick={() => setCajonAbierto(a => !a)} className="flex items-center justify-between border-b border-lab-borde/15 px-3 py-2 text-sm font-semibold text-lab-tinta lg:pointer-events-none">
           <span className="flex items-center gap-2"><span className="lab-primario flex h-6 w-6 items-center justify-center rounded-md"><Boxes className="h-3.5 w-3.5" /></span> Cajón de piezas</span>
           <span className="lg:hidden">{cajonAbierto ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}</span>
         </button>
@@ -195,15 +195,15 @@ export default function Armar(p: Props) {
                 {doc.piezas.filter(p => p.padre).map(p => (
                   <li key={p.id} data-fam={pieza(p.pieza).familia} data-elegida={seleccion === p.id} className="lab-fam lab-tarjeta flex items-center gap-2 rounded-lg py-1.5 pl-3 pr-2 text-xs">
                     <button onClick={() => { setSeleccion(p.id); setElegida(null) }} className="min-w-0 flex-1 text-left">
-                      <div className="truncate font-medium text-white">{p.etiqueta}</div>
-                      <div className="truncate text-[10px] text-slate-500">{pieza(p.pieza).nombre}</div>
+                      <div className="truncate font-medium text-lab-tinta">{p.etiqueta}</div>
+                      <div className="truncate text-[10px] text-lab-tenue">{pieza(p.pieza).nombre}</div>
                     </button>
-                    <button onClick={() => quitarPieza(p.id)} className="rounded-md p-1.5 text-red-300 hover:bg-red-500/15" title={`Quitar ${p.etiqueta}`} aria-label={`Quitar ${p.etiqueta}`}>
+                    <button onClick={() => quitarPieza(p.id)} className="rounded-md p-1.5 text-red-700 hover:bg-red-500/15" title={`Quitar ${p.etiqueta}`} aria-label={`Quitar ${p.etiqueta}`}>
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </li>
                 ))}
-                <li className="px-1 pt-1 text-[10px] leading-snug text-slate-500">Para cambiar el chasis, elige otro en la pestaña «Chasis». Ctrl+Z deshace.</li>
+                <li className="px-1 pt-1 text-[10px] leading-snug text-lab-tenue">Para cambiar el chasis, elige otro en la pestaña «Chasis». Ctrl+Z deshace.</li>
               </ul>
             ) : (
             <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 gap-2 overflow-y-auto p-2 sm:grid-cols-3 lg:grid-cols-1">
@@ -252,20 +252,20 @@ export default function Armar(p: Props) {
 
         {/* Datos en vivo */}
         <div className="pointer-events-none absolute right-2 top-2 w-48 rounded-xl lab-vidrio p-2.5 text-xs backdrop-blur sm:w-56">
-          <div className="mb-1.5 flex items-center gap-1.5 font-semibold text-white"><Scale className="h-3.5 w-3.5 text-lab-acento" /> {doc.nombre}</div>
+          <div className="mb-1.5 flex items-center gap-1.5 font-semibold text-lab-tinta"><Scale className="h-3.5 w-3.5 text-lab-acento" /> {doc.nombre}</div>
           <Dato k="Peso" v={`${res.masa_g.toFixed(0)} g`} />
           <Dato k="Medidas" v={`${(res.medidas.largo / 10).toFixed(1)} × ${(res.medidas.ancho / 10).toFixed(1)} × ${(res.medidas.alto / 10).toFixed(1)} cm`} />
           <Dato k="Centro de gravedad" v={`${res.cg.x >= 0 ? '+' : ''}${res.cg.x.toFixed(0)} mm ${res.cg.x >= 0 ? 'adelante' : 'atrás'}`} />
           <Dato k="Piezas" v={String(res.piezas)} />
           {avisos.map((a, i) => (
-            <div key={i} className="mt-1.5 flex gap-1 rounded-md bg-amber-500/15 px-1.5 py-1 text-[11px] leading-snug text-amber-200"><AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" /> {a}</div>
+            <div key={i} className="mt-1.5 flex gap-1 rounded-md bg-amber-500/15 px-1.5 py-1 text-[11px] leading-snug text-amber-700"><AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" /> {a}</div>
           ))}
         </div>
 
         {elegida && !arrastre?.iniciado && (
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-emerald-400/30 bg-black/70 px-3 py-1.5 text-xs text-emerald-200 backdrop-blur">
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-emerald-400/30 bg-lab-superficie/95 px-3 py-1.5 text-xs text-emerald-700 backdrop-blur">
             {marcadores.length ? <>Toca un punto verde para poner <b>{pieza(elegida).nombre}</b></> : <>No hay lugar libre para <b>{pieza(elegida).nombre}</b></>}
-            <button onClick={() => setElegida(null)} className="rounded-full p-0.5 hover:bg-white/10"><X className="h-3.5 w-3.5" /></button>
+            <button onClick={() => setElegida(null)} className="rounded-full p-0.5 hover:bg-lab-tinta/[0.07]"><X className="h-3.5 w-3.5" /></button>
           </div>
         )}
       </div>
@@ -283,7 +283,7 @@ export default function Armar(p: Props) {
 
       {/* Pieza que se está arrastrando */}
       {arrastre?.iniciado && (
-        <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-emerald-400/60 bg-lab-superficie/90 px-2.5 py-1.5 text-xs font-medium text-white shadow-xl" style={{ left: arrastre.x, top: arrastre.y }}>
+        <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-emerald-400/60 bg-lab-superficie/90 px-2.5 py-1.5 text-xs font-medium text-lab-tinta shadow-xl" style={{ left: arrastre.x, top: arrastre.y }}>
           {pieza(arrastre.pieza).nombre}
         </div>
       )}
@@ -293,14 +293,14 @@ export default function Armar(p: Props) {
 
 function BotonIcono({ titulo, onClick, disabled, activo, children }: { titulo: string; onClick: () => void; disabled?: boolean; activo?: boolean; children: React.ReactNode }) {
   return (
-    <button title={titulo} aria-label={titulo} onClick={onClick} disabled={disabled} className={`flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 backdrop-blur transition disabled:opacity-35 ${activo ? 'bg-lab-acento/25 text-lab-acento shadow-[0_0_14px_-4px] shadow-lab-acento' : 'bg-lab-superficie/75 text-slate-200 hover:bg-lab-elevado'}`}>
+    <button title={titulo} aria-label={titulo} onClick={onClick} disabled={disabled} className={`flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 backdrop-blur transition disabled:opacity-35 ${activo ? 'bg-lab-acento/25 text-lab-acento shadow-[0_0_14px_-4px] shadow-lab-acento' : 'bg-lab-superficie/75 text-lab-tinta hover:bg-lab-elevado'}`}>
       {children}
     </button>
   )
 }
 
 function Dato({ k, v }: { k: string; v: string }) {
-  return <div className="flex justify-between gap-2 py-0.5"><span className="text-slate-400">{k}</span><span className="text-right font-mono text-white">{v}</span></div>
+  return <div className="flex justify-between gap-2 py-0.5"><span className="text-lab-suave">{k}</span><span className="text-right font-mono text-lab-tinta">{v}</span></div>
 }
 
 function TarjetaPieza({ def, elegida, enUso, onTocar, onArrastrar }: { def: PiezaDef; elegida: boolean; enUso: boolean; onTocar: () => void; onArrastrar: (x: number, y: number) => void }) {
@@ -310,18 +310,18 @@ function TarjetaPieza({ def, elegida, enUso, onTocar, onArrastrar }: { def: Piez
       onPointerDown={e => { if (e.button === 0 && !def.proximamente) onArrastrar(e.clientX, e.clientY) }}
       data-fam={def.familia}
       data-elegida={elegida}
-      className={`lab-fam touch-none select-none rounded-xl p-2 pl-3 text-left ${def.proximamente ? 'rounded-xl border border-dashed border-lab-borde/15 bg-white/[0.02] opacity-60' : 'lab-tarjeta'}`}
+      className={`lab-fam touch-none select-none rounded-xl p-2 pl-3 text-left ${def.proximamente ? 'rounded-xl border border-dashed border-lab-borde/15 bg-lab-superficie opacity-60' : 'lab-tarjeta'}`}
     >
       <div className="flex items-start justify-between gap-1">
-        <span className="text-xs font-semibold leading-tight text-white">{def.nombre}</span>
+        <span className="text-xs font-semibold leading-tight text-lab-tinta">{def.nombre}</span>
         {def.proximamente
-          ? <span className="shrink-0 rounded bg-sky-500/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-sky-300">Próximamente</span>
+          ? <span className="shrink-0 rounded bg-sky-500/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-sky-700">Próximamente</span>
           : def.enKits && <span className="shrink-0 rounded bg-chaski-primary/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-chaski-primary">En kits</span>}
       </div>
-      <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-slate-400">{def.descripcion}</p>
-      <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-500">
+      <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-lab-suave">{def.descripcion}</p>
+      <div className="mt-1 flex items-center gap-2 text-[10px] text-lab-tenue">
         <span className="lab-dato font-mono">{def.masa_g} g</span>
-        {enUso && <span className="text-emerald-400">● en el robot</span>}
+        {enUso && <span className="text-emerald-600">● en el robot</span>}
       </div>
     </button>
   )
@@ -348,16 +348,16 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
     <aside className="absolute inset-x-0 bottom-0 z-20 max-h-[60vh] overflow-y-auto rounded-t-2xl border-t border-lab-borde/15 bg-lab-superficie/95 p-3 shadow-2xl backdrop-blur lg:static lab-panel lg:order-3 lg:max-h-none lg:w-80 lg:rounded-none lg:border-l lg:border-t-0">
       <div className="mb-2 flex items-start justify-between gap-2">
         <div>
-          <div className="text-[11px] uppercase tracking-wide text-slate-500">{inst.etiqueta}</div>
-          <h3 className="text-sm font-semibold text-white">{v.nombre}</h3>
+          <div className="text-[11px] uppercase tracking-wide text-lab-tenue">{inst.etiqueta}</div>
+          <h3 className="text-sm font-semibold text-lab-tinta">{v.nombre}</h3>
         </div>
-        <button onClick={onCerrar} className="rounded-lg p-1 text-slate-400 hover:bg-white/10" aria-label="Cerrar"><X className="h-4 w-4" /></button>
+        <button onClick={onCerrar} className="rounded-lg p-1 text-lab-suave hover:bg-lab-tinta/[0.07]" aria-label="Cerrar"><X className="h-4 w-4" /></button>
       </div>
-      <p className="mb-2 text-xs leading-relaxed text-slate-300">{def.descripcion}</p>
+      <p className="mb-2 text-xs leading-relaxed text-lab-tinta2">{def.descripcion}</p>
       {def.enKits && <div className="mb-2 inline-block rounded bg-chaski-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-chaski-primary">Viene en los kits ChaskiBots</div>}
       {credito && (
-        <p className="mb-2 text-[10px] leading-snug text-slate-500">
-          Modelo 3D: <a href={credito.fuente} target="_blank" rel="noreferrer" className="underline hover:text-slate-300">«{credito.titulo}»</a> de {credito.autor.replace(/ (.*)$/, '')} · {credito.licencia.replace(/ (.*)$/, '')}
+        <p className="mb-2 text-[10px] leading-snug text-lab-tenue">
+          Modelo 3D: <a href={credito.fuente} target="_blank" rel="noreferrer" className="underline hover:text-lab-tinta2">«{credito.titulo}»</a> de {credito.autor.replace(/ (.*)$/, '')} · {credito.licencia.replace(/ (.*)$/, '')}
         </p>
       )}
 
@@ -365,7 +365,7 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
         <table className="mb-3 w-full text-xs">
           <tbody>
             {[['Peso', `${v.masa_g} g`] as [string, string], ...def.datos].map(([k, val]) => (
-              <tr key={k} className="border-b border-lab-borde/10"><td className="py-1 pr-2 text-slate-400">{k}</td><td className="py-1 text-right text-slate-100">{val}</td></tr>
+              <tr key={k} className="border-b border-lab-borde/10"><td className="py-1 pr-2 text-lab-suave">{k}</td><td className="py-1 text-right text-lab-tinta">{val}</td></tr>
             ))}
           </tbody>
         </table>
@@ -373,12 +373,12 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
 
       {def.variantes && (
         <div className="mb-3">
-          <div className="mb-1 text-[11px] font-semibold text-slate-400">Material</div>
+          <div className="mb-1 text-[11px] font-semibold text-lab-suave">Material</div>
           <div className="grid grid-cols-2 gap-1.5">
             {def.variantes.map(x => (
-              <button key={x.id} onClick={() => cambiar(cambiarVariante(doc, id, x.id), `Material: ${x.nombre}`)} className={`flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-left text-[11px] ${(inst.variante ?? def.variantes![0].id) === x.id ? 'border-lab-acento/60 bg-lab-acento/10 text-white' : 'border-lab-borde/15 text-slate-300 hover:bg-white/5'}`}>
+              <button key={x.id} onClick={() => cambiar(cambiarVariante(doc, id, x.id), `Material: ${x.nombre}`)} className={`flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-left text-[11px] ${(inst.variante ?? def.variantes![0].id) === x.id ? 'border-lab-acento/60 bg-lab-acento/10 text-lab-tinta' : 'border-lab-borde/15 text-lab-tinta2 hover:bg-lab-tinta/[0.04]'}`}>
                 <span className="h-3 w-3 shrink-0 rounded-full border border-lab-borde/25" style={{ background: x.color }} />
-                <span>{x.nombre}<span className="block text-slate-500">{x.masa_g} g</span></span>
+                <span>{x.nombre}<span className="block text-lab-tenue">{x.masa_g} g</span></span>
               </button>
             ))}
           </div>
@@ -387,11 +387,11 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
 
       {alternativas.length > 0 && (
         <div className="mb-3">
-          <div className="mb-1 text-[11px] font-semibold text-slate-400">Cambiar por</div>
+          <div className="mb-1 text-[11px] font-semibold text-lab-suave">Cambiar por</div>
           <div className="flex flex-col gap-1">
             {alternativas.map(a => (
-              <button key={a.id} onClick={() => reemplazarPor(a.id)} className="flex items-center justify-between rounded-lg border border-lab-borde/15 px-2 py-1.5 text-left text-xs text-slate-200 hover:bg-white/5">
-                <span>{a.nombre}</span><span className="text-[10px] text-slate-500">{a.masa_g} g</span>
+              <button key={a.id} onClick={() => reemplazarPor(a.id)} className="flex items-center justify-between rounded-lg border border-lab-borde/15 px-2 py-1.5 text-left text-xs text-lab-tinta hover:bg-lab-tinta/[0.04]">
+                <span>{a.nombre}</span><span className="text-[10px] text-lab-tenue">{a.masa_g} g</span>
               </button>
             ))}
           </div>
@@ -400,7 +400,7 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
 
       <div className="flex gap-2">
         {mt?.rotacionesPermitidas && mt.rotacionesPermitidas.length > 1 && (
-          <button onClick={() => cambiar(girar(doc, id), `Girar ${inst.etiqueta}`)} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-lab-borde/15 py-2 text-xs hover:bg-white/5"><RotateCw className="h-3.5 w-3.5" /> Girar</button>
+          <button onClick={() => cambiar(girar(doc, id), `Girar ${inst.etiqueta}`)} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-lab-borde/15 py-2 text-xs hover:bg-lab-tinta/[0.04]"><RotateCw className="h-3.5 w-3.5" /> Girar</button>
         )}
         {inst.padre && (
           <button
@@ -409,13 +409,13 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
               cambiar(quitar(doc, id), `Quitar ${inst.etiqueta}`)
               onCerrar()
             }}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-500/30 py-2 text-xs text-red-300 hover:bg-red-500/10"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-500/30 py-2 text-xs text-red-700 hover:bg-red-500/10"
           >
             <Trash2 className="h-3.5 w-3.5" /> Quitar
           </button>
         )}
       </div>
-      {!inst.padre && <p className="mt-2 flex gap-1 text-[11px] text-slate-500"><Info className="h-3 w-3 shrink-0" /> El chasis es la base: se cambia, no se quita.</p>}
+      {!inst.padre && <p className="mt-2 flex gap-1 text-[11px] text-lab-tenue"><Info className="h-3 w-3 shrink-0" /> El chasis es la base: se cambia, no se quita.</p>}
     </aside>
   )
 }
