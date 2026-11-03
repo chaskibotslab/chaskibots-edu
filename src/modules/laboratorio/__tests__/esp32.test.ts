@@ -62,6 +62,7 @@ describe('ESP32 simulado (capa ESP32 sobre ATmega2560)', () => {
     expect(ok.error).toBeUndefined()
     expect(ok.codigo).toContain('#line 1 "sketch.ino"')
     expect(ok.codigo).toContain('// #include <WiFi.h>  (lo provee el simulador)')
-    expect(prepararSketchEsp32('#include <WebServer.h>\nvoid setup(){}').error).toMatch(/WebServer/)
+    expect(prepararSketchEsp32('#include <WebServer.h>\nvoid setup(){}').error).toBeUndefined()
+    expect(prepararSketchEsp32('#include <ESPAsyncWebServer.h>\nvoid setup(){}').error).toMatch(/ESPAsyncWebServer/)
   })
 })

@@ -53,7 +53,8 @@ export interface PlanCircuito {
   /** Cantidad de nodos (el 0 es tierra). */
   n: number
   vLogica: number
-  fuentes: { nodo: number; v: number }[]
+  /** `pila`: batería o fuente MB102 (se puede desconectar); si no, una salida de la placa. */
+  fuentes: { nodo: number; v: number; pila?: boolean }[]
   /** Pines de señal de la placa que tocan el circuito. */
   pines: { pin: string; nodo: number }[]
   elementos: Elemento[]
@@ -67,6 +68,8 @@ export interface ControlesCircuito {
   perillas: Record<string, number>
   /** Mano delante del (primer) sensor ultrasónico de la mesa: distancia en cm; sin valor = no hay mano. */
   mano?: number | null
+  /** La pila (o la fuente) desconectada: un circuito sin placa empieza así y se enciende con «Encender». */
+  pilaApagada?: boolean
 }
 
 /** Distancias que se pueden elegir para la mano (cm). */
@@ -84,6 +87,8 @@ export interface EstadoCircuito {
   entradas: Record<string, [boolean, boolean]>
   analog: Record<string, number>
   avisos: string[]
+  /** La pila o la fuente está desconectada (el LED de la fuente MB102 se apaga). */
+  apagada: boolean
 }
 
 export const PERILLA_INICIAL = 0.5
@@ -156,7 +161,7 @@ export function planCircuito(doc: RobotDoc): PlanCircuito | null {
         const v = datosPlaca(c.placa).fuentes[pin.nombre]
         if (v !== undefined) fuentes.push({ nodo: nd, v })
         else if (pin.tipo !== 'alim' && p.id === mcu?.id) pines.push({ pin: pin.nombre, nodo: nd })
-      } else if (c.tipo === 'bateria' && pin.nombre === '+') fuentes.push({ nodo: nd, v: c.voltaje })
+      } else if (c.tipo === 'bateria' && pin.nombre === '+') fuentes.push({ nodo: nd, v: c.voltaje, pila: true })
     }
   }
 
@@ -228,7 +233,7 @@ export function resolverCircuito(
     }
     const fuente = (a: number, v: number, g: number) => { G[a * n + a] += g; I[a] += g * v }
     for (let i = 1; i < n; i++) G[i * n + i] += G_FUGA
-    for (const f of plan.fuentes) fuente(f.nodo, f.v, G_FUENTE)
+    for (const f of plan.fuentes) if (!(f.pila && controles.pilaApagada)) fuente(f.nodo, f.v, G_FUENTE)
     for (const p of plan.pines) {
       // Sin informe todavía (antes del primer paso) el pin es una entrada, como al encender.
       const r = pines?.[p.pin]
@@ -281,7 +286,7 @@ export function resolverCircuito(
   const alto = calcular(p => (p.duty > 0.02 ? 1 : 0))
   const bajo = hayPwm ? calcular(p => (p.duty >= 0.98 ? 1 : 0)) : alto
 
-  const estado: EstadoCircuito = { leds: {}, quemados: [], sonidos: [], digital: {}, entradas: {}, analog: {}, avisos: [] }
+  const estado: EstadoCircuito = { leds: {}, quemados: [], sonidos: [], digital: {}, entradas: {}, analog: {}, avisos: [], apagada: !!controles.pilaApagada }
 
   // Entradas de la placa: nivel lógico (con y sin pull-up) y voltaje (analogRead).
   // También antes del primer paso: el programa lee los pines apenas arranca.

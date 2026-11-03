@@ -14,7 +14,7 @@ const NEGRO = '#111827'
 const ROJO = '#ef4444'
 const GRIS = '#94a3b8'
 
-class Banco {
+export class Banco {
   doc: RobotDoc
   constructor(nombre: string, placa = 'arduino-uno') { this.doc = bancoVacio(placa, nombre) }
   /** Pincha un componente en un hueco (1–8 arriba de la canaleta, 9–16 abajo). */
@@ -1194,7 +1194,7 @@ export function plantillasCircuito(doc: RobotDoc, tabla: FilaPin[]): PlantillaCo
 const KIT_8VO = 'Kit 8vo EGB · Semáforo'
 const KIT_9NO = 'Kit 9no EGB · Basurero'
 
-const conPlantillas = (principal: { id: string; nombre: string; descripcion: string; codigo: string }[]) =>
+export const conPlantillas = (principal: { id: string; nombre: string; descripcion: string; codigo: string }[]) =>
   (doc: RobotDoc, tabla: FilaPin[]) => [...principal, ...plantillasCircuito(doc, tabla).filter(p => !principal.some(x => x.id === p.id))]
 
 export const PROYECTOS_CIRCUITO: Prearmado[] = [

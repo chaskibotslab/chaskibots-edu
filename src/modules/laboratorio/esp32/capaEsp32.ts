@@ -11,7 +11,8 @@
 //     cualquier pin; aquí se avisan al simulador por los registros GPIOR
 //     (ver engine/avrRunner.ts), así se miden exactos en cualquier pin.
 //   - BluetoothSerial usa el mismo canal que Serial (el monitor y el control
-//     remoto en pantalla); WiFi está simulado (siempre «conectado»).
+//     remoto en pantalla); WiFi está simulado (siempre «conectado») y
+//     WebServer recibe las letras del control como visitas a "/<letra>".
 // Límite conocido: en el AVR, `int` es de 16 bits (en el ESP32, 32).
 
 /**
@@ -138,16 +139,47 @@ class CbWiFi {
 };
 static CbWiFi WiFi;
 
+// WebServer simulado: no hay celular que abra la página del robot, así que cada
+// letra del control remoto llega como una visita a "/<letra>" (por ejemplo "/F").
+class WebServer {
+ public:
+  WebServer(int = 80) {}
+  void begin() {}
+  void on(const char* ruta, void (*f)()) { if (_n < 20) { _rutas[_n] = ruta; _fns[_n++] = f; } }
+  void onNotFound(void (*f)()) { _nf = f; }
+  void handleClient() {
+    while (Serial.available()) {
+      int c = Serial.read();
+      if (c == '\n' || c == '\r') continue;
+      _uri[0] = '/'; _uri[1] = (char)c; _uri[2] = 0;
+      bool hecho = false;
+      for (uint8_t i = 0; i < _n && !hecho; i++) if (strcmp(_rutas[i], _uri) == 0) { _fns[i](); hecho = true; }
+      if (!hecho && _nf) _nf();
+    }
+  }
+  void send(int, const char* = "", const char* = "") {}
+  void send(int, const char*, const String&) {}
+  String uri() { return String(_uri); }
+  String arg(const char*) { return String(""); }
+  bool hasArg(const char*) { return false; }
+ private:
+  const char* _rutas[20];
+  void (*_fns[20])();
+  void (*_nf)() = nullptr;
+  uint8_t _n = 0;
+  char _uri[3] = "/";
+};
+
 static inline uint16_t touchRead(uint8_t) { return 60; }
 static inline uint32_t esp_random() { return ((uint32_t)random(0x7FFF) << 16) | random(0xFFFF); }
 // ===== Fin de la capa ESP32 =====
 `
 
 /** Librerías del ESP32 que la capa ya reemplaza (se quitan del sketch). */
-const REEMPLAZADAS = ['ESP32Servo.h', 'ESP32_Servo.h', 'Servo.h', 'WiFi.h', 'BluetoothSerial.h', 'analogWrite.h']
+const REEMPLAZADAS = ['ESP32Servo.h', 'ESP32_Servo.h', 'Servo.h', 'WiFi.h', 'BluetoothSerial.h', 'WebServer.h', 'analogWrite.h']
 
 /** Librerías del ESP32 que el simulador no tiene: error claro en español. */
-const NO_DISPONIBLES = ['WebServer.h', 'ESPAsyncWebServer.h', 'HTTPClient.h', 'PubSubClient.h', 'Preferences.h', 'SPIFFS.h', 'esp_now.h', 'BLEDevice.h', 'ArduinoJson.h']
+const NO_DISPONIBLES = ['ESPAsyncWebServer.h', 'HTTPClient.h', 'PubSubClient.h', 'Preferences.h', 'SPIFFS.h', 'esp_now.h', 'BLEDevice.h', 'ArduinoJson.h']
 
 export interface SketchEsp32 { codigo: string; error?: string }
 

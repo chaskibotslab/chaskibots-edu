@@ -38,6 +38,8 @@ export const ARDUINO_UNO: PiezaDef = {
   masa_g: 25,
   material: 'pcb',
   colisionadores: [{ forma: 'caja', medidas: [68.6, 12, 53.4], centro: [0, 6, 0] }],
+  // El modelo real con su USB y su conector de alimentación (medido del GLB).
+  huella: [{ forma: 'caja', medidas: [75.7, 12, 59.2], centro: [0, 6, -2.8] }],
   montajes: [],
   encaja: ['placa'],
   pines: pinesUno,
@@ -56,6 +58,7 @@ export const ARDUINO_NANO: PiezaDef = {
   masa_g: 7,
   material: 'pcb',
   colisionadores: [{ forma: 'caja', medidas: [45, 8, 18], centro: [0, 4, 0] }],
+  huella: [{ forma: 'caja', medidas: [48, 8, 18], centro: [-1.5, 4, 0] }], // con el mini USB
   montajes: [],
   encaja: ['placa'],
   pines: [
@@ -94,6 +97,7 @@ export const ARDUINO_MEGA: PiezaDef = {
   masa_g: 37,
   material: 'pcb',
   colisionadores: [{ forma: 'caja', medidas: [53.3, 12, 101.6], centro: [0, 6, 0] }],
+  huella: [{ forma: 'caja', medidas: [53.3, 12, 104.8], centro: [0, 6, -1.6] }], // con el USB-B
   montajes: [],
   encaja: ['placa'],
   pines: pinesMega,
