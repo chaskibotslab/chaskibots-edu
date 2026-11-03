@@ -102,6 +102,34 @@ export function laberinto(): ArenaDef {
   }
 }
 
+/**
+ * Sala con polvo para el robot aspirador (3 × 2,2 m): sofá, mueble de la tele,
+ * maceta, y las patas de una mesa y de una silla, por donde el robot puede pasar.
+ */
+export function sala(): ArenaDef {
+  const patas = (id: string, cx: number, cz: number, dx: number, dz: number, radio: number, color: string): ObjetoArena[] =>
+    [[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([sx, sz], i) => ({
+      id: `${id}-${i + 1}`, forma: 'cilindro', medidas: [radio, 0.4, radio], x: cx + sx * dx, z: cz + sz * dz, color, material: 'mdf',
+    }))
+  return {
+    id: 'sala',
+    nombre: 'Sala con polvo',
+    descripcion: 'Una sala con muebles y el piso sucio. El robot aspirador limpia por donde pasa: ¿cuánto logra limpiar?',
+    ancho: 3, largo: 2.2,
+    piso: { material: 'mdf', color: '#b08a5a', reflectancia: 0.6 },
+    objetos: [
+      { id: 'sofa', forma: 'caja', medidas: [0.9, 0.35, 0.35], x: 0, z: -0.9, color: '#475569', material: 'mdf' },
+      { id: 'mueble-tv', forma: 'caja', medidas: [0.7, 0.45, 0.25], x: 0.1, z: 0.95, color: '#78350f', material: 'mdf' },
+      { id: 'maceta', forma: 'cilindro', medidas: [0.12, 0.3, 0.12], x: 1.25, z: -0.8, color: '#c2410c', material: 'pla' },
+      ...patas('mesa', 0, 0.05, 0.4, 0.2, 0.02, '#92400e'),
+      ...patas('silla', -1, -0.6, 0.175, 0.175, 0.015, '#57534e'),
+    ],
+    paredes: true,
+    limpieza: { celda: 0.05 },
+    inicio: { x: -1.2, z: 0.6, yaw: 0 },
+  }
+}
+
 /** Mesa de 1,2 × 0,8 m a 75 cm del suelo: el robot no debe caerse. */
 export function mesa(): ArenaDef {
   return {
@@ -134,7 +162,7 @@ export function mesaElectronica(): ArenaDef {
 }
 
 export function listaArenas(): ArenaDef[] {
-  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), mesa(), dohyo('minisumo'), dohyo('sumo'), mesaElectronica()]
+  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), mesaElectronica()]
 }
 
 export function arena(id: string): ArenaDef {

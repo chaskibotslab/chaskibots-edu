@@ -10,6 +10,7 @@ import { construirMinisumo } from '../robots/prearmados'
 import type { RobotDoc } from '../robots/doc'
 import { AvrRunner, CPU_FREQ_HZ, type StepResult } from './avrRunner'
 import { Competencia, type NivelRival } from './competencia'
+import { Limpieza } from './limpieza'
 import { Mundo, type Gravedad } from './fisica/mundo'
 import { Reloj, RobotFisico } from './fisica/robotFisico'
 import { Ultrasonidos } from './hcsr04'
@@ -25,6 +26,8 @@ export class SimSincrona {
   readonly doc: RobotDoc
   /** Combate de sumo (solo en arenas de competencia y si se pide un rival). */
   readonly competencia: Competencia | null
+  /** Polvo de la sala (solo en la arena del robot aspirador). */
+  readonly limpieza: Limpieza | null
   avr: AvrRunner | null
   private us: Ultrasonidos | null
   private readonly hex: string | undefined
@@ -52,6 +55,7 @@ export class SimSincrona {
     this.competencia = arena.competencia && opciones.rival
       ? new Competencia(this.mundo, arena, this.robot, construirMinisumo('pla-rojo', 'Rival'), opciones.rival, this.reflectancia)
       : null
+    this.limpieza = arena.limpieza ? new Limpieza(arena) : null
     this.encender()
     this.competencia?.empezar()
   }
@@ -83,6 +87,7 @@ export class SimSincrona {
     this.competencia?.antes()
     this.reloj.avanzar(this.mundo, [this.robot, ...(this.competencia?.robots ?? [])], dtReal)
     if (this.competencia?.despues(dtReal) === 'nueva-ronda') this.encender()
+    if (this.limpieza) { const p = this.robot.pose().pos; this.limpieza.barrer(p.x, p.z) }
     this.tiempo += dtReal
   }
 

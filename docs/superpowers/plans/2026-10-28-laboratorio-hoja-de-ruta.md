@@ -16,6 +16,7 @@ Cada fase se publica funcionando, con sus pruebas, antes de empezar la siguiente
 
 ## F5, por pasos
 
+0. **Minisumo RC y placas que caben** (2026-10-30): prearmado «Minisumo RC» (ESP32, chasis de aluminio como lastre) manejado con teclado; plantilla RC para cualquier robot con driver; ninguna placa, driver o batería puede chocar o salirse de su base, tampoco al cambiarla por otra.
 1. **F5.1 Minisumo** (hecho): chasis 10 × 10 cm con pala de acero (colisionador inclinado y de poca fricción), micromotor N20, rueda de silicona de 34 mm, LiPo 2S; dohyo de 77 cm (negro con borde blanco, elevado); rival de práctica en 3 niveles (quieto, empujador, cazador) con las mismas piezas y física, cerebro en TypeScript; juez (`engine/competencia.ts`): 5 s de espera con salida en falso, fuera del dohyo, tiempo de ronda, 2 de 3 con salidas frente a frente / de costado / de espaldas; revisión de reglamento (medidas y peso); prearmado «Minisumo» (Nano + TB6612) con su programa; prueba de lazo cerrado: gana 2-0 al rival quieto.
 2. **F5.2 Sumo** (dohyo de 154 cm ya creado): chasis y rival de 20 × 20 cm / 3 kg.
 3. **F5.3 Repeticiones**: grabar las poses de cada robot y volver a ver el combate.
@@ -42,6 +43,52 @@ se queman sin resistencia, pull-up, divisores de voltaje, PWM, tone).
 Modelos 3D: los componentes simples se dibujan por código con medidas reales;
 para los módulos (relé, DHT11, LCD…) conviene descargarlos de Sketchfab
 (falta `SKETCHFAB_API_TOKEN` en `.env.local`).
+
+## C, colecciones de Sketchfab, por pasos
+
+Pedido del usuario (2026-10-30): que los modelos de roboticaparana (colecciones
+«Robótica Educacional Módulo 1» y «Primeiros Passos Módulo 4») y «Robô WiFi»
+(cleitonrosa) estén funcionales, ordenados y clasificados.
+
+Revisado con la API de Sketchfab el 2026-10-30: 59 modelos distintos, todos gratis.
+55 descargables con CC BY (hay que dar crédito). Otros 4 no se pueden descargar:
+Aula 31 «em ação», Aula 21 Varal, Aula 18 y Aula 20 Plantas Felizes; esos se
+reconstruyen con piezas propias y sin usar su modelo. Muchos repiten el mismo
+proyecto con el kit 2021 y el 2023, así que quedan unos 30 proyectos.
+
+Decisión: cada modelo es una escena completa ya armada, de 0,3 a 2,6 millones de
+triángulos, y no se puede simular ni manejar como está. Se usan como referencia del
+montaje y para recortar las piezas que falten (con su crédito). Cada proyecto se
+arma con las piezas del catálogo y corre con el micro emulado, como los actuales.
+
+| Paso | Categoría en la galería | Proyectos (número de Aula) | Piezas nuevas |
+|---|---|---|---|
+| C1 | Luces | LED y resistor (08), PWM y fade (18–20), Super Máquina (21–22), RGB y arcoíris (25–26) | Ninguna |
+| C2 | Semáforos | Carros, cruce, peatones, con botón (09–12, 15) | Ninguna |
+| C3 | Entradas y sonido | Pulsador (13), potenciómetro (23), buzzer (24), LDR (27), estacionamiento (35), distancia (34) | Ninguna |
+| C4 | Pantallas | 7 segmentos de 1 y 4 dígitos (16), LCD 16×2 (36), OLED (36), trena digital (37) | Displays, LCD, OLED; emular I2C |
+| C5 | Sensores | LM35 y DHT11 (29), obstáculo IR (30) | LM35, DHT11 |
+| C6 | Robots (hecho) | Motores (31), chasis 2WD (32), seguidor (33), sumô (38), Robô WiFi, aspirador | Ninguna (arena `sala`, WebServer simulado) |
+| C7 | Proyectos | Medidor de altura, Smartpot, casa inteligente, plantas felices, varal, macaco trapezista | Maquetas, relé, bomba, humedad |
+
+Estado (2026-10-30): la galería ya se ordena por grupos (`robots/clasificacion.ts`).
+Hechos en `robots/proyectosAulas.ts`: LED y resistencias, fade, Super Máquina, semáforo
+de carros, de cruce, con peatones y botón, y sensor de estacionamiento. Los temas de
+pulsador, potenciómetro, buzzer, LDR, distancia y RGB ya existían y quedaron clasificados.
+Falta de C1–C3: las variantes de ánodo común (necesitan otra pieza de LED RGB) y mostrar
+la serie completa de cada Aula.
+
+C6 (2026-11-02): grupo nuevo «Motores y chasis» con «Mis primeros motores» (2WD sin
+sensores que dibuja un cuadrado; Aulas 31–32). «Robot aspirador» en la arena nueva
+`sala` (muebles, patas de mesa y silla, piso con polvo): `engine/limpieza.ts` cuenta las
+celdas limpias, la escena dibuja el polvo y el HUD muestra el % limpio; el programa hace
+espiral, curva con los IR, rebota con el ultrasonido y se destraba (33 % en 2 min en la
+prueba). «Robô WiFi» (ESP32): la capa del ESP32 ahora trae un `WebServer` simulado en el
+que cada letra del control remoto es una visita a «/<letra>». Seguidor y minisumo quedan
+marcados con las Aulas 33 y 38.
+
+C4, C5 y C7 se cruzan con E4–E7: se hacen juntos para no repetir piezas.
+Descargar los modelos requiere `SKETCHFAB_API_TOKEN` en `.env.local` (todavía falta).
 
 ## F3, por pasos
 

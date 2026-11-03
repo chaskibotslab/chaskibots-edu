@@ -149,6 +149,9 @@ export interface PiezaDef {
   variantes?: Variante[]
   /** Formas simples para los choques (separadas del modelo visual). */
   colisionadores: Colisionador[]
+  /** Lo que ocupa a la vista si es más que sus colisionadores (USB, conectores): cuenta
+   *  para ver si choca con otra pieza al armar, pero no cambia la física. */
+  huella?: Colisionador[]
   /** Dónde se le puede encastrar algo. */
   montajes: PuntoMontaje[]
   /** En qué tipos de montaje encastra esta pieza (vacío = solo como raíz). */

@@ -266,6 +266,52 @@ function PisoArena({ sim, version }: { sim: Simulacion; version: number }) {
   )
 }
 
+/** Polvo de la sala del robot aspirador: cada celda sucia es una mancha; las limpias se borran. */
+function Polvo({ sim, version }: { sim: Simulacion; version: number }) {
+  const limpieza = sim.limpieza
+  const lienzo = useMemo(() => {
+    if (!limpieza) return null
+    const canvas = document.createElement('canvas')
+    canvas.width = limpieza.cols
+    canvas.height = limpieza.filas
+    const textura = new THREE.CanvasTexture(canvas)
+    textura.colorSpace = THREE.SRGBColorSpace
+    // Cada celda con un tono un poco distinto, para que parezca suciedad y no una grilla.
+    const tono = Array.from({ length: limpieza.celdas.length }, (_, i) => {
+      const r = Math.sin(i * 12.9898) * 43758.5453
+      return r - Math.floor(r)
+    })
+    return { canvas, textura, tono, dibujada: -1 }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limpieza, version])
+  useEffect(() => () => lienzo?.textura.dispose(), [lienzo])
+
+  useFrame(() => {
+    if (!limpieza || !lienzo || lienzo.dibujada === limpieza.version) return
+    lienzo.dibujada = limpieza.version
+    const ctx = lienzo.canvas.getContext('2d')!
+    const img = ctx.createImageData(limpieza.cols, limpieza.filas)
+    for (let i = 0; i < limpieza.celdas.length; i++) {
+      const t = lienzo.tono[i]
+      img.data[i * 4] = 70 + t * 30
+      img.data[i * 4 + 1] = 60 + t * 25
+      img.data[i * 4 + 2] = 45 + t * 20
+      img.data[i * 4 + 3] = limpieza.celdas[i] === 1 ? 120 + t * 90 : 0
+    }
+    ctx.putImageData(img, 0, 0)
+    lienzo.textura.needsUpdate = true
+  })
+
+  if (!limpieza || !lienzo) return null
+  return (
+    // El canvas va de z = −largo/2 (fila 0, arriba) a +largo/2: el plano acostado lo pone así.
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.0009, 0]} receiveShadow>
+      <planeGeometry args={[sim.arena.ancho, sim.arena.largo]} />
+      <meshStandardMaterial map={lienzo.textura} transparent depthWrite={false} roughness={1} />
+    </mesh>
+  )
+}
+
 /** Rastro del recorrido del robot. */
 function Rastro({ sim, version }: { sim: Simulacion; version: number }) {
   const MAX = 1500
@@ -370,7 +416,8 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel, zoo
       <Estudio intensidad={0.6} />
       <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={2.2} />
       <PisoArena sim={sim} version={versionArena} />
-      {!sim.arena.banco && <Rastro sim={sim} version={versionArena} />}
+      {sim.limpieza && <Polvo sim={sim} version={versionArena} />}
+      {!sim.arena.banco && !sim.limpieza && <Rastro sim={sim} version={versionArena} />}
       <Robot3D doc={sim.doc} sim={sim} />
       {sim.arena.banco && sim.plan.ultrasonidos.length > 0 && <Mano3D sim={sim} />}
       {sim.competencia && <Robot3D doc={sim.competencia.rival.doc} sim={sim.competencia.rival} />}

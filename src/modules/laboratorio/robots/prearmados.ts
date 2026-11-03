@@ -9,6 +9,7 @@ import { encastrar, robotVacio } from '../engine/ensamblaje'
 import { infoPlaca } from '../engine/placa'
 import type { RobotDoc } from './doc'
 import { PROYECTOS_CIRCUITO, plantillasCircuito } from './circuitos'
+import { PROYECTOS_AULAS, tema } from './proyectosAulas'
 import { esBanco } from '../engine/ensamblaje'
 
 export interface PlantillaCodigo { id: string; nombre: string; descripcion: string; codigo: string; bloques?: ProgramaBloques }
@@ -25,6 +26,8 @@ export interface Prearmado {
   categoria?: 'robot' | 'electronica'
   /** Kit de la plataforma al que corresponde (se muestra en la galería). */
   kit?: string
+  /** De qué tema de un curso externo viene la idea (se muestra en la galería). */
+  tema?: string
   construir: () => RobotDoc
   plantillas: (doc: RobotDoc, tabla: FilaPin[]) => PlantillaCodigo[]
 }
@@ -709,30 +712,38 @@ export function construirSeguidorEsp32(): RobotDoc {
   return a.terminar(codigoSeguidor)
 }
 
-function codigoRc(tabla: FilaPin[], doc: RobotDoc) {
-  return `// Robot de radiocontrol por Bluetooth (ESP32).
-// El ESP32 tiene Bluetooth: desde el celular (o el control en pantalla del
-// laboratorio) llegan letras y el robot obedece:
+/**
+ * Manejar el robot con letras. El ESP32 las recibe por su Bluetooth; las otras
+ * placas, por el puerto serie (en el robot real, con un módulo HC-05 en RX/TX).
+ */
+export function codigoRc(tabla: FilaPin[], doc: RobotDoc) {
+  const bt = infoPlaca(doc).placa === 'esp32'
+  const puerto = bt ? 'SerialBT' : 'Serial'
+  return `// Robot de radiocontrol: lo manejas tú, con el teclado de la compu
+// (flechas o WASD), el control en pantalla o un control de videojuego.
+// Cada tecla llega como una letra y el robot obedece:
 //   F = adelante   B = atrás   L = izquierda   R = derecha   S = parar
+//   G / I = curva adelante a la izq. / der.   H / J = curva atrás a la izq. / der.
 //   0–9 = velocidad (0 = lenta, 9 = máxima)
+${bt
+    ? `// El ESP32 tiene Bluetooth: en el robot real, las letras las manda una app del celular.
 #include <BluetoothSerial.h>
 
 BluetoothSerial SerialBT;
-
+`
+    : '// En el robot real, las letras llegan con un módulo Bluetooth HC-05 conectado a RX y TX.\n'}
 ${bloqueMotores(tabla, doc)}
 
 int velocidad = 200;   // 0 a 255
 
 void setup() {
   ${SETUP_MOTORES}
-  Serial.begin(115200);
-  SerialBT.begin("RobotChaski");   // nombre que verás en el celular
-  Serial.println("Listo: conéctate a RobotChaski por Bluetooth");
+  ${bt ? 'Serial.begin(115200);\n  SerialBT.begin("RobotChaski");   // nombre que verás en el celular\n  Serial.println("Listo: conéctate a RobotChaski por Bluetooth");' : 'Serial.begin(9600);\n  Serial.println("Listo: maneja con las flechas");'}
 }
 
 void loop() {
-  if (!SerialBT.available()) return;
-  char c = SerialBT.read();
+  if (!${puerto}.available()) return;
+  char c = ${puerto}.read();
 
   if (c >= '0' && c <= '9') {            // un número cambia la velocidad
     velocidad = map(c - '0', 0, 9, 90, 255);
@@ -743,6 +754,10 @@ void loop() {
     case 'B': motores(-velocidad, -velocidad); break;
     case 'L': motores(-velocidad / 2, velocidad); break;
     case 'R': motores(velocidad, -velocidad / 2); break;
+    case 'G': motores(velocidad * 2 / 5, velocidad); break;
+    case 'I': motores(velocidad, velocidad * 2 / 5); break;
+    case 'H': motores(-velocidad * 2 / 5, -velocidad); break;
+    case 'J': motores(-velocidad, -velocidad * 2 / 5); break;
     case 'S': motores(0, 0); break;
   }
 }
@@ -924,6 +939,23 @@ export function construirMinisumoEsp32(): RobotDoc {
   return a.terminar(codigoMinisumo)
 }
 
+/**
+ * Minisumo RC: lo maneja el alumno, así que no lleva sensores. Sin ultrasonido ni
+ * piso de arriba, el ESP32 cabe abajo. Sin el peso de los sensores no tenía agarre
+ * para empujar al rival: por eso el chasis es de aluminio, que hace de lastre.
+ */
+export function construirMinisumoRc(): RobotDoc {
+  const a = new Armador('chasis-minisumo', 'aluminio', 'Minisumo RC')
+  a.poner('esp32-devkit', 'chasis', 'placa')
+  a.poner('tb6612', 'chasis', 'driver')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  const mi = a.poner('motor-n20', 'chasis', 'motor-izq')
+  const md = a.poner('motor-n20', 'chasis', 'motor-der')
+  a.poner('rueda-34', mi, 'eje')
+  a.poner('rueda-34', md, 'eje')
+  return a.terminar(codigoRc)
+}
+
 // ---------------------------------------------------------------------------
 // Evita obstáculos con IR: el más simple, sin servo ni ultrasonido
 // ---------------------------------------------------------------------------
@@ -1008,12 +1040,386 @@ export function construirEvitaIr(): RobotDoc {
   return a.terminar(codigoEvitaIr)
 }
 
+// ---------------------------------------------------------------------------
+// Primeros motores: el chasis 2WD sin sensores, que sigue un camino fijo
+// ---------------------------------------------------------------------------
+
+function codigoCuadrado(tabla: FilaPin[], doc: RobotDoc) {
+  return `// Mis primeros motores: el robot dibuja un cuadrado.
+// No tiene sensores: avanza y gira durante un tiempo fijo (con delay).
+// Ajusta GIRO_MS hasta que cada giro sea de 90°: depende de la batería y del piso.
+${bloqueMotores(tabla, doc)}
+
+const int VELOCIDAD = 180;
+const int AVANCE_MS = 1200;   // cuánto avanza en cada lado
+const int GIRO_MS = 250;      // cuánto gira en cada esquina
+
+void setup() {
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+  delay(1000);
+}
+
+void loop() {
+  for (int lado = 1; lado <= 4; lado++) {
+    Serial.print("Lado ");
+    Serial.println(lado);
+    motores(VELOCIDAD, VELOCIDAD);    // adelante
+    delay(AVANCE_MS);
+    motores(0, 0);
+    delay(200);
+    motores(-VELOCIDAD, VELOCIDAD);   // girar a la izquierda en el lugar
+    delay(GIRO_MS);
+    motores(0, 0);
+    delay(200);
+  }
+  Serial.println("¡Cuadrado listo!");
+  delay(2000);
+}
+`
+}
+
+function codigoCadaMotor(tabla: FilaPin[], doc: RobotDoc) {
+  return `// Cada motor por separado: así se descubre si alguno está conectado al revés.
+// Si una rueda gira hacia atrás cuando dice "adelante", invierte sus dos cables
+// en el driver (o cambia HIGH por LOW en la función motores).
+${bloqueMotores(tabla, doc)}
+
+void setup() {
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.println("Izquierdo adelante");
+  motores(180, 0);
+  delay(1500);
+  Serial.println("Izquierdo atras");
+  motores(-180, 0);
+  delay(1500);
+  Serial.println("Derecho adelante");
+  motores(0, 180);
+  delay(1500);
+  Serial.println("Derecho atras");
+  motores(0, -180);
+  delay(1500);
+  motores(0, 0);
+  delay(1000);
+}
+`
+}
+
+export function construirPrimerosMotores(): RobotDoc {
+  const a = new Armador('chasis-2wd', 'mdf', 'Mis primeros motores')
+  a.poner('arduino-uno', 'chasis', 'placa')
+  a.poner('l298n', 'chasis', 'driver')
+  a.poner('bateria-2x18650', 'chasis', 'bateria')
+  const mi = a.poner('motor-tt', 'chasis', 'motor-izq')
+  const md = a.poner('motor-tt', 'chasis', 'motor-der')
+  a.poner('rueda-65', mi, 'eje')
+  a.poner('rueda-65', md, 'eje')
+  a.poner('rueda-loca', 'chasis', 'loca')
+  return a.terminar(codigoCuadrado)
+}
+
+// ---------------------------------------------------------------------------
+// Robot aspirador: recorre la sala sin chocar para limpiar todo lo que pueda
+// ---------------------------------------------------------------------------
+
+function codigoAspirador(tabla: FilaPin[], doc: RobotDoc) {
+  const us = doc.piezas.find(p => p.pieza === 'hcsr04')?.id ?? ''
+  return `// Robot aspirador: recorre la sala para limpiar todo el piso que pueda.
+//  1. Empieza en espiral: limpia bien alrededor de donde lo dejaste.
+//  2. Después avanza recto. Si un IR de las esquinas ve algo a un costado (LOW),
+//     curva para alejarse sin frenar.
+//  3. Si el ultrasonido ve un mueble cerca al frente (o lo ven los dos IR),
+//     retrocede y gira un ángulo al azar.
+//  4. Cada 10 s cambia de rumbo aunque no choque, para no repetir el camino.
+//  5. Si la distancia al frente no cambia en 2 s, o lleva mucho rato curvando
+//     entre patas de muebles, está trabado: retrocede y gira.
+// Los IR ven las patas finas de mesas y sillas, que el ultrasonido a veces no ve.
+
+const int TRIG = ${pinCodigo(pinDePlaca(tabla, us, 'TRIG'))};
+const int ECHO = ${pinCodigo(pinDePlaca(tabla, us, 'ECHO'))};
+const int IR_IZQ = ${pinesObstaculo(tabla, doc, 'frente-izq')};
+const int IR_DER = ${pinesObstaculo(tabla, doc, 'frente-der')};
+
+${bloqueMotores(tabla, doc)}
+
+const int AVANCE = 170;
+const int CERCA_CM = 15;
+const unsigned long ESPIRAL_MS = 8000;
+const unsigned long CAMBIO_MS = 10000;
+
+bool enEspiral = true;
+unsigned long inicio = 0;
+unsigned long ultimoGiro = 0;
+unsigned long ultimaRevision = 0;
+long cmAnterior = 0;
+int iguales = 0;   // revisiones seguidas con la misma distancia
+unsigned long curvandoDesde = 0;   // desde cuándo está curvando para esquivar (0 = no)
+
+${MEDIR_CM}
+
+// Gira en el lugar un ángulo al azar (entre 250 y 750 ms de giro).
+void girarAlAzar(bool aLaDerecha) {
+  if (aLaDerecha) motores(180, -180);
+  else motores(-180, 180);
+  delay(250 + random(500));
+  ultimoGiro = millis();
+}
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(IR_IZQ, INPUT);
+  pinMode(IR_DER, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+  Serial.println("Aspirando...");
+  digitalWrite(LED_BUILTIN, HIGH);   // LED encendido = aspiradora funcionando
+  inicio = millis();
+  ultimoGiro = millis();
+}
+
+// Salir de donde se trabó: retroceder bastante y girar al azar.
+void escapar(const char* motivo) {
+  Serial.println(motivo);
+  enEspiral = false;
+  iguales = 0;
+  curvandoDesde = 0;
+  motores(-170, -170);
+  delay(500);
+  girarAlAzar(random(2) == 0);
+}
+
+void loop() {
+  long cm = medirCm();
+  bool izq = digitalRead(IR_IZQ) == LOW;
+  bool der = digitalRead(IR_DER) == LOW;
+
+  // ¿Trabado? Si la distancia al frente no cambia en 2 s, el robot no se mueve
+  // aunque tenga los motores encendidos (las ruedas patinan contra algo).
+  if (millis() - ultimaRevision > 1000) {
+    ultimaRevision = millis();
+    if (cm < 400 && abs(cm - cmAnterior) <= 1) iguales++;
+    else iguales = 0;
+    cmAnterior = cm;
+    if (iguales >= 2) { escapar("¡Trabado! Retrocedo"); return; }
+  }
+
+  if (cm < CERCA_CM || (izq && der)) {
+    enEspiral = false;
+    Serial.println("Mueble al frente: retrocedo y giro");
+    motores(-150, -150);
+    delay(250);
+    girarAlAzar(random(2) == 0);
+    return;
+  }
+  if (izq || der) {
+    enEspiral = false;
+    // Si lleva mucho rato curvando, está dando vueltas entre patas de muebles.
+    if (curvandoDesde == 0) curvandoDesde = millis();
+    if (millis() - curvandoDesde > 2500) { escapar("Me enredé: retrocedo"); return; }
+    if (izq) motores(AVANCE, AVANCE / 4);   // algo a la izquierda: curvar a la derecha
+    else motores(AVANCE / 4, AVANCE);       // algo a la derecha: curvar a la izquierda
+    return;
+  }
+  curvandoDesde = 0;
+
+  if (enEspiral) {
+    unsigned long t = millis() - inicio;
+    if (t > ESPIRAL_MS) { enEspiral = false; return; }
+    // La rueda de afuera va rápido y la de adentro acelera de a poco: la vuelta se agranda.
+    motores(AVANCE + 40, map(t, 0, ESPIRAL_MS, 40, AVANCE));
+    return;
+  }
+
+  if (millis() - ultimoGiro > CAMBIO_MS) {
+    Serial.println("Cambio de rumbo");
+    girarAlAzar(random(2) == 0);
+    return;
+  }
+  motores(AVANCE, AVANCE);
+}
+`
+}
+
+export function construirAspirador(): RobotDoc {
+  const a = new Armador('chasis-2wd', 'pla', 'Robot aspirador')
+  a.poner('arduino-uno', 'chasis', 'placa')
+  a.poner('l298n', 'chasis', 'driver')
+  a.poner('bateria-2x18650', 'chasis', 'bateria')
+  const mi = a.poner('motor-tt', 'chasis', 'motor-izq')
+  const md = a.poner('motor-tt', 'chasis', 'motor-der')
+  a.poner('rueda-65', mi, 'eje')
+  a.poner('rueda-65', md, 'eje')
+  a.poner('rueda-loca', 'chasis', 'loca')
+  a.poner('hcsr04', 'chasis', 'frente')
+  a.poner('fc51', 'chasis', 'frente-izq')
+  a.poner('fc51', 'chasis', 'frente-der')
+  return a.terminar(codigoAspirador)
+}
+
+// ---------------------------------------------------------------------------
+// Robô WiFi: el ESP32 crea su red y una página web con botones
+// ---------------------------------------------------------------------------
+
+function codigoRoboWifi(tabla: FilaPin[], doc: RobotDoc) {
+  return `// Robô WiFi: el ESP32 crea su propia red WiFi y una página web con botones.
+// En el robot real: conecta el celular a la red "RoboWiFi" (clave 12345678),
+// abre http://192.168.4.1 y cada botón visita una dirección del robot:
+//   /F adelante   /B atrás   /L izquierda   /R derecha   /S parar
+//   /G /I curvas adelante   /H /J curvas atrás   /0 a /9 velocidad
+// En el simulador no hay celular: el control remoto (o el teclado) hace esas visitas.
+#include <WiFi.h>
+#include <WebServer.h>
+
+WebServer servidor(80);
+
+${bloqueMotores(tabla, doc)}
+
+int velocidad = 200;   // 0 a 255
+
+// La página que ve el celular: cada botón visita /F, /B, /L, /R o /S.
+const char PAGINA[] =
+  "<html><body style='font-size:2em;text-align:center'>"
+  "<h3>Robo WiFi</h3>"
+  "<button onclick=\\"fetch('/F')\\">Adelante</button><br>"
+  "<button onclick=\\"fetch('/L')\\">Izq</button>"
+  "<button onclick=\\"fetch('/S')\\">Parar</button>"
+  "<button onclick=\\"fetch('/R')\\">Der</button><br>"
+  "<button onclick=\\"fetch('/B')\\">Atras</button>"
+  "</body></html>";
+
+void pagina()    { servidor.send(200, "text/html", PAGINA); }
+void adelante()  { motores(velocidad, velocidad); servidor.send(200); }
+void atras()     { motores(-velocidad, -velocidad); servidor.send(200); }
+void izquierda() { motores(-velocidad / 2, velocidad); servidor.send(200); }
+void derecha()   { motores(velocidad, -velocidad / 2); servidor.send(200); }
+void parar()     { motores(0, 0); servidor.send(200); }
+void curvaIzq()  { motores(velocidad * 2 / 5, velocidad); servidor.send(200); }
+void curvaDer()  { motores(velocidad, velocidad * 2 / 5); servidor.send(200); }
+void atrasIzq()  { motores(-velocidad * 2 / 5, -velocidad); servidor.send(200); }
+void atrasDer()  { motores(-velocidad, -velocidad * 2 / 5); servidor.send(200); }
+
+// Las direcciones /0 a /9 cambian la velocidad.
+void otraDireccion() {
+  String uri = servidor.uri();
+  char c = uri.length() > 1 ? uri[1] : ' ';
+  if (c >= '0' && c <= '9') velocidad = map(c - '0', 0, 9, 90, 255);
+  servidor.send(200);
+}
+
+void setup() {
+  ${SETUP_MOTORES}
+  Serial.begin(115200);
+  WiFi.softAP("RoboWiFi", "12345678");
+  Serial.print("Red RoboWiFi lista. Abre http://");
+  Serial.println(WiFi.softAPIP());
+
+  servidor.on("/", pagina);
+  servidor.on("/F", adelante);
+  servidor.on("/B", atras);
+  servidor.on("/L", izquierda);
+  servidor.on("/R", derecha);
+  servidor.on("/S", parar);
+  servidor.on("/G", curvaIzq);
+  servidor.on("/I", curvaDer);
+  servidor.on("/H", atrasIzq);
+  servidor.on("/J", atrasDer);
+  servidor.onNotFound(otraDireccion);
+  servidor.begin();
+}
+
+void loop() {
+  servidor.handleClient();   // atiende cada visita de la página
+}
+`
+}
+
+export function construirRoboWifi(): RobotDoc {
+  const a = new Armador('chasis-2wd', 'acrilico', 'Robô WiFi')
+  a.poner('esp32-devkit', 'chasis', 'placa')
+  a.poner('l298n', 'chasis', 'driver')
+  a.poner('bateria-2x18650', 'chasis', 'bateria')
+  const mi = a.poner('motor-tt', 'chasis', 'motor-izq')
+  const md = a.poner('motor-tt', 'chasis', 'motor-der')
+  a.poner('rueda-65', mi, 'eje')
+  a.poner('rueda-65', md, 'eje')
+  a.poner('rueda-loca', 'chasis', 'loca')
+  return a.terminar(codigoRoboWifi)
+}
+
 export const PREARMADOS: Prearmado[] = [
+  {
+    id: 'primeros-motores',
+    nombre: 'Mis primeros motores',
+    descripcion: 'El chasis 2WD sin sensores: dos motores TT, el driver L298N y el Arduino UNO. Dibuja un cuadrado en el piso.',
+    dificultad: 'inicial',
+    tema: tema('las Aulas 31 y 32'),
+    logica: [
+      'El driver recibe del Arduino la dirección (IN1–IN4) y la velocidad (ENA y ENB, con PWM) de cada motor.',
+      'Para avanzar, los dos motores giran hacia adelante; para girar en el lugar, uno adelante y el otro atrás.',
+      'Sin sensores, el robot no sabe cuánto giró: avanza y gira durante un tiempo fijo.',
+      'Mira el rastro en el piso y ajusta GIRO_MS hasta que las esquinas sean de 90°.',
+    ],
+    arena: 'campo-libre',
+    construir: construirPrimerosMotores,
+    plantillas: (doc, tabla) => [
+      { id: 'cuadrado', nombre: 'Dibujar un cuadrado', descripcion: 'Avanza y gira 4 veces', codigo: codigoCuadrado(tabla, doc) },
+      { id: 'cada-motor', nombre: 'Cada motor por separado', descripcion: 'Para ver si alguno está al revés', codigo: codigoCadaMotor(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'aspirador',
+    nombre: 'Robot aspirador',
+    descripcion: 'Limpia una sala con muebles: el piso empieza sucio y se limpia por donde pasa el robot. Ultrasonido al frente y dos IR en las esquinas.',
+    dificultad: 'intermedio',
+    tema: tema('la Aula 31 (robot aspirador)'),
+    logica: [
+      'Empieza en espiral, para limpiar bien alrededor de donde lo dejaste.',
+      'Después avanza recto. Si un IR de las esquinas ve algo a un costado (una pata de mesa, la pared), curva para alejarse sin frenar.',
+      'Si el ultrasonido ve un mueble a menos de 15 cm al frente, retrocede y gira un ángulo al azar.',
+      'Cada 10 s cambia de rumbo aunque no choque, para no repetir siempre el mismo camino.',
+      'Si el ultrasonido mide lo mismo durante 2 s, o lleva 2,5 s curvando entre patas de muebles, está trabado: retrocede y gira.',
+      'Arriba a la izquierda ves cuánto del piso ya está limpio. Prueba a cambiar los tiempos para limpiar más rápido.',
+    ],
+    arena: 'sala',
+    construir: construirAspirador,
+    plantillas: (doc, tabla) => [
+      { id: 'aspirador', nombre: 'Aspirador (espiral y rebote)', descripcion: 'Espiral, recto y giro al azar', codigo: codigoAspirador(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'robo-wifi',
+    nombre: 'Robô WiFi (ESP32)',
+    descripcion: 'El ESP32 crea su red WiFi y una página con botones para manejarlo desde el celular. En el laboratorio lo manejas con el teclado o el control en pantalla.',
+    dificultad: 'intermedio',
+    tema: 'Idea del modelo «Robô WiFi» de Sketchfab',
+    logica: [
+      'El ESP32 crea su propia red WiFi (softAP) y un servidor web en el puerto 80.',
+      'Cada botón de la página visita una dirección: /F adelante, /B atrás, /L, /R y /S para parar.',
+      'Con servidor.on() cada dirección llama a una función que mueve los motores.',
+      'En el simulador, cada tecla del control remoto hace la visita a esa dirección.',
+    ],
+    arena: 'campo-libre',
+    construir: construirRoboWifi,
+    plantillas: (doc, tabla) => [
+      { id: 'robo-wifi', nombre: 'Robô WiFi (página web)', descripcion: 'Servidor web con una dirección por botón', codigo: codigoRoboWifi(tabla, doc) },
+      { id: 'rc', nombre: 'Manejar por Bluetooth (RC)', descripcion: 'Obedece las letras del control', codigo: codigoRc(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
   {
     id: 'seguidor',
     nombre: 'Seguidor de línea',
     descripcion: 'Dos sensores IR miran el piso y el robot corrige para no salirse de la cinta negra.',
     dificultad: 'inicial',
+    tema: tema('la Aula 33'),
     logica: [
       'Los dos sensores miran el piso: sobre blanco dan LOW, sobre la cinta negra dan HIGH.',
       'Si ninguno ve la línea, está entre los dos: sigue recto.',
@@ -1155,9 +1561,10 @@ export const PREARMADOS: Prearmado[] = [
   },
   {
     id: 'minisumo',
-    nombre: 'Minisumo',
-    descripcion: 'Robot de 10 × 10 cm con pala de acero, micromotores N20 y Arduino Nano. Pelea contra un rival de práctica en el dohyo: gana quien saque al otro (2 de 3 rondas).',
+    nombre: 'Minisumo autónomo',
+    descripcion: 'Pelea solo, con su programa y sus sensores. Robot de 10 × 10 cm con pala de acero, micromotores N20 y Arduino Nano, contra un rival de práctica en el dohyo: gana quien saque al otro (2 de 3 rondas).',
     dificultad: 'intermedio',
+    tema: tema('la Aula 38 (sumô)'),
     logica: [
       'Espera 5 s quieto al empezar cada ronda (reglamento).',
       'Si un sensor de abajo ve el borde blanco: retrocede un poco y gira en el lugar hacia el centro.',
@@ -1175,8 +1582,8 @@ export const PREARMADOS: Prearmado[] = [
   },
   {
     id: 'minisumo-esp32',
-    nombre: 'Minisumo ESP32 (dos pisos)',
-    descripcion: 'El minisumo con ESP32. La placa y el driver no caben abajo junto a la batería y los sensores: suben al piso de arriba, sobre separadores de latón.',
+    nombre: 'Minisumo autónomo ESP32 (dos pisos)',
+    descripcion: 'El minisumo autónomo con ESP32. La placa y el driver van en el piso de arriba, sobre separadores de latón, y abajo quedan la batería y los sensores.',
     dificultad: 'avanzado',
     logica: [
       'El mismo programa del minisumo: espera 5 s, busca girando, ataca y evita el borde.',
@@ -1190,6 +1597,24 @@ export const PREARMADOS: Prearmado[] = [
     plantillas: (doc, tabla) => [
       { id: 'minisumo', nombre: 'Minisumo (buscar y atacar)', descripcion: 'Espera, busca, ataca y evita el borde', codigo: codigoMinisumo(tabla, doc) },
       { id: 'sensores', nombre: 'Prueba de sensores', descripcion: 'Distancia, IR y borde en el Monitor Serie', codigo: codigoLecturaMinisumo(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'minisumo-rc',
+    nombre: 'Minisumo RC',
+    descripcion: 'El minisumo que manejas tú con el teclado de la compu: flechas o WASD. Sin sensores, con ESP32. Pelea contra el rival de práctica en el dohyo.',
+    dificultad: 'inicial',
+    logica: [
+      'Presiona «Compilar y ejecutar»: empieza el combate y aparece el control remoto.',
+      'Espera la cuenta de 5 s: hasta que termine, el robot no obedece, para que no haya salida en falso.',
+      'Maneja con las flechas o WASD. Dos teclas a la vez hacen una curva, y Espacio frena.',
+      'Las teclas 0 a 9 cambian la velocidad. Empuja de frente con la pala para levantar al rival.',
+    ],
+    arena: 'dohyo-minisumo',
+    construir: construirMinisumoRc,
+    plantillas: (doc, tabla) => [
+      { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Obedece las letras del control', codigo: codigoRc(tabla, doc) },
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
     ],
   },
@@ -1213,13 +1638,40 @@ export const PREARMADOS: Prearmado[] = [
     ],
   },
   ...PROYECTOS_CIRCUITO,
+  ...PROYECTOS_AULAS,
 ]
+
+/** Las del proyecto primero; después, las genéricas y los ejemplos de cada pieza del robot. */
+export function plantillasDe(doc: RobotDoc, prearmado: string | null): PlantillaCodigo[] {
+  const { tabla } = autocablear(doc, { conservar: true })
+  const pre = PREARMADOS.find(p => p.id === prearmado)
+  const propias = pre ? pre.plantillas(doc, tabla) : []
+  return [...propias, ...plantillasGenericas(doc, tabla).filter(g => !propias.some(x => x.id === g.id))]
+}
+
+/**
+ * Al cambiar una pieza pueden cambiar los pines. Si el programa es una plantilla sin
+ * tocar, se rehace con los pines nuevos. Si el alumno ya la editó no se toca su código:
+ * `desactualizado` avisa que sus pines pueden haber quedado viejos.
+ */
+export function programaConPinesNuevos(antes: RobotDoc, despues: RobotDoc, prearmado: string | null): { doc: RobotDoc; desactualizado: boolean } {
+  const cpp = despues.programa.cpp
+  if (despues.programa.modo !== 'codigo' || !cpp.trim()) return { doc: despues, desactualizado: false }
+  const previa = plantillasDe(antes, prearmado).find(p => p.codigo === cpp)
+  const nueva = previa && plantillasDe(despues, prearmado).find(p => p.id === previa.id)
+  if (nueva) return { doc: { ...despues, programa: { modo: 'codigo', cpp: nueva.codigo } }, desactualizado: false }
+  const pines = (d: RobotDoc) => JSON.stringify(autocablear(d, { conservar: true }).tabla)
+  return { doc: despues, desactualizado: pines(antes) !== pines(despues) }
+}
 
 /** Plantillas genéricas para un robot armado desde cero. */
 export function plantillasGenericas(doc: RobotDoc, tabla: FilaPin[]): PlantillaCodigo[] {
   if (esBanco(doc)) return plantillasCircuito(doc, tabla)
   const out: PlantillaCodigo[] = []
-  if (driverDe(doc)) out.push({ id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) })
+  if (driverDe(doc)) {
+    out.push({ id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) })
+    out.push({ id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Obedece las letras del control', codigo: codigoRc(tabla, doc) })
+  }
   if (doc.piezas.some(p => p.padre?.montaje === 'piso-izq') && doc.piezas.some(p => p.padre?.montaje === 'piso-der')) {
     out.push({ id: 'seguidor', nombre: 'Seguidor de línea', descripcion: 'Con los sensores de piso', codigo: codigoSeguidor(tabla, doc) })
   }

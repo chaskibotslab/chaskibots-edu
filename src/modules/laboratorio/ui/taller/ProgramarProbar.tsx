@@ -108,8 +108,10 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
   const [datos, setDatos] = useState(() => typeof window === 'undefined' || window.innerWidth >= 1500)
   const [versionArena, setVersionArena] = useState(0)
   const [pestana, setPestana] = useState<Pestana>('serial')
-  // El control remoto se abre solo si el programa usa Bluetooth.
-  const [control, setControl] = useState(() => /BluetoothSerial|SerialBT/.test(doc.programa.cpp))
+  // El control remoto se abre solo si el programa obedece letras (Bluetooth o la plantilla RC).
+  const leeLetras = /SerialBT|Serial\.read\(\)|handleClient\(\)/.test(codigo)
+  const [control, setControl] = useState(leeLetras)
+  useEffect(() => { if (leeLetras) setControl(true) }, [leeLetras])
   const serialRef = useRef<HTMLPreElement>(null)
   const archivoPista = useRef<HTMLInputElement>(null)
   const clave = estructura(doc)
@@ -164,13 +166,16 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
       setSerial('')
       await sim.cargarPrograma(data.hex)
       setPestana('serial')
-      setAviso({ tipo: 'ok', texto: `Programa cargado · ${data.size ?? '?'} bytes de 32 256${data.cached ? ' · (caché)' : ''}` })
+      // Si se ejecutó con Ctrl+Enter, el foco sigue en el editor y las teclas de manejo se escribirían en el código.
+      if (leeLetras && document.activeElement instanceof HTMLElement) document.activeElement.blur()
+      const capacidad = infoPlaca(doc).chip === 'atmega328p' ? ' de 32 256' : ''
+      setAviso({ tipo: 'ok', texto: `Programa cargado · ${data.size ?? '?'} bytes${capacidad}${data.cached ? ' · (caché)' : ''}` })
     } catch (err) {
       setAviso({ tipo: 'error', texto: err instanceof Error ? err.message : 'Error al compilar' })
     } finally {
       setCompilando(false)
     }
-  }, [sim, codigo, compilando, doc, activarSonido])
+  }, [sim, codigo, compilando, doc, activarSonido, leeLetras])
 
   const cambiarArena = (id: string) => {
     if (id === 'propia' && imagenPropia) return
@@ -421,8 +426,8 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                 ))}
               </div>
             )}
-            {sim && control && <ControlRemoto sim={sim} conPrograma={tele?.estado === 'corriendo' || tele?.estado === 'pausado'} onCerrar={() => setControl(false)} />}
-            <div className="pointer-events-none absolute bottom-2 left-3 hidden text-[11px] text-slate-400/80 sm:block">
+            {sim && control && <ControlRemoto sim={sim} conPrograma={tele?.estado === 'corriendo' || tele?.estado === 'pausado'} leeLetras={leeLetras} fase={tele?.combate?.fase} onCerrar={() => setControl(false)} />}
+            <div className={`pointer-events-none absolute bottom-2 left-3 hidden text-[11px] text-slate-400/80 ${control ? '' : 'sm:block'}`}>
               {banco ? `${conPulsador ? 'Haz clic en el pulsador para presionarlo · ' : ''}arrastra para girar la cámara` : 'Doble clic en el piso para mover el robot · arrastra para girar la cámara'}
             </div>
           </div>
@@ -507,6 +512,17 @@ function HUD({ tele, robot = true, sinPlaca = false, encendido = false }: { tele
         {tele.estado === 'corriendo' && (
           <div className={`rounded-lg lab-vidrio px-2.5 py-1.5 font-mono text-[11px] backdrop-blur ${lento ? 'text-amber-300' : 'text-slate-300'}`}>
             {tele.mhz.toFixed(1)} MHz · velocidad {tele.velocidadPct.toFixed(0)}%
+          </div>
+        )}
+        {tele.limpieza !== undefined && (
+          <div className="w-44 rounded-lg lab-vidrio px-2.5 py-1.5 text-xs backdrop-blur">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-300">Piso limpio</span>
+              <span className="font-mono font-semibold text-white">{tele.limpieza.toFixed(0)}%</span>
+            </div>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full rounded-full bg-emerald-400 transition-[width]" style={{ width: `${tele.limpieza}%` }} />
+            </div>
           </div>
         )}
         {tele.error && <div className="rounded-lg bg-red-500/20 px-2.5 py-1.5 text-xs text-red-300">{tele.error}</div>}

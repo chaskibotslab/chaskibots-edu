@@ -108,7 +108,8 @@ export const CHASIS_MINISUMO: PiezaDef = {
     { forma: 'caja', medidas: [30, 1.5, 96], centro: [48, -14.8, 0], rotacion: [0, 0, -37], friccion: 0.15 },
   ],
   montajes: [
-    { id: 'placa', tipo: 'placa', nombre: 'Placa', posicion: [-14, ARRIBA + 10, 0], rotacionesPermitidas: [0, 180] },
+    // Aquí caben Nano, ESP32 y Pico sin pasarse de la base; el UNO sube al piso de arriba.
+    { id: 'placa', tipo: 'placa', nombre: 'Placa', posicion: [-12, ARRIBA + 10, 0], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver', posicion: [-22, ARRIBA, -24], rotacionesPermitidas: [0, 90, 180, 270] },
     { id: 'bateria', tipo: 'bateria', nombre: 'Batería', posicion: [-16, ARRIBA, 24] },
     // Una batería grande (2×18650) no cabe al costado sin tocar la rueda: va al centro,
@@ -156,6 +157,8 @@ export const PISO_ARRIBA_MINISUMO: PiezaDef = {
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Placa (arriba)', posicion: [0, ARRIBA_PISO + 10, -18], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver (arriba)', posicion: [0, ARRIBA_PISO, 20], rotacionesPermitidas: [0, 90, 180, 270] },
+    // El UNO solo entra a lo largo del piso, y entonces ocupa todo: el driver queda abajo.
+    { id: 'placa-centro', tipo: 'placa', nombre: 'Placa grande (a lo largo)', posicion: [0, ARRIBA_PISO + 10, 0], rotacion: [0, 90, 0], rotacionesPermitidas: [0, 180] },
   ],
   encaja: ['piso'],
   pines: [],

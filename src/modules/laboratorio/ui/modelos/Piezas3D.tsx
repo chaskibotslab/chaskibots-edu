@@ -326,6 +326,7 @@ export const Pico = forwardRef(function Pico(_: object, refLed: Ref<THREE.MeshSt
   const q = useCalidad()
   return (
     <group>
+      <SeparadoresPlaca largo={51} ancho={21} />
       <mesh position={M(0, 0.5, 0)} castShadow={q.sombras} receiveShadow>
         <boxGeometry args={[m(51), m(1), m(21)]} />
         <meshStandardMaterial color="#1f7a3f" roughness={0.5} metalness={0.1} />

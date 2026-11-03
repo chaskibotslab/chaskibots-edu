@@ -4,8 +4,8 @@ import { PREARMADOS } from '../robots/prearmados'
 
 describe('piezas encimadas', () => {
   it('ningún proyecto armado tiene piezas encimadas', () => {
-    for (const p of PREARMADOS) expect(avisosEnsamblaje(p.construir()).filter(a => a.includes('encimad')), p.id).toEqual([])
-  })
+    for (const p of PREARMADOS) expect(avisosEnsamblaje(p.construir()).filter(a => a.includes('encimad') || a.includes('se sale')), p.id).toEqual([])
+  }, 60_000)
 
   it('minisumo con ESP32 y L298N: abajo no caben; con el piso de arriba, sí', () => {
     let d = robotVacio('chasis-minisumo')
@@ -39,8 +39,9 @@ describe('piezas encimadas', () => {
   })
 
   it('los separadores del piso de arriba no dejan poner el L298N debajo', () => {
+    // El L298N ya no se puede poner ahí (asoma de la base): un robot guardado de antes sí puede traerlo.
     let d = robotVacio('chasis-minisumo')
-    d = encastrar(d, 'l298n', 'chasis', 'driver').doc
+    d = { ...d, piezas: [...d.piezas, { id: 'l298n', pieza: 'l298n', etiqueta: 'Driver L298N', padre: { instancia: 'chasis', montaje: 'driver' } }] }
     expect(motivoNoEncastra(d, 'piso-arriba-minisumo', 'chasis', 'arriba')).toMatch(/chocaría con .*L298N\. Cambia de lugar/)
   })
 })

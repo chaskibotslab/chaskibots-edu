@@ -11,7 +11,8 @@ import { datosVariante, pieza } from '../../catalogo/piezas'
 import { autocablear } from '../../engine/autocableado'
 import { bancoVacio, esBanco, robotVacio, validar } from '../../engine/ensamblaje'
 import type { RobotDoc } from '../../robots/doc'
-import { PREARMADOS, construirSeguidor, plantillasGenericas } from '../../robots/prearmados'
+import { PREARMADOS, construirSeguidor, plantillasDe, programaConPinesNuevos } from '../../robots/prearmados'
+import { GRUPOS, grupoDe, ordenEnGrupo } from '../../robots/clasificacion'
 import { calidadInicial, type NivelCalidad } from '../calidad'
 import Armar from './Armar'
 import MisRobots from './MisRobots'
@@ -93,10 +94,13 @@ export default function Taller() {
   const cambiar = useCallback((d: RobotDoc, texto?: string, recablear = true) => {
     const actual = docActual.current
     if (actual) setPasado(p => [...p.slice(-MAX_HISTORIAL + 1), actual])
-    setDoc(recablear ? conCables(d) : sincronizar(d))
+    const nuevo = recablear ? conCables(d) : sincronizar(d)
+    const r = actual && recablear ? programaConPinesNuevos(actual, nuevo, prearmado) : { doc: nuevo, desactualizado: false }
+    setDoc(r.doc)
     setFuturo([])
-    if (texto) setAviso({ tipo: 'info', texto })
-  }, [])
+    if (r.desactualizado) setAviso({ tipo: 'info', texto: `${texto ? `${texto}. ` : ''}Cambiaron los pines: revisa los de tu código o carga una plantilla en «Programar».` })
+    else if (texto) setAviso({ tipo: 'info', texto })
+  }, [prearmado])
 
   const deshacer = () => {
     if (!doc || !pasado.length) return
@@ -157,11 +161,7 @@ export default function Taller() {
 
   const plantillas = useMemo(() => {
     if (!doc) return []
-    const { tabla } = autocablear(doc, { conservar: true })
-    const pre = PREARMADOS.find(p => p.id === prearmado)
-    // Las del proyecto primero; después, los ejemplos de cada pieza que tenga el robot.
-    const propias = pre ? pre.plantillas(doc, tabla) : []
-    return [...propias, ...plantillasGenericas(doc, tabla).filter(g => !propias.some(x => x.id === g.id))]
+    return plantillasDe(doc, prearmado)
   }, [doc, prearmado])
 
   const exportar = () => {
@@ -306,6 +306,9 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
   const lista = PREARMADOS
     .filter(p => (p.categoria ?? 'robot') === categoria)
     .filter(p => placa === 'todas' || placaDe(p.id) === placa)
+  const grupos = GRUPOS
+    .map(g => ({ nombre: g, proyectos: lista.filter(p => grupoDe(p.id) === g).sort((a, b) => ordenEnGrupo(a.id) - ordenEnGrupo(b.id)) }))
+    .filter(g => g.proyectos.length > 0)
   const Icono = categoria === 'robot' ? Bot : Lightbulb
   return (
     <Modal titulo={categoria === 'robot' ? '¿Con qué robot empezamos?' : '¿Qué circuito armamos?'} onCerrar={onCerrar} ancho="max-w-5xl">
@@ -324,8 +327,11 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
         </div>
       </div>
       {lista.length === 0 && <p className="mb-3 text-sm text-slate-400">Todavía no hay proyectos de esta placa en esta sección.</p>}
+      {grupos.map(g => (
+      <section key={g.nombre} className="mb-5">
+      <h3 className="mb-2 text-sm font-semibold text-white">{g.nombre} <span className="font-normal text-slate-500">· {g.proyectos.length}</span></h3>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {lista.map(p => (
+        {g.proyectos.map(p => (
           <button key={p.id} onClick={() => onAbrir(p.construir(), p.id)} className="group rounded-xl border border-lab-borde/15 bg-white/[0.03] p-4 text-left transition hover:border-lab-acento/50 hover:bg-lab-acento/5">
             <div className="mb-2 flex items-center justify-between">
               <Icono className="h-6 w-6 text-lab-acento" />
@@ -333,6 +339,7 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
             </div>
             <div className="font-semibold text-white">{p.nombre}</div>
             {p.kit && <div className="mt-0.5 inline-block rounded bg-chaski-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-chaski-primary">{p.kit}</div>}
+            {p.tema && <div className="mt-0.5 text-[10px] text-slate-500">{p.tema}</div>}
             <p className="mt-1 text-xs leading-relaxed text-slate-400">{p.descripcion}</p>
             <div className="mt-2 rounded-lg bg-black/20 p-2">
               <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Cómo piensa</div>
@@ -344,6 +351,8 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
           </button>
         ))}
       </div>
+      </section>
+      ))}
       <div className="mt-5 border-t border-lab-borde/15 pt-4">
         <div className="mb-2 text-sm font-semibold text-white">Empezar desde cero</div>
         {categoria === 'electronica' ? (<>

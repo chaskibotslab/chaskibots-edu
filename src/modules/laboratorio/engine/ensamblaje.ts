@@ -4,7 +4,7 @@
 // Todo es puro: recibe un RobotDoc y devuelve datos o un RobotDoc nuevo.
 
 import { Euler, Matrix4, Quaternion, Vector3 } from 'three'
-import { datosVariante, pieza } from '../catalogo/piezas'
+import { LISTA_PIEZAS, datosVariante, pieza } from '../catalogo/piezas'
 import { grados, type Colisionador, type PiezaDef, type PuntoMontaje, type V3 } from '../catalogo/tipos'
 import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 
@@ -209,7 +209,7 @@ export function resumen(doc: RobotDoc, ps = poses(doc)): Resumen {
 interface Caja { c: Vector3; ejes: Vector3[]; h: number[] }
 
 function cajasDe(def: PiezaDef, pose: Pose): Caja[] {
-  return def.colisionadores.map(col => {
+  return (def.huella ?? def.colisionadores).map(col => {
     let h: number[]
     if (col.forma === 'caja') h = col.medidas.map(x => x / 2)
     else if (col.forma === 'esfera') h = [col.radio, col.radio, col.radio]
@@ -259,10 +259,31 @@ export function encimadas(doc: RobotDoc, ps = poses(doc)): [PiezaEnRobot, PiezaE
   return out
 }
 
+/** Hasta cuánto (mm) puede asomar una pieza del borde de su base. */
+const MARGEN_SOBRESALE = 2
+
+/** ¿La placa, el driver o la batería se salen de la base donde van atornillados? */
+function sobresale(doc: RobotDoc, p: PiezaEnRobot, ps: Map<string, Pose>): boolean {
+  const m = montajeDe(doc, p)
+  const padre = doc.piezas.find(x => x.id === p.padre?.instancia)
+  if (!m || !padre || !['placa', 'driver', 'bateria'].includes(m.tipo)) return false
+  const defPadre = pieza(padre.pieza)
+  const base = defPadre.colisionadores[0]
+  if (defPadre.comportamiento.tipo !== 'chasis' || base?.forma !== 'caja') return false
+  const aBase = matriz(ps.get(padre.id)!).invert()
+  const ce = base.centro ?? [0, 0, 0]
+  return pieza(p.pieza).colisionadores.some(c => esquinas(c).some(e => {
+    const w = aRobot(ps.get(p.id)!, e).applyMatrix4(aBase)
+    return Math.abs(w.x - ce[0]) > base.medidas[0] / 2 + MARGEN_SOBRESALE || Math.abs(w.z - ce[2]) > base.medidas[2] / 2 + MARGEN_SOBRESALE
+  }))
+}
+
 /** Avisos de armado que el alumno debe ver (no impiden probar). */
 export function avisosEnsamblaje(doc: RobotDoc): string[] {
   const avisos: string[] = []
   for (const [a, b] of encimadas(doc)) avisos.push(`${a.etiqueta} y ${b.etiqueta} están encimados: cambia uno de lugar`)
+  const ps0 = poses(doc)
+  for (const p of doc.piezas) if (sobresale(doc, p, ps0)) avisos.push(`${p.etiqueta} se sale de la base: cámbiala de lugar o usa una más chica`)
   if (esBanco(doc)) {
     // En la mesa de electrónica no hay ruedas ni motores: hace falta la placa o, para
     // un circuito sin programa, una batería.
@@ -321,27 +342,46 @@ export function motivoNoEncastra(doc: RobotDoc, piezaId: string, instancia: stri
   if (def.comportamiento.tipo === 'mcu' && doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'mcu')) {
     return 'El robot ya tiene una placa'
   }
-  // No cabe: chocaría con otra pieza (pasa en chasis chicos con piezas grandes).
+  // No cabe: chocaría con otra pieza o se saldría de la base (chasis chicos con piezas grandes).
   const otra = chocaria(doc, piezaId, instancia, montajeId)
-  if (otra) {
+  const seSale = !otra && sobresaldria(doc, piezaId, instancia, montajeId)
+  if (otra || seSale) {
     // Sugiere un lugar donde sí cabe; si no hay y el chasis admite un piso de arriba, ese piso.
     const ocupados = new Set(doc.piezas.filter(p => p.padre).map(p => `${p.padre!.instancia}/${p.padre!.montaje}`))
     const libre = doc.piezas.flatMap(p => pieza(p.pieza).montajes.map(mm => ({ p, mm })))
-      .find(({ p, mm }) => def.encaja.includes(mm.tipo) && !ocupados.has(`${p.id}/${mm.id}`) && !(p.id === instancia && mm.id === montajeId) && !chocaria(doc, piezaId, p.id, mm.id))
+      .find(({ p, mm }) => def.encaja.includes(mm.tipo) && !ocupados.has(`${p.id}/${mm.id}`) && !(p.id === instancia && mm.id === montajeId) && !chocaria(doc, piezaId, p.id, mm.id) && !sobresaldria(doc, piezaId, p.id, mm.id))
     const conPiso = !def.encaja.includes('piso') && pieza(raiz(doc).pieza).montajes.some(x => x.tipo === 'piso') && !doc.piezas.some(p => pieza(p.pieza).encaja.includes('piso'))
     const consejo = libre ? ` Ponla en «${libre.mm.nombre}».`
-      : conPiso ? ' Agrega el «Piso de arriba» (en Chasis y bases) y sube ahí la placa o el driver para hacer lugar.'
+      : conPiso && cabeEnUnPiso(doc, piezaId) ? ' Agrega el «Piso de arriba» (en Chasis y bases) y sube ahí la placa o el driver para hacer lugar.'
+      : conPiso ? ' Es demasiado grande para este chasis: usa una más chica.'
       : ' Cambia de lugar la otra pieza o prueba en otro montaje.'
-    return `${def.nombre} no cabe ahí: chocaría con ${otra.etiqueta}.${consejo}`
+    return `${def.nombre} no cabe ahí: ${otra ? `chocaría con ${otra.etiqueta}` : 'se saldría de la base'}.${consejo}`
   }
   return null
 }
 
+const conNueva = (doc: RobotDoc, piezaId: string, instancia: string, montajeId: string): RobotDoc => (
+  { ...doc, piezas: [...doc.piezas, { id: '__nueva__', pieza: piezaId, etiqueta: pieza(piezaId).nombre, padre: { instancia, montaje: montajeId } }] }
+)
+
 /** Con qué pieza chocaría `piezaId` puesta en ese montaje (null = cabe). */
 function chocaria(doc: RobotDoc, piezaId: string, instancia: string, montajeId: string): PiezaEnRobot | null {
-  const prueba: RobotDoc = { ...doc, piezas: [...doc.piezas, { id: '__nueva__', pieza: piezaId, etiqueta: pieza(piezaId).nombre, padre: { instancia, montaje: montajeId } }] }
-  const choque = encimadas(prueba).find(([a, b]) => a.id === '__nueva__' || b.id === '__nueva__')
+  const choque = encimadas(conNueva(doc, piezaId, instancia, montajeId)).find(([a, b]) => a.id === '__nueva__' || b.id === '__nueva__')
   return choque ? (choque[0].id === '__nueva__' ? choque[1] : choque[0]) : null
+}
+
+function sobresaldria(doc: RobotDoc, piezaId: string, instancia: string, montajeId: string): boolean {
+  const prueba = conNueva(doc, piezaId, instancia, montajeId)
+  return sobresale(prueba, prueba.piezas[prueba.piezas.length - 1], poses(prueba))
+}
+
+/** ¿Cabría sobre un piso de arriba vacío? (El Mega, por ejemplo, ni así.) */
+function cabeEnUnPiso(doc: RobotDoc, piezaId: string): boolean {
+  const montaje = pieza(raiz(doc).pieza).montajes.find(x => x.tipo === 'piso')
+  const piso = LISTA_PIEZAS.find(x => x.encaja.includes('piso'))
+  if (!montaje || !piso) return false
+  const base: RobotDoc = { ...doc, piezas: [{ ...raiz(doc) }, { id: 'piso', pieza: piso.id, etiqueta: piso.nombre, padre: { instancia: raiz(doc).id, montaje: montaje.id } }] }
+  return piso.montajes.some(m => pieza(piezaId).encaja.includes(m.tipo) && !sobresaldria(base, piezaId, 'piso', m.id))
 }
 
 function slug(s: string) {
@@ -417,6 +457,9 @@ export function reemplazar(doc: RobotDoc, id: string, nuevaPieza: string, varian
   if (actual.padre) {
     const m = montajeDe(doc, actual)
     if (m && !nuevo.encaja.includes(m.tipo)) throw new Error(`${nuevo.nombre} no encaja en «${m.nombre}»`)
+    // La pieza nueva también tiene que caber donde estaba la otra.
+    const motivo = motivoNoEncastra(quitar(doc, id), nuevaPieza, actual.padre.instancia, actual.padre.montaje)
+    if (motivo) throw new Error(motivo)
   } else if (nuevo.encaja.length) {
     throw new Error('El chasis solo se puede cambiar por otro chasis')
   }
@@ -444,8 +487,15 @@ export function girar(doc: RobotDoc, id: string): RobotDoc {
   const ops = m?.rotacionesPermitidas
   if (!p || !m || !ops || ops.length < 2) return doc
   const i = ops.indexOf(p.padre!.giro ?? 0)
-  const giro = ops[(i + 1) % ops.length]
-  return { ...doc, piezas: doc.piezas.map(x => (x.id === id ? { ...x, padre: { ...x.padre!, giro } } : x)) }
+  // El siguiente giro en el que no choque con nada ni se salga de la base.
+  for (let n = 1; n < ops.length; n++) {
+    const giro = ops[(i + n) % ops.length]
+    const d: RobotDoc = { ...doc, piezas: doc.piezas.map(x => (x.id === id ? { ...x, padre: { ...x.padre!, giro } } : x)) }
+    const ps = poses(d)
+    const nueva = d.piezas.find(x => x.id === id)!
+    if (!encimadas(d, ps).some(([a, b]) => a.id === id || b.id === id) && !sobresale(d, nueva, ps)) return d
+  }
+  return doc
 }
 
 export function cambiarVariante(doc: RobotDoc, id: string, variante: string): RobotDoc {
