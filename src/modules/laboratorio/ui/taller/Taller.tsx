@@ -5,8 +5,8 @@
 // programa); cada cambio de piezas recablea solo y se puede deshacer.
 // El borrador se guarda en este navegador (en F3, en la cuenta).
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Bot, Cable, Lightbulb, CloudUpload, Code2, Download, FileUp, FlaskConical, FolderOpen, Hammer, LayoutGrid, Loader2, Play, Printer, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowLeft, Bot, Cable, ChevronRight, CloudUpload, Code2, Download, FileUp, FolderOpen, Hammer, LayoutGrid, Lightbulb, Loader2, MoreHorizontal, Pencil, Play, Plus, Printer, Search, X } from 'lucide-react'
 import { datosVariante, pieza } from '../../catalogo/piezas'
 import { autocablear } from '../../engine/autocableado'
 import { bancoVacio, esBanco, robotVacio, validar } from '../../engine/ensamblaje'
@@ -15,6 +15,7 @@ import { PREARMADOS, construirSeguidor, plantillasDe, programaConPinesNuevos } f
 import { GRUPOS, grupoDe, ordenEnGrupo } from '../../robots/clasificacion'
 import { calidadInicial, type NivelCalidad } from '../calidad'
 import Armar from './Armar'
+import Miniatura from './Miniatura'
 import MisRobots from './MisRobots'
 import { generarArduino } from '../../bloques/generador'
 import { PROGRAMA_VACIO } from '../../bloques/definiciones'
@@ -203,50 +204,51 @@ export default function Taller() {
   return (
     <div data-paso={pestana} className="lab-tema flex h-[calc(100dvh-4rem)] min-h-[560px] flex-col text-lab-tinta">
       {/* ---------- Encabezado ---------- */}
-      <div className="lab-barra z-10 flex flex-wrap items-center gap-2 px-3 py-2">
-        <div className="mr-1 flex items-center gap-2">
-          <div className="lab-primario flex h-8 w-8 items-center justify-center rounded-lg"><FlaskConical className="h-4 w-4" /></div>
-          <div className="hidden leading-tight sm:block">
-            <div className="text-sm font-semibold text-lab-tinta">Laboratorio de Robótica</div>
-            <div className="text-[11px] text-lab-suave">Arma, cablea, programa y prueba</div>
-          </div>
-        </div>
-        <input
-          value={doc.nombre}
-          onChange={e => setDoc({ ...doc, nombre: e.target.value.slice(0, 40) })}
-          className="h-9 w-36 rounded-lg border border-lab-borde/15 bg-lab-fondo px-2 text-sm font-medium text-lab-tinta outline-none focus:border-lab-acento/50 sm:w-44"
-          aria-label="Nombre del robot"
-        />
-        <nav aria-label="Pasos" className="order-last flex w-full items-center gap-1 overflow-x-auto sm:order-none sm:w-auto">
-          {pestanas.map(([id, txt, Icon], i) => (
-            <Fragment key={id}>
-              {i > 0 && <span aria-hidden className="hidden h-px w-3 shrink-0 bg-gradient-to-r from-lab-borde/10 to-lab-borde/30 md:block" />}
-              <button data-id={id} aria-current={pestana === id ? 'step' : undefined} onClick={() => setPestana(id)} className="lab-paso flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium">
-                <span className="lab-paso-num flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold">{i + 1}</span>
-                <Icon className="h-4 w-4" /> {txt}
-              </button>
-            </Fragment>
+      <div className="lab-barra z-10 flex h-12 shrink-0 items-stretch gap-3 px-3">
+        <label className="group flex min-w-0 items-center gap-1.5" title="Cambiar el nombre">
+          <input
+            value={doc.nombre}
+            onChange={e => setDoc({ ...doc, nombre: e.target.value.slice(0, 40) })}
+            size={Math.max(8, doc.nombre.length)}
+            className="min-w-0 max-w-[12rem] truncate rounded bg-transparent px-1 py-1 text-sm font-semibold text-lab-tinta outline-none hover:bg-lab-fondo2 focus:bg-lab-fondo2 focus:ring-1 focus:ring-lab-acento/40 lg:max-w-[16rem]"
+            aria-label="Nombre del robot"
+          />
+          <Pencil className="hidden h-3.5 w-3.5 shrink-0 text-lab-tenue group-hover:block" />
+        </label>
+        <span aria-hidden className="my-3 w-px bg-lab-borde/20" />
+        <nav aria-label="Pasos" className="flex min-w-0 items-stretch overflow-x-auto">
+          {pestanas.map(([id, txt], i) => (
+            <button key={id} data-id={id} aria-current={pestana === id ? 'step' : undefined} onClick={() => setPestana(id)} className="lab-paso flex shrink-0 items-center gap-2 px-3 text-sm font-medium">
+              <span className="lab-paso-num flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold">{i + 1}</span>
+              {txt}
+            </button>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-1.5">
-          <button onClick={guardarNube} disabled={guardando} className="lab-primario flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold disabled:opacity-50" title="Guardar en tu cuenta (Ctrl+S)">
-            {guardando ? <Loader2 className="h-4 w-4 animate-spin" /> : <CloudUpload className="h-4 w-4" />} <span className="hidden md:inline">Guardar</span>
-          </button>
-          <button onClick={() => setMisRobots(true)} className="flex h-9 items-center gap-1.5 rounded-lg border border-lab-borde/15 bg-lab-fondo px-3 text-sm hover:bg-lab-tinta/[0.04]" title="Tus robots guardados">
-            <FolderOpen className="h-4 w-4" /> <span className="hidden lg:inline">Mis robots</span>
-          </button>
-          <button onClick={() => setGaleria(true)} className="flex h-9 items-center gap-1.5 rounded-lg border border-lab-borde/15 bg-lab-fondo px-3 text-sm hover:bg-lab-tinta/[0.04]" title="Robots prearmados o empezar de cero">
+        <div className="ml-auto flex items-center gap-2">
+          <button onClick={() => setGaleria(true)} className="lab-secundario flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-medium" title="Proyectos listos o empezar de cero">
             <LayoutGrid className="h-4 w-4" /> <span className="hidden md:inline">Proyectos</span>
           </button>
-          <button onClick={exportar} className="flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 bg-lab-fondo hover:bg-lab-tinta/[0.04]" title="Descargar proyecto (.json)"><Download className="h-4 w-4" /></button>
-          <button onClick={() => archivo.current?.click()} className="flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 bg-lab-fondo hover:bg-lab-tinta/[0.04]" title="Abrir proyecto (.json)"><FileUp className="h-4 w-4" /></button>
+          <MenuMas
+            opciones={[
+              { icono: FolderOpen, texto: 'Mis robots guardados', accion: () => setMisRobots(true) },
+              { icono: Download, texto: 'Descargar proyecto (.json)', accion: exportar },
+              { icono: FileUp, texto: 'Abrir proyecto (.json)', accion: () => archivo.current?.click() },
+            ]}
+          />
+          <button onClick={guardarNube} disabled={guardando} className="lab-primario flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-semibold disabled:opacity-50" title="Guardar en tu cuenta (Ctrl+S)">
+            {guardando ? <Loader2 className="h-4 w-4 animate-spin" /> : <CloudUpload className="h-4 w-4" />} <span className="hidden sm:inline">Guardar</span>
+          </button>
           <input ref={archivo} type="file" accept="application/json,.json" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) importar(f); e.target.value = '' }} />
         </div>
       </div>
 
+      {/* Aviso flotante: no empuja el contenido hacia abajo. */}
       {aviso && (
-        <div className={`border-b px-4 py-1.5 text-xs ${aviso.tipo === 'error' ? 'border-red-500/30 bg-red-500/10 text-red-700' : aviso.tipo === 'ok' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700' : 'border-sky-500/30 bg-sky-500/10 text-sky-700'}`}>
-          {aviso.texto}
+        <div role="status" className="pointer-events-none fixed inset-x-0 top-[7.25rem] z-40 flex justify-center px-4">
+          <div className={`flex max-w-xl items-start gap-2 rounded-md border bg-lab-superficie px-3 py-2 text-xs text-lab-tinta shadow-lg ${aviso.tipo === 'error' ? 'border-red-300' : aviso.tipo === 'ok' ? 'border-emerald-300' : 'border-lab-borde/25'}`}>
+            <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${aviso.tipo === 'error' ? 'bg-red-500' : aviso.tipo === 'ok' ? 'bg-emerald-500' : 'bg-lab-acento'}`} />
+            {aviso.texto}
+          </div>
         </div>
       )}
 
@@ -282,14 +284,44 @@ export default function Taller() {
 
 function Modal({ titulo, onCerrar, children, ancho = 'max-w-3xl' }: { titulo: string; onCerrar: () => void; children: React.ReactNode; ancho?: string }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center sm:p-4" onClick={onCerrar}>
-      <div className={`max-h-[90dvh] w-full ${ancho} overflow-y-auto rounded-t-2xl lab-vidrio p-4 sm:rounded-2xl sm:p-6`} onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 sm:items-center sm:p-4" onClick={onCerrar}>
+      <div className={`max-h-[90dvh] w-full ${ancho} overflow-y-auto rounded-t-lg lab-vidrio p-4 sm:rounded-lg sm:p-6`} onClick={e => e.stopPropagation()}>
         <div className="mb-4 flex items-center justify-between gap-2">
           <h2 className="text-lg font-semibold text-lab-tinta">{titulo}</h2>
-          <button onClick={onCerrar} className="rounded-lg p-1.5 text-lab-suave hover:bg-lab-tinta/[0.07]" aria-label="Cerrar"><X className="h-5 w-5" /></button>
+          <button onClick={onCerrar} className="rounded-md p-1.5 text-lab-suave hover:bg-lab-fondo2" aria-label="Cerrar"><X className="h-5 w-5" /></button>
         </div>
         {children}
       </div>
+    </div>
+  )
+}
+
+/** Menú «⋯» de la barra: las acciones que se usan poco, fuera de la vista. */
+function MenuMas({ opciones }: { opciones: { icono: typeof Hammer; texto: string; accion: () => void }[] }) {
+  const [abierto, setAbierto] = useState(false)
+  const caja = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!abierto) return
+    const fuera = (e: PointerEvent) => { if (!caja.current?.contains(e.target as Node)) setAbierto(false) }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setAbierto(false) }
+    window.addEventListener('pointerdown', fuera)
+    window.addEventListener('keydown', esc)
+    return () => { window.removeEventListener('pointerdown', fuera); window.removeEventListener('keydown', esc) }
+  }, [abierto])
+  return (
+    <div ref={caja} className="relative">
+      <button onClick={() => setAbierto(a => !a)} aria-expanded={abierto} aria-label="Más opciones" title="Más opciones" className="lab-secundario flex h-8 w-8 items-center justify-center rounded-md">
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+      {abierto && (
+        <div role="menu" className="lab-vidrio absolute right-0 top-10 z-50 w-60 rounded-md py-1">
+          {opciones.map(({ icono: I, texto, accion }) => (
+            <button key={texto} role="menuitem" onClick={() => { setAbierto(false); accion() }} className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-lab-tinta hover:bg-lab-fondo2">
+              <I className="h-4 w-4 text-lab-suave" /> {texto}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -298,90 +330,190 @@ type PlacaGaleria = 'arduino' | 'esp32' | 'pico' | 'mega'
 /** Placa de un proyecto de la galería, por su id ('rc-esp32', 'pico-perilla'…). */
 const placaDe = (id: string): PlacaGaleria => (id.includes('esp32') ? 'esp32' : id.startsWith('pico') ? 'pico' : id.startsWith('mega') ? 'mega' : 'arduino')
 
-const DIFICULTAD = { inicial: 'bg-emerald-500/15 text-emerald-700', intermedio: 'bg-amber-500/15 text-amber-700', avanzado: 'bg-red-500/15 text-red-700' }
+const NIVEL = { inicial: ['Inicial', 1], intermedio: ['Intermedio', 2], avanzado: ['Avanzado', 3] } as const
+
+/** Nivel con tres rayitas: una = inicial, tres = avanzado. */
+function Nivel({ nivel }: { nivel: keyof typeof NIVEL }) {
+  const [txt, n] = NIVEL[nivel]
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs text-lab-suave">
+      <span className="flex gap-0.5">{[1, 2, 3].map(i => <span key={i} className={`h-2 w-1.5 rounded-[1px] ${i <= n ? 'bg-lab-acento' : 'bg-lab-borde/25'}`} />)}</span>
+      {txt}
+    </span>
+  )
+}
+
+type Proyecto = (typeof PREARMADOS)[number]
+interface FichaProyecto { p: Proyecto; placa: string; piezas: number }
+
+const INICIOS_ROBOT = [
+  ['chasis-2wd', 'Chasis 2WD', 'Dos ruedas y rueda loca: gira fácil'],
+  ['chasis-4wd', 'Chasis 4WD', 'Cuatro ruedas: más fuerza y tracción'],
+  ['chasis-minisumo', 'Chasis minisumo', '10 × 10 cm con pala: para competir en el dohyo'],
+] as const
+const INICIOS_BANCO = [
+  ['arduino-uno', 'Protoboard + Arduino UNO', 'Como en el kit de 8vo'],
+  ['arduino-nano', 'Protoboard + Arduino Nano', 'La misma placa, más chiquita'],
+  ['esp32-devkit', 'Protoboard + ESP32', 'Trabaja con 3,3 V'],
+  ['raspberry-pico', 'Protoboard + Raspberry Pi Pico', 'RP2040, 3,3 V, en C++'],
+  ['arduino-mega', 'Protoboard + Arduino Mega', '54 pines y 16 analógicas'],
+] as const
 
 function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | null) => void; onCerrar: () => void }) {
   const [categoria, setCategoria] = useState<'robot' | 'electronica'>('robot')
   const [placa, setPlaca] = useState<'todas' | PlacaGaleria>('todas')
-  const lista = PREARMADOS
-    .filter(p => (p.categoria ?? 'robot') === categoria)
-    .filter(p => placa === 'todas' || placaDe(p.id) === placa)
+  const [busqueda, setBusqueda] = useState('')
+  const [elegido, setElegido] = useState<string | null>(null)
+  // En el celular la ficha tapa la lista; en pantallas anchas van lado a lado.
+  const [verFicha, setVerFicha] = useState(false)
+
+  const fichas = useMemo<FichaProyecto[]>(() => PREARMADOS.map(p => {
+    const d = p.construir()
+    const mcu = d.piezas.find(x => pieza(x.pieza).familia === 'placa')
+    return { p, placa: mcu ? pieza(mcu.pieza).nombre : 'Sin placa', piezas: d.piezas.length }
+  }), [])
+
+  useEffect(() => {
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onCerrar() }
+    window.addEventListener('keydown', esc)
+    return () => window.removeEventListener('keydown', esc)
+  }, [onCerrar])
+
+  const q = busqueda.trim().toLowerCase()
+  const deCategoria = fichas.filter(f => (f.p.categoria ?? 'robot') === categoria)
+  const lista = deCategoria
+    .filter(f => placa === 'todas' || placaDe(f.p.id) === placa)
+    .filter(f => !q || `${f.p.nombre} ${f.p.descripcion} ${f.p.tema ?? ''} ${f.placa}`.toLowerCase().includes(q))
   const grupos = GRUPOS
-    .map(g => ({ nombre: g, proyectos: lista.filter(p => grupoDe(p.id) === g).sort((a, b) => ordenEnGrupo(a.id) - ordenEnGrupo(b.id)) }))
-    .filter(g => g.proyectos.length > 0)
+    .map(g => ({ nombre: g, fichas: lista.filter(f => grupoDe(f.p.id) === g).sort((a, b) => ordenEnGrupo(a.p.id) - ordenEnGrupo(b.p.id)) }))
+    .filter(g => g.fichas.length > 0)
+  const actual = lista.find(f => f.p.id === elegido) ?? grupos[0]?.fichas[0] ?? null
   const Icono = categoria === 'robot' ? Bot : Lightbulb
+  const cuenta = (id: 'todas' | PlacaGaleria) => deCategoria.filter(f => id === 'todas' || placaDe(f.p.id) === id).length
+
+  const elegir = (id: string) => { setElegido(id); setVerFicha(true) }
+
   return (
-    <Modal titulo={categoria === 'robot' ? '¿Con qué robot empezamos?' : '¿Qué circuito armamos?'} onCerrar={onCerrar} ancho="max-w-5xl">
-      <div className="mb-3 flex flex-wrap items-center gap-3">
-        <div className="flex overflow-hidden rounded-lg border border-lab-borde/20 text-sm">
-          {([['robot', 'Robots', Bot], ['electronica', 'Electrónica', Lightbulb]] as const).map(([id, txt, I]) => (
-            <button key={id} onClick={() => setCategoria(id)} className={`flex items-center gap-1.5 px-3 py-1.5 font-medium ${categoria === id ? 'bg-lab-acento/20 text-lab-acento' : 'text-lab-tinta2 hover:bg-lab-tinta/[0.04]'}`}>
-              <I className="h-4 w-4" /> {txt}
-            </button>
-          ))}
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 sm:items-center sm:p-4" onClick={onCerrar}>
+      <div className="lab-vidrio flex h-[92dvh] w-full max-w-6xl flex-col overflow-hidden rounded-t-lg sm:h-[86dvh] sm:rounded-lg" onClick={e => e.stopPropagation()}>
+        {/* Encabezado */}
+        <div className="flex items-center gap-3 border-b border-lab-borde/20 px-4 py-3 sm:px-5">
+          <h2 className="text-base font-semibold text-lab-tinta">Proyectos</h2>
+          <div className="flex rounded-md bg-lab-fondo2 p-0.5 text-sm">
+            {([['robot', 'Robots', Bot], ['electronica', 'Electrónica', Lightbulb]] as const).map(([id, txt, I]) => (
+              <button key={id} onClick={() => { setCategoria(id); setPlaca('todas'); setElegido(null); setVerFicha(false) }} className={`flex items-center gap-1.5 rounded px-3 py-1 font-medium ${categoria === id ? 'bg-lab-superficie text-lab-tinta shadow-sm' : 'text-lab-suave hover:text-lab-tinta'}`}>
+                <I className="h-4 w-4" /> {txt}
+              </button>
+            ))}
+          </div>
+          <button onClick={onCerrar} className="ml-auto rounded-md p-1.5 text-lab-suave hover:bg-lab-fondo2" aria-label="Cerrar"><X className="h-5 w-5" /></button>
         </div>
-        <div className="flex gap-1.5">
-          {([['todas', 'Todos'], ['arduino', 'Arduino'], ['esp32', 'ESP32'], ['pico', 'Raspberry Pi Pico'], ['mega', 'Mega']] as const).map(([id, txt]) => (
-            <button key={id} onClick={() => setPlaca(id)} className={`rounded-full px-3 py-1 text-xs font-medium ${placa === id ? 'lab-primario' : 'bg-lab-tinta/[0.04] text-lab-tinta2 hover:bg-lab-tinta/[0.07]'}`}>{txt}</button>
-          ))}
-        </div>
-      </div>
-      {lista.length === 0 && <p className="mb-3 text-sm text-lab-suave">Todavía no hay proyectos de esta placa en esta sección.</p>}
-      {grupos.map(g => (
-      <section key={g.nombre} className="mb-5">
-      <h3 className="mb-2 text-sm font-semibold text-lab-tinta">{g.nombre} <span className="font-normal text-lab-tenue">· {g.proyectos.length}</span></h3>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {g.proyectos.map(p => (
-          <button key={p.id} onClick={() => onAbrir(p.construir(), p.id)} className="group rounded-xl border border-lab-borde/15 bg-lab-superficie p-4 text-left transition hover:border-lab-acento/50 hover:bg-lab-acento/5">
-            <div className="mb-2 flex items-center justify-between">
-              <Icono className="h-6 w-6 text-lab-acento" />
-              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${DIFICULTAD[p.dificultad]}`}>{p.dificultad}</span>
+
+        <div className="flex min-h-0 flex-1">
+          {/* Lista */}
+          <div className={`min-h-0 w-full flex-col border-lab-borde/20 md:flex md:w-[44%] md:border-r ${verFicha ? 'hidden' : 'flex'}`}>
+            <div className="space-y-2.5 border-b border-lab-borde/20 p-4">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-lab-tenue" />
+                <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder={categoria === 'robot' ? 'Buscar: seguidor, sumo, aspiradora…' : 'Buscar: semáforo, LED, sensor…'} className="h-9 w-full rounded-md border border-lab-borde/30 bg-lab-superficie pl-8 pr-3 text-sm text-lab-tinta outline-none placeholder:text-lab-tenue focus:border-lab-acento focus:ring-1 focus:ring-lab-acento" />
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {([['todas', 'Todas'], ['arduino', 'Arduino'], ['esp32', 'ESP32'], ['pico', 'Pico'], ['mega', 'Mega']] as const).map(([id, txt]) => cuenta(id) > 0 && (
+                  <button key={id} onClick={() => setPlaca(id)} aria-pressed={placa === id} className="lab-chip px-2.5 py-1 text-xs font-medium">
+                    {txt} <span className="lab-chip-n">{cuenta(id)}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="font-semibold text-lab-tinta">{p.nombre}</div>
-            {p.kit && <div className="mt-0.5 inline-block rounded bg-chaski-primary/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-chaski-primary">{p.kit}</div>}
-            {p.tema && <div className="mt-0.5 text-[10px] text-lab-tenue">{p.tema}</div>}
-            <p className="mt-1 text-xs leading-relaxed text-lab-suave">{p.descripcion}</p>
-            <div className="mt-2 rounded-lg bg-lab-fondo2 p-2">
-              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-lab-tenue">Cómo piensa</div>
-              <ol className="list-decimal space-y-0.5 pl-4 text-[11px] leading-snug text-lab-tinta2">
-                {p.logica.map((l, i) => <li key={i}>{l}</li>)}
-              </ol>
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              {lista.length === 0 && <p className="p-4 text-sm text-lab-suave">No hay proyectos con ese filtro.</p>}
+              {grupos.map(g => (
+                <section key={g.nombre}>
+                  <h3 className="lab-seccion sticky top-0 z-[1] border-b border-lab-borde/15 bg-lab-fondo px-4 py-1.5">{g.nombre} <span className="font-normal text-lab-tenue">· {g.fichas.length}</span></h3>
+                  <ul>
+                    {g.fichas.map(f => {
+                      const sel = actual?.p.id === f.p.id
+                      return (
+                        <li key={f.p.id}>
+                          <button onClick={() => elegir(f.p.id)} onDoubleClick={() => onAbrir(f.p.construir(), f.p.id)} className={`relative flex w-full items-center gap-3 border-b border-lab-borde/10 px-4 py-2.5 text-left transition ${sel ? 'bg-lab-fondo2' : 'hover:bg-lab-fondo'}`}>
+                            {sel && <span className="absolute inset-y-0 left-0 w-[3px] bg-lab-acento" />}
+                            <Miniatura nombre={`proyecto-${f.p.id}`} icono={Icono} className="h-14 w-20 shrink-0 rounded border border-lab-borde/15" />
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-sm font-medium text-lab-tinta">{f.p.nombre}</span>
+                              <span className="block truncate text-xs text-lab-tenue">{f.placa} · {f.piezas} piezas</span>
+                            </span>
+                            <ChevronRight className="h-4 w-4 shrink-0 text-lab-tenue md:hidden" />
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </section>
+              ))}
+              {/* Empezar de cero */}
+              <section>
+                <h3 className="lab-seccion sticky top-0 z-[1] border-b border-lab-borde/15 bg-lab-fondo px-4 py-1.5">Empezar de cero</h3>
+                <ul>
+                  {(categoria === 'robot' ? INICIOS_ROBOT : INICIOS_BANCO).map(([id, n, d]) => (
+                    <li key={id}>
+                      <button
+                        onClick={() => onAbrir(categoria === 'robot'
+                          ? { ...robotVacio(id, id === 'chasis-minisumo' ? 'pla' : 'acrilico', 'Mi robot'), programa: { modo: 'bloques', bloques: PROGRAMA_VACIO, cpp: '' } }
+                          : bancoVacio(id, 'Mi circuito'), null)}
+                        className="flex w-full items-center gap-3 border-b border-lab-borde/10 px-4 py-2.5 text-left hover:bg-lab-fondo"
+                      >
+                        <span className="flex h-14 w-20 shrink-0 items-center justify-center rounded border border-dashed border-lab-borde/40 text-lab-tenue"><Plus className="h-5 w-5" /></span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-medium text-lab-tinta">{n}</span>
+                          <span className="block truncate text-xs text-lab-tenue">{d}</span>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             </div>
-            <div className="mt-3 text-xs font-medium text-lab-acento group-hover:underline">Abrir y modificar →</div>
-          </button>
-        ))}
-      </div>
-      </section>
-      ))}
-      <div className="mt-5 border-t border-lab-borde/15 pt-4">
-        <div className="mb-2 text-sm font-semibold text-lab-tinta">Empezar desde cero</div>
-        {categoria === 'electronica' ? (<>
-        <p className="mb-3 text-xs text-lab-suave">Una protoboard con la placa al lado; después pincha LED, resistencias, pulsadores… desde el cajón «Componentes».</p>
-        <div className="grid gap-2 sm:grid-cols-3">
-          {([
-            ['arduino-uno', 'Protoboard + Arduino UNO', 'Como en el kit de 8vo'], ['arduino-nano', 'Protoboard + Arduino Nano', 'La misma placa, más chiquita'],
-            ['esp32-devkit', 'Protoboard + ESP32', 'Trabaja con 3,3 V'], ['raspberry-pico', 'Protoboard + Raspberry Pi Pico', 'RP2040, 3,3 V, en C++'],
-            ['arduino-mega', 'Protoboard + Arduino Mega', '54 pines y 16 analógicas'],
-          ] as const).map(([placaId, n, d]) => (
-            <button key={placaId} onClick={() => onAbrir(bancoVacio(placaId, 'Mi circuito'), null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-lab-superficie">
-              <div className="text-sm font-semibold text-lab-tinta">{n}</div>
-              <div className="text-xs text-lab-suave">{d}</div>
-            </button>
-          ))}
+          </div>
+
+          {/* Ficha del proyecto elegido */}
+          {actual && (
+            <div className={`min-h-0 flex-1 overflow-y-auto md:block ${verFicha ? 'block' : 'hidden'}`}>
+              <div className="mx-auto max-w-2xl p-4 sm:p-6">
+                <button onClick={() => setVerFicha(false)} className="mb-3 flex items-center gap-1 text-sm text-lab-suave hover:text-lab-tinta md:hidden"><ArrowLeft className="h-4 w-4" /> Proyectos</button>
+                <div className="mb-1 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-lab-tenue">{grupoDe(actual.p.id)}</span>
+                  {actual.p.kit && <span className="lab-etiqueta">{actual.p.kit}</span>}
+                </div>
+                <h3 className="mb-4 text-xl font-semibold text-lab-tinta">{actual.p.nombre}</h3>
+                <div className="grid gap-5 lg:grid-cols-[1fr_15rem]">
+                  <Miniatura nombre={`proyecto-${actual.p.id}`} icono={Icono} className="aspect-[4/3] w-full rounded-md border border-lab-borde/20" />
+                  <div className="flex flex-col">
+                    <button onClick={() => onAbrir(actual.p.construir(), actual.p.id)} className="lab-primario h-10 w-full rounded-md text-sm font-semibold">Abrir en el taller</button>
+                    <p className="mt-2 text-xs leading-relaxed text-lab-tenue">Se abre listo para armar, cablear, programar y probar. Ctrl+Z deshace lo que cambies.</p>
+                    <dl className="mt-4 space-y-1.5 border-t border-lab-borde/20 pt-4 text-xs">
+                      <div className="flex gap-3"><dt className="w-14 text-lab-tenue">Placa</dt><dd className="font-medium text-lab-tinta">{actual.placa}</dd></div>
+                      <div className="flex gap-3"><dt className="w-14 text-lab-tenue">Piezas</dt><dd className="font-medium text-lab-tinta">{actual.piezas}</dd></div>
+                      <div className="flex items-center gap-3"><dt className="w-14 text-lab-tenue">Nivel</dt><dd><Nivel nivel={actual.p.dificultad} /></dd></div>
+                    </dl>
+                  </div>
+                </div>
+                <p className="mt-5 text-sm leading-relaxed text-lab-tinta2">{actual.p.descripcion}</p>
+                {actual.p.tema && <p className="mt-1 text-xs text-lab-tenue">{actual.p.tema}</p>}
+                <h4 className="mt-5 text-sm font-semibold text-lab-tinta">Cómo piensa</h4>
+                <ol className="mt-2 space-y-1.5 text-sm leading-relaxed text-lab-tinta2">
+                  {actual.p.logica.map((l, i) => (
+                    <li key={i} className="flex gap-2.5">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-lab-suave ring-1 ring-lab-borde/40">{i + 1}</span>
+                      <span>{l}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          )}
         </div>
-        </>) : (<>
-        <p className="mb-3 text-xs text-lab-suave">Elige el chasis; después arrastra las piezas desde el cajón.</p>
-        <div className="grid gap-2 sm:grid-cols-3">
-          {[['chasis-2wd', 'Chasis 2WD', 'Dos ruedas y rueda loca: gira fácil'], ['chasis-4wd', 'Chasis 4WD', 'Cuatro ruedas: más fuerza y tracción'], ['chasis-minisumo', 'Chasis minisumo', '10 × 10 cm con pala: para competir en el dohyo']].map(([id, n, d]) => (
-            <button key={id} onClick={() => onAbrir({ ...robotVacio(id, id === 'chasis-minisumo' ? 'pla' : 'acrilico', 'Mi robot'), programa: { modo: 'bloques', bloques: PROGRAMA_VACIO, cpp: '' } }, null)} className="rounded-xl border border-dashed border-lab-borde/25 p-3 text-left hover:border-lab-acento/50 hover:bg-lab-superficie">
-              <div className="text-sm font-semibold text-lab-tinta">{n}</div>
-              <div className="text-xs text-lab-suave">{d}</div>
-            </button>
-          ))}
-        </div>
-        </>)}
       </div>
-    </Modal>
+    </div>
   )
 }
 

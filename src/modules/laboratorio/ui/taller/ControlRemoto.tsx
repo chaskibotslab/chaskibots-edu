@@ -132,7 +132,7 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, fase, onCer
       onPointerDown={e => { e.preventDefault(); (e.target as HTMLElement).setPointerCapture?.(e.pointerId); setDir(d) }}
       onPointerUp={() => setDir('S')}
       onPointerCancel={() => setDir('S')}
-      className={`flex h-12 w-12 touch-none select-none items-center justify-center rounded-xl border text-lab-tinta transition ${efectiva === d ? 'border-lab-acento bg-lab-acento/40' : 'border-lab-borde/20 bg-lab-tinta/[0.07] hover:bg-lab-tinta/[0.13]'} ${clase}`}
+      className={`flex h-12 w-12 touch-none select-none items-center justify-center rounded-md border text-lab-tinta transition ${efectiva === d ? 'border-lab-acento bg-lab-acento/40' : 'border-lab-borde/20 bg-lab-tinta/[0.07] hover:bg-lab-tinta/[0.13]'} ${clase}`}
       aria-label={d}
     >
       <Icon className="h-6 w-6" />
@@ -140,7 +140,7 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, fase, onCer
   )
 
   return (
-    <div className="pointer-events-auto absolute bottom-3 left-3 z-10 max-h-[calc(100%-1.5rem)] w-56 overflow-y-auto rounded-2xl lab-vidrio p-3 text-xs text-lab-tinta backdrop-blur">
+    <div className="pointer-events-auto absolute bottom-3 left-3 z-10 max-h-[calc(100%-1.5rem)] w-56 overflow-y-auto rounded-2xl lab-vidrio p-3 text-xs text-lab-tinta">
       <div className="mb-2 flex items-center justify-between">
         <span className="flex items-center gap-1.5 font-semibold text-lab-tinta"><Gamepad2 className="h-4 w-4 text-lab-acento" /> Control remoto</span>
         <button onClick={onCerrar} className="rounded p-0.5 text-lab-suave hover:bg-lab-tinta/[0.07]" aria-label="Cerrar"><X className="h-4 w-4" /></button>
@@ -156,7 +156,7 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, fase, onCer
       <div className="mx-auto grid w-fit grid-cols-3 gap-1.5">
         <span />{boton('F', ArrowUp)}<span />
         {boton('L', ArrowLeft)}
-        <button onClick={() => setDir('S')} className="flex h-12 w-12 items-center justify-center rounded-xl border border-lab-borde/20 bg-lab-tinta/[0.04] text-lab-tinta2 hover:bg-lab-tinta/10" aria-label="Parar"><Square className="h-5 w-5" /></button>
+        <button onClick={() => setDir('S')} className="flex h-12 w-12 items-center justify-center rounded-md border border-lab-borde/20 bg-lab-tinta/[0.04] text-lab-tinta2 hover:bg-lab-tinta/10" aria-label="Parar"><Square className="h-5 w-5" /></button>
         {boton('R', ArrowRight)}
         <span />{boton('B', ArrowDown)}<span />
       </div>

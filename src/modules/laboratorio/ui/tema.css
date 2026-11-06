@@ -1,26 +1,26 @@
-/* Cromática del laboratorio de robótica: claro, tipo cuaderno.
-   Papel blanco sobre gris muy claro, texto gris tinta y un solo color de
-   acento (azul) para lo que se puede tocar. Los colores de estado siempre
-   significan lo mismo: verde = funciona, ámbar = aviso, rojo = error.
-   Los colores son tripletes RGB para usarlos con opacidad en Tailwind
-   (bg-lab-acento/20). */
+/* Cromática del laboratorio de robótica: limpia, tipo catálogo técnico.
+   Papel blanco, líneas finas grises, esquinas poco redondeadas y un solo
+   color de acento (petróleo) para lo que se puede tocar. Los colores de
+   estado siempre significan lo mismo: verde = funciona, ámbar = aviso,
+   rojo = error. Los colores son tripletes RGB para usarlos con opacidad en
+   Tailwind (bg-lab-acento/20). */
 
 .lab-tema {
-  --lab-vacio: 238 241 246;
-  --lab-fondo: 247 249 252;
-  --lab-fondo2: 241 244 249;
+  --lab-vacio: 244 246 249;
+  --lab-fondo: 248 250 252;
+  --lab-fondo2: 241 244 248;
   --lab-superficie: 255 255 255;
   --lab-elevado: 255 255 255;
-  --lab-borde: 71 85 105;
-  --lab-dato: 14 116 144;
+  --lab-borde: 100 116 139;
+  --lab-dato: 15 110 120;
 
   --lab-tinta: 15 23 42;
   --lab-tinta2: 51 65 85;
   --lab-suave: 71 85 105;
   --lab-tenue: 100 116 139;
 
-  --lab-acento: 37 99 235;
-  --lab-acento-2: 59 130 246;
+  --lab-acento: 15 110 120;
+  --lab-acento-2: 20 132 143;
   --lab-sobreacento: 255 255 255;
 
   background: rgb(var(--lab-vacio));
@@ -28,91 +28,101 @@
   color-scheme: light;
 }
 
-/* Barra superior: papel con una línea fina abajo. */
+/* Barra superior: una sola fila, papel con una línea fina abajo. */
 .lab-barra {
   position: relative;
-  background: rgb(var(--lab-superficie) / 0.96);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgb(var(--lab-borde) / 0.16);
+  background: rgb(var(--lab-superficie));
+  border-bottom: 1px solid rgb(var(--lab-borde) / 0.2);
 }
 
 /* Paneles laterales y modales. */
-.lab-panel {
-  background: rgb(var(--lab-superficie));
-}
+.lab-panel { background: rgb(var(--lab-superficie)); }
 .lab-vidrio {
-  background: rgb(var(--lab-superficie) / 0.92);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgb(var(--lab-borde) / 0.18);
-  box-shadow: 0 10px 28px -14px rgb(15 23 42 / 0.35);
+  background: rgb(var(--lab-superficie));
+  border: 1px solid rgb(var(--lab-borde) / 0.2);
+  box-shadow: 0 12px 32px -16px rgb(15 23 42 / 0.3);
 }
 
-/* Botón principal: azul liso. */
+/* Botón principal: petróleo liso. */
 .lab-primario {
   background: rgb(var(--lab-acento));
   color: rgb(var(--lab-sobreacento));
-  box-shadow: 0 6px 16px -8px rgb(var(--lab-acento) / 0.7);
   transition: background 0.15s, transform 0.1s;
 }
-.lab-primario:hover:not(:disabled) { background: rgb(29 78 216); }
+.lab-primario:hover:not(:disabled) { background: rgb(12 92 101); }
 .lab-primario:active:not(:disabled) { transform: scale(0.98); }
 
-/* Pasos: número en círculo; el paso actual se marca con una línea azul abajo. */
-.lab-paso { position: relative; color: rgb(var(--lab-suave)); transition: background 0.2s, color 0.2s; }
-.lab-paso:hover { background: rgb(var(--lab-acento) / 0.06); color: rgb(var(--lab-tinta)); }
-.lab-paso .lab-paso-num { background: rgb(var(--lab-borde) / 0.10); color: rgb(var(--lab-suave)); }
-.lab-paso[aria-current='step'] { color: rgb(var(--lab-tinta)); background: rgb(var(--lab-acento) / 0.08); }
+/* Botón secundario: contorno fino. */
+.lab-secundario {
+  background: rgb(var(--lab-superficie));
+  color: rgb(var(--lab-tinta));
+  box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.3);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.lab-secundario:hover:not(:disabled) { background: rgb(var(--lab-fondo2)); box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.45); }
+
+/* Pasos: pestañas con texto; la actual se subraya con el acento. */
+.lab-paso { position: relative; color: rgb(var(--lab-suave)); transition: color 0.15s; }
+.lab-paso:hover { color: rgb(var(--lab-tinta)); }
+.lab-paso .lab-paso-num { box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.4); color: rgb(var(--lab-suave)); }
+.lab-paso[aria-current='step'] { color: rgb(var(--lab-tinta)); }
 .lab-paso[aria-current='step']::after {
   content: '';
   position: absolute;
-  inset: auto 10px 0 10px;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
+  inset: auto 8px 0 8px;
+  height: 2px;
   background: rgb(var(--lab-acento));
 }
-.lab-paso[aria-current='step'] .lab-paso-num { background: rgb(var(--lab-acento)); color: white; }
-.lab-paso[aria-current='step'] svg { color: rgb(var(--lab-acento)); }
+.lab-paso[aria-current='step'] .lab-paso-num { background: rgb(var(--lab-acento)); box-shadow: none; color: white; }
 
-/* Familias del cajón de piezas (tonos oscuros para leerse sobre blanco). */
-.lab-fam { --f: 100 116 139; }
-.lab-fam[data-fam='chasis'] { --f: 161 98 7; }
-.lab-fam[data-fam='placa'] { --f: 29 78 216; }
-.lab-fam[data-fam='movimiento'] { --f: 202 138 4; }
-.lab-fam[data-fam='servo'] { --f: 79 70 229; }
-.lab-fam[data-fam='sensor'] { --f: 13 148 136; }
-.lab-fam[data-fam='electronica'] { --f: 220 38 38; }
-.lab-fam[data-fam='circuito'] { --f: 234 88 12; }
-.lab-fam[data-fam='robot'] { --f: var(--lab-acento); }
-
-.lab-fam-chip { background: rgb(var(--lab-superficie)); color: rgb(var(--lab-tinta2)); box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.18); }
-.lab-fam-chip:hover { background: rgb(var(--f) / 0.08); }
-.lab-fam-chip[aria-pressed='true'] { background: rgb(var(--f) / 0.12); color: rgb(var(--f)); box-shadow: inset 0 0 0 1px rgb(var(--f) / 0.5); }
-
-.lab-tarjeta {
-  position: relative;
-  overflow: hidden;
+/* Filtros con contador (cajón de piezas, galería). */
+.lab-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 4px;
   background: rgb(var(--lab-superficie));
-  border: 1px solid rgb(var(--lab-borde) / 0.16);
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
-  transition: border-color 0.15s, background 0.15s, transform 0.15s, box-shadow 0.15s;
+  color: rgb(var(--lab-tinta));
+  box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.3);
+  transition: background 0.15s, box-shadow 0.15s;
 }
-.lab-tarjeta::before {
-  content: '';
-  position: absolute;
-  inset: 8px auto 8px 0;
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: rgb(var(--f));
-}
-.lab-tarjeta:hover { border-color: rgb(var(--f) / 0.5); box-shadow: 0 8px 20px -14px rgb(15 23 42 / 0.45); }
-.lab-tarjeta[data-elegida='true'] { border-color: rgb(var(--f)); background: rgb(var(--f) / 0.06); }
+.lab-chip:hover { background: rgb(var(--lab-fondo2)); }
+.lab-chip .lab-chip-n { color: rgb(var(--lab-tenue)); font-size: 0.7rem; font-variant-numeric: tabular-nums; }
+.lab-chip[aria-pressed='true'] { background: rgb(var(--lab-acento)); color: white; box-shadow: none; }
+.lab-chip[aria-pressed='true'] .lab-chip-n { color: rgb(255 255 255 / 0.75); }
 
-/* Fondo de las escenas 3D (el lienzo es transparente): cielo claro. */
-.lab-escena {
-  background:
-    radial-gradient(ellipse 70% 55% at 50% 38%, rgb(255 255 255), transparent 75%),
-    linear-gradient(180deg, rgb(226 232 240), rgb(203 213 225));
+/* Etiqueta pequeña con contorno («EN KITS», «PRÓXIMAMENTE»). */
+.lab-etiqueta {
+  display: inline-block;
+  border-radius: 3px;
+  padding: 0 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  line-height: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--lab-suave));
+  box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.45);
 }
+
+/* Título de sección: versalitas pequeñas. */
+.lab-seccion { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(var(--lab-tinta2)); }
+
+/* Tarjetas de pieza y de proyecto: papel con borde fino; elegida = borde de acento. */
+.lab-tarjeta {
+  background: rgb(var(--lab-superficie));
+  border: 1px solid rgb(var(--lab-borde) / 0.22);
+  border-radius: 6px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.lab-tarjeta:hover { border-color: rgb(var(--lab-borde) / 0.5); }
+.lab-tarjeta[data-elegida='true'] { border-color: rgb(var(--lab-acento)); box-shadow: 0 0 0 1px rgb(var(--lab-acento)); }
+
+/* Fondo de las miniaturas: gris muy claro, como foto de catálogo. */
+.lab-foto { background: linear-gradient(180deg, rgb(246 248 251), rgb(236 240 245)); }
+
+/* Fondo de las escenas 3D (el lienzo es transparente): estudio claro. */
+.lab-escena { background: linear-gradient(180deg, rgb(246 248 251), rgb(228 233 240)); }
 
 /* Lecturas numéricas (velocidad, peso, pines). */
 .lab-dato { color: rgb(var(--lab-dato)); font-variant-numeric: tabular-nums; }
@@ -126,19 +136,16 @@
 /* Esquema de cableado: papel cuadriculado. */
 .lab-plano {
   background-color: rgb(var(--lab-fondo));
-  background-image:
-    radial-gradient(rgb(var(--lab-borde) / 0.22) 1px, transparent 1.2px),
-    linear-gradient(rgb(var(--lab-acento) / 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(var(--lab-acento) / 0.06) 1px, transparent 1px);
-  background-size: 16px 16px, 80px 80px, 80px 80px;
+  background-image: radial-gradient(rgb(var(--lab-borde) / 0.28) 1px, transparent 1.2px);
+  background-size: 16px 16px;
 }
 
 /* Bloques: globals.css pinta Blockly oscuro para el resto de la plataforma;
    en el laboratorio va claro. */
-.lab-tema .blocklyToolboxDiv { background: rgb(var(--lab-superficie)) !important; border-right: 1px solid rgb(var(--lab-borde) / 0.16) !important; }
+.lab-tema .blocklyToolboxDiv { background: rgb(var(--lab-superficie)) !important; border-right: 1px solid rgb(var(--lab-borde) / 0.2) !important; }
 .lab-tema .blocklyTreeLabel { color: rgb(var(--lab-tinta)) !important; }
 .lab-tema .blocklyTreeRow:hover { background: rgb(var(--lab-acento) / 0.08) !important; }
-.lab-tema .blocklyTreeSelected { background: rgb(var(--lab-acento) / 0.16) !important; }
+.lab-tema .blocklyTreeSelected { background: rgb(var(--lab-acento) / 0.14) !important; }
 .lab-tema .blocklyFlyoutBackground { fill: rgb(var(--lab-fondo2)) !important; }
 
 /* Cuenta regresiva del combate: cada número aparece grande y se achica. */

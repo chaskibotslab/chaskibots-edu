@@ -77,7 +77,7 @@ export default function PanelCircuito({ sim, tele, silencio, onSilencio, onGesto
   const buzzers = sim.doc.piezas.filter(p => pieza(p.pieza).comportamiento.tipo === 'buzzer')
 
   return (
-    <div className="absolute right-3 top-3 z-10 w-60 max-w-[calc(100%-1.5rem)] space-y-2.5 rounded-xl lab-vidrio p-3 text-xs">
+    <div className="absolute right-3 top-3 z-10 w-60 max-w-[calc(100%-1.5rem)] space-y-2.5 rounded-md lab-vidrio p-3 text-xs">
       {(controles.length > 0 || ultrasonido) && (
         <div className="space-y-2">
           <div className="text-[10px] font-semibold uppercase tracking-wide text-lab-suave">Tú controlas</div>
@@ -94,7 +94,7 @@ export default function PanelCircuito({ sim, tele, silencio, onSilencio, onGesto
                   onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); cambiar(true) }}
                   onPointerUp={() => cambiar(false)}
                   onPointerCancel={() => cambiar(false)}
-                  className={`flex w-full touch-none select-none items-center justify-between gap-2 rounded-lg border px-2.5 py-2 font-medium transition ${presionado ? 'translate-y-px border-red-400/60 bg-red-500/25 text-lab-tinta' : 'border-lab-borde/20 bg-lab-tinta/[0.04] text-lab-tinta hover:bg-lab-tinta/[0.07]'}`}
+                  className={`flex w-full touch-none select-none items-center justify-between gap-2 rounded-md border px-2.5 py-2 font-medium transition ${presionado ? 'translate-y-px border-red-400/60 bg-red-500/25 text-lab-tinta' : 'border-lab-borde/20 bg-lab-tinta/[0.04] text-lab-tinta hover:bg-lab-tinta/[0.07]'}`}
                 >
                   <span className="flex items-center gap-2">
                     <span className={`h-3.5 w-3.5 rounded-full border-2 ${presionado ? 'border-red-300 bg-red-500' : 'border-red-400/70 bg-red-500/40'}`} />
@@ -230,7 +230,7 @@ function ControlJoystick({ sim, inst, etiqueta, onGesto, onCambio }: { sim: Simu
           onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); boton(true) }}
           onPointerUp={() => boton(false)}
           onPointerCancel={() => boton(false)}
-          className={`touch-none select-none rounded-lg border px-2.5 py-2 font-medium ${presionado ? 'border-red-400/60 bg-red-500/25 text-lab-tinta' : 'border-lab-borde/20 bg-lab-tinta/[0.04] text-lab-tinta hover:bg-lab-tinta/[0.07]'}`}
+          className={`touch-none select-none rounded-md border px-2.5 py-2 font-medium ${presionado ? 'border-red-400/60 bg-red-500/25 text-lab-tinta' : 'border-lab-borde/20 bg-lab-tinta/[0.04] text-lab-tinta hover:bg-lab-tinta/[0.07]'}`}
         >
           SW
           <div className="text-[9px] font-normal text-lab-suave">{presionado ? 'presionado' : 'mantén'}</div>

@@ -25,15 +25,14 @@ function Estudio({ intensidad = 1 }: { intensidad?: number }) {
       <Lightformer form="rect" intensity={2.2 * intensidad} position={[0, 5, -2]} scale={[10, 3, 1]} rotation-x={Math.PI / 2.5} />
       <Lightformer form="rect" intensity={1.2 * intensidad} position={[-5, 2, 1]} scale={[3, 6, 1]} rotation-y={Math.PI / 2} />
       <Lightformer form="rect" intensity={1.2 * intensidad} position={[5, 2, 1]} scale={[3, 6, 1]} rotation-y={-Math.PI / 2} />
-      <Lightformer form="ring" color="#E57361" intensity={0.6 * intensidad} position={[0, 3, 5]} scale={2} />
-    </Environment>
+          </Environment>
   )
 }
 
 function Luces({ sombras, tamSombra, alcance }: { sombras: boolean; tamSombra: number; alcance: number }) {
   return (
     <>
-      <hemisphereLight args={['#e8eeff', '#2a2f48', 0.38]} />
+      <hemisphereLight args={['#ffffff', '#94a3b8', 0.55]} />
       <directionalLight
         position={[2.5, 4, 1.5]}
         intensity={1.8}
@@ -75,41 +74,16 @@ function Lienzo({ nivel, onNivel, children, camara }: { nivel: NivelCalidad; onN
 // Taller
 // ---------------------------------------------------------------------------
 
+/** Mesa de trabajo: piso de estudio claro con cuadrícula fina (1 cm) y gruesa (5 cm). */
 function Mesa() {
-  const textura = useMemo(() => {
-    // Veta de madera generada (sin descargar imágenes).
-    const c = document.createElement('canvas')
-    c.width = 512; c.height = 512
-    const ctx = c.getContext('2d')!
-    ctx.fillStyle = '#8a6240'
-    ctx.fillRect(0, 0, 512, 512)
-    for (let i = 0; i < 140; i++) {
-      const y = Math.random() * 512
-      ctx.strokeStyle = `rgba(${60 + Math.random() * 40}, ${38 + Math.random() * 20}, 20, ${0.15 + Math.random() * 0.25})`
-      ctx.lineWidth = 1 + Math.random() * 3
-      ctx.beginPath()
-      ctx.moveTo(0, y)
-      for (let x = 0; x <= 512; x += 32) ctx.lineTo(x, y + Math.sin(x / 60 + i) * 4)
-      ctx.stroke()
-    }
-    const t = new THREE.CanvasTexture(c)
-    t.colorSpace = THREE.SRGBColorSpace
-    t.wrapS = t.wrapT = THREE.RepeatWrapping
-    t.repeat.set(2, 1)
-    return t
-  }, [])
   return (
     <group>
-      <mesh position={[0, -0.02, 0]} receiveShadow>
-        <boxGeometry args={[1.6, 0.04, 0.9]} />
-        <meshStandardMaterial map={textura} roughness={0.7} />
+      <mesh position={[0, -0.0005, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[6, 6]} />
+        <meshStandardMaterial color="#e6eaf0" roughness={0.95} />
       </mesh>
-      {/* Tapete de corte verde */}
-      <mesh position={[0, 0.0005, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[0.6, 0.45]} />
-        <meshStandardMaterial color="#1d3b30" roughness={0.92} />
-      </mesh>
-      <gridHelper args={[0.6, 24, '#3d6b57', '#2a5444']} position={[0, 0.001, 0]} scale={[1, 1, 0.75]} />
+      <gridHelper args={[1.2, 120, '#d3d9e2', '#d3d9e2']} position={[0, 0.0002, 0]} />
+      <gridHelper args={[1.2, 24, '#bcc5d1', '#bcc5d1']} position={[0, 0.0003, 0]} />
     </group>
   )
 }
@@ -147,7 +121,7 @@ export function EscenaTaller(p: PropsTaller) {
       <Estudio />
       <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={0.5} />
       <Mesa />
-      <ContactShadows position={[0, 0.0012, 0]} scale={0.8} blur={2.4} opacity={0.55} far={0.3} resolution={q.nivel === 'baja' ? 256 : 512} />
+      <ContactShadows position={[0, 0.0012, 0]} scale={0.8} blur={2.4} opacity={0.4} far={0.3} resolution={q.nivel === 'baja' ? 256 : 512} />
       <ExplosionSuave objetivo={p.explosion}>
         {e => (
           <Robot3D
@@ -215,9 +189,9 @@ function PisoArena({ sim, version }: { sim: Simulacion; version: number }) {
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, bajo - 0.0005, 0]} receiveShadow onDoubleClick={arena.mesa ? undefined : colocar}>
         <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial color="#c3cbd6" roughness={0.95} />
+        <meshStandardMaterial color="#e6eaf0" roughness={0.95} />
       </mesh>
-      <gridHelper args={[14, 70, '#a7b1bf', '#b4bdca']} position={[0, bajo, 0]} />
+      <gridHelper args={[14, 70, '#c4ccd7', '#d3d9e2']} position={[0, bajo, 0]} />
       {arena.mesa && (
         <group>
           <mesh position={[0, -0.02, 0]} castShadow receiveShadow>
@@ -412,7 +386,7 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel, zoo
   const q = CALIDADES[nivel]
   return (
     <Lienzo nivel={nivel} onNivel={onNivel} camara={[-1.1, 0.9, 1.3]}>
-      <fog attach="fog" args={['#cbd5e1', 6, 16]} />
+      <fog attach="fog" args={['#e4e9f0', 6, 16]} />
       <Estudio intensidad={0.6} />
       <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={2.2} />
       <PisoArena sim={sim} version={versionArena} />

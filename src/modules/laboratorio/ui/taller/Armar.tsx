@@ -8,8 +8,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
-  AlertTriangle, Boxes, ChevronDown, ChevronUp, Expand, Info, Loader2, Package, RotateCw, Scale, Shrink, Trash2, Undo2, Redo2, X, Cable as IconCable,
+  AlertTriangle, ChevronDown, ChevronUp, Expand, Info, Loader2, Package, RotateCw, Search, Shrink, Trash2, Undo2, Redo2, X, Cable as IconCable,
 } from 'lucide-react'
+import Miniatura from './Miniatura'
 import { FAMILIAS, type Familia, type PiezaDef } from '../../catalogo/tipos'
 import { LISTA_PIEZAS, datosVariante, pieza, piezasDe } from '../../catalogo/piezas'
 import {
@@ -24,8 +25,6 @@ const EscenaTaller = dynamic(() => import('../Escena3D').then(m => m.EscenaTalle
   ssr: false,
   loading: () => <div className="flex h-full items-center justify-center gap-2 text-sm text-lab-suave"><Loader2 className="h-5 w-5 animate-spin" /> Preparando el taller…</div>,
 })
-
-const ICONO_FAMILIA: Record<Familia, string> = { chasis: '🛠️', placa: '🧠', movimiento: '⚙️', servo: '🦾', sensor: '👁️', electronica: '🔋', circuito: '💡' }
 
 interface Props {
   doc: RobotDoc
@@ -61,6 +60,7 @@ export default function Armar(p: Props) {
   const [explosion, setExplosion] = useState(false)
   const [cables, setCables] = useState(true)
   const [cajonAbierto, setCajonAbierto] = useState(true)
+  const [busqueda, setBusqueda] = useState('')
   const lienzo = useRef<HTMLDivElement>(null)
   const posMarcadores = useRef(new Map<string, { x: number; y: number }>())
 
@@ -166,48 +166,67 @@ export default function Armar(p: Props) {
   }, [arrastre, marcadores, masCercano, poner])
 
   const res = useMemo(() => resumen(doc), [doc])
+  // Lo que ofrece el cajón: en la mesa, la pila de 9 V y el joystick también van en «Componentes».
+  const deFamilia = (f: Familia) => [...piezasDe(f), ...(banco && f === 'circuito' ? EXTRAS_MESA : [])].sort((a, b) => Number(!!b.enKits) - Number(!!a.enKits))
+  const q = busqueda.trim().toLowerCase()
+  const visibles = q
+    ? LISTA_PIEZAS.filter(d => `${d.nombre} ${d.descripcion}`.toLowerCase().includes(q))
+    : familia === 'robot' ? [] : deFamilia(familia)
   const avisos = useMemo(() => avisosEnsamblaje(doc), [doc])
   const sel = seleccion ? doc.piezas.find(x => x.id === seleccion) ?? null : null
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row">
       {/* ---------- Cajón de piezas ---------- */}
-      <aside className={`order-2 lab-panel flex flex-col border-lab-borde/15 lg:order-1 lg:w-72 lg:border-r ${cajonAbierto ? 'max-h-[44vh] lg:max-h-none' : ''}`}>
-        <button onClick={() => setCajonAbierto(a => !a)} className="flex items-center justify-between border-b border-lab-borde/15 px-3 py-2 text-sm font-semibold text-lab-tinta lg:pointer-events-none">
-          <span className="flex items-center gap-2"><span className="lab-primario flex h-6 w-6 items-center justify-center rounded-md"><Boxes className="h-3.5 w-3.5" /></span> Cajón de piezas</span>
-          <span className="lg:hidden">{cajonAbierto ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}</span>
-        </button>
-        {cajonAbierto && (
-          <>
-            <div className="flex gap-1 overflow-x-auto border-b border-lab-borde/15 p-2">
-              <button onClick={() => setFamilia('robot')} data-fam="robot" aria-pressed={familia === 'robot'} className="lab-fam lab-fam-chip shrink-0 rounded-lg px-2.5 py-1.5 text-xs">
-                <span className="mr-1">🤖</span>En el robot ({doc.piezas.length - 1})
-              </button>
-              {FAMILIAS.map(f => (
-                <button key={f.id} onClick={() => setFamilia(f.id)} data-fam={f.id} aria-pressed={familia === f.id} className="lab-fam lab-fam-chip shrink-0 rounded-lg px-2.5 py-1.5 text-xs">
-                  <span className="mr-1">{ICONO_FAMILIA[f.id]}</span>{f.nombre}
-                </button>
-              ))}
+      <aside className={`order-2 lab-panel flex flex-col border-t border-lab-borde/20 lg:order-1 lg:w-80 lg:border-r lg:border-t-0 ${cajonAbierto ? 'max-h-[46vh] lg:max-h-none' : ''}`}>
+        <div className="border-b border-lab-borde/20 px-3 pb-3 pt-3">
+          <button onClick={() => setCajonAbierto(a => !a)} className="flex w-full items-center justify-between lg:pointer-events-none">
+            <span className="lab-seccion">Piezas</span>
+            <span className="text-lab-suave lg:hidden">{cajonAbierto ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}</span>
+          </button>
+          {cajonAbierto && (<>
+            <p className="mt-0.5 text-xs text-lab-tenue">Arrastra una pieza al {banco ? 'circuito' : 'robot'}, o tócala y elige dónde va.</p>
+            <div className="relative mt-2.5">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-lab-tenue" />
+              <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar: LED, motor, sensor…" className="h-8 w-full rounded-md border border-lab-borde/30 bg-lab-superficie pl-8 pr-7 text-sm text-lab-tinta outline-none placeholder:text-lab-tenue focus:border-lab-acento focus:ring-1 focus:ring-lab-acento" />
+              {busqueda && <button onClick={() => setBusqueda('')} className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-lab-tenue hover:text-lab-tinta" aria-label="Borrar búsqueda"><X className="h-3.5 w-3.5" /></button>}
             </div>
-            {familia === 'robot' ? (
-              // Piezas montadas: tocar = seleccionar; papelera = quitar (con lo que cuelga de ella).
-              <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
-                {doc.piezas.filter(p => p.padre).map(p => (
-                  <li key={p.id} data-fam={pieza(p.pieza).familia} data-elegida={seleccion === p.id} className="lab-fam lab-tarjeta flex items-center gap-2 rounded-lg py-1.5 pl-3 pr-2 text-xs">
-                    <button onClick={() => { setSeleccion(p.id); setElegida(null) }} className="min-w-0 flex-1 text-left">
-                      <div className="truncate font-medium text-lab-tinta">{p.etiqueta}</div>
-                      <div className="truncate text-[10px] text-lab-tenue">{pieza(p.pieza).nombre}</div>
-                    </button>
-                    <button onClick={() => quitarPieza(p.id)} className="rounded-md p-1.5 text-red-700 hover:bg-red-500/15" title={`Quitar ${p.etiqueta}`} aria-label={`Quitar ${p.etiqueta}`}>
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </li>
-                ))}
-                <li className="px-1 pt-1 text-[10px] leading-snug text-lab-tenue">Para cambiar el chasis, elige otro en la pestaña «Chasis». Ctrl+Z deshace.</li>
-              </ul>
-            ) : (
-            <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 gap-2 overflow-y-auto p-2 sm:grid-cols-3 lg:grid-cols-1">
-              {[...piezasDe(familia), ...(banco && familia === 'circuito' ? EXTRAS_MESA : [])].sort((a, b) => Number(!!b.enKits) - Number(!!a.enKits)).map(def => (
+            {!busqueda && (
+              <label className="relative mt-2 block">
+                <span className="sr-only">Qué piezas mostrar</span>
+                <select value={familia} onChange={e => setFamilia(e.target.value as Familia | 'robot')} className="h-8 w-full appearance-none rounded-md border border-lab-borde/30 bg-lab-superficie pl-2.5 pr-8 text-sm text-lab-tinta outline-none focus:border-lab-acento focus:ring-1 focus:ring-lab-acento">
+                  <option value="robot">{banco ? 'Puestas en el circuito' : 'Puestas en el robot'} ({doc.piezas.length - 1})</option>
+                  {FAMILIAS.map(f => <option key={f.id} value={f.id}>{f.nombre} ({deFamilia(f.id).length})</option>)}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-lab-tenue" />
+              </label>
+            )}
+          </>)}
+        </div>
+        {cajonAbierto && (
+          familia === 'robot' && !busqueda ? (
+            // Piezas montadas: tocar = seleccionar; papelera = quitar (con lo que cuelga de ella).
+            <ul className="min-h-0 flex-1 overflow-y-auto">
+              {doc.piezas.filter(p => p.padre).map(p => (
+                <li key={p.id} className={`flex items-center gap-2.5 border-b border-lab-borde/10 px-3 py-1.5 ${seleccion === p.id ? 'bg-lab-fondo2' : 'hover:bg-lab-fondo'}`}>
+                  <button onClick={() => { setSeleccion(p.id); setElegida(null) }} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
+                    <Miniatura nombre={`pieza-${p.pieza}`} className="h-9 w-9 shrink-0 rounded border border-lab-borde/15" />
+                    <span className="min-w-0">
+                      <span className="block truncate text-xs font-medium text-lab-tinta">{p.etiqueta}</span>
+                      <span className="block truncate text-[11px] text-lab-tenue">{pieza(p.pieza).nombre}</span>
+                    </span>
+                  </button>
+                  <button onClick={() => quitarPieza(p.id)} className="rounded p-1.5 text-lab-tenue hover:bg-red-50 hover:text-red-600" title={`Quitar ${p.etiqueta}`} aria-label={`Quitar ${p.etiqueta}`}>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </li>
+              ))}
+              <li className="px-3 py-2 text-[11px] leading-snug text-lab-tenue">Para cambiar la base, elige otra en «Chasis y bases». Ctrl+Z deshace.</li>
+            </ul>
+          ) : (
+            <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-3 gap-2 overflow-y-auto p-3 sm:grid-cols-4 lg:grid-cols-2">
+              {visibles.length === 0 && <p className="col-span-full text-xs text-lab-suave">No hay piezas con «{busqueda}».</p>}
+              {visibles.map(def => (
                 <TarjetaPieza
                   key={def.id}
                   def={def}
@@ -220,8 +239,7 @@ export default function Armar(p: Props) {
                 />
               ))}
             </div>
-            )}
-          </>
+          )
         )}
       </aside>
 
@@ -242,28 +260,30 @@ export default function Armar(p: Props) {
         />
 
         {/* Barra de herramientas */}
-        <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
-          <BotonIcono titulo="Deshacer" onClick={p.deshacer} disabled={!p.puedeDeshacer}><Undo2 className="h-4 w-4" /></BotonIcono>
-          <BotonIcono titulo="Rehacer" onClick={p.rehacer} disabled={!p.puedeRehacer}><Redo2 className="h-4 w-4" /></BotonIcono>
+        <div className="absolute left-3 top-3 flex items-center gap-0.5 rounded-md border border-lab-borde/20 bg-lab-superficie p-1 shadow-sm">
+          <BotonIcono titulo="Deshacer (Ctrl+Z)" onClick={p.deshacer} disabled={!p.puedeDeshacer}><Undo2 className="h-4 w-4" /></BotonIcono>
+          <BotonIcono titulo="Rehacer (Ctrl+Y)" onClick={p.rehacer} disabled={!p.puedeRehacer}><Redo2 className="h-4 w-4" /></BotonIcono>
+          <span aria-hidden className="mx-1 h-5 w-px bg-lab-borde/20" />
           <BotonIcono titulo={explosion ? 'Juntar piezas' : 'Vista explosionada'} onClick={() => setExplosion(e => !e)} activo={explosion}>{explosion ? <Shrink className="h-4 w-4" /> : <Expand className="h-4 w-4" />}</BotonIcono>
           <BotonIcono titulo={cables ? 'Ocultar cables' : 'Mostrar cables'} onClick={() => setCables(c => !c)} activo={cables}><IconCable className="h-4 w-4" /></BotonIcono>
           <BotonIcono titulo="Lista de materiales" onClick={p.onListaMateriales}><Package className="h-4 w-4" /></BotonIcono>
         </div>
 
         {/* Datos en vivo */}
-        <div className="pointer-events-none absolute right-2 top-2 w-48 rounded-xl lab-vidrio p-2.5 text-xs backdrop-blur sm:w-56">
-          <div className="mb-1.5 flex items-center gap-1.5 font-semibold text-lab-tinta"><Scale className="h-3.5 w-3.5 text-lab-acento" /> {doc.nombre}</div>
+        <div className="pointer-events-none absolute right-3 top-3 hidden w-64 rounded-md border border-lab-borde/20 bg-lab-superficie/95 px-3 py-2.5 text-xs shadow-sm sm:block">
+          <div className="lab-seccion mb-1.5">{banco ? 'Circuito' : 'Robot'}</div>
           <Dato k="Peso" v={`${res.masa_g.toFixed(0)} g`} />
           <Dato k="Medidas" v={`${(res.medidas.largo / 10).toFixed(1)} × ${(res.medidas.ancho / 10).toFixed(1)} × ${(res.medidas.alto / 10).toFixed(1)} cm`} />
-          <Dato k="Centro de gravedad" v={`${res.cg.x >= 0 ? '+' : ''}${res.cg.x.toFixed(0)} mm ${res.cg.x >= 0 ? 'adelante' : 'atrás'}`} />
+          <Dato k="Centro de gravedad" v={`${Math.abs(res.cg.x).toFixed(0)} mm ${res.cg.x >= 0 ? 'adelante' : 'atrás'}`} />
           <Dato k="Piezas" v={String(res.piezas)} />
           {avisos.map((a, i) => (
-            <div key={i} className="mt-1.5 flex gap-1 rounded-md bg-amber-500/15 px-1.5 py-1 text-[11px] leading-snug text-amber-700"><AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" /> {a}</div>
+            <div key={i} className="mt-2 flex gap-1.5 border-t border-lab-borde/15 pt-2 text-[11px] leading-snug text-amber-700"><AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" /> {a}</div>
           ))}
         </div>
 
         {elegida && !arrastre?.iniciado && (
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-emerald-400/30 bg-lab-superficie/95 px-3 py-1.5 text-xs text-emerald-700 backdrop-blur">
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-md border border-lab-borde/20 bg-lab-superficie px-3 py-1.5 text-xs text-lab-tinta shadow-sm">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
             {marcadores.length ? <>Toca un punto verde para poner <b>{pieza(elegida).nombre}</b></> : <>No hay lugar libre para <b>{pieza(elegida).nombre}</b></>}
             <button onClick={() => setElegida(null)} className="rounded-full p-0.5 hover:bg-lab-tinta/[0.07]"><X className="h-3.5 w-3.5" /></button>
           </div>
@@ -283,7 +303,7 @@ export default function Armar(p: Props) {
 
       {/* Pieza que se está arrastrando */}
       {arrastre?.iniciado && (
-        <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-emerald-400/60 bg-lab-superficie/90 px-2.5 py-1.5 text-xs font-medium text-lab-tinta shadow-xl" style={{ left: arrastre.x, top: arrastre.y }}>
+        <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 rounded-md border border-lab-acento bg-lab-superficie px-2.5 py-1.5 text-xs font-medium text-lab-tinta shadow-lg" style={{ left: arrastre.x, top: arrastre.y }}>
           {pieza(arrastre.pieza).nombre}
         </div>
       )}
@@ -293,14 +313,14 @@ export default function Armar(p: Props) {
 
 function BotonIcono({ titulo, onClick, disabled, activo, children }: { titulo: string; onClick: () => void; disabled?: boolean; activo?: boolean; children: React.ReactNode }) {
   return (
-    <button title={titulo} aria-label={titulo} onClick={onClick} disabled={disabled} className={`flex h-9 w-9 items-center justify-center rounded-lg border border-lab-borde/15 backdrop-blur transition disabled:opacity-35 ${activo ? 'bg-lab-acento/25 text-lab-acento shadow-[0_0_14px_-4px] shadow-lab-acento' : 'bg-lab-superficie/75 text-lab-tinta hover:bg-lab-elevado'}`}>
+    <button title={titulo} aria-label={titulo} aria-pressed={activo} onClick={onClick} disabled={disabled} className={`flex h-8 w-8 items-center justify-center rounded transition disabled:opacity-30 ${activo ? 'bg-lab-acento/10 text-lab-acento' : 'text-lab-tinta2 hover:bg-lab-fondo2'}`}>
       {children}
     </button>
   )
 }
 
 function Dato({ k, v }: { k: string; v: string }) {
-  return <div className="flex justify-between gap-2 py-0.5"><span className="text-lab-suave">{k}</span><span className="text-right font-mono text-lab-tinta">{v}</span></div>
+  return <div className="flex justify-between gap-2 py-0.5"><span className="text-lab-tenue">{k}</span><span className="text-right tabular-nums text-lab-tinta">{v}</span></div>
 }
 
 function TarjetaPieza({ def, elegida, enUso, onTocar, onArrastrar }: { def: PiezaDef; elegida: boolean; enUso: boolean; onTocar: () => void; onArrastrar: (x: number, y: number) => void }) {
@@ -308,21 +328,19 @@ function TarjetaPieza({ def, elegida, enUso, onTocar, onArrastrar }: { def: Piez
     <button
       onClick={onTocar}
       onPointerDown={e => { if (e.button === 0 && !def.proximamente) onArrastrar(e.clientX, e.clientY) }}
-      data-fam={def.familia}
       data-elegida={elegida}
-      className={`lab-fam touch-none select-none rounded-xl p-2 pl-3 text-left ${def.proximamente ? 'rounded-xl border border-dashed border-lab-borde/15 bg-lab-superficie opacity-60' : 'lab-tarjeta'}`}
+      title={def.descripcion}
+      className={`lab-tarjeta flex touch-none select-none flex-col p-1.5 text-left ${def.proximamente ? 'border-dashed opacity-60' : ''}`}
     >
-      <div className="flex items-start justify-between gap-1">
-        <span className="text-xs font-semibold leading-tight text-lab-tinta">{def.nombre}</span>
-        {def.proximamente
-          ? <span className="shrink-0 rounded bg-sky-500/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-sky-700">Próximamente</span>
-          : def.enKits && <span className="shrink-0 rounded bg-chaski-primary/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-chaski-primary">En kits</span>}
-      </div>
-      <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-lab-suave">{def.descripcion}</p>
-      <div className="mt-1 flex items-center gap-2 text-[10px] text-lab-tenue">
-        <span className="lab-dato font-mono">{def.masa_g} g</span>
-        {enUso && <span className="text-emerald-600">● en el robot</span>}
-      </div>
+      <Miniatura nombre={`pieza-${def.id}`} icono={Package} className="aspect-[4/3] w-full rounded-[3px]" />
+      <span className="mt-1.5 line-clamp-2 min-h-[2rem] px-0.5 text-center text-xs font-medium leading-4 text-lab-tinta">{def.nombre}</span>
+      <span className="mt-1 flex items-center justify-between gap-1 px-0.5">
+        {def.proximamente ? <span className="lab-etiqueta">Pronto</span> : def.enKits ? <span className="lab-etiqueta">En kits</span> : <span />}
+        <span className="flex items-center gap-1 text-[10px] tabular-nums text-lab-tenue">
+          {enUso && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="Ya está puesta" />}
+          {def.masa_g} g
+        </span>
+      </span>
     </button>
   )
 }
@@ -345,16 +363,17 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
   }
 
   return (
-    <aside className="absolute inset-x-0 bottom-0 z-20 max-h-[60vh] overflow-y-auto rounded-t-2xl border-t border-lab-borde/15 bg-lab-superficie/95 p-3 shadow-2xl backdrop-blur lg:static lab-panel lg:order-3 lg:max-h-none lg:w-80 lg:rounded-none lg:border-l lg:border-t-0">
-      <div className="mb-2 flex items-start justify-between gap-2">
-        <div>
-          <div className="text-[11px] uppercase tracking-wide text-lab-tenue">{inst.etiqueta}</div>
-          <h3 className="text-sm font-semibold text-lab-tinta">{v.nombre}</h3>
+    <aside className="absolute inset-x-0 bottom-0 z-20 max-h-[60vh] overflow-y-auto rounded-t-lg border-t border-lab-borde/20 bg-lab-superficie p-4 shadow-2xl lg:static lab-panel lg:order-3 lg:max-h-none lg:w-80 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none">
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="lab-seccion">{inst.etiqueta}</div>
+          <h3 className="mt-0.5 text-base font-semibold text-lab-tinta">{v.nombre}</h3>
         </div>
-        <button onClick={onCerrar} className="rounded-lg p-1 text-lab-suave hover:bg-lab-tinta/[0.07]" aria-label="Cerrar"><X className="h-4 w-4" /></button>
+        <button onClick={onCerrar} className="rounded-md p-1 text-lab-suave hover:bg-lab-fondo2" aria-label="Cerrar"><X className="h-4 w-4" /></button>
       </div>
+      <Miniatura nombre={`pieza-${def.id}`} icono={Package} className="mb-3 aspect-[16/10] w-full rounded-md border border-lab-borde/15" />
       <p className="mb-2 text-xs leading-relaxed text-lab-tinta2">{def.descripcion}</p>
-      {def.enKits && <div className="mb-2 inline-block rounded bg-chaski-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-chaski-primary">Viene en los kits ChaskiBots</div>}
+      {def.enKits && <div className="mb-2"><span className="lab-etiqueta">Viene en los kits ChaskiBots</span></div>}
       {credito && (
         <p className="mb-2 text-[10px] leading-snug text-lab-tenue">
           Modelo 3D: <a href={credito.fuente} target="_blank" rel="noreferrer" className="underline hover:text-lab-tinta2">«{credito.titulo}»</a> de {credito.autor.replace(/ (.*)$/, '')} · {credito.licencia.replace(/ (.*)$/, '')}
@@ -373,7 +392,7 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
 
       {def.variantes && (
         <div className="mb-3">
-          <div className="mb-1 text-[11px] font-semibold text-lab-suave">Material</div>
+          <div className="lab-seccion mb-1.5">Material</div>
           <div className="grid grid-cols-2 gap-1.5">
             {def.variantes.map(x => (
               <button key={x.id} onClick={() => cambiar(cambiarVariante(doc, id, x.id), `Material: ${x.nombre}`)} className={`flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-left text-[11px] ${(inst.variante ?? def.variantes![0].id) === x.id ? 'border-lab-acento/60 bg-lab-acento/10 text-lab-tinta' : 'border-lab-borde/15 text-lab-tinta2 hover:bg-lab-tinta/[0.04]'}`}>
@@ -387,7 +406,7 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
 
       {alternativas.length > 0 && (
         <div className="mb-3">
-          <div className="mb-1 text-[11px] font-semibold text-lab-suave">Cambiar por</div>
+          <div className="lab-seccion mb-1.5">Cambiar por</div>
           <div className="flex flex-col gap-1">
             {alternativas.map(a => (
               <button key={a.id} onClick={() => reemplazarPor(a.id)} className="flex items-center justify-between rounded-lg border border-lab-borde/15 px-2 py-1.5 text-left text-xs text-lab-tinta hover:bg-lab-tinta/[0.04]">
@@ -400,7 +419,7 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
 
       <div className="flex gap-2">
         {mt?.rotacionesPermitidas && mt.rotacionesPermitidas.length > 1 && (
-          <button onClick={() => cambiar(girar(doc, id), `Girar ${inst.etiqueta}`)} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-lab-borde/15 py-2 text-xs hover:bg-lab-tinta/[0.04]"><RotateCw className="h-3.5 w-3.5" /> Girar</button>
+          <button onClick={() => cambiar(girar(doc, id), `Girar ${inst.etiqueta}`)} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-lab-borde/30 py-2 text-xs hover:bg-lab-fondo2"><RotateCw className="h-3.5 w-3.5" /> Girar</button>
         )}
         {inst.padre && (
           <button
@@ -409,7 +428,7 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
               cambiar(quitar(doc, id), `Quitar ${inst.etiqueta}`)
               onCerrar()
             }}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-500/30 py-2 text-xs text-red-700 hover:bg-red-500/10"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-md border border-red-300 py-2 text-xs text-red-700 hover:bg-red-50"
           >
             <Trash2 className="h-3.5 w-3.5" /> Quitar
           </button>
