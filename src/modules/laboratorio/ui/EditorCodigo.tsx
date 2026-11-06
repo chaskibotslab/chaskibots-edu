@@ -48,44 +48,44 @@ const CONSTANTES = ['HIGH', 'LOW', 'INPUT', 'OUTPUT', 'INPUT_PULLUP', 'LED_BUILT
 
 let autocompletadoRegistrado = false
 function registrarArduino(monaco: Monaco) {
-  // Tema «Noche de taller»: mismo azul tinta que el laboratorio (tema.css).
-  monaco.editor.defineTheme('chaski-noche', {
-    base: 'vs-dark',
+  // Tema «Cuaderno»: papel blanco y colores de sintaxis legibles sobre fondo claro (tema.css).
+  monaco.editor.defineTheme('chaski-dia', {
+    base: 'vs',
     inherit: true,
     rules: [
-      { token: 'comment', foreground: '6B7AA6', fontStyle: 'italic' },
-      { token: 'keyword', foreground: 'B4A5FF' },
-      { token: 'keyword.directive', foreground: 'F07A63' },
-      { token: 'type', foreground: '5EEAD4' },
-      { token: 'string', foreground: 'F5C46B' },
-      { token: 'number', foreground: '67E8F9' },
-      { token: 'identifier', foreground: 'E2E8F0' },
-      { token: 'delimiter', foreground: '94A3C8' },
-      { token: 'operator', foreground: 'F59E8B' },
+      { token: 'comment', foreground: '64748B', fontStyle: 'italic' },
+      { token: 'keyword', foreground: '7C3AED' },
+      { token: 'keyword.directive', foreground: 'C2410C' },
+      { token: 'type', foreground: '0F766E' },
+      { token: 'string', foreground: 'A16207' },
+      { token: 'number', foreground: '0369A1' },
+      { token: 'identifier', foreground: '0F172A' },
+      { token: 'delimiter', foreground: '475569' },
+      { token: 'operator', foreground: 'BE123C' },
     ],
     colors: {
-      'editor.background': '#0B0F1C',
-      'editor.foreground': '#E2E8F0',
-      'editor.lineHighlightBackground': '#151C33',
+      'editor.background': '#FFFFFF',
+      'editor.foreground': '#0F172A',
+      'editor.lineHighlightBackground': '#EFF6FF',
       'editor.lineHighlightBorder': '#00000000',
-      'editorLineNumber.foreground': '#3A4670',
-      'editorLineNumber.activeForeground': '#B4A5FF',
-      'editor.selectionBackground': '#9380FA40',
-      'editor.inactiveSelectionBackground': '#9380FA22',
-      'editorCursor.foreground': '#B4A5FF',
-      'editorIndentGuide.background1': '#1A2140',
-      'editorIndentGuide.activeBackground1': '#3A4670',
-      'editorBracketMatch.background': '#5EEAD420',
-      'editorBracketMatch.border': '#5EEAD480',
-      'editorWidget.background': '#131A2E',
-      'editorWidget.border': '#2A3460',
-      'editorSuggestWidget.background': '#131A2E',
-      'editorSuggestWidget.border': '#2A3460',
-      'editorSuggestWidget.selectedBackground': '#9380FA33',
-      'editorHoverWidget.background': '#131A2E',
-      'editorHoverWidget.border': '#2A3460',
-      'scrollbarSlider.background': '#3A467055',
-      'scrollbarSlider.hoverBackground': '#9380FA66',
+      'editorLineNumber.foreground': '#94A3B8',
+      'editorLineNumber.activeForeground': '#2563EB',
+      'editor.selectionBackground': '#2563EB30',
+      'editor.inactiveSelectionBackground': '#2563EB18',
+      'editorCursor.foreground': '#2563EB',
+      'editorIndentGuide.background1': '#E2E8F0',
+      'editorIndentGuide.activeBackground1': '#94A3B8',
+      'editorBracketMatch.background': '#0F766E18',
+      'editorBracketMatch.border': '#0F766E80',
+      'editorWidget.background': '#FFFFFF',
+      'editorWidget.border': '#CBD5E1',
+      'editorSuggestWidget.background': '#FFFFFF',
+      'editorSuggestWidget.border': '#CBD5E1',
+      'editorSuggestWidget.selectedBackground': '#DBEAFE',
+      'editorHoverWidget.background': '#FFFFFF',
+      'editorHoverWidget.border': '#CBD5E1',
+      'scrollbarSlider.background': '#94A3B855',
+      'scrollbarSlider.hoverBackground': '#2563EB66',
     },
   })
   if (autocompletadoRegistrado) return
@@ -151,7 +151,7 @@ export default function EditorCodigo({
     <MonacoEditor
       height="100%"
       language="cpp"
-      theme="chaski-noche"
+      theme="chaski-dia"
       value={codigo}
       onChange={v => onChange(v ?? '')}
       beforeMount={registrarArduino}
@@ -160,6 +160,15 @@ export default function EditorCodigo({
         monacoRef.current = monaco
         // Ctrl+Enter = compilar y ejecutar
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => ejecutarRef.current())
+        // Monaco colorea en segundo plano cuando el navegador está libre, y la escena 3D
+        // nunca lo deja libre: sin esto el código queda sin colores. Los sketches son cortos.
+        const colorear = () => {
+          const m = editor.getModel() as unknown as { getLineCount(): number; tokenization?: { forceTokenization(linea: number): void } } | null
+          m?.tokenization?.forceTokenization(m.getLineCount())
+        }
+        // La gramática de C++ llega unos instantes después de montar el editor.
+        for (const ms of [0, 300, 1000, 2500]) setTimeout(colorear, ms)
+        editor.onDidChangeModelContent(colorear)
       }}
       options={{
         fontSize: 14,
