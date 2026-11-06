@@ -237,6 +237,14 @@ export class Simulacion {
 
   colocarRobot(p?: Pose2D) { this.fisica.colocar(p ?? this.arena.inicio) }
 
+  /** Volver a empezar: robots a la salida, combate 0 a 0 y el programa desde el principio (como apretar RESET). */
+  reiniciar() {
+    if (this.competencia) this.cambiarArena(this.arena)
+    else this.fisica.colocar(this.arena.inicio)
+    if (this.hex) void this.cargarPrograma(this.hex)
+    else this.limpieza?.reiniciar()
+  }
+
   cambiarArena(arena: ArenaDef, imagen?: CanvasImageSource) {
     const motores = this.fisica?.ruedas.map(r => r.volts)
     this.montarArena(arena, imagen)
