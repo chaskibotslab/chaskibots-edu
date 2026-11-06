@@ -46,13 +46,23 @@ export class Mundo {
       // el piso del aula queda mucho más abajo.
       this.world.createCollider(RAPIER.ColliderDesc.cuboid(arena.ancho / 2, 0.02, arena.largo / 2).setTranslation(0, -0.02, 0).setFriction(0.8))
       this.world.createCollider(RAPIER.ColliderDesc.cuboid(20, 0.05, 20).setTranslation(0, -arena.mesa.altura - 0.05, 0).setFriction(0.8))
+    } else if (arena.pozo) {
+      // Piso con un agujero cuadrado: cuatro tablas alrededor del pozo y el fondo, 40 cm más abajo.
+      const { x, z, lado } = arena.pozo
+      const x0 = x - lado / 2, x1 = x + lado / 2, z0 = z - lado / 2, z1 = z + lado / 2, B = 20
+      const tabla = (ax: number, bx: number, az: number, bz: number) => {
+        if (bx - ax <= 0 || bz - az <= 0) return
+        this.world.createCollider(RAPIER.ColliderDesc.cuboid((bx - ax) / 2, 0.05, (bz - az) / 2).setTranslation((ax + bx) / 2, -0.05, (az + bz) / 2).setFriction(0.8))
+      }
+      tabla(-B, x0, -B, B); tabla(x1, B, -B, B); tabla(x0, x1, -B, z0); tabla(x0, x1, z1, B)
+      this.world.createCollider(RAPIER.ColliderDesc.cuboid(lado / 2, 0.05, lado / 2).setTranslation(x, -0.45, z).setFriction(0.8))
     } else {
       // Piso: más grande que la arena, la cara de arriba en y = 0.
       this.world.createCollider(RAPIER.ColliderDesc.cuboid(20, 0.05, 20).setTranslation(0, -0.05, 0).setFriction(0.8))
     }
 
     if (arena.paredes) {
-      const h = 0.15, e = 0.02
+      const h = arena.paredesAlto ?? 0.15, e = 0.02
       const W = arena.ancho / 2, L = arena.largo / 2
       for (const [x, z, hx, hz] of [[0, -L - e, W + e, e], [0, L + e, W + e, e], [-W - e, 0, e, L + e], [W + e, 0, e, L + e]] as const) {
         this.world.createCollider(RAPIER.ColliderDesc.cuboid(hx, h / 2, hz).setTranslation(x, h / 2, z).setFriction(0.5))

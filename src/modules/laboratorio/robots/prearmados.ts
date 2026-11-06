@@ -956,6 +956,138 @@ export function construirMinisumoRc(): RobotDoc {
   return a.terminar(codigoRc)
 }
 
+
+// ---------------------------------------------------------------------------
+// Battlebots: chasis con cuña, arma giratoria con ESC, arena de combate
+// ---------------------------------------------------------------------------
+
+/** Pin del ESC del arma (su señal SIG). */
+function pinArma(tabla: FilaPin[], doc: RobotDoc) {
+  return pinCodigo(pinDePlaca(tabla, doc.piezas.find(p => p.pieza === 'arma-giratoria')?.id ?? '', 'SIG'))
+}
+
+const ESC_REAL = `// En el robot real, el ESC se maneja con la librería Servo: esc.attach(ARMA);
+// esc.writeMicroseconds(1000) = quieta … 2000 = máxima (y se «arma» con 1000 al empezar).
+// En el laboratorio también entiende analogWrite: 0 = quieta, 255 = máxima.`
+
+function codigoBattlebotRc(tabla: FilaPin[], doc: RobotDoc) {
+  return `// Battlebot de radiocontrol: lo manejas tú y decides cuándo girar el arma.
+// Cada tecla llega como una letra (en el robot real, por Bluetooth con un HC-05):
+//   F = adelante   B = atrás   L = izquierda   R = derecha   S = parar
+//   G / I = curva adelante a la izq. / der.   H / J = curva atrás
+//   0–9 = velocidad      X = arma a fondo      Y = arma apagada
+// Consejo: la barra tarda ~1 s en llegar a toda velocidad. Enciéndela antes de
+// acercarte y pega de frente: después de cada golpe pierde velocidad.
+${ESC_REAL}
+
+${bloqueMotores(tabla, doc)}
+
+const int ARMA = ${pinArma(tabla, doc)};   // señal del ESC del arma
+
+int velocidad = 200;   // 0 a 255
+
+void setup() {
+  ${SETUP_MOTORES}
+  pinMode(ARMA, OUTPUT);
+  analogWrite(ARMA, 0);   // el arma empieza quieta (por seguridad)
+  Serial.begin(9600);
+  Serial.println("Listo: maneja con las flechas y enciende el arma con E");
+}
+
+void loop() {
+  if (!Serial.available()) return;
+  char c = Serial.read();
+
+  if (c >= '0' && c <= '9') {
+    velocidad = map(c - '0', 0, 9, 90, 255);
+    return;
+  }
+  switch (c) {
+    case 'F': motores(velocidad, velocidad); break;
+    case 'B': motores(-velocidad, -velocidad); break;
+    case 'L': motores(-velocidad / 2, velocidad); break;
+    case 'R': motores(velocidad, -velocidad / 2); break;
+    case 'G': motores(velocidad * 2 / 5, velocidad); break;
+    case 'I': motores(velocidad, velocidad * 2 / 5); break;
+    case 'H': motores(-velocidad * 2 / 5, -velocidad); break;
+    case 'J': motores(-velocidad, -velocidad * 2 / 5); break;
+    case 'S': motores(0, 0); break;
+    case 'X': analogWrite(ARMA, 255); Serial.println("Arma a fondo"); break;
+    case 'Y': analogWrite(ARMA, 0); Serial.println("Arma apagada"); break;
+  }
+}
+`
+}
+
+function codigoBattlebotAuto(tabla: FilaPin[], doc: RobotDoc) {
+  const us = doc.piezas.find(p => p.pieza === 'hcsr04')?.id ?? ''
+  return `// Battlebot autónomo: sale al centro de la arena, busca girando con el
+// ultrasonido, ataca con el arma a fondo y retrocede después de cada pasada
+// (para que la barra recupere velocidad).
+// Ojo: el ultrasonido no distingue al rival de una pared. Desde el centro, las
+// paredes quedan a más de 1,2 m: lo que esté más cerca debería ser el rival.
+// ¿Se te ocurre algo mejor?
+${ESC_REAL}
+
+const int TRIG = ${pinCodigo(pinDePlaca(tabla, us, 'TRIG'))};
+const int ECHO = ${pinCodigo(pinDePlaca(tabla, us, 'ECHO'))};
+const int ARMA = ${pinArma(tabla, doc)};
+
+${bloqueMotores(tabla, doc)}
+
+${MEDIR_CM}
+
+const int CERCA_CM = 115;   // más cerca que las paredes: ahí está el rival
+
+void setup() {
+  ${SETUP_MOTORES}
+  pinMode(TRIG, OUTPUT); pinMode(ECHO, INPUT);
+  pinMode(ARMA, OUTPUT);
+  Serial.begin(9600);
+  delay(3000);               // la cuenta del juez: quieto hasta que empiece
+  analogWrite(ARMA, 255);    // el arma a fondo durante todo el combate
+  motores(200, 200);         // sale de la esquina hacia el centro (≈ 1 m)
+  delay(2000);
+  motores(0, 0);
+}
+
+void loop() {
+  long cm = medirCm();
+  if (cm < CERCA_CM) {
+    Serial.print("Ataque a "); Serial.print(cm); Serial.println(" cm");
+    motores(255, 255);       // a fondo contra lo que tiene delante
+    delay(700);
+    motores(-200, -200);     // retrocede para volver a tomar impulso
+    delay(400);
+  } else {
+    motores(150, -150);      // busca girando en el lugar
+    delay(60);
+  }
+}
+`
+}
+
+/** Battlebot: chasis con cuña de aluminio, UNO, L298N, dos 18650, motores TT y el arma giratoria. */
+export function construirBattlebot(variante = 'aluminio', nombre = 'Battlebot', sensor = false): RobotDoc {
+  const a = new Armador('chasis-battlebot', variante, nombre)
+  a.poner('arduino-uno', 'chasis', 'placa')
+  a.poner('l298n', 'chasis', 'driver')
+  a.poner('bateria-2x18650', 'chasis', 'bateria')
+  const mi = a.poner('motor-tt', 'chasis', 'motor-izq')
+  const md = a.poner('motor-tt', 'chasis', 'motor-der')
+  a.poner('rueda-65', mi, 'eje')
+  a.poner('rueda-65', md, 'eje')
+  a.poner('rueda-loca', 'chasis', 'loca')
+  a.poner('arma-giratoria', 'chasis', 'arma')
+  if (sensor) a.poner('hcsr04', 'chasis', 'frente')
+  return a.terminar(sensor ? codigoBattlebotAuto : codigoBattlebotRc)
+}
+
+/** El rival de práctica de cada arena de competencia. */
+export function rivalPara(categoria: 'minisumo' | 'sumo' | 'beetle'): RobotDoc {
+  return categoria === 'beetle' ? construirBattlebot('pla-rojo', 'Rival') : construirMinisumo('pla-rojo', 'Rival')
+}
+
 // ---------------------------------------------------------------------------
 // Evita obstáculos con IR: el más simple, sin servo ni ultrasonido
 // ---------------------------------------------------------------------------
@@ -1616,6 +1748,43 @@ export const PREARMADOS: Prearmado[] = [
     plantillas: (doc, tabla) => [
       { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Obedece las letras del control', codigo: codigoRc(tabla, doc) },
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'battlebot-rc',
+    nombre: 'Battlebot RC con arma giratoria',
+    descripcion: 'Un robot de combate que manejas tú: cuña de acero al frente y una barra que gira a 6000 rpm. Pelea en la arena contra el rival de práctica hasta dejarlo KO.',
+    dificultad: 'intermedio',
+    logica: [
+      'Presiona «Compilar y ejecutar»: empieza el combate (2 minutos) y aparece el control remoto.',
+      'Maneja con las flechas o WASD; la tecla E (o el botón «Encender arma») hace girar la barra.',
+      'La barra guarda energía al girar (½·I·ω²) y la descarga de golpe al tocar al rival: cada golpe a fondo le quita unos 12 de vida.',
+      'Después de cada golpe la barra pierde velocidad: aléjate un momento para que vuelva a tomar impulso.',
+      'KO si el rival se queda sin vida, cae al pozo o pasa 10 s sin moverse. Si nadie cae, gana quien tiene más vida.',
+    ],
+    arena: 'arena-combate',
+    construir: () => construirBattlebot(),
+    plantillas: (doc, tabla) => [
+      { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Flechas para moverse, X/Y para el arma', codigo: codigoBattlebotRc(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'battlebot-auto',
+    nombre: 'Battlebot autónomo',
+    descripcion: 'El mismo robot de combate, pero piensa solo: busca con el ultrasonido, ataca con el arma a fondo y retrocede para tomar impulso.',
+    dificultad: 'avanzado',
+    logica: [
+      'Espera los 3 s de la cuenta, enciende el arma y sale de la esquina hacia el centro.',
+      'Gira en el lugar midiendo la distancia con el HC-SR04.',
+      'Si algo está a menos de 1,15 m (desde el centro, las paredes están más lejos), avanza a fondo 0,7 s y retrocede 0,4 s.',
+      'Problema para pensar: el ultrasonido también ve las paredes. ¿Cómo distinguirías al rival?',
+    ],
+    arena: 'arena-combate',
+    construir: () => construirBattlebot('pla', 'Battlebot autónomo', true),
+    plantillas: (doc, tabla) => [
+      { id: 'auto', nombre: 'Buscar y atacar', descripcion: 'Ultrasonido + arma a fondo', codigo: codigoBattlebotAuto(tabla, doc) },
+      { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Flechas para moverse, X/Y para el arma', codigo: codigoBattlebotRc(tabla, doc) },
     ],
   },
   {

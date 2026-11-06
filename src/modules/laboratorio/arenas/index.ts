@@ -162,7 +162,7 @@ export function mesaElectronica(): ArenaDef {
 }
 
 export function listaArenas(): ArenaDef[] {
-  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), mesaElectronica()]
+  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), arenaCombate(), mesaElectronica()]
 }
 
 export function arena(id: string): ArenaDef {
@@ -203,6 +203,34 @@ export function dohyo(categoria: 'minisumo' | 'sumo'): ArenaDef {
       ],
     },
     inicio: { x: -d, z: 0, yaw: 0 },
+  }
+}
+
+/**
+ * Arena de combate (battlebots): 2,4 × 2,4 m de piso de acero con paredes de
+ * policarbonato de 40 cm y un pozo en una esquina. Los robots salen de
+ * esquinas opuestas. Un combate de 2 minutos con 100 de vida cada uno.
+ */
+export function arenaCombate(): ArenaDef {
+  const d = 0.75
+  return {
+    id: 'arena-combate',
+    nombre: 'Arena de combate (battlebots)',
+    descripcion: 'Arena de 2,4 m con paredes altas y un pozo en la esquina. Robots de hasta 1,5 kg. KO: vida en cero, caer al pozo o quedar 10 s sin moverse.',
+    ancho: 2.4, largo: 2.4,
+    piso: { material: 'metal', color: '#8b939c', reflectancia: 0.35 },
+    objetos: [],
+    paredes: true,
+    paredesAlto: 0.4,
+    pozo: { x: 0.85, z: 0.85, lado: 0.4 },
+    competencia: {
+      tipo: 'battlebot', categoria: 'beetle',
+      maxLadoMm: 300, maxMasaG: 1500,
+      vida: 100, inmovilS: 10,
+      espera: 3, duracionRonda: 120, puntosParaGanar: 1,
+      salidas: [{ nombre: 'Esquinas opuestas', alumno: { x: -d, z: d, yaw: Math.PI / 4 }, rival: { x: d, z: -d, yaw: -3 * Math.PI / 4 } }],
+    },
+    inicio: { x: -d, z: d, yaw: Math.PI / 4 },
   }
 }
 

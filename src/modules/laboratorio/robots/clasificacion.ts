@@ -5,6 +5,7 @@ const POR_GRUPO: Record<string, string[]> = {
   'Motores y chasis': ['primeros-motores'],
   'Minisumo autónomo': ['minisumo', 'minisumo-esp32'],
   'Radiocontrol (RC)': ['minisumo-rc', 'rc-esp32', 'robo-wifi'],
+  'Battlebots (combate)': ['battlebot-rc', 'battlebot-auto'],
   'Seguidores de línea': ['seguidor', 'seguidor-freno', 'seguidor-esp32'],
   'Obstáculos y exploración': ['evita-ir', 'evita-obstaculos', 'anticaida', 'aspirador', 'explorador', 'laberinto'],
   // Electrónica

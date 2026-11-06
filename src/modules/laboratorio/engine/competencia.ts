@@ -13,9 +13,16 @@
 //     cae por debajo de la plataforma); si salen los dos, nadie suma;
 //   · si nadie sale en el tiempo de la ronda, es empate;
 //   · gana el combate quien llega a 2 puntos; como mucho se juegan 3 rondas.
+//
+// Battlebots (arena de combate): un solo combate de 2 minutos. Cada robot
+// empieza con 100 de vida y la pierde con los golpes del arma del otro (la
+// energía que descarga la barra al tocarlo). Pierde por KO quien se queda sin
+// vida, cae al pozo o pasa 10 s sin moverse (dado vuelta, trabado). Si nadie
+// cae, gana quien tiene más vida al final.
 // La usan la simulación del navegador (simulation.ts) y la de los tests
 // (simSincrona.ts), así el juez es el mismo en los dos lados.
 
+import RAPIER from '@dimforge/rapier3d-compat'
 import type { ArenaDef, ReglamentoSumo } from '../arenas/tipos'
 import type { RobotDoc } from '../robots/doc'
 import type { PinReport } from './avrRunner'
@@ -37,6 +44,54 @@ export const NIVELES_RIVAL: Record<NivelRival, { nombre: string; descripcion: st
   cazador: { nombre: 'Cazador', descripcion: 'Busca girando, ataca a toda velocidad cuando te ve y huye del borde.' },
 }
 
+/** Los mismos niveles en la arena de combate. */
+export const NIVELES_RIVAL_COMBATE: Record<NivelRival, { nombre: string; descripcion: string }> = {
+  quieto: { nombre: 'Quieto', descripcion: 'No se mueve, pero su arma gira: practica cómo acercarte sin que te golpee.' },
+  empujador: { nombre: 'Empujador', descripcion: 'Te persigue despacio con el arma apagada: solo empuja con la cuña.' },
+  cazador: { nombre: 'Cazador', descripcion: 'Te persigue rápido con el arma a fondo.' },
+}
+
+/** Energía (J) → daño: un golpe con la barra a fondo quita unos 12 puntos. */
+const DANO_POR_JOULE = 5
+/** Parte de la energía de la barra que se lleva el robot golpeado (el resto es ruido, chispas y rebote). */
+const TRANSFERENCIA = 0.15
+
+/**
+ * Golpes del arma de `atacante` sobre `victima`: si la barra girando alcanza su
+ * planta, descarga parte de su energía como un empujón (hacia afuera, en el
+ * sentido del giro y un poco hacia arriba), frena la barra y devuelve el daño.
+ */
+export function golpesArma(atacante: RobotFisico, victima: RobotFisico): number {
+  let dano = 0
+  const world = atacante.mundo.world
+  for (const a of atacante.armas) {
+    if (a.espera > 0 || a.omega < 60) continue
+    const c = atacante.puntoMundo({ x: a.centro.x * 1000, y: a.centro.y * 1000, z: a.centro.z * 1000 })
+    // ¿La barra (el disco que barre, un poco más grande) toca alguna pieza del rival?
+    let toca = false
+    world.intersectionsWithShape(c, atacante.body.rotation(), new RAPIER.Cylinder(0.012, a.radio + 0.012), col => {
+      if (col.parent()?.handle === victima.body.handle) { toca = true; return false }
+      return true
+    }, undefined, undefined, undefined, atacante.body)
+    if (!toca) continue
+    const v = victima.body.translation()
+    const dx = v.x - c.x, dz = v.z - c.z
+    const d = Math.hypot(dx, dz) || 1
+    const energia = 0.5 * a.inercia * a.omega * a.omega * TRANSFERENCIA
+    const j = Math.sqrt(2 * victima.masa * energia)
+    // Hacia afuera del eje y en el sentido del giro (antihorario visto desde arriba).
+    const rx = dx / d, rz = dz / d
+    const dir = { x: rx * 0.75 + rz * 0.5, y: 0.35, z: rz * 0.75 - rx * 0.5 }
+    const n = Math.hypot(dir.x, dir.y, dir.z)
+    victima.body.applyImpulse({ x: (dir.x / n) * j, y: (dir.y / n) * j, z: (dir.z / n) * j }, true)
+    atacante.body.applyImpulse({ x: -rx * j * 0.4, y: 0, z: -rz * j * 0.4 }, true)
+    a.omega *= 0.45
+    a.espera = 0.25
+    dano += energia * DANO_POR_JOULE
+  }
+  return dano
+}
+
 /** Lo que el rival decide en cada momento: velocidad de cada lado de −1 a 1. */
 interface Orden { izq: number; der: number }
 
@@ -52,9 +107,15 @@ export class Rival {
   private maniobra: Maniobra | null = null
   private readonly montajeDe: Map<string, string>
   private readonly vMax: number
+  /** En la arena de combate persigue al alumno (sabe dónde está) en vez de leer el borde. */
+  private readonly combate: boolean
+  /** Pozo de la arena de combate: el rival lo esquiva. */
+  private readonly pozo: ArenaDef['pozo']
 
-  constructor(mundo: Mundo, doc: RobotDoc, nivel: NivelRival, inicio: Pose2D) {
+  constructor(mundo: Mundo, doc: RobotDoc, nivel: NivelRival, inicio: Pose2D, combate = false, pozo?: ArenaDef['pozo']) {
     this.doc = doc
+    this.combate = combate
+    this.pozo = pozo
     this.nivel = nivel
     this.plan = planDe(doc)
     this.fisica = new RobotFisico(mundo, doc, this.plan, inicio)
@@ -69,13 +130,30 @@ export class Rival {
   colocar(p: Pose2D) { this.fisica.colocar(p); this.maniobra = null }
 
   /** Lee sus sensores y pone el voltaje de cada rueda. `activo` = la ronda está en juego. */
-  pensar(t: number, reflectancia: FuncionReflectancia, activo: boolean) {
+  pensar(t: number, reflectancia: FuncionReflectancia, activo: boolean, objetivo?: RobotFisico) {
     this.lecturas = leerSensores(this.plan, this.doc, this.fisica, reflectancia).lecturas
-    const o = activo ? this.decidir(t) : { izq: 0, der: 0 }
+    const o = !activo ? { izq: 0, der: 0 } : this.combate && objetivo ? this.perseguir(objetivo) : this.decidir(t)
+    for (const a of this.fisica.armas) a.acelerador = activo && this.nivel !== 'empujador' ? 1 : 0
     for (const r of this.fisica.ruedas) {
       const m = this.plan.motores.find(x => x.instancia === r.motor)
       r.volts = (m?.rueda && m.rueda.centro.z < 0 ? o.izq : o.der) * this.vMax
     }
+  }
+
+  /** Combate: gira hacia el alumno y avanza derecho cuando lo tiene de frente. */
+  private perseguir(objetivo: RobotFisico): Orden {
+    if (this.nivel === 'quieto') return { izq: 0, der: 0 }
+    const potencia = this.nivel === 'cazador' ? 1 : 0.5
+    const yo = this.fisica.pose(), otro = objetivo.pose().pos
+    let rumbo = Math.atan2(-(otro.z - yo.pos.z), otro.x - yo.pos.x)
+    // Cerca del pozo: se aleja de él antes de seguir persiguiendo.
+    const p = this.pozo
+    if (p && Math.hypot(yo.pos.x - p.x, yo.pos.z - p.z) < p.lado * 1.1) rumbo = Math.atan2(-(yo.pos.z - p.z), yo.pos.x - p.x)
+    let e = rumbo - yo.yaw
+    e = Math.atan2(Math.sin(e), Math.cos(e))
+    if (Math.abs(e) > 0.6) return e > 0 ? { izq: -potencia * 0.7, der: potencia * 0.7 } : { izq: potencia * 0.7, der: -potencia * 0.7 }
+    const k = e * 1.2
+    return { izq: potencia * (1 - Math.max(0, k)), der: potencia * (1 + Math.min(0, k)) }
   }
 
   private decidir(t: number): Orden {
@@ -130,6 +208,8 @@ export interface EstadoCombate {
   /** Resultado de la última ronda terminada. */
   ultima: { ganador: Lado | 'empate'; motivo: string } | null
   ganador: Lado | 'empate' | null
+  /** Battlebot: vida que le queda a cada uno (0–100). */
+  vida?: Record<Lado, number>
 }
 
 const PAUSA_S = 3
@@ -144,6 +224,7 @@ export class Competencia {
   private t = 0
   private finFase = 0
   private origenAlumno = { x: 0, z: 0 }
+  private quieto: Record<Lado, number> = { alumno: 0, rival: 0 }
   readonly estado: EstadoCombate
 
   constructor(mundo: Mundo, arena: ArenaDef, alumno: RobotFisico, rivalDoc: RobotDoc, nivel: NivelRival, reflectancia: FuncionReflectancia) {
@@ -153,9 +234,10 @@ export class Competencia {
     this.alumno = alumno
     this.reflectancia = reflectancia
     const s = this.reglamento.salidas[0]
-    this.rival = new Rival(mundo, rivalDoc, nivel, s.rival)
+    this.rival = new Rival(mundo, rivalDoc, nivel, s.rival, this.reglamento.tipo === 'battlebot', arena.pozo)
     alumno.colocar(s.alumno)
     this.estado = { fase: 'espera', ronda: 1, salida: s.nombre, restante: 0, marcador: { alumno: 0, rival: 0 }, ultima: null, ganador: null }
+    if (this.reglamento.vida) this.estado.vida = { alumno: this.reglamento.vida, rival: this.reglamento.vida }
   }
 
   get robots(): RobotFisico[] { return [this.rival.fisica] }
@@ -163,6 +245,7 @@ export class Competencia {
   /** Empieza un combate nuevo (al cargar el programa del alumno). */
   empezar() {
     this.estado.marcador = { alumno: 0, rival: 0 }
+    if (this.reglamento.vida) this.estado.vida = { alumno: this.reglamento.vida, rival: this.reglamento.vida }
     this.estado.ultima = null
     this.estado.ganador = null
     this.prepararRonda(1)
@@ -176,7 +259,7 @@ export class Competencia {
 
   /** Antes del paso de física: el rival piensa. */
   antes() {
-    this.rival.pensar(this.t, this.reflectancia, this.estado.fase === 'combate')
+    this.rival.pensar(this.t, this.reflectancia, this.estado.fase === 'combate', this.alumno)
   }
 
   /**
@@ -195,6 +278,8 @@ export class Competencia {
         e.fase = 'combate'
         this.finFase = this.t + this.reglamento.duracionRonda
       }
+    } else if (e.fase === 'combate' && this.reglamento.tipo === 'battlebot') {
+      this.juzgarCombate(dt)
     } else if (e.fase === 'combate') {
       const fueraA = this.fuera(this.alumno), fueraR = this.fuera(this.rival.fisica)
       if (fueraA && fueraR) this.terminarRonda('empate', 'Salieron los dos a la vez')
@@ -206,6 +291,32 @@ export class Competencia {
       return 'nueva-ronda'
     }
     return null
+  }
+
+  /** Battlebot: golpes de las armas, pozo, robots inmóviles y tiempo. */
+  private juzgarCombate(dt: number) {
+    const vida = this.estado.vida!
+    vida.rival = Math.max(0, vida.rival - golpesArma(this.alumno, this.rival.fisica))
+    vida.alumno = Math.max(0, vida.alumno - golpesArma(this.rival.fisica, this.alumno))
+    const inmovil = this.reglamento.inmovilS ?? 10
+    for (const [lado, f] of [['alumno', this.alumno], ['rival', this.rival.fisica]] as const) {
+      const v = f.body.linvel(), w = f.body.angvel()
+      // El rival «quieto» no se mueve a propósito: no cuenta como inmovilizado.
+      const aproposito = lado === 'rival' && this.rival.nivel === 'quieto'
+      this.quieto[lado] = !aproposito && Math.hypot(v.x, v.z) < 0.02 && Math.abs(w.y) < 0.2 ? this.quieto[lado] + dt : 0
+    }
+    const ko = (lado: Lado, f: RobotFisico): string | null =>
+      vida[lado] <= 0 ? 'se quedó sin vida'
+        : f.body.translation().y < -0.15 ? 'cayó al pozo'
+          : this.quieto[lado] >= inmovil ? `pasó ${inmovil} s sin moverse` : null
+    const koA = ko('alumno', this.alumno), koR = ko('rival', this.rival.fisica)
+    if (koA && koR) this.terminarRonda('empate', 'Los dos quedaron fuera de combate')
+    else if (koR) this.terminarRonda('alumno', `¡KO! El rival ${koR}`)
+    else if (koA) this.terminarRonda('rival', `KO: tu robot ${koA}`)
+    else if (this.t >= this.finFase) {
+      const g: Lado | 'empate' = vida.alumno > vida.rival + 0.5 ? 'alumno' : vida.rival > vida.alumno + 0.5 ? 'rival' : 'empate'
+      this.terminarRonda(g, g === 'empate' ? 'Tiempo: empate en vida' : `Tiempo: gana quien quedó con más vida (${vida.alumno.toFixed(0)} a ${vida.rival.toFixed(0)})`)
+    }
   }
 
   /** Fuera: el centro pasó el borde o el robot cayó por debajo de la plataforma. */
@@ -224,6 +335,7 @@ export class Competencia {
     this.alumno.colocar(s.alumno)
     this.rival.colocar(s.rival)
     this.origenAlumno = { x: s.alumno.x, z: s.alumno.z }
+    this.quieto = { alumno: 0, rival: 0 }
     this.finFase = this.t + this.reglamento.espera
     e.restante = this.reglamento.espera
   }

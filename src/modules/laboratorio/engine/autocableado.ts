@@ -149,6 +149,14 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
     tomar(PREFERENCIAS.servo, s.id, s.etiqueta, 'SIG', 'Señal del servo')
   }
 
+  // Arma (ESC): la corriente directo de la batería; la señal, a un pin PWM libre.
+  for (const a of de('arma-giratoria')) {
+    if (!nueva(a.id)) continue
+    if (bateria) cable([a.id, 'BAT+'], [bateria.id, '+'], ROJO)
+    if (mcu) cable([a.id, 'GND'], [mcu.id, 'GND'], NEGRO)
+    tomar([...PREFERENCIAS.en, ...PREFERENCIAS.servo], a.id, a.etiqueta, 'SIG', 'Señal del ESC: analogWrite 0 = quieta, 255 = máxima')
+  }
+
   // Mesa de electrónica: cada componente a un pin libre y a tierra, de izquierda
   // a derecha. Cada LED lleva en serie una resistencia libre (si no hay, va
   // directo a tierra y la verificación avisa que se va a quemar).

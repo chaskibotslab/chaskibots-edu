@@ -143,4 +143,16 @@ export function aplicarPines(plan: SimPlan, fisica: RobotFisico, pines: Record<s
     const p = pines[s.sig]
     if (p && p.mode === 'output' && p.pulsoUs > 300 && p.pulsoUs < 3000) f.objetivo = servoPulseToAngle(p.pulsoUs / 1000)
   }
+
+  // Arma: el ESC entiende analogWrite (0–255) o, como en el robot real con la librería
+  // Servo, pulsos de 1000 µs (quieta) a 2000 µs (máxima).
+  for (const ap of plan.armas) {
+    const f = fisica.armas.find(x => x.instancia === ap.instancia)
+    if (!f) continue
+    const p = ap.sig && pines ? pines[ap.sig] : undefined
+    if (!p || p.mode !== 'output') { f.acelerador = 0; continue }
+    f.acelerador = p.pulsoUs >= 900 && p.pulsoUs <= 2100 && p.duty < 0.25
+      ? Math.max(0, Math.min(1, (p.pulsoUs - 1000) / 1000))
+      : p.duty
+  }
 }
