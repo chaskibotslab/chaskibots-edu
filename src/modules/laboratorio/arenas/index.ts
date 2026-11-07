@@ -1,6 +1,6 @@
 // Arenas de F2: las pistas de línea de F1 y el campo libre con obstáculos.
 
-import { PISTAS, type Pista } from '../engine/tracks'
+import { PISTAS, curvas, type Pista } from '../engine/tracks'
 import type { ArenaDef, ObjetoArena } from './tipos'
 
 export type { ArenaDef, ObjetoArena }
@@ -162,7 +162,7 @@ export function mesaElectronica(): ArenaDef {
 }
 
 export function listaArenas(): ArenaDef[] {
-  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), arenaCombate(), mesaElectronica()]
+  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), arenaCombate(), circuitoVelocidad(), mesaElectronica()]
 }
 
 export function arena(id: string): ArenaDef {
@@ -207,6 +207,21 @@ export function dohyo(categoria: 'minisumo' | 'sumo'): ArenaDef {
 }
 
 /**
+ * Competencia de velocidad: la pista de curvas con cronómetro. Tres vueltas
+ * contra el reloj (máximo 3 minutos); salirse de la línea anula la vuelta.
+ */
+export function circuitoVelocidad(): ArenaDef {
+  const base = PISTAS.find(p => p.id === 'curvas')!
+  const pista: Pista = { ...base, id: 'circuito-velocidad', trazado: curvas }
+  return {
+    ...arenaDePista(pista),
+    nombre: 'Competencia de velocidad (3 vueltas)',
+    descripcion: 'La pista de curvas con cronómetro: tres vueltas lo más rápido posible. Si el robot se sale de la línea, la vuelta no cuenta y vuelve a la salida.',
+    cronometro: { vueltas: 3, maxS: 180 },
+  }
+}
+
+/**
  * Arena de combate (battlebots): 2,4 × 2,4 m de piso de acero con paredes de
  * policarbonato de 40 cm y un pozo en una esquina. Los robots salen de
  * esquinas opuestas. Un combate de 2 minutos con 100 de vida cada uno.
@@ -216,12 +231,12 @@ export function arenaCombate(): ArenaDef {
   return {
     id: 'arena-combate',
     nombre: 'Arena de combate (battlebots)',
-    descripcion: 'Arena de 2,4 m con paredes altas y un pozo en la esquina. Robots de hasta 1,5 kg. KO: vida en cero, caer al pozo o quedar 10 s sin moverse.',
+    descripcion: 'Arena de 2,4 m con paredes de 60 cm y un pozo en la esquina. Robots de hasta 1,5 kg. KO: vida en cero, caer al pozo o quedar 10 s sin moverse.',
     ancho: 2.4, largo: 2.4,
     piso: { material: 'metal', color: '#8b939c', reflectancia: 0.35 },
     objetos: [],
     paredes: true,
-    paredesAlto: 0.4,
+    paredesAlto: 0.6,
     pozo: { x: 0.85, z: 0.85, lado: 0.4 },
     competencia: {
       tipo: 'battlebot', categoria: 'beetle',

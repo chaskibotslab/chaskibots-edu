@@ -260,6 +260,60 @@ export function construirSeguidor(): RobotDoc {
   return a.terminar(codigoSeguidor)
 }
 
+
+// ---------------------------------------------------------------------------
+// Seguidor de velocidad (competencia): acelera en las rectas y frena para las curvas
+// ---------------------------------------------------------------------------
+
+function codigoSeguidorVelocidad(tabla: FilaPin[], doc: RobotDoc) {
+  const s = sensoresLinea(tabla, doc)
+  return `// Seguidor de velocidad para competencia: tres vueltas contra el reloj.
+// Idea de los robots de competencia: VELOCIDAD ADAPTATIVA.
+//  - Mientras la línea sigue entre los sensores (una recta), acelera poco a
+//    poco desde BASE hasta RAPIDO.
+//  - Cuando un sensor toca la línea (empieza una curva), corrige girando y
+//    vuelve a BASE: llegar rápido a la curva hace que el robot se pase.
+// Prueba a cambiar BASE, RAPIDO, GIRO y ACELERA: ¿cuál es tu mejor vuelta sin salirte?
+
+const int IR_IZQ = ${s.DO_IZQ};   // HIGH = ve la línea negra
+const int IR_DER = ${s.DO_DER};
+
+${bloqueMotores(tabla, doc)}
+
+const int BASE = 150;      // velocidad al salir de una curva (0 a 255)
+const int RAPIDO = 255;    // velocidad máxima en las rectas
+const int GIRO = 180;      // fuerza de la corrección
+const int ACELERA = 2;     // cada cuántos ms sube 1 la velocidad en la recta
+
+unsigned long ultimaCorreccion = 0;
+
+void setup() {
+  pinMode(IR_IZQ, INPUT);
+  pinMode(IR_DER, INPUT);
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+  Serial.println("Seguidor de velocidad listo");
+}
+
+void loop() {
+  bool izq = digitalRead(IR_IZQ) == HIGH;
+  bool der = digitalRead(IR_DER) == HIGH;
+
+  if (izq && !der) {
+    motores(-GIRO / 2, GIRO);        // la línea se fue a la izquierda
+    ultimaCorreccion = millis();
+  } else if (der && !izq) {
+    motores(GIRO, -GIRO / 2);        // la línea se fue a la derecha
+    ultimaCorreccion = millis();
+  } else {
+    // Recta (o cruce): cuanto más dura sin corregir, más rápido.
+    int v = constrain(BASE + (millis() - ultimaCorreccion) / ACELERA, BASE, RAPIDO);
+    motores(v, v);
+  }
+}
+`
+}
+
 // ---------------------------------------------------------------------------
 // Evita obstáculos: ultrasonido sobre un servo que "mira" a los lados
 // ---------------------------------------------------------------------------
@@ -961,9 +1015,9 @@ export function construirMinisumoRc(): RobotDoc {
 // Battlebots: chasis con cuña, arma giratoria con ESC, arena de combate
 // ---------------------------------------------------------------------------
 
-/** Pin del ESC del arma (su señal SIG). */
+/** Pin del ESC del arma (su señal SIG), sea barra, tambor o disco. */
 function pinArma(tabla: FilaPin[], doc: RobotDoc) {
-  return pinCodigo(pinDePlaca(tabla, doc.piezas.find(p => p.pieza === 'arma-giratoria')?.id ?? '', 'SIG'))
+  return pinCodigo(pinDePlaca(tabla, doc.piezas.find(p => pieza(p.pieza).comportamiento.tipo === 'arma-giratoria')?.id ?? '', 'SIG'))
 }
 
 const ESC_REAL = `// En el robot real, el ESC se maneja con la librería Servo: esc.attach(ARMA);
@@ -971,12 +1025,12 @@ const ESC_REAL = `// En el robot real, el ESC se maneja con la librería Servo: 
 // En el laboratorio también entiende analogWrite: 0 = quieta, 255 = máxima.`
 
 function codigoBattlebotRc(tabla: FilaPin[], doc: RobotDoc) {
-  return `// Battlebot de radiocontrol: lo manejas tú y decides cuándo girar el arma.
+  return `// Robot de combate de radiocontrol: lo manejas tú y decides cuándo girar el arma.
 // Cada tecla llega como una letra (en el robot real, por Bluetooth con un HC-05):
 //   F = adelante   B = atrás   L = izquierda   R = derecha   S = parar
 //   G / I = curva adelante a la izq. / der.   H / J = curva atrás
 //   0–9 = velocidad      X = arma a fondo      Y = arma apagada
-// Consejo: la barra tarda ~1 s en llegar a toda velocidad. Enciéndela antes de
+// Consejo: el arma tarda ~1 s en llegar a toda velocidad. Enciéndela antes de
 // acercarte y pega de frente: después de cada golpe pierde velocidad.
 ${ESC_REAL}
 
@@ -1021,7 +1075,7 @@ void loop() {
 
 function codigoBattlebotAuto(tabla: FilaPin[], doc: RobotDoc) {
   const us = doc.piezas.find(p => p.pieza === 'hcsr04')?.id ?? ''
-  return `// Battlebot autónomo: sale al centro de la arena, busca girando con el
+  return `// Robot de combate autónomo: sale al centro de la arena, busca girando con el
 // ultrasonido, ataca con el arma a fondo y retrocede después de cada pasada
 // (para que la barra recupere velocidad).
 // Ojo: el ultrasonido no distingue al rival de una pared. Desde el centro, las
@@ -1067,25 +1121,28 @@ void loop() {
 `
 }
 
-/** Battlebot: chasis con cuña de aluminio, UNO, L298N, dos 18650, motores TT y el arma giratoria. */
-export function construirBattlebot(variante = 'aluminio', nombre = 'Battlebot', sensor = false): RobotDoc {
-  const a = new Armador('chasis-battlebot', variante, nombre)
-  a.poner('arduino-uno', 'chasis', 'placa')
-  a.poner('l298n', 'chasis', 'driver')
-  a.poner('bateria-2x18650', 'chasis', 'bateria')
-  const mi = a.poner('motor-tt', 'chasis', 'motor-izq')
-  const md = a.poner('motor-tt', 'chasis', 'motor-der')
-  a.poner('rueda-65', mi, 'eje')
-  a.poner('rueda-65', md, 'eje')
-  a.poner('rueda-loca', 'chasis', 'loca')
-  a.poner('arma-giratoria', 'chasis', 'arma')
+/**
+ * Robot de combate de verdad (beetle): chasis blindado, Nano como receptor,
+ * TB6612, LiPo 2S, motores de 22 mm con ruedas de combate y el arma (tambor o
+ * disco vertical). El autónomo lleva además un ultrasonido al frente.
+ */
+export function construirWarbot(arma: 'tambor' | 'disco', variante = 'aluminio', nombre = arma === 'tambor' ? 'Tambor' : 'Disco vertical', sensor = false): RobotDoc {
+  const a = new Armador(arma === 'tambor' ? 'chasis-tambor' : 'chasis-disco', variante, nombre)
+  a.poner('arduino-nano', 'chasis', 'placa')
+  a.poner('tb6612', 'chasis', 'driver')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  const mi = a.poner('motor-combate', 'chasis', 'motor-izq')
+  const md = a.poner('motor-combate', 'chasis', 'motor-der')
+  a.poner('rueda-combate', mi, 'eje')
+  a.poner('rueda-combate', md, 'eje')
+  a.poner(arma === 'tambor' ? 'arma-tambor' : 'arma-disco', 'chasis', 'arma')
   if (sensor) a.poner('hcsr04', 'chasis', 'frente')
   return a.terminar(sensor ? codigoBattlebotAuto : codigoBattlebotRc)
 }
 
 /** El rival de práctica de cada arena de competencia. */
 export function rivalPara(categoria: 'minisumo' | 'sumo' | 'beetle'): RobotDoc {
-  return categoria === 'beetle' ? construirBattlebot('pla-rojo', 'Rival') : construirMinisumo('pla-rojo', 'Rival')
+  return categoria === 'beetle' ? construirWarbot('tambor', 'rojo', 'Rival') : construirMinisumo('pla-rojo', 'Rival')
 }
 
 // ---------------------------------------------------------------------------
@@ -1568,6 +1625,25 @@ export const PREARMADOS: Prearmado[] = [
     ],
   },
   {
+    id: 'seguidor-velocidad',
+    nombre: 'Seguidor de velocidad (competencia)',
+    descripcion: 'El seguidor de línea en modo carrera: tres vueltas contra el reloj en la pista de curvas. Acelera en las rectas y frena para las curvas.',
+    dificultad: 'intermedio',
+    logica: [
+      'Presiona «Compilar y ejecutar»: arranca el cronómetro y cuenta cada vuelta.',
+      'Mientras la línea sigue entre los sensores (una recta), acelera poco a poco hasta RAPIDO.',
+      'Cuando un sensor toca la línea, corrige girando y vuelve a la velocidad BASE para no pasarse en la curva.',
+      'Si se aleja de la línea más de 1 s, la vuelta se anula y vuelve a la salida.',
+      'Desafío: ajusta BASE, RAPIDO, GIRO y ACELERA hasta lograr tu mejor tiempo sin salirte.',
+    ],
+    arena: 'circuito-velocidad',
+    construir: () => { const d = construirSeguidor(); const { tabla } = autocablear(d); return { ...d, nombre: 'Seguidor de velocidad', programa: { modo: 'codigo', cpp: codigoSeguidorVelocidad(tabla, d) } } },
+    plantillas: (doc, tabla) => [
+      { id: 'velocidad', nombre: 'Seguidor de velocidad', descripcion: 'Acelera en las rectas, frena para las curvas', codigo: codigoSeguidorVelocidad(tabla, doc) },
+      { id: 'seguidor', nombre: 'Seguidor de línea básico', descripcion: 'Para comparar tiempos', codigo: codigoSeguidor(tabla, doc) },
+    ],
+  },
+  {
     id: 'evita-obstaculos',
     nombre: 'Evita obstáculos',
     descripcion: 'Un ultrasonido sobre un servo mira adelante y a los lados para esquivar cajas y paredes.',
@@ -1751,39 +1827,57 @@ export const PREARMADOS: Prearmado[] = [
     ],
   },
   {
-    id: 'battlebot-rc',
-    nombre: 'Battlebot RC con arma giratoria',
-    descripcion: 'Un robot de combate que manejas tú: cuña de acero al frente y una barra que gira a 6000 rpm. Pelea en la arena contra el rival de práctica hasta dejarlo KO.',
+    id: 'warbot-tambor',
+    nombre: 'Robot de combate con tambor',
+    descripcion: 'Un beetle de competencia de verdad: chasis blindado de aluminio, horquillas de acero y un tambor de 250 g que gira a 7000 rpm y lanza al rival por el aire. Lo manejas tú.',
     dificultad: 'intermedio',
     logica: [
       'Presiona «Compilar y ejecutar»: empieza el combate (2 minutos) y aparece el control remoto.',
-      'Maneja con las flechas o WASD; la tecla E (o el botón «Encender arma») hace girar la barra.',
-      'La barra guarda energía al girar (½·I·ω²) y la descarga de golpe al tocar al rival: cada golpe a fondo le quita unos 12 de vida.',
-      'Después de cada golpe la barra pierde velocidad: aléjate un momento para que vuelva a tomar impulso.',
-      'KO si el rival se queda sin vida, cae al pozo o pasa 10 s sin moverse. Si nadie cae, gana quien tiene más vida.',
+      'Maneja con las flechas o WASD; la tecla E (o «Encender arma») hace girar el tambor.',
+      'El tambor gira de pie: su frente sube, así que golpea al rival por abajo y lo levanta.',
+      'Guarda energía al girar (½·I·ω²): un golpe a fondo le quita unos 20 de vida. Después pierde velocidad: aléjate y vuelve a cargar.',
+      'KO si el rival se queda sin vida, cae al pozo o pasa 10 s sin moverse (por ejemplo, dado vuelta).',
     ],
     arena: 'arena-combate',
-    construir: () => construirBattlebot(),
+    construir: () => construirWarbot('tambor'),
     plantillas: (doc, tabla) => [
       { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Flechas para moverse, X/Y para el arma', codigo: codigoBattlebotRc(tabla, doc) },
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
     ],
   },
   {
-    id: 'battlebot-auto',
-    nombre: 'Battlebot autónomo',
-    descripcion: 'El mismo robot de combate, pero piensa solo: busca con el ultrasonido, ataca con el arma a fondo y retrocede para tomar impulso.',
+    id: 'warbot-disco',
+    nombre: 'Robot de combate con disco vertical',
+    descripcion: 'Un beetle con un disco de acero de 110 mm que gira de pie en el centro. Más lento que el tambor, pero con la masa lejos del eje: cada golpe pega fuerte. Lo manejas tú.',
+    dificultad: 'intermedio',
+    logica: [
+      'Presiona «Compilar y ejecutar» y enciende el disco con la tecla E.',
+      'El disco tarda más que el tambor en llegar a toda velocidad (≈ 1,4 s): enciéndelo antes de acercarte.',
+      'Compara: el disco gira a 3500 rpm y el tambor a 7000, pero el disco guarda más energía porque su masa está más lejos del eje (I = ½·m·r²).',
+      'Ataca de frente: el disco golpea solo lo que tiene delante, por eso hay que apuntar bien.',
+    ],
+    arena: 'arena-combate',
+    construir: () => construirWarbot('disco'),
+    plantillas: (doc, tabla) => [
+      { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Flechas para moverse, X/Y para el arma', codigo: codigoBattlebotRc(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'warbot-auto',
+    nombre: 'Robot de combate autónomo (tambor)',
+    descripcion: 'El robot de tambor, pero piensa solo: sale al centro, busca con el ultrasonido, ataca con el tambor a fondo y retrocede para volver a cargar.',
     dificultad: 'avanzado',
     logica: [
-      'Espera los 3 s de la cuenta, enciende el arma y sale de la esquina hacia el centro.',
+      'Espera los 3 s de la cuenta, enciende el tambor y sale de la esquina hacia el centro.',
       'Gira en el lugar midiendo la distancia con el HC-SR04.',
       'Si algo está a menos de 1,15 m (desde el centro, las paredes están más lejos), avanza a fondo 0,7 s y retrocede 0,4 s.',
       'Problema para pensar: el ultrasonido también ve las paredes. ¿Cómo distinguirías al rival?',
     ],
     arena: 'arena-combate',
-    construir: () => construirBattlebot('pla', 'Battlebot autónomo', true),
+    construir: () => construirWarbot('tambor', 'uhmw', 'Tambor autónomo', true),
     plantillas: (doc, tabla) => [
-      { id: 'auto', nombre: 'Buscar y atacar', descripcion: 'Ultrasonido + arma a fondo', codigo: codigoBattlebotAuto(tabla, doc) },
+      { id: 'auto', nombre: 'Buscar y atacar', descripcion: 'Ultrasonido + tambor a fondo', codigo: codigoBattlebotAuto(tabla, doc) },
       { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Flechas para moverse, X/Y para el arma', codigo: codigoBattlebotRc(tabla, doc) },
     ],
   },

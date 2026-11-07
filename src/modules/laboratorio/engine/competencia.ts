@@ -61,15 +61,43 @@ const TRANSFERENCIA = 0.15
  * planta, descarga parte de su energía como un empujón (hacia afuera, en el
  * sentido del giro y un poco hacia arriba), frena la barra y devuelve el daño.
  */
+/** ¿Algún colisionador de `a` está en contacto con uno de `b`? */
+function seTocan(a: RobotFisico, b: RobotFisico): boolean {
+  const w = a.mundo.world
+  let toca = false
+  for (let i = 0; i < a.body.numColliders() && !toca; i++) {
+    const c = a.body.collider(i)
+    w.contactPairsWith(c, o => {
+      if (toca || o.parent()?.handle !== b.body.handle) return
+      w.contactPair(c, o, m => { if (m.numContacts() > 0) toca = true })
+    })
+  }
+  return toca
+}
+
+/** Producto de cuaterniones a·b (girar primero con b y después con a). */
+function multQ(a: { x: number; y: number; z: number; w: number }, b: { x: number; y: number; z: number; w: number }) {
+  return {
+    w: a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
+    x: a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+    y: a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+    z: a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
+  }
+}
+
 export function golpesArma(atacante: RobotFisico, victima: RobotFisico): number {
   let dano = 0
   const world = atacante.mundo.world
   for (const a of atacante.armas) {
     if (a.espera > 0 || a.omega < 60) continue
     const c = atacante.puntoMundo({ x: a.centro.x * 1000, y: a.centro.y * 1000, z: a.centro.z * 1000 })
-    // ¿La barra (el disco que barre, un poco más grande) toca alguna pieza del rival?
+    // ¿Lo que barre el arma (un poco más grande) toca alguna pieza del rival?
+    // Acostada: un disco fino en su plano. De pie: un cilindro a lo largo del eje lateral.
+    const q = atacante.body.rotation()
+    const rot = a.vertical ? multQ(q, { x: Math.SQRT1_2, y: 0, z: 0, w: Math.SQRT1_2 }) : q
+    const forma = a.vertical ? new RAPIER.Cylinder(a.ancho / 2 + 0.005, a.radio + 0.012) : new RAPIER.Cylinder(0.012, a.radio + 0.012)
     let toca = false
-    world.intersectionsWithShape(c, atacante.body.rotation(), new RAPIER.Cylinder(0.012, a.radio + 0.012), col => {
+    world.intersectionsWithShape(c, rot, forma, col => {
       if (col.parent()?.handle === victima.body.handle) { toca = true; return false }
       return true
     }, undefined, undefined, undefined, atacante.body)
@@ -79,9 +107,13 @@ export function golpesArma(atacante: RobotFisico, victima: RobotFisico): number 
     const d = Math.hypot(dx, dz) || 1
     const energia = 0.5 * a.inercia * a.omega * a.omega * TRANSFERENCIA
     const j = Math.sqrt(2 * victima.masa * energia)
-    // Hacia afuera del eje y en el sentido del giro (antihorario visto desde arriba).
     const rx = dx / d, rz = dz / d
-    const dir = { x: rx * 0.75 + rz * 0.5, y: 0.35, z: rz * 0.75 - rx * 0.5 }
+    // Acostada: hacia afuera del eje y en el sentido del giro (antihorario visto desde arriba).
+    // De pie: el frente del arma sube, así que lanza al rival hacia adelante y arriba.
+    const f = atacante.direccionMundo({ x: 1, y: 0, z: 0 })
+    const dir = a.vertical
+      ? { x: f.x * 0.5 + rx * 0.15, y: 0.85, z: f.z * 0.5 + rz * 0.15 }
+      : { x: rx * 0.75 + rz * 0.5, y: 0.35, z: rz * 0.75 - rx * 0.5 }
     const n = Math.hypot(dir.x, dir.y, dir.z)
     victima.body.applyImpulse({ x: (dir.x / n) * j, y: (dir.y / n) * j, z: (dir.z / n) * j }, true)
     atacante.body.applyImpulse({ x: -rx * j * 0.4, y: 0, z: -rz * j * 0.4 }, true)
@@ -225,6 +257,8 @@ export class Competencia {
   private finFase = 0
   private origenAlumno = { x: 0, z: 0 }
   private quieto: Record<Lado, number> = { alumno: 0, rival: 0 }
+  /** Segundos que los dos robots llevan trabados uno contra otro (battlebot). */
+  private trabados = 0
   readonly estado: EstadoCombate
 
   constructor(mundo: Mundo, arena: ArenaDef, alumno: RobotFisico, rivalDoc: RobotDoc, nivel: NivelRival, reflectancia: FuncionReflectancia) {
@@ -299,11 +333,21 @@ export class Competencia {
     vida.rival = Math.max(0, vida.rival - golpesArma(this.alumno, this.rival.fisica))
     vida.alumno = Math.max(0, vida.alumno - golpesArma(this.rival.fisica, this.alumno))
     const inmovil = this.reglamento.inmovilS ?? 10
+    // Trabados uno contra otro no cuenta como inmovilizado (como en el reglamento);
+    // si siguen así 5 s, el juez los separa y vuelven a sus esquinas.
+    const tocan = seTocan(this.alumno, this.rival.fisica)
+    const quietos = (f: RobotFisico) => { const v = f.body.linvel(), w = f.body.angvel(); return Math.hypot(v.x, v.z) < 0.02 && Math.abs(w.y) < 0.2 }
+    this.trabados = tocan && quietos(this.alumno) && quietos(this.rival.fisica) ? this.trabados + dt : 0
+    if (this.trabados >= 5) {
+      const s = this.reglamento.salidas[0]
+      this.alumno.colocar(s.alumno); this.rival.colocar(s.rival)
+      this.trabados = 0
+      this.estado.ultima = { ganador: 'empate', motivo: 'Estaban trabados: el juez los separó' }
+    }
     for (const [lado, f] of [['alumno', this.alumno], ['rival', this.rival.fisica]] as const) {
-      const v = f.body.linvel(), w = f.body.angvel()
       // El rival «quieto» no se mueve a propósito: no cuenta como inmovilizado.
       const aproposito = lado === 'rival' && this.rival.nivel === 'quieto'
-      this.quieto[lado] = !aproposito && Math.hypot(v.x, v.z) < 0.02 && Math.abs(w.y) < 0.2 ? this.quieto[lado] + dt : 0
+      this.quieto[lado] = !aproposito && !tocan && quietos(f) ? this.quieto[lado] + dt : 0
     }
     const ko = (lado: Lado, f: RobotFisico): string | null =>
       vida[lado] <= 0 ? 'se quedó sin vida'

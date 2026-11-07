@@ -40,8 +40,9 @@ describe('las placas respetan los espacios', () => {
     expect(motivoNoEncastra(robotVacio('chasis-minisumo'), 'arduino-mega', 'chasis', 'placa')).toMatch(/demasiado grande/)
   })
 
+  // Los robots de combate son beetles compactos: como en los reales, el Mega no entra.
   it('las cinco placas caben en los chasis 2WD y 4WD de cada robot', () => {
-    for (const p of PREARMADOS.filter(x => (x.categoria ?? 'robot') === 'robot' && !x.id.startsWith('minisumo'))) {
+    for (const p of PREARMADOS.filter(x => (x.categoria ?? 'robot') === 'robot' && !x.id.startsWith('minisumo') && !x.id.startsWith('warbot'))) {
       for (const placa of ['arduino-uno', 'arduino-nano', 'arduino-mega', 'esp32-devkit', 'raspberry-pico']) {
         expect(encimadas(conPlacaDe(p.construir(), placa)), `${p.id} con ${placa}`).toEqual([])
       }

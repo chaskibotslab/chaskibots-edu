@@ -51,6 +51,8 @@ export interface ArenaDef {
   banco?: boolean
   /** Zona de llegada (solo visual). */
   meta?: { x: number; z: number; radio: number }
+  /** Competencia de velocidad (seguidor de línea): vueltas y tiempo máximo (engine/cronometro.ts). */
+  cronometro?: { vueltas: number; maxS: number }
   /** Sala con polvo para el robot aspirador: celdas de `celda` m (engine/limpieza.ts). */
   limpieza?: { celda: number }
   inicio: Pose2D

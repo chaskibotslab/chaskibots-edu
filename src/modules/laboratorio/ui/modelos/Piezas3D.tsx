@@ -12,7 +12,7 @@ import type { MaterialFisico } from '../../catalogo/tipos'
 import { useCalidad } from '../calidad'
 import { anclaCircuito } from './Circuito3D'
 import { PLACA_PISO, SEPARADORES_PISO } from '../../catalogo/piezas/chasis'
-import { CUNA } from '../../catalogo/piezas/combate'
+import { CUNA, HORQUILLAS_DISCO, HORQUILLAS_TAMBOR, PATINES_DISCO, PLACA_COMBATE } from '../../catalogo/piezas/combate'
 
 const m = (v: number) => v / 1000
 type V = [number, number, number]
@@ -199,6 +199,215 @@ export const ArmaGiratoria = forwardRef(function ArmaGiratoria({ radio, alto }: 
           <cylinderGeometry args={[m(6), m(6), m(3), 16]} />
           <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
         </mesh>
+      </group>
+    </group>
+  )
+})
+
+// ---------------------------------------------------------------------------
+// Robots de combate de verdad (beetle): chasis blindados, motores, ruedas y armas
+// ---------------------------------------------------------------------------
+
+const ACERO = '#9aa3ad'
+const PAVONADO = '#2b2f36'
+
+function Tornillos({ puntos, y }: { puntos: [number, number][]; y: number }) {
+  return (
+    <>
+      {puntos.map(([x, z], i) => (
+        <mesh key={i} position={M(x, y, z)}>
+          <cylinderGeometry args={[m(2.6), m(2.6), m(1.4), 6]} />
+          <meshStandardMaterial color="#c9ced6" metalness={0.8} roughness={0.3} />
+        </mesh>
+      ))}
+    </>
+  )
+}
+
+/** Placa del chasis blindado: biselada, con franjas de advertencia atrás y tornillos. */
+function PlacaBlindada({ cajas, material, color }: { cajas: { medidas: V; centro: V }[]; material: MaterialFisico; color: string }) {
+  const q = useCalidad()
+  return (
+    <>
+      {cajas.map((c, i) => (
+        <RoundedBox key={i} args={M(...c.medidas)} position={M(...c.centro)} radius={m(1.5)} smoothness={2} castShadow={q.sombras} receiveShadow>
+          <MaterialChasis material={material} color={color} />
+        </RoundedBox>
+      ))}
+    </>
+  )
+}
+
+/** Horquillas de acero con su perforación de alivio. */
+function Horquillas({ horquillas }: { horquillas: { medidas: V; centro: V }[] }) {
+  const q = useCalidad()
+  return (
+    <>
+      {horquillas.map((h, i) => (
+        <group key={i} position={M(...h.centro)}>
+          <RoundedBox args={M(...h.medidas)} radius={m(1.2)} smoothness={2} castShadow={q.sombras} receiveShadow>
+            <meshStandardMaterial color={ACERO} metalness={0.6} roughness={0.35} />
+          </RoundedBox>
+          <mesh position={M(-h.medidas[0] * 0.18, 0, h.centro[2] > 0 ? h.medidas[2] / 2 + 0.1 : -h.medidas[2] / 2 - 0.1)} rotation={[0, h.centro[2] > 0 ? 0 : Math.PI, 0]}>
+            <circleGeometry args={[m(Math.min(h.medidas[1], h.medidas[0]) * 0.22), 20]} />
+            <meshStandardMaterial color={PAVONADO} roughness={0.6} />
+          </mesh>
+        </group>
+      ))}
+    </>
+  )
+}
+
+export function ChasisTambor({ material, color }: { material: MaterialFisico; color: string }) {
+  return (
+    <group>
+      <PlacaBlindada material={material} color={color} cajas={[{ medidas: [PLACA_COMBATE.largo, 4, PLACA_COMBATE.ancho], centro: [PLACA_COMBATE.centroX, 0, 0] }]} />
+      <Horquillas horquillas={HORQUILLAS_TAMBOR} />
+      {/* Barra que une las horquillas por arriba (rigidez) */}
+      <mesh position={M(52, 4, 0)} castShadow>
+        <boxGeometry args={[m(10), m(6), m(122)]} />
+        <meshStandardMaterial color={ACERO} metalness={0.6} roughness={0.35} />
+      </mesh>
+      <mesh position={M(-86, 2.2, 0)} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[m(6), m(104)]} />
+        <meshStandardMaterial color="#facc15" roughness={0.6} />
+      </mesh>
+      <Tornillos y={2.4} puntos={[[-80, -48], [-80, 48], [40, -48], [40, 48], [-20, -48], [-20, 48]]} />
+    </group>
+  )
+}
+
+export function ChasisDisco({ material, color }: { material: MaterialFisico; color: string }) {
+  return (
+    <group>
+      <PlacaBlindada material={material} color={color} cajas={[
+        { medidas: [88, 4, PLACA_COMBATE.ancho], centro: [-44, 0, 0] },
+        { medidas: [48, 4, 47], centro: [24, 0, -31.5] },
+        { medidas: [48, 4, 47], centro: [24, 0, 31.5] },
+      ]} />
+      <Horquillas horquillas={HORQUILLAS_DISCO} />
+      <Horquillas horquillas={PATINES_DISCO} />
+      <mesh position={M(-86, 2.2, 0)} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[m(6), m(104)]} />
+        <meshStandardMaterial color="#facc15" roughness={0.6} />
+      </mesh>
+      <Tornillos y={2.4} puntos={[[-80, -48], [-80, 48], [40, -48], [40, 48], [-10, -48], [-10, 48]]} />
+    </group>
+  )
+}
+
+/** Motor de 22 mm: lata negra, reductora plateada y el eje hacia +z. */
+export function MotorCombate() {
+  const q = useCalidad()
+  return (
+    <group>
+      <mesh position={M(0, 0, -26)} rotation={[Math.PI / 2, 0, 0]} castShadow={q.sombras}>
+        <cylinderGeometry args={[m(11), m(11), m(28), 24]} />
+        <meshStandardMaterial color="#1f2328" metalness={0.5} roughness={0.45} />
+      </mesh>
+      <mesh position={M(0, 0, -6)} rotation={[Math.PI / 2, 0, 0]} castShadow={q.sombras}>
+        <cylinderGeometry args={[m(11), m(11), m(12), 24]} />
+        <meshStandardMaterial color={METAL} metalness={0.85} roughness={0.25} />
+      </mesh>
+      <mesh position={M(0, 0, 3)} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[m(2.5), m(2.5), m(6), 12]} />
+        <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.2} />
+      </mesh>
+    </group>
+  )
+}
+
+/** Rueda de combate: espuma negra maciza y cubo de aluminio con 6 agujeros. */
+export function RuedaCombate({ radio, ancho }: { radio: number; ancho: number }) {
+  const q = useCalidad()
+  return (
+    <group rotation={[Math.PI / 2, 0, 0]}>
+      <mesh castShadow={q.sombras} receiveShadow>
+        <cylinderGeometry args={[m(radio), m(radio), m(ancho), 40]} />
+        <meshStandardMaterial color="#14161a" roughness={0.95} />
+      </mesh>
+      {[-1, 1].map(s => (
+        <group key={s} position={M(0, (s * ancho) / 2, 0)}>
+          <mesh position={M(0, s * 0.3, 0)}>
+            <cylinderGeometry args={[m(radio * 0.55), m(radio * 0.55), m(0.8), 32]} />
+            <meshStandardMaterial color="#c3c9d1" metalness={0.85} roughness={0.25} />
+          </mesh>
+          {Array.from({ length: 6 }, (_, i) => (
+            <mesh key={i} position={M(Math.cos((i * Math.PI) / 3) * radio * 0.33, s * 0.8, Math.sin((i * Math.PI) / 3) * radio * 0.33)}>
+              <cylinderGeometry args={[m(radio * 0.07), m(radio * 0.07), m(0.4), 10]} />
+              <meshStandardMaterial color="#3a3f47" />
+            </mesh>
+          ))}
+        </group>
+      ))}
+    </group>
+  )
+}
+
+/** Tambor de acero con dos hileras de dientes; gira con `refGiro` alrededor de z. */
+export const ArmaTambor = forwardRef(function ArmaTambor({ radio, ancho }: { radio: number; ancho: number }, refGiro: Ref<THREE.Group>) {
+  const q = useCalidad()
+  return (
+    <group>
+      {/* Eje que atraviesa las horquillas */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[m(5), m(5), m(ancho + 18), 12]} />
+        <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.2} />
+      </mesh>
+      <group ref={refGiro}>
+        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow={q.sombras}>
+          <cylinderGeometry args={[m(radio), m(radio), m(ancho), 36]} />
+          <meshStandardMaterial color="#2a2e35" metalness={0.75} roughness={0.32} />
+        </mesh>
+        {/* Dientes: dos hileras opuestas, desfasadas */}
+        {[0, Math.PI].map((a, k) => [-ancho * 0.25, ancho * 0.25].map((z, j) => (
+          <mesh key={`${k}-${j}`} position={M(Math.cos(a) * (radio + 3), Math.sin(a) * (radio + 3), z * (k ? -1 : 1))} rotation={[0, 0, a]} castShadow={q.sombras}>
+            <boxGeometry args={[m(10), m(9), m(ancho * 0.32)]} />
+            <meshStandardMaterial color="#d9dee5" metalness={0.8} roughness={0.25} />
+          </mesh>
+        )))}
+        {[-1, 1].map(s => (
+          <mesh key={s} position={M(0, 0, s * (ancho / 2 + 0.2))} rotation={[0, s > 0 ? 0 : Math.PI, 0]}>
+            <ringGeometry args={[m(radio * 0.35), m(radio * 0.9), 32]} />
+            <meshStandardMaterial color="#ef4444" roughness={0.5} />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  )
+})
+
+/** Disco vertical de acero con dos dientes; gira con `refGiro` alrededor de z. */
+export const ArmaDisco = forwardRef(function ArmaDisco({ radio, ancho }: { radio: number; ancho: number }, refGiro: Ref<THREE.Group>) {
+  const q = useCalidad()
+  return (
+    <group>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[m(5), m(5), m(30), 12]} />
+        <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.2} />
+      </mesh>
+      {/* Motor sin escobillas al costado del eje */}
+      <mesh position={M(0, 0, -16)} rotation={[Math.PI / 2, 0, 0]} castShadow={q.sombras}>
+        <cylinderGeometry args={[m(12), m(12), m(10), 24]} />
+        <meshStandardMaterial color="#1f2937" metalness={0.6} roughness={0.35} />
+      </mesh>
+      <group ref={refGiro}>
+        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow={q.sombras}>
+          <cylinderGeometry args={[m(radio), m(radio), m(ancho), 48]} />
+          <meshStandardMaterial color="#b8c0ca" metalness={0.8} roughness={0.28} />
+        </mesh>
+        {[0, Math.PI].map(a => (
+          <mesh key={a} position={M(Math.cos(a) * (radio + 2), Math.sin(a) * (radio + 2), 0)} rotation={[0, 0, a + 0.4]} castShadow={q.sombras}>
+            <boxGeometry args={[m(14), m(10), m(ancho + 2)]} />
+            <meshStandardMaterial color="#e5e7eb" metalness={0.85} roughness={0.2} />
+          </mesh>
+        ))}
+        {[-1, 1].map(s => (
+          <mesh key={s} position={M(0, 0, s * (ancho / 2 + 0.2))} rotation={[0, s > 0 ? 0 : Math.PI, 0]}>
+            <ringGeometry args={[m(radio * 0.25), m(radio * 0.45), 32]} />
+            <meshStandardMaterial color={PAVONADO} roughness={0.5} />
+          </mesh>
+        ))}
       </group>
     </group>
   )

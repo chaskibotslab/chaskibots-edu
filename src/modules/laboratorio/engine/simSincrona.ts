@@ -10,6 +10,7 @@ import { rivalPara } from '../robots/prearmados'
 import type { RobotDoc } from '../robots/doc'
 import { AvrRunner, CPU_FREQ_HZ, type StepResult } from './avrRunner'
 import { Competencia, type NivelRival } from './competencia'
+import { Cronometro } from './cronometro'
 import { Limpieza } from './limpieza'
 import { Mundo, type Gravedad } from './fisica/mundo'
 import { Reloj, RobotFisico } from './fisica/robotFisico'
@@ -26,6 +27,9 @@ export class SimSincrona {
   readonly doc: RobotDoc
   /** Combate de sumo (solo en arenas de competencia y si se pide un rival). */
   readonly competencia: Competencia | null
+  /** Cronómetro de la competencia de velocidad (si la arena lo tiene). */
+  readonly cronometro: Cronometro | null
+  private readonly inicio: ArenaDef['inicio']
   /** Polvo de la sala (solo en la arena del robot aspirador). */
   readonly limpieza: Limpieza | null
   avr: AvrRunner | null
@@ -56,8 +60,11 @@ export class SimSincrona {
       ? new Competencia(this.mundo, arena, this.robot, rivalPara(arena.competencia.categoria), opciones.rival, this.reflectancia)
       : null
     this.limpieza = arena.limpieza ? new Limpieza(arena) : null
+    this.cronometro = arena.cronometro && arena.pista?.trazado ? new Cronometro(arena) : null
+    this.inicio = arena.inicio
     this.encender()
     this.competencia?.empezar()
+    this.cronometro?.empezar()
   }
 
   /** Enciende (o reinicia) el micro con el programa: como apretar RESET. */
@@ -88,6 +95,7 @@ export class SimSincrona {
     this.reloj.avanzar(this.mundo, [this.robot, ...(this.competencia?.robots ?? [])], dtReal)
     if (this.competencia?.despues(dtReal) === 'nueva-ronda') this.encender()
     if (this.limpieza) { const p = this.robot.pose().pos; this.limpieza.barrer(p.x, p.z) }
+    if (this.cronometro) { const p = this.robot.pose().pos; if (this.cronometro.actualizar(dtReal, p.x, p.z) === 'reubicar') this.robot.colocar(this.inicio) }
     this.tiempo += dtReal
   }
 

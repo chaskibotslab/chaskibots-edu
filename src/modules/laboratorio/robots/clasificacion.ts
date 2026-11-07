@@ -5,8 +5,8 @@ const POR_GRUPO: Record<string, string[]> = {
   'Motores y chasis': ['primeros-motores'],
   'Minisumo autónomo': ['minisumo', 'minisumo-esp32'],
   'Radiocontrol (RC)': ['minisumo-rc', 'rc-esp32', 'robo-wifi'],
-  'Battlebots (combate)': ['battlebot-rc', 'battlebot-auto'],
-  'Seguidores de línea': ['seguidor', 'seguidor-freno', 'seguidor-esp32'],
+  'Robots de combate': ['warbot-tambor', 'warbot-disco', 'warbot-auto'],
+  'Seguidores de línea': ['seguidor', 'seguidor-freno', 'seguidor-esp32', 'seguidor-velocidad'],
   'Obstáculos y exploración': ['evita-ir', 'evita-obstaculos', 'anticaida', 'aspirador', 'explorador', 'laberinto'],
   // Electrónica
   Luces: ['led-pila', 'dos-pilas', 'primer-led', 'tres-brillos', 'tres-leds', 'fade', 'super-maquina', 'rgb', 'led-tapa', 'pico-parpadeo', 'mega-barra'],

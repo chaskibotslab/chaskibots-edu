@@ -17,7 +17,7 @@ import { useCalidad } from './calidad'
 import { infoPlaca } from '../engine/placa'
 import {
   ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
-  ChasisMinisumo, MotorN20, BateriaLipo, ChasisBattlebot, ArmaGiratoria,
+  ChasisMinisumo, MotorN20, BateriaLipo, ChasisBattlebot, ArmaGiratoria, ChasisTambor, ChasisDisco, MotorCombate, RuedaCombate, ArmaTambor, ArmaDisco,
 } from './modelos/Piezas3D'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
 import { ALTO_PROTOBOARD, agujeroRiel } from '../catalogo/piezas/circuito'
@@ -105,6 +105,21 @@ function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst:
     case 'proc:piso-arriba': return <PisoArriba alto={SEPARADOR_PISO} color={v.color ?? '#334155'} />
     case 'proc:chasis-minisumo': return <ChasisMinisumo material={v.material} color={v.color ?? '#1f2430'} />
     case 'proc:chasis-battlebot': return <ChasisBattlebot material={v.material} color={v.color ?? '#b8bec6'} />
+    case 'proc:chasis-tambor': return <ChasisTambor material={v.material} color={v.color ?? '#4b5563'} />
+    case 'proc:chasis-disco': return <ChasisDisco material={v.material} color={v.color ?? '#4b5563'} />
+    case 'proc:motor-combate': return <MotorCombate />
+    case 'proc:rueda-combate': {
+      const r = refs.ruedas.get(inst.id)
+      return <group ref={r?.ref}>{c.tipo === 'rueda' && <RuedaCombate radio={c.radio_mm} ancho={c.ancho_mm} />}</group>
+    }
+    case 'proc:arma-tambor':
+    case 'proc:arma-disco': {
+      if (!refs.armas.has(inst.id)) refs.armas.set(inst.id, createRef())
+      const radio = c.tipo === 'arma-giratoria' ? c.radio_mm : 28, ancho = c.tipo === 'arma-giratoria' ? c.ancho_mm ?? 8 : 8
+      return def.modelo === 'proc:arma-tambor'
+        ? <ArmaTambor ref={refs.armas.get(inst.id)} radio={radio} ancho={ancho} />
+        : <ArmaDisco ref={refs.armas.get(inst.id)} radio={radio} ancho={ancho} />
+    }
     case 'proc:arma-giratoria': {
       if (!refs.armas.has(inst.id)) refs.armas.set(inst.id, createRef())
       return <ArmaGiratoria ref={refs.armas.get(inst.id)} radio={c.tipo === 'arma-giratoria' ? c.radio_mm : 65} alto={c.tipo === 'arma-giratoria' ? c.alto_mm : 42} />
@@ -396,7 +411,8 @@ export default function Robot3D(props: Props) {
       // La barra gira de verdad, pero a 6000 rpm se vería quieta: se dibuja más lenta.
       for (const a of f.armas) {
         const g = refs.armas.get(a.instancia)?.current
-        if (g) g.rotation.y = a.angulo * 0.07
+        // De pie (tambor, disco) gira alrededor de z: el frente sube.
+        if (g) { if (a.vertical) g.rotation.z = a.angulo * 0.07; else g.rotation.y = a.angulo * 0.07 }
       }
       for (const s of Array.from(f.servos.values())) {
         const ref = refs.servos.get(s.instancia)?.current

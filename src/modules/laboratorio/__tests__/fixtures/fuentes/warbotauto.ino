@@ -1,4 +1,4 @@
-// Battlebot autónomo: sale al centro de la arena, busca girando con el
+// Robot de combate autónomo: sale al centro de la arena, busca girando con el
 // ultrasonido, ataca con el arma a fondo y retrocede después de cada pasada
 // (para que la barra recupere velocidad).
 // Ojo: el ultrasonido no distingue al rival de una pared. Desde el centro, las

@@ -1,9 +1,9 @@
-// Battlebot de radiocontrol: lo manejas tú y decides cuándo girar el arma.
+// Robot de combate de radiocontrol: lo manejas tú y decides cuándo girar el arma.
 // Cada tecla llega como una letra (en el robot real, por Bluetooth con un HC-05):
 //   F = adelante   B = atrás   L = izquierda   R = derecha   S = parar
 //   G / I = curva adelante a la izq. / der.   H / J = curva atrás
 //   0–9 = velocidad      X = arma a fondo      Y = arma apagada
-// Consejo: la barra tarda ~1 s en llegar a toda velocidad. Enciéndela antes de
+// Consejo: el arma tarda ~1 s en llegar a toda velocidad. Enciéndela antes de
 // acercarte y pega de frente: después de cada golpe pierde velocidad.
 // En el robot real, el ESC se maneja con la librería Servo: esc.attach(ARMA);
 // esc.writeMicroseconds(1000) = quieta … 2000 = máxima (y se «arma» con 1000 al empezar).
