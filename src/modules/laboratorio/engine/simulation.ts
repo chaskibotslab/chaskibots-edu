@@ -20,6 +20,7 @@ import type { WorkerIn, WorkerOut } from './avr.worker'
 import { planCircuito, type ControlesCircuito, type EstadoCircuito, type PlanCircuito } from './circuito'
 import { avisosEnsamblaje } from './ensamblaje'
 import { Limpieza } from './limpieza'
+import { Cronometro, type EstadoCarrera } from './cronometro'
 import { Mundo, iniciarRapier, type Gravedad } from './fisica/mundo'
 import { Reloj, RobotFisico } from './fisica/robotFisico'
 import type { UltrasonidoPines } from './hcsr04'
@@ -50,6 +51,7 @@ export interface Telemetria {
   circuito?: EstadoCircuito
   /** Solo en la sala del robot aspirador: porcentaje del piso ya limpio. */
   limpieza?: number
+  carrera?: EstadoCarrera
   error?: string
 }
 
@@ -67,6 +69,7 @@ export class Simulacion {
   competencia: Competencia | null = null
   /** Polvo de la sala (solo en la arena del robot aspirador). */
   limpieza: Limpieza | null = null
+  cronometro: Cronometro | null = null
   private nivelRival: NivelRival = 'cazador'
   /** Programa cargado: hace falta para reiniciar el micro en cada ronda. */
   private hex: string | null = null
@@ -139,6 +142,7 @@ export class Simulacion {
       ? new Competencia(this.mundo, arena, this.fisica, rivalPara(arena.competencia.categoria), this.nivelRival, this.reflectancia())
       : null
     this.limpieza = arena.limpieza ? new Limpieza(arena) : null
+    this.cronometro = arena.cronometro && arena.pista?.trazado ? new Cronometro(arena) : null
   }
 
   /** Lo que ven los sensores de piso: la imagen de la pista o el piso de la arena. */
@@ -166,6 +170,7 @@ export class Simulacion {
     if (this.competencia) this.competencia.empezar()
     else this.fisica.colocar(this.arena.inicio)
     this.limpieza?.reiniciar() // cada prueba empieza con la sala sucia
+    this.cronometro?.empezar() // largada
     return this.encender(hex)
   }
 
@@ -201,6 +206,7 @@ export class Simulacion {
     this.hex = null
     this.onSonidos([])
     this.competencia?.detener()
+    this.cronometro?.detener()
     for (const r of this.fisica.ruedas) r.volts = 0
   }
 
@@ -330,6 +336,7 @@ export class Simulacion {
     c?.antes()
     this.reloj.avanzar(this.mundo, [this.fisica, ...(c?.robots ?? [])], dt)
     if (this.limpieza) { const p = this.fisica.pose().pos; this.limpieza.barrer(p.x, p.z) }
+    if (this.cronometro) { const p = this.fisica.pose().pos; if (this.cronometro.actualizar(dt, p.x, p.z) === 'reubicar') this.fisica.colocar(this.arena.inicio) }
     // Nueva ronda: los robots ya están en sus salidas; el programa vuelve a empezar.
     if (c?.despues(dt) === 'nueva-ronda' && this.hex) this.encender(this.hex).catch(() => {})
   }
@@ -373,6 +380,7 @@ export class Simulacion {
       error: this.error,
       circuito: this.estadoCircuito ?? undefined,
       limpieza: this.limpieza?.porcentaje,
+      carrera: this.cronometro ? { ...this.cronometro.estado, vueltas: [...this.cronometro.estado.vueltas] } : undefined,
       combate: this.competencia ? { ...this.competencia.estado, marcador: { ...this.competencia.estado.marcador }, vida: this.competencia.estado.vida && { ...this.competencia.estado.vida } } : undefined,
     })
   }

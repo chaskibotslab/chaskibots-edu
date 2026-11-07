@@ -260,6 +260,60 @@ export function construirSeguidor(): RobotDoc {
   return a.terminar(codigoSeguidor)
 }
 
+
+// ---------------------------------------------------------------------------
+// Seguidor de velocidad (competencia): acelera en las rectas y frena para las curvas
+// ---------------------------------------------------------------------------
+
+function codigoSeguidorVelocidad(tabla: FilaPin[], doc: RobotDoc) {
+  const s = sensoresLinea(tabla, doc)
+  return `// Seguidor de velocidad para competencia: tres vueltas contra el reloj.
+// Idea de los robots de competencia: VELOCIDAD ADAPTATIVA.
+//  - Mientras la línea sigue entre los sensores (una recta), acelera poco a
+//    poco desde BASE hasta RAPIDO.
+//  - Cuando un sensor toca la línea (empieza una curva), corrige girando y
+//    vuelve a BASE: llegar rápido a la curva hace que el robot se pase.
+// Prueba a cambiar BASE, RAPIDO, GIRO y ACELERA: ¿cuál es tu mejor vuelta sin salirte?
+
+const int IR_IZQ = ${s.DO_IZQ};   // HIGH = ve la línea negra
+const int IR_DER = ${s.DO_DER};
+
+${bloqueMotores(tabla, doc)}
+
+const int BASE = 150;      // velocidad al salir de una curva (0 a 255)
+const int RAPIDO = 255;    // velocidad máxima en las rectas
+const int GIRO = 180;      // fuerza de la corrección
+const int ACELERA = 2;     // cada cuántos ms sube 1 la velocidad en la recta
+
+unsigned long ultimaCorreccion = 0;
+
+void setup() {
+  pinMode(IR_IZQ, INPUT);
+  pinMode(IR_DER, INPUT);
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+  Serial.println("Seguidor de velocidad listo");
+}
+
+void loop() {
+  bool izq = digitalRead(IR_IZQ) == HIGH;
+  bool der = digitalRead(IR_DER) == HIGH;
+
+  if (izq && !der) {
+    motores(-GIRO / 2, GIRO);        // la línea se fue a la izquierda
+    ultimaCorreccion = millis();
+  } else if (der && !izq) {
+    motores(GIRO, -GIRO / 2);        // la línea se fue a la derecha
+    ultimaCorreccion = millis();
+  } else {
+    // Recta (o cruce): cuanto más dura sin corregir, más rápido.
+    int v = constrain(BASE + (millis() - ultimaCorreccion) / ACELERA, BASE, RAPIDO);
+    motores(v, v);
+  }
+}
+`
+}
+
 // ---------------------------------------------------------------------------
 // Evita obstáculos: ultrasonido sobre un servo que "mira" a los lados
 // ---------------------------------------------------------------------------
@@ -1565,6 +1619,25 @@ export const PREARMADOS: Prearmado[] = [
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
       { id: 'sensores', nombre: 'Lectura de sensores', descripcion: 'Valores de los IR en el Monitor Serie', codigo: codigoLecturaLinea(tabla, doc) },
       { id: 'blink', nombre: 'Blink (LED 13)', descripcion: 'Primer programa', codigo: BLINK },
+    ],
+  },
+  {
+    id: 'seguidor-velocidad',
+    nombre: 'Seguidor de velocidad (competencia)',
+    descripcion: 'El seguidor de línea en modo carrera: tres vueltas contra el reloj en la pista de curvas. Acelera en las rectas y frena para las curvas.',
+    dificultad: 'intermedio',
+    logica: [
+      'Presiona «Compilar y ejecutar»: arranca el cronómetro y cuenta cada vuelta.',
+      'Mientras la línea sigue entre los sensores (una recta), acelera poco a poco hasta RAPIDO.',
+      'Cuando un sensor toca la línea, corrige girando y vuelve a la velocidad BASE para no pasarse en la curva.',
+      'Si se aleja de la línea más de 1 s, la vuelta se anula y vuelve a la salida.',
+      'Desafío: ajusta BASE, RAPIDO, GIRO y ACELERA hasta lograr tu mejor tiempo sin salirte.',
+    ],
+    arena: 'circuito-velocidad',
+    construir: () => { const d = construirSeguidor(); const { tabla } = autocablear(d); return { ...d, nombre: 'Seguidor de velocidad', programa: { modo: 'codigo', cpp: codigoSeguidorVelocidad(tabla, d) } } },
+    plantillas: (doc, tabla) => [
+      { id: 'velocidad', nombre: 'Seguidor de velocidad', descripcion: 'Acelera en las rectas, frena para las curvas', codigo: codigoSeguidorVelocidad(tabla, doc) },
+      { id: 'seguidor', nombre: 'Seguidor de línea básico', descripcion: 'Para comparar tiempos', codigo: codigoSeguidor(tabla, doc) },
     ],
   },
   {

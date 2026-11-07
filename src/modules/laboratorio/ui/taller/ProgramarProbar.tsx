@@ -423,6 +423,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             )}
             {sim && <HUD tele={tele} robot={!banco && datos} sinPlaca={sinPlaca} encendido={encendido} />}
             {sim && banco && <PanelCircuito sim={sim} tele={tele} silencio={silencio} onSilencio={setSilencio} onGesto={activarSonido} />}
+            {sim && tele?.carrera && <Carrera carrera={tele.carrera} onReiniciar={() => { sim.reiniciar(); setAviso(null) }} />}
             {sim && arena.competencia && <Combate sim={sim} tele={tele} reglamento={arena.competencia} doc={doc} onReiniciar={() => { sim.reiniciar(); setAviso(null) }} />}
             {sim && (
               <div className="absolute bottom-2 right-3 z-20 flex items-center gap-1.5">
@@ -638,6 +639,41 @@ function PanelPines({ tele }: { tele: Telemetria | null }) {
 // ---------------------------------------------------------------------------
 // Combate (sumo / minisumo): marcador, cuenta regresiva, rival y reglamento
 // ---------------------------------------------------------------------------
+
+/** Competencia de velocidad: vuelta, cronómetro y mejor vuelta; al tocarla, los tiempos de cada vuelta. */
+function Carrera({ carrera: c, onReiniciar }: { carrera: NonNullable<Telemetria['carrera']>; onReiniciar: () => void }) {
+  const [abierto, setAbierto] = useState(false)
+  const seg = (s: number) => `${s.toFixed(1)} s`
+  const linea = c.fase === 'espera' ? 'Compila y ejecuta tu programa para largar'
+    : c.fase === 'final' ? c.motivo ?? 'Fin de la carrera'
+      : `Vuelta ${seg(c.tiempoVuelta)}${c.salidas ? ` · ${c.salidas} salida${c.salidas > 1 ? 's' : ''}` : ''}`
+  return (
+    <div className="absolute left-1/2 top-3 z-10 w-[min(19rem,calc(100%-1.5rem))] -translate-x-1/2">
+      <button onClick={() => setAbierto(a => !a)} aria-expanded={abierto} title="Ver los tiempos de cada vuelta" className="lab-vidrio flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-xs">
+        <span className="w-14 text-left font-mono text-base font-bold text-lab-tinta">{seg(c.tiempo)}</span>
+        <span className="min-w-0 flex-1 text-center leading-tight">
+          <span className="block font-semibold text-lab-tinta">{c.fase === 'final' ? 'Llegada' : `Vuelta ${Math.min(c.vuelta, c.totalVueltas)} de ${c.totalVueltas}`}</span>
+          <span className={`block truncate text-[11px] ${c.fase === 'final' && c.vueltas.length >= c.totalVueltas ? 'font-semibold text-emerald-700' : 'text-lab-suave'}`}>{linea}</span>
+        </span>
+        <span className="w-14 text-right leading-tight"><span className="block text-[10px] uppercase text-lab-tenue">Mejor</span><span className="lab-dato font-mono text-sm font-semibold">{c.mejor === null ? '—' : seg(c.mejor)}</span></span>
+        <ChevronDown className={`h-3.5 w-3.5 shrink-0 text-lab-tenue transition ${abierto ? 'rotate-180' : ''}`} />
+      </button>
+      {abierto && (
+        <div className="lab-vidrio mt-1 space-y-2 rounded-md p-2.5 text-xs">
+          {c.vueltas.length === 0 ? <p className="text-lab-suave">Todavía no hay vueltas completas.</p> : (
+            <ol className="space-y-0.5">
+              {c.vueltas.map((v, i) => (
+                <li key={i} className="flex justify-between"><span className="text-lab-suave">Vuelta {i + 1}</span><span className={`font-mono ${v === c.mejor ? 'font-semibold text-lab-acento' : 'text-lab-tinta'}`}>{seg(v)}</span></li>
+              ))}
+            </ol>
+          )}
+          <p className="text-[11px] leading-snug text-lab-suave">Si el robot se aleja de la línea más de 1 s, la vuelta se anula y vuelve a la salida.</p>
+          <button onClick={onReiniciar} className="lab-secundario flex h-7 w-full items-center justify-center gap-1.5 rounded-md text-xs font-medium"><RotateCcw className="h-3.5 w-3.5" /> Largar otra vez</button>
+        </div>
+      )}
+    </div>
+  )
+}
 
 /** Vida de un robot de combate: número y barra (verde → ámbar → rojo). */
 function BarraVida({ valor, lado }: { valor: number; lado: 'alumno' | 'rival' }) {

@@ -1,6 +1,6 @@
 // Arenas de F2: las pistas de línea de F1 y el campo libre con obstáculos.
 
-import { PISTAS, type Pista } from '../engine/tracks'
+import { PISTAS, curvas, type Pista } from '../engine/tracks'
 import type { ArenaDef, ObjetoArena } from './tipos'
 
 export type { ArenaDef, ObjetoArena }
@@ -162,7 +162,7 @@ export function mesaElectronica(): ArenaDef {
 }
 
 export function listaArenas(): ArenaDef[] {
-  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), arenaCombate(), mesaElectronica()]
+  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), arenaCombate(), circuitoVelocidad(), mesaElectronica()]
 }
 
 export function arena(id: string): ArenaDef {
@@ -203,6 +203,21 @@ export function dohyo(categoria: 'minisumo' | 'sumo'): ArenaDef {
       ],
     },
     inicio: { x: -d, z: 0, yaw: 0 },
+  }
+}
+
+/**
+ * Competencia de velocidad: la pista de curvas con cronómetro. Tres vueltas
+ * contra el reloj (máximo 3 minutos); salirse de la línea anula la vuelta.
+ */
+export function circuitoVelocidad(): ArenaDef {
+  const base = PISTAS.find(p => p.id === 'curvas')!
+  const pista: Pista = { ...base, id: 'circuito-velocidad', trazado: curvas }
+  return {
+    ...arenaDePista(pista),
+    nombre: 'Competencia de velocidad (3 vueltas)',
+    descripcion: 'La pista de curvas con cronómetro: tres vueltas lo más rápido posible. Si el robot se sale de la línea, la vuelta no cuenta y vuelve a la salida.',
+    cronometro: { vueltas: 3, maxS: 180 },
   }
 }
 

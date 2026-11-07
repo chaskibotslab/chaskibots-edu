@@ -17,6 +17,8 @@ export interface Pista {
   inicio: Pose2D
   /** Dibuja la pista en coordenadas de mundo (metros). */
   dibujar?: (ctx: CanvasRenderingContext2D) => void
+  /** La línea como curva cerrada (t de 0 a 1, en el sentido de marcha): la usa el cronómetro. */
+  trazado?: (t: number) => Punto
 }
 
 export const PX_POR_M = 500 // 2 mm por píxel
@@ -24,7 +26,7 @@ const CINTA_M = 0.019       // cinta aislante de 19 mm
 const BLANCO = '#f4f4f0'
 const NEGRO = '#111111'
 
-type Punto = [number, number]
+export type Punto = [number, number]
 
 function trazo(ctx: CanvasRenderingContext2D, pts: Punto[], cerrar = true) {
   ctx.strokeStyle = NEGRO
@@ -49,7 +51,7 @@ function poseInicial(f: (t: number) => Punto): Pose2D {
 }
 
 function pistaParametrica(id: string, nombre: string, f: (t: number) => Punto, anchoM = 3, altoM = 2): Pista {
-  return { id, nombre, anchoM, altoM, inicio: poseInicial(f), dibujar: ctx => trazo(ctx, muestrear(f)) }
+  return { id, nombre, anchoM, altoM, inicio: poseInicial(f), dibujar: ctx => trazo(ctx, muestrear(f)), trazado: f }
 }
 
 // Óvalo tipo estadio: dos rectas y dos semicírculos.
