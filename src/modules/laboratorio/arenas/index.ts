@@ -231,12 +231,12 @@ export function arenaCombate(): ArenaDef {
   return {
     id: 'arena-combate',
     nombre: 'Arena de combate (battlebots)',
-    descripcion: 'Arena de 2,4 m con paredes altas y un pozo en la esquina. Robots de hasta 1,5 kg. KO: vida en cero, caer al pozo o quedar 10 s sin moverse.',
+    descripcion: 'Arena de 2,4 m con paredes de 60 cm y un pozo en la esquina. Robots de hasta 1,5 kg. KO: vida en cero, caer al pozo o quedar 10 s sin moverse.',
     ancho: 2.4, largo: 2.4,
     piso: { material: 'metal', color: '#8b939c', reflectancia: 0.35 },
     objetos: [],
     paredes: true,
-    paredesAlto: 0.4,
+    paredesAlto: 0.6,
     pozo: { x: 0.85, z: 0.85, lado: 0.4 },
     competencia: {
       tipo: 'battlebot', categoria: 'beetle',

@@ -61,6 +61,8 @@ export interface ServoFisico { instancia: string; angulo: number; objetivo: numb
 export interface ArmaFisica {
   instancia: string
   centro: V3          // eje de la barra a la altura de su plano (m, marco del cuerpo)
+  vertical: boolean   // gira de pie (tambor, disco) alrededor del eje lateral
+  ancho: number       // m a lo largo del eje
   radio: number       // m
   inercia: number     // kg·m²
   omegaMax: number    // rad/s
@@ -164,7 +166,7 @@ export class RobotFisico {
     for (const a of plan.armas) {
       this.armas.push({
         instancia: a.instancia, centro: mm({ x: a.centro[0], y: a.centro[1], z: a.centro[2] }), radio: a.radio, inercia: a.inercia,
-        omegaMax: a.omegaMax, tau: a.tau, activa: a.alimentado, acelerador: 0, omega: 0, angulo: 0, espera: 0,
+        omegaMax: a.omegaMax, tau: a.tau, activa: a.alimentado, acelerador: 0, omega: 0, angulo: 0, espera: 0, vertical: a.vertical, ancho: a.ancho,
       })
     }
     for (const s of plan.servos) this.servos.set(s.instancia, { instancia: s.instancia, angulo: 90, objetivo: null, gradosPorSeg: s.gradosPorSeg, activo: s.alimentado })

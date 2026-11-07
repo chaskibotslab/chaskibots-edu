@@ -56,7 +56,7 @@ export interface UltrasonidoPlan { instancia: string; trig: string | null; echo:
 export interface ObstaculoPlan { instancia: string; out: string | null; alcanceMm: number; origen: V3 }
 export interface ServoPlan { instancia: string; sig: string | null; gradosPorSeg: number; alimentado: boolean }
 /** Arma giratoria: `centro` = eje de la barra a la altura de su plano (mm, marco del robot). */
-export interface ArmaPlan { instancia: string; sig: string | null; alimentado: boolean; omegaMax: number; radio: number; inercia: number; tau: number; centro: V3 }
+export interface ArmaPlan { instancia: string; sig: string | null; alimentado: boolean; omegaMax: number; radio: number; inercia: number; tau: number; centro: V3; vertical: boolean; ancho: number }
 
 export interface SimPlan {
   mcu: string | null
@@ -212,13 +212,15 @@ export function planDe(doc: RobotDoc): SimPlan {
       if (!ok) avisos.push(`${p.etiqueta}: el ESC necesita la batería (BAT+ al + y GND a tierra)`)
       const sig = pinPlaca(p.id, 'SIG')
       if (ok && !sig) avisos.push(`${p.etiqueta}: la señal (SIG) no está conectada a la placa`)
-      const largo = 2 * c.radio_mm / 1000
+      const largo = 2 * c.radio_mm / 1000, masa = c.masa_barra_g / 1000, r = c.radio_mm / 1000
       armas.push({
         instancia: p.id, sig, alimentado: ok,
         // Las rpm suben con el voltaje (el motor está pensado para 7,4 V).
         omegaMax: (c.rpm_max * Math.min(1.5, vBat / 7.4) * 2 * Math.PI) / 60,
         radio: c.radio_mm / 1000,
-        inercia: (c.masa_barra_g / 1000) * largo * largo / 12,
+        inercia: (c.forma ?? 'barra') === 'barra' ? masa * largo * largo / 12 : 0.5 * masa * r * r,
+        vertical: c.giro === 'vertical',
+        ancho: (c.ancho_mm ?? 6) / 1000,
         tau: c.tau_s,
         centro: aRobot(ps.get(p.id)!, [0, c.alto_mm, 0]).toArray() as V3,
       })

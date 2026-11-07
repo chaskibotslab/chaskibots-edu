@@ -119,9 +119,13 @@ export type Comportamiento =
   | { tipo: 'maqueta' }
   /**
    * Arma giratoria de battlebot: un motor sin escobillas con su ESC hace girar una
-   * barra de acero. `alto_mm`: altura del plano de la barra sobre el ancla.
+   * masa de acero. `giro`: 'horizontal' = gira acostada alrededor del eje vertical
+   * (barra); 'vertical' = gira de pie alrededor del eje lateral (tambor, disco) y
+   * lanza al rival hacia arriba. `forma` define la inercia: barra m·L²/12;
+   * tambor y disco ½·m·r². `alto_mm`: altura del eje (o del plano) sobre el ancla;
+   * `ancho_mm`: lo que ocupa a lo largo del eje (tambor) o el espesor (disco, barra).
    */
-  | { tipo: 'arma-giratoria'; rpm_max: number; radio_mm: number; masa_barra_g: number; tau_s: number; alto_mm: number }
+  | { tipo: 'arma-giratoria'; giro?: 'horizontal' | 'vertical'; forma?: 'barra' | 'tambor' | 'disco'; rpm_max: number; radio_mm: number; masa_barra_g: number; tau_s: number; alto_mm: number; ancho_mm?: number }
   /** Pieza que se ve en el catálogo pero todavía no se simula (llega en una fase futura). */
   | { tipo: 'sin-simular' }
 
