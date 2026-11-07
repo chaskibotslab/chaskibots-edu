@@ -17,7 +17,7 @@ import { useCalidad } from './calidad'
 import { infoPlaca } from '../engine/placa'
 import {
   ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
-  ChasisMinisumo, MotorN20, BateriaLipo,
+  ChasisMinisumo, MotorN20, BateriaLipo, ChasisBattlebot, ArmaGiratoria,
 } from './modelos/Piezas3D'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
 import { ALTO_PROTOBOARD, agujeroRiel } from '../catalogo/piezas/circuito'
@@ -33,6 +33,7 @@ interface Refs {
   ledsIr: Map<string, RefObject<THREE.MeshStandardMaterial>>
   ledsObs: Map<string, RefObject<THREE.MeshStandardMaterial>>
   led13: RefObject<THREE.MeshStandardMaterial>
+  armas: Map<string, RefObject<THREE.Group>>
 }
 
 /** Lo mínimo para animar un robot en la arena: su física, sus pines y sus sensores. */
@@ -103,6 +104,11 @@ function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst:
     case 'proc:bateria-lipo': return <BateriaLipo />
     case 'proc:piso-arriba': return <PisoArriba alto={SEPARADOR_PISO} color={v.color ?? '#334155'} />
     case 'proc:chasis-minisumo': return <ChasisMinisumo material={v.material} color={v.color ?? '#1f2430'} />
+    case 'proc:chasis-battlebot': return <ChasisBattlebot material={v.material} color={v.color ?? '#b8bec6'} />
+    case 'proc:arma-giratoria': {
+      if (!refs.armas.has(inst.id)) refs.armas.set(inst.id, createRef())
+      return <ArmaGiratoria ref={refs.armas.get(inst.id)} radio={c.tipo === 'arma-giratoria' ? c.radio_mm : 65} alto={c.tipo === 'arma-giratoria' ? c.alto_mm : 42} />
+    }
     case 'proc:motor-n20': return <MotorN20 />
     case 'proc:motor-tt': return <MotorTT />
     case 'proc:rueda': {
@@ -353,7 +359,7 @@ export default function Robot3D(props: Props) {
   const { doc, sim, marcadores = [], cables = true } = props
   const grupo = useRef<THREE.Group>(null)
   const refs = useMemo<Refs>(() => ({
-    servos: new Map(), ruedas: new Map(), ledsIr: new Map(), ledsObs: new Map(), led13: createRef(),
+    servos: new Map(), ruedas: new Map(), ledsIr: new Map(), ledsObs: new Map(), led13: createRef(), armas: new Map(),
   }), [])
 
   const datos = useMemo(() => {
@@ -386,6 +392,11 @@ export default function Robot3D(props: Props) {
       for (const r of f.ruedas) {
         const w = refs.ruedas.get(r.instancia)
         if (w?.ref.current) w.ref.current.rotation.z = -r.angulo * w.signo
+      }
+      // La barra gira de verdad, pero a 6000 rpm se vería quieta: se dibuja más lenta.
+      for (const a of f.armas) {
+        const g = refs.armas.get(a.instancia)?.current
+        if (g) g.rotation.y = a.angulo * 0.07
       }
       for (const s of Array.from(f.servos.values())) {
         const ref = refs.servos.get(s.instancia)?.current

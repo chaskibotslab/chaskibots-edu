@@ -54,6 +54,25 @@ export interface RuedaFisica {
 
 export interface ServoFisico { instancia: string; angulo: number; objetivo: number | null; gradosPorSeg: number; activo: boolean }
 
+/**
+ * Arma giratoria: la barra acelera hacia `acelerador × omegaMax` con la constante
+ * de tiempo del motor. Su energía (½·I·ω²) es la que descarga al golpear (competencia.ts).
+ */
+export interface ArmaFisica {
+  instancia: string
+  centro: V3          // eje de la barra a la altura de su plano (m, marco del cuerpo)
+  radio: number       // m
+  inercia: number     // kg·m²
+  omegaMax: number    // rad/s
+  tau: number
+  activa: boolean     // tiene batería
+  acelerador: number  // 0–1 (señal del ESC)
+  omega: number
+  angulo: number
+  /** Segundos hasta que puede volver a golpear (un golpe por pasada). */
+  espera: number
+}
+
 const mm = (v: { x: number; y: number; z: number }): V3 => ({ x: v.x / 1000, y: v.y / 1000, z: v.z / 1000 })
 
 function rotacionColisionador(c: Colisionador): TQ {
@@ -73,6 +92,7 @@ export class RobotFisico {
   readonly masa: number
   readonly ruedas: RuedaFisica[] = []
   readonly servos = new Map<string, ServoFisico>()
+  readonly armas: ArmaFisica[] = []
   /** Altura del origen del robot (chasis) cuando apoya en el piso (m). */
   readonly alturaApoyo: number
   private readonly k: number
@@ -141,6 +161,12 @@ export class RobotFisico {
         mu: friccion(r.material, material), params: mp.params, omega: 0, angulo: 0, volts: 0, normal: 0,
       })
     }
+    for (const a of plan.armas) {
+      this.armas.push({
+        instancia: a.instancia, centro: mm({ x: a.centro[0], y: a.centro[1], z: a.centro[2] }), radio: a.radio, inercia: a.inercia,
+        omegaMax: a.omegaMax, tau: a.tau, activa: a.alimentado, acelerador: 0, omega: 0, angulo: 0, espera: 0,
+      })
+    }
     for (const s of plan.servos) this.servos.set(s.instancia, { instancia: s.instancia, angulo: 90, objetivo: null, gradosPorSeg: s.gradosPorSeg, activo: s.alimentado })
 
     const n = Math.max(1, this.ruedas.length)
@@ -175,6 +201,7 @@ export class RobotFisico {
     this.body.setLinvel({ x: 0, y: 0, z: 0 }, true)
     this.body.setAngvel({ x: 0, y: 0, z: 0 }, true)
     for (const r of this.ruedas) { r.omega = 0; r.volts = 0 }
+    for (const a of this.armas) { a.omega = 0; a.acelerador = 0; a.espera = 0 }
   }
 
   /** Un sub-paso de 1/240 s: servos, motores y fuerzas de las ruedas. */
@@ -184,6 +211,12 @@ export class RobotFisico {
       const d = s.objetivo - s.angulo
       const max = s.gradosPorSeg * dt
       s.angulo += Math.max(-max, Math.min(max, d))
+    }
+    for (const a of this.armas) {
+      const objetivo = a.activa ? a.acelerador * a.omegaMax : 0
+      a.omega += (objetivo - a.omega) * Math.min(1, dt / a.tau)
+      a.angulo += a.omega * dt
+      a.espera = Math.max(0, a.espera - dt)
     }
 
     const body = this.body

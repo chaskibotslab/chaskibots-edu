@@ -6,7 +6,7 @@
 
 import { reflectanciaArena } from '../arenas'
 import type { ArenaDef } from '../arenas/tipos'
-import { construirMinisumo } from '../robots/prearmados'
+import { rivalPara } from '../robots/prearmados'
 import type { RobotDoc } from '../robots/doc'
 import { AvrRunner, CPU_FREQ_HZ, type StepResult } from './avrRunner'
 import { Competencia, type NivelRival } from './competencia'
@@ -53,7 +53,7 @@ export class SimSincrona {
     this.us = null
     this.doc = doc
     this.competencia = arena.competencia && opciones.rival
-      ? new Competencia(this.mundo, arena, this.robot, construirMinisumo('pla-rojo', 'Rival'), opciones.rival, this.reflectancia)
+      ? new Competencia(this.mundo, arena, this.robot, rivalPara(arena.competencia.categoria), opciones.rival, this.reflectancia)
       : null
     this.limpieza = arena.limpieza ? new Limpieza(arena) : null
     this.encender()

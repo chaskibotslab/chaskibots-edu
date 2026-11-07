@@ -12,6 +12,7 @@ import type { MaterialFisico } from '../../catalogo/tipos'
 import { useCalidad } from '../calidad'
 import { anclaCircuito } from './Circuito3D'
 import { PLACA_PISO, SEPARADORES_PISO } from '../../catalogo/piezas/chasis'
+import { CUNA } from '../../catalogo/piezas/combate'
 
 const m = (v: number) => v / 1000
 type V = [number, number, number]
@@ -134,6 +135,74 @@ export function ChasisMinisumo({ material, color }: { material: MaterialFisico; 
     </group>
   )
 }
+
+/** Chasis de battlebot: placa de 220 × 120 mm, cuña de acero al frente y rieles laterales. */
+export function ChasisBattlebot({ material, color }: { material: MaterialFisico; color: string }) {
+  const q = useCalidad()
+  const ang = (CUNA.grados * Math.PI) / 180
+  return (
+    <group>
+      <RoundedBox args={[m(220), m(3), m(120)]} radius={m(1.2)} smoothness={2} castShadow={q.sombras} receiveShadow>
+        <MaterialChasis material={material} color={color} />
+      </RoundedBox>
+      {/* Cuña de acero con su filo */}
+      <mesh position={M(CUNA.x, CUNA.y, 0)} rotation={[0, 0, -ang]} castShadow={q.sombras} receiveShadow>
+        <boxGeometry args={[m(CUNA.largo), m(1.5), m(CUNA.ancho)]} />
+        <meshStandardMaterial color="#d8dde3" metalness={0.55} roughness={0.32} />
+      </mesh>
+      {/* Rieles laterales que sostienen la cuña */}
+      {[-58, 58].map(z => (
+        <mesh key={z} position={M(108, -12, z)} castShadow={q.sombras}>
+          <boxGeometry args={[m(18), m(20), m(3)]} />
+          <meshStandardMaterial color="#9ca3af" metalness={0.5} roughness={0.4} />
+        </mesh>
+      ))}
+      {/* Franjas de advertencia en la placa */}
+      {[-104, 104].map(x => (
+        <mesh key={x} position={M(x, 1.6, 0)} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[m(8), m(116)]} />
+          <meshStandardMaterial color="#facc15" roughness={0.6} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+/** Arma giratoria: poste, motor sin escobillas y la barra de acero (la barra gira con `refGiro`). */
+export const ArmaGiratoria = forwardRef(function ArmaGiratoria({ radio, alto }: { radio: number; alto: number }, refGiro: Ref<THREE.Group>) {
+  const q = useCalidad()
+  return (
+    <group>
+      {/* Poste de aluminio */}
+      <mesh position={M(0, (alto - 14) / 2, 0)} castShadow={q.sombras}>
+        <cylinderGeometry args={[m(9), m(11), m(alto - 14), 20]} />
+        <meshStandardMaterial color="#9aa3ad" metalness={0.85} roughness={0.3} />
+      </mesh>
+      {/* Motor sin escobillas (campana) */}
+      <mesh position={M(0, alto - 8, 0)} castShadow={q.sombras}>
+        <cylinderGeometry args={[m(14), m(14), m(12), 24]} />
+        <meshStandardMaterial color="#1f2937" metalness={0.7} roughness={0.35} />
+      </mesh>
+      <group ref={refGiro} position={M(0, alto, 0)}>
+        {/* Barra de acero con dientes en las puntas */}
+        <mesh castShadow={q.sombras}>
+          <boxGeometry args={[m(radio * 2), m(6), m(20)]} />
+          <meshStandardMaterial color="#e5e7eb" metalness={0.55} roughness={0.3} />
+        </mesh>
+        {[-1, 1].map(s => (
+          <mesh key={s} position={M(s * (radio - 6), 0, s * 8)} castShadow={q.sombras}>
+            <boxGeometry args={[m(12), m(8), m(8)]} />
+            <meshStandardMaterial color="#ef4444" metalness={0.5} roughness={0.4} />
+          </mesh>
+        ))}
+        <mesh position={M(0, 4, 0)}>
+          <cylinderGeometry args={[m(6), m(6), m(3), 16]} />
+          <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
+        </mesh>
+      </group>
+    </group>
+  )
+})
 
 // ---------------------------------------------------------------------------
 // Placas y electrónica

@@ -13,7 +13,7 @@
 import { reflectanciaArena } from '../arenas'
 import type { ArenaDef } from '../arenas/tipos'
 import type { RobotDoc } from '../robots/doc'
-import { construirMinisumo } from '../robots/prearmados'
+import { rivalPara } from '../robots/prearmados'
 import { Competencia, type EstadoCombate, type NivelRival } from './competencia'
 import { CPU_FREQ_HZ, type PinReport, type StepResult } from './avrRunner'
 import type { WorkerIn, WorkerOut } from './avr.worker'
@@ -136,7 +136,7 @@ export class Simulacion {
     this.fisica = new RobotFisico(this.mundo, this.doc, this.plan, arena.inicio)
     this.reloj = new Reloj()
     this.competencia = arena.competencia
-      ? new Competencia(this.mundo, arena, this.fisica, construirMinisumo('pla-rojo', 'Rival'), this.nivelRival, this.reflectancia())
+      ? new Competencia(this.mundo, arena, this.fisica, rivalPara(arena.competencia.categoria), this.nivelRival, this.reflectancia())
       : null
     this.limpieza = arena.limpieza ? new Limpieza(arena) : null
   }
@@ -236,6 +236,14 @@ export class Simulacion {
   // ---------------- escena ----------------
 
   colocarRobot(p?: Pose2D) { this.fisica.colocar(p ?? this.arena.inicio) }
+
+  /** Volver a empezar: robots a la salida, combate 0 a 0 y el programa desde el principio (como apretar RESET). */
+  reiniciar() {
+    if (this.competencia) this.cambiarArena(this.arena)
+    else this.fisica.colocar(this.arena.inicio)
+    if (this.hex) void this.cargarPrograma(this.hex)
+    else this.limpieza?.reiniciar()
+  }
 
   cambiarArena(arena: ArenaDef, imagen?: CanvasImageSource) {
     const motores = this.fisica?.ruedas.map(r => r.volts)
@@ -365,7 +373,7 @@ export class Simulacion {
       error: this.error,
       circuito: this.estadoCircuito ?? undefined,
       limpieza: this.limpieza?.porcentaje,
-      combate: this.competencia ? { ...this.competencia.estado, marcador: { ...this.competencia.estado.marcador } } : undefined,
+      combate: this.competencia ? { ...this.competencia.estado, marcador: { ...this.competencia.estado.marcador }, vida: this.competencia.estado.vida && { ...this.competencia.estado.vida } } : undefined,
     })
   }
 

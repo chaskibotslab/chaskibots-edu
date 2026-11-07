@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic'
 import {
   Play, Square, Pause, RotateCcw, Upload, Gauge, Camera, Navigation, Map as MapIcon,
   CheckCircle2, Power, Terminal, CircuitBoard, AlertTriangle, Loader2, Send, Trash2, RotateCw, FileCode2, Download, Puzzle, Gamepad2,
-  Maximize2, Minimize2, ZoomIn, ZoomOut, Eye, EyeOff,
+  ChevronDown, Maximize2, Minimize2, ZoomIn, ZoomOut, Eye, EyeOff,
 } from 'lucide-react'
 import { pieza } from '../../catalogo/piezas'
 import { Simulacion, type Telemetria } from '../../engine/simulation'
@@ -30,7 +30,7 @@ const EditorBloques = dynamic(() => import('../../bloques/EditorBloques'), { ssr
 import { verificar } from '../../engine/verificacion'
 import { infoPlaca, mcuDe } from '../../engine/placa'
 import ControlRemoto from './ControlRemoto'
-import { NIVELES_RIVAL, revisarReglamento, type NivelRival } from '../../engine/competencia'
+import { NIVELES_RIVAL, NIVELES_RIVAL_COMBATE, revisarReglamento, type NivelRival } from '../../engine/competencia'
 import { esBanco, resumen } from '../../engine/ensamblaje'
 import PanelCircuito from './PanelCircuito'
 import { SonidoBuzzers } from '../sonido'
@@ -105,6 +105,13 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
   // Vista ampliada: la escena ocupa todo (sin editor ni monitor). Datos: recuadros sobre la escena;
   // en pantallas chicas empiezan ocultos para que se vea la arena.
   const [ampliada, setAmpliada] = useState(false)
+  // Esc sale de la pantalla completa.
+  useEffect(() => {
+    if (!ampliada) return
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setAmpliada(false) }
+    window.addEventListener('keydown', esc)
+    return () => window.removeEventListener('keydown', esc)
+  }, [ampliada])
   const [datos, setDatos] = useState(() => typeof window === 'undefined' || window.innerWidth >= 1500)
   const [versionArena, setVersionArena] = useState(0)
   const [pestana, setPestana] = useState<Pestana>('serial')
@@ -364,12 +371,12 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
         </div>
         )}
 
-        <div className={`min-h-0 flex-1 flex-col ${vista === 'probar' || ampliada ? 'flex' : 'hidden lg:flex'}`}>
+        <div className={`min-h-0 min-w-0 flex-1 flex-col ${vista === 'probar' || ampliada ? 'flex' : 'hidden lg:flex'}`}>
           {/* Barra de la escena: salida, pista, gravedad y cámara. */}
           <div className="flex flex-wrap items-center gap-1.5 border-b border-lab-borde/20 bg-lab-superficie px-2 py-1.5">
           {!banco && <>
-            <button onClick={() => sim?.colocarRobot()} className={boton} title="Volver a la salida">
-              <RotateCcw className="h-4 w-4" /> <span className="hidden md:inline">Salida</span>
+            <button onClick={() => { sim?.reiniciar(); setAviso(null) }} className={boton} title={arena.competencia ? 'Empezar el combate otra vez: 0 a 0, robots a la salida y el programa desde el principio' : 'Volver a la salida y reiniciar el programa (como apretar RESET)'}>
+              <RotateCcw className="h-4 w-4" /> <span className="hidden sm:inline">Reiniciar</span>
             </button>
             <button onClick={() => girarRobot(Math.PI / 12)} className="lab-secundario flex h-8 w-8 items-center justify-center rounded-md" title="Girar el robot 15° a la izquierda">
               <RotateCcw className="h-4 w-4 -scale-x-100 rotate-180" />
@@ -379,13 +386,13 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             </button>
             <label className="lab-secundario flex h-8 items-center gap-1.5 rounded-md pl-2 text-sm">
               <MapIcon className="h-4 w-4 text-lab-suave" />
-              <select className="h-full max-w-[10rem] bg-transparent pr-2 text-lab-tinta outline-none [&_option]:bg-lab-superficie" value={imagenPropia ? 'propia' : arena.id} onChange={e => cambiarArena(e.target.value)}>
+              <select className="h-full max-w-[9rem] bg-transparent pr-2 text-lab-tinta outline-none [&_option]:bg-lab-superficie" value={imagenPropia ? 'propia' : arena.id} onChange={e => cambiarArena(e.target.value)}>
                 {arenas.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)}
                 {imagenPropia && <option value="propia">{imagenPropia.nombre}</option>}
               </select>
             </label>
             <button onClick={() => archivoPista.current?.click()} className={boton} title="Usar tu propia pista (imagen PNG/JPG, se estira a 3 × 2 m)">
-              <Upload className="h-4 w-4" /> <span className="hidden md:inline">Pista</span>
+              <Upload className="h-4 w-4" /> <span className="hidden 2xl:inline">Pista</span>
             </button>
             <input ref={archivoPista} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) subirPista(f); e.target.value = '' }} />
             <label className="lab-secundario flex h-8 items-center gap-1.5 rounded-md pl-2 text-sm" title="Gravedad">
@@ -398,12 +405,15 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             <div className="ml-auto flex h-8 rounded-md bg-lab-fondo2 p-0.5 text-sm">
               {([['libre', 'Libre', Camera], ['seguir', 'Seguir', Navigation], ['arriba', 'Arriba', MapIcon]] as const).filter(([id]) => !banco || id !== 'seguir').map(([id, txt, Icon]) => (
                 <button key={id} onClick={() => setCamara(id)} title={`Cámara: ${txt}`} className={`flex items-center gap-1 rounded px-2.5 ${camara === id ? 'bg-lab-superficie font-medium text-lab-tinta shadow-sm' : 'text-lab-suave hover:text-lab-tinta'}`}>
-                  <Icon className="h-3.5 w-3.5" /> <span className="hidden xl:inline">{txt}</span>
+                  <Icon className="h-3.5 w-3.5" /> <span className="hidden 2xl:inline">{txt}</span>
                 </button>
               ))}
             </div>
+            <button onClick={() => setAmpliada(x => !x)} className={ampliada ? 'lab-primario flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-semibold' : 'lab-secundario flex h-8 w-8 items-center justify-center rounded-md'} title={ampliada ? 'Salir de pantalla completa (Esc)' : 'Pantalla completa: solo la escena'} aria-label={ampliada ? 'Salir de pantalla completa' : 'Pantalla completa'}>
+              {ampliada ? <><Minimize2 className="h-4 w-4" /> Salir</> : <Maximize2 className="h-4 w-4" />}
+            </button>
           </div>
-          <div className="relative min-h-[300px] flex-[3]">
+          <div className="relative min-h-[300px] min-w-0 flex-[3] overflow-hidden">
             {sim ? (
               <EscenaArena sim={sim} modoCamara={camara} versionArena={versionArena} nivel={nivel} onNivel={onNivel} zoom={zoom} />
             ) : (
@@ -413,14 +423,13 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             )}
             {sim && <HUD tele={tele} robot={!banco && datos} sinPlaca={sinPlaca} encendido={encendido} />}
             {sim && banco && <PanelCircuito sim={sim} tele={tele} silencio={silencio} onSilencio={setSilencio} onGesto={activarSonido} />}
-            {sim && arena.competencia && <Combate sim={sim} tele={tele} reglamento={arena.competencia} doc={doc} compacto={!datos} />}
+            {sim && arena.competencia && <Combate sim={sim} tele={tele} reglamento={arena.competencia} doc={doc} onReiniciar={() => { sim.reiniciar(); setAviso(null) }} />}
             {sim && (
               <div className="absolute bottom-2 right-3 z-20 flex items-center gap-1.5">
                 {([
                   ['Acercar', ZoomIn, () => setZoom(z => ({ n: z.n + 1, factor: 0.75 }))],
                   ['Alejar', ZoomOut, () => setZoom(z => ({ n: z.n + 1, factor: 1 / 0.75 }))],
                   ...(!banco ? [[datos ? 'Ocultar datos' : 'Mostrar datos', datos ? EyeOff : Eye, () => setDatos(x => !x)] as const] : []),
-                  [ampliada ? 'Achicar la vista' : 'Ampliar la vista', ampliada ? Minimize2 : Maximize2, () => setAmpliada(x => !x)],
                 ] as const).map(([txt, Icon, accion]) => (
                   <button key={txt} onClick={accion} title={txt} aria-label={txt} className="flex h-8 w-8 items-center justify-center rounded-md lab-vidrio text-lab-tinta hover:text-lab-tinta">
                     <Icon className="h-4 w-4" />
@@ -428,7 +437,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                 ))}
               </div>
             )}
-            {sim && control && <ControlRemoto sim={sim} conPrograma={tele?.estado === 'corriendo' || tele?.estado === 'pausado'} leeLetras={leeLetras} fase={tele?.combate?.fase} onCerrar={() => setControl(false)} />}
+            {sim && control && <ControlRemoto sim={sim} conPrograma={tele?.estado === 'corriendo' || tele?.estado === 'pausado'} leeLetras={leeLetras} conArma={/case 'X'/.test(codigo)} fase={tele?.combate?.fase} onCerrar={() => setControl(false)} />}
             <div className={`pointer-events-none absolute bottom-2 left-3 hidden rounded-md bg-lab-superficie/85 px-2 py-0.5 text-[11px] text-lab-suave ${control ? '' : 'sm:block'}`}>
               {banco ? `${conPulsador ? 'Haz clic en el pulsador para presionarlo · ' : ''}arrastra para girar la cámara` : 'Doble clic en el piso para mover el robot · arrastra para girar la cámara'}
             </div>
@@ -630,9 +639,26 @@ function PanelPines({ tele }: { tele: Telemetria | null }) {
 // Combate (sumo / minisumo): marcador, cuenta regresiva, rival y reglamento
 // ---------------------------------------------------------------------------
 
-/** Marcador del combate. `compacto`: solo una línea arriba, para que se vea el dohyo. */
-function Combate({ sim, tele, reglamento, doc, compacto = false }: { sim: Simulacion; tele: Telemetria | null; reglamento: ReglamentoSumo; doc: RobotDoc; compacto?: boolean }) {
+/** Vida de un robot de combate: número y barra (verde → ámbar → rojo). */
+function BarraVida({ valor, lado }: { valor: number; lado: 'alumno' | 'rival' }) {
+  const color = valor > 50 ? 'bg-emerald-500' : valor > 25 ? 'bg-amber-500' : 'bg-red-500'
+  return (
+    <span className={`flex w-16 shrink-0 flex-col gap-0.5 ${lado === 'rival' ? 'items-end' : 'items-start'}`} title={`${lado === 'alumno' ? 'Tu vida' : 'Vida del rival'}: ${valor.toFixed(0)}`}>
+      <span className={`text-[10px] font-semibold uppercase ${lado === 'alumno' ? 'text-lab-acento' : 'text-red-700'}`}>{lado === 'alumno' ? 'Tú' : 'Rival'} {valor.toFixed(0)}</span>
+      <span className="h-1.5 w-full overflow-hidden rounded-full bg-lab-tinta/10">
+        <span className={`block h-full ${color} transition-[width] ${lado === 'rival' ? 'ml-auto' : ''}`} style={{ width: `${Math.max(0, valor)}%` }} />
+      </span>
+    </span>
+  )
+}
+
+/**
+ * Marcador del combate: una tira chica arriba al centro (para no tapar la arena
+ * ni los datos). Al tocarla se despliega el detalle: rival, reglamento y reiniciar.
+ */
+function Combate({ sim, tele, reglamento, doc, onReiniciar }: { sim: Simulacion; tele: Telemetria | null; reglamento: ReglamentoSumo; doc: RobotDoc; onReiniciar: () => void }) {
   const [rival, setRival] = useState<NivelRival>(sim.rival)
+  const [abierto, setAbierto] = useState(false)
   const reglas = useMemo(() => {
     const r = resumen(doc)
     return revisarReglamento(reglamento, { largo: r.max.x - r.min.x, ancho: r.max.z - r.min.z, masa: r.masa_g })
@@ -640,64 +666,53 @@ function Combate({ sim, tele, reglamento, doc, compacto = false }: { sim: Simula
   const c = tele?.combate
   if (!c) return null
   const valido = reglas.every(x => x.ok)
+  const niveles = reglamento.tipo === 'battlebot' ? NIVELES_RIVAL_COMBATE : NIVELES_RIVAL
+  const vida = c.vida
   const fase =
-    c.fase === 'espera' ? 'Compila y ejecuta tu programa para empezar el combate'
-      : c.fase === 'cuenta' ? `Esperando… el robot no debe moverse (${Math.ceil(c.restante)} s)`
-        : c.fase === 'combate' ? `¡En juego! Quedan ${Math.ceil(c.restante)} s`
+    c.fase === 'espera' ? 'Compila y ejecuta tu programa para empezar'
+      : c.fase === 'cuenta' ? `Espera: no te muevas (${Math.ceil(c.restante)} s)`
+        : c.fase === 'combate' ? `¡En juego! ${Math.ceil(c.restante)} s`
           : c.fase === 'pausa' ? c.ultima?.motivo ?? ''
-            : c.ganador === 'alumno' ? '¡Ganaste el combate! 🏆' : c.ganador === 'rival' ? 'Ganó el rival. Mejora tu programa y prueba otra vez.' : 'Empate'
-  const cuenta = c.fase === 'cuenta' && c.restante > 0 && (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-      <div key={Math.ceil(c.restante)} className="lab-dato animate-ping-once font-mono text-8xl font-black drop-shadow-[0_0_24px_rgba(94,234,212,0.6)]">{Math.ceil(c.restante)}</div>
-    </div>
-  )
-  if (compacto) return (
-    <>
-      <div className="pointer-events-none absolute left-1/2 top-3 z-10 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-2.5 rounded-full lab-vidrio px-3 py-1 text-xs">
-        <span className="lab-dato font-mono text-base font-bold">{c.marcador.alumno}</span>
-        <span className="truncate text-lab-tinta">{c.fase === 'final' ? (c.ganador === 'alumno' ? '¡Ganaste! 🏆' : c.ganador === 'rival' ? 'Ganó el rival' : 'Empate') : `Ronda ${c.ronda}/${reglamento.salidas.length}`}</span>
-        <span className="font-mono text-base font-bold text-red-700">{c.marcador.rival}</span>
-      </div>
-      {cuenta}
-    </>
-  )
+            : c.ganador === 'alumno' ? '¡Ganaste el combate! 🏆' : c.ganador === 'rival' ? 'Ganó el rival: mejora tu programa' : 'Empate'
   return (
     <>
-      <div className="absolute left-1/2 top-3 z-10 w-[min(22rem,calc(100%-1.5rem))] -translate-x-1/2 rounded-md lab-vidrio p-2.5 text-xs">
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-center">
-            <div className="text-[10px] uppercase tracking-wide text-lab-suave">Tú</div>
-            <div className="lab-dato font-mono text-2xl font-bold leading-none">{c.marcador.alumno}</div>
-          </div>
-          <div className="min-w-0 flex-1 text-center">
-            <div className="font-semibold text-lab-tinta">{c.fase === 'final' ? 'Fin del combate' : `Ronda ${c.ronda} de ${reglamento.salidas.length}`}</div>
-            <div className="truncate text-[11px] text-lab-suave">{c.fase === 'final' ? `Gana quien llega a ${reglamento.puntosParaGanar}` : c.salida}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-[10px] uppercase tracking-wide text-red-700/80">Rival</div>
-            <div className="font-mono text-2xl font-bold leading-none text-red-700">{c.marcador.rival}</div>
-          </div>
-        </div>
-        <div className={`mt-2 rounded-md px-2 py-1.5 text-center ${c.fase === 'final' ? (c.ganador === 'alumno' ? 'bg-emerald-500/20 font-semibold text-emerald-700' : 'bg-red-500/15 text-red-700') : 'bg-lab-tinta/[0.04] text-lab-tinta'}`}>{fase}</div>
-        <div className="mt-2 flex items-center gap-2">
-          <label className="flex flex-1 items-center gap-1.5 text-[11px] text-lab-suave">
-            Rival
-            <select
-              value={rival}
-              onChange={e => { const n = e.target.value as NivelRival; setRival(n); sim.elegirRival(n) }}
-              className="h-7 flex-1 rounded-md border border-lab-borde/20 bg-lab-fondo px-1.5 text-xs text-lab-tinta [&_option]:bg-lab-superficie"
-              title={NIVELES_RIVAL[rival].descripcion}
-            >
-              {(Object.keys(NIVELES_RIVAL) as NivelRival[]).map(n => <option key={n} value={n}>{NIVELES_RIVAL[n].nombre}</option>)}
-            </select>
-          </label>
-          <span className={`rounded-md px-1.5 py-1 text-[10px] font-semibold ${valido ? 'bg-emerald-500/15 text-emerald-700' : 'bg-red-500/15 text-red-700'}`} title={reglas.map(x => (x.ok ? '✓ ' : '✗ ') + x.texto).join(' · ')}>
-            {valido ? '✓ Reglamento' : '✗ Fuera de reglamento'}
+      <div className="absolute left-1/2 top-3 z-10 w-[min(19rem,calc(100%-1.5rem))] -translate-x-1/2">
+        <button onClick={() => setAbierto(a => !a)} aria-expanded={abierto} title="Ver rival y reglamento" className="lab-vidrio flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-xs">
+          {vida ? <BarraVida valor={vida.alumno} lado="alumno" /> : <span className="lab-dato w-6 text-left font-mono text-base font-bold">{c.marcador.alumno}</span>}
+          <span className="min-w-0 flex-1 text-center leading-tight">
+            <span className="block font-semibold text-lab-tinta">{c.fase === 'final' ? 'Fin del combate' : vida ? 'Combate' : `Ronda ${c.ronda} de ${reglamento.salidas.length}`}</span>
+            <span className={`block truncate text-[11px] ${c.fase === 'final' && c.ganador === 'alumno' ? 'font-semibold text-emerald-700' : 'text-lab-suave'}`}>{c.fase === 'final' && c.ultima ? `${fase} · ${c.ultima.motivo}` : fase}</span>
           </span>
-        </div>
-        {!valido && <ul className="mt-1.5 space-y-0.5 text-[11px] text-red-700">{reglas.filter(x => !x.ok).map(x => <li key={x.texto}>✗ {x.texto}</li>)}</ul>}
+          {vida ? <BarraVida valor={vida.rival} lado="rival" /> : <span className="w-6 text-right font-mono text-base font-bold text-red-700">{c.marcador.rival}</span>}
+          <ChevronDown className={`h-3.5 w-3.5 shrink-0 text-lab-tenue transition ${abierto ? 'rotate-180' : ''}`} />
+        </button>
+        {abierto && (
+          <div className="lab-vidrio mt-1 space-y-2 rounded-md p-2.5 text-xs">
+            <div className="flex justify-between text-[10px] uppercase tracking-wide"><span className="text-lab-acento">Tú</span><span className="text-lab-tenue">{c.salida}</span><span className="text-red-700">Rival</span></div>
+            <label className="flex items-center gap-1.5 text-[11px] text-lab-suave">
+              Rival
+              <select
+                value={rival}
+                onChange={e => { const n = e.target.value as NivelRival; setRival(n); sim.elegirRival(n) }}
+                className="h-7 flex-1 rounded-md border border-lab-borde/30 bg-lab-superficie px-1.5 text-xs text-lab-tinta"
+                title={niveles[rival].descripcion}
+              >
+                {(Object.keys(niveles) as NivelRival[]).map(n => <option key={n} value={n}>{niveles[n].nombre}</option>)}
+              </select>
+            </label>
+            <p className="text-[11px] leading-snug text-lab-suave">{niveles[rival].descripcion}</p>
+            <div className={valido ? 'text-emerald-700' : 'text-red-700'}>
+              {valido ? '✓ Tu robot cumple el reglamento' : <ul className="space-y-0.5">{reglas.filter(x => !x.ok).map(x => <li key={x.texto}>✗ {x.texto}</li>)}</ul>}
+            </div>
+            <button onClick={onReiniciar} className="lab-secundario flex h-7 w-full items-center justify-center gap-1.5 rounded-md text-xs font-medium"><RotateCcw className="h-3.5 w-3.5" /> {vida ? 'Empezar otra vez' : 'Empezar otra vez (0 a 0)'}</button>
+          </div>
+        )}
       </div>
-      {cuenta}
+      {c.fase === 'cuenta' && c.restante > 0 && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div key={Math.ceil(c.restante)} className="lab-dato animate-ping-once font-mono text-8xl font-black drop-shadow-[0_0_24px_rgba(15,110,120,0.35)]">{Math.ceil(c.restante)}</div>
+        </div>
+      )}
     </>
   )
 }

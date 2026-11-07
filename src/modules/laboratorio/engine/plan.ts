@@ -7,7 +7,7 @@ import { pieza } from '../catalogo/piezas'
 import type { V3 } from '../catalogo/tipos'
 import type { RobotDoc } from '../robots/doc'
 import type { MotorParams } from './bridge'
-import { poses, resumen, ruedas, type RuedaGeo } from './ensamblaje'
+import { aRobot, poses, resumen, ruedas, type RuedaGeo } from './ensamblaje'
 import { infoPlaca, mcuDe } from './placa'
 
 const k = (inst: string, pin: string) => `${inst}.${pin}`
@@ -55,6 +55,8 @@ export interface LineaPlan { instancia: string; pinDigital: string | null; pinAn
 export interface UltrasonidoPlan { instancia: string; trig: string | null; echo: string | null; alcanceCm: number; aperturaGrados: number; origen: V3 }
 export interface ObstaculoPlan { instancia: string; out: string | null; alcanceMm: number; origen: V3 }
 export interface ServoPlan { instancia: string; sig: string | null; gradosPorSeg: number; alimentado: boolean }
+/** Arma giratoria: `centro` = eje de la barra a la altura de su plano (mm, marco del robot). */
+export interface ArmaPlan { instancia: string; sig: string | null; alimentado: boolean; omegaMax: number; radio: number; inercia: number; tau: number; centro: V3 }
 
 export interface SimPlan {
   mcu: string | null
@@ -63,6 +65,7 @@ export interface SimPlan {
   ultrasonidos: UltrasonidoPlan[]
   obstaculos: ObstaculoPlan[]
   servos: ServoPlan[]
+  armas: ArmaPlan[]
   voltajeBateria: number
   caidaDriver: number
   masaKg: number
@@ -175,6 +178,8 @@ export function planDe(doc: RobotDoc): SimPlan {
   const ultrasonidos: UltrasonidoPlan[] = []
   const obstaculos: ObstaculoPlan[] = []
   const servos: ServoPlan[] = []
+  const armas: ArmaPlan[] = []
+  const ps = poses(doc)
   for (const p of doc.piezas) {
     const c = pieza(p.pieza).comportamiento
     if (c.tipo === 'ir-reflectivo') {
@@ -199,11 +204,29 @@ export function planDe(doc: RobotDoc): SimPlan {
       const ok = alimentado(p.id, 'V+', 'GND')
       if (!ok) avisos.push(`${p.etiqueta}: no tiene alimentación (V+ y GND)`)
       servos.push({ instancia: p.id, sig: pinPlaca(p.id, 'SIG'), gradosPorSeg: 60 / c.seg_por_60, alimentado: ok })
+    } else if (c.tipo === 'arma-giratoria') {
+      // El ESC toma la corriente directo de la batería: sin ella, la señal no mueve nada.
+      const bat = doc.piezas.find(b => pieza(b.pieza).comportamiento.tipo === 'bateria' && mismo([b.id, '+'], [p.id, 'BAT+']))
+      const vBat = bat ? (pieza(bat.pieza).comportamiento as { voltaje: number }).voltaje : 0
+      const ok = !!bat && tierras.some(t => mismo([p.id, 'GND'], t))
+      if (!ok) avisos.push(`${p.etiqueta}: el ESC necesita la batería (BAT+ al + y GND a tierra)`)
+      const sig = pinPlaca(p.id, 'SIG')
+      if (ok && !sig) avisos.push(`${p.etiqueta}: la señal (SIG) no está conectada a la placa`)
+      const largo = 2 * c.radio_mm / 1000
+      armas.push({
+        instancia: p.id, sig, alimentado: ok,
+        // Las rpm suben con el voltaje (el motor está pensado para 7,4 V).
+        omegaMax: (c.rpm_max * Math.min(1.5, vBat / 7.4) * 2 * Math.PI) / 60,
+        radio: c.radio_mm / 1000,
+        inercia: (c.masa_barra_g / 1000) * largo * largo / 12,
+        tau: c.tau_s,
+        centro: aRobot(ps.get(p.id)!, [0, c.alto_mm, 0]).toArray() as V3,
+      })
     }
   }
 
   return {
-    mcu: mcu?.id ?? null, motores, lineas, ultrasonidos, obstaculos, servos,
+    mcu: mcu?.id ?? null, motores, lineas, ultrasonidos, obstaculos, servos, armas,
     voltajeBateria, caidaDriver, masaKg: resumen(doc).masa_g / 1000, avisos,
   }
 }

@@ -10,7 +10,7 @@
 
 export type V3 = [number, number, number]
 
-export type Familia = 'placa' | 'chasis' | 'movimiento' | 'servo' | 'sensor' | 'electronica' | 'circuito'
+export type Familia = 'placa' | 'chasis' | 'movimiento' | 'servo' | 'sensor' | 'electronica' | 'circuito' | 'arma'
 
 export const FAMILIAS: { id: Familia; nombre: string }[] = [
   { id: 'chasis', nombre: 'Chasis y bases' },
@@ -20,6 +20,7 @@ export const FAMILIAS: { id: Familia; nombre: string }[] = [
   { id: 'sensor', nombre: 'Sensores' },
   { id: 'electronica', nombre: 'Electrónica' },
   { id: 'circuito', nombre: 'Componentes' },
+  { id: 'arma', nombre: 'Armas de combate' },
 ]
 
 /** Tipos de punto de montaje: una pieza solo encastra donde su tipo coincide. */
@@ -39,6 +40,7 @@ export type TipoMontaje =
   | 'piso'            // segundo piso sobre separadores (cuando abajo no cabe todo)
   | 'fuente-protoboard' // fuente MB102 pinchada en los rieles de la protoboard
   | 'modulo-mesa'     // módulo sobre la mesa junto a la protoboard (joystick)
+  | 'arma'            // arma de un robot de combate (battlebot)
 
 export interface PuntoMontaje {
   id: string
@@ -115,6 +117,11 @@ export type Comportamiento =
   | { tipo: 'joystick'; ohm: number }
   /** Maqueta del proyecto (basurero, su tapa): no tiene pines, solo se ve y se mueve con el servo. */
   | { tipo: 'maqueta' }
+  /**
+   * Arma giratoria de battlebot: un motor sin escobillas con su ESC hace girar una
+   * barra de acero. `alto_mm`: altura del plano de la barra sobre el ancla.
+   */
+  | { tipo: 'arma-giratoria'; rpm_max: number; radio_mm: number; masa_barra_g: number; tau_s: number; alto_mm: number }
   /** Pieza que se ve en el catálogo pero todavía no se simula (llega en una fase futura). */
   | { tipo: 'sin-simular' }
 

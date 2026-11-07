@@ -37,6 +37,10 @@ export interface ArenaDef {
   objetos: ObjetoArena[]
   /** Paredes alrededor del borde. */
   paredes: boolean
+  /** Alto de las paredes (m); 15 cm si no se dice. La arena de combate las tiene altas. */
+  paredesAlto?: number
+  /** Pozo cuadrado en el piso (arena de combate): el robot que cae ahí queda fuera. */
+  pozo?: { x: number; z: number; lado: number }
   /** Mesa elevada: fuera de ella no hay piso (el robot se cae). */
   mesa?: { altura: number }
   /** Dohyo de sumo: plataforma circular negra con borde blanco; su cara de arriba está en y = 0. */
@@ -52,10 +56,17 @@ export interface ArenaDef {
   inicio: Pose2D
 }
 
-/** Reglamento de sumo / minisumo (versión de aula: rondas de 60 s). */
+/**
+ * Reglamento de la competencia. Sumo / minisumo: rondas de 60 s, gana quien saca
+ * al otro. Battlebot: un combate con vida; KO por vida en cero, pozo o inmóvil.
+ */
 export interface ReglamentoSumo {
-  tipo: 'sumo'
-  categoria: 'minisumo' | 'sumo'
+  tipo: 'sumo' | 'battlebot'
+  categoria: 'minisumo' | 'sumo' | 'beetle'
+  /** Battlebot: vida de cada robot al empezar. */
+  vida?: number
+  /** Battlebot: segundos quieto que cuentan como KO. */
+  inmovilS?: number
   /** Lado máximo del robot visto desde arriba (mm) y masa máxima (g). */
   maxLadoMm: number
   maxMasaG: number
