@@ -649,6 +649,77 @@ export const RaspberryPi4 = forwardRef(function RaspberryPi4(_: object, refLed: 
   )
 })
 
+/**
+ * Jetson Nano (kit B01) de costado: placa base de 80 × 100 mm, el módulo con
+ * su disipador negro de aletas, el conector de 40 pines en un borde, los
+ * puertos (USB, Ethernet, HDMI) en el borde trasero y el conector CSI.
+ */
+export const JetsonNano = forwardRef(function JetsonNano(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
+  const q = useCalidad()
+  return (
+    <group position={M(3, 0, 0)}>
+      <RoundedBox args={M(80, 1.6, 100)} position={M(0, 3.8, 0)} radius={m(2)} smoothness={2} castShadow={q.sombras} receiveShadow>
+        <meshStandardMaterial color="#14532d" roughness={0.6} />
+      </RoundedBox>
+      {/* Patas de la placa base */}
+      {[[-35, -45], [-35, 45], [35, -45], [35, 45]].map(([x, z]) => (
+        <mesh key={`${x}${z}`} position={M(x, 1.5, z)}><cylinderGeometry args={[m(2), m(2), m(3), 8]} /><meshStandardMaterial color={METAL} metalness={0.8} roughness={0.3} /></mesh>
+      ))}
+      {/* Módulo (SODIMM) y disipador con aletas */}
+      <mesh position={M(6, 5.5, 4)}><boxGeometry args={[m(45), m(1.2), m(70)]} /><meshStandardMaterial color="#1e3a2a" roughness={0.6} /></mesh>
+      <mesh position={M(6, 8, 4)} castShadow={q.sombras}><boxGeometry args={[m(40), m(4), m(60)]} /><meshStandardMaterial color="#18181b" metalness={0.5} roughness={0.5} /></mesh>
+      {Array.from({ length: q.sombras ? 12 : 6 }, (_, i) => (
+        <mesh key={i} position={M(6, 18, -24 + i * (q.sombras ? 4.4 : 9.6))} castShadow={q.sombras}>
+          <boxGeometry args={[m(40), m(17), m(q.sombras ? 1.4 : 3)]} />
+          <meshStandardMaterial color="#18181b" metalness={0.5} roughness={0.45} />
+        </mesh>
+      ))}
+      {/* Conector de 40 pines en el borde −x */}
+      <mesh position={M(-35, 7, 0)} castShadow={q.sombras}><boxGeometry args={[m(5), m(5), m(51)]} /><meshStandardMaterial color="#111214" roughness={0.6} /></mesh>
+      {q.sombras && Array.from({ length: 20 }, (_, i) => [-1.27, 1.27].map(dx => (
+        <mesh key={`${i}${dx}`} position={M(-35 + dx, 10.4, -24.1 + i * 2.54)}>
+          <boxGeometry args={[m(0.64), m(3), m(0.64)]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.25} />
+        </mesh>
+      )))}
+      {/* Puertos en el borde −z: USB ×4, Ethernet, HDMI, DisplayPort, alimentación */}
+      {[[-26, 15, 16], [-8, 15, 16], [12, 13, 16], [30, 6, 15]].map(([x, alto, ancho]) => (
+        <mesh key={x} position={M(x, 4.6 + alto / 2, -43)} castShadow={q.sombras}>
+          <boxGeometry args={[m(ancho), m(alto), m(14)]} />
+          <meshStandardMaterial color={METAL} metalness={0.85} roughness={0.3} />
+        </mesh>
+      ))}
+      {/* Conector CSI (cámara) junto al borde +z */}
+      <mesh position={M(20, 6, 46)}><boxGeometry args={[m(17), m(3), m(5)]} /><meshStandardMaterial color="#f5f5f4" roughness={0.6} /></mesh>
+      {/* LED de encendido */}
+      <mesh position={M(-28, 5, 44)}><boxGeometry args={[m(1.6), m(1), m(1)]} /><meshStandardMaterial ref={refLed} color="#22c55e" emissive="#22c55e" emissiveIntensity={1.5} /></mesh>
+    </group>
+  )
+})
+
+/**
+ * Cámara CSI (IMX219) sobre un mástil: base atornillada al chasis detrás del
+ * borde, el mástil con el cable plano y la placa de la cámara inclinada 40°
+ * hacia el piso. La lente queda en (0, 95, 0), mirando a +x.
+ */
+export function CamaraCSI() {
+  const q = useCalidad()
+  return (
+    <group>
+      <mesh position={M(-12, 1.5, 0)} castShadow={q.sombras}><boxGeometry args={[m(24), m(3), m(24)]} /><meshStandardMaterial color="#27272a" roughness={0.5} /></mesh>
+      <mesh position={M(-12, 45, 0)} castShadow={q.sombras}><boxGeometry args={[m(5), m(84), m(5)]} /><meshStandardMaterial color="#3f3f46" metalness={0.6} roughness={0.35} /></mesh>
+      {/* Cable plano por detrás del mástil */}
+      <mesh position={M(-14.8, 48, 0)}><boxGeometry args={[m(0.4), m(90), m(16)]} /><meshStandardMaterial color="#e7d8b1" roughness={0.7} /></mesh>
+      <group position={M(-6, 95, 0)} rotation={[0, 0, (-40 * Math.PI) / 180]}>
+        <mesh castShadow={q.sombras}><boxGeometry args={[m(1.6), m(24), m(25)]} /><meshStandardMaterial color="#15803d" roughness={0.55} /></mesh>
+        <mesh position={M(2.5, 0, 0)}><boxGeometry args={[m(3.5), m(8.5), m(8.5)]} /><meshStandardMaterial color={NEGRO} roughness={0.5} /></mesh>
+        <mesh position={M(5, 0, 0)} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[m(3), m(3), m(2.5), 16]} /><meshStandardMaterial color="#09090b" metalness={0.4} roughness={0.2} /></mesh>
+        <mesh position={M(6.3, 0, 0)} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[m(1.6), m(1.6), m(0.2), 16]} /><meshStandardMaterial color="#1e3a8a" metalness={0.9} roughness={0.05} /></mesh>
+      </group>
+    </group>
+  )
+}
+
 export const Pico = forwardRef(function Pico(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
   const q = useCalidad()
   return (

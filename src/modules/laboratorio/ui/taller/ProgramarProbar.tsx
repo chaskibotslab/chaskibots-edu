@@ -313,7 +313,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             <Gamepad2 className="h-4 w-4" /> <span className="hidden md:inline">Control</span>
           </button>
         )}
-        <button onClick={descargarIno} className={boton} title={python ? 'Descargar el programa (.py) para correrlo en la Raspberry Pi' : 'Descargar el programa (.ino) para abrirlo en el Arduino IDE'}>
+        <button onClick={descargarIno} className={boton} title={python ? `Descargar el programa (.py) para correrlo en la ${infoPlaca(doc).nombre}` : 'Descargar el programa (.ino) para abrirlo en el Arduino IDE'}>
           <Download className="h-4 w-4" /> <span className="hidden md:inline">.{extension}</span>
         </button>
         </>)}
@@ -563,6 +563,7 @@ function HUD({ tele, robot = true, sinPlaca = false, encendido = false, python =
       </div>
 
       {robot && <div className="pointer-events-none absolute right-3 top-3 hidden w-56 space-y-2 rounded-md lab-vidrio p-3 text-xs sm:block">
+        {tele.camara && <VistaCamara imagen={tele.camara} />}
         <div className="flex items-center justify-between">
           <span className="text-lab-suave">Velocidad</span>
           <span className="font-mono text-lab-tinta">{(tele.velocidadRobot * 100).toFixed(1)} cm/s</span>
@@ -623,6 +624,27 @@ function HUD({ tele, robot = true, sinPlaca = false, encendido = false, python =
   )
 }
 
+/** Lo que ve la cámara del robot, píxel por píxel (la misma tabla de números que lee el programa). */
+function VistaCamara({ imagen }: { imagen: NonNullable<Telemetria['camara']> }) {
+  const ref = useRef<HTMLCanvasElement>(null)
+  useEffect(() => {
+    const ctx = ref.current?.getContext('2d')
+    if (!ctx) return
+    const datos = ctx.createImageData(imagen.ancho, imagen.alto)
+    imagen.px.forEach((b, i) => { datos.data.set([b, b, b, 255], i * 4) })
+    ctx.putImageData(datos, 0, 0)
+  }, [imagen])
+  return (
+    <div>
+      <div className="mb-1 flex justify-between text-[10px] text-lab-suave">
+        <span>Cámara</span>
+        <span className="font-mono">{imagen.ancho} × {imagen.alto} px</span>
+      </div>
+      <canvas ref={ref} width={imagen.ancho} height={imagen.alto} className="w-full rounded-sm border border-lab-borde/30" style={{ imageRendering: 'pixelated', aspectRatio: `${imagen.ancho} / ${imagen.alto}` }} />
+    </div>
+  )
+}
+
 function PanelPines({ tele }: { tele: Telemetria | null }) {
   const pines = tele?.pines ?? {}
   const nombres = useMemo(() => [...Array.from({ length: 14 }, (_, i) => `D${i}`), ...Array.from({ length: 6 }, (_, i) => `A${i}`)], [])
@@ -630,9 +652,12 @@ function PanelPines({ tele }: { tele: Telemetria | null }) {
   if (!tele || tele.estado === 'sin-programa') {
     return <p className="p-3 text-xs text-lab-tenue">Ejecuta un programa para ver el estado de cada pin en vivo.</p>
   }
+  // Raspberry Pi y Jetson: sus pines (GPIO17, PIN32…) son los que usa el programa.
+  const claves = Object.keys(pines)
+  const lista = claves.every(k => /^[DA]\d+$/.test(k)) ? nombres : claves.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
   return (
     <div className="grid grid-cols-2 gap-1.5 p-3 sm:grid-cols-4 xl:grid-cols-5">
-      {nombres.map(n => {
+      {lista.map(n => {
         const p = pines[n]
         const salida = p?.mode === 'output'
         const esPwm = salida && p.duty > 0.01 && p.duty < 0.99 && p.freqHz > 50

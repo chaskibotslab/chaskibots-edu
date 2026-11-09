@@ -156,6 +156,7 @@ const pinesPi: PinDef[] = [
   { nombre: '3V3', tipo: 'alim', ayuda: 'Salida de 3,3 V para sensores' },
   { nombre: '5V', tipo: 'alim', ayuda: '5 V: alimenta la placa (en el robot real, con un regulador de 5 V y 3 A)' },
   { nombre: 'GND', tipo: 'gnd', ayuda: 'Tierra (negativo común)' },
+  { nombre: 'CSI', tipo: 'csi', ayuda: 'Conector de la cámara (cable plano)' },
 ]
 
 export const RASPBERRY_PI_4: PiezaDef = {
@@ -178,6 +179,48 @@ export const RASPBERRY_PI_4: PiezaDef = {
     ['En el simulador', 'Tu programa en Python corre en el navegador (Pyodide); sleep() va al ritmo de la simulación'],
   ],
   fuente: 'Raspberry Pi 4 Model B, hoja de datos oficial; documentación de gpiozero',
+}
+
+// Jetson Nano (kit de desarrollo B01): computadora con GPU para visión e IA.
+// Se programa en Python con Jetson.GPIO; los pines se llaman por su número
+// físico en el conector de 40 pines (GPIO.BOARD), como en los ejemplos de NVIDIA.
+const pinJ = (n: number, extra = ''): PinDef => ({ nombre: `PIN${n}`, tipo: 'digital', ayuda: `Pin ${n} del conector: digital${extra}` })
+const pinesJetson: PinDef[] = [
+  { nombre: 'PIN32', tipo: 'pwm', ayuda: 'Pin 32: digital y PWM por hardware (GPIO.PWM)' },
+  { nombre: 'PIN33', tipo: 'pwm', ayuda: 'Pin 33: digital y PWM por hardware (GPIO.PWM)' },
+  pinJ(7), pinJ(11), pinJ(12), pinJ(13), pinJ(15), pinJ(16), pinJ(18), pinJ(19), pinJ(21), pinJ(22), pinJ(23), pinJ(24), pinJ(26),
+  pinJ(29), pinJ(31), pinJ(35), pinJ(36), pinJ(37), pinJ(38), pinJ(40),
+  { nombre: 'PIN3', tipo: 'digital', ayuda: 'SDA (I2C): mejor dejarlo para sensores I2C' },
+  { nombre: 'PIN5', tipo: 'digital', ayuda: 'SCL (I2C): mejor dejarlo para sensores I2C' },
+  { nombre: 'PIN8', tipo: 'digital', ayuda: 'TX de la UART: mejor no usarlo' },
+  { nombre: 'PIN10', tipo: 'digital', ayuda: 'RX de la UART: mejor no usarlo' },
+  { nombre: '3V3', tipo: 'alim', ayuda: 'Salida de 3,3 V para sensores (pines 1 y 17)' },
+  { nombre: '5V', tipo: 'alim', ayuda: '5 V (pines 2 y 4): en el robot real, la placa necesita una fuente de 5 V y 4 A' },
+  { nombre: 'GND', tipo: 'gnd', ayuda: 'Tierra (negativo común)' },
+  { nombre: 'CSI', tipo: 'csi', ayuda: 'Conector de la cámara (cable plano): CAM0' },
+]
+
+export const JETSON_NANO: PiezaDef = {
+  id: 'jetson-nano',
+  nombre: 'Jetson Nano',
+  familia: 'placa',
+  descripcion: 'La computadora de NVIDIA para robots que ven: Linux, una GPU para visión e inteligencia artificial y una cámara CSI. Se programa en Python con Jetson.GPIO (pines por su número físico) y la cámara entrega imágenes como tablas de números.',
+  modelo: 'proc:jetson-nano',
+  masa_g: 140,
+  material: 'pcb',
+  // 80 × 100 mm con el disipador (29 mm de alto); va de costado y 3 mm adelante del ancla para dejar lugar al driver.
+  colisionadores: [{ forma: 'caja', medidas: [80, 29, 100], centro: [3, 14.5, 0] }],
+  montajes: [],
+  encaja: ['placa'],
+  pines: pinesJetson,
+  comportamiento: { tipo: 'mcu', placa: 'jetson', frecuencia_hz: 1_430_000_000, vLogica: 3.3 },
+  datos: [
+    ['Procesador', 'ARM Cortex-A57 de 4 núcleos a 1,43 GHz + GPU Maxwell de 128 núcleos'], ['Sistema', 'Ubuntu (JetPack de NVIDIA)'],
+    ['Voltaje lógico', '3,3 V (¡no le pongas 5 V en un pin!)'], ['Programación', 'Python con Jetson.GPIO (GPIO.BOARD: el pin 32 es el 32)'],
+    ['PWM', 'Solo en los pines 32 y 33'], ['Cámara', 'CSI (cable plano), como la cámara de la Raspberry Pi v2'],
+    ['En el simulador', 'Tu programa en Python corre en el navegador (Pyodide); la cámara da imágenes chicas en escala de grises'],
+  ],
+  fuente: 'NVIDIA Jetson Nano Developer Kit, guía del usuario; documentación de Jetson.GPIO',
 }
 
 // ESP32 DevKit V1 (30 pines). Se simula a nivel de API Arduino sobre un

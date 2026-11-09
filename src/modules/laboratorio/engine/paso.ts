@@ -121,6 +121,49 @@ export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, 
 }
 
 
+/** Una imagen de la cámara: `px` fila por fila, de arriba abajo; 0 = negro, 255 = blanco. */
+export interface ImagenCamara { ancho: number; alto: number; px: number[] }
+
+/** Lo que se ve encima del horizonte o más allá de 3 m: la pared gris del aula. */
+const GRIS_LEJOS = 0.55
+
+/**
+ * Imagen de la primera cámara (null si no hay ninguna conectada). Cada píxel
+ * es un rayo desde la lente (cámara estenopeica) hasta el plano del piso, y su
+ * brillo es la reflectancia de ese punto: la misma que leen los sensores de
+ * línea, así la cámara y los TCRT5000 ven la misma pista.
+ */
+export function leerCamara(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, reflectancia: FuncionReflectancia): ImagenCamara | null {
+  const c = plan.camaras[0]
+  if (!c) return null
+  const pose = poses(doc, fisica.angulosServo()).get(c.instancia)!
+  const o = fisica.puntoMundo(aRobot(pose, c.origen))
+  // Ejes de la cámara en el marco de la pieza: adelante (+x inclinado hacia abajo), arriba y
+  // derecha (+z = adelante × arriba; las ruedas izquierdas están en z < 0).
+  const t = (c.inclinacion * Math.PI) / 180
+  const eje = (v: { x: number; y: number; z: number }) => fisica.direccionMundo(rotar(pose.rot, v))
+  const f = eje({ x: Math.cos(t), y: -Math.sin(t), z: 0 })
+  const arriba = eje({ x: Math.sin(t), y: Math.cos(t), z: 0 })
+  const der = eje({ x: 0, y: 0, z: 1 })
+  const tx = Math.tan((c.fovH * Math.PI) / 360), ty = Math.tan((c.fovV * Math.PI) / 360)
+  // Huella de un píxel en el piso, para promediar (como el desenfoque de una cámara real).
+  const px: number[] = new Array(c.ancho * c.alto)
+  for (let j = 0; j < c.alto; j++) {
+    const v = 1 - ((j + 0.5) / c.alto) * 2
+    for (let i = 0; i < c.ancho; i++) {
+      const u = ((i + 0.5) / c.ancho) * 2 - 1
+      const dx = f.x + der.x * u * tx + arriba.x * v * ty
+      const dy = f.y + der.y * u * tx + arriba.y * v * ty
+      const dz = f.z + der.z * u * tx + arriba.z * v * ty
+      const k = dy < -1e-6 ? -o.y / dy : Infinity   // distancia (en unidades de d) hasta y = 0
+      const lejos = !(k < Infinity) || k * Math.hypot(dx, dy, dz) > 3
+      const r = lejos ? GRIS_LEJOS : reflectancia(o.x + dx * k, o.z + dz * k, 0.002 + 0.004 * k * Math.hypot(dx, dy, dz))
+      px[j * c.ancho + i] = Math.round(Math.max(0, Math.min(1, r)) * 255)
+    }
+  }
+  return { ancho: c.ancho, alto: c.alto, px }
+}
+
 /** Pines del micro → driver → voltaje de cada motor; pulsos → ángulo pedido a cada servo. */
 export function aplicarPines(plan: SimPlan, fisica: RobotFisico, pines: Record<string, PinReport> | null) {
   const duty = (pin: string | null) => {

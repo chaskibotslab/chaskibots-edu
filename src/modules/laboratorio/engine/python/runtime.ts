@@ -11,10 +11,14 @@
 // el navegador vaya lento.
 //
 // Desde afuera solo se usan dos funciones:
-//   _cargar(codigo)                 → None o el mensaje de error de sintaxis
-//   _avanzar(dt, digital, dobles, us) → { pines, salida, error, terminado }
+//   _cargar(codigo, placa)                 → None o el mensaje de error de sintaxis
+//   _avanzar(dt, digital, dobles, us, cam) → { pines, salida, error, terminado }
+// `placa`: 'rpi' (pines GPIO17…) o 'jetson' (pines PIN32…, por su número físico).
 // `digital`: {GPIO17: True}, `dobles`: {GPIO2: [sin_pullup, con_pullup]},
-// `us`: [{trig, echo, cm}] (cm None = sin eco).
+// `us`: [{trig, echo, cm}] (cm None = sin eco), `cam`: {ancho, alto, px} o None.
+//
+// Bibliotecas: gpiozero (Raspberry), RPi.GPIO / Jetson.GPIO (la misma API,
+// con GPIO.BOARD o GPIO.BCM) y «camara», la cámara CSI del simulador.
 
 export const RUNTIME_PY = String.raw`
 import ast, sys, types, math
@@ -30,19 +34,32 @@ class _Espera:
 def _espera(s=0.0):
     return _Espera(s)
 
-_estado = {'t': 0.0, 'despertar': 0.0, 'coro': None, 'vivo': False, 'salida': [], 'lineas': 0}
-_pines = {}        # 'GPIO17' -> objeto que lo maneja (salida) o modo de entrada
-_entradas = {'digital': {}, 'dobles': {}, 'us': []}
+_estado = {'t': 0.0, 'despertar': 0.0, 'coro': None, 'vivo': False, 'salida': [], 'lineas': 0, 'placa': 'rpi'}
+_pines = {}        # 'GPIO17' (o 'PIN11' en la Jetson) -> objeto que lo maneja
+_entradas = {'digital': {}, 'dobles': {}, 'us': [], 'cam': None}
+
+# Conector de 40 pines (igual en la Raspberry y la Jetson): número físico -> GPIO BCM.
+_BOARD_A_BCM = {3: 2, 5: 3, 7: 4, 8: 14, 10: 15, 11: 17, 12: 18, 13: 27, 15: 22, 16: 23, 18: 24, 19: 10, 21: 9, 22: 25,
+                23: 11, 24: 8, 26: 7, 27: 0, 28: 1, 29: 5, 31: 6, 32: 12, 33: 13, 35: 19, 36: 16, 37: 26, 38: 20, 40: 21}
+_BCM_A_BOARD = {v: k for k, v in _BOARD_A_BCM.items()}
 
 def _nombre_pin(p):
+    """Nombre del pin en el simulador. gpiozero usa la numeración BCM."""
     if isinstance(p, int):
-        return 'GPIO%d' % p
-    s = str(p).upper()
-    if s.startswith('GPIO'):
-        return 'GPIO%d' % int(s[4:])
-    if s.isdigit():
-        return 'GPIO%d' % int(s)
-    raise ValueError('Pin desconocido: %r (usa el número BCM, por ejemplo 17 o "GPIO17")' % (p,))
+        n = p
+    else:
+        s = str(p).upper()
+        if s.startswith('GPIO') and s[4:].isdigit():
+            n = int(s[4:])
+        elif s.isdigit():
+            n = int(s)
+        else:
+            raise ValueError('Pin desconocido: %r (usa el número BCM, por ejemplo 17 o "GPIO17")' % (p,))
+    if _estado['placa'] == 'jetson':
+        if n not in _BCM_A_BOARD:
+            raise ValueError('El GPIO%d no está en el conector de la Jetson' % n)
+        return 'PIN%d' % _BCM_A_BOARD[n]
+    return 'GPIO%d' % n
 
 def _ocupar(pin, quien):
     n = _nombre_pin(pin)
@@ -302,6 +319,154 @@ for _k, _v in list(globals().items()):
         setattr(_gz, _k, _v)
 sys.modules['gpiozero'] = _gz
 
+# ---------------------------------------------------------------- RPi.GPIO / Jetson.GPIO
+
+_gpio = {'modo': None}
+
+class _CanalGPIO:
+    def __init__(self, nombre, salida, pud, valor):
+        self.nombre, self.salida, self.pud, self.valor, self.pwm = nombre, salida, pud, valor, None
+    def leer(self):
+        d = _entradas['dobles'].get(self.nombre)
+        if d is not None:
+            return bool(d[1] if self.pud == _G.PUD_UP else d[0])
+        return bool(_entradas['digital'].get(self.nombre, self.pud == _G.PUD_UP))
+    def _reporte(self):
+        if self.salida:
+            if self.pwm is not None and self.pwm.activo:
+                return self.pwm._reporte()
+            return {'mode': 'output', 'level': self.valor, 'duty': float(self.valor), 'freqHz': 0, 'pulsoUs': 0}
+        return {'mode': 'input_pullup' if self.pud == _G.PUD_UP else 'input', 'level': 1 if self.leer() else 0, 'duty': 0, 'freqHz': 0, 'pulsoUs': 0}
+
+def _canal_gpio(ch):
+    modo = _gpio['modo']
+    if modo is None:
+        raise RuntimeError('Primero elige cómo numerar los pines: GPIO.setmode(GPIO.BOARD) o GPIO.setmode(GPIO.BCM)')
+    try:
+        n = int(ch)
+    except (TypeError, ValueError):
+        raise ValueError('Pin desconocido: %r' % (ch,))
+    if modo == _G.BOARD:
+        if n not in _BOARD_A_BCM:
+            raise ValueError('El pin %d del conector no es un GPIO (es alimentación, tierra o no existe)' % n)
+        return 'PIN%d' % n if _estado['placa'] == 'jetson' else 'GPIO%d' % _BOARD_A_BCM[n]
+    if n not in _BCM_A_BOARD:
+        raise ValueError('El GPIO%d no está en el conector de 40 pines' % n)
+    return 'PIN%d' % _BCM_A_BOARD[n] if _estado['placa'] == 'jetson' else 'GPIO%d' % n
+
+def _lista(x):
+    return list(x) if isinstance(x, (list, tuple)) else [x]
+
+def _canal_usado(ch, salida=None):
+    nombre = _canal_gpio(ch)
+    c = _pines.get(nombre)
+    if not isinstance(c, _CanalGPIO):
+        raise RuntimeError('El pin %s no está configurado: usa GPIO.setup(%s, GPIO.OUT) o GPIO.setup(%s, GPIO.IN)' % (ch, ch, ch))
+    if salida and not c.salida:
+        raise RuntimeError('El pin %s está configurado como entrada (GPIO.IN): para escribir usa GPIO.OUT' % ch)
+    return c
+
+class _PWM:
+    def __init__(self, ch, frecuencia):
+        c = _canal_usado(ch)
+        if not c.salida:
+            raise RuntimeError('Antes de GPIO.PWM, configura el pin como salida: GPIO.setup(%s, GPIO.OUT)' % ch)
+        if _estado['placa'] == 'jetson' and c.nombre not in ('PIN32', 'PIN33'):
+            raise ValueError('En la Jetson Nano solo los pines 32 y 33 tienen PWM (el %s no)' % ch)
+        self.canal, self.frecuencia, self.duty, self.activo = c, float(frecuencia), 0.0, False
+        c.pwm = self
+    def start(self, duty):
+        self.ChangeDutyCycle(duty); self.activo = True
+    def ChangeDutyCycle(self, duty):
+        duty = float(duty)
+        if duty < 0 or duty > 100:
+            raise ValueError('El ciclo de trabajo va de 0 a 100 (pusiste %s)' % duty)
+        self.duty = duty
+    def ChangeFrequency(self, f):
+        self.frecuencia = float(f)
+    def stop(self):
+        self.activo = False
+    def _reporte(self):
+        d = self.duty / 100.0
+        return {'mode': 'output', 'level': 1 if d >= 0.5 else 0, 'duty': d, 'freqHz': self.frecuencia if 0 < d < 1 else 0, 'pulsoUs': (d / self.frecuencia * 1e6) if self.frecuencia else 0}
+
+_G = types.ModuleType('GPIO')
+_G.BOARD, _G.BCM = 10, 11
+_G.OUT, _G.IN = 0, 1
+_G.LOW, _G.HIGH = 0, 1
+_G.PUD_OFF, _G.PUD_DOWN, _G.PUD_UP = 20, 21, 22
+_G.RISING, _G.FALLING, _G.BOTH = 31, 32, 33
+
+def _setmode(m):
+    if m not in (_G.BOARD, _G.BCM):
+        raise ValueError('Usa GPIO.setmode(GPIO.BOARD) o GPIO.setmode(GPIO.BCM)')
+    _gpio['modo'] = m
+
+def _setup(ch, direccion, pull_up_down=20, initial=None):
+    for c in _lista(ch):
+        nombre = _canal_gpio(c)
+        previo = _pines.get(nombre)
+        if previo is not None and not isinstance(previo, _CanalGPIO):
+            raise RuntimeError('El pin %s ya lo usa otro dispositivo' % nombre)
+        salida = direccion == _G.OUT
+        _pines[nombre] = _CanalGPIO(nombre, salida, pull_up_down, 1 if (salida and initial) else 0)
+
+def _output(ch, valor):
+    canales, valores = _lista(ch), _lista(valor)
+    if len(valores) == 1:
+        valores = valores * len(canales)
+    for c, v in zip(canales, valores):
+        _canal_usado(c, salida=True).valor = 1 if v else 0
+
+def _input(ch):
+    c = _canal_usado(ch)
+    return c.valor if c.salida else (_G.HIGH if c.leer() else _G.LOW)
+
+def _cleanup(ch=None):
+    nombres = None if ch is None else {_canal_gpio(c) for c in _lista(ch)}
+    for n, q in list(_pines.items()):
+        if isinstance(q, _CanalGPIO) and (nombres is None or n in nombres):
+            del _pines[n]
+
+_G.setmode, _G.getmode = _setmode, lambda: _gpio['modo']
+_G.setwarnings = lambda b: None
+_G.setup, _G.output, _G.input, _G.cleanup, _G.PWM = _setup, _output, _input, _cleanup, _PWM
+_G.model = 'JETSON_NANO'
+for _pkg in ('RPi', 'Jetson'):
+    _m = types.ModuleType(_pkg)
+    _m.GPIO = _G
+    sys.modules[_pkg] = _m
+    sys.modules[_pkg + '.GPIO'] = _G
+
+# ---------------------------------------------------------------- camara
+
+class Camara:
+    """Cámara CSI del simulador. leer() da la imagen como una lista de filas
+    (de arriba abajo); cada fila es una lista de números: 0 = negro, 255 = blanco.
+    En la Jetson real se usa OpenCV (cv2.VideoCapture) y la imagen es una
+    matriz de NumPy, pero la idea es la misma: una tabla de números."""
+    def __init__(self, *a, **kw):
+        pass
+    def _imagen(self):
+        cam = _entradas['cam']
+        if cam is None:
+            raise RuntimeError('No hay imagen: conecta la cámara CSI al conector CSI de la placa')
+        return cam
+    @property
+    def ancho(self):
+        return int(self._imagen()['ancho'])
+    @property
+    def alto(self):
+        return int(self._imagen()['alto'])
+    def leer(self):
+        cam = self._imagen()
+        w, h, px = int(cam['ancho']), int(cam['alto']), list(cam['px'])
+        return [px[j * w:(j + 1) * w] for j in range(h)]
+
+_cm = types.ModuleType('camara')
+_cm.Camara = Camara
+sys.modules['camara'] = _cm
+
 # time.sleep y signal.pause también existen como módulos (los reescribe el ast).
 _tm = types.ModuleType('time')
 _tm.sleep = lambda s=0: None
@@ -380,9 +545,11 @@ class _Salida:
     def flush(self):
         pass
 
-def _cargar(codigo):
+def _cargar(codigo, placa='rpi'):
     _pines.clear()
-    _estado.update(t=0.0, reloj=0.0, despertar=0.0, coro=None, vivo=False, salida=[], lineas=0)
+    _gpio['modo'] = None
+    _entradas['cam'] = None
+    _estado.update(t=0.0, reloj=0.0, despertar=0.0, coro=None, vivo=False, salida=[], lineas=0, placa=placa)
     try:
         arbol = _reescribir(ast.parse(codigo, '<programa>'))
         codigo_obj = compile(arbol, '<programa>', 'exec', flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
@@ -404,10 +571,12 @@ def _reporte():
             pines[n] = q._reporte()
     return pines
 
-def _avanzar(dt, digital=None, dobles=None, us=None):
+def _avanzar(dt, digital=None, dobles=None, us=None, cam=None):
     _entradas['digital'] = dict(digital or {})
     _entradas['dobles'] = {k: list(v) for k, v in (dobles or {}).items()}
     _entradas['us'] = [dict(u) for u in (us or [])]
+    if cam is not None:
+        _entradas['cam'] = dict(cam)   # la última imagen sigue valiendo hasta que llegue otra
     # Reloj lógico: cada sleep despierta en su instante exacto (no al cuadro siguiente),
     # así 50 × sleep(0.1) son 5 s justos aunque la simulación avance de a 1/60 s.
     reloj = _estado['reloj'] = _estado.get('reloj', 0.0) + dt

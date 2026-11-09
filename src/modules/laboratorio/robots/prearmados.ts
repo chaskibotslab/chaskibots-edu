@@ -11,6 +11,7 @@ import type { RobotDoc } from './doc'
 import { PROYECTOS_CIRCUITO, plantillasCircuito } from './circuitos'
 import { PROYECTOS_AULAS, tema } from './proyectosAulas'
 import { PROYECTOS_RPI } from './raspberry'
+import { PROYECTOS_JETSON, plantillasJetson } from './jetson'
 import { esBanco } from '../engine/ensamblaje'
 
 export interface PlantillaCodigo { id: string; nombre: string; descripcion: string; codigo: string; bloques?: ProgramaBloques }
@@ -1904,6 +1905,7 @@ export const PREARMADOS: Prearmado[] = [
   ...PROYECTOS_CIRCUITO,
   ...PROYECTOS_AULAS,
   ...PROYECTOS_RPI(construirSeguidor),
+  ...PROYECTOS_JETSON,
 ]
 
 /** Las del proyecto primero; después, las genéricas y los ejemplos de cada pieza del robot. */
@@ -1932,6 +1934,8 @@ export function programaConPinesNuevos(antes: RobotDoc, despues: RobotDoc, prear
 /** Plantillas genéricas para un robot armado desde cero. */
 export function plantillasGenericas(doc: RobotDoc, tabla: FilaPin[]): PlantillaCodigo[] {
   if (esBanco(doc)) return plantillasCircuito(doc, tabla)
+  // La Jetson se programa en Python: sus plantillas no son de Arduino.
+  if (infoPlaca(doc).placa === 'jetson') return plantillasJetson(doc, tabla)
   const out: PlantillaCodigo[] = []
   if (driverDe(doc)) {
     out.push({ id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) })

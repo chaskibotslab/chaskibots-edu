@@ -73,6 +73,36 @@ export const HCSR04: PiezaDef = {
 }
 
 /**
+ * Cámara CSI con sensor IMX219 (la «Raspberry Pi Camera v2», la que usan la
+ * Jetson Nano y la JetBot) sobre un mástil de 9 cm, inclinada hacia el piso
+ * para ver la pista delante del robot. Va en el montaje frontal: el mástil
+ * queda detrás del borde y la lente mira hacia +x.
+ */
+export const CAMARA_CSI: PiezaDef = {
+  id: 'camara-csi',
+  nombre: 'Cámara CSI IMX219',
+  familia: 'sensor',
+  descripcion: 'Una cámara de 8 MP con cable plano para la Jetson Nano o la Raspberry Pi. En el simulador entrega una imagen chica en escala de grises (40 × 30 números de 0 a 255) que tu programa analiza para ver la línea.',
+  modelo: 'proc:camara-csi',
+  masa_g: 18,
+  material: 'pcb',
+  colisionadores: [
+    { forma: 'caja', medidas: [24, 3, 24], centro: [-12, 1.5, 0] },
+    { forma: 'caja', medidas: [5, 84, 5], centro: [-12, 45, 0] },
+    { forma: 'caja', medidas: [10, 25, 25], centro: [-6, 95, 0] },
+  ],
+  montajes: [],
+  encaja: ['sensor-frontal'],
+  pines: [{ nombre: 'CSI', tipo: 'csi', ayuda: 'Cable plano: al conector CSI de la Jetson Nano o la Raspberry Pi' }],
+  comportamiento: { tipo: 'camara', ancho_px: 40, alto_px: 30, fov_h_grados: 62.2, fov_v_grados: 48.8, inclinacion_grados: 40, origen: [0, 95, 0], fps: 30 },
+  datos: [
+    ['Sensor', 'Sony IMX219, 8 MP (3280 × 2464)'], ['Campo de visión', '62,2° × 48,8°'], ['Conexión', 'CSI-2 (cable plano de 15 pines)'],
+    ['En el simulador', 'Imagen de 40 × 30 en escala de grises, 30 cuadros por segundo; inclinada 40° hacia el piso'],
+  ],
+  fuente: 'Raspberry Pi Camera Module v2, hoja de datos; NVIDIA JetBot',
+}
+
+/**
  * Joystick KY-023 (modelo real del paquete «Electronics Components»): dos
  * potenciómetros de 10 kΩ (ejes X e Y) y un botón al presionar la palanca.
  * Sus pines salen por el borde +z, en el orden de la serigrafía.

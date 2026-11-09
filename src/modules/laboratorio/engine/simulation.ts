@@ -25,7 +25,7 @@ import { Cronometro, type EstadoCarrera } from './cronometro'
 import { Mundo, iniciarRapier, type Gravedad } from './fisica/mundo'
 import { Reloj, RobotFisico } from './fisica/robotFisico'
 import type { UltrasonidoPines } from './hcsr04'
-import { aplicarPines, leerSensores, type LecturaSensor } from './paso'
+import { aplicarPines, leerCamara, leerSensores, type ImagenCamara, type LecturaSensor } from './paso'
 import { planDe, type SimPlan } from './plan'
 import { infoPlaca } from './placa'
 import { MapaPista, type Pose2D } from './tracks'
@@ -53,6 +53,8 @@ export interface Telemetria {
   /** Solo en la sala del robot aspirador: porcentaje del piso ya limpio. */
   limpieza?: number
   carrera?: EstadoCarrera
+  /** Lo que ve la cámara (solo si el robot tiene una conectada). */
+  camara?: ImagenCamara
   error?: string
 }
 
@@ -95,6 +97,10 @@ export class Simulacion {
   private sensores: LecturaSensor[] = []
   private ultrasonidos: UltrasonidoPines[] = []
   private serialPendiente = ''
+  /** Última imagen de la cámara y cuándo (tiempo simulado) toca la siguiente. */
+  private imagen: ImagenCamara | null = null
+  private proximaFoto = 0
+  private ultimaFotoReal = 0
   private estado: Telemetria['estado'] = 'sin-programa'
   private error?: string
   private readonly avisos: string[]
@@ -166,6 +172,7 @@ export class Simulacion {
   async cargarPrograma(hex: string): Promise<void> {
     this.hex = hex
     this.tiempoSim = 0
+    this.proximaFoto = 0
     this.quemados = new Set() // como cambiar los LED quemados antes de volver a probar
     this.avisosCircuito = []
     if (this.competencia) this.competencia.empezar()
@@ -195,7 +202,7 @@ export class Simulacion {
         else if (m.type === 'step') this.alTerminarPaso(m.result)
       }
       worker.onerror = ev => { this.falla(ev.message || 'Error en el microcontrolador'); reject(new Error(ev.message)) }
-      if (python) worker.postMessage({ type: 'load', python: hex } satisfies PythonIn)
+      if (python) worker.postMessage({ type: 'load', python: hex, placa: infoPlaca(this.doc).placa === 'jetson' ? 'jetson' : 'rpi' } satisfies PythonIn)
       else worker.postMessage({ type: 'load', hex, chip: infoPlaca(this.doc).chip } satisfies WorkerIn)
     })
   }
@@ -277,6 +284,11 @@ export class Simulacion {
     if (!this.cargado) {
       // Sin programa: la física sigue (se puede mover el robot), motores en 0.
       this.leerSensores()
+      // La cámara se sigue viendo en el panel (10 cuadros por segundo alcanzan).
+      if (this.plan.camaras.length && ahora - this.ultimaFotoReal > 100) {
+        this.ultimaFotoReal = ahora
+        this.imagen = leerCamara(this.plan, this.doc, this.fisica, this.reflectancia())
+      }
       this.pasoFisica(dtReal)
       this.emitir(ahora)
       return
@@ -293,8 +305,15 @@ export class Simulacion {
     if (dt < 0.002) return
     const { digital, dobles, analog } = this.leerSensores()
     this.pendiente = true
-    const msg: WorkerIn = { type: 'step', cycles: Math.round(dt * CPU_FREQ_HZ), digital, dobles, analog, ultrasonidos: this.ultrasonidos }
+    const msg: WorkerIn & { camara?: ImagenCamara } = { type: 'step', cycles: Math.round(dt * CPU_FREQ_HZ), digital, dobles, analog, ultrasonidos: this.ultrasonidos }
     if (this.serialPendiente) { msg.serial = this.serialPendiente; this.serialPendiente = '' }
+    // Cámara: una foto nueva cada 1/fps segundos simulados (como el sensor real).
+    const cam = this.plan.camaras[0]
+    if (cam && this.tiempoSim >= this.proximaFoto) {
+      this.imagen = leerCamara(this.plan, this.doc, this.fisica, this.reflectancia())
+      if (this.imagen) msg.camara = this.imagen
+      this.proximaFoto = Math.max(this.proximaFoto + 1 / cam.fps, this.tiempoSim)
+    }
     this.worker.postMessage(msg)
   }
 
@@ -384,6 +403,7 @@ export class Simulacion {
       error: this.error,
       circuito: this.estadoCircuito ?? undefined,
       limpieza: this.limpieza?.porcentaje,
+      camara: this.imagen ?? undefined,
       carrera: this.cronometro ? { ...this.cronometro.estado, vueltas: [...this.cronometro.estado.vueltas] } : undefined,
       combate: this.competencia ? { ...this.competencia.estado, marcador: { ...this.competencia.estado.marcador }, vida: this.competencia.estado.vida && { ...this.competencia.estado.vida } } : undefined,
     })

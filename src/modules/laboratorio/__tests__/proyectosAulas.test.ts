@@ -17,7 +17,7 @@ const hex = (n: string) => fs.readFileSync(path.join(__dirname, 'fixtures', `${n
 describe('clasificación de la galería', () => {
   it('cada proyecto está en un grupo de su sección', () => {
     for (const p of PREARMADOS) expect(grupoDe(p.id), p.id).not.toBeNull()
-    expect(GRUPOS.length).toBe(9)
+    expect(GRUPOS.length).toBe(12)
   })
 })
 
