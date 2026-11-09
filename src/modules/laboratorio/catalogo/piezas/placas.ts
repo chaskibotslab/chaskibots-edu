@@ -143,6 +143,43 @@ export const RASPBERRY_PICO: PiezaDef = {
   fuente: 'Raspberry Pi Pico, hoja de datos oficial',
 }
 
+// Raspberry Pi 4: una computadora con Linux. Se programa en Python con
+// gpiozero (python.worker.ts); los GPIO van con numeración BCM y 3,3 V.
+const gpioPi = (g: number, extra = ''): PinDef => ({ nombre: `GPIO${g}`, tipo: 'pwm', ayuda: `GPIO${g} (BCM): digital, y PWM por software con gpiozero${extra}` })
+const pinesPi: PinDef[] = [
+  gpioPi(4), gpioPi(17), gpioPi(27), gpioPi(22), gpioPi(5), gpioPi(6), gpioPi(13, ' · PWM por hardware'), gpioPi(19, ' · PWM por hardware'), gpioPi(26),
+  gpioPi(18, ' · PWM por hardware'), gpioPi(23), gpioPi(24), gpioPi(25), gpioPi(12, ' · PWM por hardware'), gpioPi(16), gpioPi(20), gpioPi(21), gpioPi(8), gpioPi(7),
+  { nombre: 'GPIO2', tipo: 'digital', ayuda: 'SDA (I2C): mejor dejarlo para sensores I2C' },
+  { nombre: 'GPIO3', tipo: 'digital', ayuda: 'SCL (I2C): mejor dejarlo para sensores I2C' },
+  { nombre: 'GPIO14', tipo: 'digital', ayuda: 'TX de la UART: mejor no usarlo' },
+  { nombre: 'GPIO15', tipo: 'digital', ayuda: 'RX de la UART: mejor no usarlo' },
+  { nombre: '3V3', tipo: 'alim', ayuda: 'Salida de 3,3 V para sensores' },
+  { nombre: '5V', tipo: 'alim', ayuda: '5 V: alimenta la placa (en el robot real, con un regulador de 5 V y 3 A)' },
+  { nombre: 'GND', tipo: 'gnd', ayuda: 'Tierra (negativo común)' },
+]
+
+export const RASPBERRY_PI_4: PiezaDef = {
+  id: 'raspberry-pi-4',
+  nombre: 'Raspberry Pi 4',
+  familia: 'placa',
+  descripcion: 'Una computadora completa del tamaño de una tarjeta, con Linux. Se programa en Python con gpiozero: LED, botones, motores, sensores y servos. Lógica de 3,3 V y sin entradas analógicas.',
+  modelo: 'proc:raspberry-pi-4',
+  masa_g: 46,
+  material: 'pcb',
+  // Placa de 85 × 56 mm con los puertos USB y Ethernet (17 mm de alto); el ancla queda en los agujeros de montaje.
+  colisionadores: [{ forma: 'caja', medidas: [85, 17, 56], centro: [4, 8.5, 0] }],
+  montajes: [],
+  encaja: ['placa'],
+  pines: pinesPi,
+  comportamiento: { tipo: 'mcu', placa: 'rpi', frecuencia_hz: 1_500_000_000, vLogica: 3.3 },
+  datos: [
+    ['Procesador', 'Broadcom BCM2711, 4 núcleos a 1,5 GHz'], ['Sistema', 'Raspberry Pi OS (Linux)'], ['Voltaje lógico', '3,3 V (¡no le pongas 5 V en un GPIO!)'],
+    ['Programación', 'Python con gpiozero (numeración BCM: LED(17) = GPIO17)'], ['Entradas analógicas', 'No tiene: se usa un conversor (MCP3008)'],
+    ['En el simulador', 'Tu programa en Python corre en el navegador (Pyodide); sleep() va al ritmo de la simulación'],
+  ],
+  fuente: 'Raspberry Pi 4 Model B, hoja de datos oficial; documentación de gpiozero',
+}
+
 // ESP32 DevKit V1 (30 pines). Se simula a nivel de API Arduino sobre un
 // ATmega2560 (ver esp32/capaEsp32.ts): GPIOn del ESP32 = pin n.
 const ana = (g: number, extra = ''): PinDef => ({ nombre: `GPIO${g}`, tipo: 'analogico', ayuda: `GPIO${g} con ADC (0–4095)${extra}` })

@@ -7,12 +7,14 @@ import { pieza } from '../catalogo/piezas'
 import type { RobotDoc } from '../robots/doc'
 import type { Chip } from './avrRunner'
 
-export type Placa = 'uno' | 'nano' | 'mega' | 'esp32' | 'pico'
+export type Placa = 'uno' | 'nano' | 'mega' | 'esp32' | 'pico' | 'rpi'
 
 export interface InfoPlaca {
   placa: Placa
   nombre: string
   chip: Chip
+  /** En qué se programa: C++ (se compila y se emula) o Python (Raspberry Pi, con gpiozero). */
+  lenguaje: 'cpp' | 'python'
   /** Placa que se pide al compilador (ESP32, Pico y Mega se compilan sobre el ATmega2560 con su capa). */
   compilador: Placa
   vLogica: 5 | 3.3
@@ -65,6 +67,23 @@ const ESP32_PREF: InfoPlaca['preferencias'] = {
   analogica: ['GPIO34', 'GPIO35', 'GPIO32', 'GPIO33', 'GPIO36', 'GPIO39'],
 }
 
+// Raspberry Pi 4: GPIO con numeración BCM, 3,3 V, PWM por software en cualquier
+// pin (gpiozero) y sin entradas analógicas. Se evitan GPIO2/3 (I2C) y 14/15 (UART).
+const RPI_PREF: InfoPlaca['preferencias'] = {
+  en: ['GPIO12', 'GPIO13', 'GPIO18', 'GPIO19'],
+  in: ['GPIO5', 'GPIO6', 'GPIO16', 'GPIO20', 'GPIO21', 'GPIO26'],
+  lineaDigital: ['GPIO17', 'GPIO27', 'GPIO22'],
+  lineaAnalogica: [],
+  obstaculo: ['GPIO17', 'GPIO27', 'GPIO22', 'GPIO4'],
+  trig: ['GPIO23', 'GPIO25'],
+  echo: ['GPIO24', 'GPIO8'],
+  servo: ['GPIO18', 'GPIO19', 'GPIO13'],
+  led: ['GPIO17', 'GPIO27', 'GPIO22', 'GPIO23', 'GPIO24', 'GPIO25', 'GPIO5', 'GPIO6'],
+  boton: ['GPIO26', 'GPIO16', 'GPIO20', 'GPIO21', 'GPIO4'],
+  buzzer: ['GPIO18', 'GPIO12', 'GPIO13'],
+  analogica: [],
+}
+
 // Raspberry Pi Pico: PWM en cualquier GP; ADC solo en GP26–GP28.
 const PICO_PREF: InfoPlaca['preferencias'] = {
   en: ['GP14', 'GP15'],
@@ -85,24 +104,28 @@ const ARDUINO_5V = { '5V': 5, '3V3': 3.3 }
 
 const INFO: Record<Placa, InfoPlaca> = {
   uno: {
-    placa: 'uno', nombre: 'Arduino UNO', chip: 'atmega328p', compilador: 'uno', vLogica: 5, prefijoPin: 'D', pwmEnTodos: false, pinLed: 'D13',
+    placa: 'uno', nombre: 'Arduino UNO', lenguaje: 'cpp', chip: 'atmega328p', compilador: 'uno', vLogica: 5, prefijoPin: 'D', pwmEnTodos: false, pinLed: 'D13',
     alimSensores: '5V', alimServo: '5V', fuentes: ARDUINO_5V, preferencias: ARDUINO_PREF, reservados: ['D0', 'D1'],
   },
   nano: {
-    placa: 'nano', nombre: 'Arduino Nano', chip: 'atmega328p', compilador: 'nano', vLogica: 5, prefijoPin: 'D', pwmEnTodos: false, pinLed: 'D13',
+    placa: 'nano', nombre: 'Arduino Nano', lenguaje: 'cpp', chip: 'atmega328p', compilador: 'nano', vLogica: 5, prefijoPin: 'D', pwmEnTodos: false, pinLed: 'D13',
     alimSensores: '5V', alimServo: '5V', fuentes: ARDUINO_5V, preferencias: ARDUINO_PREF, reservados: ['D0', 'D1'],
   },
   mega: {
-    placa: 'mega', nombre: 'Arduino Mega', chip: 'atmega2560-mega', compilador: 'mega', vLogica: 5, prefijoPin: 'D', pwmEnTodos: false, pinLed: 'D13',
+    placa: 'mega', nombre: 'Arduino Mega', lenguaje: 'cpp', chip: 'atmega2560-mega', compilador: 'mega', vLogica: 5, prefijoPin: 'D', pwmEnTodos: false, pinLed: 'D13',
     alimSensores: '5V', alimServo: '5V', fuentes: ARDUINO_5V, preferencias: ARDUINO_PREF, reservados: ['D0', 'D1'],
   },
   esp32: {
-    placa: 'esp32', nombre: 'ESP32', chip: 'atmega2560', compilador: 'esp32', vLogica: 3.3, prefijoPin: 'GPIO', pwmEnTodos: true, pinLed: 'GPIO2',
+    placa: 'esp32', nombre: 'ESP32', lenguaje: 'cpp', chip: 'atmega2560', compilador: 'esp32', vLogica: 3.3, prefijoPin: 'GPIO', pwmEnTodos: true, pinLed: 'GPIO2',
     alimSensores: '3V3', alimServo: 'VIN', fuentes: { '3V3': 3.3, VIN: 5 }, preferencias: ESP32_PREF, reservados: ['GPIO1', 'GPIO3'],
   },
   pico: {
-    placa: 'pico', nombre: 'Raspberry Pi Pico', chip: 'atmega2560-pico', compilador: 'pico', vLogica: 3.3, prefijoPin: 'GP', pwmEnTodos: true, pinLed: 'GP25',
+    placa: 'pico', nombre: 'Raspberry Pi Pico', lenguaje: 'cpp', chip: 'atmega2560-pico', compilador: 'pico', vLogica: 3.3, prefijoPin: 'GP', pwmEnTodos: true, pinLed: 'GP25',
     alimSensores: '3V3', alimServo: 'VBUS', fuentes: { '3V3': 3.3, VBUS: 5 }, preferencias: PICO_PREF, reservados: [],
+  },  // La Raspberry Pi no se compila ni se emula: corre Python (python.worker.ts). `chip` no se usa.
+  rpi: {
+    placa: 'rpi', nombre: 'Raspberry Pi 4', lenguaje: 'python', chip: 'atmega328p', compilador: 'rpi', vLogica: 3.3, prefijoPin: 'GPIO', pwmEnTodos: true, pinLed: 'GPIO47',
+    alimSensores: '3V3', alimServo: '5V', fuentes: { '3V3': 3.3, '5V': 5 }, preferencias: RPI_PREF, reservados: ['GPIO14', 'GPIO15'],
   },
 }
 

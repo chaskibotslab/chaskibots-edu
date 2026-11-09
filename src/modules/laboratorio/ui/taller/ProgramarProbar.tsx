@@ -86,6 +86,8 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
   const [entrada, setEntrada] = useState('')
   // Mesa de electrónica: solo su escritorio; robots: las pistas y arenas.
   const banco = esBanco(doc)
+  const python = infoPlaca(doc).lenguaje === 'python'
+  const extension = python ? 'py' : 'ino'
   // Circuito sin placa (pila o fuente + componentes): no hay nada que programar, ya funciona.
   const sinPlaca = banco && !mcuDe(doc)
   const [encendido, setEncendido] = useState(false)
@@ -147,6 +149,26 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
     }
     setCompilando(true)
     activarSonido()
+    // Raspberry Pi: Python no se compila; se carga directo en el worker de Pyodide.
+    if (python) {
+      setAviso({ tipo: 'info', texto: 'Cargando Python en el navegador… (la primera vez tarda unos segundos)' })
+      try {
+        setSerial('')
+        setErrores([])
+        await sim.cargarPrograma(codigo)
+        setPestana('serial')
+        if (leeLetras && document.activeElement instanceof HTMLElement) document.activeElement.blur()
+        setAviso({ tipo: 'ok', texto: 'Programa en Python corriendo en la Raspberry Pi' })
+      } catch (err) {
+        const texto = err instanceof Error ? err.message : 'Error en el programa'
+        const linea = /Línea (\d+)/.exec(texto)
+        if (linea) setErrores([{ line: Number(linea[1]), col: 1, severity: 'error', message: texto }])
+        setAviso({ tipo: 'error', texto })
+      } finally {
+        setCompilando(false)
+      }
+      return
+    }
     setAviso({ tipo: 'info', texto: 'Compilando con avr-gcc… (la primera vez puede tardar unos segundos)' })
     try {
       const res = await fetch('/api/lab/compile', {
@@ -220,7 +242,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
     const blob = new Blob([codigo], { type: 'text/plain' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = `${doc.nombre.normalize('NFD').replace(/[^\w]+/g, '_') || 'robot'}.ino`
+    a.download = `${doc.nombre.normalize('NFD').replace(/[^\w]+/g, '_') || 'robot'}.${extension}`
     a.click()
     URL.revokeObjectURL(a.href)
   }
@@ -291,8 +313,8 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             <Gamepad2 className="h-4 w-4" /> <span className="hidden md:inline">Control</span>
           </button>
         )}
-        <button onClick={descargarIno} className={boton} title="Descargar el programa (.ino) para abrirlo en el Arduino IDE">
-          <Download className="h-4 w-4" /> <span className="hidden md:inline">.ino</span>
+        <button onClick={descargarIno} className={boton} title={python ? 'Descargar el programa (.py) para correrlo en la Raspberry Pi' : 'Descargar el programa (.ino) para abrirlo en el Arduino IDE'}>
+          <Download className="h-4 w-4" /> <span className="hidden md:inline">.{extension}</span>
         </button>
         </>)}
 
@@ -333,13 +355,13 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
         <div className={`min-h-0 flex-col border-lab-borde/20 lg:w-[40%] lg:border-r ${ampliada ? 'hidden' : `lg:flex ${vista === 'programar' ? 'flex flex-1 lg:flex-none' : 'hidden'}`}`}>
           <div className="flex items-center justify-between gap-2 border-b border-lab-borde/20 bg-lab-fondo2 px-3 py-1.5 text-xs text-lab-suave">
             <div className="flex rounded-md bg-lab-superficie/0 p-0.5 ring-1 ring-lab-borde/20">
-              {([['bloques', 'Bloques', Puzzle], ['codigo', 'Código', FileCode2]] as const).map(([modo, txt, Icon]) => (
+              {([['bloques', 'Bloques', Puzzle], ['codigo', python ? 'Python' : 'Código', FileCode2]] as const).filter(([modo]) => !python || modo === 'codigo').map(([modo, txt, Icon]) => (
                 <button key={modo} onClick={() => cambiarModo(modo)} className={`flex items-center gap-1 rounded px-2.5 py-0.5 ${doc.programa.modo === modo ? 'bg-lab-superficie font-medium text-lab-tinta shadow-sm' : 'hover:text-lab-tinta'}`}>
                   <Icon className="h-3.5 w-3.5" /> {txt}
                 </button>
               ))}
             </div>
-            <span className="truncate font-mono">{doc.nombre}.ino</span>
+            <span className="truncate font-mono">{doc.nombre}.{extension}</span>
             <span className="hidden xl:inline">Ctrl+Enter para ejecutar</span>
           </div>
           {doc.programa.modo === 'bloques' ? (
@@ -365,7 +387,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
             </div>
           ) : (
             <div className="min-h-0 flex-1">
-              <EditorCodigo codigo={codigo} onChange={cpp => onPrograma({ modo: 'codigo', cpp })} errores={errores} onEjecutar={compilarYEjecutar} />
+              <EditorCodigo codigo={codigo} lenguaje={python ? 'python' : 'cpp'} onChange={cpp => onPrograma({ modo: 'codigo', cpp })} errores={errores} onEjecutar={compilarYEjecutar} />
             </div>
           )}
         </div>

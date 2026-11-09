@@ -16,7 +16,7 @@ import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
 import { infoPlaca } from '../engine/placa'
 import {
-  ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
+  ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, RaspberryPi4, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
   ChasisMinisumo, MotorN20, BateriaLipo, ChasisBattlebot, ArmaGiratoria, ChasisTambor, ChasisDisco, MotorCombate, RuedaCombate, ArmaTambor, ArmaDisco,
 } from './modelos/Piezas3D'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
@@ -98,6 +98,7 @@ function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst:
     case 'proc:arduino-nano': return <ArduinoNano ref={refs.led13} />
     case 'proc:arduino-mega': return <ArduinoMega ref={refs.led13} />
     case 'proc:pico': return <Pico ref={refs.led13} />
+    case 'proc:raspberry-pi-4': return <RaspberryPi4 ref={refs.led13} />
     case 'proc:l298n': return <L298N />
     case 'proc:bateria-18650': return <Bateria18650 />
     case 'proc:bateria-9v': return <Bateria9V />

@@ -17,6 +17,7 @@ import { rivalPara } from '../robots/prearmados'
 import { Competencia, type EstadoCombate, type NivelRival } from './competencia'
 import { CPU_FREQ_HZ, type PinReport, type StepResult } from './avrRunner'
 import type { WorkerIn, WorkerOut } from './avr.worker'
+import type { PythonIn } from './python.worker'
 import { planCircuito, type ControlesCircuito, type EstadoCircuito, type PlanCircuito } from './circuito'
 import { avisosEnsamblaje } from './ensamblaje'
 import { Limpieza } from './limpieza'
@@ -182,7 +183,9 @@ export class Simulacion {
     this.estado = 'cargando'
     this.error = undefined
     this.pines = {}
-    const worker = new Worker(new URL('./avr.worker.ts', import.meta.url))
+    // Raspberry Pi: el «hex» es el programa en Python y lo corre Pyodide (mismo protocolo).
+    const python = infoPlaca(this.doc).lenguaje === 'python'
+    const worker = python ? new Worker(new URL('./python.worker.ts', import.meta.url)) : new Worker(new URL('./avr.worker.ts', import.meta.url))
     this.worker = worker
     await new Promise<void>((resolve, reject) => {
       worker.onmessage = (e: MessageEvent<WorkerOut>) => {
@@ -192,7 +195,8 @@ export class Simulacion {
         else if (m.type === 'step') this.alTerminarPaso(m.result)
       }
       worker.onerror = ev => { this.falla(ev.message || 'Error en el microcontrolador'); reject(new Error(ev.message)) }
-      worker.postMessage({ type: 'load', hex, chip: infoPlaca(this.doc).chip } satisfies WorkerIn)
+      if (python) worker.postMessage({ type: 'load', python: hex } satisfies PythonIn)
+      else worker.postMessage({ type: 'load', hex, chip: infoPlaca(this.doc).chip } satisfies WorkerIn)
     })
   }
 
