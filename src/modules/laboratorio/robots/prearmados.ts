@@ -10,6 +10,7 @@ import { infoPlaca } from '../engine/placa'
 import type { RobotDoc } from './doc'
 import { PROYECTOS_CIRCUITO, plantillasCircuito } from './circuitos'
 import { PROYECTOS_AULAS, tema } from './proyectosAulas'
+import { PROYECTOS_RPI } from './raspberry'
 import { esBanco } from '../engine/ensamblaje'
 
 export interface PlantillaCodigo { id: string; nombre: string; descripcion: string; codigo: string; bloques?: ProgramaBloques }
@@ -1902,6 +1903,7 @@ export const PREARMADOS: Prearmado[] = [
   },
   ...PROYECTOS_CIRCUITO,
   ...PROYECTOS_AULAS,
+  ...PROYECTOS_RPI(construirSeguidor),
 ]
 
 /** Las del proyecto primero; después, las genéricas y los ejemplos de cada pieza del robot. */

@@ -7,6 +7,8 @@ const POR_GRUPO: Record<string, string[]> = {
   'Radiocontrol (RC)': ['minisumo-rc', 'rc-esp32', 'robo-wifi'],
   'Robots de combate': ['warbot-tambor', 'warbot-disco', 'warbot-auto'],
   'Seguidores de línea': ['seguidor', 'seguidor-freno', 'seguidor-esp32', 'seguidor-velocidad'],
+  // La galería muestra cada grupo en las dos secciones con sus proyectos de esa sección.
+  'Raspberry Pi y Python': ['rpi-seguidor', 'rpi-semaforo', 'rpi-distancia'],
   'Obstáculos y exploración': ['evita-ir', 'evita-obstaculos', 'anticaida', 'aspirador', 'explorador', 'laberinto'],
   // Electrónica
   Luces: ['led-pila', 'dos-pilas', 'primer-led', 'tres-brillos', 'tres-leds', 'fade', 'super-maquina', 'rgb', 'led-tapa', 'pico-parpadeo', 'mega-barra'],

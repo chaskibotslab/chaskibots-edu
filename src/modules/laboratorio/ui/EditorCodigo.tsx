@@ -121,9 +121,11 @@ function registrarArduino(monaco: Monaco) {
 }
 
 export default function EditorCodigo({
-  codigo, onChange, errores, onEjecutar,
+  codigo, onChange, errores, onEjecutar, lenguaje = 'cpp',
 }: {
   codigo: string
+  /** C++ de Arduino o Python (Raspberry Pi con gpiozero). */
+  lenguaje?: 'cpp' | 'python'
   onChange: (c: string) => void
   errores: ErrorCompilacion[]
   onEjecutar: () => void
@@ -150,7 +152,7 @@ export default function EditorCodigo({
   return (
     <MonacoEditor
       height="100%"
-      language="cpp"
+      language={lenguaje}
       theme="chaski-dia"
       value={codigo}
       onChange={v => onChange(v ?? '')}
@@ -174,7 +176,7 @@ export default function EditorCodigo({
         fontSize: 14,
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
-        tabSize: 2,
+        tabSize: lenguaje === 'python' ? 4 : 2,
         automaticLayout: true,
         fontLigatures: true,
         padding: { top: 12 },

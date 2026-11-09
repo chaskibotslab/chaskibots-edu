@@ -600,6 +600,55 @@ export const ArduinoMega = forwardRef(function ArduinoMega(_: object, refLed13: 
 const PICO_1_20 = ['GP0', 'GP1', 'GND', 'GP2', 'GP3', 'GP4', 'GP5', 'GND', 'GP6', 'GP7', 'GP8', 'GP9', 'GND', 'GP10', 'GP11', 'GP12', 'GP13', 'GND', 'GP14', 'GP15']
 const PICO_40_21 = ['VBUS', 'VSYS', 'GND', '3V3_EN', '3V3', 'ADC_VREF', 'GP28', 'AGND', 'GP27', 'GP26', 'RUN', 'GP22', 'GND', 'GP21', 'GP20', 'GP19', 'GP18', 'GND', 'GP17', 'GP16']
 
+/**
+ * Raspberry Pi 4: placa verde de 85 × 56 mm (ancla en los agujeros de montaje,
+ * x = −4), los 40 pines en un borde, dos USB dobles y el Ethernet en el otro
+ * extremo, el procesador con su tapa metálica y el LED verde de actividad.
+ */
+export const RaspberryPi4 = forwardRef(function RaspberryPi4(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
+  const q = useCalidad()
+  const cx = 4
+  return (
+    <group position={M(cx, 0, 0)}>
+      <RoundedBox args={M(85, 1.6, 56)} position={M(0, 0.8, 0)} radius={m(3)} smoothness={2} castShadow={q.sombras} receiveShadow>
+        <meshStandardMaterial color="#1a7a3e" roughness={0.6} />
+      </RoundedBox>
+      {/* Cabezal de 40 pines (2 × 20) en el borde */}
+      <mesh position={M(-6, 4.2, -24)} castShadow={q.sombras}>
+        <boxGeometry args={[m(51), m(5), m(5)]} />
+        <meshStandardMaterial color="#111214" roughness={0.6} />
+      </mesh>
+      {Array.from({ length: 20 }, (_, i) => [-1.27, 1.27].map(dz => (
+        <mesh key={`${i}${dz}`} position={M(-30.1 + i * 2.54, 7.6, -24 + dz)}>
+          <boxGeometry args={[m(0.64), m(3), m(0.64)]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.25} />
+        </mesh>
+      )))}
+      {/* Procesador con tapa metálica, RAM y chip USB */}
+      <mesh position={M(-10, 2.2, 2)}><boxGeometry args={[m(15), m(1.4), m(15)]} /><meshStandardMaterial color="#c9ced6" metalness={0.9} roughness={0.3} /></mesh>
+      <mesh position={M(8, 2.0, 2)}><boxGeometry args={[m(12), m(1), m(10)]} /><meshStandardMaterial color={NEGRO} roughness={0.5} /></mesh>
+      <mesh position={M(22, 2.0, 12)}><boxGeometry args={[m(7), m(1), m(7)]} /><meshStandardMaterial color={NEGRO} roughness={0.5} /></mesh>
+      {/* Puertos: dos USB dobles y el Ethernet en el extremo */}
+      {[[-14, '#1d4ed8'], [4, '#111214']].map(([z, c]) => (
+        <group key={String(z)} position={M(36, 9.1, z as number)}>
+          <mesh castShadow={q.sombras}><boxGeometry args={[m(17), m(15), m(13)]} /><meshStandardMaterial color={METAL} metalness={0.85} roughness={0.3} /></mesh>
+          {[-3.5, 3.5].map(dy => (
+            <mesh key={dy} position={M(8.6, dy, 0)}><boxGeometry args={[m(0.4), m(2), m(10)]} /><meshStandardMaterial color={c as string} roughness={0.5} /></mesh>
+          ))}
+        </group>
+      ))}
+      <mesh position={M(35, 8.4, 20.5)} castShadow={q.sombras}><boxGeometry args={[m(21), m(13.5), m(16)]} /><meshStandardMaterial color={METAL} metalness={0.85} roughness={0.3} /></mesh>
+      {/* USB-C y dos micro HDMI en el lado largo */}
+      {[-30, -15, -3].map((x, i) => (
+        <mesh key={x} position={M(x, 2.6, 26.5)}><boxGeometry args={[m(i ? 7 : 9), m(3), m(5)]} /><meshStandardMaterial color={METAL} metalness={0.85} roughness={0.3} /></mesh>
+      ))}
+      {/* LED de actividad (GPIO47) y de encendido */}
+      <mesh position={M(-38, 2, 24)}><boxGeometry args={[m(1.6), m(1), m(1)]} /><meshStandardMaterial ref={refLed} color="#22c55e" emissive="#22c55e" emissiveIntensity={0} /></mesh>
+      <mesh position={M(-38, 2, 21.5)}><boxGeometry args={[m(1.6), m(1), m(1)]} /><meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={1.5} /></mesh>
+    </group>
+  )
+})
+
 export const Pico = forwardRef(function Pico(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
   const q = useCalidad()
   return (
