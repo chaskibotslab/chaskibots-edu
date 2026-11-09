@@ -292,10 +292,10 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
           onClick={compilarYEjecutar}
           disabled={!sim || compilando}
           className="lab-primario flex h-8 items-center gap-2 rounded-md px-4 text-sm font-semibold disabled:opacity-50"
-          title="Compilar y ejecutar (Ctrl+Enter)"
+          title={python ? "Ejecutar el programa en Python (Ctrl+Enter)" : "Compilar y ejecutar (Ctrl+Enter)"}
         >
           {compilando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-          <span className="hidden sm:inline">Compilar y ejecutar</span><span className="sm:hidden">Ejecutar</span>
+          <span className="hidden sm:inline">{python ? 'Ejecutar' : 'Compilar y ejecutar'}</span><span className="sm:hidden">Ejecutar</span>
         </button>
         {corriendo && (
           <>
@@ -443,7 +443,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
                 <Loader2 className="h-5 w-5 animate-spin" /> Preparando física…
               </div>
             )}
-            {sim && <HUD tele={tele} robot={!banco && datos} sinPlaca={sinPlaca} encendido={encendido} />}
+            {sim && <HUD tele={tele} robot={!banco && datos} sinPlaca={sinPlaca} encendido={encendido} python={python} />}
             {sim && banco && <PanelCircuito sim={sim} tele={tele} silencio={silencio} onSilencio={setSilencio} onGesto={activarSonido} />}
             {sim && tele?.carrera && <Carrera carrera={tele.carrera} onReiniciar={() => { sim.reiniciar(); setAviso(null) }} />}
             {sim && arena.competencia && <Combate sim={sim} tele={tele} reglamento={arena.competencia} doc={doc} onReiniciar={() => { sim.reiniciar(); setAviso(null) }} />}
@@ -524,7 +524,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
 
 // ---------- Indicadores sobre la escena ----------
 
-function HUD({ tele, robot = true, sinPlaca = false, encendido = false }: { tele: Telemetria | null; robot?: boolean; sinPlaca?: boolean; encendido?: boolean }) {
+function HUD({ tele, robot = true, sinPlaca = false, encendido = false, python = false }: { tele: Telemetria | null; robot?: boolean; sinPlaca?: boolean; encendido?: boolean; python?: boolean }) {
   if (!tele) return null
   const sinProgramaTxt = !sinPlaca ? { txt: 'Sin programa', cls: 'bg-slate-500' } : encendido ? { txt: 'Encendido (pila conectada)', cls: 'bg-emerald-500' } : { txt: 'Apagado: presiona «Encender»', cls: 'bg-slate-500' }
   const estado = {
@@ -545,7 +545,7 @@ function HUD({ tele, robot = true, sinPlaca = false, encendido = false }: { tele
         </div>
         {tele.estado === 'corriendo' && (
           <div className={`rounded-md lab-vidrio px-2.5 py-1.5 font-mono text-[11px] ${lento ? 'text-amber-700' : 'text-lab-tinta2'}`}>
-            {tele.mhz.toFixed(1)} MHz · velocidad {tele.velocidadPct.toFixed(0)}%
+            {python ? 'Python' : `${tele.mhz.toFixed(1)} MHz`} · velocidad {tele.velocidadPct.toFixed(0)}%
           </div>
         )}
         {tele.limpieza !== undefined && (
