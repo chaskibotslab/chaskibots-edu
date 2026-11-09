@@ -31,7 +31,7 @@ describe('Raspberry Pi: armado', () => {
       const d = proyecto(id)
       expect(infoPlaca(d).lenguaje, id).toBe('python')
       expect(encimadas(d), id).toEqual([])
-      expect(verificar(d).filter(p => p.nivel !== 'ok'), id).toEqual([])
+      expect(verificar(d), id).toEqual([])   // ni errores ni advertencias
       expect(planDe(d).avisos, id).toEqual([])
     }
   })

@@ -56,7 +56,7 @@ export function verificar(doc: RobotDoc): Problema[] {
       else if (c.tipo === 'bateria' && pin.nombre === '+') rol.set(k, 'bateria+')
       else if (c.tipo === 'mcu' && pin.nombre in datosPlaca(c.placa).fuentes) rol.set(k, 'fuente')
       else if (c.tipo === 'puente-h' && pin.nombre === c.alim.salida5v) rol.set(k, 'fuente')
-      else if (c.tipo === 'mcu' && pin.tipo !== 'alim') rol.set(k, pin.tipo === 'pwm' || datosPlaca(c.placa).pwmEnTodos ? 'pwm-placa' : 'senal-placa')
+      else if (c.tipo === 'mcu' && pin.tipo !== 'alim' && pin.tipo !== 'csi') rol.set(k, pin.tipo === 'pwm' || datosPlaca(c.placa).pwmEnTodos ? 'pwm-placa' : 'senal-placa')
       else if (c.tipo === 'motor-dc') rol.set(k, 'motor')
       else if (pin.tipo === 'analogico' && c.tipo !== 'mcu') rol.set(k, 'salida-analogica')
       else rol.set(k, 'otro')
@@ -107,7 +107,10 @@ export function verificar(doc: RobotDoc): Problema[] {
     for (const canal of c.canales) {
       const g = grupos.get(n.get(clave(d.id, canal.en)) ?? '') ?? []
       const sinPwm = g.find(k => rol.get(k) === 'senal-placa')
-      if (sinPwm) out.push({ nivel: 'advertencia', texto: `${canal.en} (velocidad) va a ${nombre(sinPwm)}, que no tiene PWM (~): el motor solo podrá ir a fondo o apagado. Usa D3, D5, D6, D9, D10 o D11.`, pines: [clave(d.id, canal.en), sinPwm] })
+      if (!sinPwm) continue
+      const placa = doc.piezas.find(x => x.id === sinPwm.split('.')[0])
+      const conPwm = placa ? pieza(placa.pieza).pines.filter(x => x.tipo === 'pwm').map(x => x.nombre) : []
+      out.push({ nivel: 'advertencia', texto: `${canal.en} (velocidad) va a ${nombre(sinPwm)}, que no tiene PWM (~): el motor solo podrá ir a fondo o apagado. Usa ${conPwm.length ? conPwm.join(', ').replace(/, ([^,]*)$/, ' o $1') : 'un pin con PWM'}.`, pines: [clave(d.id, canal.en), sinPwm] })
     }
   }
 

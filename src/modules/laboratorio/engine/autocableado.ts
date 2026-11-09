@@ -149,6 +149,12 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
     tomar(PREFERENCIAS.servo, s.id, s.etiqueta, 'SIG', 'Señal del servo')
   }
 
+  // Cámara: su cable plano al conector CSI (si la placa lo tiene; si no, el plan avisa).
+  for (const s of de('camara')) {
+    if (!nueva(s.id) || !mcu || !pieza(mcu.pieza).pines.some(p => p.tipo === 'csi')) continue
+    cable([s.id, 'CSI'], [mcu.id, 'CSI'], '#94a3b8')
+  }
+
   // Arma (ESC): la corriente directo de la batería; la señal, a un pin PWM libre.
   for (const a of de('arma-giratoria')) {
     if (!nueva(a.id)) continue

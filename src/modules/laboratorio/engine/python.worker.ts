@@ -1,8 +1,8 @@
 // Web Worker de la Raspberry Pi: corre el programa en Python (Pyodide) fuera
 // del hilo de la interfaz. Habla el MISMO protocolo que avr.worker.ts, así la
 // simulación no distingue una placa de otra:
-//   interfaz → { type: 'load', python }
-//   interfaz → { type: 'step', cycles, digital, dobles, ultrasonidos, serial? }
+//   interfaz → { type: 'load', python, placa }
+//   interfaz → { type: 'step', cycles, digital, dobles, ultrasonidos, camara?, serial? }
 //   worker   → { type: 'step', result, ms }
 // «cycles» se traduce a segundos con la misma frecuencia de referencia, y el
 // reloj del programa (sleep) avanza exactamente ese tiempo (ver runtime.ts).
@@ -10,14 +10,16 @@
 import { RUNTIME_PY } from './python/runtime'
 import type { PinReport, StepResult } from './avrRunner'
 import type { UltrasonidoPines } from './hcsr04'
+import type { ImagenCamara } from './paso'
 
 const PYODIDE = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
 /** La misma frecuencia de referencia que el Arduino emulado (avrRunner.ts), sin cargar el emulador aquí. */
 const CPU_FREQ_HZ = 16_000_000
 
 export type PythonIn =
-  | { type: 'load'; python: string }
-  | { type: 'step'; cycles: number; digital: Record<string, boolean>; dobles?: Record<string, [boolean, boolean]>; analog: Record<string, number>; ultrasonidos: UltrasonidoPines[]; serial?: string }
+  | { type: 'load'; python: string; placa: 'rpi' | 'jetson' }
+  /** `camara`: imagen nueva de la cámara (si no viene, el programa sigue viendo la anterior). */
+  | { type: 'step'; cycles: number; digital: Record<string, boolean>; dobles?: Record<string, [boolean, boolean]>; analog: Record<string, number>; ultrasonidos: UltrasonidoPines[]; camara?: ImagenCamara; serial?: string }
 
 interface Pyodide {
   runPython(code: string): unknown
@@ -44,7 +46,7 @@ ctx.onmessage = async (e: MessageEvent<PythonIn>) => {
   try {
     if (msg.type === 'load') {
       const p = await iniciar()
-      const error = p.globals.get('_cargar')(msg.python)
+      const error = p.globals.get('_cargar')(msg.python, msg.placa)
       if (typeof error === 'string') { ctx.postMessage({ type: 'error', message: error }); return }
       total = 0
       ctx.postMessage({ type: 'loaded' })
@@ -53,7 +55,7 @@ ctx.onmessage = async (e: MessageEvent<PythonIn>) => {
     if (msg.type === 'step' && py) {
       const t = performance.now()
       const dt = msg.cycles / CPU_FREQ_HZ
-      const r = py.globals.get('_avanzar')(dt, py.toPy(msg.digital), py.toPy(msg.dobles ?? {}), py.toPy(msg.ultrasonidos)) as { toJs(o: object): unknown; destroy(): void }
+      const r = py.globals.get('_avanzar')(dt, py.toPy(msg.digital), py.toPy(msg.dobles ?? {}), py.toPy(msg.ultrasonidos), msg.camara ? py.toPy(msg.camara) : null) as { toJs(o: object): unknown; destroy(): void }
       const res = r.toJs({ dict_converter: Object.fromEntries }) as { pines: Record<string, PinReport>; salida: string; error: string | null; terminado: boolean }
       r.destroy()
       total += msg.cycles

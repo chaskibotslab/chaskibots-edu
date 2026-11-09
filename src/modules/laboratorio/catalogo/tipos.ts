@@ -70,7 +70,8 @@ export type Colisionador =
   | { forma: 'cilindro'; radio: number; alto: number; eje: 'x' | 'y' | 'z'; centro?: V3; friccion?: number }
   | { forma: 'esfera'; radio: number; centro?: V3; friccion?: number }
 
-export type TipoPin = 'digital' | 'pwm' | 'analogico' | 'i2c' | 'alim' | 'gnd' | 'potencia'
+/** `csi`: conector de cámara (cable plano), no es un pin de señal. */
+export type TipoPin = 'digital' | 'pwm' | 'analogico' | 'i2c' | 'alim' | 'gnd' | 'potencia' | 'csi'
 
 export interface PinDef {
   nombre: string
@@ -92,7 +93,7 @@ export interface AlimDriver {
 
 export type Comportamiento =
   /** El «cerebro»: la placa define qué se emula y cómo se compila (engine/placa.ts). */
-  | { tipo: 'mcu'; placa: 'uno' | 'nano' | 'mega' | 'esp32' | 'pico' | 'rpi'; frecuencia_hz: number; vLogica: 5 | 3.3 }
+  | { tipo: 'mcu'; placa: 'uno' | 'nano' | 'mega' | 'esp32' | 'pico' | 'rpi' | 'jetson'; frecuencia_hz: number; vLogica: 5 | 3.3 }
   | { tipo: 'chasis' }
   | { tipo: 'motor-dc'; v_nominal: number; rpm_sin_carga: number; torque_bloqueo_nm: number; zona_muerta_v: number; tau_s: number; corriente_a: number }
   | { tipo: 'rueda'; radio_mm: number; ancho_mm: number }
@@ -103,6 +104,12 @@ export type Comportamiento =
   | { tipo: 'ir-reflectivo'; umbral: number; altura_max_mm: number; radio_lectura_mm: number }
   | { tipo: 'ir-obstaculo'; alcance_mm: number; origen: V3 }
   | { tipo: 'ultrasonido'; alcance_max_cm: number; apertura_grados: number; origen: V3 }
+  /**
+   * Cámara (cable plano al conector CSI de la placa). `origen`: centro de la
+   * lente; mira hacia +x, inclinada `inclinacion_grados` hacia el piso. La
+   * imagen es chica y en escala de grises: ancho_px × alto_px números de 0 a 255.
+   */
+  | { tipo: 'camara'; ancho_px: number; alto_px: number; fov_h_grados: number; fov_v_grados: number; inclinacion_grados: number; origen: V3; fps: number }
   /** Base de la mesa de electrónica: protoboard con lugar para la placa al lado. */
   | { tipo: 'protoboard' }
   // Componentes del circuito (engine/circuito.ts los resuelve con análisis nodal).

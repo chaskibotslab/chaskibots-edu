@@ -54,6 +54,8 @@ export interface MotorPlan {
 export interface LineaPlan { instancia: string; pinDigital: string | null; pinAnalogico: string | null; umbral: number; radioMm: number; alturaMaxMm: number }
 export interface UltrasonidoPlan { instancia: string; trig: string | null; echo: string | null; alcanceCm: number; aperturaGrados: number; origen: V3 }
 export interface ObstaculoPlan { instancia: string; out: string | null; alcanceMm: number; origen: V3 }
+/** Cámara conectada al CSI de la placa: lente en `origen` (marco de la pieza), mirando a +x e inclinada hacia el piso. */
+export interface CamaraPlan { instancia: string; ancho: number; alto: number; fovH: number; fovV: number; inclinacion: number; origen: V3; fps: number }
 export interface ServoPlan { instancia: string; sig: string | null; gradosPorSeg: number; alimentado: boolean }
 /** Arma giratoria: `centro` = eje de la barra a la altura de su plano (mm, marco del robot). */
 export interface ArmaPlan { instancia: string; sig: string | null; alimentado: boolean; omegaMax: number; radio: number; inercia: number; tau: number; centro: V3; vertical: boolean; ancho: number }
@@ -64,6 +66,7 @@ export interface SimPlan {
   lineas: LineaPlan[]
   ultrasonidos: UltrasonidoPlan[]
   obstaculos: ObstaculoPlan[]
+  camaras: CamaraPlan[]
   servos: ServoPlan[]
   armas: ArmaPlan[]
   voltajeBateria: number
@@ -177,6 +180,7 @@ export function planDe(doc: RobotDoc): SimPlan {
   const lineas: LineaPlan[] = []
   const ultrasonidos: UltrasonidoPlan[] = []
   const obstaculos: ObstaculoPlan[] = []
+  const camaras: CamaraPlan[] = []
   const servos: ServoPlan[] = []
   const armas: ArmaPlan[] = []
   const ps = poses(doc)
@@ -200,6 +204,15 @@ export function planDe(doc: RobotDoc): SimPlan {
       const ok = alimentado(p.id, 'VCC', 'GND')
       if (!ok) avisos.push(`${p.etiqueta}: no tiene alimentación (VCC y GND)`)
       obstaculos.push({ instancia: p.id, out: ok ? pinPlaca(p.id, 'OUT') : null, alcanceMm: c.alcance_mm, origen: c.origen })
+    } else if (c.tipo === 'camara') {
+      // El cable plano lleva datos y alimentación: basta con que llegue al CSI de la placa.
+      const conCsi = !!mcu && mcuPines.some(x => x.tipo === 'csi')
+      if (!conCsi) avisos.push(`${p.etiqueta}: esta placa no tiene conector de cámara (usa la Jetson Nano o la Raspberry Pi)`)
+      else if (!mismo([p.id, 'CSI'], [mcu!.id, 'CSI'])) avisos.push(`${p.etiqueta}: conecta su cable plano al CSI de la placa`)
+      else camaras.push({
+        instancia: p.id, ancho: c.ancho_px, alto: c.alto_px, fovH: c.fov_h_grados, fovV: c.fov_v_grados,
+        inclinacion: c.inclinacion_grados, origen: c.origen, fps: c.fps,
+      })
     } else if (c.tipo === 'servo') {
       const ok = alimentado(p.id, 'V+', 'GND')
       if (!ok) avisos.push(`${p.etiqueta}: no tiene alimentación (V+ y GND)`)
@@ -228,7 +241,7 @@ export function planDe(doc: RobotDoc): SimPlan {
   }
 
   return {
-    mcu: mcu?.id ?? null, motores, lineas, ultrasonidos, obstaculos, servos, armas,
+    mcu: mcu?.id ?? null, motores, lineas, ultrasonidos, obstaculos, camaras, servos, armas,
     voltajeBateria, caidaDriver, masaKg: resumen(doc).masa_g / 1000, avisos,
   }
 }

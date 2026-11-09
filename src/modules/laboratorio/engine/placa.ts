@@ -7,7 +7,7 @@ import { pieza } from '../catalogo/piezas'
 import type { RobotDoc } from '../robots/doc'
 import type { Chip } from './avrRunner'
 
-export type Placa = 'uno' | 'nano' | 'mega' | 'esp32' | 'pico' | 'rpi'
+export type Placa = 'uno' | 'nano' | 'mega' | 'esp32' | 'pico' | 'rpi' | 'jetson'
 
 export interface InfoPlaca {
   placa: Placa
@@ -18,8 +18,8 @@ export interface InfoPlaca {
   /** Placa que se pide al compilador (ESP32, Pico y Mega se compilan sobre el ATmega2560 con su capa). */
   compilador: Placa
   vLogica: 5 | 3.3
-  /** Cómo se llaman sus pines en el código: «5» → D5, GPIO5 o GP5. */
-  prefijoPin: 'D' | 'GPIO' | 'GP'
+  /** Cómo se llaman sus pines en el código: «5» → D5, GPIO5, GP5 o PIN5 (Jetson: número físico del conector). */
+  prefijoPin: 'D' | 'GPIO' | 'GP' | 'PIN'
   /** Todos sus pines de salida dan PWM (ESP32, Pico); si no, solo los marcados ~. */
   pwmEnTodos: boolean
   pinLed: string
@@ -84,6 +84,24 @@ const RPI_PREF: InfoPlaca['preferencias'] = {
   analogica: [],
 }
 
+// Jetson Nano: el conector de 40 pines es como el de la Raspberry, pero con
+// Jetson.GPIO se numeran por su posición física (GPIO.BOARD): PIN32 = pin 32.
+// PWM por hardware solo en los pines 32 y 33; sin entradas analógicas.
+const JETSON_PREF: InfoPlaca['preferencias'] = {
+  en: ['PIN32', 'PIN33'],
+  in: ['PIN29', 'PIN31', 'PIN36', 'PIN38', 'PIN40', 'PIN37'],
+  lineaDigital: ['PIN11', 'PIN13', 'PIN15'],
+  lineaAnalogica: [],
+  obstaculo: ['PIN11', 'PIN13', 'PIN15', 'PIN7'],
+  trig: ['PIN16', 'PIN22'],
+  echo: ['PIN18', 'PIN24'],
+  servo: ['PIN33', 'PIN32'],
+  led: ['PIN11', 'PIN13', 'PIN15', 'PIN16', 'PIN18', 'PIN22', 'PIN29', 'PIN31'],
+  boton: ['PIN37', 'PIN36', 'PIN38', 'PIN40', 'PIN7'],
+  buzzer: ['PIN12', 'PIN35'],
+  analogica: [],
+}
+
 // Raspberry Pi Pico: PWM en cualquier GP; ADC solo en GP26–GP28.
 const PICO_PREF: InfoPlaca['preferencias'] = {
   en: ['GP14', 'GP15'],
@@ -127,6 +145,11 @@ const INFO: Record<Placa, InfoPlaca> = {
     placa: 'rpi', nombre: 'Raspberry Pi 4', lenguaje: 'python', chip: 'atmega328p', compilador: 'rpi', vLogica: 3.3, prefijoPin: 'GPIO', pwmEnTodos: true, pinLed: 'GPIO47',
     alimSensores: '3V3', alimServo: '5V', fuentes: { '3V3': 3.3, '5V': 5 }, preferencias: RPI_PREF, reservados: ['GPIO14', 'GPIO15'],
   },
+  // Jetson Nano: también Python (Jetson.GPIO, con la misma API que RPi.GPIO) y una cámara CSI.
+  jetson: {
+    placa: 'jetson', nombre: 'Jetson Nano', lenguaje: 'python', chip: 'atmega328p', compilador: 'jetson', vLogica: 3.3, prefijoPin: 'PIN', pwmEnTodos: false, pinLed: 'PIN0',
+    alimSensores: '3V3', alimServo: '5V', fuentes: { '3V3': 3.3, '5V': 5 }, preferencias: JETSON_PREF, reservados: ['PIN8', 'PIN10'],
+  },
 }
 
 /** Datos de una placa por su id ('uno', 'esp32'…). */
@@ -143,9 +166,9 @@ export function infoPlaca(doc: RobotDoc): InfoPlaca {
   return INFO[c?.tipo === 'mcu' ? c.placa : 'uno']
 }
 
-/** Número de pin para el código: "D5" → "5", "GPIO25" → "25", "GP15" → "15", "A0" → "A0". */
+/** Número de pin para el código: "D5" → "5", "GPIO25" → "25", "GP15" → "15", "PIN32" → "32", "A0" → "A0". */
 export function pinCodigo(pin: string | null): string {
   if (!pin) return '-1'
-  const m = /^(?:GPIO|GP|D)(\d+)$/.exec(pin)
+  const m = /^(?:GPIO|GP|D|PIN)(\d+)$/.exec(pin)
   return m ? m[1] : pin
 }

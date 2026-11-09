@@ -9,6 +9,7 @@ const POR_GRUPO: Record<string, string[]> = {
   'Seguidores de línea': ['seguidor', 'seguidor-freno', 'seguidor-esp32', 'seguidor-velocidad'],
   // La galería muestra cada grupo en las dos secciones con sus proyectos de esa sección.
   'Raspberry Pi y Python': ['rpi-seguidor', 'rpi-semaforo', 'rpi-distancia'],
+  'Visión artificial (Jetson Nano)': ['jetson-seguidor-camara', 'jetson-carrera-camara'],
   'Obstáculos y exploración': ['evita-ir', 'evita-obstaculos', 'anticaida', 'aspirador', 'explorador', 'laberinto'],
   // Electrónica
   Luces: ['led-pila', 'dos-pilas', 'primer-led', 'tres-brillos', 'tres-leds', 'fade', 'super-maquina', 'rgb', 'led-tapa', 'pico-parpadeo', 'mega-barra'],
