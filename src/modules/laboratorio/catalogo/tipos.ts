@@ -70,8 +70,8 @@ export type Colisionador =
   | { forma: 'cilindro'; radio: number; alto: number; eje: 'x' | 'y' | 'z'; centro?: V3; friccion?: number }
   | { forma: 'esfera'; radio: number; centro?: V3; friccion?: number }
 
-/** `csi`: conector de cámara (cable plano), no es un pin de señal. */
-export type TipoPin = 'digital' | 'pwm' | 'analogico' | 'i2c' | 'alim' | 'gnd' | 'potencia' | 'csi'
+/** `csi`: conector de cámara (cable plano); `eth`: conector de red (RJ45). No son pines de señal. */
+export type TipoPin = 'digital' | 'pwm' | 'analogico' | 'i2c' | 'alim' | 'gnd' | 'potencia' | 'csi' | 'eth'
 
 export interface PinDef {
   nombre: string
@@ -133,6 +133,21 @@ export type Comportamiento =
    * `ancho_mm`: lo que ocupa a lo largo del eje (tambor) o el espesor (disco, barra).
    */
   | { tipo: 'arma-giratoria'; giro?: 'horizontal' | 'vertical'; forma?: 'barra' | 'tambor' | 'disco'; rpm_max: number; radio_mm: number; masa_barra_g: number; tau_s: number; alto_mm: number; ancho_mm?: number }
+  /**
+   * Perro robot cuadrúpedo (como el Unitree Go2): trae sus 12 motores, su batería y
+   * el controlador de marcha. No se programan las patas una por una: la placa le
+   * manda órdenes de alto nivel por el cable de red (caminar a tal velocidad,
+   * girar, pararse, sentarse) y el controlador mueve las patas. `caderas`: dónde
+   * arranca cada pata (adelante izq., adelante der., atrás izq., atrás der.).
+   * `alturas_mm`: altura de las caderas en cada postura. `distancia`: sensor de
+   * profundidad de la cabeza (mira hacia +x, ignora el piso).
+   */
+  | {
+      tipo: 'cuadrupedo'; caderas: [V3, V3, V3, V3]; muslo_mm: number; pierna_mm: number
+      alturas_mm: { parado: number; echado: number; sentado_adelante: number; sentado_atras: number }
+      v_max: number; v_lateral_max: number; giro_max_grados: number
+      distancia: { origen: V3; alcance_cm: number }
+    }
   /** Pieza que se ve en el catálogo pero todavía no se simula (llega en una fase futura). */
   | { tipo: 'sin-simular' }
 

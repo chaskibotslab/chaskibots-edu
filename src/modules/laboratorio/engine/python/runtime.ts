@@ -12,13 +12,16 @@
 //
 // Desde afuera solo se usan dos funciones:
 //   _cargar(codigo, placa)                 → None o el mensaje de error de sintaxis
-//   _avanzar(dt, digital, dobles, us, cam) → { pines, salida, error, terminado }
+//   _avanzar(dt, digital, dobles, us, cam, perro) → { pines, salida, error, terminado, marcha }
 // `placa`: 'rpi' (pines GPIO17…) o 'jetson' (pines PIN32…, por su número físico).
 // `digital`: {GPIO17: True}, `dobles`: {GPIO2: [sin_pullup, con_pullup]},
-// `us`: [{trig, echo, cm}] (cm None = sin eco), `cam`: {ancho, alto, px} o None.
+// `us`: [{trig, echo, cm}] (cm None = sin eco), `cam`: {ancho, alto, px} o None,
+// `perro`: lo que cuenta el perro robot (ver EstadoPerro en cuadrupedo.ts) o None.
+// `marcha`: la última orden al perro {vx, vy, giro, postura} o None.
 //
 // Bibliotecas: gpiozero (Raspberry), RPi.GPIO / Jetson.GPIO (la misma API,
-// con GPIO.BOARD o GPIO.BCM) y «camara», la cámara CSI del simulador.
+// con GPIO.BOARD o GPIO.BCM), «camara» (la cámara CSI del simulador) y
+// «perro» (el perro robot cuadrúpedo).
 
 export const RUNTIME_PY = String.raw`
 import ast, sys, types, math
@@ -36,7 +39,7 @@ def _espera(s=0.0):
 
 _estado = {'t': 0.0, 'despertar': 0.0, 'coro': None, 'vivo': False, 'salida': [], 'lineas': 0, 'placa': 'rpi'}
 _pines = {}        # 'GPIO17' (o 'PIN11' en la Jetson) -> objeto que lo maneja
-_entradas = {'digital': {}, 'dobles': {}, 'us': [], 'cam': None}
+_entradas = {'digital': {}, 'dobles': {}, 'us': [], 'cam': None, 'perro': None}
 
 # Conector de 40 pines (igual en la Raspberry y la Jetson): número físico -> GPIO BCM.
 _BOARD_A_BCM = {3: 2, 5: 3, 7: 4, 8: 14, 10: 15, 11: 17, 12: 18, 13: 27, 15: 22, 16: 23, 18: 24, 19: 10, 21: 9, 22: 25,
@@ -467,6 +470,59 @@ _cm = types.ModuleType('camara')
 _cm.Camara = Camara
 sys.modules['camara'] = _cm
 
+# ---------------------------------------------------------------- perro
+
+class Perro:
+    """Perro robot cuadrúpedo (como el Unitree Go2 en su modo de alto nivel).
+    No se mueve cada motor: se le pide una postura y una velocidad, y su
+    controlador de marcha mueve las 4 patas. Las órdenes viajan por el cable
+    de red; la última orden vale hasta que se mande otra.
+      mover(vx, vy=0, giro=0): vx adelante (m/s), vy a la izquierda (m/s),
+                               giro a la izquierda (grados por segundo)."""
+    def __init__(self, *a, **kw):
+        if _entradas['perro'] is None:
+            raise RuntimeError('El perro no responde: conecta el cable de red (ETH) del perro a la placa')
+        _estado['marcha'] = {'vx': 0.0, 'vy': 0.0, 'giro': 0.0, 'postura': _entradas['perro']['postura']}
+    def _orden(self, **kw):
+        _estado['marcha'].update(kw)
+    def _sensor(self):
+        return _entradas['perro']
+    def pararse(self):
+        self._orden(postura='parado', vx=0.0, vy=0.0, giro=0.0)
+    def echarse(self):
+        self._orden(postura='echado', vx=0.0, vy=0.0, giro=0.0)
+    def sentarse(self):
+        self._orden(postura='sentado', vx=0.0, vy=0.0, giro=0.0)
+    def saludar(self):
+        """Se sienta y levanta la pata delantera derecha."""
+        self._orden(postura='saludo', vx=0.0, vy=0.0, giro=0.0)
+    def mover(self, vx, vy=0, giro=0):
+        if _estado['marcha']['postura'] != 'parado':
+            raise RuntimeError('Para caminar, el perro tiene que estar de pie: llama a perro.pararse() antes de perro.mover()')
+        s = self._sensor()
+        lim = lambda v, m: max(-m, min(m, float(v)))
+        self._orden(vx=lim(vx, s['v_max']), vy=lim(vy, s['v_lateral_max']), giro=lim(giro, s['giro_max']))
+    def detener(self):
+        self._orden(vx=0.0, vy=0.0, giro=0.0)
+    def distancia(self):
+        """Centímetros hasta lo que tiene adelante (si no ve nada, el alcance: 200)."""
+        d = self._sensor()['distancia']
+        return float(self._sensor()['alcance']) if d is None else float(d)
+    def orientacion(self):
+        """Grados que giró desde la salida (+ = a la izquierda). No salta en 180: dos vueltas = 720."""
+        return float(self._sensor()['orientacion'])
+    @property
+    def postura(self):
+        return self._sensor()['postura']
+    @property
+    def listo(self):
+        """True cuando terminó de pararse y ya puede caminar."""
+        return bool(self._sensor()['lista'])
+
+_pm = types.ModuleType('perro')
+_pm.Perro = Perro
+sys.modules['perro'] = _pm
+
 # time.sleep y signal.pause también existen como módulos (los reescribe el ast).
 _tm = types.ModuleType('time')
 _tm.sleep = lambda s=0: None
@@ -549,7 +605,8 @@ def _cargar(codigo, placa='rpi'):
     _pines.clear()
     _gpio['modo'] = None
     _entradas['cam'] = None
-    _estado.update(t=0.0, reloj=0.0, despertar=0.0, coro=None, vivo=False, salida=[], lineas=0, placa=placa)
+    _entradas['perro'] = None
+    _estado.update(t=0.0, reloj=0.0, despertar=0.0, coro=None, vivo=False, salida=[], lineas=0, placa=placa, marcha=None)
     try:
         arbol = _reescribir(ast.parse(codigo, '<programa>'))
         codigo_obj = compile(arbol, '<programa>', 'exec', flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
@@ -571,12 +628,13 @@ def _reporte():
             pines[n] = q._reporte()
     return pines
 
-def _avanzar(dt, digital=None, dobles=None, us=None, cam=None):
+def _avanzar(dt, digital=None, dobles=None, us=None, cam=None, perro=None):
     _entradas['digital'] = dict(digital or {})
     _entradas['dobles'] = {k: list(v) for k, v in (dobles or {}).items()}
     _entradas['us'] = [dict(u) for u in (us or [])]
     if cam is not None:
         _entradas['cam'] = dict(cam)   # la última imagen sigue valiendo hasta que llegue otra
+    _entradas['perro'] = dict(perro) if perro is not None else None
     # Reloj lógico: cada sleep despierta en su instante exacto (no al cuadro siguiente),
     # así 50 × sleep(0.1) son 5 s justos aunque la simulación avance de a 1/60 s.
     reloj = _estado['reloj'] = _estado.get('reloj', 0.0) + dt
@@ -610,5 +668,11 @@ def _avanzar(dt, digital=None, dobles=None, us=None, cam=None):
         _estado['t'] = reloj
     salida = ''.join(_estado['salida'])
     _estado['salida'] = []
-    return {'pines': _reporte(), 'salida': salida, 'error': error, 'terminado': not _estado['vivo']}
+    marcha = _estado.get('marcha')
+    if marcha is not None:
+        marcha = dict(marcha)
+        if not _estado['vivo']:
+            # Programa terminado: el perro deja de recibir órdenes y se queda quieto en su postura.
+            marcha.update(vx=0.0, vy=0.0, giro=0.0)
+    return {'pines': _reporte(), 'salida': salida, 'error': error, 'terminado': not _estado['vivo'], 'marcha': marcha}
 `

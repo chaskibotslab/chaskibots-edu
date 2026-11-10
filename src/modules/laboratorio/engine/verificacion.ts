@@ -56,7 +56,7 @@ export function verificar(doc: RobotDoc): Problema[] {
       else if (c.tipo === 'bateria' && pin.nombre === '+') rol.set(k, 'bateria+')
       else if (c.tipo === 'mcu' && pin.nombre in datosPlaca(c.placa).fuentes) rol.set(k, 'fuente')
       else if (c.tipo === 'puente-h' && pin.nombre === c.alim.salida5v) rol.set(k, 'fuente')
-      else if (c.tipo === 'mcu' && pin.tipo !== 'alim' && pin.tipo !== 'csi') rol.set(k, pin.tipo === 'pwm' || datosPlaca(c.placa).pwmEnTodos ? 'pwm-placa' : 'senal-placa')
+      else if (c.tipo === 'mcu' && pin.tipo !== 'alim' && pin.tipo !== 'csi' && pin.tipo !== 'eth') rol.set(k, pin.tipo === 'pwm' || datosPlaca(c.placa).pwmEnTodos ? 'pwm-placa' : 'senal-placa')
       else if (c.tipo === 'motor-dc') rol.set(k, 'motor')
       else if (pin.tipo === 'analogico' && c.tipo !== 'mcu') rol.set(k, 'salida-analogica')
       else rol.set(k, 'otro')

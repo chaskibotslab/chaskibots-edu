@@ -10,6 +10,7 @@ import type { RobotDoc } from '../robots/doc'
 import type { PinReport } from './avrRunner'
 import { resolverCircuito, type ControlesCircuito, type EstadoCircuito, type PlanCircuito } from './circuito'
 import { irAnalogVolts, irDigital, l298nChannel, servoPulseToAngle, voltsToAdc } from './bridge'
+import { estadoPerro, medirDistancia, type EstadoPerro } from './cuadrupedo'
 import { aRobot, poses } from './ensamblaje'
 import type { RobotFisico } from './fisica/robotFisico'
 import { rotar } from './fisica/vec'
@@ -162,6 +163,14 @@ export function leerCamara(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, re
     }
   }
   return { ancho: c.ancho, alto: c.alto, px }
+}
+
+/** Lo que el perro robot le cuenta a la placa por el cable de red (null si no es un perro o no está conectado). */
+export function leerPerro(plan: SimPlan, fisica: RobotFisico): EstadoPerro | null {
+  const c = plan.cuadrupedo, m = fisica.marcha
+  if (!c || !m || !c.conectado) return null
+  const cm = medirDistancia(c, m, (o, d, a) => fisica.rayo(o, d, a), p => fisica.puntoMundo({ x: p[0], y: p[1], z: p[2] }), d => fisica.direccionMundo(d))
+  return estadoPerro(c, m, cm)
 }
 
 /** Pines del micro → driver → voltaje de cada motor; pulsos → ángulo pedido a cada servo. */

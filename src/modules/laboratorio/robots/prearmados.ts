@@ -12,7 +12,8 @@ import { PROYECTOS_CIRCUITO, plantillasCircuito } from './circuitos'
 import { PROYECTOS_AULAS, tema } from './proyectosAulas'
 import { PROYECTOS_RPI } from './raspberry'
 import { PROYECTOS_JETSON, plantillasJetson } from './jetson'
-import { esBanco } from '../engine/ensamblaje'
+import { PROYECTOS_PERRO, plantillasCuadrupedo } from './perro'
+import { esBanco, raiz } from '../engine/ensamblaje'
 
 export interface PlantillaCodigo { id: string; nombre: string; descripcion: string; codigo: string; bloques?: ProgramaBloques }
 
@@ -1906,6 +1907,7 @@ export const PREARMADOS: Prearmado[] = [
   ...PROYECTOS_AULAS,
   ...PROYECTOS_RPI(construirSeguidor),
   ...PROYECTOS_JETSON,
+  ...PROYECTOS_PERRO,
 ]
 
 /** Las del proyecto primero; después, las genéricas y los ejemplos de cada pieza del robot. */
@@ -1934,6 +1936,8 @@ export function programaConPinesNuevos(antes: RobotDoc, despues: RobotDoc, prear
 /** Plantillas genéricas para un robot armado desde cero. */
 export function plantillasGenericas(doc: RobotDoc, tabla: FilaPin[]): PlantillaCodigo[] {
   if (esBanco(doc)) return plantillasCircuito(doc, tabla)
+  // El perro robot recibe órdenes de alto nivel en Python (módulo perro), con la placa que sea.
+  if (pieza(raiz(doc).pieza).comportamiento.tipo === 'cuadrupedo') return plantillasCuadrupedo(doc)
   // La Jetson se programa en Python: sus plantillas no son de Arduino.
   if (infoPlaca(doc).placa === 'jetson') return plantillasJetson(doc, tabla)
   const out: PlantillaCodigo[] = []

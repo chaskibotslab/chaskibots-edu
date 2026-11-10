@@ -157,6 +157,7 @@ const pinesPi: PinDef[] = [
   { nombre: '5V', tipo: 'alim', ayuda: '5 V: alimenta la placa (en el robot real, con un regulador de 5 V y 3 A)' },
   { nombre: 'GND', tipo: 'gnd', ayuda: 'Tierra (negativo común)' },
   { nombre: 'CSI', tipo: 'csi', ayuda: 'Conector de la cámara (cable plano)' },
+  { nombre: 'ETH', tipo: 'eth', ayuda: 'Puerto de red (RJ45): para hablar con el perro robot' },
 ]
 
 export const RASPBERRY_PI_4: PiezaDef = {
@@ -198,6 +199,7 @@ const pinesJetson: PinDef[] = [
   { nombre: '5V', tipo: 'alim', ayuda: '5 V (pines 2 y 4): en el robot real, la placa necesita una fuente de 5 V y 4 A' },
   { nombre: 'GND', tipo: 'gnd', ayuda: 'Tierra (negativo común)' },
   { nombre: 'CSI', tipo: 'csi', ayuda: 'Conector de la cámara (cable plano): CAM0' },
+  { nombre: 'ETH', tipo: 'eth', ayuda: 'Puerto de red (RJ45): para hablar con el perro robot' },
 ]
 
 export const JETSON_NANO: PiezaDef = {

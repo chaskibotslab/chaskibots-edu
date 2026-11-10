@@ -68,6 +68,17 @@ export function campoLibre(semilla = 7, cantidad = 9, id = 'campo-libre'): Arena
   }
 }
 
+/** Patio vacío de 4 × 3 m con paredes: para practicar movimientos (el perro robot). */
+export function patio(): ArenaDef {
+  return {
+    ...campoLibre(7, 0),
+    id: 'patio',
+    nombre: 'Patio libre',
+    descripcion: 'Piso amplio y sin obstáculos, con paredes: para practicar movimientos.',
+    inicio: { x: -0.6, z: 0.4, yaw: 0 },
+  }
+}
+
 /** Óvalo con una barrera sobre la línea: para seguidores que deben frenar. */
 export function ovaloConBarrera(): ArenaDef {
   const base = arenaDePista(PISTAS.find(p => p.id === 'ovalo')!)
@@ -162,7 +173,7 @@ export function mesaElectronica(): ArenaDef {
 }
 
 export function listaArenas(): ArenaDef[] {
-  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), arenaCombate(), circuitoVelocidad(), mesaElectronica()]
+  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), patio(), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), arenaCombate(), circuitoVelocidad(), mesaElectronica()]
 }
 
 export function arena(id: string): ArenaDef {

@@ -19,6 +19,7 @@ import {
   AVRADC, adcConfig, ADCMuxInputType, PinState, type AVRPortConfig,
 } from 'avr8js'
 import { parseIntelHex } from './hex'
+import type { ComandoMarcha } from './cuadrupedo'
 
 export const CPU_FREQ_HZ = 16_000_000
 
@@ -107,6 +108,8 @@ export interface StepResult {
   totalCycles: number                  // ciclos desde el arranque
   pins: Record<string, PinReport>
   serial: number[]                     // bytes que el sketch envió por Serial
+  /** Última orden al perro robot (solo los programas en Python que lo usan). */
+  marcha?: ComandoMarcha | null
 }
 
 /** Callback de flanco (HC-SR04): pin, nivel, ciclo exacto. */

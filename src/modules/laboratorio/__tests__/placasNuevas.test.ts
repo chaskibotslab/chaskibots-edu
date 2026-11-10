@@ -8,7 +8,7 @@ import { prepararSketch } from '../esp32/capasPlacas'
 import { pinesDelCodigo, verificar } from '../engine/verificacion'
 import { infoPlaca, pinCodigo } from '../engine/placa'
 import { anclaPin } from '../ui/modelos/Piezas3D'
-import { pieza } from '../catalogo/piezas'
+import { LISTA_PIEZAS, pieza } from '../catalogo/piezas'
 import { bancoVacio, encimadas } from '../engine/ensamblaje'
 import { construirJoystickLeds, construirMegaBarra, construirPicoParpadeo, construirPicoPerilla } from '../robots/circuitos'
 import { ejeJoystick } from '../engine/circuito'
@@ -22,10 +22,10 @@ const idDe = (doc: RobotDoc, piezaId: string) => doc.piezas.filter(p => p.pieza 
 const brillo = (s: SimSincrona, id: string) => s.ultimas?.circuito?.leds[id]?.[0] ?? 0
 
 describe('placas nuevas: fichas, pines y capas', () => {
-  it('cada pin de la Pico y el Mega tiene dónde dibujar su cable', () => {
-    for (const id of ['raspberry-pico', 'arduino-mega']) {
-      const def = pieza(id)
-      for (const p of def.pines) expect(anclaPin(def.modelo, p.nombre), `${id} ${p.nombre}`).not.toBeNull()
+  it('cada pin de cada pieza tiene dónde dibujar su cable (la protoboard usa sus rieles)', () => {
+    for (const def of LISTA_PIEZAS) {
+      if (def.id === 'protoboard-830') continue
+      for (const p of def.pines) expect(anclaPin(def.modelo, p.nombre), `${def.id} ${p.nombre}`).not.toBeNull()
     }
   })
 
