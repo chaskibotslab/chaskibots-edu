@@ -2,8 +2,8 @@
 // del hilo de la interfaz. Habla el MISMO protocolo que avr.worker.ts, así la
 // simulación no distingue una placa de otra:
 //   interfaz → { type: 'load', python, placa }
-//   interfaz → { type: 'step', cycles, digital, dobles, ultrasonidos, camara?, serial? }
-//   worker   → { type: 'step', result, ms }
+//   interfaz → { type: 'step', cycles, digital, dobles, ultrasonidos, camara?, perro?, serial? }
+//   worker   → { type: 'step', result, ms }   (result.marcha: la orden al perro robot)
 // «cycles» se traduce a segundos con la misma frecuencia de referencia, y el
 // reloj del programa (sleep) avanza exactamente ese tiempo (ver runtime.ts).
 
@@ -11,6 +11,7 @@ import { RUNTIME_PY } from './python/runtime'
 import type { PinReport, StepResult } from './avrRunner'
 import type { UltrasonidoPines } from './hcsr04'
 import type { ImagenCamara } from './paso'
+import type { ComandoMarcha, EstadoPerro } from './cuadrupedo'
 
 const PYODIDE = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
 /** La misma frecuencia de referencia que el Arduino emulado (avrRunner.ts), sin cargar el emulador aquí. */
@@ -19,7 +20,8 @@ const CPU_FREQ_HZ = 16_000_000
 export type PythonIn =
   | { type: 'load'; python: string; placa: 'rpi' | 'jetson' }
   /** `camara`: imagen nueva de la cámara (si no viene, el programa sigue viendo la anterior). */
-  | { type: 'step'; cycles: number; digital: Record<string, boolean>; dobles?: Record<string, [boolean, boolean]>; analog: Record<string, number>; ultrasonidos: UltrasonidoPines[]; camara?: ImagenCamara; serial?: string }
+  /** `perro`: lo que cuenta el perro robot por el cable de red (si hay uno conectado). */
+  | { type: 'step'; cycles: number; digital: Record<string, boolean>; dobles?: Record<string, [boolean, boolean]>; analog: Record<string, number>; ultrasonidos: UltrasonidoPines[]; camara?: ImagenCamara; perro?: EstadoPerro; serial?: string }
 
 interface Pyodide {
   runPython(code: string): unknown
@@ -55,11 +57,11 @@ ctx.onmessage = async (e: MessageEvent<PythonIn>) => {
     if (msg.type === 'step' && py) {
       const t = performance.now()
       const dt = msg.cycles / CPU_FREQ_HZ
-      const r = py.globals.get('_avanzar')(dt, py.toPy(msg.digital), py.toPy(msg.dobles ?? {}), py.toPy(msg.ultrasonidos), msg.camara ? py.toPy(msg.camara) : null) as { toJs(o: object): unknown; destroy(): void }
-      const res = r.toJs({ dict_converter: Object.fromEntries }) as { pines: Record<string, PinReport>; salida: string; error: string | null; terminado: boolean }
+      const r = py.globals.get('_avanzar')(dt, py.toPy(msg.digital), py.toPy(msg.dobles ?? {}), py.toPy(msg.ultrasonidos), msg.camara ? py.toPy(msg.camara) : null, msg.perro ? py.toPy(msg.perro) : null) as { toJs(o: object): unknown; destroy(): void }
+      const res = r.toJs({ dict_converter: Object.fromEntries }) as { pines: Record<string, PinReport>; salida: string; error: string | null; terminado: boolean; marcha: ComandoMarcha | null }
       r.destroy()
       total += msg.cycles
-      const result: StepResult = { cycles: msg.cycles, totalCycles: total, pins: res.pines, serial: Array.from(new TextEncoder().encode(res.salida)) }
+      const result: StepResult = { cycles: msg.cycles, totalCycles: total, pins: res.pines, serial: Array.from(new TextEncoder().encode(res.salida)), marcha: res.marcha }
       ctx.postMessage({ type: 'step', result, ms: performance.now() - t })
       // Un error del programa se muestra como los de la placa (el paso ya avanzó la física).
       if (res.error) ctx.postMessage({ type: 'error', message: res.error })

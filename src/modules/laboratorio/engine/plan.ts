@@ -7,6 +7,7 @@ import { pieza } from '../catalogo/piezas'
 import type { V3 } from '../catalogo/tipos'
 import type { RobotDoc } from '../robots/doc'
 import type { MotorParams } from './bridge'
+import type { CuadrupedoPlan } from './cuadrupedo'
 import { aRobot, poses, resumen, ruedas, type RuedaGeo } from './ensamblaje'
 import { infoPlaca, mcuDe } from './placa'
 
@@ -69,6 +70,8 @@ export interface SimPlan {
   camaras: CamaraPlan[]
   servos: ServoPlan[]
   armas: ArmaPlan[]
+  /** Perro robot (el chasis cuadrúpedo): null en los robots con ruedas. */
+  cuadrupedo: CuadrupedoPlan | null
   voltajeBateria: number
   caidaDriver: number
   masaKg: number
@@ -183,10 +186,28 @@ export function planDe(doc: RobotDoc): SimPlan {
   const camaras: CamaraPlan[] = []
   const servos: ServoPlan[] = []
   const armas: ArmaPlan[] = []
+  let cuadrupedo: CuadrupedoPlan | null = null
   const ps = poses(doc)
   for (const p of doc.piezas) {
     const c = pieza(p.pieza).comportamiento
-    if (c.tipo === 'ir-reflectivo') {
+    if (c.tipo === 'cuadrupedo') {
+      // Las órdenes de marcha van por el cable de red; la batería del perro es suya.
+      const conEth = !!mcu && mcuPines.some(x => x.tipo === 'eth')
+      if (!mcu) avisos.push(`${p.etiqueta}: le falta la placa en el lomo (Jetson Nano o Raspberry Pi) que le da las órdenes`)
+      else if (!conEth) avisos.push(`${p.etiqueta}: esta placa no tiene puerto de red; usa la Jetson Nano o la Raspberry Pi`)
+      else if (!mismo([p.id, 'ETH'], [mcu.id, 'ETH'])) avisos.push(`${p.etiqueta}: conecta el cable de red (ETH) del perro a la placa`)
+      const pose = ps.get(p.id)!
+      const a = c.alturas_mm
+      cuadrupedo = {
+        instancia: p.id,
+        caderas: c.caderas.map(h => { const v = aRobot(pose, h); return { x: v.x / 1000, y: v.y / 1000, z: v.z / 1000 } }),
+        largoPata: (c.muslo_mm + c.pierna_mm) / 1000,
+        alturas: { parado: a.parado / 1000, echado: a.echado / 1000, sentadoAdelante: a.sentado_adelante / 1000, sentadoAtras: a.sentado_atras / 1000 },
+        vMax: c.v_max, vLatMax: c.v_lateral_max, giroMax: c.giro_max_grados,
+        distancia: { origen: aRobot(pose, c.distancia.origen).toArray() as V3, alcanceCm: c.distancia.alcance_cm },
+        conectado: conEth && mismo([p.id, 'ETH'], [mcu!.id, 'ETH']),
+      }
+    } else if (c.tipo === 'ir-reflectivo') {
       const ok = alimentado(p.id, 'VCC', 'GND')
       if (!ok) avisos.push(`${p.etiqueta}: no tiene alimentación (VCC y GND)`)
       const pinDigital = ok ? pinPlaca(p.id, 'DO') : null
@@ -241,7 +262,7 @@ export function planDe(doc: RobotDoc): SimPlan {
   }
 
   return {
-    mcu: mcu?.id ?? null, motores, lineas, ultrasonidos, obstaculos, camaras, servos, armas,
+    mcu: mcu?.id ?? null, motores, lineas, ultrasonidos, obstaculos, camaras, servos, armas, cuadrupedo,
     voltajeBateria, caidaDriver, masaKg: resumen(doc).masa_g / 1000, avisos,
   }
 }

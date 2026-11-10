@@ -291,6 +291,9 @@ export function avisosEnsamblaje(doc: RobotDoc): string[] {
     if (!tiene('mcu') && !tiene('bateria')) avisos.push('Falta la placa (Arduino o ESP32) o una batería: el circuito no tiene de dónde sacar corriente')
     return avisos
   }
+  // El perro robot trae sus motores, su batería y su controlador: solo le falta la placa
+  // (de eso y del cable de red avisa el plan).
+  if (pieza(raiz(doc).pieza).comportamiento.tipo === 'cuadrupedo') return avisos
   const ps = poses(doc)
   const rs = ruedas(doc, ps)
   const motores = doc.piezas.filter(p => pieza(p.pieza).comportamiento.tipo === 'motor-dc')

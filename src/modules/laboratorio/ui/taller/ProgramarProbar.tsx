@@ -158,7 +158,7 @@ export default function ProgramarProbar({ doc, vista, arenaInicial, plantillas, 
         await sim.cargarPrograma(codigo)
         setPestana('serial')
         if (leeLetras && document.activeElement instanceof HTMLElement) document.activeElement.blur()
-        setAviso({ tipo: 'ok', texto: 'Programa en Python corriendo en la Raspberry Pi' })
+        setAviso({ tipo: 'ok', texto: `Programa en Python corriendo en la ${infoPlaca(doc).nombre}` })
       } catch (err) {
         const texto = err instanceof Error ? err.message : 'Error en el programa'
         const linea = /Línea (\d+)/.exec(texto)
@@ -564,6 +564,20 @@ function HUD({ tele, robot = true, sinPlaca = false, encendido = false, python =
 
       {robot && <div className="pointer-events-none absolute right-3 top-3 hidden w-56 space-y-2 rounded-md lab-vidrio p-3 text-xs sm:block">
         {tele.camara && <VistaCamara imagen={tele.camara} />}
+        {tele.perro && (
+          <div className="grid grid-cols-3 gap-1.5">
+            {[
+              ['Postura', NOMBRE_POSTURA[tele.perro.postura]],
+              ['Distancia', tele.perro.distancia === null ? 'libre' : `${tele.perro.distancia.toFixed(0)} cm`],
+              ['Giro', `${tele.perro.orientacion.toFixed(0)}°`],
+            ].map(([k, v]) => (
+              <div key={k} className="rounded-md bg-lab-tinta/[0.04] p-1.5">
+                <div className="mb-0.5 text-[10px] text-lab-suave">{k}</div>
+                <div className="font-mono text-[11px] text-lab-tinta">{v}</div>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <span className="text-lab-suave">Velocidad</span>
           <span className="font-mono text-lab-tinta">{(tele.velocidadRobot * 100).toFixed(1)} cm/s</span>
@@ -623,6 +637,8 @@ function HUD({ tele, robot = true, sinPlaca = false, encendido = false, python =
     </>
   )
 }
+
+const NOMBRE_POSTURA: Record<NonNullable<Telemetria['perro']>['postura'], string> = { echado: 'echado', parado: 'de pie', sentado: 'sentado', saludo: 'saluda' }
 
 /** Lo que ve la cámara del robot, píxel por píxel (la misma tabla de números que lee el programa). */
 function VistaCamara({ imagen }: { imagen: NonNullable<Telemetria['camara']> }) {

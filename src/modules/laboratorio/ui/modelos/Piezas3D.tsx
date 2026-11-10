@@ -11,8 +11,11 @@ import type * as THREE from 'three'
 import type { MaterialFisico } from '../../catalogo/tipos'
 import { useCalidad } from '../calidad'
 import { anclaCircuito } from './Circuito3D'
+import { anclaComputadora } from './Computadoras3D'
 import { PLACA_PISO, SEPARADORES_PISO } from '../../catalogo/piezas/chasis'
 import { CUNA, HORQUILLAS_DISCO, HORQUILLAS_TAMBOR, PATINES_DISCO, PLACA_COMBATE } from '../../catalogo/piezas/combate'
+
+export { RaspberryPi4, JetsonNano } from './Computadoras3D'
 
 const m = (v: number) => v / 1000
 type V = [number, number, number]
@@ -600,102 +603,80 @@ export const ArduinoMega = forwardRef(function ArduinoMega(_: object, refLed13: 
 const PICO_1_20 = ['GP0', 'GP1', 'GND', 'GP2', 'GP3', 'GP4', 'GP5', 'GND', 'GP6', 'GP7', 'GP8', 'GP9', 'GND', 'GP10', 'GP11', 'GP12', 'GP13', 'GND', 'GP14', 'GP15']
 const PICO_40_21 = ['VBUS', 'VSYS', 'GND', '3V3_EN', '3V3', 'ADC_VREF', 'GP28', 'AGND', 'GP27', 'GP26', 'RUN', 'GP22', 'GND', 'GP21', 'GP20', 'GP19', 'GP18', 'GND', 'GP17', 'GP16']
 
-/**
- * Raspberry Pi 4: placa verde de 85 × 56 mm (ancla en los agujeros de montaje,
- * x = −4), los 40 pines en un borde, dos USB dobles y el Ethernet en el otro
- * extremo, el procesador con su tapa metálica y el LED verde de actividad.
- */
-export const RaspberryPi4 = forwardRef(function RaspberryPi4(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
-  const q = useCalidad()
-  const cx = 4
-  return (
-    <group position={M(cx, 0, 0)}>
-      <RoundedBox args={M(85, 1.6, 56)} position={M(0, 0.8, 0)} radius={m(3)} smoothness={2} castShadow={q.sombras} receiveShadow>
-        <meshStandardMaterial color="#1a7a3e" roughness={0.6} />
-      </RoundedBox>
-      {/* Cabezal de 40 pines (2 × 20) en el borde */}
-      <mesh position={M(-6, 4.2, -24)} castShadow={q.sombras}>
-        <boxGeometry args={[m(51), m(5), m(5)]} />
-        <meshStandardMaterial color="#111214" roughness={0.6} />
-      </mesh>
-      {Array.from({ length: 20 }, (_, i) => [-1.27, 1.27].map(dz => (
-        <mesh key={`${i}${dz}`} position={M(-30.1 + i * 2.54, 7.6, -24 + dz)}>
-          <boxGeometry args={[m(0.64), m(3), m(0.64)]} />
-          <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.25} />
-        </mesh>
-      )))}
-      {/* Procesador con tapa metálica, RAM y chip USB */}
-      <mesh position={M(-10, 2.2, 2)}><boxGeometry args={[m(15), m(1.4), m(15)]} /><meshStandardMaterial color="#c9ced6" metalness={0.9} roughness={0.3} /></mesh>
-      <mesh position={M(8, 2.0, 2)}><boxGeometry args={[m(12), m(1), m(10)]} /><meshStandardMaterial color={NEGRO} roughness={0.5} /></mesh>
-      <mesh position={M(22, 2.0, 12)}><boxGeometry args={[m(7), m(1), m(7)]} /><meshStandardMaterial color={NEGRO} roughness={0.5} /></mesh>
-      {/* Puertos: dos USB dobles y el Ethernet en el extremo */}
-      {[[-14, '#1d4ed8'], [4, '#111214']].map(([z, c]) => (
-        <group key={String(z)} position={M(36, 9.1, z as number)}>
-          <mesh castShadow={q.sombras}><boxGeometry args={[m(17), m(15), m(13)]} /><meshStandardMaterial color={METAL} metalness={0.85} roughness={0.3} /></mesh>
-          {[-3.5, 3.5].map(dy => (
-            <mesh key={dy} position={M(8.6, dy, 0)}><boxGeometry args={[m(0.4), m(2), m(10)]} /><meshStandardMaterial color={c as string} roughness={0.5} /></mesh>
-          ))}
-        </group>
-      ))}
-      <mesh position={M(35, 8.4, 20.5)} castShadow={q.sombras}><boxGeometry args={[m(21), m(13.5), m(16)]} /><meshStandardMaterial color={METAL} metalness={0.85} roughness={0.3} /></mesh>
-      {/* USB-C y dos micro HDMI en el lado largo */}
-      {[-30, -15, -3].map((x, i) => (
-        <mesh key={x} position={M(x, 2.6, 26.5)}><boxGeometry args={[m(i ? 7 : 9), m(3), m(5)]} /><meshStandardMaterial color={METAL} metalness={0.85} roughness={0.3} /></mesh>
-      ))}
-      {/* LED de actividad (GPIO47) y de encendido */}
-      <mesh position={M(-38, 2, 24)}><boxGeometry args={[m(1.6), m(1), m(1)]} /><meshStandardMaterial ref={refLed} color="#22c55e" emissive="#22c55e" emissiveIntensity={0} /></mesh>
-      <mesh position={M(-38, 2, 21.5)}><boxGeometry args={[m(1.6), m(1), m(1)]} /><meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={1.5} /></mesh>
-    </group>
-  )
-})
+/** Radio del pie de goma del perro (mm): el centro del pie queda a esta altura del piso. */
+export const RADIO_PIE = 11
+
+/** Los tres giros de una pata del perro: abducción (afuera/adentro), muslo y rodilla. */
+export interface PataPerro { abd: THREE.Group | null; muslo: THREE.Group | null; rodilla: THREE.Group | null }
 
 /**
- * Jetson Nano (kit B01) de costado: placa base de 80 × 100 mm, el módulo con
- * su disipador negro de aletas, el conector de 40 pines en un borde, los
- * puertos (USB, Ethernet, HDMI) en el borde trasero y el conector CSI.
+ * Cinemática inversa de una pata de dos tramos iguales (`l` m): ángulos del
+ * muslo y de la rodilla (rad, giro alrededor de z: + lleva el pie adelante)
+ * para que el pie quede `x` adelante y `y` abajo de la cadera. La rodilla
+ * apunta hacia atrás, como en el Unitree Go2.
  */
-export const JetsonNano = forwardRef(function JetsonNano(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
+export function ikPata(x: number, y: number, l: number): [number, number] {
+  const d = Math.min(2 * l * 0.995, Math.max(0.02, Math.hypot(x, y)))
+  const a = Math.acos(d / (2 * l))
+  const b = Math.atan2(x, y)
+  return [b - a, 2 * a]
+}
+
+/**
+ * Perro robot cuadrúpedo: cuerpo de aluminio con la cabeza (visor y sensor de
+ * profundidad abajo), y cuatro patas con el motor de la cadera, el muslo y la
+ * pierna con su pie de goma. Las patas se arman en grupos que Robot3D gira en
+ * cada cuadro (`patas`) según la postura y el trote.
+ */
+export function PerroRobot({ caderas, muslo, pierna, color, patas }: { caderas: V[]; muslo: number; pierna: number; color: string; patas: PataPerro[] }) {
   const q = useCalidad()
+  // Parado (cadera a 160 mm del piso), hasta que Robot3D las mueva.
+  const [m0, r0] = ikPata(0, 0.16 - RADIO_PIE / 1000, muslo / 1000)
+  // React engancha primero las refs de los hijos (rodilla, muslo) y después la de la cadera.
+  const pata = (i: number) => (patas[i] ??= { abd: null, muslo: null, rodilla: null })
   return (
-    <group position={M(3, 0, 0)}>
-      <RoundedBox args={M(80, 1.6, 100)} position={M(0, 3.8, 0)} radius={m(2)} smoothness={2} castShadow={q.sombras} receiveShadow>
-        <meshStandardMaterial color="#14532d" roughness={0.6} />
+    <group>
+      <RoundedBox args={M(300, 70, 110)} position={M(0, 35, 0)} radius={m(14)} smoothness={3} castShadow={q.sombras} receiveShadow>
+        <meshStandardMaterial color={color} metalness={0.55} roughness={0.38} />
       </RoundedBox>
-      {/* Patas de la placa base */}
-      {[[-35, -45], [-35, 45], [35, -45], [35, 45]].map(([x, z]) => (
-        <mesh key={`${x}${z}`} position={M(x, 1.5, z)}><cylinderGeometry args={[m(2), m(2), m(3), 8]} /><meshStandardMaterial color={METAL} metalness={0.8} roughness={0.3} /></mesh>
+      {/* Franja oscura del lomo y la tapa de la batería */}
+      <mesh position={M(0, 70.6, 0)} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[m(250), m(70)]} /><meshStandardMaterial color="#1f2328" roughness={0.6} /></mesh>
+      <mesh position={M(-120, 36, 55.6)}><boxGeometry args={[m(40), m(30), m(1)]} /><meshStandardMaterial color="#1f2328" roughness={0.5} /></mesh>
+      {/* Panel de conexiones del lomo: red (RJ45 hacia arriba) y bornes de 5 V */}
+      <mesh position={M(-88, 70.8, -40)}><boxGeometry args={[m(30), m(1.6), m(15)]} /><meshStandardMaterial color="#15181c" roughness={0.6} /></mesh>
+      <mesh position={M(-95, 71.4, -40)}><boxGeometry args={[m(11), m(1), m(10)]} /><meshStandardMaterial color="#050607" roughness={0.8} /></mesh>
+      <mesh position={M(-80, 72, -40)}><boxGeometry args={[m(6), m(2.4), m(10)]} /><meshStandardMaterial color="#1d4ed8" roughness={0.5} /></mesh>
+      {/* Cabeza: visor negro brillante y el sensor de profundidad abajo */}
+      <RoundedBox args={M(60, 55, 70)} position={M(170, 55, 0)} radius={m(12)} smoothness={3} castShadow={q.sombras}>
+        <meshStandardMaterial color={color} metalness={0.55} roughness={0.38} />
+      </RoundedBox>
+      <RoundedBox args={M(8, 30, 56)} position={M(198, 62, 0)} radius={m(4)} smoothness={2}>
+        <meshStandardMaterial color="#05070a" metalness={0.3} roughness={0.08} />
+      </RoundedBox>
+      {[-14, 14].map(z => (
+        <mesh key={z} position={M(202.5, 64, z)}><boxGeometry args={[m(0.5), m(4), m(10)]} /><meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={1.4} /></mesh>
       ))}
-      {/* Módulo (SODIMM) y disipador con aletas */}
-      <mesh position={M(6, 5.5, 4)}><boxGeometry args={[m(45), m(1.2), m(70)]} /><meshStandardMaterial color="#1e3a2a" roughness={0.6} /></mesh>
-      <mesh position={M(6, 8, 4)} castShadow={q.sombras}><boxGeometry args={[m(40), m(4), m(60)]} /><meshStandardMaterial color="#18181b" metalness={0.5} roughness={0.5} /></mesh>
-      {Array.from({ length: q.sombras ? 12 : 6 }, (_, i) => (
-        <mesh key={i} position={M(6, 18, -24 + i * (q.sombras ? 4.4 : 9.6))} castShadow={q.sombras}>
-          <boxGeometry args={[m(40), m(17), m(q.sombras ? 1.4 : 3)]} />
-          <meshStandardMaterial color="#18181b" metalness={0.5} roughness={0.45} />
-        </mesh>
+      <mesh position={M(192, 28, 0)}><sphereGeometry args={[m(13), 20, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2]} /><meshStandardMaterial color="#0b0d10" metalness={0.4} roughness={0.2} /></mesh>
+      {caderas.map(([x, y, z], i) => (
+        <group key={i} position={M(x, y, z)} ref={g => { pata(i).abd = g }}>
+          {/* Motor de la cadera */}
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow={q.sombras}><cylinderGeometry args={[m(17), m(17), m(30), 20]} /><meshStandardMaterial color="#2a2f36" metalness={0.6} roughness={0.35} /></mesh>
+          <group position={M(0, 0, z < 0 ? -18 : 18)} rotation={[0, 0, m0]} ref={g => { pata(i).muslo = g }}>
+            <mesh rotation={[Math.PI / 2, 0, 0]} castShadow={q.sombras}><cylinderGeometry args={[m(19), m(19), m(22), 20]} /><meshStandardMaterial color="#2a2f36" metalness={0.6} roughness={0.35} /></mesh>
+            <RoundedBox args={M(26, muslo, 20)} position={M(0, -muslo / 2, 0)} radius={m(7)} smoothness={2} castShadow={q.sombras}>
+              <meshStandardMaterial color={color} metalness={0.55} roughness={0.38} />
+            </RoundedBox>
+            <group position={M(0, -muslo, 0)} rotation={[0, 0, r0]} ref={g => { pata(i).rodilla = g }}>
+              <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[m(9), m(9), m(22), 14]} /><meshStandardMaterial color="#1f2328" metalness={0.5} roughness={0.4} /></mesh>
+              <mesh position={M(0, -pierna / 2, 0)} castShadow={q.sombras}><cylinderGeometry args={[m(6), m(8), m(pierna), 12]} /><meshStandardMaterial color="#1f2328" metalness={0.5} roughness={0.4} /></mesh>
+              <mesh position={M(0, -pierna, 0)} castShadow={q.sombras}><sphereGeometry args={[m(RADIO_PIE), 16, 12]} /><meshStandardMaterial color="#111214" roughness={0.9} /></mesh>
+            </group>
+          </group>
+        </group>
       ))}
-      {/* Conector de 40 pines en el borde −x */}
-      <mesh position={M(-35, 7, 0)} castShadow={q.sombras}><boxGeometry args={[m(5), m(5), m(51)]} /><meshStandardMaterial color="#111214" roughness={0.6} /></mesh>
-      {q.sombras && Array.from({ length: 20 }, (_, i) => [-1.27, 1.27].map(dx => (
-        <mesh key={`${i}${dx}`} position={M(-35 + dx, 10.4, -24.1 + i * 2.54)}>
-          <boxGeometry args={[m(0.64), m(3), m(0.64)]} />
-          <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.25} />
-        </mesh>
-      )))}
-      {/* Puertos en el borde −z: USB ×4, Ethernet, HDMI, DisplayPort, alimentación */}
-      {[[-26, 15, 16], [-8, 15, 16], [12, 13, 16], [30, 6, 15]].map(([x, alto, ancho]) => (
-        <mesh key={x} position={M(x, 4.6 + alto / 2, -43)} castShadow={q.sombras}>
-          <boxGeometry args={[m(ancho), m(alto), m(14)]} />
-          <meshStandardMaterial color={METAL} metalness={0.85} roughness={0.3} />
-        </mesh>
-      ))}
-      {/* Conector CSI (cámara) junto al borde +z */}
-      <mesh position={M(20, 6, 46)}><boxGeometry args={[m(17), m(3), m(5)]} /><meshStandardMaterial color="#f5f5f4" roughness={0.6} /></mesh>
-      {/* LED de encendido */}
-      <mesh position={M(-28, 5, 44)}><boxGeometry args={[m(1.6), m(1), m(1)]} /><meshStandardMaterial ref={refLed} color="#22c55e" emissive="#22c55e" emissiveIntensity={1.5} /></mesh>
     </group>
   )
-})
+}
 
 /**
  * Cámara CSI (IMX219) sobre un mástil: base atornillada al chasis detrás del
@@ -1281,8 +1262,18 @@ export function anclaPin(modelo: string, pin: string): V | null {
       const i = ['GND', '+5V', 'VRx', 'VRy', 'SW'].indexOf(pin)
       return i >= 0 ? [-5.08 + i * 2.54, 1.5, 17.5] : null
     }
+    // Robots de combate: los cables salen de atrás del motor y, en las armas,
+    // del variador (ESC) al pie del poste, del motor del disco o del eje hueco del tambor.
+    case 'proc:motor-combate': return pin === 'M+' ? [2.5, 0, -40.5] : pin === 'M-' ? [-2.5, 0, -40.5] : null
+    case 'proc:arma-giratoria': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [-11.5, 4, (i - 1) * 3] : null }
+    case 'proc:arma-tambor': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [0, (1 - i) * 2.5, -59] : null }
+    case 'proc:arma-disco': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [0, (1 - i) * 4, -21.5] : null }
+    // Panel de conexiones del perro en el lomo: red y alimentación.
+    case 'proc:perro-robot': return ({ ETH: [-95, 71, -40], '5V': [-80, 73, -42.5], GND: [-80, 73, -37.5] } as Record<string, V>)[pin] ?? null
+    // Cable plano de la cámara: sale de abajo del mástil.
+    case 'proc:camara-csi': return pin === 'CSI' ? [-14.8, 4, 0] : null
   }
-  return anclaCircuito(modelo, pin)
+  return anclaComputadora(modelo, pin) ?? anclaCircuito(modelo, pin)
 }
 
 /** Hacia dónde sale el cable de cada pin (marco de la pieza) y cómo se conecta. */
@@ -1307,6 +1298,20 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
     case 'proc:fc51': return { dir: [-1, 0, 0], tipo: 'dupont' }
     case 'proc:hcsr04': return { dir: [-1, 0, 0], tipo: 'dupont' }
     case 'proc:joystick': return { dir: [0, 0, 1], tipo: 'dupont' }
+    case 'proc:jetson-nano':
+      if (pin === 'ETH') return { dir: [-1, 0, 0], tipo: 'soldado' }
+      if (pin === 'CSI') return { dir: [0, 0.4, 1], tipo: 'soldado' }
+      return { dir: [0, 1, 0], tipo: 'dupont' }
+    case 'proc:raspberry-pi-4':
+      if (pin === 'ETH') return { dir: [1, 0, 0], tipo: 'soldado' }
+      if (pin === 'CSI') return { dir: [0, 1, 0], tipo: 'soldado' }
+      return { dir: [0, 1, 0], tipo: 'dupont' }
+    case 'proc:camara-csi': return { dir: [-1, 0, 0], tipo: 'soldado' }
+    case 'proc:motor-combate':
+    case 'proc:arma-tambor':
+    case 'proc:arma-disco': return { dir: [0, 0, -1], tipo: 'soldado' }
+    case 'proc:arma-giratoria': return { dir: [-1, 0, 0], tipo: 'soldado' }
+    case 'proc:perro-robot': return { dir: [0, 1, 0], tipo: 'soldado' }
   }
   if (anclaCircuito(modelo, pin)) return { dir: [0, 1, 0], tipo: 'macho' }
   return { dir: [0, 1, 0], tipo: 'dupont' }

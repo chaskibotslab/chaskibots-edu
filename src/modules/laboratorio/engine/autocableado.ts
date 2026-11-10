@@ -155,6 +155,14 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
     cable([s.id, 'CSI'], [mcu.id, 'CSI'], '#94a3b8')
   }
 
+  // Perro robot: el cable de red para las órdenes y su batería alimenta la placa.
+  for (const p of de('cuadrupedo')) {
+    if (!nueva(p.id) || !mcu) continue
+    if (pieza(mcu.pieza).pines.some(x => x.tipo === 'eth')) cable([p.id, 'ETH'], [mcu.id, 'ETH'], '#2563eb')
+    cable([p.id, '5V'], [mcu.id, info.alimServo], ROJO)
+    cable([p.id, 'GND'], [mcu.id, 'GND'], NEGRO)
+  }
+
   // Arma (ESC): la corriente directo de la batería; la señal, a un pin PWM libre.
   for (const a of de('arma-giratoria')) {
     if (!nueva(a.id)) continue

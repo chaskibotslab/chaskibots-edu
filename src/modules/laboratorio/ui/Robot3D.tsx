@@ -12,12 +12,14 @@ import { datosVariante, pieza } from '../catalogo/piezas'
 import { grados, type PiezaDef, type PuntoMontaje } from '../catalogo/tipos'
 import { hijos, montajeDe, poses, raiz, resumen, ruedas, ruedasLocas, aRobot } from '../engine/ensamblaje'
 import type { Simulacion } from '../engine/simulation'
+import type { RobotFisico } from '../engine/fisica/robotFisico'
 import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
 import { infoPlaca } from '../engine/placa'
 import {
   ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, RaspberryPi4, JetsonNano, CamaraCSI, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
   ChasisMinisumo, MotorN20, BateriaLipo, ChasisBattlebot, ArmaGiratoria, ChasisTambor, ChasisDisco, MotorCombate, RuedaCombate, ArmaTambor, ArmaDisco,
+  PerroRobot, ikPata, RADIO_PIE, type PataPerro,
 } from './modelos/Piezas3D'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
 import { ALTO_PROTOBOARD, agujeroRiel } from '../catalogo/piezas/circuito'
@@ -34,6 +36,8 @@ interface Refs {
   ledsObs: Map<string, RefObject<THREE.MeshStandardMaterial>>
   led13: RefObject<THREE.MeshStandardMaterial>
   armas: Map<string, RefObject<THREE.Group>>
+  /** Patas del perro robot (abducción, muslo, rodilla), en el orden de sus caderas. */
+  perro: PataPerro[]
 }
 
 /** Lo mínimo para animar un robot en la arena: su física, sus pines y sus sensores. */
@@ -127,6 +131,8 @@ function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst:
       if (!refs.armas.has(inst.id)) refs.armas.set(inst.id, createRef())
       return <ArmaGiratoria ref={refs.armas.get(inst.id)} radio={c.tipo === 'arma-giratoria' ? c.radio_mm : 65} alto={c.tipo === 'arma-giratoria' ? c.alto_mm : 42} />
     }
+    case 'proc:perro-robot':
+      return c.tipo === 'cuadrupedo' ? <PerroRobot caderas={c.caderas} muslo={c.muslo_mm} pierna={c.pierna_mm} color={v.color ?? '#3f4650'} patas={refs.perro} /> : null
     case 'proc:motor-n20': return <MotorN20 />
     case 'proc:motor-tt': return <MotorTT />
     case 'proc:rueda': {
@@ -373,11 +379,41 @@ function ProyectarMarcadores({ doc, marcadores, destino, raizRef }: { doc: Robot
   return null
 }
 
+/**
+ * Patas del perro en cada cuadro: el pie va donde la suspensión de esa pata
+ * encontró el piso y, al caminar, se mueve al trote (patas en diagonal juntas):
+ * adelante en el aire y atrás apoyado. La pata del saludo se mueve en el aire.
+ */
+function animarPatas(mc: NonNullable<RobotFisico['marcha']>, patas: PataPerro[], t: number) {
+  const c = mc.plan
+  const l = c.largoPata / 2
+  const avance = mc.v.x / c.vMax, lado = mc.v.y / c.vLatMax, giro = mc.v.w / ((c.giroMax * Math.PI) / 180)
+  const rapidez = Math.min(1, Math.max(Math.hypot(avance, lado), Math.abs(giro)))
+  mc.patas.forEach((p, i) => {
+    const r = patas[i]
+    if (!r?.abd || !r.muslo || !r.rodilla) return
+    const psi = mc.fase + (i === 0 || i === 3 ? 0 : Math.PI)
+    let x: number, y: number, z = p.corrimiento.z
+    if (p.enAire) {
+      x = 0.09; y = 0.05 + 0.015 * Math.sin(t * 9)
+    } else {
+      const zancada = 0.035 * (avance + (c.caderas[i].z < 0 ? -0.7 : 0.7) * giro)
+      x = -zancada * Math.cos(psi)
+      y = Math.min(2 * l, p.largo ?? p.altura) - RADIO_PIE / 1000 - 0.025 * rapidez * Math.max(0, Math.sin(psi))
+      z -= 0.015 * lado * Math.cos(psi)   // vy + = izquierda (−z)
+    }
+    r.abd.rotation.x = -Math.atan2(z, y)
+    const [a, b] = ikPata(x, Math.hypot(y, z), l)
+    r.muslo.rotation.z = a
+    r.rodilla.rotation.z = b
+  })
+}
+
 export default function Robot3D(props: Props) {
   const { doc, sim, marcadores = [], cables = true } = props
   const grupo = useRef<THREE.Group>(null)
   const refs = useMemo<Refs>(() => ({
-    servos: new Map(), ruedas: new Map(), ledsIr: new Map(), ledsObs: new Map(), led13: createRef(), armas: new Map(),
+    servos: new Map(), ruedas: new Map(), ledsIr: new Map(), ledsObs: new Map(), led13: createRef(), armas: new Map(), perro: [],
   }), [])
 
   const datos = useMemo(() => {
@@ -389,7 +425,10 @@ export default function Robot3D(props: Props) {
     }
     const locas = ruedasLocas(doc, ps)
     const bajo = Math.min(...rs.map(r => r.centro.y - r.radio), ...locas.map(l => l.centroBola.y - l.radio), resumen(doc, ps).min.y)
-    return { espaciadores: new Map(locas.map(l => [l.instancia, l.espaciador])), apoyo: m(-bajo) }
+    // El perro se muestra parado sobre sus patas (sus colisionadores no llegan al piso).
+    const c = pieza(raiz(doc).pieza).comportamiento
+    const apoyo = c.tipo === 'cuadrupedo' ? m(c.alturas_mm.parado - c.caderas[0][1]) : m(-bajo)
+    return { espaciadores: new Map(locas.map(l => [l.instancia, l.espaciador])), apoyo }
   }, [doc, refs])
 
   const porInstancia = useMemo(() => {
@@ -398,7 +437,7 @@ export default function Robot3D(props: Props) {
     return mapa
   }, [marcadores])
 
-  useFrame(() => {
+  useFrame(({ clock }) => {
     const g = grupo.current
     if (!g) return
     const f = sim?.fisica
@@ -417,6 +456,7 @@ export default function Robot3D(props: Props) {
         // De pie (tambor, disco) gira alrededor de z: el frente sube.
         if (g) { if (a.vertical) g.rotation.z = a.angulo * 0.07; else g.rotation.y = a.angulo * 0.07 }
       }
+      if (f.marcha) animarPatas(f.marcha, refs.perro, clock.elapsedTime)
       for (const s of Array.from(f.servos.values())) {
         const ref = refs.servos.get(s.instancia)?.current
         if (ref) ref.rotation.y = grados(s.angulo - 90)

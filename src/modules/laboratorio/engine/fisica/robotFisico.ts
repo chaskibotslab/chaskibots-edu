@@ -28,6 +28,7 @@ import { datosVariante, pieza } from '../../catalogo/piezas'
 import { friccion, type Colisionador } from '../../catalogo/tipos'
 import type { RobotDoc } from '../../robots/doc'
 import { motorStep, type MotorParams } from '../bridge'
+import { Marcha } from '../cuadrupedo'
 import { poses, resumen, ruedasLocas, type Pose } from '../ensamblaje'
 import type { SimPlan } from '../plan'
 import type { Pose2D } from '../tracks'
@@ -97,6 +98,8 @@ export class RobotFisico {
   readonly armas: ArmaFisica[] = []
   /** Altura del origen del robot (chasis) cuando apoya en el piso (m). */
   readonly alturaApoyo: number
+  /** Controlador de marcha del perro robot (null en los robots con ruedas). */
+  readonly marcha: Marcha | null
   private readonly k: number
   private readonly b: number
 
@@ -114,7 +117,9 @@ export class RobotFisico {
     for (const l of Array.from(locas.values())) bajo = Math.min(bajo, l.centroBola.y - l.radio)
     // Sin ruedas (mesa de electrónica): se apoya en lo más bajo de sus piezas.
     if (!isFinite(bajo)) bajo = resumen(doc, ps).min.y
-    this.alturaApoyo = -bajo / 1000 + COMPRESION
+    // Perro: arranca echado, sobre sus patas.
+    this.marcha = plan.cuadrupedo ? new Marcha(plan.cuadrupedo, resumen(doc, ps).masa_g / 1000) : null
+    this.alturaApoyo = this.marcha ? this.marcha.alturaOrigen('echado') : -bajo / 1000 + COMPRESION
 
     this.body = world.createRigidBody(
       RAPIER.RigidBodyDesc.dynamic()
@@ -204,6 +209,7 @@ export class RobotFisico {
     this.body.setAngvel({ x: 0, y: 0, z: 0 }, true)
     for (const r of this.ruedas) { r.omega = 0; r.volts = 0 }
     for (const a of this.armas) { a.omega = 0; a.acelerador = 0; a.espera = 0 }
+    this.marcha?.reiniciar()
   }
 
   /** Un sub-paso de 1/240 s: servos, motores y fuerzas de las ruedas. */
@@ -222,6 +228,7 @@ export class RobotFisico {
     }
 
     const body = this.body
+    if (this.marcha) { this.marcha.subpaso(this.mundo.world, body, dt); return }
     const rot = body.rotation()
     const pos = body.translation()
     const abajo = rotar(rot, { x: 0, y: -1, z: 0 })
