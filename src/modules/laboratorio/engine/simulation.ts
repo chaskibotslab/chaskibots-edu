@@ -92,6 +92,8 @@ export class Simulacion {
   private cargado = false
   private pendiente = false
   private corriendo = false
+  /** Cámara lenta: 1 = tiempo real, 0,5 o 0,25 = la simulación avanza más despacio que el reloj. */
+  velocidad = 1
   private atraso = 0
   private ultimoCuadro = 0
   private raf = 0
@@ -280,9 +282,11 @@ export class Simulacion {
 
   private cuadro = (ahora: number) => {
     this.raf = requestAnimationFrame(this.cuadro)
-    const dtReal = Math.min((ahora - this.ultimoCuadro) / 1000, 0.1)
+    const dtReloj = Math.min((ahora - this.ultimoCuadro) / 1000, 0.1)
     this.ultimoCuadro = ahora
-    this.ventana.real += dtReal
+    this.ventana.real += dtReloj
+    // En cámara lenta, cada segundo del reloj vale menos tiempo simulado (el micro recibe menos ciclos: sigue sincronizado).
+    const dtReal = dtReloj * this.velocidad
 
     if (!this.corriendo) { this.emitir(ahora); return }
 

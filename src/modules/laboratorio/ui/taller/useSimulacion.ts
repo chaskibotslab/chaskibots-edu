@@ -42,6 +42,8 @@ export interface SimulacionTaller {
   imagenPropia: { nombre: string; img: HTMLImageElement } | null
   gravedad: Gravedad
   camara: ModoCamara
+  /** Cámara lenta: 1, 0,5 o 0,25. */
+  velocidadSim: number
   silencio: boolean
   encendido: boolean
   versionArena: number
@@ -61,6 +63,7 @@ export interface SimulacionTaller {
   girarRobot: (delta: number) => void
   setGravedad: (g: Gravedad) => void
   setCamara: (c: ModoCamara) => void
+  setVelocidadSim: (v: number) => void
   setSilencio: (s: boolean) => void
   activarSonido: () => void
   /** Circuitos sin placa: conectar o desconectar la pila. */
@@ -89,6 +92,8 @@ export function useSimulacion(doc: RobotDoc | null, arenaInicial: string, activo
   const [versionArena, setVersionArena] = useState(0)
   const [gravedad, setGravedadEstado] = useState<Gravedad>('tierra')
   const [camara, setCamara] = useState<ModoCamara>('libre')
+  const [velocidadSim, setVelocidadEstado] = useState(1)
+  const velocidadRef = useRef(1)
   const [silencio, setSilencio] = useState(false)
   const [encendido, setEncendido] = useState(false)
   const [imagenPropia, setImagenPropia] = useState<{ nombre: string; img: HTMLImageElement } | null>(null)
@@ -147,6 +152,7 @@ export function useSimulacion(doc: RobotDoc | null, arenaInicial: string, activo
     s.onSerial = t => { if (m.vivo) setSerial(prev => (prev + t).slice(-MAX_SERIAL)) }
     s.onArenaCambiada = () => { if (m.vivo) setVersionArena(v => v + 1) }
     s.onSonidos = l => sonido.current?.actualizar(l)
+    s.velocidad = velocidadRef.current
     setEncendido(false)
     setErrores([])
     setAviso(null)
@@ -266,6 +272,7 @@ export function useSimulacion(doc: RobotDoc | null, arenaInicial: string, activo
   }, [sim])
 
   const setGravedad = useCallback((g: Gravedad) => { setGravedadEstado(g); sim?.cambiarGravedad(g) }, [sim])
+  const setVelocidadSim = useCallback((v: number) => { velocidadRef.current = v; setVelocidadEstado(v); if (sim) sim.velocidad = v }, [sim])
   const enviarSerial = useCallback((texto: string) => { if (texto) sim?.enviarSerial(texto + '\n') }, [sim])
   const limpiarSerial = useCallback(() => setSerial(''), [])
   const encender = useCallback((si: boolean) => {
@@ -281,8 +288,8 @@ export function useSimulacion(doc: RobotDoc | null, arenaInicial: string, activo
 
   return {
     sim, tele, estado, robotCambio, codigoModificado, serial, errores, compilando, aviso,
-    arena, arenas, imagenPropia, gravedad, camara, silencio, encendido, versionArena, banco, python, sinPlaca,
+    arena, arenas, imagenPropia, gravedad, camara, velocidadSim, silencio, encendido, versionArena, banco, python, sinPlaca,
     ejecutar, pausar, reanudar, detener, reiniciar, cambiarArena, subirPista, enviarSerial, limpiarSerial, girarRobot,
-    setGravedad, setCamara, setSilencio, activarSonido, encender, setErrores, cerrarAviso,
+    setGravedad, setCamara, setVelocidadSim, setSilencio, activarSonido, encender, setErrores, cerrarAviso,
   }
 }

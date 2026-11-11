@@ -9,8 +9,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
-  AlertTriangle, Camera, ChevronDown, ChevronUp, CircuitBoard, Code2, Gamepad2, Gauge, Loader2, Map as MapIcon, Maximize2, Minimize2,
-  Navigation, Pause, Pencil, Play, Power, RotateCcw, RotateCw, Send, Square, Terminal, Trash2, Upload, X, ZoomIn, ZoomOut,
+  AlertTriangle, Camera, ChevronDown, ChevronUp, CircuitBoard, Code2, Eye, Gamepad2, Gauge, Loader2, Map as MapIcon, Maximize2, Minimize2,
+  Navigation, Pause, Pencil, Play, Power, RotateCcw, RotateCw, Send, Square, Terminal, Timer, Trash2, Upload, Video, X, ZoomIn, ZoomOut,
 } from 'lucide-react'
 import { pieza } from '../../catalogo/piezas'
 import { GRAVEDADES, type Gravedad } from '../../engine/fisica/mundo'
@@ -28,6 +28,7 @@ const EscenaArena = dynamic(() => import('../Escena3D').then(m => m.EscenaArena)
 
 type Pestana = 'serial' | 'pines' | 'problemas'
 const CLAVE_CAJON = 'chaskibots-lab:cajon'
+const CLAVE_SENSORES = 'chaskibots-lab:sensores'
 
 interface Props {
   doc: RobotDoc
@@ -46,6 +47,9 @@ export default function Probar({ doc, s, nivel, onNivel, onIrA }: Props) {
   const [escena, setEscena] = useState(false)
   const [pestana, setPestana] = useState<Pestana>('serial')
   const [cajon, setCajon] = useState(() => { try { return localStorage.getItem(CLAVE_CAJON) === '1' } catch { return false } })
+  // «Sensores»: dibujar en la arena lo que ve cada sensor; se recuerda entre sesiones.
+  const [sensores, setSensores] = useState(() => { try { return localStorage.getItem(CLAVE_SENSORES) === '1' } catch { return false } })
+  const verSensores = (si: boolean) => { setSensores(si); try { localStorage.setItem(CLAVE_SENSORES, si ? '1' : '0') } catch { /* modo privado */ } }
   const abiertoSolo = useRef(false)
   const [entrada, setEntrada] = useState('')
   const serialRef = useRef<HTMLPreElement>(null)
@@ -127,6 +131,11 @@ export default function Probar({ doc, s, nivel, onNivel, onIrA }: Props) {
 
         <div className="flex items-center gap-1.5">
           {!banco && (
+            <button onClick={() => verSensores(!sensores)} aria-pressed={sensores} className={`${boton} ${sensores ? '!bg-lab-acento/10 text-lab-acento' : ''}`} title="Ver qué lee cada sensor: la mancha de los sensores de línea, el cono del ultrasonido, los rayos infrarrojos y la pirámide de la cámara">
+              <Eye className="h-4 w-4" /> Sensores
+            </button>
+          )}
+          {!banco && (
             <button onClick={() => setControl(c => !c)} className={`${boton} ${control ? '!bg-lab-acento/10 text-lab-acento' : ''}`} title="Control remoto: manejar el robot con teclado, botones o un control">
               <Gamepad2 className="h-4 w-4" /> Control
             </button>
@@ -153,7 +162,7 @@ export default function Probar({ doc, s, nivel, onNivel, onIrA }: Props) {
       <div className="flex min-h-0 flex-1">
         <div className="lab-escena relative min-h-0 min-w-0 flex-1 overflow-hidden">
           {sim ? (
-            <EscenaArena sim={sim} modoCamara={s.camara} versionArena={s.versionArena} nivel={nivel} onNivel={onNivel} zoom={zoom} />
+            <EscenaArena sim={sim} modoCamara={s.camara} versionArena={s.versionArena} nivel={nivel} onNivel={onNivel} zoom={zoom} sensores={sensores} />
           ) : (
             <div className="flex h-full items-center justify-center gap-2 text-sm text-lab-suave">
               <Loader2 className="h-5 w-5 animate-spin" /> Preparando física…
@@ -191,7 +200,10 @@ export default function Probar({ doc, s, nivel, onNivel, onIrA }: Props) {
           )}
           {sim && control && !banco && <ControlRemoto sim={sim} conPrograma={corriendo} leeLetras={leeLetras} conArma={/case 'X'/.test(codigo)} fase={tele?.combate?.fase} onCerrar={() => setControl(false)} />}
           <div className={`pointer-events-none absolute bottom-2 left-3 rounded-md bg-lab-superficie/85 px-2 py-0.5 text-[11px] text-lab-suave ${control ? 'hidden' : ''}`}>
-            {banco ? `${conPulsador ? 'Haz clic en el pulsador para presionarlo · ' : ''}arrastra para girar la cámara` : 'Doble clic en el piso para mover el robot · arrastra para girar la cámara'}
+            {banco
+              ? `${conPulsador ? 'Haz clic en el pulsador para presionarlo · ' : ''}arrastra para girar la cámara`
+              : corriendo && s.estado !== 'pausado' ? 'Pausa el programa para mover el robot · arrastra el fondo para girar la cámara'
+                : 'Arrastra el robot para moverlo (o doble clic en el piso) · arrastra el fondo para girar la cámara'}
           </div>
         </div>
 
@@ -304,7 +316,7 @@ function MenuEscena({ s, zoom, onSubirPista, onCerrar }: { s: SimulacionTaller; 
     window.addEventListener('keydown', esc)
     return () => { window.removeEventListener('pointerdown', fuera); window.removeEventListener('keydown', esc) }
   }, [onCerrar])
-  const camaras = useMemo(() => ([['libre', 'Libre', Camera], ['seguir', 'Seguir', Navigation], ['arriba', 'Arriba', MapIcon]] as const).filter(([id]) => !s.banco || id !== 'seguir'), [s.banco])
+  const camaras = useMemo(() => ([['libre', 'Libre', Camera], ['seguir', 'Seguir', Navigation], ['robot', 'Robot', Video], ['arriba', 'Arriba', MapIcon]] as const).filter(([id]) => !s.banco || (id !== 'seguir' && id !== 'robot')), [s.banco])
   return (
     <div ref={caja} role="menu" className="lab-vidrio absolute right-0 top-10 z-50 w-72 rounded-md p-3 text-xs">
       {!s.banco && (
@@ -355,6 +367,15 @@ function MenuEscena({ s, zoom, onSubirPista, onCerrar }: { s: SimulacionTaller; 
       <div className="mt-1.5 flex gap-1.5">
         <button onClick={() => zoom(0.75)} className="lab-secundario flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md"><ZoomIn className="h-3.5 w-3.5" /> Acercar</button>
         <button onClick={() => zoom(1 / 0.75)} className="lab-secundario flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md"><ZoomOut className="h-3.5 w-3.5" /> Alejar</button>
+      </div>
+
+      <Titulo>Velocidad</Titulo>
+      <div className="flex h-8 rounded-md bg-lab-fondo2 p-0.5" title="Cámara lenta: la simulación avanza más despacio que el reloj, pero el programa sigue sincronizado">
+        {([[1, '×1'], [0.5, '×0,5'], [0.25, '×0,25']] as const).map(([v, txt]) => (
+          <button key={v} onClick={() => s.setVelocidadSim(v)} aria-pressed={s.velocidadSim === v} className={`flex flex-1 items-center justify-center gap-1 rounded ${s.velocidadSim === v ? 'bg-lab-superficie font-medium text-lab-tinta shadow-sm' : 'text-lab-suave hover:text-lab-tinta'}`}>
+            {v === 1 ? <Timer className="h-3.5 w-3.5" /> : null} {txt}
+          </button>
+        ))}
       </div>
     </div>
   )

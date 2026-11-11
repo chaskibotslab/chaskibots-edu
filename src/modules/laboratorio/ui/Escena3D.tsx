@@ -10,6 +10,7 @@ import { ContactShadows, OrbitControls, PerformanceMonitor } from '@react-three/
 import * as THREE from 'three'
 import Robot3D, { type MarcadorMontaje } from './Robot3D'
 import Mano3D from './modelos/Mano3D'
+import Sensores3D from './Sensores3D'
 import { resumen } from '../engine/ensamblaje'
 import type { Simulacion } from '../engine/simulation'
 import type { RobotDoc } from '../robots/doc'
@@ -18,7 +19,7 @@ import { Efectos, Estudio, Luces, Sala } from './entorno/Entorno'
 import { Arena3D, GROSOR_PISO } from './entorno/Arena3D'
 import { ALTURA_MESA, Mesa3D } from './entorno/Mesa3D'
 
-export type ModoCamara = 'libre' | 'seguir' | 'arriba'
+export type ModoCamara = 'libre' | 'seguir' | 'arriba' | 'robot'
 /** Pedido de zoom desde los botones (+/−): cada pedido nuevo (n distinto) acerca o aleja la cámara. */
 export interface PedidoZoom { n: number; factor: number }
 
@@ -225,8 +226,19 @@ function ControlCamara({ sim, modo, zoom }: { sim: Simulacion; modo: ModoCamara;
     c.update()
   }, [zoom, camera])
 
+  // Cámara «robot»: montada en el frente del robot, por encima de su pieza más alta, mirando el piso de adelante.
+  const tamano = useMemo(() => resumen(sim.doc), [sim])
   useFrame(() => {
-    if (modo !== 'seguir' || !sim.fisica) return
+    if (!sim.fisica) return
+    if (modo === 'robot') {
+      const o = sim.fisica.puntoMundo({ x: tamano.max.x - 15, y: tamano.max.y + 25, z: 0 })
+      const t = sim.fisica.puntoMundo({ x: tamano.max.x + 500, y: 0, z: 0 })
+      camera.position.set(o.x, o.y, o.z)
+      camera.up.set(0, 1, 0)
+      camera.lookAt(t.x, t.y, t.z)
+      return
+    }
+    if (modo !== 'seguir') return
     const p = sim.fisica.body.translation()
     const yaw = sim.fisica.pose().yaw
     // Detrás y por encima del robot, suavizado.
@@ -241,12 +253,54 @@ function ControlCamara({ sim, modo, zoom }: { sim: Simulacion; modo: ModoCamara;
     <OrbitControls
       ref={controles}
       makeDefault
+      enabled={modo !== 'robot'}
       enableRotate={modo !== 'arriba'}
       maxPolarAngle={Math.PI / 2 - 0.05}
       minDistance={banco ? 0.05 : 0.12}
       maxDistance={banco ? 1.2 : 7}
       enableDamping
     />
+  )
+}
+
+/**
+ * Arrastrar el robot por el piso con el mouse (con el programa detenido o en
+ * pausa): mientras se arrastra, la cámara no gira. Doble clic en el piso sigue
+ * funcionando. Con el programa corriendo no hace nada: primero hay que pausar.
+ */
+function ArrastreRobot({ sim, children }: { sim: Simulacion; children: ReactNode }) {
+  const { controls, gl } = useThree()
+  const plano = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), [])
+  const punto = useMemo(() => new THREE.Vector3(), [])
+  const arrastrando = useRef(false)
+  const puede = () => !sim.tieneProgramaCorriendo || sim.pausado
+  const habilitar = (si: boolean) => { const c = controls as unknown as { enabled: boolean } | null; if (c) c.enabled = si }
+  return (
+    <group
+      onPointerDown={e => {
+        if (!puede() || e.button !== 0) return
+        e.stopPropagation()
+        arrastrando.current = true
+        ;(e.target as Element).setPointerCapture?.(e.pointerId)
+        habilitar(false)
+        gl.domElement.style.cursor = 'grabbing'
+      }}
+      onPointerMove={e => {
+        if (!arrastrando.current) return
+        if (e.ray.intersectPlane(plano, punto)) sim.colocarRobot({ x: punto.x, z: punto.z, yaw: sim.fisica.pose().yaw })
+      }}
+      onPointerUp={e => {
+        if (!arrastrando.current) return
+        arrastrando.current = false
+        ;(e.target as Element).releasePointerCapture?.(e.pointerId)
+        habilitar(true)
+        gl.domElement.style.cursor = puede() ? 'grab' : ''
+      }}
+      onPointerOver={() => { if (puede()) gl.domElement.style.cursor = 'grab' }}
+      onPointerOut={() => { if (!arrastrando.current) gl.domElement.style.cursor = '' }}
+    >
+      {children}
+    </group>
   )
 }
 
@@ -259,7 +313,7 @@ export function pisoAula(arena: Simulacion['arena']): number {
   return -GROSOR_PISO
 }
 
-export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel, zoom }: { sim: Simulacion; modoCamara: ModoCamara; versionArena: number; nivel: NivelCalidad; onNivel: (n: NivelCalidad) => void; zoom?: PedidoZoom }) {
+export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel, zoom, sensores = false }: { sim: Simulacion; modoCamara: ModoCamara; versionArena: number; nivel: NivelCalidad; onNivel: (n: NivelCalidad) => void; zoom?: PedidoZoom; sensores?: boolean }) {
   const q = CALIDADES[nivel]
   const arena = sim.arena
   const bajo = pisoAula(arena)
@@ -276,7 +330,8 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel, zoo
       {arena.banco ? <Mesa3D /> : <Arena3D sim={sim} version={versionArena} bajo={bajo} onColocar={colocar} />}
       {sim.limpieza && <Polvo sim={sim} version={versionArena} />}
       {!arena.banco && !sim.limpieza && <Rastro sim={sim} version={versionArena} />}
-      <Robot3D doc={sim.doc} sim={sim} />
+      {arena.banco ? <Robot3D doc={sim.doc} sim={sim} /> : <ArrastreRobot sim={sim}><Robot3D doc={sim.doc} sim={sim} /></ArrastreRobot>}
+      {sensores && !arena.banco && <Sensores3D sim={sim} />}
       {arena.banco && sim.plan.ultrasonidos.length > 0 && <Mano3D sim={sim} />}
       {sim.competencia && <Robot3D doc={sim.competencia.rival.doc} sim={sim.competencia.rival} />}
       <ControlCamara sim={sim} modo={modoCamara} zoom={zoom} />
