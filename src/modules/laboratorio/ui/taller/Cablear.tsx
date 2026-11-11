@@ -12,7 +12,7 @@ import { pieza } from '../../catalogo/piezas'
 import type { PinDef } from '../../catalogo/tipos'
 import { autocablear } from '../../engine/autocableado'
 import { verificar } from '../../engine/verificacion'
-import { mcuDe } from '../../engine/placa'
+import { infoPlaca, mcuDe } from '../../engine/placa'
 import { esBanco } from '../../engine/ensamblaje'
 import type { Cable, RobotDoc } from '../../robots/doc'
 
@@ -56,7 +56,8 @@ function disponer(doc: RobotDoc): Tarjeta[] {
     const der = esp ? pines.slice(Math.ceil(pines.length / 2)) : pines.filter(p => !/^D\d+$/.test(p.nombre))
     const alto = 46 + Math.max(izq.length, der.length) * PASO
     tarjetas.push({
-      id: mcu.id, titulo: mcu.etiqueta, x: xPlaca, y: 20, ancho: ANCHO_PLACA, alto,
+      // El nombre real de la placa (la etiqueta de la instancia puede venir de otro proyecto).
+      id: mcu.id, titulo: infoPlaca(doc).nombre, x: xPlaca, y: 20, ancho: ANCHO_PLACA, alto,
       pines: [
         ...izq.map((pin, i) => ({ pin, x: xPlaca, y: 20 + 40 + i * PASO, lado: 'izq' as const })),
         ...der.map((pin, i) => ({ pin, x: xPlaca + ANCHO_PLACA, y: 20 + 40 + i * PASO, lado: 'der' as const })),

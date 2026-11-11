@@ -20,14 +20,17 @@ import MisRobots from './MisRobots'
 import { generarArduino } from '../../bloques/generador'
 import { PROGRAMA_VACIO } from '../../bloques/definiciones'
 import Cablear from './Cablear'
-import ProgramarProbar from './ProgramarProbar'
+import Programar from './Programar'
+import Probar from './Probar'
+import { useSimulacion } from './useSimulacion'
 
 type Pestana = 'armar' | 'cablear' | 'programar' | 'probar'
 
 const CLAVE_BORRADOR = 'chaskibots-lab:robot-v2'
 const MAX_HISTORIAL = 80
 
-interface Borrador { doc: RobotDoc; prearmado: string | null; nubeId?: string | null }
+/** `arena`: la que eligió el alumno en Probar (si no es la del proyecto). */
+interface Borrador { doc: RobotDoc; prearmado: string | null; nubeId?: string | null; arena?: string }
 
 function leerBorrador(): Borrador | null {
   try {
@@ -64,21 +67,30 @@ export default function Taller() {
   const [guardando, setGuardando] = useState(false)
   const [nivel, setNivel] = useState<NivelCalidad>('media')
   const [aviso, setAviso] = useState<{ tipo: 'ok' | 'error' | 'info'; texto: string } | null>(null)
+  const [arenaGuardada, setArenaGuardada] = useState<string | null>(null)
   const archivo = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setNivel(calidadInicial())
     const b = leerBorrador()
-    if (b) { setDoc(b.doc); setPrearmado(b.prearmado); setNubeId(b.nubeId ?? null) }
+    if (b) { setDoc(b.doc); setPrearmado(b.prearmado); setNubeId(b.nubeId ?? null); setArenaGuardada(b.arena ?? null) }
     else { setDoc(construirSeguidor()); setPrearmado('seguidor'); setGaleria(true) }
   }, [])
+
+  // Arena del proyecto (o la que el alumno dejó elegida en este navegador).
+  const arenaInicial = arenaGuardada ?? (!doc ? 'ovalo' : PREARMADOS.find(p => p.id === prearmado)?.arena
+    ?? (esBanco(doc) ? 'mesa-electronica' : doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'ultrasonido') ? 'campo-libre' : 'ovalo'))
+
+  // La simulación vive aquí para que siga corriendo al pasar de Programar a Probar y volver.
+  const s = useSimulacion(doc, arenaInicial, pestana === 'programar' || pestana === 'probar')
 
   // Guardar el borrador (con una pequeña espera para no escribir en cada tecla).
   useEffect(() => {
     if (!doc) return
-    const t = setTimeout(() => guardarBorrador({ doc, prearmado, nubeId }), 400)
+    const arena = s.sim && !s.imagenPropia && s.arena.id !== arenaInicial ? s.arena.id : arenaGuardada ?? undefined
+    const t = setTimeout(() => guardarBorrador({ doc, prearmado, nubeId, arena }), 400)
     return () => clearTimeout(t)
-  }, [doc, prearmado, nubeId])
+  }, [doc, prearmado, nubeId, s.sim, s.arena.id, s.imagenPropia, arenaInicial, arenaGuardada])
 
   useEffect(() => {
     if (!aviso) return
@@ -155,6 +167,7 @@ export default function Taller() {
     setDoc(conCables(d))
     setNubeId(idNube)
     setPrearmado(id)
+    setArenaGuardada(null)
     setPasado([]); setFuturo([])
     setGaleria(false)
     setPestana('armar')
@@ -198,8 +211,6 @@ export default function Taller() {
   const pestanas: [Pestana, string, typeof Hammer][] = [
     ['armar', 'Armar', Hammer], ['cablear', 'Cablear', Cable], ['programar', 'Programar', Code2], ['probar', 'Probar', Play],
   ]
-  const arenaInicial = PREARMADOS.find(p => p.id === prearmado)?.arena
-    ?? (esBanco(doc) ? 'mesa-electronica' : doc.piezas.some(p => pieza(p.pieza).comportamiento.tipo === 'ultrasonido') ? 'campo-libre' : 'ovalo')
 
   return (
     <div data-paso={pestana} className="lab-tema flex h-[calc(100dvh-4rem)] min-h-[560px] flex-col text-lab-tinta">
@@ -261,17 +272,16 @@ export default function Taller() {
         />
       )}
       {pestana === 'cablear' && <Cablear doc={doc} cambiar={cambiar} />}
-      {(pestana === 'programar' || pestana === 'probar') && (
-        <ProgramarProbar
+      {pestana === 'programar' && (
+        <Programar
           doc={doc}
-          vista={pestana}
-          arenaInicial={arenaInicial}
+          s={s}
           plantillas={plantillas}
           onPrograma={p => setDoc(d => (d ? sincronizar({ ...d, programa: p }) : d))}
-          nivel={nivel}
-          onNivel={setNivel}
+          onIrA={setPestana}
         />
       )}
+      {pestana === 'probar' && <Probar doc={doc} s={s} nivel={nivel} onNivel={setNivel} onIrA={setPestana} />}
 
       {galeria && <Galeria onAbrir={abrir} onCerrar={() => setGaleria(false)} />}
       {materiales && <ListaMateriales doc={doc} onCerrar={() => setMateriales(false)} />}
