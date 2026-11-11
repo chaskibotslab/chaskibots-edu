@@ -275,12 +275,13 @@ function Cable({ a, b, color }: { a: Punta; b: Punta; color: string }) {
     const salida = (p: Punta) => p.pos.clone().addScaledVector(p.dir, largoConector(p.tipo) || 0.004)
     const p0 = salida(a), p3 = salida(b)
     const L = p0.distanceTo(p3)
-    const tiron = Math.min(0.03, 0.008 + L * 0.25)
+    // Sale derecho del conector un tramo corto y enseguida se tiende hacia la otra
+    // punta, cayendo por su peso: cables bajos y pegados al robot, no arcos altos.
+    const tiron = Math.min(0.016, 0.006 + L * 0.12)
     const p1 = p0.clone().addScaledVector(a.dir, tiron)
     const p2 = p3.clone().addScaledVector(b.dir, tiron)
-    // Peso: la parte del medio cae un poco.
-    p1.y -= L * 0.05
-    p2.y -= L * 0.05
+    p1.y -= L * 0.08
+    p2.y -= L * 0.08
     const curva = new THREE.CubicBezierCurve3(p0, p1, p2, p3)
     const conector = (t: Punta['tipo']) => t === 'dupont' || t === 'macho'
     const grueso = !conector(a.tipo) && !conector(b.tipo) ? 0.0009 : 0.00065

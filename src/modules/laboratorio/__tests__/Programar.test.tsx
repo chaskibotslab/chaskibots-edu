@@ -23,7 +23,7 @@ function simFalsa(extra: Partial<SimulacionTaller> = {}): SimulacionTaller {
     arena: listaArenas()[0], arenas: listaArenas(), imagenPropia: null, gravedad: 'tierra', camara: 'libre', silencio: false, encendido: false,
     versionArena: 0, banco: false, python: false, sinPlaca: false,
     ejecutar: vi.fn(async () => true), pausar: nada, reanudar: nada, detener: nada, reiniciar: nada, cambiarArena: nada, subirPista: nada,
-    enviarSerial: nada, limpiarSerial: nada, girarRobot: nada, setGravedad: nada, setCamara: nada, setSilencio: nada, activarSonido: nada,
+    enviarSerial: nada, limpiarSerial: nada, girarRobot: nada, setGravedad: nada, setCamara: nada, velocidadSim: 1, setVelocidadSim: nada, setSilencio: nada, activarSonido: nada,
     encender: nada, setErrores: vi.fn(), cerrarAviso: nada,
     ...extra,
   }

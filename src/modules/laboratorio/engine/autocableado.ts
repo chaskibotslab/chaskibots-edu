@@ -11,7 +11,8 @@ import { infoPlaca, mcuDe, pinCodigo } from './placa'
 
 const ROJO = '#ef4444'
 const NEGRO = '#111827'
-const SENALES = ['#a855f7', '#3b82f6', '#22c55e', '#f97316', '#eab308', '#f8fafc', '#06b6d4', '#ec4899', '#84cc16', '#f59e0b', '#14b8a6', '#8b5cf6']
+// Colores de los cables Dupont reales (sin rojo ni negro, que son alimentación y tierra).
+const SENALES = ['#d9a400', '#2f9e44', '#1c7ed6', '#e8590c', '#e9ecef', '#7048e8', '#868e96', '#8d5524', '#15aabf', '#c2255c', '#66a80f', '#4263eb']
 
 
 export interface FilaPin {

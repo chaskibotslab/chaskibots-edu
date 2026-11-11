@@ -2,7 +2,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 
-vi.mock('../ui/Escena3D', () => ({ EscenaArena: () => <div data-testid="escena" /> }))
+vi.mock('../ui/Escena3D', () => ({ EscenaArena: (p: { sensores?: boolean }) => <div data-testid="escena" data-sensores={String(!!p.sensores)} /> }))
 vi.mock('../ui/EditorCodigo', () => ({ default: ({ codigo, soloLectura }: { codigo: string; soloLectura?: boolean }) => <textarea data-testid="editor" readOnly={soloLectura} value={codigo} onChange={() => {}} /> }))
 vi.mock('../ui/taller/ControlRemoto', () => ({ default: () => <div data-testid="control" /> }))
 vi.mock('../ui/taller/PanelCircuito', () => ({ default: () => <div data-testid="circuito" /> }))
@@ -17,10 +17,10 @@ function simFalsa(extra: Partial<SimulacionTaller> = {}): SimulacionTaller {
   return {
     sim: {} as SimulacionTaller['sim'], tele: null, estado: 'sin-programa', robotCambio: false, codigoModificado: false,
     serial: '', errores: [], compilando: false, aviso: null,
-    arena: listaArenas().find(a => a.id === 'ovalo')!, arenas: listaArenas().filter(a => !a.banco), imagenPropia: null, gravedad: 'tierra', camara: 'libre', silencio: false, encendido: false,
+    arena: listaArenas().find(a => a.id === 'ovalo')!, arenas: listaArenas().filter(a => !a.banco), imagenPropia: null, gravedad: 'tierra', camara: 'libre', velocidadSim: 1, silencio: false, encendido: false,
     versionArena: 0, banco: false, python: false, sinPlaca: false,
     ejecutar: vi.fn(async () => true), pausar: vi.fn(), reanudar: vi.fn(), detener: vi.fn(), reiniciar: vi.fn(), cambiarArena: vi.fn(), subirPista: nada,
-    enviarSerial: vi.fn(), limpiarSerial: nada, girarRobot: nada, setGravedad: nada, setCamara: vi.fn(), setSilencio: nada, activarSonido: nada,
+    enviarSerial: vi.fn(), limpiarSerial: nada, girarRobot: nada, setGravedad: nada, setCamara: vi.fn(), setVelocidadSim: vi.fn(), setSilencio: nada, activarSonido: nada,
     encender: vi.fn(), setErrores: nada, cerrarAviso: nada,
     ...extra,
   }
@@ -96,6 +96,32 @@ describe('Probar: la escena a pantalla completa con una barra corta y un cajón'
     expect(s.cambiarArena).toHaveBeenCalledWith('laberinto')
     fireEvent.click(screen.getByRole('button', { name: /Seguir/ }))
     expect(s.setCamara).toHaveBeenCalledWith('seguir')
+  })
+
+  it('«Sensores» se activa y la escena lo recibe', async () => {
+    render(<Probar doc={doc} s={simFalsa()} nivel="baja" onNivel={() => {}} onIrA={() => {}} />)
+    const b = screen.getByRole('button', { name: /Sensores/ })
+    expect(b).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(b)
+    expect(b).toHaveAttribute('aria-pressed', 'true')
+    expect(await screen.findByTestId('escena')).toHaveAttribute('data-sensores', 'true')
+  })
+
+  it('el menú Escena tiene la cámara «Robot» y la cámara lenta', () => {
+    const s = simFalsa()
+    render(<Probar doc={doc} s={s} nivel="baja" onNivel={() => {}} onIrA={() => {}} />)
+    fireEvent.click(screen.getByRole('button', { name: /Escena/ }))
+    fireEvent.click(screen.getByRole('button', { name: /^Robot$/ }))
+    expect(s.setCamara).toHaveBeenCalledWith('robot')
+    fireEvent.click(screen.getByRole('button', { name: '×0,5' }))
+    expect(s.setVelocidadSim).toHaveBeenCalledWith(0.5)
+  })
+
+  it('en la mesa de electrónica no hay cámara «Robot» ni botón «Sensores»', () => {
+    render(<Probar doc={doc} s={simFalsa({ banco: true, arena: listaArenas().find(a => a.banco)! })} nivel="baja" onNivel={() => {}} onIrA={() => {}} />)
+    expect(screen.queryByRole('button', { name: /Sensores/ })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /Escena/ }))
+    expect(screen.queryByRole('button', { name: /^Robot$/ })).toBeNull()
   })
 
   it('Ver código abre el programa de solo lectura con un atajo a Programar', () => {

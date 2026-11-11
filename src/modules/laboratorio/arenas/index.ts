@@ -1,9 +1,12 @@
 // Arenas de F2: las pistas de línea de F1 y el campo libre con obstáculos.
 
 import { PISTAS, curvas, type Pista } from '../engine/tracks'
-import type { ArenaDef, ObjetoArena } from './tipos'
+import type { ArenaDef, AspectoObjeto, DecoracionArena, ObjetoArena } from './tipos'
 
-export type { ArenaDef, ObjetoArena }
+export type { ArenaDef, AspectoObjeto, DecoracionArena, ObjetoArena }
+
+/** Cómo se dibuja el objeto: su aspecto o, si no tiene, su forma lisa. */
+export const aspectoDe = (o: ObjetoArena): AspectoObjeto | 'caja' | 'cilindro' => o.aspecto ?? o.forma
 
 export function arenaDePista(p: Pista): ArenaDef {
   return {
@@ -53,7 +56,7 @@ export function campoLibre(semilla = 7, cantidad = 9, id = 'campo-libre'): Arena
     if (objetos.some(o => Math.hypot(o.x - x, o.z - z) < (o.medidas[0] + lado) / 2 + 0.3)) continue
     objetos.push({
       id: `caja-${objetos.length + 1}`, forma: 'caja', medidas: [lado, 0.1 + rnd() * 0.15, lado],
-      x, z, yaw: rnd() * Math.PI, color: COLORES_CAJA[objetos.length % COLORES_CAJA.length], material: 'mdf',
+      x, z, yaw: rnd() * Math.PI, color: COLORES_CAJA[objetos.length % COLORES_CAJA.length], material: 'mdf', aspecto: 'carton',
     })
   }
   return {
@@ -87,7 +90,7 @@ export function ovaloConBarrera(): ArenaDef {
     id: 'ovalo-barrera',
     nombre: 'Óvalo con barrera',
     descripcion: 'La pista del óvalo con una caja sobre la línea: el robot debe frenar antes de chocar.',
-    objetos: [{ id: 'barrera', forma: 'caja', medidas: [0.05, 0.12, 0.22], x: 0.35, z: 0.55, color: '#dc2626', material: 'mdf' }],
+    objetos: [{ id: 'barrera', forma: 'caja', medidas: [0.05, 0.12, 0.22], x: 0.35, z: 0.55, color: '#dc2626', material: 'mdf', aspecto: 'barrera' }],
   }
 }
 
@@ -98,7 +101,7 @@ export function ovaloConBarrera(): ArenaDef {
 export function laberinto(): ArenaDef {
   const alto = 0.12, grueso = 0.02, color = '#e2e8f0'
   const pared = (id: string, x: number, z1: number, z2: number): ObjetoArena => ({
-    id, forma: 'caja', medidas: [grueso, alto, z2 - z1], x, z: (z1 + z2) / 2, color, material: 'mdf',
+    id, forma: 'caja', medidas: [grueso, alto, z2 - z1], x, z: (z1 + z2) / 2, color, material: 'mdf', aspecto: 'pared-mdf',
   })
   return {
     id: 'laberinto',
@@ -118,22 +121,29 @@ export function laberinto(): ArenaDef {
  * maceta, y las patas de una mesa y de una silla, por donde el robot puede pasar.
  */
 export function sala(): ArenaDef {
-  const patas = (id: string, cx: number, cz: number, dx: number, dz: number, radio: number, color: string): ObjetoArena[] =>
+  const patas = (id: string, cx: number, cz: number, dx: number, dz: number, radio: number, color: string, aspecto: 'pata-madera' | 'pata-metal'): ObjetoArena[] =>
     [[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([sx, sz], i) => ({
-      id: `${id}-${i + 1}`, forma: 'cilindro', medidas: [radio, 0.4, radio], x: cx + sx * dx, z: cz + sz * dz, color, material: 'mdf',
+      id: `${id}-${i + 1}`, forma: 'cilindro', medidas: [radio, 0.4, radio], x: cx + sx * dx, z: cz + sz * dz, color, material: 'mdf', aspecto,
     }))
   return {
     id: 'sala',
     nombre: 'Sala con polvo',
     descripcion: 'Una sala con muebles y el piso sucio. El robot aspirador limpia por donde pasa: ¿cuánto logra limpiar?',
     ancho: 3, largo: 2.2,
-    piso: { material: 'mdf', color: '#b08a5a', reflectancia: 0.6 },
+    piso: { material: 'mdf', color: '#b08a5a', reflectancia: 0.6, aspecto: 'madera' },
     objetos: [
-      { id: 'sofa', forma: 'caja', medidas: [0.9, 0.35, 0.35], x: 0, z: -0.9, color: '#475569', material: 'mdf' },
-      { id: 'mueble-tv', forma: 'caja', medidas: [0.7, 0.45, 0.25], x: 0.1, z: 0.95, color: '#78350f', material: 'mdf' },
-      { id: 'maceta', forma: 'cilindro', medidas: [0.12, 0.3, 0.12], x: 1.25, z: -0.8, color: '#c2410c', material: 'pla' },
-      ...patas('mesa', 0, 0.05, 0.4, 0.2, 0.02, '#92400e'),
-      ...patas('silla', -1, -0.6, 0.175, 0.175, 0.015, '#57534e'),
+      { id: 'sofa', forma: 'caja', medidas: [0.9, 0.35, 0.35], x: 0, z: -0.9, color: '#475569', material: 'mdf', aspecto: 'sofa' },
+      { id: 'mueble-tv', forma: 'caja', medidas: [0.7, 0.45, 0.25], x: 0.1, z: 0.95, yaw: Math.PI, color: '#78350f', material: 'mdf', aspecto: 'mueble' },
+      { id: 'maceta', forma: 'cilindro', medidas: [0.12, 0.3, 0.12], x: 1.25, z: -0.8, color: '#b5542d', material: 'pla', aspecto: 'maceta' },
+      ...patas('mesa', 0, 0.05, 0.4, 0.2, 0.02, '#92400e', 'pata-madera'),
+      ...patas('silla', -1, -0.6, 0.175, 0.175, 0.015, '#57534e', 'pata-metal'),
+    ],
+    // Lo que está por encima del robot: se ve, no choca.
+    decoracion: [
+      { id: 'tablero-mesa', medidas: [0.9, 0.03, 0.5], x: 0, y: 0.4, z: 0.05, color: '#92400e', aspecto: 'madera' },
+      { id: 'asiento-silla', medidas: [0.42, 0.04, 0.42], x: -1, y: 0.4, z: -0.6, color: '#57534e', aspecto: 'tela' },
+      { id: 'respaldo-silla', medidas: [0.42, 0.42, 0.03], x: -1, y: 0.44, z: -0.6 - 0.195, color: '#57534e', aspecto: 'tela' },
+      { id: 'tele', medidas: [0.6, 0.36, 0.025], x: 0.1, y: 0.45, z: 0.95 + 0.06, color: '#0f172a', aspecto: 'liso' },
     ],
     paredes: true,
     limpieza: { celda: 0.05 },
