@@ -121,7 +121,7 @@ function registrarArduino(monaco: Monaco) {
 }
 
 export default function EditorCodigo({
-  codigo, onChange, errores, onEjecutar, lenguaje = 'cpp',
+  codigo, onChange, errores, onEjecutar, lenguaje = 'cpp', irALinea, soloLectura = false,
 }: {
   codigo: string
   /** C++ de Arduino o Python (Raspberry Pi con gpiozero). */
@@ -129,11 +129,23 @@ export default function EditorCodigo({
   onChange: (c: string) => void
   errores: ErrorCompilacion[]
   onEjecutar: () => void
+  /** Pedido de saltar a una línea (desde la lista de problemas); `v` cambia en cada pedido. */
+  irALinea?: { linea: number; v: number }
+  /** Vista de solo lectura («Ver código» en Probar). */
+  soloLectura?: boolean
 }) {
   const monacoRef = useRef<Monaco | null>(null)
   const editorRef = useRef<Parameters<OnMount>[0] | null>(null)
   const ejecutarRef = useRef(onEjecutar)
   ejecutarRef.current = onEjecutar
+
+  useEffect(() => {
+    const editor = editorRef.current
+    if (!irALinea || !editor) return
+    editor.revealLineInCenter(irALinea.linea)
+    editor.setPosition({ lineNumber: irALinea.linea, column: 1 })
+    editor.focus()
+  }, [irALinea])
 
   // Marcar errores del compilador en el editor (subrayado rojo + mensaje).
   useEffect(() => {
@@ -174,6 +186,8 @@ export default function EditorCodigo({
       }}
       options={{
         fontSize: 14,
+        readOnly: soloLectura,
+        domReadOnly: soloLectura,
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
         tabSize: lenguaje === 'python' ? 4 : 2,
