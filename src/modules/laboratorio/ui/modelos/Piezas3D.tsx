@@ -7,6 +7,7 @@
 
 import { forwardRef, useMemo, type Ref } from 'react'
 import { RoundedBox, useGLTF } from '@react-three/drei'
+import { agujerosAligerado, agujerosChasis, PlacaRecortada, type Agujero } from './Placa3D'
 import type * as THREE from 'three'
 import type { MaterialFisico } from '../../catalogo/tipos'
 import { useCalidad } from '../calidad'
@@ -78,30 +79,41 @@ function Separador({ pos, alto }: { pos: V; alto: number }) {
 
 export function Chasis({ largo, ancho, material, color }: { largo: number; ancho: number; material: MaterialFisico; color: string }) {
   const q = useCalidad()
-  const ranuras: V[] = []
-  for (let x = -largo / 2 + 25; x < largo / 2 - 20; x += 22) ranuras.push([x, 0, -ancho / 2 + 14], [x, 0, ancho / 2 - 14])
+  const dosRuedas = largo < 180
+  const agujeros = useMemo(
+    () => agujerosChasis(largo, ancho, dosRuedas ? [5] : [60, -60], dosRuedas ? -65 : null, dosRuedas ? -23 : 0),
+    [largo, ancho, dosRuedas],
+  )
+  const espesor = material === 'aluminio' ? 2 : 3
   return (
     <group>
-      <RoundedBox args={[m(largo), m(material === 'aluminio' ? 2 : 3), m(ancho)]} radius={m(1)} smoothness={2} castShadow={q.sombras} receiveShadow>
+      <PlacaRecortada largo={largo} ancho={ancho} espesor={espesor} radio={10} agujeros={agujeros} castShadow={q.sombras}>
         <MaterialChasis material={material} color={color} />
-      </RoundedBox>
-      {/* Ranuras de montaje (decorativas) */}
-      {ranuras.map((p, i) => (
-        <mesh key={i} position={M(p[0], 1.6, p[2])} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[m(10), m(3)]} />
-          <meshStandardMaterial color="#0b0d12" transparent opacity={material === 'acrilico' ? 0.35 : 0.7} />
-        </mesh>
-      ))}
-      {/* Tornillos en las esquinas */}
+      </PlacaRecortada>
+      {/* Tornillos M3 con tuerca en las esquinas */}
       {[[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([sx, sz], i) => (
-        <mesh key={i} position={M(sx * (largo / 2 - 6), 2, sz * (ancho / 2 - 6))}>
-          <cylinderGeometry args={[m(2.6), m(2.6), m(1.4), 12]} />
-          <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
-        </mesh>
+        <group key={i} position={M(sx * (largo / 2 - 7), 0, sz * (ancho / 2 - 7))}>
+          <mesh position={M(0, espesor / 2 + 0.9, 0)}>
+            <cylinderGeometry args={[m(2.7), m(2.7), m(1.8), 16]} />
+            <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
+          </mesh>
+          <mesh position={M(0, -espesor / 2 - 1.2, 0)}>
+            <cylinderGeometry args={[m(3.1), m(3.1), m(2.4), 6]} />
+            <meshStandardMaterial color="#b8bec6" metalness={0.85} roughness={0.3} />
+          </mesh>
+        </group>
       ))}
     </group>
   )
 }
+
+/** Ranuras de los motores N20 y agujeros de los separadores del piso de arriba. */
+const AGUJEROS_MINISUMO: Agujero[] = [
+  ...SEPARADORES_PISO.map(([x, z]) => ({ x, z, d: 3.2 })),
+  { x: -30, z: -30, lx: 3.2, lz: 10 }, { x: -30, z: 30, lx: 3.2, lz: 10 },
+  { x: 10, z: -30, lx: 3.2, lz: 10 }, { x: 10, z: 30, lx: 3.2, lz: 10 },
+  { x: -10, z: 0, lx: 14, lz: 3.2 }, { x: 20, z: 0, lx: 14, lz: 3.2 },
+]
 
 /** Chasis de minisumo: placa de 76 × 96 mm, pala de acero inclinada y laterales. */
 export function ChasisMinisumo({ material, color }: { material: MaterialFisico; color: string }) {
@@ -109,9 +121,9 @@ export function ChasisMinisumo({ material, color }: { material: MaterialFisico; 
   const pala = (37 * Math.PI) / 180
   return (
     <group>
-      <RoundedBox args={[m(76), m(3), m(96)]} radius={m(1)} smoothness={2} castShadow={q.sombras} receiveShadow>
+      <PlacaRecortada largo={76} ancho={96} radio={6} agujeros={AGUJEROS_MINISUMO} castShadow={q.sombras}>
         <MaterialChasis material={material} color={color} />
-      </RoundedBox>
+      </PlacaRecortada>
       {/* Pala de acero pulido con su filo */}
       <mesh position={M(48, -14.8, 0)} rotation={[0, 0, -pala]} castShadow={q.sombras} receiveShadow>
         <boxGeometry args={[m(30), m(1.5), m(96)]} />
@@ -233,9 +245,10 @@ function PlacaBlindada({ cajas, material, color }: { cajas: { medidas: V; centro
   return (
     <>
       {cajas.map((c, i) => (
-        <RoundedBox key={i} args={M(...c.medidas)} position={M(...c.centro)} radius={m(1.5)} smoothness={2} castShadow={q.sombras} receiveShadow>
+        <PlacaRecortada key={i} largo={c.medidas[0]} ancho={c.medidas[2]} espesor={c.medidas[1]} radio={6} position={M(...c.centro)} castShadow={q.sombras}
+          agujeros={c.medidas[0] > 60 ? agujerosAligerado(c.medidas[0], c.medidas[2]) : []}>
           <MaterialChasis material={material} color={color} />
-        </RoundedBox>
+        </PlacaRecortada>
       ))}
     </>
   )
@@ -482,15 +495,27 @@ export function SeparadoresPlaca({ largo, ancho }: { largo: number; ancho: numbe
   return <>{[[-x, -z], [-x, z], [x, -z], [x, z]].map(([px, pz], i) => <Separador key={i} pos={[px, -10, pz]} alto={10} />)}</>
 }
 
+const AGUJEROS_PISO_ARRIBA: Agujero[] = [
+  ...SEPARADORES_PISO.map(([x, z]) => ({ x, z, d: 3.2 })),
+  ...[-20, -10, 0, 10, 20].flatMap(z => [{ x: -12, z, d: 3.2 }, { x: 0, z, d: 3.2 }, { x: 12, z, d: 3.2 }]),
+]
+
 /** Piso de arriba del minisumo: placa sobre cuatro separadores de latón (ver PISO_ARRIBA_MINISUMO). */
 export function PisoArriba({ alto, color }: { alto: number; color: string }) {
   const q = useCalidad()
   return (
     <group>
       {SEPARADORES_PISO.map(([x, z], i) => <Separador key={i} pos={[x, 0, z]} alto={alto} />)}
-      <RoundedBox args={[m(PLACA_PISO[0]), m(3), m(PLACA_PISO[1])]} radius={m(1)} position={M(0, alto + 1.5, 0)} castShadow={q.sombras} receiveShadow>
+      <PlacaRecortada largo={PLACA_PISO[0]} ancho={PLACA_PISO[1]} radio={5} position={M(0, alto + 1.5, 0)} castShadow={q.sombras}
+        agujeros={AGUJEROS_PISO_ARRIBA}>
         <meshStandardMaterial color={color} roughness={0.55} />
-      </RoundedBox>
+      </PlacaRecortada>
+      {SEPARADORES_PISO.map(([x, z], i) => (
+        <mesh key={`t${i}`} position={M(x, alto + 3.8, z)}>
+          <cylinderGeometry args={[m(2.6), m(2.6), m(1.6), 16]} />
+          <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
+        </mesh>
+      ))}
     </group>
   )
 }
@@ -1008,23 +1033,35 @@ export function Rueda({ radio, ancho, material, color }: { radio: number; ancho:
   )
 }
 
-/** Rueda loca colgada: +y local apunta al piso (el montaje la gira 180°). */
+/** Rueda loca colgada: +y local apunta al piso (el montaje la gira 180°). Bola de acero en su copa, sobre separadores. */
 export function RuedaLoca({ espaciador, radio }: { espaciador: number; radio: number }) {
   const q = useCalidad()
   return (
     <group>
-      {espaciador > 0.5 && [-7, 7].map(x => <Separador key={x} pos={[x, 0, 0]} alto={espaciador} />)}
+      {espaciador > 0.5 && [[-7, -7], [-7, 7], [7, -7], [7, 7]].map(([x, z]) => <Separador key={`${x}${z}`} pos={[x, 0, z]} alto={espaciador} />)}
+      {/* Brida de acero con sus cuatro agujeros */}
       <mesh position={M(0, espaciador + 1, 0)}>
-        <boxGeometry args={[m(24), m(2), m(14)]} />
+        <boxGeometry args={[m(24), m(2), m(24)]} />
         <meshStandardMaterial color={METAL} metalness={0.85} roughness={0.3} />
       </mesh>
-      <mesh position={M(0, espaciador + radio * 0.9, 0)}>
-        <cylinderGeometry args={[m(radio + 1.5), m(radio + 2.5), m(radio * 1.2), 20]} />
-        <meshStandardMaterial color="#9ca3af" metalness={0.8} roughness={0.3} />
+      {[[-7, -7], [-7, 7], [7, -7], [7, 7]].map(([x, z]) => (
+        <mesh key={`t${x}${z}`} position={M(x, espaciador + 2.6, z)}>
+          <cylinderGeometry args={[m(2.4), m(2.4), m(1.4), 12]} />
+          <meshStandardMaterial color="#9aa1aa" metalness={0.9} roughness={0.3} />
+        </mesh>
+      ))}
+      {/* Copa: cilindro que se cierra hacia la bola */}
+      <mesh position={M(0, espaciador + 2 + radio * 0.55, 0)}>
+        <cylinderGeometry args={[m(radio + 1.2), m(radio + 2.6), m(radio * 1.1), 24]} />
+        <meshStandardMaterial color="#aab1b9" metalness={0.85} roughness={0.28} />
       </mesh>
-      <mesh position={M(0, espaciador + radio + 1, 0)} castShadow={q.sombras}>
+      <mesh position={M(0, espaciador + 2 + radio * 1.1, 0)}>
+        <torusGeometry args={[m(radio + 0.6), m(1.2), 10, 24]} />
+        <meshStandardMaterial color="#8d949c" metalness={0.85} roughness={0.3} />
+      </mesh>
+      <mesh position={M(0, espaciador + radio + 1.2, 0)} castShadow={q.sombras}>
         <sphereGeometry args={[m(radio), q.segmentos, q.segmentos / 2]} />
-        <meshStandardMaterial color="#e5e7eb" metalness={1} roughness={0.08} />
+        <meshStandardMaterial color="#eef1f4" metalness={1} roughness={0.06} />
       </mesh>
     </group>
   )

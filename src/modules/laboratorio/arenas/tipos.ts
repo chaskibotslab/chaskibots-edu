@@ -5,6 +5,13 @@
 import type { MaterialFisico } from '../catalogo/tipos'
 import type { Pista, Pose2D } from '../engine/tracks'
 
+/**
+ * Cómo se dibuja un objeto (solo visual; el colisionador es siempre su caja o
+ * cilindro de `medidas`). Sin aspecto: caja o cilindro lisos del color dado.
+ */
+export type AspectoObjeto =
+  | 'carton' | 'pared-mdf' | 'barrera' | 'sofa' | 'mueble' | 'maceta' | 'pata-madera' | 'pata-metal'
+
 export interface ObjetoArena {
   id: string
   forma: 'caja' | 'cilindro'
@@ -18,7 +25,25 @@ export interface ObjetoArena {
   material: MaterialFisico
   /** Si tiene masa, se puede empujar (si no, es fijo). */
   masaKg?: number
+  aspecto?: AspectoObjeto
 }
+
+/** Decoración: se ve pero no choca (tablero de una mesa, asiento de una silla, la tele). */
+export interface DecoracionArena {
+  id: string
+  /** [largo x, alto y, ancho z] (m) */
+  medidas: [number, number, number]
+  x: number
+  /** Altura de la base (m). */
+  y: number
+  z: number
+  yaw?: number
+  color: string
+  aspecto: 'madera' | 'tela' | 'liso' | 'metal'
+}
+
+/** Textura del piso de la arena; si falta, se elige por `material`. */
+export type AspectoPiso = 'melamina' | 'mdf' | 'madera' | 'acero' | 'goma'
 
 export interface ArenaDef {
   id: string
@@ -31,10 +56,12 @@ export interface ArenaDef {
     color: string
     /** Reflectancia uniforme (0 negro – 1 blanco) si no hay pista dibujada. */
     reflectancia: number
+    aspecto?: AspectoPiso
   }
   /** Pista dibujada (seguidor de línea): textura del piso y lo que leen los sensores. */
   pista?: Pista
   objetos: ObjetoArena[]
+  decoracion?: DecoracionArena[]
   /** Paredes alrededor del borde. */
   paredes: boolean
   /** Alto de las paredes (m); 15 cm si no se dice. La arena de combate las tiene altas. */
