@@ -24,7 +24,7 @@ const ORO = '#d6b25e'
 // ---------------------------------------------------------------------------
 
 /** Generador pseudoaleatorio con semilla (mulberry32): la placa sale igual siempre. */
-function azar(semilla: number) {
+export function azar(semilla: number) {
   let a = semilla >>> 0
   return () => {
     a = (a + 0x6d2b79f5) >>> 0
@@ -46,7 +46,7 @@ type Lapiz = { g: CanvasRenderingContext2D; X: (x: number) => number; Z: (z: num
  * montaje dorados y lo que dibuje `extra` (serigrafía). Fuera del contorno es
  * transparente para que respete las esquinas redondeadas.
  */
-function texturaPlaca(largo: number, ancho: number, radio: number, mascara: string, pista: string, agujeros: [number, number][], prohibido: Rect[], semilla: number, extra: (l: Lapiz) => void) {
+export function texturaPlaca(largo: number, ancho: number, radio: number, mascara: string, pista: string, agujeros: [number, number][], prohibido: Rect[], semilla: number, extra: (l: Lapiz) => void) {
   const E = 8
   const c = document.createElement('canvas')
   c.width = largo * E; c.height = ancho * E
@@ -98,7 +98,7 @@ function texturaPlaca(largo: number, ancho: number, radio: number, mascara: stri
 }
 
 /** Texto de la serigrafía (alto en mm). */
-function texto(l: Lapiz, s: string, x: number, z: number, alto: number, alinear: CanvasTextAlign = 'left', negrita = false) {
+export function texto(l: Lapiz, s: string, x: number, z: number, alto: number, alinear: CanvasTextAlign = 'left', negrita = false) {
   l.g.font = `${negrita ? '700 ' : ''}${alto * l.E}px "Helvetica Neue", Arial, sans-serif`
   l.g.textAlign = alinear
   l.g.textBaseline = 'middle'
@@ -106,13 +106,13 @@ function texto(l: Lapiz, s: string, x: number, z: number, alto: number, alinear:
 }
 
 /** Contorno de un componente en la serigrafía. */
-function contorno(l: Lapiz, x: number, z: number, ax: number, az: number) {
+export function contorno(l: Lapiz, x: number, z: number, ax: number, az: number) {
   l.g.lineWidth = 0.18 * l.E
   l.g.strokeRect(l.X(x - ax / 2), l.Z(z - az / 2), ax * l.E, az * l.E)
 }
 
 /** Placa: el sustrato (con su canto) y la textura de la cara de arriba. */
-function Sustrato({ largo, ancho, radio, color, textura }: { largo: number; ancho: number; radio: number; color: string; textura: THREE.Texture }) {
+export function Sustrato({ largo, ancho, radio, color, textura }: { largo: number; ancho: number; radio: number; color: string; textura: THREE.Texture }) {
   const q = useCalidad()
   // Contorno con esquinas redondeadas, extruido 1,6 mm hacia arriba.
   const forma = useMemo(() => {
@@ -231,7 +231,7 @@ function ConectorFpc({ pos, eje, largo = 22 }: { pos: V; eje: 'x' | 'z'; largo?:
 }
 
 /** Chip negro (con o sin marca de pin 1). */
-function Chip({ pos, l, a, alto = 1, color = '#16171a', metal = false }: { pos: [number, number]; l: number; a: number; alto?: number; color?: string; metal?: boolean }) {
+export function Chip({ pos, l, a, alto = 1, color = '#16171a', metal = false }: { pos: [number, number]; l: number; a: number; alto?: number; color?: string; metal?: boolean }) {
   const q = useCalidad()
   return (
     <mesh position={M(pos[0], 1.6 + alto / 2, pos[1])} castShadow={q.sombras}>
@@ -242,7 +242,7 @@ function Chip({ pos, l, a, alto = 1, color = '#16171a', metal = false }: { pos: 
 }
 
 /** Resistencias y capacitores SMD repartidos donde no hay otro componente. */
-function Pasivos({ semilla, n, area, prohibido }: { semilla: number; n: number; area: Rect; prohibido: Rect[] }) {
+export function Pasivos({ semilla, n, area, prohibido }: { semilla: number; n: number; area: Rect; prohibido: Rect[] }) {
   const q = useCalidad()
   const lista = useMemo(() => {
     const r = azar(semilla)

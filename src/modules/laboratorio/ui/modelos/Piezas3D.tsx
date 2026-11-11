@@ -8,6 +8,9 @@
 import { forwardRef, useMemo, type Ref } from 'react'
 import { RoundedBox, useGLTF } from '@react-three/drei'
 import { agujerosAligerado, agujerosChasis, PlacaRecortada, type Agujero } from './Placa3D'
+import { NANO_ADELANTE, NANO_ATRAS, PICO_1_20, PICO_40_21 } from './Modulos3D'
+
+export { ArduinoNano, Pico, TCRT5000, Bateria18650 } from './Modulos3D'
 import type * as THREE from 'three'
 import type { MaterialFisico } from '../../catalogo/tipos'
 import { useCalidad } from '../calidad'
@@ -624,9 +627,6 @@ export const ArduinoMega = forwardRef(function ArduinoMega(_: object, refLed13: 
 // Raspberry Pi Pico (USB hacia −x)
 // ---------------------------------------------------------------------------
 
-/** Pines 1–20 (lado −z) y 40–21 (lado +z) de la Pico, según su serigrafía. */
-const PICO_1_20 = ['GP0', 'GP1', 'GND', 'GP2', 'GP3', 'GP4', 'GP5', 'GND', 'GP6', 'GP7', 'GP8', 'GP9', 'GND', 'GP10', 'GP11', 'GP12', 'GP13', 'GND', 'GP14', 'GP15']
-const PICO_40_21 = ['VBUS', 'VSYS', 'GND', '3V3_EN', '3V3', 'ADC_VREF', 'GP28', 'AGND', 'GP27', 'GP26', 'RUN', 'GP22', 'GND', 'GP21', 'GP20', 'GP19', 'GP18', 'GND', 'GP17', 'GP16']
 
 /** Radio del pie de goma del perro (mm): el centro del pie queda a esta altura del piso. */
 export const RADIO_PIE = 11
@@ -726,98 +726,7 @@ export function CamaraCSI() {
   )
 }
 
-export const Pico = forwardRef(function Pico(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
-  const q = useCalidad()
-  return (
-    <group>
-      <SeparadoresPlaca largo={51} ancho={21} />
-      <mesh position={M(0, 0.5, 0)} castShadow={q.sombras} receiveShadow>
-        <boxGeometry args={[m(51), m(1), m(21)]} />
-        <meshStandardMaterial color="#1f7a3f" roughness={0.5} metalness={0.1} />
-      </mesh>
-      {/* Bordes almenados (castellated) dorados */}
-      {[-8.89, 8.89].flatMap(z => Array.from({ length: 20 }, (_, i) => (
-        <mesh key={`${z}${i}`} position={M(-24.13 + i * 2.54, 1.05, z)}>
-          <cylinderGeometry args={[m(0.8), m(0.8), m(0.1), 10]} />
-          <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.25} />
-        </mesh>
-      )))}
-      {/* Micro USB, RP2040, memoria flash y botón BOOTSEL */}
-      <mesh position={M(-24, 2.4, 0)} castShadow={q.sombras}>
-        <boxGeometry args={[m(5.5), m(2.8), m(8)]} />
-        <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
-      </mesh>
-      <mesh position={M(2, 1.5, 0)} castShadow={q.sombras}>
-        <boxGeometry args={[m(7), m(1), m(7)]} />
-        <meshStandardMaterial color="#141414" roughness={0.35} />
-      </mesh>
-      <mesh position={M(13, 1.6, 0)}>
-        <boxGeometry args={[m(5), m(1.2), m(6)]} />
-        <meshStandardMaterial color="#1f1f1f" roughness={0.4} />
-      </mesh>
-      <mesh position={M(-12, 2.2, 3)}>
-        <boxGeometry args={[m(4), m(2.4), m(3.2)]} />
-        <meshStandardMaterial color="#f5f5f4" roughness={0.5} />
-      </mesh>
-      {/* LED de GP25 junto al USB */}
-      <mesh position={M(-19, 1.4, -5)}>
-        <boxGeometry args={[m(1.6), m(0.8), m(1)]} />
-        <meshStandardMaterial ref={refLed} color="#14532d" emissive="#4ade80" emissiveIntensity={0} />
-      </mesh>
-    </group>
-  )
-})
 
-/** Pines del Nano por lado (USB hacia −x), según su serigrafía. */
-const NANO_ATRAS = ['D13', '3V3', 'AREF', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', '5V', 'RST', 'GND', 'VIN']
-const NANO_ADELANTE = ['D12', 'D11', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'GND', 'RST', 'D0', 'D1']
-
-export const ArduinoNano = forwardRef(function ArduinoNano(_: object, refLed13: Ref<THREE.MeshStandardMaterial>) {
-  const q = useCalidad()
-  return (
-    <group>
-      {[[-19, -6], [-19, 6], [19, -6], [19, 6]].map(([x, z], i) => <Separador key={i} pos={[x, -10, z]} alto={10} />)}
-      <mesh position={M(0, 0.8, 0)} castShadow={q.sombras} receiveShadow>
-        <boxGeometry args={[m(45), m(1.6), m(18)]} />
-        <meshStandardMaterial color="#1d4fb8" roughness={0.45} metalness={0.1} />
-      </mesh>
-      {/* Mini USB */}
-      <mesh position={M(-21, 3.2, 0)} castShadow={q.sombras}>
-        <boxGeometry args={[m(9), m(4), m(7.5)]} />
-        <meshStandardMaterial color={METAL} metalness={0.9} roughness={0.25} />
-      </mesh>
-      {/* ATmega328P (TQFP) girado 45° */}
-      <mesh position={M(4, 2.1, 0)} rotation={[0, Math.PI / 4, 0]} castShadow={q.sombras}>
-        <boxGeometry args={[m(7), m(1.2), m(7)]} />
-        <meshStandardMaterial color="#141414" roughness={0.35} />
-      </mesh>
-      <mesh position={M(-9, 2.4, -2)}>
-        <boxGeometry args={[m(5), m(1.6), m(3)]} />
-        <meshStandardMaterial color="#141414" roughness={0.4} />
-      </mesh>
-      <mesh position={M(13, 2.3, 3)}>
-        <boxGeometry args={[m(5), m(1.4), m(2)]} />
-        <meshStandardMaterial color="#d4d4d8" metalness={0.95} roughness={0.15} />
-      </mesh>
-      {/* Botón de reset */}
-      <mesh position={M(-2, 2.6, -4.5)}>
-        <boxGeometry args={[m(3.5), m(2), m(3.5)]} />
-        <meshStandardMaterial color="#e5e7eb" roughness={0.5} />
-      </mesh>
-      {/* LED «L» (13) y LED de encendido */}
-      <mesh position={M(-14, 1.9, 4)}>
-        <boxGeometry args={[m(1.6), m(0.8), m(1)]} />
-        <meshStandardMaterial ref={refLed13} color="#78350f" emissive="#fb923c" emissiveIntensity={0} />
-      </mesh>
-      <mesh position={M(-14, 1.9, 6)}>
-        <boxGeometry args={[m(1.6), m(0.8), m(1)]} />
-        <meshStandardMaterial color="#14532d" emissive="#22c55e" emissiveIntensity={1.5} />
-      </mesh>
-      <Pines n={15} pos={[0, 1.6, -7.6]} />
-      <Pines n={15} pos={[0, 1.6, 7.6]} />
-    </group>
-  )
-})
 
 export function L298N() {
   const q = useCalidad()
@@ -862,35 +771,6 @@ export function L298N() {
   )
 }
 
-export function Bateria18650() {
-  const q = useCalidad()
-  return (
-    <group>
-      <mesh position={M(0, 4, 0)} castShadow={q.sombras}>
-        <boxGeometry args={[m(77), m(8), m(41)]} />
-        <meshStandardMaterial color={NEGRO} roughness={0.7} />
-      </mesh>
-      {[-9.5, 9.5].map(z => (
-        <group key={z} position={M(0, 11, z)}>
-          <mesh rotation={[0, 0, Math.PI / 2]} castShadow={q.sombras}>
-            <cylinderGeometry args={[m(9), m(9), m(65), q.segmentos]} />
-            <meshPhysicalMaterial color="#2563eb" roughness={0.3} clearcoat={0.8} />
-          </mesh>
-          <mesh position={M(33, 0, 0)} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[m(4), m(4), m(1.5), 16]} />
-            <meshStandardMaterial color={METAL} metalness={0.95} roughness={0.2} />
-          </mesh>
-        </group>
-      ))}
-      {[-36, 36].map(x => (
-        <mesh key={x} position={M(x, 11, 0)}>
-          <boxGeometry args={[m(5), m(14), m(41)]} />
-          <meshStandardMaterial color={NEGRO} roughness={0.7} />
-        </mesh>
-      ))}
-    </group>
-  )
-}
 
 export function BateriaLipo() {
   const q = useCalidad()
@@ -1123,51 +1003,6 @@ export function HornServo() {
 // Sensores
 // ---------------------------------------------------------------------------
 
-export const TCRT5000 = forwardRef(function TCRT5000({ alturaSoporte }: { alturaSoporte: number }, refLed: Ref<THREE.MeshStandardMaterial>) {
-  const q = useCalidad()
-  return (
-    <group>
-      {/* Componente TCRT5000 mirando al piso */}
-      <mesh position={M(0, 3.5, 0)} castShadow={q.sombras}>
-        <boxGeometry args={[m(6), m(7), m(10)]} />
-        <meshStandardMaterial color={NEGRO} roughness={0.4} />
-      </mesh>
-      <mesh position={M(0, 0.4, -2.5)}>
-        <cylinderGeometry args={[m(1.8), m(1.8), m(0.8), 12]} />
-        <meshStandardMaterial color="#60a5fa" emissive="#3b82f6" emissiveIntensity={0.4} />
-      </mesh>
-      <mesh position={M(0, 0.4, 2.5)}>
-        <cylinderGeometry args={[m(1.8), m(1.8), m(0.8), 12]} />
-        <meshStandardMaterial color="#0a0a0a" roughness={0.2} />
-      </mesh>
-      {/* Placa azul del módulo */}
-      <mesh position={M(-12, 7.8, 0)} castShadow={q.sombras}>
-        <boxGeometry args={[m(32), m(1.6), m(13)]} />
-        <meshStandardMaterial color={PCB_AZUL} roughness={0.55} />
-      </mesh>
-      <mesh position={M(-14, 10.6, 0)}>
-        <boxGeometry args={[m(6), m(4), m(6)]} />
-        <meshStandardMaterial color="#2563eb" roughness={0.4} />
-      </mesh>
-      {/* LED indicador: se enciende cuando ve blanco (DO en LOW) */}
-      <mesh position={M(-6, 9, 4)}>
-        <boxGeometry args={[m(2), m(1.2), m(1.6)]} />
-        <meshStandardMaterial ref={refLed} color="#7f1d1d" emissive="#ef4444" emissiveIntensity={0} />
-      </mesh>
-      <Pines n={4} pos={[-26, 8.6, 0]} horizontal="z" />
-      {/* Soporte acrílico hasta el chasis */}
-      <mesh position={M(-20, 8.6 + alturaSoporte / 2, 0)}>
-        <boxGeometry args={[m(3), m(alturaSoporte), m(12)]} />
-        <meshStandardMaterial color="#cbd5e1" transparent opacity={0.4} roughness={0.1} />
-      </mesh>
-      {/* Zona del piso que lee el sensor */}
-      <mesh position={M(0, -12.5, 0)} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[m(3.5), 20]} />
-        <meshBasicMaterial color="#ff2d2d" transparent opacity={0.5} depthWrite={false} />
-      </mesh>
-    </group>
-  )
-})
 
 export const FC51 = forwardRef(function FC51(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
   const q = useCalidad()
