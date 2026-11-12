@@ -129,5 +129,53 @@ export const CREDITOS_MODELOS: Record<string, CreditoModelo> = {
     "autor": "matheus.nfranca97 (https://sketchfab.com/matheus.nfranca97)",
     "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
     "fuente": "https://sketchfab.com/3d-models/micro-sumo-paladin-c70f396029de4fc285f06e31b7400a9b"
+  },
+  "riptide-casco.glb": {
+    "titulo": "RipTide",
+    "autor": "Floating Castle Design (https://sketchfab.com/FloatingCastleRobotics)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/riptide-0edf3dc8122c4e66860c26e07f890470"
+  },
+  "riptide-rueda.glb": {
+    "titulo": "RipTide",
+    "autor": "Floating Castle Design (https://sketchfab.com/FloatingCastleRobotics)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/riptide-0edf3dc8122c4e66860c26e07f890470"
+  },
+  "riptide-tambor.glb": {
+    "titulo": "RipTide",
+    "autor": "Floating Castle Design (https://sketchfab.com/FloatingCastleRobotics)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/riptide-0edf3dc8122c4e66860c26e07f890470"
+  },
+  "fathom-casco.glb": {
+    "titulo": "Fathom",
+    "autor": "Floating Castle Design (https://sketchfab.com/FloatingCastleRobotics)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/fathom-afc8c574eb7e48e3b2589cfa11052fef"
+  },
+  "fathom-rueda.glb": {
+    "titulo": "Fathom",
+    "autor": "Floating Castle Design (https://sketchfab.com/FloatingCastleRobotics)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/fathom-afc8c574eb7e48e3b2589cfa11052fef"
+  },
+  "cuna-casco.glb": {
+    "titulo": "Ant Weight Battle Bot",
+    "autor": "WilliamMezitis (https://sketchfab.com/WilliamMezitis)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/ant-weight-battle-bot-8bee21300da44c60b300e325507b9591"
+  },
+  "cuna-rueda.glb": {
+    "titulo": "Ant Weight Battle Bot",
+    "autor": "WilliamMezitis (https://sketchfab.com/WilliamMezitis)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/ant-weight-battle-bot-8bee21300da44c60b300e325507b9591"
+  },
+  "bateria-9v.glb": {
+    "titulo": "[CC0] Generic 9V Battery",
+    "autor": "literallylara (https://sketchfab.com/literallylara)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/cc0-generic-9v-battery-05e70a17e01a4be08381afe2128284e9"
   }
 }

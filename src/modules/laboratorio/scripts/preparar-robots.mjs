@@ -40,6 +40,19 @@ const ABYSS = {
   tambor: [[-17.1, 17.1], [-7.8, 2.8], [7.4, 15.6]],
 }
 
+// «RipTide» (Floating Castle Robotics, Tinkercad): cajas en unidades del archivo.
+const RIPTIDE = {
+  ruedaIzq: [[-8.2, -5.4], [-13.8, -7.6], [-3.9, 2.3]],
+  ruedaDer: [[15.4, 18.2], [-13.8, -7.6], [-3.9, 2.3]],
+  tambor: [[-7.7, 17.7], [-12.8, -4.6], [3.4, 13.5]],
+}
+// «Fathom» (Floating Castle Robotics, Tinkercad): las cuatro ruedas.
+const FATHOM = {
+  delIzq: [[-20.2, -13.8], [-25.6, -13.3], [9.3, 21.6]],
+  delDer: [[13.8, 20.2], [-25.6, -13.3], [9.3, 21.6]],
+  traIzq: [[-19.8, -12.3], [-25.6, -15.3], [-18.7, -8.4]],
+  traDer: [[12.3, 19.8], [-25.6, -15.3], [-18.7, -8.4]],
+}
 const ROBOTS = {
   // Unitree Go1 de C. Yamahata. Las patas vienen separadas por tramo, con un
   // «hueso» en cada articulación. Escala: caderas a 115 mm del centro, como
@@ -78,6 +91,11 @@ const ROBOTS = {
     archivo: 'line-follower-robot.glb', mmPorUnidad: 10, giros: [['y', 90]], maxTri: 22000, opacidadMin: 0.82,
     partes: { chasis: { sinNodos: ['Board_3', 'battery', 'micro-metal-gearmotor-standard', 'pololu-wheel', 'pololu-ball-caster'], pivote: [-1.401, 0.289, -2.7] } },
   },
+  // Pila de 9 V (modelo CC0, en metros, parada): se acuesta con los bornes hacia +x.
+  'bateria-9v': {
+    archivo: 'cc0-generic-9v-battery.glb', mmPorUnidad: 1000, giros: [['z', -90]], maxTri: 2000,
+    partes: { pila: { sinNodos: [], pivote: [0.009, 0.024, 0] } },
+  },
   // Origen sobre el eje, 8 mm antes del centro de la rueda (como el N20 del catálogo).
   'motor-n20': {
     archivo: 'line-follower-robot.glb', mmPorUnidad: 10, giros: [['y', 90]], maxTri: 5000,
@@ -98,6 +116,40 @@ const ROBOTS = {
   'rueda-31': {
     archivo: 'micro-sumo-paladin.glb', mmPorUnidad: 1000, giros: [['y', 90]], maxTri: 3000, color: [0.03, 0.03, 0.035],
     partes: { rueda: { nodos: ['Roda'], pivote: [0.029, 0.1175, -0.0173] } },
+  },
+  // «RipTide»: tambor enorme de tres tramos entre dos brazos, ruedas atrás y
+  // patines al frente. Escala: rueda de 6 unidades → 60 mm. Origen en el eje de las ruedas.
+  'riptide-casco': {
+    archivo: 'riptide.glb', mmPorUnidad: 10, giros: [['y', 90]], maxTri: 9000,
+    partes: { casco: { fuera: [RIPTIDE.ruedaIzq, RIPTIDE.ruedaDer, RIPTIDE.tambor], pivote: [5, -10.71, -0.79] } },
+  },
+  'riptide-rueda': {
+    archivo: 'riptide.glb', mmPorUnidad: 10, giros: [['y', 90]], maxTri: 5000,
+    partes: { rueda: { dentro: [RIPTIDE.ruedaIzq], pivote: [-6.75, -10.71, -0.79] } },
+  },
+  'riptide-tambor': {
+    archivo: 'riptide.glb', mmPorUnidad: 10, giros: [['y', 90]], maxTri: 8000,
+    partes: { tambor: { dentro: [RIPTIDE.tambor], pivote: [5, -8.71, 8.46] } },
+  },
+  // «Fathom»: un tiburón con arpón, de cuatro ruedas. Escala: 4,5 mm por unidad
+  // (20 cm de ancho). Origen entre los dos ejes, a la altura del eje delantero.
+  'fathom-casco': {
+    archivo: 'fathom.glb', mmPorUnidad: 4.5, giros: [['y', 90]], maxTri: 14000,
+    partes: { casco: { fuera: [FATHOM.delIzq, FATHOM.delDer, FATHOM.traIzq, FATHOM.traDer], pivote: [0, -19.47, 0.97] } },
+  },
+  'fathom-rueda': {
+    archivo: 'fathom.glb', mmPorUnidad: 4.5, giros: [['y', 90]], maxTri: 5000,
+    partes: { rueda: { dentro: [FATHOM.delIzq], pivote: [-17, -19.47, 15.47] } },
+  },
+  // «Ant Weight Battle Bot» de WilliamMezitis: caja con tapa y una pala curva
+  // (en metros, el frente ya es +x). Se quitan sus motores: van los del catálogo.
+  'cuna-casco': {
+    archivo: 'ant-weight-battle-bot.glb', mmPorUnidad: 1000, maxTri: 8000,
+    partes: { casco: { nodos: ['Object_28', 'Object_29', 'Object_11', 'Object_16', 'Object_26', 'Object_27'], pivote: [0.065, 0.082, 0.1335] } },
+  },
+  'cuna-rueda': {
+    archivo: 'ant-weight-battle-bot.glb', mmPorUnidad: 1000, maxTri: 6000,
+    partes: { rueda: { nodos: ['Object_12', 'Object_13'], pivote: [0.065, 0.0818, 0.1927] } },
   },
   'abyss-tambor': {
     archivo: 'abyss.glb', mmPorUnidad: 5, giros: [['y', 90]], maxTri: 6000,

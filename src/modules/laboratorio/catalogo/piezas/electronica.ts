@@ -102,6 +102,8 @@ export const BATERIA_9V: PiezaDef = {
   descripcion: 'La de los kits. Sirve para el Arduino, pero da poca corriente: con varios motores el voltaje se cae.',
   enKits: true,
   modelo: 'proc:bateria-9v',
+  // «Generic 9V Battery» de literallylara (scripts/preparar-robots.mjs).
+  glb: '/lab/modelos/bateria-9v.glb',
   masa_g: 50,
   material: 'plastico',
   colisionadores: [{ forma: 'caja', medidas: [48.5, 17.5, 26.5], centro: [0, 8.75, 0] }],

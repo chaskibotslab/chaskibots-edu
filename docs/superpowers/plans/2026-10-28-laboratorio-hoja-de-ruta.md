@@ -183,8 +183,25 @@ pistas, y un mazo plano por cada pieza de afuera hasta un conector en el borde.
 El circuito no cambia (`doc.cables` es el mismo): en «Cablear» se sigue viendo
 cable por cable. Botón en la barra de «Armar»; los tres robots de competencia
 la traen puesta. Prueba: `pcb.test.ts`.
-Falta: M4 y M5; otros robots de combate bajados (Fathom, RipTide, Ant) y el
-minisumo «Paladino» grande, sin integrar.
+Más robots de combate (mismo día), en `catalogo/piezas/combatePro.ts`, con
+PCB puesta y `combatePro.test.ts`:
+- «RipTide» (Floating Castle Robotics): tambor de tres tramos entre dos brazos
+  y patines al frente; proyecto `warbot-riptide` (mismo programa que el warbot
+  de tambor).
+- «Fathom» (Floating Castle Robotics): tiburón con arpón, cuatro ruedas con
+  cuatro motores; proyecto `warbot-fathom` (radiocontrol, sin arma que gire).
+- «Cuña» (Ant Weight Battle Bot, WilliamMezitis): caja con pala; proyecto
+  `warbot-cuna` (radiocontrol; se mete debajo del rival y lo empuja).
+Descartado: el minisumo «Paladino» grande (una sola malla gris, sin piezas
+separables).
+M4 revisado (mismo día): solo entra la pila de 9 V (modelo de literallylara,
+`bateria-9v.glb`; el «+» del cable va del lado donde el modelo lo trae impreso).
+Descartados: la rueda loca (es una rueda de mueble, no la de bola de los kits)
+y el ESP32 (sin pines y con menos detalle que la placa hecha por código). Nano,
+RPi 4B y 18650 quedan como están: las placas por código ya tienen los pines
+alineados con el cableado y cambiarlas no mejora lo que se ve.
+Falta: M5 (LCD, DHT22, relé, OLED), que necesita comportamientos nuevos en el
+simulador, no solo el modelo.
 
 Pasos:
 1. M1: bajar la lista, medir cada modelo (tamaño real, caras) y descartar lo que no sirva.

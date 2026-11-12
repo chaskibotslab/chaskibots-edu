@@ -1,0 +1,52 @@
+// Robot de radiocontrol: lo manejas tú, con el teclado de la compu
+// (flechas o WASD), el control en pantalla o un control de videojuego.
+// Cada tecla llega como una letra y el robot obedece:
+//   F = adelante   B = atrás   L = izquierda   R = derecha   S = parar
+//   G / I = curva adelante a la izq. / der.   H / J = curva atrás a la izq. / der.
+//   0–9 = velocidad (0 = lenta, 9 = máxima)
+// En el robot real, las letras llegan con un módulo Bluetooth HC-05 conectado a RX y TX.
+
+const int ENA = 5, IN1 = 7, IN2 = 8;   // motores del lado izquierdo
+const int ENB = 6, IN3 = 9, IN4 = 10;   // motores del lado derecho
+
+// Velocidad de cada lado: de -255 (atrás) a 255 (adelante)
+void motores(int izq, int der) {
+  izq = constrain(izq, -255, 255);
+  der = constrain(der, -255, 255);
+  digitalWrite(IN1, izq >= 0 ? HIGH : LOW);
+  digitalWrite(IN2, izq >= 0 ? LOW : HIGH);
+  analogWrite(ENA, abs(izq));
+  digitalWrite(IN3, der >= 0 ? HIGH : LOW);
+  digitalWrite(IN4, der >= 0 ? LOW : HIGH);
+  analogWrite(ENB, abs(der));
+}
+
+int velocidad = 200;   // 0 a 255
+
+void setup() {
+  pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(ENB, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("Listo: maneja con las flechas");
+}
+
+void loop() {
+  if (!Serial.available()) return;
+  char c = Serial.read();
+
+  if (c >= '0' && c <= '9') {            // un número cambia la velocidad
+    velocidad = map(c - '0', 0, 9, 90, 255);
+    return;
+  }
+  switch (c) {
+    case 'F': motores(velocidad, velocidad); break;
+    case 'B': motores(-velocidad, -velocidad); break;
+    case 'L': motores(-velocidad / 2, velocidad); break;
+    case 'R': motores(velocidad, -velocidad / 2); break;
+    case 'G': motores(velocidad * 2 / 5, velocidad); break;
+    case 'I': motores(velocidad, velocidad * 2 / 5); break;
+    case 'H': motores(-velocidad * 2 / 5, -velocidad); break;
+    case 'J': motores(-velocidad, -velocidad * 2 / 5); break;
+    case 'S': motores(0, 0); break;
+  }
+}

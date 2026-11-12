@@ -5,7 +5,7 @@ const POR_GRUPO: Record<string, string[]> = {
   'Motores y chasis': ['primeros-motores'],
   'Minisumo autónomo': ['minisumo', 'minisumo-esp32', 'minisumo-paladin'],
   'Radiocontrol (RC)': ['minisumo-rc', 'rc-esp32', 'robo-wifi'],
-  'Robots de combate': ['warbot-tambor', 'warbot-disco', 'warbot-abyss', 'warbot-auto'],
+  'Robots de combate': ['warbot-tambor', 'warbot-disco', 'warbot-abyss', 'warbot-riptide', 'warbot-fathom', 'warbot-cuna', 'warbot-auto'],
   'Seguidores de línea': ['seguidor', 'seguidor-freno', 'seguidor-esp32', 'seguidor-pro', 'seguidor-velocidad'],
   // La galería muestra cada grupo en las dos secciones con sus proyectos de esa sección.
   'Raspberry Pi y Python': ['rpi-seguidor', 'rpi-semaforo', 'rpi-distancia'],
