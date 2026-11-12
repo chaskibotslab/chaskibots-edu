@@ -30,6 +30,9 @@ export interface RobotDoc {
   /** 'auto' (por defecto): los cables se rehacen solos al cambiar piezas.
    *  'manual': se respetan los del alumno y solo se conectan las piezas nuevas. */
   cableado?: 'auto' | 'manual'
+  /** Cómo se hacen las conexiones en el robot armado: con cables sueltos (por defecto)
+   *  o con una PCB (pistas de cobre y un mazo por pieza). Las conexiones son las mismas. */
+  conexion?: 'cables' | 'pcb'
   /** En bloques, `cpp` es el código generado (se rehace al cambiar bloques o cables). */
   programa: { modo: 'codigo'; cpp: string } | { modo: 'bloques'; bloques: ProgramaBloques; cpp: string }
 }
