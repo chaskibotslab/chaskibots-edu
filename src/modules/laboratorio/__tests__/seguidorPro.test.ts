@@ -23,7 +23,8 @@ describe('seguidor de competencia', () => {
     expect(r.masa_g).toBeLessThan(200)
     expect(r.min.y).toBeCloseTo(-14.5, 0)   // se apoya en las ruedas de 42 mm
     // El programa de prueba (fixtures/fuentes/seguidorpro.ino) es el del proyecto.
-    expect(fx('fuentes/seguidorpro.ino')).toBe(d.programa.cpp)
+    // (git puede dejar el archivo con CRLF en Windows: se compara sin los \r)
+    expect(fx('fuentes/seguidorpro.ino').split('\r').join('')).toBe(d.programa.cpp)
   })
 
   it('recorre el óvalo con su programa real sin salirse de la línea', () => {

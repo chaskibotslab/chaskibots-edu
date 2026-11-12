@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
-  AlertTriangle, ChevronDown, ChevronUp, Expand, Info, Loader2, Package, RotateCw, Search, Shrink, Trash2, Undo2, Redo2, X, Cable as IconCable,
+  AlertTriangle, ChevronDown, ChevronUp, Expand, Info, Loader2, Package, RotateCw, Search, Shrink, Trash2, Undo2, Redo2, X, Cable as IconCable, CircuitBoard,
 } from 'lucide-react'
 import Miniatura from './Miniatura'
 import { FAMILIAS, type Familia, type PiezaDef } from '../../catalogo/tipos'
@@ -266,6 +266,13 @@ export default function Armar(p: Props) {
           <span aria-hidden className="mx-1 h-5 w-px bg-lab-borde/20" />
           <BotonIcono titulo={explosion ? 'Juntar piezas' : 'Vista explosionada'} onClick={() => setExplosion(e => !e)} activo={explosion}>{explosion ? <Shrink className="h-4 w-4" /> : <Expand className="h-4 w-4" />}</BotonIcono>
           <BotonIcono titulo={cables ? 'Ocultar cables' : 'Mostrar cables'} onClick={() => setCables(c => !c)} activo={cables}><IconCable className="h-4 w-4" /></BotonIcono>
+          {!banco && (
+            <BotonIcono
+              titulo={doc.conexion === 'pcb' ? 'Conexiones con PCB (toca para volver a los cables sueltos)' : 'Usar una PCB en lugar de cables sueltos'}
+              onClick={() => cambiar({ ...doc, conexion: doc.conexion === 'pcb' ? 'cables' : 'pcb' }, doc.conexion === 'pcb' ? 'Conexiones con cables sueltos' : 'Conexiones con PCB: las mismas conexiones, en pistas y mazos ordenados')}
+              activo={doc.conexion === 'pcb'}
+            ><CircuitBoard className="h-4 w-4" /></BotonIcono>
+          )}
           <BotonIcono titulo="Lista de materiales" onClick={p.onListaMateriales}><Package className="h-4 w-4" /></BotonIcono>
         </div>
 

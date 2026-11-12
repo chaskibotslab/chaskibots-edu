@@ -176,6 +176,13 @@ con sus piezas de catálogo, proyecto en la galería y prueba de física:
   `paladin.test.ts` (mismo programa y cableado que el minisumo; gana 2 a 0).
 Los modelos de Tinkercad (una malla por color) se separan por sólidos sueltos
 (`dentro` / `fuera` en `preparar-robots.mjs`); los de CAD, por nombre de nodo.
+Conexiones con PCB (mismo día, pedido del usuario para evitar la maraña de
+cables): `RobotDoc.conexion: 'cables' | 'pcb'`. Con `pcb`, `ui/modelos/Pcb3D.tsx`
+dibuja una placa bajo la placa y el driver, las conexiones entre ellos como
+pistas, y un mazo plano por cada pieza de afuera hasta un conector en el borde.
+El circuito no cambia (`doc.cables` es el mismo): en «Cablear» se sigue viendo
+cable por cable. Botón en la barra de «Armar»; los tres robots de competencia
+la traen puesta. Prueba: `pcb.test.ts`.
 Falta: M4 y M5; otros robots de combate bajados (Fathom, RipTide, Ant) y el
 minisumo «Paladino» grande, sin integrar.
 

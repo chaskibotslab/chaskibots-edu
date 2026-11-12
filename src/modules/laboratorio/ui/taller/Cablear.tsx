@@ -254,6 +254,9 @@ export default function Cablear({ doc, cambiar, nivel, onNivel }: Props) {
           <span className="lab-etiqueta hidden shrink-0 xl:inline">
             {doc.cableado === 'manual' ? 'Cableado a mano' : 'Cableado automático'}
           </span>
+          {doc.conexion === 'pcb' && (
+            <span className="lab-etiqueta hidden shrink-0 xl:inline" title="Este robot usa una PCB. Aquí ves cada conexión como un cable para entenderla y poder cambiarla; en Armar y Probar van como pistas de la placa y un mazo por pieza.">Con PCB</span>
+          )}
           <span className="min-w-0 flex-1 truncate text-lab-suave">
             {elegido ? <>Ahora toca el otro pin para unir <b className="text-lab-tinta">{elegido[1]}</b> · toca el mismo para cancelar</>
               : vista === '3d' ? 'Toca una pieza para acercarte. Toca un pin y luego otro para poner un cable.'

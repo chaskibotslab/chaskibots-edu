@@ -23,6 +23,7 @@ import {
   PerroRobot, ikPata, RADIO_PIE, type PataPerro, SensorBarra,
 } from './modelos/Piezas3D'
 import { PerroGo1 } from './modelos/Robots3D'
+import { CablesPcb } from './modelos/Pcb3D'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
 import { AGUJEROS_RIEL, ALTO_PROTOBOARD, RIELES, agujeroRiel, xRiel } from '../catalogo/piezas/circuito'
 import { CircuitoVivoContexto, ModeloCircuito, esModeloCircuito, type CircuitoVivo } from './modelos/Circuito3D'
@@ -432,6 +433,8 @@ function Cables({ doc, cableado }: { doc: RobotDoc; cableado?: Cableado3D }) {
   }, [doc])
   const sel = cableado?.cableSel ?? null
   const elegir = cableado?.onCable
+  // Con PCB: pistas y mazos en lugar de cables sueltos. En «Cablear» se ve cada conexión como cable, para poder tocarla.
+  if (doc.conexion === 'pcb' && !cableado) return <CablesPcb doc={doc} lista={lista} suelto={({ c, i, p }) => <Cable key={i} a={p[0]} b={p[1]} color={c.color} />} />
   return <>{lista.map(({ c, i, p }) => (
     <Cable key={i} a={p[0]} b={p[1]} color={c.color} sel={sel === i} tenue={sel !== null && sel !== i} onClick={elegir ? () => elegir(i) : undefined} />
   ))}</>

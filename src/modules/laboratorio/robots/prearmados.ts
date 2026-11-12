@@ -48,9 +48,10 @@ class Armador {
     this.doc = r.doc
     return r.id
   }
-  terminar(codigo: (tabla: FilaPin[], doc: RobotDoc) => string): RobotDoc {
+  /** `conexion: 'pcb'`: el robot se muestra con PCB en lugar de cables sueltos (las conexiones son las mismas). */
+  terminar(codigo: (tabla: FilaPin[], doc: RobotDoc) => string, conexion?: RobotDoc['conexion']): RobotDoc {
     const { cables, tabla } = autocablear(this.doc)
-    const doc = { ...this.doc, cables }
+    const doc: RobotDoc = { ...this.doc, cables, ...(conexion ? { conexion } : {}) }
     return { ...doc, programa: { modo: 'codigo', cpp: codigo(tabla, doc) } }
   }
 }
@@ -280,7 +281,7 @@ export function construirSeguidorPro(): RobotDoc {
   a.poner('rueda-loca-chica', 'chasis', 'loca')
   a.poner('sensor-linea-barra', 'chasis', 'piso-izq')
   a.poner('sensor-linea-barra', 'chasis', 'piso-der')
-  return a.terminar(codigoSeguidor)
+  return a.terminar(codigoSeguidor, 'pcb')
 }
 
 
@@ -1011,7 +1012,7 @@ export function construirPaladin(): RobotDoc {
   a.poner('fc51', 'chasis', 'frente-der')
   a.poner('sensor-linea-barra', 'chasis', 'piso-izq')
   a.poner('sensor-linea-barra', 'chasis', 'piso-der')
-  return a.terminar(codigoMinisumo)
+  return a.terminar(codigoMinisumo, 'pcb')
 }
 
 /**
@@ -1200,7 +1201,7 @@ export function construirAbyss(nombre = 'Abyss'): RobotDoc {
   a.poner('rueda-abyss', mi, 'eje')
   a.poner('rueda-abyss', md, 'eje')
   a.poner('tambor-abyss', 'chasis', 'arma')
-  return a.terminar(codigoBattlebotRc)
+  return a.terminar(codigoBattlebotRc, 'pcb')
 }
 
 /** El rival de práctica de cada arena de competencia. */
