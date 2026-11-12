@@ -5,16 +5,32 @@
 // (con mouse o con el dedo). Tocar un cable lo selecciona para quitarlo.
 // Cada bloque se puede arrastrar para ordenar el esquema a gusto.
 // La verificación eléctrica corre en vivo y marca los pines con problemas.
+//
+// Dos vistas del mismo cableado: «En las piezas» (3D: se toca el pin real de
+// cada pieza y el cable Dupont aparece entre ellas, como en la mesa) y
+// «Esquema» (2D, más cómodo para ver todo de un vistazo). Al costado, la
+// explicación de cada pin y cada cable y la guía de lo que falta conectar.
 
-import { useMemo, useRef, useState } from 'react'
-import { AlertTriangle, CheckCircle2, LayoutGrid, Trash2, Wand2, XCircle } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { AlertTriangle, Box, CheckCircle2, Code2, LayoutGrid, Lightbulb, Loader2, MousePointerClick, Network, Trash2, Wand2, XCircle } from 'lucide-react'
 import { pieza } from '../../catalogo/piezas'
 import type { PinDef } from '../../catalogo/tipos'
 import { autocablear } from '../../engine/autocableado'
 import { verificar } from '../../engine/verificacion'
 import { infoPlaca, mcuDe } from '../../engine/placa'
 import { esBanco } from '../../engine/ensamblaje'
+import { explicarCable, explicarPin, pasosPendientes } from '../../engine/explicacion'
 import type { Cable, RobotDoc } from '../../robots/doc'
+import type { NivelCalidad } from '../calidad'
+
+const EscenaCablear = dynamic(() => import('../Escena3D').then(m => m.EscenaCablear), {
+  ssr: false,
+  loading: () => <div className="flex h-full items-center justify-center gap-2 text-sm text-lab-suave"><Loader2 className="h-5 w-5 animate-spin" /> Preparando la mesa…</div>,
+})
+
+type Vista = '3d' | 'esquema'
+const CLAVE_VISTA = 'chaskibots-lab:cablear-vista'
 
 const ROJO = '#ef4444', NEGRO = '#111827'
 const SENALES = ['#a855f7', '#3b82f6', '#22c55e', '#f97316', '#eab308', '#06b6d4', '#ec4899', '#84cc16', '#f59e0b', '#14b8a6']
@@ -100,10 +116,22 @@ function disponer(doc: RobotDoc): Tarjeta[] {
   return tarjetas
 }
 
-export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: RobotDoc, texto?: string, recablear?: boolean) => void }) {
+interface Props {
+  doc: RobotDoc
+  cambiar: (d: RobotDoc, texto?: string, recablear?: boolean) => void
+  nivel: NivelCalidad
+  onNivel: (n: NivelCalidad) => void
+}
+
+export default function Cablear({ doc, cambiar, nivel, onNivel }: Props) {
+  const [vista, setVista] = useState<Vista>('3d')
+  useEffect(() => { try { if (localStorage.getItem(CLAVE_VISTA) === 'esquema') setVista('esquema') } catch { /* almacenamiento bloqueado */ } }, [])
+  const elegirVista = (v: Vista) => { setVista(v); try { localStorage.setItem(CLAVE_VISTA, v) } catch { /* modo privado */ } }
   const [elegido, setElegido] = useState<[string, string] | null>(null)
   const [cableSel, setCableSel] = useState<number | null>(null)
   const [resaltar, setResaltar] = useState<string[]>([])
+  /** Pin bajo el puntero: se explica al costado sin tener que tocarlo. */
+  const [sobre, setSobre] = useState<[string, string] | null>(null)
   // Bloques movidos por el alumno (desplazamiento desde su lugar automático).
   const [movidas, setMovidas] = useState<Record<string, { dx: number; dy: number }>>({})
   const svg = useRef<SVGSVGElement>(null)
@@ -150,14 +178,44 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
 
   const pinDef = (inst: string, pin: string) => pieza(doc.piezas.find(p => p.id === inst)!.pieza).pines.find(p => p.nombre === pin)!
 
+  const mismo = (c: Pick<Cable, 'de' | 'a'>, a: [string, string], b: [string, string]) =>
+    (c.de.join() === a.join() && c.a.join() === b.join()) || (c.de.join() === b.join() && c.a.join() === a.join())
+
+  /** Pone un cable y lo deja elegido: al costado se lee para qué sirve. */
+  const ponerCable = (a: [string, string], b: [string, string], color?: string) => {
+    const ya = doc.cables.findIndex(c => mismo(c, a, b))
+    if (ya >= 0) { setCableSel(ya); setElegido(null); return }
+    const nuevo: Cable = { de: a, a: b, color: color ?? colorPara(pinDef(...a), pinDef(...b), doc.cables.length) }
+    cambiar({ ...doc, cableado: 'manual', cables: [...doc.cables, nuevo] }, `Cable: ${a[1]} → ${b[1]}`, false)
+    setElegido(null)
+    setCableSel(doc.cables.length)
+  }
+
   const tocarPin = (inst: string, pin: string) => {
     setCableSel(null)
     if (!elegido) { setElegido([inst, pin]); return }
     if (elegido[0] === inst && elegido[1] === pin) { setElegido(null); return }
-    const nuevo: Cable = { de: elegido, a: [inst, pin], color: colorPara(pinDef(...elegido), pinDef(inst, pin), doc.cables.length) }
-    cambiar({ ...doc, cableado: 'manual', cables: [...doc.cables, nuevo] }, `Cable: ${elegido[1]} → ${pin}`, false)
-    setElegido(null)
+    ponerCable(elegido, [inst, pin])
   }
+
+  // Guía: lo que falta conectar, con su porqué. El primer paso late en la escena.
+  const pasos = useMemo(() => pasosPendientes(doc), [doc])
+  const paso = pasos[0] ?? null
+  const sugeridos = useMemo(() => new Set(paso ? [paso.cable.de.join('.'), paso.cable.a.join('.')] : []), [paso])
+
+  // Qué se explica al costado: el pin bajo el puntero; si no, el cable elegido; si no, el pin elegido.
+  const pinExplicado = sobre ?? (cableSel === null ? elegido : null)
+  const exCable = useMemo(() => (!sobre && cableSel !== null && doc.cables[cableSel] ? explicarCable(doc, doc.cables[cableSel]) : null), [doc, cableSel, sobre])
+  const exPin = useMemo(() => (pinExplicado ? explicarPin(doc, pinExplicado[0], pinExplicado[1]) : null), [doc, pinExplicado])
+
+  const cableado3D = useMemo(() => ({
+    elegido, cableSel, problemas: conProblema, sugeridos,
+    onPin: tocarPin,
+    onCable: (i: number | null) => { setCableSel(i); if (i !== null) setElegido(null) },
+    onSobre: setSobre,
+    // tocarPin cambia con doc y elegido, que ya están en la lista.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [doc, elegido, cableSel, conProblema, sugeridos])
 
   const quitarCable = (i: number) => {
     const c = doc.cables[i]
@@ -182,17 +240,27 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
 
   return (
     <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-      {/* ---------- Esquema ---------- */}
-      <div className="lab-plano relative min-h-[320px] flex-1 overflow-auto">
-        <div className="sticky left-0 top-0 z-10 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-lab-borde/20 bg-lab-superficie px-3 py-2 text-xs">
-          <span className="lab-etiqueta">
+      {/* ---------- Mesa (3D) o esquema ---------- */}
+      <div className={`relative flex min-h-[320px] flex-1 flex-col ${vista === 'esquema' ? 'lab-plano overflow-auto' : 'overflow-hidden'}`}>
+        <div className="sticky left-0 top-0 z-10 flex h-11 shrink-0 items-center gap-x-3 overflow-x-auto whitespace-nowrap border-b border-lab-borde/20 bg-lab-superficie px-3 text-xs">
+          <div className="flex shrink-0 rounded-md bg-lab-fondo2 p-0.5" role="group" aria-label="Cómo ver el cableado">
+            {([['3d', 'En las piezas', Box], ['esquema', 'Esquema', Network]] as const).map(([id, txt, I]) => (
+              <button key={id} onClick={() => elegirVista(id)} aria-pressed={vista === id} title={id === '3d' ? 'Cablear sobre las piezas reales, en 3D' : 'Ver todas las conexiones en un esquema'}
+                className={`flex items-center gap-1.5 rounded px-2.5 py-1 font-medium ${vista === id ? 'bg-lab-superficie text-lab-tinta shadow-sm' : 'text-lab-suave hover:text-lab-tinta'}`}>
+                <I className="h-3.5 w-3.5" /> {txt}
+              </button>
+            ))}
+          </div>
+          <span className="lab-etiqueta hidden shrink-0 xl:inline">
             {doc.cableado === 'manual' ? 'Cableado a mano' : 'Cableado automático'}
           </span>
-          <span className="text-lab-suave">
-            {elegido ? <>Ahora toca el otro pin para unir <b className="text-lab-tinta">{elegido[1]}</b> · toca el mismo para cancelar</> : 'Toca un pin y luego otro para poner un cable. Toca un cable para quitarlo. Arrastra un bloque para moverlo.'}
+          <span className="min-w-0 flex-1 truncate text-lab-suave">
+            {elegido ? <>Ahora toca el otro pin para unir <b className="text-lab-tinta">{elegido[1]}</b> · toca el mismo para cancelar</>
+              : vista === '3d' ? 'Toca una pieza para acercarte. Toca un pin y luego otro para poner un cable.'
+                : 'Toca un pin y luego otro para poner un cable. Arrastra un bloque para moverlo.'}
           </span>
-          <div className="ml-auto flex gap-1.5">
-            {Object.keys(movidas).length > 0 && (
+          <div className="ml-auto flex shrink-0 gap-1.5">
+            {vista === 'esquema' && Object.keys(movidas).length > 0 && (
               <button onClick={() => setMovidas({})} className="flex items-center gap-1 lab-secundario rounded-md px-2.5 py-1.5 font-medium" title="Volver a poner los bloques en su lugar">
                 <LayoutGrid className="h-3.5 w-3.5" /> Ordenar bloques
               </button>
@@ -207,7 +275,15 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
             ><Trash2 className="h-3.5 w-3.5" /> Quitar todos</button>
           </div>
         </div>
-        <svg ref={svg} viewBox={`${minX} ${minY} ${ancho - minX} ${alto - minY}`} className="h-auto min-w-[760px] w-full touch-none" onClick={() => { setCableSel(null) }} onPointerMove={arrastrar} onPointerUp={soltar} onPointerCancel={soltar}>
+        {vista === '3d' && (
+          <div className="relative min-h-0 flex-1 touch-none">
+            <EscenaCablear doc={doc} cableado={cableado3D} nivel={nivel} onNivel={onNivel} />
+            <p className="pointer-events-none absolute bottom-3 left-3 hidden rounded-md bg-lab-superficie/90 px-2.5 py-1.5 text-[11px] text-lab-suave shadow-sm sm:block">
+              Arrastra para girar · rueda o dos dedos para acercar · botón derecho para mover
+            </p>
+          </div>
+        )}
+        {vista === 'esquema' && <svg ref={svg} viewBox={`${minX} ${minY} ${ancho - minX} ${alto - minY}`} className="h-auto min-w-[760px] w-full touch-none" onClick={() => { setCableSel(null) }} onPointerMove={arrastrar} onPointerUp={soltar} onPointerCancel={soltar}>
           {/* Uniones por dentro de la protoboard */}
           {internas.map((c, i) => {
             const d = curva(c)
@@ -241,12 +317,12 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
                 const sel = elegido && elegido[0] === t.id && elegido[1] === p.pin.nombre
                 const conectado = [...doc.cables, ...internas].some(c => `${c.de[0]}.${c.de[1]}` === k || `${c.a[0]}.${c.a[1]}` === k)
                 return (
-                  <g key={k} onClick={e => { e.stopPropagation(); tocarPin(t.id, p.pin.nombre) }} className="cursor-pointer">
+                  <g key={k} onClick={e => { e.stopPropagation(); tocarPin(t.id, p.pin.nombre) }} onPointerEnter={() => setSobre([t.id, p.pin.nombre])} onPointerLeave={() => setSobre(null)} className="cursor-pointer">
                     <title>{p.pin.ayuda ?? p.pin.nombre}</title>
                     <rect x={t.x} y={p.y - 13} width={t.ancho} height={26} fill="transparent" />
                     <line x1={t.x + 12} x2={t.x + t.ancho - 12} y1={p.y} y2={p.y} stroke={color} strokeWidth={sel ? 5 : 3} strokeLinecap="round" />
                     <text x={t.x + t.ancho / 2} y={p.y - 6} textAnchor="middle" fill={color} fontSize={11} fontWeight={600}>{mas ? 'riel +' : 'riel −'} {p.pin.nombre.endsWith('arriba') ? 'de arriba' : 'de abajo'}</text>
-                    {[t.x, t.x + t.ancho].map(x => <circle key={x} cx={x} cy={p.y} r={sel ? 7.5 : 5.5} fill={conectado ? color : '#ffffff'} stroke={color} strokeWidth={2} />)}
+                    {[t.x, t.x + t.ancho].map(x => <circle key={x} cx={x} cy={p.y} r={sel ? 7.5 : 5.5} fill={conectado ? color : '#ffffff'} stroke={sugeridos.has(k) ? '#22c55e' : color} strokeWidth={sugeridos.has(k) ? 3.5 : 2} />)}
                   </g>
                 )
               })}
@@ -263,10 +339,11 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
                 const color = p.pin.tipo === 'gnd' ? '#64748b' : p.pin.tipo === 'alim' || p.pin.tipo === 'potencia' ? '#dc2626' : p.pin.tipo === 'pwm' ? '#9333ea' : p.pin.tipo === 'analogico' ? '#65a30d' : '#2563eb'
                 const tx = p.lado === 'der' ? p.x - 12 : p.x + 12
                 return (
-                  <g key={k} onClick={e => { e.stopPropagation(); tocarPin(t.id, p.pin.nombre) }} className="cursor-pointer">
+                  <g key={k} onClick={e => { e.stopPropagation(); tocarPin(t.id, p.pin.nombre) }} onPointerEnter={() => setSobre([t.id, p.pin.nombre])} onPointerLeave={() => setSobre(null)} className="cursor-pointer">
                     <title>{p.pin.ayuda ?? p.pin.nombre}</title>
                     <circle cx={p.x} cy={p.y} r={13} fill="transparent" />
                     {mal && <circle cx={p.x} cy={p.y} r={10} fill="none" stroke="#f59e0b" strokeWidth={2} />}
+                    {sugeridos.has(k) && <circle cx={p.x} cy={p.y} r={10} fill="none" stroke="#22c55e" strokeWidth={2.5}><animate attributeName="r" values="8;12;8" dur="1.2s" repeatCount="indefinite" /></circle>}
                     <circle cx={p.x} cy={p.y} r={sel ? 7.5 : 5.5} fill={conectado ? color : '#ffffff'} stroke={color} strokeWidth={2} />
                     <text x={tx} y={p.y + 4} textAnchor={p.lado === 'der' ? 'end' : 'start'} fill={sel ? '#0f172a' : '#475569'} fontWeight={sel ? 700 : 400} fontSize={11} fontFamily="monospace">
                       {p.pin.nombre}{p.pin.tipo === 'pwm' ? '~' : ''}
@@ -276,9 +353,9 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
               })}
             </g>
           ))}
-        </svg>
+        </svg>}
         {cableSel !== null && doc.cables[cableSel] && (
-          <div className="fixed bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-md lab-vidrio px-3 py-1.5 text-xs text-lab-tinta">
+          <div className="fixed bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-md lab-vidrio px-3 py-1.5 text-xs text-lab-tinta lg:hidden">
             <span className="font-mono">{doc.cables[cableSel].de[1]} → {doc.cables[cableSel].a[1]}</span>
             <button onClick={() => quitarCable(cableSel)} className="flex items-center gap-1 rounded px-2 py-1 font-medium text-red-700 hover:bg-red-50"><Trash2 className="h-3.5 w-3.5" /> Quitar cable</button>
           </div>
@@ -287,6 +364,59 @@ export default function Cablear({ doc, cambiar }: { doc: RobotDoc; cambiar: (d: 
 
       {/* ---------- Revisión y tabla ---------- */}
       <aside className="max-h-[45vh] w-full overflow-y-auto border-t border-lab-borde/20 bg-lab-superficie p-4 text-xs lg:max-h-none lg:w-80 lg:border-l lg:border-t-0">
+        {/* Explicación de lo que se está tocando */}
+        <h3 className="lab-seccion mb-2">Qué es</h3>
+        <div className="mb-5 min-h-[6.5rem] rounded-md border border-lab-borde/20 bg-lab-fondo px-3 py-2.5 leading-relaxed" aria-live="polite">
+          {exCable && cableSel !== null ? (
+            <>
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: doc.cables[cableSel].color === NEGRO ? '#4b5563' : doc.cables[cableSel].color }} />
+                <span className="font-mono text-sm font-semibold text-lab-tinta">{exCable.titulo}</span>
+                <span className="ml-auto text-[10px] uppercase tracking-wide text-lab-tenue">Cable</span>
+              </div>
+              <p className="mt-1.5 text-lab-tinta2">{exCable.texto}</p>
+              {exCable.codigo && <p className="mt-1.5 flex gap-1.5 text-lab-tinta2"><Code2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-lab-acento" /><span className="font-mono text-[11px]">{exCable.codigo}</span></p>}
+              <button onClick={() => quitarCable(cableSel)} className="mt-2 flex items-center gap-1 rounded px-2 py-1 font-medium text-red-700 hover:bg-red-50"><Trash2 className="h-3.5 w-3.5" /> Quitar este cable</button>
+            </>
+          ) : exPin ? (
+            <>
+              <div className="flex items-baseline gap-2">
+                <span className="font-mono text-sm font-semibold text-lab-tinta">{exPin.titulo}</span>
+                <span className="ml-auto shrink-0 text-[10px] uppercase tracking-wide text-lab-tenue">{exPin.tipo}</span>
+              </div>
+              <p className="mt-1.5 text-lab-tinta2">{exPin.que}</p>
+              {exPin.codigo && <p className="mt-1.5 flex gap-1.5 text-lab-tinta2"><Code2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-lab-acento" /><span className="font-mono text-[11px]">{exPin.codigo}</span></p>}
+              <p className="mt-1.5 text-lab-suave">{exPin.unidoA.length ? <>Ahora está unido a: <b className="font-medium text-lab-tinta2">{exPin.unidoA.join(', ')}</b>.</> : 'Ahora está suelto: no tiene ningún cable.'}</p>
+              {exPin.cuidado && <p className="mt-1.5 flex gap-1.5 text-amber-800"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {exPin.cuidado}</p>}
+            </>
+          ) : (
+            <p className="flex gap-2 text-lab-suave"><MousePointerClick className="mt-0.5 h-4 w-4 shrink-0" /> Pasa por encima de un pin o toca un cable: aquí se explica qué hace, a qué está unido y cómo se usa en el programa.</p>
+          )}
+        </div>
+
+        {/* Guía paso a paso */}
+        <h3 className="lab-seccion mb-2">Guía paso a paso</h3>
+        {paso ? (
+          <div className="mb-5">
+            <p className="mb-2 text-lab-suave">{pasos.length === 1 ? 'Falta 1 cable' : `Faltan ${pasos.length} cables`} para que todo funcione. El siguiente:</p>
+            <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2.5 leading-relaxed text-emerald-900">
+              <p className="flex gap-1.5 font-semibold"><Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {paso.titulo}</p>
+              <p className="mt-1">{paso.porque}</p>
+              {paso.codigo && <p className="mt-1 font-mono text-[11px]">{paso.codigo}</p>}
+              <p className="mt-1.5 text-emerald-800">{vista === '3d' ? 'Los dos pines laten en verde: tócalos, uno y después el otro.' : 'Toca esos dos pines en el esquema.'}</p>
+              <button onClick={() => ponerCable(paso.cable.de, paso.cable.a, paso.cable.color)} className="mt-2 rounded border border-emerald-300 bg-white px-2 py-1 font-medium text-emerald-800 hover:bg-emerald-100">Poner este cable por mí</button>
+            </div>
+            {pasos.length > 1 && (
+              <ol start={2} className="mt-2 list-decimal space-y-1 pl-5 text-lab-suave">
+                {pasos.slice(1, 6).map((x, i) => <li key={i}>{x.titulo.replace(/^Conecta /, '')}</li>)}
+                {pasos.length > 6 && <li className="list-none">… y {pasos.length - 6} más</li>}
+              </ol>
+            )}
+          </div>
+        ) : (
+          <p className="mb-5 flex items-center gap-2 text-lab-suave"><CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" /> No falta ningún cable: cada pieza está conectada.</p>
+        )}
+
         <h3 className="lab-seccion mb-2">Revisión</h3>
         {problemas.length === 0 ? (
           <div className="mb-3 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-800"><CheckCircle2 className="h-4 w-4" /> Todo bien: {esBanco(doc) ? 'el circuito' : 'el robot'} está listo para probar.</div>

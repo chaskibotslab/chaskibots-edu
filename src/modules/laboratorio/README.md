@@ -32,6 +32,7 @@ Navegador                                                  Railway
 | `engine/avr.worker.ts` | Web Worker que corre el CPU |
 | `engine/bridge.ts` | Funciones puras pin ↔ física: PWM, L298N, motor, IR, ADC, HC-SR04, servo |
 | `engine/netlist.ts` | Convierte el cableado en «qué pin maneja qué» |
+| `engine/explicacion.ts` | Textos para el alumno, sacados del catálogo: qué hace cada pin y cada cable, guía de lo que falta conectar, qué se aprende con un proyecto |
 | `engine/nucleo.ts` | Un paso de simulación (lo comparten el navegador y los tests) |
 | `engine/physics.ts` | Rapier: chasis, ruedas, gravedad, raycast |
 | `engine/tracks.ts` | Pistas: generadas por código o PNG del usuario |
@@ -42,6 +43,8 @@ Navegador                                                  Railway
 | `server/acceso.ts` | Flag `LAB_ENABLED` + sesión (reutiliza `@/lib/session`) |
 | `__tests__/` | Tests unitarios, de emulación y de lazo cerrado |
 | `scripts/smoke-rutas.mjs` | Verifica que las rutas existentes no cambiaron |
+| `scripts/descargar-sketchfab.mjs` | Baja modelos gratuitos (CC0, CC BY) de Sketchfab a `modelos-3d/sketchfab/` (fuera de git) con su licencia. Usa `SKETCHFAB_API_TOKEN` de `.env.local`; salta los modelos pagos |
+| `scripts/preparar-robots.mjs` | Separa un robot bajado en sus partes (carrocería, ruedas, arma, patas), lo pasa a metros con +x adelante y lo deja liviano en `public/lab/modelos/`; anota el crédito en `catalogo/creditosModelos.ts` |
 
 Rutas nuevas: `src/app/laboratorio/page.tsx` y `src/app/api/lab/compile/route.ts`. Son archivos delgados que solo montan el módulo.
 

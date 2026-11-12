@@ -263,6 +263,26 @@ export function construirSeguidor(): RobotDoc {
   return a.terminar(codigoSeguidor)
 }
 
+/**
+ * Seguidor de línea de competencia (modelo real): chasis en T con barra de
+ * sensores al frente, Nano y TB6612 en el piso de arriba, LiPo entre los dos
+ * pisos, micromotores N20 con ruedas de 42 mm y rueda loca de bola.
+ */
+export function construirSeguidorPro(): RobotDoc {
+  const a = new Armador('chasis-seguidor-pro', '', 'Seguidor de competencia')
+  a.poner('arduino-nano', 'chasis', 'placa')
+  a.poner('tb6612', 'chasis', 'driver')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  const mi = a.poner('motor-n20', 'chasis', 'motor-izq')
+  const md = a.poner('motor-n20', 'chasis', 'motor-der')
+  a.poner('rueda-42', mi, 'eje')
+  a.poner('rueda-42', md, 'eje')
+  a.poner('rueda-loca-chica', 'chasis', 'loca')
+  a.poner('sensor-linea-barra', 'chasis', 'piso-izq')
+  a.poner('sensor-linea-barra', 'chasis', 'piso-der')
+  return a.terminar(codigoSeguidor)
+}
+
 
 // ---------------------------------------------------------------------------
 // Seguidor de velocidad (competencia): acelera en las rectas y frena para las curvas
@@ -973,6 +993,28 @@ export function construirMinisumo(variante = 'pla', nombre = 'Minisumo'): RobotD
 }
 
 /**
+ * Minisumo «Paladín»: carrocería de torneo (modelo real) con las ruedas y la
+ * batería adentro, los sensores en la ventana del frente y la placa arriba.
+ * Lleva las mismas piezas electrónicas, y el mismo programa, que el minisumo.
+ */
+export function construirPaladin(): RobotDoc {
+  const a = new Armador('chasis-paladin', '', 'Minisumo Paladín')
+  a.poner('arduino-nano', 'chasis', 'placa')
+  a.poner('tb6612', 'chasis', 'driver')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  const mi = a.poner('motor-n20', 'chasis', 'motor-izq')
+  const md = a.poner('motor-n20', 'chasis', 'motor-der')
+  a.poner('rueda-31', mi, 'eje')
+  a.poner('rueda-31', md, 'eje')
+  a.poner('hcsr04', 'chasis', 'frente')
+  a.poner('fc51', 'chasis', 'frente-izq')
+  a.poner('fc51', 'chasis', 'frente-der')
+  a.poner('sensor-linea-barra', 'chasis', 'piso-izq')
+  a.poner('sensor-linea-barra', 'chasis', 'piso-der')
+  return a.terminar(codigoMinisumo)
+}
+
+/**
  * Minisumo con ESP32: la placa no cabe abajo junto a la LiPo y el ultrasonido,
  * así que la placa y el driver suben al piso de arriba. El ultrasonido queda
  * abajo, a la altura del rival (arriba, su haz pasaría por encima). Driver
@@ -1141,6 +1183,24 @@ export function construirWarbot(arma: 'tambor' | 'disco', variante = 'aluminio',
   a.poner(arma === 'tambor' ? 'arma-tambor' : 'arma-disco', 'chasis', 'arma')
   if (sensor) a.poner('hcsr04', 'chasis', 'frente')
   return a.terminar(sensor ? codigoBattlebotAuto : codigoBattlebotRc)
+}
+
+/**
+ * «Abyss»: robot de combate de competencia con modelo real. La misma
+ * electrónica que el robot de tambor (Nano, TB6612, LiPo 2S), pero adentro de
+ * la carrocería, con sus ruedas y su tambor de 170 mm.
+ */
+export function construirAbyss(nombre = 'Abyss'): RobotDoc {
+  const a = new Armador('chasis-abyss', '', nombre)
+  a.poner('arduino-nano', 'chasis', 'placa')
+  a.poner('tb6612', 'chasis', 'driver')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  const mi = a.poner('motor-combate', 'chasis', 'motor-izq')
+  const md = a.poner('motor-combate', 'chasis', 'motor-der')
+  a.poner('rueda-abyss', mi, 'eje')
+  a.poner('rueda-abyss', md, 'eje')
+  a.poner('tambor-abyss', 'chasis', 'arma')
+  return a.terminar(codigoBattlebotRc)
 }
 
 /** El rival de práctica de cada arena de competencia. */
@@ -1628,6 +1688,28 @@ export const PREARMADOS: Prearmado[] = [
     ],
   },
   {
+    id: 'seguidor-pro',
+    nombre: 'Seguidor de línea de competencia (modelo real)',
+    descripcion: 'El modelo 3D de un seguidor de carrera real: chasis liviano en T, micromotores N20 con ruedas de 42 mm y una barra de sensores bien adelante. La misma lógica que el seguidor básico, en un robot mucho más ágil.',
+    dificultad: 'intermedio',
+    logica: [
+      'Los dos sensores de la barra miran el piso desde 5 mm: sobre blanco dan LOW, sobre la cinta negra dan HIGH.',
+      'La barra va 9 cm delante de las ruedas: el robot «ve» la curva antes de llegar y alcanza a girar.',
+      'Si ninguno ve la línea, está entre los dos: sigue recto. Si uno la ve, gira hacia ese lado.',
+      'Es liviano (≈ 140 g) y bajo: acelera y frena rápido. Compara su vuelta con la del seguidor de kit.',
+      'Desafío: sube VELOCIDAD y GIRO de a poco hasta que se salga en la curva; ese es su límite.',
+    ],
+    arena: 'ovalo',
+    construir: construirSeguidorPro,
+    plantillas: (doc, tabla) => [
+      { id: 'seguidor', nombre: 'Seguidor de línea (2 sensores)', descripcion: 'Lógica sí/no con los sensores digitales', codigo: codigoSeguidor(tabla, doc) },
+      { id: 'proporcional', nombre: 'Seguidor proporcional', descripcion: 'Corrección suave con analogRead', codigo: codigoProporcional(tabla, doc) },
+      { id: 'velocidad', nombre: 'Seguidor de velocidad', descripcion: 'Acelera en las rectas, frena para las curvas', codigo: codigoSeguidorVelocidad(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+      { id: 'sensores', nombre: 'Lectura de sensores', descripcion: 'Valores de los IR en el Monitor Serie', codigo: codigoLecturaLinea(tabla, doc) },
+    ],
+  },
+  {
     id: 'seguidor-velocidad',
     nombre: 'Seguidor de velocidad (competencia)',
     descripcion: 'El seguidor de línea en modo carrera: tres vueltas contra el reloj en la pista de curvas. Acelera en las rectas y frena para las curvas.',
@@ -1792,6 +1874,27 @@ export const PREARMADOS: Prearmado[] = [
     ],
   },
   {
+    id: 'minisumo-paladin',
+    nombre: 'Minisumo de competencia «Paladín»',
+    descripcion: 'El minisumo como se ve en los torneos: carrocería cerrada con rampa, ruedas de silicona adentro y los sensores mirando por la ventana del frente. Lleva la misma electrónica y el mismo programa que el minisumo autónomo: lo que cambia es el diseño mecánico.',
+    dificultad: 'avanzado',
+    tema: tema('la Aula 38 (sumô)'),
+    logica: [
+      'Espera 5 s quieto al empezar cada ronda (reglamento).',
+      'Si un sensor de abajo ve el borde blanco: retrocede un poco y gira en el lugar hacia el centro.',
+      'Si el ultrasonido ve al rival a menos de 60 cm: ¡ataca a fondo! La rampa se mete debajo y le quita tracción.',
+      'Mientras empuja, corrige hacia el lado donde el IR ve al rival para pegarle de frente.',
+      'Compara con el minisumo de chasis abierto: ¿por qué en los torneos todos van cerrados y bajos?',
+    ],
+    arena: 'dohyo-minisumo',
+    construir: construirPaladin,
+    plantillas: (doc, tabla) => [
+      { id: 'minisumo', nombre: 'Minisumo (buscar y atacar)', descripcion: 'Espera, busca, ataca y evita el borde', codigo: codigoMinisumo(tabla, doc) },
+      { id: 'sensores', nombre: 'Prueba de sensores', descripcion: 'Distancia, IR y borde en el Monitor Serie', codigo: codigoLecturaMinisumo(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
     id: 'minisumo-esp32',
     nombre: 'Minisumo autónomo ESP32 (dos pisos)',
     descripcion: 'El minisumo autónomo con ESP32. La placa y el driver van en el piso de arriba, sobre separadores de latón, y abajo quedan la batería y los sensores.',
@@ -1843,6 +1946,25 @@ export const PREARMADOS: Prearmado[] = [
     ],
     arena: 'arena-combate',
     construir: () => construirWarbot('tambor'),
+    plantillas: (doc, tabla) => [
+      { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Flechas para moverse, X/Y para el arma', codigo: codigoBattlebotRc(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'warbot-abyss',
+    nombre: '«Abyss»: robot de tambor de competencia',
+    descripcion: 'El modelo 3D de un robot de combate real (diseño de Floating Castle Robotics): carrocería blindada con la electrónica adentro, ruedas anchas y un tambor de 170 mm que ocupa todo el frente. Lo manejas tú.',
+    dificultad: 'intermedio',
+    logica: [
+      'Presiona «Compilar y ejecutar»: empieza el combate y aparece el control remoto.',
+      'Maneja con las flechas o WASD; la tecla E (o «Encender arma») hace girar el tambor.',
+      'La electrónica va adentro de la carrocería, protegida de los golpes: en «Cablear» la carrocería se vuelve transparente para ver la placa, el driver y la batería.',
+      'El tambor es tan ancho como el robot: no hace falta apuntar tanto, pero es pesado y todo el peso queda adelante. Por eso se apoya en las púas de los brazos.',
+      'Compáralo con el robot de tambor angosto: ¿cuál gira más rápido en el lugar?, ¿cuál pega más fuerte?',
+    ],
+    arena: 'arena-combate',
+    construir: () => construirAbyss(),
     plantillas: (doc, tabla) => [
       { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Flechas para moverse, X/Y para el arma', codigo: codigoBattlebotRc(tabla, doc) },
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },

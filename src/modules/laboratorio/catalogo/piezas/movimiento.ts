@@ -101,6 +101,8 @@ export const MOTOR_N20: PiezaDef = {
   familia: 'movimiento',
   descripcion: 'Motor metálico diminuto con reductora: el de los minisumos y robots pequeños. Rápido y liviano.',
   modelo: 'proc:motor-n20',
+  // Micromotor Pololu del «Line Follower Robot» de zoe.goodward (scripts/preparar-robots.mjs).
+  glb: '/lab/modelos/motor-n20.glb',
   masa_g: 10,
   material: 'metal',
   colisionadores: [{ forma: 'caja', medidas: [12, 10, 24], centro: [0, 0, -12] }],

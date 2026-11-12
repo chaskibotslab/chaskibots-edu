@@ -173,6 +173,8 @@ export interface PiezaDef {
   glb?: string
   /** Escala del modelo real (p. ej. la rueda de 48 mm usa el modelo de 65 mm reducido). */
   escalaGlb?: number
+  /** Carrocería cerrada con la electrónica adentro: se ve traslúcida al cablear y al poner piezas. */
+  carcasa?: boolean
   /** Se muestra en el cajón pero todavía no se puede usar: texto de cuándo llega. */
   proximamente?: string
   masa_g: number

@@ -75,5 +75,59 @@ export const CREDITOS_MODELOS: Record<string, CreditoModelo> = {
     "autor": "Aficionado (https://sketchfab.com/TECH_AR)",
     "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
     "fuente": "https://sketchfab.com/3d-models/electronics-components-2d438fc3577a46f3ab7ad0bf88ab9f32"
+  },
+  "perro-go1.glb": {
+    "titulo": "Robot dog Unitree Go1",
+    "autor": "C. Yamahata (https://sketchfab.com/cyamahat)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/robot-dog-unitree-go1-926627f69b194b6da4fbf8a31df49303"
+  },
+  "abyss-casco.glb": {
+    "titulo": "Abyss",
+    "autor": "Floating Castle Design (https://sketchfab.com/FloatingCastleRobotics)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/abyss-0361f5fe78b74c8f9432c4911c2102d7"
+  },
+  "abyss-rueda.glb": {
+    "titulo": "Abyss",
+    "autor": "Floating Castle Design (https://sketchfab.com/FloatingCastleRobotics)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/abyss-0361f5fe78b74c8f9432c4911c2102d7"
+  },
+  "abyss-tambor.glb": {
+    "titulo": "Abyss",
+    "autor": "Floating Castle Design (https://sketchfab.com/FloatingCastleRobotics)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/abyss-0361f5fe78b74c8f9432c4911c2102d7"
+  },
+  "seguidor-pro-chasis.glb": {
+    "titulo": "Line Follower Robot",
+    "autor": "zoe.goodward (https://sketchfab.com/zoe.goodward)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/line-follower-robot-11bf9b71d5f34517b404d12c74ddb506"
+  },
+  "motor-n20.glb": {
+    "titulo": "Line Follower Robot",
+    "autor": "zoe.goodward (https://sketchfab.com/zoe.goodward)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/line-follower-robot-11bf9b71d5f34517b404d12c74ddb506"
+  },
+  "rueda-42.glb": {
+    "titulo": "Line Follower Robot",
+    "autor": "zoe.goodward (https://sketchfab.com/zoe.goodward)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/line-follower-robot-11bf9b71d5f34517b404d12c74ddb506"
+  },
+  "paladin-casco.glb": {
+    "titulo": "Micro sumo paladin",
+    "autor": "matheus.nfranca97 (https://sketchfab.com/matheus.nfranca97)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/micro-sumo-paladin-c70f396029de4fc285f06e31b7400a9b"
+  },
+  "rueda-31.glb": {
+    "titulo": "Micro sumo paladin",
+    "autor": "matheus.nfranca97 (https://sketchfab.com/matheus.nfranca97)",
+    "licencia": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "fuente": "https://sketchfab.com/3d-models/micro-sumo-paladin-c70f396029de4fc285f06e31b7400a9b"
   }
 }

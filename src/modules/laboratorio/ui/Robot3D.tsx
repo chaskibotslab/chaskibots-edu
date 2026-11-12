@@ -5,8 +5,9 @@
 // forma que el robot: lo que cuelga de un servo gira con él y las ruedas
 // giran sobre su eje. En el taller muestra además los puntos de encastre.
 
-import { createRef, Suspense, useMemo, useRef, type MutableRefObject, type RefObject } from 'react'
+import { createRef, Suspense, useMemo, useRef, useState, type MutableRefObject, type RefObject } from 'react'
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
+import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { datosVariante, pieza } from '../catalogo/piezas'
 import { grados, type PiezaDef, type PuntoMontaje } from '../catalogo/tipos'
@@ -19,13 +20,20 @@ import { infoPlaca } from '../engine/placa'
 import {
   ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, RaspberryPi4, JetsonNano, CamaraCSI, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
   ChasisMinisumo, MotorN20, BateriaLipo, ChasisBattlebot, ArmaGiratoria, ChasisTambor, ChasisDisco, MotorCombate, RuedaCombate, ArmaTambor, ArmaDisco,
-  PerroRobot, ikPata, RADIO_PIE, type PataPerro,
+  PerroRobot, ikPata, RADIO_PIE, type PataPerro, SensorBarra,
 } from './modelos/Piezas3D'
+import { PerroGo1 } from './modelos/Robots3D'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
-import { ALTO_PROTOBOARD, agujeroRiel } from '../catalogo/piezas/circuito'
+import { AGUJEROS_RIEL, ALTO_PROTOBOARD, RIELES, agujeroRiel, xRiel } from '../catalogo/piezas/circuito'
 import { CircuitoVivoContexto, ModeloCircuito, esModeloCircuito, type CircuitoVivo } from './modelos/Circuito3D'
 
 const m = (v: number) => v / 1000
+
+/**
+ * Bajo el puntero hay un pin de cableado: el pin gana aunque un cable o la
+ * pieza estén más cerca de la cámara (el pin está metido en su conector).
+ */
+const hayPin = (e: { intersections: { object: THREE.Object3D }[] }) => e.intersections.some(i => i.object.userData.esPin)
 
 export interface MarcadorMontaje { clave: string; instancia: string; montaje: PuntoMontaje }
 
@@ -57,6 +65,25 @@ interface Props {
   posMarcadores?: MutableRefObject<Map<string, { x: number; y: number }>>
   explosion?: number
   cables?: boolean
+  /** Modo cablear: muestra cada pin como un punto que se puede tocar y deja elegir cables. */
+  cableado?: Cableado3D
+}
+
+/** Lo que necesita la escena para cablear sobre las piezas reales. Los pines van como "instancia.pin". */
+export interface Cableado3D {
+  /** Pin ya elegido (la primera punta del cable que se está poniendo). */
+  elegido: [string, string] | null
+  cableSel: number | null
+  /** Pines con algún problema eléctrico. */
+  problemas: Set<string>
+  /** Pines del próximo paso de la guía: laten para que se encuentren. */
+  sugeridos: Set<string>
+  onPin: (inst: string, pin: string) => void
+  onCable: (i: number | null) => void
+  /** El puntero pasa por encima de un pin (null = salió). */
+  onSobre?: (pin: [string, string] | null) => void
+  /** Se tocó una pieza (no un pin): punto tocado en el mundo, para acercar la cámara ahí. */
+  onPieza?: (punto: THREE.Vector3, inst: string) => void
 }
 
 function matrizMontaje(mt: PuntoMontaje, giro = 0) {
@@ -67,7 +94,7 @@ function matrizMontaje(mt: PuntoMontaje, giro = 0) {
 }
 
 /** Modelo real (GLB) si la pieza lo tiene; mientras carga se ve el hecho por código. */
-function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number; bajoChasis?: number }) {
+function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLoca: number; bajoChasis?: number; traslucido?: boolean }) {
   if (!p.def.glb) return <ModeloProc {...p} />
   const c = p.def.comportamiento
   if (c.tipo === 'rueda') {
@@ -78,6 +105,26 @@ function Modelo(p: { inst: PiezaEnRobot; def: PiezaDef; refs: Refs; espaciadorLo
           <ModeloGlb url={p.def.glb} escala={p.def.escalaGlb} />
         </Suspense>
       </group>
+    )
+  }
+  if (c.tipo === 'arma-giratoria') {
+    // El arma entera gira (tambor con sus dientes): el grupo es el que mueve la simulación.
+    if (!p.refs.armas.has(p.inst.id)) p.refs.armas.set(p.inst.id, createRef())
+    return (
+      <Suspense fallback={null}>
+        <group ref={p.refs.armas.get(p.inst.id)}><ModeloGlb url={p.def.glb} escala={p.def.escalaGlb} /></group>
+      </Suspense>
+    )
+  }
+  if (c.tipo === 'chasis') {
+    // Carrocería real: en «Cablear» se vuelve traslúcida para ver la electrónica que lleva adentro.
+    return <Suspense fallback={null}><ModeloGlb url={p.def.glb} escala={p.def.escalaGlb} traslucido={p.traslucido && p.def.carcasa} /></Suspense>
+  }
+  if (c.tipo === 'cuadrupedo') {
+    return (
+      <Suspense fallback={<ModeloProc {...p} />}>
+        <PerroGo1 url={p.def.glb} caderas={c.caderas} patas={p.refs.perro} />
+      </Suspense>
     )
   }
   return (
@@ -150,6 +197,10 @@ function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst:
       // El soporte sube desde el sensor (8,6 mm) hasta la cara de abajo del chasis (3 mm de espesor).
       return <TCRT5000 ref={refs.ledsIr.get(inst.id)} alturaSoporte={Math.max(1, bajoChasis - 1.5 - 8.6)} />
     }
+    case 'proc:sensor-barra': {
+      if (!refs.ledsIr.has(inst.id)) refs.ledsIr.set(inst.id, createRef())
+      return <SensorBarra ref={refs.ledsIr.get(inst.id)} />
+    }
     case 'proc:fc51': {
       if (!refs.ledsObs.has(inst.id)) refs.ledsObs.set(inst.id, createRef())
       return <FC51 ref={refs.ledsObs.get(inst.id)} />
@@ -214,13 +265,16 @@ function Nodo(p: NodoProps) {
   const { doc, inst, refs, seleccion, onSeleccionar, explosion = 0 } = p
   const def = pieza(inst.pieza)
   const hs = hijos(doc, inst.id)
-  const click = onSeleccionar
-    ? (e: ThreeEvent<MouseEvent>) => { e.stopPropagation(); onSeleccionar(inst.id) }
+  const enfocar = p.cableado?.onPieza
+  const click = onSeleccionar || enfocar
+    ? (e: ThreeEvent<MouseEvent>) => { if (hayPin(e)) return; e.stopPropagation(); onSeleccionar?.(inst.id); enfocar?.(e.point.clone(), inst.id) }
     : undefined
   return (
     <group>
       <group onClick={click}>
-        <Modelo inst={inst} def={def} refs={refs} espaciadorLoca={p.espaciadores.get(inst.id) ?? 0} bajoChasis={-(montajeDe(doc, inst)?.posicion[1] ?? -35)} />
+        <Modelo inst={inst} def={def} refs={refs} espaciadorLoca={p.espaciadores.get(inst.id) ?? 0} bajoChasis={-(montajeDe(doc, inst)?.posicion[1] ?? -35)}
+          traslucido={!!p.cableado || explosion > 0.05 || (p.marcadores?.length ?? 0) > 0}
+        />
         {seleccion === inst.id && <Seleccion def={def} />}
       </group>
       {(p.porInstancia.get(inst.id) ?? []).map(mk => (
@@ -269,8 +323,9 @@ const largoConector = (t: Punta['tipo']) => (t === 'dupont' ? LARGO_DUPONT : t =
  * su conector Dupont, o del borne) y se curva hacia la otra punta como un
  * cable semirrígido (curva de Bézier), cayendo un poco por su peso.
  */
-function Cable({ a, b, color }: { a: Punta; b: Punta; color: string }) {
+function Cable({ a, b, color, sel = false, tenue = false, fantasma = false, onClick }: { a: Punta; b: Punta; color: string; sel?: boolean; tenue?: boolean; fantasma?: boolean; onClick?: () => void }) {
   const q = useCalidad()
+  const tocable = !!onClick
   const datos = useMemo(() => {
     const salida = (p: Punta) => p.pos.clone().addScaledVector(p.dir, largoConector(p.tipo) || 0.004)
     const p0 = salida(a), p3 = salida(b)
@@ -285,14 +340,21 @@ function Cable({ a, b, color }: { a: Punta; b: Punta; color: string }) {
     const curva = new THREE.CubicBezierCurve3(p0, p1, p2, p3)
     const conector = (t: Punta['tipo']) => t === 'dupont' || t === 'macho'
     const grueso = !conector(a.tipo) && !conector(b.tipo) ? 0.0009 : 0.00065
-    const tubo = new THREE.TubeGeometry(curva, q.nivel === 'baja' ? 14 : 36, grueso, q.nivel === 'baja' ? 5 : 8, false)
-    return { tubo, grueso }
-  }, [a, b, q.nivel])
+    const tubo = new THREE.TubeGeometry(curva, q.nivel === 'baja' ? 14 : 36, sel ? grueso * 1.7 : grueso, q.nivel === 'baja' ? 5 : 8, false)
+    // Tubo ancho invisible: un cable de 1 mm sería casi imposible de tocar con el dedo.
+    const toque = tocable ? new THREE.TubeGeometry(curva, 12, 0.0028, 5, false) : null
+    return { tubo, grueso, toque }
+  }, [a, b, q.nivel, sel, tocable])
   return (
     <group>
-      <mesh geometry={datos.tubo} castShadow={q.sombras}>
-        <meshStandardMaterial color={color} roughness={0.4} />
+      <mesh geometry={datos.tubo} castShadow={q.sombras && !fantasma}>
+        <meshStandardMaterial color={color} roughness={0.4} emissive={sel ? color : '#000000'} emissiveIntensity={sel ? 0.6 : 0} transparent={tocable || fantasma} opacity={fantasma ? 0.55 : tenue ? 0.3 : 1} />
       </mesh>
+      {datos.toque && (
+        <mesh geometry={datos.toque} onClick={e => { if (hayPin(e)) return; e.stopPropagation(); onClick?.() }} onPointerOver={e => { if (hayPin(e)) return; e.stopPropagation(); document.body.style.cursor = 'pointer' }} onPointerOut={() => { document.body.style.cursor = '' }}>
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
+      )}
       {[a, b].map((p, i) => (largoConector(p.tipo) ? <ConectorDupont key={i} punta={p} largo={largoConector(p.tipo)} /> : <Punta key={i} punta={p} color={color} grueso={datos.grueso} />))}
     </group>
   )
@@ -321,44 +383,190 @@ function Punta({ punta, color, grueso }: { punta: Punta; color: string; grueso: 
   )
 }
 
-function Cables({ doc }: { doc: RobotDoc }) {
+/**
+ * Dónde termina cada cable: `punta` para un pin con lugar fijo y `enRiel` para
+ * los rieles de la protoboard (el cable entra en el agujero libre más cercano
+ * a su otra punta). Todo en metros, en el marco del robot.
+ */
+function puntasDe(doc: RobotDoc) {
+  const ps = poses(doc)
+  const punta = (inst: string, pin: string): Punta | null => {
+    const p = doc.piezas.find(x => x.id === inst)
+    const pose = ps.get(inst)
+    if (!p || !pose) return null
+    const modelo = pieza(p.pieza).modelo
+    const a = anclaPin(modelo, pin)
+    if (!a) return null
+    const s = salidaPin(modelo, pin)
+    return {
+      pos: aRobot(pose, a).multiplyScalar(0.001),
+      dir: new THREE.Vector3(...s.dir).normalize().applyQuaternion(pose.rot),
+      tipo: s.tipo,
+    }
+  }
+  const usados = new Map<string, Set<number>>()
+  const base = raiz(doc)
+  const poseBase = ps.get(base.id)
+  const enRiel = (inst: string, pin: string, otra: Punta | null): Punta | null => {
+    if (!poseBase || inst !== base.id) return null
+    // Un puente entre dos rieles va al principio de la protoboard.
+    const x = otra ? otra.pos.clone().multiplyScalar(1000).sub(poseBase.pos).applyQuaternion(poseBase.rot.clone().invert()).x : -70
+    const h = agujeroRiel(pin, x, usados)
+    if (!h) return null
+    return { pos: aRobot(poseBase, [h[0], ALTO_PROTOBOARD + 0.3, h[1]]).multiplyScalar(0.001), dir: new THREE.Vector3(0, 1, 0).applyQuaternion(poseBase.rot), tipo: 'macho' }
+  }
+  /** Las dos puntas de un cable (null si algún pin no tiene lugar). */
+  const cable = (de: [string, string], a: [string, string]): [Punta, Punta] | null => {
+    const pa = punta(...de), pb = punta(...a)
+    const x = pa ?? enRiel(...de, pb)
+    const y = pb ?? enRiel(...a, x)
+    return x && y ? [x, y] : null
+  }
+  return { punta, cable, base, poseBase }
+}
+
+function Cables({ doc, cableado }: { doc: RobotDoc; cableado?: Cableado3D }) {
   const lista = useMemo(() => {
-    const ps = poses(doc)
-    const punta = (inst: string, pin: string): Punta | null => {
-      const p = doc.piezas.find(x => x.id === inst)
-      const pose = ps.get(inst)
-      if (!p || !pose) return null
-      const modelo = pieza(p.pieza).modelo
-      const a = anclaPin(modelo, pin)
-      if (!a) return null
-      const s = salidaPin(modelo, pin)
-      return {
-        pos: aRobot(pose, a).multiplyScalar(0.001),
-        dir: new THREE.Vector3(...s.dir).normalize().applyQuaternion(pose.rot),
-        tipo: s.tipo,
+    const { cable } = puntasDe(doc)
+    return doc.cables.map((c, i) => ({ c, i, p: cable(c.de, c.a) })).filter(x => x.p) as { c: RobotDoc['cables'][number]; i: number; p: [Punta, Punta] }[]
+  }, [doc])
+  const sel = cableado?.cableSel ?? null
+  const elegir = cableado?.onCable
+  return <>{lista.map(({ c, i, p }) => (
+    <Cable key={i} a={p[0]} b={p[1]} color={c.color} sel={sel === i} tenue={sel !== null && sel !== i} onClick={elegir ? () => elegir(i) : undefined} />
+  ))}</>
+}
+
+const COLOR_PIN: Record<string, string> = { gnd: '#64748b', alim: '#dc2626', potencia: '#dc2626', pwm: '#9333ea', analogico: '#65a30d' }
+const colorPin = (tipo: string) => COLOR_PIN[tipo] ?? '#2563eb'
+
+type EstadoPin = 'normal' | 'elegido' | 'sugerido' | 'problema'
+const colorEstado = (e: EstadoPin, normal: string) => (e === 'elegido' ? '#facc15' : e === 'sugerido' ? '#22c55e' : e === 'problema' ? '#f59e0b' : normal)
+
+function EtiquetaPin({ texto }: { texto: string }) {
+  return (
+    <Html position={[0, 0.004, 0]} center zIndexRange={[30, 0]} style={{ pointerEvents: 'none' }}>
+      <span style={{ display: 'block', transform: 'translateY(-14px)', whiteSpace: 'nowrap', background: 'rgba(15,23,42,.92)', color: '#fff', font: '600 11px ui-monospace, monospace', padding: '2px 6px', borderRadius: 4 }}>{texto}</span>
+    </Html>
+  )
+}
+
+interface PropsPunto { estado: EstadoPin; etiqueta: string; onClick: () => void; onSobre: (si: boolean) => void }
+
+/** Un pin que se puede tocar: una bolita en su lugar real, del color de su tipo. */
+function PuntoPin({ pos, color, estado, etiqueta, onClick, onSobre }: PropsPunto & { pos: THREE.Vector3; color: string }) {
+  const ref = useRef<THREE.Mesh>(null)
+  const [sobre, setSobre] = useState(false)
+  useFrame(({ clock }) => {
+    if (!ref.current) return
+    const late = estado === 'sugerido' || estado === 'elegido' ? 1.45 + Math.sin(clock.elapsedTime * 6) * 0.3 : 1
+    ref.current.scale.setScalar(sobre ? 1.6 : late)
+  })
+  return (
+    <mesh
+      ref={ref} position={pos} renderOrder={10} userData={{ esPin: true }}
+      onClick={e => { e.stopPropagation(); onClick() }}
+      onPointerOver={e => { e.stopPropagation(); setSobre(true); onSobre(true); document.body.style.cursor = 'pointer' }}
+      onPointerOut={() => { setSobre(false); onSobre(false); document.body.style.cursor = '' }}
+    >
+      <sphereGeometry args={[0.00115, 14, 10]} />
+      <meshBasicMaterial color={colorEstado(estado, color)} transparent opacity={sobre || estado !== 'normal' ? 1 : 0.85} depthTest={false} />
+      {(sobre || estado === 'elegido') && <EtiquetaPin texto={etiqueta} />}
+    </mesh>
+  )
+}
+
+/** Riel de la protoboard: una barra a lo largo de todos sus agujeros (están unidos por dentro). */
+function BarraRiel({ a, b, mas, estado, etiqueta, onClick, onSobre }: PropsPunto & { a: THREE.Vector3; b: THREE.Vector3; mas: boolean }) {
+  const [sobre, setSobre] = useState(false)
+  const mat = useRef<THREE.MeshBasicMaterial>(null)
+  useFrame(({ clock }) => {
+    if (mat.current) mat.current.opacity = sobre ? 0.9 : estado === 'normal' ? 0.4 : 0.6 + Math.sin(clock.elapsedTime * 6) * 0.3
+  })
+  const { centro, giro, largo } = useMemo(() => ({
+    centro: a.clone().add(b).multiplyScalar(0.5),
+    giro: new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), b.clone().sub(a).normalize()),
+    largo: a.distanceTo(b) + 0.003,
+  }), [a, b])
+  return (
+    <mesh
+      position={centro} quaternion={giro} renderOrder={9} userData={{ esPin: true }}
+      onClick={e => { e.stopPropagation(); onClick() }}
+      onPointerOver={e => { e.stopPropagation(); setSobre(true); onSobre(true); document.body.style.cursor = 'pointer' }}
+      onPointerOut={() => { setSobre(false); onSobre(false); document.body.style.cursor = '' }}
+    >
+      <boxGeometry args={[largo, 0.0006, 0.0021]} />
+      <meshBasicMaterial ref={mat} color={colorEstado(estado, mas ? '#dc2626' : '#2563eb')} transparent opacity={0.4} depthTest={false} />
+      {(sobre || estado === 'elegido') && <EtiquetaPin texto={etiqueta} />}
+    </mesh>
+  )
+}
+
+/** Modo cablear: todos los pines del robot en su lugar real, y el cable que se está por poner. */
+function PinesCableado({ doc, cableado }: { doc: RobotDoc; cableado: Cableado3D }) {
+  const [sobre, setSobre] = useState<[string, string] | null>(null)
+  const datos = useMemo(() => {
+    const t = puntasDe(doc)
+    const pines: { inst: string; pin: string; tipo: string; etiqueta: string; pos: THREE.Vector3 }[] = []
+    const rieles: { pin: string; mas: boolean; a: THREE.Vector3; b: THREE.Vector3 }[] = []
+    for (const p of doc.piezas) {
+      const def = pieza(p.pieza)
+      if (def.comportamiento.tipo === 'protoboard' && t.poseBase && p.id === t.base.id) {
+        for (const r of RIELES) {
+          if (!def.pines.some(x => x.nombre === r.pin)) continue
+          const y = ALTO_PROTOBOARD + 0.4
+          rieles.push({
+            pin: r.pin, mas: r.signo === '+',
+            a: aRobot(t.poseBase, [xRiel(0), y, r.z]).multiplyScalar(0.001),
+            b: aRobot(t.poseBase, [xRiel(AGUJEROS_RIEL - 1), y, r.z]).multiplyScalar(0.001),
+          })
+        }
+        continue
+      }
+      for (const pin of def.pines) {
+        const pt = t.punta(p.id, pin.nombre)
+        if (!pt) continue
+        // La bolita va en la boca del pin, apenas hacia donde sale el cable.
+        pines.push({ inst: p.id, pin: pin.nombre, tipo: pin.tipo, etiqueta: `${pin.nombre}${pin.tipo === 'pwm' ? '~' : ''}`, pos: pt.pos.clone().addScaledVector(pt.dir, 0.0012) })
       }
     }
-    // Riel de la protoboard: el cable entra en el agujero libre más cercano a su otra punta.
-    const usados = new Map<string, Set<number>>()
-    const base = raiz(doc)
-    const poseBase = ps.get(base.id)
-    const enRiel = (inst: string, pin: string, otra: Punta | null): Punta | null => {
-      if (!poseBase || inst !== base.id) return null
-      // Un puente entre dos rieles va al principio de la protoboard.
-      const x = otra ? otra.pos.clone().multiplyScalar(1000).sub(poseBase.pos).applyQuaternion(poseBase.rot.clone().invert()).x : -70
-      const h = agujeroRiel(pin, x, usados)
-      if (!h) return null
-      return { pos: aRobot(poseBase, [h[0], ALTO_PROTOBOARD + 0.3, h[1]]).multiplyScalar(0.001), dir: new THREE.Vector3(0, 1, 0).applyQuaternion(poseBase.rot), tipo: 'macho' }
-    }
-    return doc.cables
-      .map(c => {
-        const pa = punta(...c.de), pb = punta(...c.a)
-        const a = pa ?? enRiel(...c.de, pb)
-        return { c, a, b: pb ?? enRiel(...c.a, a) }
-      })
-      .filter(x => x.a && x.b) as { c: RobotDoc['cables'][number]; a: Punta; b: Punta }[]
+    return { pines, rieles, base: t.base.id }
   }, [doc])
-  return <>{lista.map(({ c, a, b }, i) => <Cable key={i} a={a} b={b} color={c.color} />)}</>
+
+  const estado = (inst: string, pin: string): EstadoPin => {
+    const k = `${inst}.${pin}`
+    if (cableado.elegido && cableado.elegido[0] === inst && cableado.elegido[1] === pin) return 'elegido'
+    if (cableado.sugeridos.has(k)) return 'sugerido'
+    if (cableado.problemas.has(k)) return 'problema'
+    return 'normal'
+  }
+  const pasar = (inst: string, pin: string) => (si: boolean) => {
+    const v: [string, string] | null = si ? [inst, pin] : null
+    setSobre(v)
+    cableado.onSobre?.(v)
+  }
+
+  // Cable «fantasma»: desde el pin elegido hasta el que está bajo el puntero, para ver cómo quedaría.
+  const fantasma = useMemo(() => {
+    const e = cableado.elegido
+    if (!e || !sobre || (e[0] === sobre[0] && e[1] === sobre[1])) return null
+    return puntasDe(doc).cable(e, sobre)
+  }, [doc, cableado.elegido, sobre])
+
+  return (
+    <group>
+      {datos.rieles.map(r => (
+        <BarraRiel key={r.pin} a={r.a} b={r.b} mas={r.mas} estado={estado(datos.base, r.pin)}
+          etiqueta={`riel ${r.mas ? '+' : '−'} de ${r.pin.endsWith('arriba') ? 'arriba' : 'abajo'}`}
+          onClick={() => cableado.onPin(datos.base, r.pin)} onSobre={pasar(datos.base, r.pin)} />
+      ))}
+      {datos.pines.map(p => (
+        <PuntoPin key={`${p.inst}.${p.pin}`} pos={p.pos} color={colorPin(p.tipo)} estado={estado(p.inst, p.pin)} etiqueta={p.etiqueta}
+          onClick={() => cableado.onPin(p.inst, p.pin)} onSobre={pasar(p.inst, p.pin)} />
+      ))}
+      {fantasma && <Cable a={fantasma[0]} b={fantasma[1]} color="#facc15" fantasma />}
+    </group>
+  )
 }
 
 /** Proyecta los marcadores a la pantalla cada cuadro (para soltar piezas arrastradas). */
@@ -400,11 +608,12 @@ function animarPatas(mc: NonNullable<RobotFisico['marcha']>, patas: PataPerro[],
     } else {
       const zancada = 0.035 * (avance + (c.caderas[i].z < 0 ? -0.7 : 0.7) * giro)
       x = -zancada * Math.cos(psi)
-      y = Math.min(2 * l, p.largo ?? p.altura) - RADIO_PIE / 1000 - 0.025 * rapidez * Math.max(0, Math.sin(psi))
+      y = Math.min(c.largoPata, p.largo ?? p.altura) - RADIO_PIE / 1000 - 0.025 * rapidez * Math.max(0, Math.sin(psi))
       z -= 0.015 * lado * Math.cos(psi)   // vy + = izquierda (−z)
     }
     r.abd.rotation.x = -Math.atan2(z, y)
-    const [a, b] = ikPata(x, Math.hypot(y, z), l)
+    // El modelo real tiene los tramos más largos que la pata de la física: dobla más la rodilla.
+    const [a, b] = ikPata(x, Math.hypot(y, z), r.tramo ?? l)
     r.muslo.rotation.z = a
     r.rodilla.rotation.z = b
   })
@@ -491,9 +700,10 @@ export default function Robot3D(props: Props) {
   const r = raiz(doc)
   return (
     <CircuitoVivoContexto.Provider value={vivo}>
-      <group ref={grupo} onPointerMissed={() => props.onSeleccionar?.(null)}>
+      <group ref={grupo} onPointerMissed={() => { props.onSeleccionar?.(null); props.cableado?.onCable(null) }}>
         <Nodo {...props} inst={r} refs={refs} espaciadores={datos.espaciadores} porInstancia={porInstancia} />
-        {cables && !props.explosion && <Cables doc={doc} />}
+        {cables && !props.explosion && <Cables doc={doc} cableado={props.cableado} />}
+        {props.cableado && !props.explosion && <PinesCableado doc={doc} cableado={props.cableado} />}
         {props.posMarcadores && <ProyectarMarcadores doc={doc} marcadores={marcadores} destino={props.posMarcadores} raizRef={grupo} />}
       </group>
     </CircuitoVivoContexto.Provider>

@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Bot, Cable, ChevronRight, CloudUpload, Code2, Download, FileUp, FolderOpen, Hammer, LayoutGrid, Lightbulb, Loader2, MoreHorizontal, Pencil, Play, Plus, Printer, Search, X } from 'lucide-react'
 import { datosVariante, pieza } from '../../catalogo/piezas'
 import { autocablear } from '../../engine/autocableado'
+import { aprendizajes } from '../../engine/explicacion'
 import { bancoVacio, esBanco, robotVacio, validar } from '../../engine/ensamblaje'
 import type { RobotDoc } from '../../robots/doc'
 import { PREARMADOS, construirSeguidor, plantillasDe, programaConPinesNuevos } from '../../robots/prearmados'
@@ -271,7 +272,7 @@ export default function Taller() {
           nivel={nivel} onNivel={setNivel} avisar={avisar} onListaMateriales={() => setMateriales(true)}
         />
       )}
-      {pestana === 'cablear' && <Cablear doc={doc} cambiar={cambiar} />}
+      {pestana === 'cablear' && <Cablear doc={doc} cambiar={cambiar} nivel={nivel} onNivel={setNivel} />}
       {pestana === 'programar' && (
         <Programar
           doc={doc}
@@ -354,7 +355,7 @@ function Nivel({ nivel }: { nivel: keyof typeof NIVEL }) {
 }
 
 type Proyecto = (typeof PREARMADOS)[number]
-interface FichaProyecto { p: Proyecto; placa: string; piezas: number }
+interface FichaProyecto { p: Proyecto; placa: string; piezas: number; aprende: string[] }
 
 const INICIOS_ROBOT = [
   ['chasis-2wd', 'Chasis 2WD', 'Dos ruedas y rueda loca: gira fácil'],
@@ -380,7 +381,7 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
   const fichas = useMemo<FichaProyecto[]>(() => PREARMADOS.map(p => {
     const d = p.construir()
     const mcu = d.piezas.find(x => pieza(x.pieza).familia === 'placa')
-    return { p, placa: mcu ? pieza(mcu.pieza).nombre : 'Sin placa', piezas: d.piezas.length }
+    return { p, placa: mcu ? pieza(mcu.pieza).nombre : 'Sin placa', piezas: d.piezas.length, aprende: aprendizajes(d) }
   }), [])
 
   useEffect(() => {
@@ -518,6 +519,14 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
                     </li>
                   ))}
                 </ol>
+                {actual.aprende.length > 0 && (<>
+                  <h4 className="mt-5 text-sm font-semibold text-lab-tinta">Qué vas a aprender</h4>
+                  <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-lab-tinta2">
+                    {actual.aprende.map(a => (
+                      <li key={a} className="flex gap-2.5"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-lab-acento" /><span>{a}</span></li>
+                    ))}
+                  </ul>
+                </>)}
               </div>
             </div>
           )}
