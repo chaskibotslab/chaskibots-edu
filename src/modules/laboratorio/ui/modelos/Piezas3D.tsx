@@ -1140,7 +1140,8 @@ export function anclaPin(modelo: string, pin: string): V | null {
       return null
     }
     case 'proc:bateria-18650': return pin === '+' ? [-38, 12, -6] : [-38, 12, 6]
-    case 'proc:bateria-9v': return pin === '+' ? [26, 9, -5] : [26, 9, 5]
+    // El «+» va del lado donde el modelo lo trae impreso.
+    case 'proc:bateria-9v': return pin === '+' ? [25.5, 9, 6.5] : [25.5, 9, -6.5]
     case 'proc:motor-tt': return pin === 'M+' ? [-50, 4, 0] : [-50, -4, 0]
     case 'proc:motor-n20': return pin === 'M+' ? [2.5, 0, -25] : [-2.5, 0, -25]
     case 'proc:bateria-lipo': return pin === '+' ? [-26, 6, -3] : [-26, 6, 3]
@@ -1174,6 +1175,7 @@ export function anclaPin(modelo: string, pin: string): V | null {
     case 'proc:arma-disco': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [0, (1 - i) * 4, -21.5] : null }
     // Tambor de 170 mm: los cables del ESC salen por el extremo, dentro del brazo.
     case 'glb:abyss-tambor': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [0, (1 - i) * 2.5, -86.5] : null }
+    case 'glb:riptide-tambor': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [0, (1 - i) * 2.5, -99] : null }
     // Panel de conexiones del perro en el lomo: red y alimentación.
     case 'proc:perro-robot': return ({ ETH: [-95, 71, -40], '5V': [-80, 73, -42.5], GND: [-80, 73, -37.5] } as Record<string, V>)[pin] ?? null
     // Cable plano de la cámara: sale de abajo del mástil.
@@ -1217,6 +1219,7 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
     case 'proc:motor-combate':
     case 'proc:arma-tambor':
     case 'glb:abyss-tambor':
+    case 'glb:riptide-tambor':
     case 'proc:arma-disco': return { dir: [0, 0, -1], tipo: 'soldado' }
     case 'proc:arma-giratoria': return { dir: [-1, 0, 0], tipo: 'soldado' }
     case 'proc:perro-robot': return { dir: [0, 1, 0], tipo: 'soldado' }

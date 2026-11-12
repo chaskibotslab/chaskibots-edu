@@ -854,6 +854,46 @@ export function construirRcEsp32(): RobotDoc {
   return a.terminar(codigoRc)
 }
 
+/** «RipTide»: como el Abyss, con un tambor ovalado enorme y patines largos. */
+export function construirRiptide(): RobotDoc {
+  const a = new Armador('chasis-riptide', '', 'RipTide')
+  a.poner('arduino-nano', 'chasis', 'placa')
+  a.poner('tb6612', 'chasis', 'driver')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  const mi = a.poner('motor-combate', 'chasis', 'motor-izq')
+  const md = a.poner('motor-combate', 'chasis', 'motor-der')
+  a.poner('rueda-riptide', mi, 'eje')
+  a.poner('rueda-riptide', md, 'eje')
+  a.poner('tambor-riptide', 'chasis', 'arma')
+  return a.terminar(codigoBattlebotRc, 'pcb')
+}
+
+/** «Fathom»: tiburón de cuatro ruedas motrices con arpón; sin arma giratoria, gana empujando. */
+export function construirFathom(): RobotDoc {
+  const a = new Armador('chasis-fathom', '', 'Fathom')
+  a.poner('arduino-nano', 'chasis', 'placa')
+  a.poner('tb6612', 'chasis', 'driver')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  for (const m of ['motor-del-izq', 'motor-tra-izq', 'motor-del-der', 'motor-tra-der']) {
+    const id = a.poner('motor-combate', 'chasis', m)
+    a.poner('rueda-fathom', id, 'eje')
+  }
+  return a.terminar(codigoRc, 'pcb')
+}
+
+/** «Cuña»: caja cerrada, dos ruedas grandes y una pala curva; gana llevando al rival al pozo. */
+export function construirCuna(): RobotDoc {
+  const a = new Armador('chasis-cuna', '', 'Cuña')
+  a.poner('arduino-nano', 'chasis', 'placa')
+  a.poner('tb6612', 'chasis', 'driver')
+  a.poner('bateria-lipo-2s', 'chasis', 'bateria')
+  const mi = a.poner('motor-combate', 'chasis', 'motor-izq')
+  const md = a.poner('motor-combate', 'chasis', 'motor-der')
+  a.poner('rueda-cuna', mi, 'eje')
+  a.poner('rueda-cuna', md, 'eje')
+  return a.terminar(codigoRc, 'pcb')
+}
+
 // ---------------------------------------------------------------------------
 // Minisumo (F5): Nano + TB6612 + LiPo, dos N20, pala de acero
 // ---------------------------------------------------------------------------
@@ -1968,6 +2008,63 @@ export const PREARMADOS: Prearmado[] = [
     construir: () => construirAbyss(),
     plantillas: (doc, tabla) => [
       { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Flechas para moverse, X/Y para el arma', codigo: codigoBattlebotRc(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'warbot-riptide',
+    nombre: '«RipTide»: tambor gigante',
+    descripcion: 'Otro diseño real de competencia (Floating Castle Robotics): casi todo el robot es el arma. Un tambor ovalado en tres tramos, ruedas atrás y dos patines que se meten debajo del rival. Lo manejas tú.',
+    dificultad: 'intermedio',
+    logica: [
+      'Presiona «Compilar y ejecutar»: empieza el combate y aparece el control remoto.',
+      'Maneja con las flechas o WASD; la tecla E (o «Encender arma») hace girar el tambor.',
+      'El tambor pesa mucho: tarda 1,4 s en llegar a toda velocidad. Enciéndelo antes de acercarte.',
+      'Los patines van delante del tambor: levantan al rival y lo dejan justo donde pega el arma.',
+      'Compáralo con el Abyss: ¿cuál arranca el arma más rápido?, ¿cuál quita más vida por golpe?',
+    ],
+    arena: 'arena-combate',
+    construir: construirRiptide,
+    plantillas: (doc, tabla) => [
+      { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Flechas para moverse, X/Y para el arma', codigo: codigoBattlebotRc(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'warbot-fathom',
+    nombre: '«Fathom»: tiburón de 4 ruedas',
+    descripcion: 'Un robot de combate sin arma giratoria (diseño de Floating Castle Robotics): carrocería de tiburón, cuatro ruedas motrices y un arpón. Gana empujando al rival hasta el pozo. Lo manejas tú.',
+    dificultad: 'intermedio',
+    logica: [
+      'Presiona «Compilar y ejecutar»: empieza el combate y aparece el control remoto.',
+      'Maneja con las flechas o WASD; las teclas 0 a 9 cambian la velocidad.',
+      'No tiene arma que gire: su fuerza son las cuatro ruedas motrices. Empuja al rival de costado, donde no tiene el arma.',
+      'El pozo está en una esquina: quien cae, pierde. Lleva al rival hasta ahí sin caer tú.',
+      'Cuidado con el arma del rival: cada golpe te quita vida. Atácalo por los lados o por atrás.',
+    ],
+    arena: 'arena-combate',
+    construir: construirFathom,
+    plantillas: (doc, tabla) => [
+      { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Obedece las letras del control', codigo: codigoRc(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'warbot-cuna',
+    nombre: '«Cuña»: robot de pala',
+    descripcion: 'El diseño más simple del combate de robots: una caja cerrada, dos ruedas grandes y una pala curva. Sin arma que gire, se mete debajo del rival y lo lleva al pozo. Lo manejas tú.',
+    dificultad: 'inicial',
+    logica: [
+      'Presiona «Compilar y ejecutar»: empieza el combate y aparece el control remoto.',
+      'Maneja con las flechas o WASD; las teclas 0 a 9 cambian la velocidad.',
+      'La pala toca el piso: si llegas de frente, el rival se sube a ella y pierde tracción.',
+      'El pozo está en una esquina: empuja al rival hasta ahí. Si pasan 2 minutos, gana quien tenga más vida.',
+      'Las ruedas son más altas que la carrocería: aunque te den vuelta, el robot sigue andando.',
+    ],
+    arena: 'arena-combate',
+    construir: construirCuna,
+    plantillas: (doc, tabla) => [
+      { id: 'rc', nombre: 'Manejar con el teclado (RC)', descripcion: 'Obedece las letras del control', codigo: codigoRc(tabla, doc) },
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
     ],
   },
