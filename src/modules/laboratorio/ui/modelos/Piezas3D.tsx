@@ -632,7 +632,11 @@ export const ArduinoMega = forwardRef(function ArduinoMega(_: object, refLed13: 
 export const RADIO_PIE = 11
 
 /** Los tres giros de una pata del perro: abducción (afuera/adentro), muslo y rodilla. */
-export interface PataPerro { abd: THREE.Group | null; muslo: THREE.Group | null; rodilla: THREE.Group | null }
+export interface PataPerro {
+  abd: THREE.Group | null; muslo: THREE.Group | null; rodilla: THREE.Group | null
+  /** Largo de cada tramo del modelo que se ve (m), si no es el de la física. */
+  tramo?: number
+}
 
 /**
  * Cinemática inversa de una pata de dos tramos iguales (`l` m): ángulos del
@@ -702,6 +706,30 @@ export function PerroRobot({ caderas, muslo, pierna, color, patas }: { caderas: 
     </group>
   )
 }
+
+/**
+ * Sensor de línea de la barra (QRE1113): el encapsulado negro mira al piso por
+ * debajo de la barra y, arriba, un LED indicador que se enciende con la lectura.
+ * Origen en la cara de abajo del sensor.
+ */
+export const SensorBarra = forwardRef(function SensorBarra(_: object, refLed: Ref<THREE.MeshStandardMaterial>) {
+  return (
+    <group>
+      <mesh position={M(0, 0.9, 0)}><boxGeometry args={[m(3.6), m(1.8), m(2.9)]} /><meshStandardMaterial color="#0b0b0d" roughness={0.45} /></mesh>
+      {/* Emisor y receptor, hacia el piso */}
+      <mesh position={M(-0.9, 0, 0)}><boxGeometry args={[m(1.1), m(0.2), m(1.6)]} /><meshStandardMaterial color="#1e3a8a" roughness={0.2} /></mesh>
+      <mesh position={M(0.9, 0, 0)}><boxGeometry args={[m(1.1), m(0.2), m(1.6)]} /><meshStandardMaterial color="#111827" roughness={0.2} /></mesh>
+      {/* Pastillas de soldadura de sus cuatro cables, sobre la barra */}
+      {[0, 1, 2, 3].map(i => (
+        <mesh key={i} position={M(-5, 1.9, -3.8 + i * 2.54)}><boxGeometry args={[m(1.6), m(0.3), m(1.6)]} /><meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.3} /></mesh>
+      ))}
+      <mesh position={M(3.2, 2.1, 0)}>
+        <boxGeometry args={[m(1.6), m(0.7), m(0.9)]} />
+        <meshStandardMaterial ref={refLed} color="#7f1d1d" emissive="#ef4444" emissiveIntensity={0} />
+      </mesh>
+    </group>
+  )
+})
 
 /**
  * Cámara CSI (IMX219) sobre un mástil: base atornillada al chasis detrás del
@@ -1121,6 +1149,10 @@ export function anclaPin(modelo: string, pin: string): V | null {
       const i = ['VCC', 'GND', 'DO', 'AO'].indexOf(pin)
       return i >= 0 ? [-26, 12, -3.8 + i * 2.54] : null
     }
+    case 'proc:sensor-barra': {
+      const i = ['VCC', 'GND', 'DO', 'AO'].indexOf(pin)
+      return i >= 0 ? [-5, 1.9, -3.8 + i * 2.54] : null
+    }
     case 'proc:fc51': {
       const i = ['VCC', 'GND', 'OUT'].indexOf(pin)
       return i >= 0 ? [2, 5, -2.54 + i * 2.54] : null
@@ -1140,6 +1172,8 @@ export function anclaPin(modelo: string, pin: string): V | null {
     case 'proc:arma-giratoria': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [-11.5, 4, (i - 1) * 3] : null }
     case 'proc:arma-tambor': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [0, (1 - i) * 2.5, -59] : null }
     case 'proc:arma-disco': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [0, (1 - i) * 4, -21.5] : null }
+    // Tambor de 170 mm: los cables del ESC salen por el extremo, dentro del brazo.
+    case 'glb:abyss-tambor': { const i = ['SIG', 'BAT+', 'GND'].indexOf(pin); return i >= 0 ? [0, (1 - i) * 2.5, -86.5] : null }
     // Panel de conexiones del perro en el lomo: red y alimentación.
     case 'proc:perro-robot': return ({ ETH: [-95, 71, -40], '5V': [-80, 73, -42.5], GND: [-80, 73, -37.5] } as Record<string, V>)[pin] ?? null
     // Cable plano de la cámara: sale de abajo del mástil.
@@ -1168,6 +1202,7 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
     case 'proc:fuente-mb102': return { dir: [0, 1, 0], tipo: 'dupont' }
     case 'proc:servo': return { dir: [1, 0, 0], tipo: 'dupont' }
     case 'proc:fc51': return { dir: [-1, 0, 0], tipo: 'dupont' }
+    case 'proc:sensor-barra': return { dir: [-0.3, 1, 0], tipo: 'soldado' }
     case 'proc:hcsr04': return { dir: [-1, 0, 0], tipo: 'dupont' }
     case 'proc:joystick': return { dir: [0, 0, 1], tipo: 'dupont' }
     case 'proc:jetson-nano':
@@ -1181,6 +1216,7 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
     case 'proc:camara-csi': return { dir: [-1, 0, 0], tipo: 'soldado' }
     case 'proc:motor-combate':
     case 'proc:arma-tambor':
+    case 'glb:abyss-tambor':
     case 'proc:arma-disco': return { dir: [0, 0, -1], tipo: 'soldado' }
     case 'proc:arma-giratoria': return { dir: [-1, 0, 0], tipo: 'soldado' }
     case 'proc:perro-robot': return { dir: [0, 1, 0], tipo: 'soldado' }
@@ -1194,17 +1230,28 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
 // ---------------------------------------------------------------------------
 
 /** Modelo 3D real ya preparado (metros, marco de la pieza). Comprimido con meshopt. */
-export function ModeloGlb({ url, escala = 1 }: { url: string; escala?: number }) {
+export function ModeloGlb({ url, escala = 1, traslucido = false }: { url: string; escala?: number; traslucido?: boolean }) {
   const q = useCalidad()
   const { scene } = useGLTF(url, false, true)
   const copia = useMemo(() => {
     const c = scene.clone(true)
     c.traverse(o => {
       const m = o as THREE.Mesh
-      if (m.isMesh) { m.castShadow = q.sombras; m.receiveShadow = true }
+      if (!m.isMesh) return
+      m.castShadow = q.sombras && !traslucido
+      m.receiveShadow = true
+      if (traslucido) {
+        // Carrocería que deja ver lo de adentro: no tapa los clics a las piezas ni a los pines.
+        const mat = (m.material as THREE.Material).clone()
+        mat.transparent = true
+        mat.opacity = 0.22
+        mat.depthWrite = false
+        m.material = mat
+        m.raycast = () => {}
+      }
     })
     return c
-  }, [scene, q.sombras])
+  }, [scene, q.sombras, traslucido])
   return <primitive object={copia} scale={escala} />
 }
 

@@ -21,6 +21,8 @@ export const PERRO_ROBOT: PiezaDef = {
   familia: 'chasis',
   descripcion: 'Un robot de cuatro patas con 12 motores, como el Unitree Go2. El controlador de marcha mueve las patas solo: tu placa le da órdenes de alto nivel por el cable de red (caminar, girar, ir de costado, pararse, sentarse) y lee su sensor de distancia.',
   modelo: 'proc:perro-robot',
+  // Modelo real del Unitree Go1, por partes (scripts/preparar-robots.mjs).
+  glb: '/lab/modelos/perro-go1.glb',
   masa_g: 3000,
   material: 'aluminio',
   color: '#3f4650',

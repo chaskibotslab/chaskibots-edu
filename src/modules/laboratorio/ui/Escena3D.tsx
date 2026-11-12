@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState, type MutableRefObject, type React
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { ContactShadows, OrbitControls, PerformanceMonitor } from '@react-three/drei'
 import * as THREE from 'three'
-import Robot3D, { type MarcadorMontaje } from './Robot3D'
+import Robot3D, { type Cableado3D, type MarcadorMontaje } from './Robot3D'
 import Mano3D from './modelos/Mano3D'
 import Sensores3D from './Sensores3D'
 import { resumen } from '../engine/ensamblaje'
@@ -76,8 +76,16 @@ function ExplosionSuave({ objetivo, children }: { objetivo: number; children: (e
 
 export function EscenaTaller(p: PropsTaller) {
   const q = CALIDADES[p.nivel]
+  // Los robots grandes (el perro, el 4WD con torre) no caben en el encuadre de un carrito: la cámara se aleja en proporción.
+  const raiz = p.doc.piezas[0]?.pieza
+  const f = useMemo(() => {
+    const r = resumen(p.doc)
+    return Math.max(1, Math.max(r.medidas.largo, r.medidas.ancho, r.medidas.alto * 1.6) / 200)
+    // Solo al cambiar de chasis: agregar una pieza no debe mover la cámara.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [raiz])
   return (
-    <Lienzo nivel={p.nivel} onNivel={p.onNivel} camara={[0.2, 0.16, 0.24]}>
+    <Lienzo key={`${raiz}-${f.toFixed(1)}`} nivel={p.nivel} onNivel={p.onNivel} camara={[0.2 * f, 0.16 * f, 0.24 * f]}>
       <Estudio />
       <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={0.5} />
       <Sala y={-ALTURA_MESA} lado={6} alto={2.6} />
@@ -92,10 +100,89 @@ export function EscenaTaller(p: PropsTaller) {
           />
         )}
       </ExplosionSuave>
-      <OrbitControls makeDefault target={[0, 0.04, 0]} minDistance={0.12} maxDistance={1.4} maxPolarAngle={Math.PI / 2 - 0.08} enableDamping />
+      <OrbitControls makeDefault target={[0, f > 1 ? 0.07 * f : 0.04, 0]} minDistance={0.12} maxDistance={1.4 * f} maxPolarAngle={Math.PI / 2 - 0.08} enableDamping />
       <Efectos />
     </Lienzo>
   )
+}
+
+/**
+ * Escena de «Cablear»: el mismo robot del taller, con cada pin como un punto
+ * que se toca para poner un cable entre las piezas reales. La cámara encuadra
+ * todo el robot y deja acercarse mucho (los pines están a 2,54 mm).
+ */
+export function EscenaCablear({ doc, cableado, nivel, onNivel }: { doc: RobotDoc; cableado: Cableado3D; nivel: NivelCalidad; onNivel: (n: NivelCalidad) => void }) {
+  const q = CALIDADES[nivel]
+  // Encuadre según el tamaño (la mesa de electrónica es ancha y baja; un robot, más alto).
+  const { camara, objetivo } = useMemo(() => {
+    const r = resumen(doc)
+    const cx = (r.min.x + r.max.x) / 2000, cz = (r.min.z + r.max.z) / 2000
+    const lado = Math.max(r.medidas.largo, r.medidas.ancho, 120) / 1000
+    const alto = r.medidas.alto / 1000
+    return {
+      camara: [cx + lado * 0.12, alto + lado * 0.7, cz + lado * 0.78] as [number, number, number],
+      objetivo: [cx, alto / 2, cz] as [number, number, number],
+    }
+    // Solo al abrir otro robot: poner un cable no debe mover la cámara.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doc.piezas.length, doc.piezas[0]?.pieza])
+  // Tocar una pieza acerca la cámara a ese punto: los pines están a 2,54 mm y de lejos no se distinguen.
+  const [foco, setFoco] = useState<{ punto: [number, number, number] | null; n: number }>({ punto: null, n: 0 })
+  const conFoco = useMemo<Cableado3D>(() => ({
+    ...cableado,
+    onPieza: p => setFoco(f => ({ punto: [p.x, p.y, p.z], n: f.n + 1 })),
+  }), [cableado])
+  return (
+    <>
+      <Lienzo nivel={nivel} onNivel={onNivel} camara={camara}>
+        <Estudio />
+        <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={0.5} />
+        <Sala y={-ALTURA_MESA} lado={6} alto={2.6} />
+        <Mesa3D />
+        <ContactShadows position={[0, 0.0012, 0]} scale={0.8} blur={2.4} opacity={0.4} far={0.3} resolution={q.nivel === 'baja' ? 256 : 512} />
+        <Robot3D doc={doc} cableado={conFoco} />
+        <OrbitControls makeDefault target={objetivo} minDistance={0.03} maxDistance={1.4} maxPolarAngle={Math.PI / 2 - 0.08} enableDamping />
+        <EnfoqueCamara foco={foco} camara={camara} objetivo={objetivo} />
+        <Efectos />
+      </Lienzo>
+      {foco.punto && (
+        <button onClick={() => setFoco(f => ({ punto: null, n: f.n + 1 }))} className="absolute right-3 top-3 rounded-md border border-lab-borde/20 bg-lab-superficie px-2.5 py-1.5 text-xs font-medium text-lab-tinta shadow-sm hover:bg-lab-fondo2">
+          Ver todo
+        </button>
+      )}
+    </>
+  )
+}
+
+/** Lleva la cámara, suavemente, hasta el punto tocado (o de vuelta a la vista completa). */
+function EnfoqueCamara({ foco, camara, objetivo }: { foco: { punto: [number, number, number] | null; n: number }; camara: [number, number, number]; objetivo: [number, number, number] }) {
+  const { camera, controls } = useThree()
+  const destino = useRef<{ pos: THREE.Vector3; obj: THREE.Vector3 } | null>(null)
+  useEffect(() => {
+    if (!foco.n) return // al abrir no se mueve nada
+    const c = controls as unknown as { target: THREE.Vector3 } | null
+    if (!c) return
+    if (!foco.punto) { destino.current = { pos: new THREE.Vector3(...camara), obj: new THREE.Vector3(...objetivo) }; return }
+    const obj = new THREE.Vector3(...foco.punto)
+    // Ya de cerca, un toque al lado (un pin errado por poco) no mueve la cámara.
+    // Para ir a otra pieza se arrastra la vista o se vuelve con «Ver todo».
+    if (camera.position.distanceTo(c.target) < 0.16) return
+    // Desde donde ya se está mirando, pero bien de arriba: los pines se ven de frente.
+    const dir = camera.position.clone().sub(c.target).normalize()
+    dir.y = Math.max(dir.y, 0.75)
+    destino.current = { pos: obj.clone().addScaledVector(dir.normalize(), 0.1), obj }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [foco])
+  useFrame(() => {
+    const d = destino.current
+    const c = controls as unknown as { target: THREE.Vector3; update: () => void } | null
+    if (!d || !c) return
+    camera.position.lerp(d.pos, 0.16)
+    c.target.lerp(d.obj, 0.16)
+    c.update()
+    if (camera.position.distanceTo(d.pos) < 0.0015) destino.current = null
+  })
+  return null
 }
 
 // ---------------------------------------------------------------------------
