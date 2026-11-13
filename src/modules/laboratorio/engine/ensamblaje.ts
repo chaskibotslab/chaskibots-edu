@@ -206,9 +206,9 @@ export function resumen(doc: RobotDoc, ps = poses(doc)): Resumen {
 // ---------------------------------------------------------------------------
 
 /** Caja orientada (mm, marco del robot): centro, ejes y medias medidas. */
-interface Caja { c: Vector3; ejes: Vector3[]; h: number[] }
+export interface Caja { c: Vector3; ejes: Vector3[]; h: number[] }
 
-function cajasDe(def: PiezaDef, pose: Pose): Caja[] {
+export function cajasDe(def: PiezaDef, pose: Pose): Caja[] {
   return (def.huella ?? def.colisionadores).map(col => {
     let h: number[]
     if (col.forma === 'caja') h = col.medidas.map(x => x / 2)

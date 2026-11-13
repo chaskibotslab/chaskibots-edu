@@ -11,7 +11,7 @@ import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { datosVariante, pieza } from '../catalogo/piezas'
 import { grados, type PiezaDef, type PuntoMontaje } from '../catalogo/tipos'
-import { hijos, montajeDe, poses, raiz, resumen, ruedas, ruedasLocas, aRobot } from '../engine/ensamblaje'
+import { esBanco, hijos, montajeDe, poses, raiz, resumen, ruedas, ruedasLocas, aRobot } from '../engine/ensamblaje'
 import type { Simulacion } from '../engine/simulation'
 import type { RobotFisico } from '../engine/fisica/robotFisico'
 import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
@@ -24,6 +24,7 @@ import {
 } from './modelos/Piezas3D'
 import { PerroGo1 } from './modelos/Robots3D'
 import { CablesPcb } from './modelos/Pcb3D'
+import { controlDirecto, rutearCables, type ExtremoCable, type RutasCables } from '../engine/rutaCables'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
 import { AGUJEROS_RIEL, ALTO_PROTOBOARD, RIELES, agujeroRiel, xRiel } from '../catalogo/piezas/circuito'
 import { CircuitoVivoContexto, ModeloCircuito, esModeloCircuito, type CircuitoVivo } from './modelos/Circuito3D'
@@ -324,28 +325,42 @@ const largoConector = (t: Punta['tipo']) => (t === 'dupont' ? LARGO_DUPONT : t =
  * su conector Dupont, o del borne) y se curva hacia la otra punta como un
  * cable semirrígido (curva de Bézier), cayendo un poco por su peso.
  */
-function Cable({ a, b, color, sel = false, tenue = false, fantasma = false, onClick }: { a: Punta; b: Punta; color: string; sel?: boolean; tenue?: boolean; fantasma?: boolean; onClick?: () => void }) {
+/** Curva de un recorrido con vueltas: tramos rectos unidos por codos redondeados, como un cable acomodado a mano. */
+function curvaRecorrido(pts: THREE.Vector3[]): THREE.Curve<THREE.Vector3> {
+  const camino = new THREE.CurvePath<THREE.Vector3>()
+  let desde = pts[0]
+  for (let i = 1; i < pts.length - 1; i++) {
+    const v = pts[i]
+    const r = Math.min(0.006, v.distanceTo(pts[i - 1]) * 0.45, v.distanceTo(pts[i + 1]) * 0.45)
+    const entra = v.clone().add(pts[i - 1].clone().sub(v).setLength(r))
+    const sale = v.clone().add(pts[i + 1].clone().sub(v).setLength(r))
+    if (desde.distanceTo(entra) > 1e-5) camino.add(new THREE.LineCurve3(desde, entra))
+    camino.add(new THREE.QuadraticBezierCurve3(entra, v, sale))
+    desde = sale
+  }
+  camino.add(new THREE.LineCurve3(desde, pts[pts.length - 1]))
+  return camino
+}
+
+function Cable({ a, b, color, ruta, sel = false, tenue = false, fantasma = false, onClick }: { a: Punta; b: Punta; color: string; /** Recorrido que rodea las piezas (metros); sin él va directo. */ ruta?: THREE.Vector3[] | null; sel?: boolean; tenue?: boolean; fantasma?: boolean; onClick?: () => void }) {
   const q = useCalidad()
   const tocable = !!onClick
   const datos = useMemo(() => {
     const salida = (p: Punta) => p.pos.clone().addScaledVector(p.dir, largoConector(p.tipo) || 0.004)
     const p0 = salida(a), p3 = salida(b)
-    const L = p0.distanceTo(p3)
     // Sale derecho del conector un tramo corto y enseguida se tiende hacia la otra
     // punta, cayendo por su peso: cables bajos y pegados al robot, no arcos altos.
-    const tiron = Math.min(0.016, 0.006 + L * 0.12)
-    const p1 = p0.clone().addScaledVector(a.dir, tiron)
-    const p2 = p3.clone().addScaledVector(b.dir, tiron)
-    p1.y -= L * 0.08
-    p2.y -= L * 0.08
-    const curva = new THREE.CubicBezierCurve3(p0, p1, p2, p3)
+    // Si en el medio hay una pieza, sigue el recorrido que la rodea.
+    const curva = ruta && ruta.length > 2 ? curvaRecorrido(ruta) : new THREE.CubicBezierCurve3(...controlDirecto(p0, a.dir, p3, b.dir, 0.001))
+    const largo = ruta && ruta.length > 2 ? curva.getLength() : 0
+    const tramos = largo ? Math.min(160, Math.max(36, Math.round(largo / 0.002))) : 36
     const conector = (t: Punta['tipo']) => t === 'dupont' || t === 'macho'
     const grueso = !conector(a.tipo) && !conector(b.tipo) ? 0.0009 : 0.00065
-    const tubo = new THREE.TubeGeometry(curva, q.nivel === 'baja' ? 14 : 36, sel ? grueso * 1.7 : grueso, q.nivel === 'baja' ? 5 : 8, false)
+    const tubo = new THREE.TubeGeometry(curva, q.nivel === 'baja' ? Math.round(tramos * 0.5) : tramos, sel ? grueso * 1.7 : grueso, q.nivel === 'baja' ? 5 : 8, false)
     // Tubo ancho invisible: un cable de 1 mm sería casi imposible de tocar con el dedo.
-    const toque = tocable ? new THREE.TubeGeometry(curva, 12, 0.0028, 5, false) : null
+    const toque = tocable ? new THREE.TubeGeometry(curva, largo ? 40 : 12, 0.0028, 5, false) : null
     return { tubo, grueso, toque }
-  }, [a, b, q.nivel, sel, tocable])
+  }, [a, b, ruta, q.nivel, sel, tocable])
   return (
     <group>
       <mesh geometry={datos.tubo} castShadow={q.sombras && !fantasma}>
@@ -389,7 +404,7 @@ function Punta({ punta, color, grueso }: { punta: Punta; color: string; grueso: 
  * los rieles de la protoboard (el cable entra en el agujero libre más cercano
  * a su otra punta). Todo en metros, en el marco del robot.
  */
-function puntasDe(doc: RobotDoc) {
+export function puntasDe(doc: RobotDoc) {
   const ps = poses(doc)
   const punta = (inst: string, pin: string): Punta | null => {
     const p = doc.piezas.find(x => x.id === inst)
@@ -426,18 +441,64 @@ function puntasDe(doc: RobotDoc) {
   return { punta, cable, base, poseBase }
 }
 
+/** Las dos puntas de cada cable en milímetros, donde el cable sale de su conector (para calcular su recorrido). */
+export function extremosDe(doc: RobotDoc): ([ExtremoCable, ExtremoCable] | null)[] {
+  const { cable } = puntasDe(doc)
+  const ext = (p: Punta, inst: string): ExtremoCable => ({ p: p.pos.clone().addScaledVector(p.dir, largoConector(p.tipo) || 0.004).multiplyScalar(1000), dir: p.dir, inst })
+  return doc.cables.map(c => { const p = cable(c.de, c.a); return p ? [ext(p[0], c.de[0]), ext(p[1], c.a[0])] : null })
+}
+
+const SIN_RUTAS: RutasCables = { rutas: [], pasacables: [] }
+const rutasGuardadas = new Map<string, RutasCables>()
+/** Recorridos de los cables (en metros). Solo dependen de las piezas y los cables, no del programa: se guardan. */
+function rutasDe(doc: RobotDoc): RutasCables {
+  if (esBanco(doc)) return SIN_RUTAS
+  const clave = JSON.stringify([doc.piezas, doc.cables])
+  let r = rutasGuardadas.get(clave)
+  if (!r) {
+    const mm = rutearCables(doc, extremosDe(doc))
+    r = { rutas: mm.rutas.map(x => x && x.map(p => p.multiplyScalar(0.001))), pasacables: mm.pasacables }
+    if (rutasGuardadas.size > 6) rutasGuardadas.delete(rutasGuardadas.keys().next().value as string)
+    rutasGuardadas.set(clave, r)
+  }
+  return r
+}
+
+/** Pasacables: el agujero con su goma por donde los cables cruzan el chasis. */
+function Pasacables3D({ h }: { h: RutasCables['pasacables'][number] }) {
+  const alto = h.y1 - h.y0
+  return (
+    <group position={[m(h.x), m((h.y0 + h.y1) / 2), m(h.z)]}>
+      <mesh>
+        <cylinderGeometry args={[m(h.radio), m(h.radio), m(alto + 0.5), 20]} />
+        <meshStandardMaterial color="#08090b" roughness={0.9} />
+      </mesh>
+      {[1, -1].map(s => (
+        <mesh key={s} position={[0, s * m(alto / 2 + 0.3), 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[m(h.radio + 0.3), m(0.7), 8, 24]} />
+          <meshStandardMaterial color="#1b1d21" roughness={0.75} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 function Cables({ doc, cableado }: { doc: RobotDoc; cableado?: Cableado3D }) {
   const lista = useMemo(() => {
     const { cable } = puntasDe(doc)
     return doc.cables.map((c, i) => ({ c, i, p: cable(c.de, c.a) })).filter(x => x.p) as { c: RobotDoc['cables'][number]; i: number; p: [Punta, Punta] }[]
   }, [doc])
+  const { rutas, pasacables } = useMemo(() => rutasDe(doc), [doc])
   const sel = cableado?.cableSel ?? null
   const elegir = cableado?.onCable
   // Con PCB: pistas y mazos en lugar de cables sueltos. En «Cablear» se ve cada conexión como cable, para poder tocarla.
-  if (doc.conexion === 'pcb' && !cableado) return <CablesPcb doc={doc} lista={lista} suelto={({ c, i, p }) => <Cable key={i} a={p[0]} b={p[1]} color={c.color} />} />
-  return <>{lista.map(({ c, i, p }) => (
-    <Cable key={i} a={p[0]} b={p[1]} color={c.color} sel={sel === i} tenue={sel !== null && sel !== i} onClick={elegir ? () => elegir(i) : undefined} />
-  ))}</>
+  if (doc.conexion === 'pcb' && !cableado) return <CablesPcb doc={doc} lista={lista} suelto={({ c, i, p }) => <Cable key={i} a={p[0]} b={p[1]} color={c.color} ruta={rutas[i]} />} />
+  return <>
+    {lista.map(({ c, i, p }) => (
+      <Cable key={i} a={p[0]} b={p[1]} color={c.color} ruta={rutas[i]} sel={sel === i} tenue={sel !== null && sel !== i} onClick={elegir ? () => elegir(i) : undefined} />
+    ))}
+    {pasacables.map((h, i) => <Pasacables3D key={`h${i}`} h={h} />)}
+  </>
 }
 
 const COLOR_PIN: Record<string, string> = { gnd: '#64748b', alim: '#dc2626', potencia: '#dc2626', pwm: '#9333ea', analogico: '#65a30d' }

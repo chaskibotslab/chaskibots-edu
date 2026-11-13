@@ -229,3 +229,33 @@ numerados como en la placa, WiFi/Bluetooth simulados). Reutiliza el
 compilador, el emulador y toda la física; reemplaza la idea de compilar a
 WebAssembly del diseño. Límite conocido: `int` es de 16 bits (en el ESP32
 real, 32); se explica al alumno.
+
+## P — Profesional y con metodología (2026-11-13, en la rama, sin publicar)
+
+Pedido del usuario: interfaz más profesional y ordenada, cables que no atraviesen
+el chasis, y metodología para enseñar (público: colegios y docentes).
+
+Hecho:
+- Recorrido de cables (`engine/rutaCables.ts`, `rutaCables.test.ts`): si la curva
+  directa toca una pieza, el cable busca el camino libre más corto (A* en una
+  cuadrícula de 3 mm), rodea las piezas y cruza el chasis por un pasacables
+  (agujero con goma, compartido por varios cables). En los 31 robots: de ~230
+  cables que atravesaban algo quedan 2 (Paladín, carrocería cerrada).
+- Misiones guiadas (`engine/mision.ts`, `ui/taller/PanelMision.tsx`,
+  `mision.test.ts`): cada proyecto se puede hacer como clase de 7 etapas
+  (El reto, Piezas, Arma, Conecta, Programa, Prueba, Demuestra) desde la base
+  vacía. El laboratorio revisa solo cada pieza, cada cable, que el programa
+  corra y que el robot se mueva. Al final: ficha de evaluación imprimible con
+  preguntas y rúbrica. El avance se guarda en el borrador del navegador.
+- Interfaz: una sola barra (sin el encabezado del sitio), fondo de estudio al
+  armar y cablear (botón «Aula» para volver a la mesa), barra de Armar con
+  rótulos, cajón de piezas de ancho fijo.
+
+Falta (ideas, sin decidir):
+- Guardar el avance de la misión en la cuenta y que el docente lo vea (modo docente).
+- Ruta de aprendizaje: proyectos en orden con desbloqueo.
+- Contenido propio por proyecto (preguntas y reto extra escritos a mano; hoy salen de las piezas).
+- Los mazos de la vista PCB todavía van en curva directa.
+- Probar las misiones en celular.
+
+- 2026-11-13: interfaz «cabina» (estilo iPhone): escena 3D a pantalla completa, islas de vidrio, selector de pasos deslizante, repisa de piezas al pie y misión en pastilla flotante. Pendiente: revisar en celular/tablet, mazos del modo PCB enrutados, 2 cables del Paladín.

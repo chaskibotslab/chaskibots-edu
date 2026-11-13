@@ -94,6 +94,60 @@ export function Sala({ y = 0, lado = 18, alto = 3.2, pozo, onDoubleClick }: {
   )
 }
 
+let texturaPlato: THREE.CanvasTexture | null = null
+/** Plato de estudio: cuadrícula fina de 1 cm (más marcada cada 5 cm) que se desvanece hacia el borde. */
+function texturaDelPlato(lado: number): THREE.CanvasTexture | null {
+  if (texturaPlato || typeof document === 'undefined') return texturaPlato
+  const px = 2048
+  const c = document.createElement('canvas')
+  c.width = c.height = px
+  const g = c.getContext('2d')
+  if (!g) return null
+  g.fillStyle = '#f4f7fb'
+  g.fillRect(0, 0, px, px)
+  const cm = px / (lado * 100)
+  const n = Math.round(lado * 100)
+  for (let i = 0; i <= n; i++) {
+    const fuerte = i % 5 === 0
+    g.strokeStyle = fuerte ? 'rgba(24, 118, 146, 0.4)' : 'rgba(74, 98, 132, 0.17)'
+    g.lineWidth = fuerte ? 1.6 : 1
+    const v = Math.round(i * cm) + 0.5
+    g.beginPath(); g.moveTo(v, 0); g.lineTo(v, px); g.stroke()
+    g.beginPath(); g.moveTo(0, v); g.lineTo(px, v); g.stroke()
+  }
+  // El borde se funde con el fondo: sin horizonte ni paredes.
+  g.globalCompositeOperation = 'destination-in'
+  const r = g.createRadialGradient(px / 2, px / 2, px * 0.2, px / 2, px / 2, px * 0.5)
+  r.addColorStop(0, 'rgba(0,0,0,1)'); r.addColorStop(0.75, 'rgba(0,0,0,0.55)'); r.addColorStop(1, 'rgba(0,0,0,0)')
+  g.fillStyle = r
+  g.fillRect(0, 0, px, px)
+  texturaPlato = new THREE.CanvasTexture(c)
+  texturaPlato.colorSpace = THREE.SRGBColorSpace
+  texturaPlato.anisotropy = 8
+  return texturaPlato
+}
+
+/**
+ * Piso de estudio para armar y cablear: claro, con cuadrícula de plano técnico en centímetros y
+ * sin sala alrededor. El robot es lo único que se mira (como en un programa de
+ * diseño). Las sombras caen en un plano transparente encima.
+ */
+export function PlatoEstudio({ lado = 1.6 }: { lado?: number }) {
+  const mapa = texturaDelPlato(lado)
+  return (
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.0006, 0]}>
+        <planeGeometry args={[lado, lado]} />
+        <meshBasicMaterial map={mapa ?? undefined} color={mapa ? '#ffffff' : '#f4f7fb'} transparent depthWrite={false} toneMapped={false} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.0002, 0]} receiveShadow>
+        <planeGeometry args={[lado, lado]} />
+        <shadowMaterial transparent opacity={0.2} />
+      </mesh>
+    </group>
+  )
+}
+
 /** Oclusión ambiental, antialiasing y tono fotográfico; nada en calidad baja. */
 export function Efectos() {
   const q = useCalidad()

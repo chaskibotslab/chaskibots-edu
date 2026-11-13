@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
-  AlertTriangle, ChevronDown, ChevronUp, Expand, Info, Loader2, Package, RotateCw, Search, Shrink, Trash2, Undo2, Redo2, X, Cable as IconCable, CircuitBoard,
+  AlertTriangle, Armchair, ChevronDown, ChevronUp, Expand, Info, Loader2, Package, RotateCw, Search, Shrink, Trash2, Undo2, Redo2, X, Cable as IconCable, CircuitBoard,
 } from 'lucide-react'
 import Miniatura from './Miniatura'
 import { FAMILIAS, type Familia, type PiezaDef } from '../../catalogo/tipos'
@@ -20,6 +20,7 @@ import type { RobotDoc } from '../../robots/doc'
 import { CREDITOS_MODELOS } from '../../catalogo/creditosModelos'
 import type { MarcadorMontaje } from '../Robot3D'
 import type { NivelCalidad } from '../calidad'
+import { useAmbiente } from '../ambiente'
 
 const EscenaTaller = dynamic(() => import('../Escena3D').then(m => m.EscenaTaller), {
   ssr: false,
@@ -37,6 +38,8 @@ interface Props {
   onNivel: (n: NivelCalidad) => void
   avisar: (tipo: 'ok' | 'error' | 'info', texto: string) => void
   onListaMateriales: () => void
+  /** Pedido de la misión guiada: buscar esta pieza en el cajón (`n` cambia en cada pedido). */
+  buscar?: { texto: string; n: number } | null
 }
 
 /** En la mesa, la pila de 9 V y el joystick también aparecen en «Componentes». */
@@ -58,11 +61,14 @@ export default function Armar(p: Props) {
   const recienArrastrado = useRef(false)
   const [activo, setActivo] = useState<string | null>(null)
   const [explosion, setExplosion] = useState(false)
+  const [ambiente, setAmbiente] = useAmbiente()
   const [cables, setCables] = useState(true)
   const [cajonAbierto, setCajonAbierto] = useState(true)
   const [busqueda, setBusqueda] = useState('')
+  useEffect(() => { if (p.buscar) { setBusqueda(p.buscar.texto); setCajonAbierto(true) } }, [p.buscar]) // eslint-disable-line react-hooks/exhaustive-deps
   const lienzo = useRef<HTMLDivElement>(null)
   const posMarcadores = useRef(new Map<string, { x: number; y: number }>())
+  const tira = useRef<HTMLDivElement>(null)
 
   // Si la pieza seleccionada desaparece (deshacer, quitar), se limpia la selección.
   useEffect(() => { if (seleccion && !doc.piezas.some(x => x.id === seleccion)) setSeleccion(null) }, [doc, seleccion])
@@ -175,76 +181,15 @@ export default function Armar(p: Props) {
   const avisos = useMemo(() => avisosEnsamblaje(doc), [doc])
   const sel = seleccion ? doc.piezas.find(x => x.id === seleccion) ?? null : null
 
-  return (
-    <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row">
-      {/* ---------- Cajón de piezas ---------- */}
-      <aside className={`order-2 lab-panel flex flex-col border-t border-lab-borde/20 lg:order-1 lg:w-80 lg:border-r lg:border-t-0 ${cajonAbierto ? 'max-h-[46vh] lg:max-h-none' : ''}`}>
-        <div className="border-b border-lab-borde/20 px-3 pb-3 pt-3">
-          <button onClick={() => setCajonAbierto(a => !a)} className="flex w-full items-center justify-between lg:pointer-events-none">
-            <span className="lab-seccion">Piezas</span>
-            <span className="text-lab-suave lg:hidden">{cajonAbierto ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}</span>
-          </button>
-          {cajonAbierto && (<>
-            <p className="mt-0.5 text-xs text-lab-tenue">Arrastra una pieza al {banco ? 'circuito' : 'robot'}, o tócala y elige dónde va.</p>
-            <div className="relative mt-2.5">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-lab-tenue" />
-              <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar: LED, motor, sensor…" className="h-8 w-full rounded-md border border-lab-borde/30 bg-lab-superficie pl-8 pr-7 text-sm text-lab-tinta outline-none placeholder:text-lab-tenue focus:border-lab-acento focus:ring-1 focus:ring-lab-acento" />
-              {busqueda && <button onClick={() => setBusqueda('')} className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-lab-tenue hover:text-lab-tinta" aria-label="Borrar búsqueda"><X className="h-3.5 w-3.5" /></button>}
-            </div>
-            {!busqueda && (
-              <label className="relative mt-2 block">
-                <span className="sr-only">Qué piezas mostrar</span>
-                <select value={familia} onChange={e => setFamilia(e.target.value as Familia | 'robot')} className="h-8 w-full appearance-none rounded-md border border-lab-borde/30 bg-lab-superficie pl-2.5 pr-8 text-sm text-lab-tinta outline-none focus:border-lab-acento focus:ring-1 focus:ring-lab-acento">
-                  <option value="robot">{banco ? 'Puestas en el circuito' : 'Puestas en el robot'} ({doc.piezas.length - 1})</option>
-                  {FAMILIAS.map(f => <option key={f.id} value={f.id}>{f.nombre} ({deFamilia(f.id).length})</option>)}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-lab-tenue" />
-              </label>
-            )}
-          </>)}
-        </div>
-        {cajonAbierto && (
-          familia === 'robot' && !busqueda ? (
-            // Piezas montadas: tocar = seleccionar; papelera = quitar (con lo que cuelga de ella).
-            <ul className="min-h-0 flex-1 overflow-y-auto">
-              {doc.piezas.filter(p => p.padre).map(p => (
-                <li key={p.id} className={`flex items-center gap-2.5 border-b border-lab-borde/10 px-3 py-1.5 ${seleccion === p.id ? 'bg-lab-fondo2' : 'hover:bg-lab-fondo'}`}>
-                  <button onClick={() => { setSeleccion(p.id); setElegida(null) }} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
-                    <Miniatura nombre={`pieza-${p.pieza}`} className="h-9 w-9 shrink-0 rounded border border-lab-borde/15" />
-                    <span className="min-w-0">
-                      <span className="block truncate text-xs font-medium text-lab-tinta">{p.etiqueta}</span>
-                      <span className="block truncate text-[11px] text-lab-tenue">{pieza(p.pieza).nombre}</span>
-                    </span>
-                  </button>
-                  <button onClick={() => quitarPieza(p.id)} className="rounded p-1.5 text-lab-tenue hover:bg-red-50 hover:text-red-600" title={`Quitar ${p.etiqueta}`} aria-label={`Quitar ${p.etiqueta}`}>
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </li>
-              ))}
-              <li className="px-3 py-2 text-[11px] leading-snug text-lab-tenue">Para cambiar la base, elige otra en «Chasis y bases». Ctrl+Z deshace.</li>
-            </ul>
-          ) : (
-            <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-3 gap-2 overflow-y-auto p-3 sm:grid-cols-4 lg:grid-cols-2">
-              {visibles.length === 0 && <p className="col-span-full text-xs text-lab-suave">No hay piezas con «{busqueda}».</p>}
-              {visibles.map(def => (
-                <TarjetaPieza
-                  key={def.id}
-                  def={def}
-                  elegida={elegida === def.id}
-                  enUso={doc.piezas.some(x => x.pieza === def.id)}
-                  onTocar={() => { if (!recienArrastrado.current) elegirPieza(def) }}
-                  onArrastrar={(x, y) => {
-                    if (!esBase(def)) setArrastre({ pieza: def.id, x, y, x0: x, y0: y, iniciado: false })
-                  }}
-                />
-              ))}
-            </div>
-          )
-        )}
-      </aside>
+  const familias: [Familia | 'robot', string, number][] = [
+    ['robot', 'Puestas', doc.piezas.length - 1],
+    ...FAMILIAS.map(f => [f.id, f.nombre, deFamilia(f.id).length] as [Familia, string, number]),
+  ]
 
-      {/* ---------- Escena ---------- */}
-      <div ref={lienzo} className="relative order-1 min-h-[280px] flex-1 touch-none lg:order-2">
+  return (
+    <div className="relative flex min-h-0 flex-1">
+      {/* ---------- Escena: ocupa toda la pantalla ---------- */}
+      <div ref={lienzo} className="absolute inset-0 touch-none">
         <EscenaTaller
           doc={doc}
           seleccion={seleccion}
@@ -258,26 +203,30 @@ export default function Armar(p: Props) {
           nivel={p.nivel}
           onNivel={p.onNivel}
         />
+      </div>
 
-        {/* Barra de herramientas */}
-        <div className="absolute left-3 top-3 flex items-center gap-0.5 rounded-md border border-lab-borde/20 bg-lab-superficie p-1 shadow-sm">
-          <BotonIcono titulo="Deshacer (Ctrl+Z)" onClick={p.deshacer} disabled={!p.puedeDeshacer}><Undo2 className="h-4 w-4" /></BotonIcono>
-          <BotonIcono titulo="Rehacer (Ctrl+Y)" onClick={p.rehacer} disabled={!p.puedeRehacer}><Redo2 className="h-4 w-4" /></BotonIcono>
-          <span aria-hidden className="mx-1 h-5 w-px bg-lab-borde/20" />
-          <BotonIcono titulo={explosion ? 'Juntar piezas' : 'Vista explosionada'} onClick={() => setExplosion(e => !e)} activo={explosion}>{explosion ? <Shrink className="h-4 w-4" /> : <Expand className="h-4 w-4" />}</BotonIcono>
-          <BotonIcono titulo={cables ? 'Ocultar cables' : 'Mostrar cables'} onClick={() => setCables(c => !c)} activo={cables}><IconCable className="h-4 w-4" /></BotonIcono>
-          {!banco && (
-            <BotonIcono
-              titulo={doc.conexion === 'pcb' ? 'Conexiones con PCB (toca para volver a los cables sueltos)' : 'Usar una PCB en lugar de cables sueltos'}
-              onClick={() => cambiar({ ...doc, conexion: doc.conexion === 'pcb' ? 'cables' : 'pcb' }, doc.conexion === 'pcb' ? 'Conexiones con cables sueltos' : 'Conexiones con PCB: las mismas conexiones, en pistas y mazos ordenados')}
-              activo={doc.conexion === 'pcb'}
-            ><CircuitBoard className="h-4 w-4" /></BotonIcono>
-          )}
-          <BotonIcono titulo="Lista de materiales" onClick={p.onListaMateriales}><Package className="h-4 w-4" /></BotonIcono>
-        </div>
+      {/* ---------- Herramientas (isla flotante) ---------- */}
+      <div className="lab-isla absolute left-3 top-[var(--lab-arriba)] z-10 flex h-11 items-center gap-0.5 px-1.5">
+        <BotonIcono titulo="Deshacer (Ctrl+Z)" onClick={p.deshacer} disabled={!p.puedeDeshacer}><Undo2 className="h-4 w-4" /></BotonIcono>
+        <BotonIcono titulo="Rehacer (Ctrl+Y)" onClick={p.rehacer} disabled={!p.puedeRehacer}><Redo2 className="h-4 w-4" /></BotonIcono>
+        <span aria-hidden className="mx-1 h-5 w-px bg-lab-borde/20" />
+        <BotonIcono titulo={explosion ? 'Juntar piezas' : 'Vista explosionada'} texto="Separar" onClick={() => setExplosion(e => !e)} activo={explosion}>{explosion ? <Shrink className="h-4 w-4" /> : <Expand className="h-4 w-4" />}</BotonIcono>
+        <BotonIcono titulo={cables ? 'Ocultar cables' : 'Mostrar cables'} texto="Cables" onClick={() => setCables(c => !c)} activo={cables}><IconCable className="h-4 w-4" /></BotonIcono>
+        {!banco && (
+          <BotonIcono
+            titulo={doc.conexion === 'pcb' ? 'Conexiones con PCB (toca para volver a los cables sueltos)' : 'Usar una PCB en lugar de cables sueltos'}
+            onClick={() => cambiar({ ...doc, conexion: doc.conexion === 'pcb' ? 'cables' : 'pcb' }, doc.conexion === 'pcb' ? 'Conexiones con cables sueltos' : 'Conexiones con PCB: las mismas conexiones, en pistas y mazos ordenados')}
+            activo={doc.conexion === 'pcb'} texto="PCB"
+          ><CircuitBoard className="h-4 w-4" /></BotonIcono>
+        )}
+        <BotonIcono titulo="Lista de materiales" texto="Materiales" onClick={p.onListaMateriales}><Package className="h-4 w-4" /></BotonIcono>
+        <span aria-hidden className="mx-1 h-5 w-px bg-lab-borde/20" />
+        <BotonIcono titulo={ambiente === 'taller' ? 'Fondo: mesa del aula (toca para el fondo de estudio)' : 'Fondo: estudio (toca para ver la mesa del aula)'} texto="Aula" onClick={() => setAmbiente(ambiente === 'taller' ? 'estudio' : 'taller')} activo={ambiente === 'taller'}><Armchair className="h-4 w-4" /></BotonIcono>
+      </div>
 
-        {/* Datos en vivo */}
-        <div className="pointer-events-none absolute right-3 top-3 hidden w-64 rounded-md border border-lab-borde/20 bg-lab-superficie/95 px-3 py-2.5 text-xs shadow-sm sm:block">
+      {/* ---------- Datos en vivo ---------- */}
+      {!sel && (
+        <div className="lab-vidrio pointer-events-none absolute right-3 top-[var(--lab-arriba)] hidden w-64 px-4 py-3 text-xs lg:block">
           <div className="lab-seccion mb-1.5">{banco ? 'Circuito' : 'Robot'}</div>
           <Dato k="Peso" v={`${res.masa_g.toFixed(0)} g`} />
           <Dato k="Medidas" v={`${(res.medidas.largo / 10).toFixed(1)} × ${(res.medidas.ancho / 10).toFixed(1)} × ${(res.medidas.alto / 10).toFixed(1)} cm`} />
@@ -287,12 +236,62 @@ export default function Armar(p: Props) {
             <div key={i} className="mt-2 flex gap-1.5 border-t border-lab-borde/15 pt-2 text-[11px] leading-snug text-amber-700"><AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" /> {a}</div>
           ))}
         </div>
+      )}
 
-        {elegida && !arrastre?.iniciado && (
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-md border border-lab-borde/20 bg-lab-superficie px-3 py-1.5 text-xs text-lab-tinta shadow-sm">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
-            {marcadores.length ? <>Toca un punto verde para poner <b>{pieza(elegida).nombre}</b></> : <>No hay lugar libre para <b>{pieza(elegida).nombre}</b></>}
-            <button onClick={() => setElegida(null)} className="rounded-full p-0.5 hover:bg-lab-tinta/[0.07]"><X className="h-3.5 w-3.5" /></button>
+      {elegida && !arrastre?.iniciado && (
+        <div className="lab-vidrio lab-aviso-punto absolute bottom-[12.5rem] left-1/2 z-10 flex -translate-x-1/2 items-center gap-2.5 whitespace-nowrap px-4 py-2 text-xs font-medium text-lab-tinta">
+          <i className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500" />
+          {marcadores.length ? <span>Toca un punto verde para poner <b>{pieza(elegida).nombre}</b></span> : <span>No hay lugar libre para <b>{pieza(elegida).nombre}</b></span>}
+          <button onClick={() => setElegida(null)} className="lab-boton-icono p-1" aria-label="Cancelar"><X className="h-3.5 w-3.5" /></button>
+        </div>
+      )}
+
+      {/* ---------- Repisa de piezas: una tira al pie, como el dock ---------- */}
+      <div className="lab-dock absolute inset-x-3 bottom-3 z-10 mx-auto max-w-6xl" onWheel={e => { if (tira.current && Math.abs(e.deltaY) > Math.abs(e.deltaX)) tira.current.scrollLeft += e.deltaY }}>
+        <div className="lab-dock-fondo" />
+        <div className={`relative flex h-[42px] items-center gap-2 px-3 pt-1 ${cajonAbierto ? '' : 'mb-1'}`}>
+          <div className="relative w-36 shrink-0 sm:w-44">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-lab-tenue" />
+            <input value={busqueda} onChange={e => { setBusqueda(e.target.value); setCajonAbierto(true) }} placeholder="Buscar pieza…" aria-label="Buscar pieza" className="h-8 w-full rounded-full bg-[rgb(118_124_140/0.14)] pl-8 pr-7 text-xs text-lab-tinta outline-none placeholder:text-lab-tenue focus:ring-2 focus:ring-lab-acento/50" />
+            {busqueda && <button onClick={() => setBusqueda('')} className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-lab-tenue hover:text-lab-tinta" aria-label="Borrar búsqueda"><X className="h-3.5 w-3.5" /></button>}
+          </div>
+          <div className="lab-sin-barra flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto" role="group" aria-label="Qué piezas mostrar">
+            {familias.map(([id, nombre, n]) => (
+              <button key={id} onClick={() => { setFamilia(id); setBusqueda(''); setCajonAbierto(true) }} aria-pressed={!q && familia === id} className="lab-chip shrink-0 px-3 py-1.5 text-xs font-semibold">
+                {nombre} <span className="lab-chip-n">{n}</span>
+              </button>
+            ))}
+          </div>
+          <button onClick={() => setCajonAbierto(a => !a)} className="lab-boton-icono flex h-8 w-8 shrink-0 items-center justify-center" title={cajonAbierto ? 'Esconder las piezas' : 'Mostrar las piezas'} aria-label={cajonAbierto ? 'Esconder las piezas' : 'Mostrar las piezas'} aria-expanded={cajonAbierto}>
+            {cajonAbierto ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+          </button>
+        </div>
+        {cajonAbierto && (
+          <div ref={tira} key={q ? 'busqueda' : familia} className="lab-dock-tira lab-sin-barra relative">
+            {familia === 'robot' && !q ? (<>
+              {doc.piezas.filter(x => x.padre).map((x, i) => (
+                <button key={x.id} onClick={() => { setSeleccion(x.id); setElegida(null) }} data-elegida={seleccion === x.id} style={{ '--i': i } as React.CSSProperties} title={`${x.etiqueta} · ${pieza(x.pieza).nombre}`} className="lab-dock-item text-left">
+                  <Miniatura nombre={`pieza-${x.pieza}`} icono={Package} className="aspect-square w-full rounded-[13px]" />
+                  <span className="mt-1 block h-6 overflow-hidden px-0.5 text-center text-[10px] font-semibold leading-3 text-lab-tinta">{x.etiqueta}</span>
+                </button>
+              ))}
+              {doc.piezas.length < 2 && <p className="pointer-events-auto px-2 pb-6 text-xs text-lab-suave">Todavía no hay piezas puestas. Elige un grupo y arrastra una pieza al {banco ? 'circuito' : 'robot'}.</p>}
+            </>) : (<>
+              {visibles.length === 0 && <p className="pointer-events-auto px-2 pb-6 text-xs text-lab-suave">No hay piezas con «{busqueda}».</p>}
+              {visibles.map((def, i) => (
+                <TarjetaPieza
+                  key={def.id}
+                  def={def}
+                  i={i}
+                  elegida={elegida === def.id}
+                  enUso={doc.piezas.some(x => x.pieza === def.id)}
+                  onTocar={() => { if (!recienArrastrado.current) elegirPieza(def) }}
+                  onArrastrar={(x, y) => {
+                    if (!esBase(def)) setArrastre({ pieza: def.id, x, y, x0: x, y0: y, iniciado: false })
+                  }}
+                />
+              ))}
+            </>)}
           </div>
         )}
       </div>
@@ -308,46 +307,48 @@ export default function Armar(p: Props) {
         />
       )}
 
-      {/* Pieza que se está arrastrando */}
+      {/* Pieza que se está arrastrando: su foto sigue al cursor. */}
       {arrastre?.iniciado && (
-        <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 rounded-md border border-lab-acento bg-lab-superficie px-2.5 py-1.5 text-xs font-medium text-lab-tinta shadow-lg" style={{ left: arrastre.x, top: arrastre.y }}>
-          {pieza(arrastre.pieza).nombre}
+        <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2" style={{ left: arrastre.x, top: arrastre.y }}>
+          <div className="lab-vidrio flex w-24 rotate-[-4deg] flex-col items-center p-1.5">
+            <Miniatura nombre={`pieza-${arrastre.pieza}`} icono={Package} className="aspect-square w-full rounded-[16px]" />
+            <span className="mt-1 max-w-full truncate text-[10px] font-semibold text-lab-tinta">{pieza(arrastre.pieza).nombre}</span>
+          </div>
         </div>
       )}
     </div>
   )
 }
 
-function BotonIcono({ titulo, onClick, disabled, activo, children }: { titulo: string; onClick: () => void; disabled?: boolean; activo?: boolean; children: React.ReactNode }) {
+function BotonIcono({ titulo, texto, onClick, disabled, activo, children }: { titulo: string; /** Rótulo corto junto al icono (en pantallas anchas). */ texto?: string; onClick: () => void; disabled?: boolean; activo?: boolean; children: React.ReactNode }) {
   return (
-    <button title={titulo} aria-label={titulo} aria-pressed={activo} onClick={onClick} disabled={disabled} className={`flex h-8 w-8 items-center justify-center rounded transition disabled:opacity-30 ${activo ? 'bg-lab-acento/10 text-lab-acento' : 'text-lab-tinta2 hover:bg-lab-fondo2'}`}>
+    <button title={titulo} aria-label={titulo} aria-pressed={activo} onClick={onClick} disabled={disabled} className={`lab-boton-icono flex h-8 items-center justify-center gap-1.5 text-xs font-semibold disabled:opacity-30 ${texto ? 'w-8 xl:w-auto xl:px-2.5' : 'w-8'}`}>
       {children}
+      {texto && <span className="hidden xl:inline">{texto}</span>}
     </button>
   )
 }
 
 function Dato({ k, v }: { k: string; v: string }) {
-  return <div className="flex justify-between gap-2 py-0.5"><span className="text-lab-tenue">{k}</span><span className="text-right tabular-nums text-lab-tinta">{v}</span></div>
+  return <div className="flex justify-between gap-2 py-0.5"><span className="text-lab-tenue">{k}</span><span className="text-right font-medium tabular-nums text-lab-tinta">{v}</span></div>
 }
 
-function TarjetaPieza({ def, elegida, enUso, onTocar, onArrastrar }: { def: PiezaDef; elegida: boolean; enUso: boolean; onTocar: () => void; onArrastrar: (x: number, y: number) => void }) {
+function TarjetaPieza({ def, i, elegida, enUso, onTocar, onArrastrar }: { def: PiezaDef; i: number; elegida: boolean; enUso: boolean; onTocar: () => void; onArrastrar: (x: number, y: number) => void }) {
   return (
     <button
       onClick={onTocar}
       onPointerDown={e => { if (e.button === 0 && !def.proximamente) onArrastrar(e.clientX, e.clientY) }}
       data-elegida={elegida}
-      title={def.descripcion}
-      className={`lab-tarjeta flex touch-none select-none flex-col p-1.5 text-left ${def.proximamente ? 'border-dashed opacity-60' : ''}`}
+      style={{ '--i': i } as React.CSSProperties}
+      title={`${def.nombre} · ${def.masa_g} g\n${def.proximamente ? `Pronto: ${def.proximamente}` : def.descripcion}`}
+      className={`lab-dock-item text-left ${def.proximamente ? 'opacity-55' : ''}`}
     >
-      <Miniatura nombre={`pieza-${def.id}`} icono={Package} className="aspect-[4/3] w-full rounded-[3px]" />
-      <span className="mt-1.5 line-clamp-2 min-h-[2rem] px-0.5 text-center text-xs font-medium leading-4 text-lab-tinta">{def.nombre}</span>
-      <span className="mt-1 flex items-center justify-between gap-1 px-0.5">
-        {def.proximamente ? <span className="lab-etiqueta">Pronto</span> : def.enKits ? <span className="lab-etiqueta">En kits</span> : <span />}
-        <span className="flex items-center gap-1 text-[10px] tabular-nums text-lab-tenue">
-          {enUso && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="Ya está puesta" />}
-          {def.masa_g} g
-        </span>
+      <span className="relative block">
+        <Miniatura nombre={`pieza-${def.id}`} icono={Package} className="aspect-square w-full rounded-[13px]" />
+        {enUso && <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" title="Ya está puesta" />}
+        {def.enKits && <span className="absolute bottom-1 left-1 rounded-full bg-white/90 px-1 text-[7px] font-bold uppercase leading-[11px] tracking-wide text-lab-acento">Kit</span>}
       </span>
+      <span className="mt-1 block h-6 overflow-hidden px-0.5 text-center text-[10px] font-semibold leading-3 text-lab-tinta">{def.nombre}</span>
     </button>
   )
 }
@@ -370,7 +371,7 @@ function PanelPieza({ doc, id, onCerrar, cambiar, avisar }: { doc: RobotDoc; id:
   }
 
   return (
-    <aside className="absolute inset-x-0 bottom-0 z-20 max-h-[60vh] overflow-y-auto rounded-t-lg border-t border-lab-borde/20 bg-lab-superficie p-4 shadow-2xl lg:static lab-panel lg:order-3 lg:max-h-none lg:w-80 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none">
+    <aside className="lab-vidrio absolute inset-x-0 bottom-0 z-30 max-h-[60vh] overflow-y-auto p-4 lg:inset-x-auto lg:bottom-auto lg:right-3 lg:top-[var(--lab-arriba)] lg:max-h-[calc(100dvh-var(--lab-arriba)-13rem)] lg:w-80">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="lab-seccion">{inst.etiqueta}</div>
