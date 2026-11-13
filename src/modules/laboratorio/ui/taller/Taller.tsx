@@ -6,7 +6,7 @@
 // El borrador se guarda en este navegador (en F3, en la cuenta).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, Bot, Cable, ChevronRight, CloudUpload, Code2, Download, FileUp, FolderOpen, Hammer, LayoutGrid, Lightbulb, Loader2, MoreHorizontal, Pencil, Play, Plus, Printer, Search, X } from 'lucide-react'
+import { ArrowLeft, Bot, Target, Cable, ChevronRight, CloudUpload, Code2, Download, FileUp, FolderOpen, Hammer, LayoutGrid, Lightbulb, Loader2, MoreHorizontal, Pencil, Play, Plus, Printer, Search, X } from 'lucide-react'
 import { datosVariante, pieza } from '../../catalogo/piezas'
 import { autocablear } from '../../engine/autocableado'
 import { aprendizajes } from '../../engine/explicacion'
@@ -23,7 +23,9 @@ import { PROGRAMA_VACIO } from '../../bloques/definiciones'
 import Cablear from './Cablear'
 import Programar from './Programar'
 import Probar from './Probar'
-import { useSimulacion } from './useSimulacion'
+import { useSimulacion, estructura } from './useSimulacion'
+import PanelMision from './PanelMision'
+import { avanceNuevo, crearMision, etapasMision, pruebaCumplida, type Avance } from '../../engine/mision'
 
 type Pestana = 'armar' | 'cablear' | 'programar' | 'probar'
 
@@ -31,7 +33,9 @@ const CLAVE_BORRADOR = 'chaskibots-lab:robot-v2'
 const MAX_HISTORIAL = 80
 
 /** `arena`: la que eligió el alumno en Probar (si no es la del proyecto). */
-interface Borrador { doc: RobotDoc; prearmado: string | null; nubeId?: string | null; arena?: string }
+interface Borrador { doc: RobotDoc; prearmado: string | null; nubeId?: string | null; arena?: string; mision?: MisionEnCurso | null }
+/** Misión guiada en curso: de qué proyecto y qué lleva hecho el alumno. */
+interface MisionEnCurso { id: string; avance: Avance }
 
 function leerBorrador(): Borrador | null {
   try {
@@ -69,12 +73,14 @@ export default function Taller() {
   const [nivel, setNivel] = useState<NivelCalidad>('media')
   const [aviso, setAviso] = useState<{ tipo: 'ok' | 'error' | 'info'; texto: string } | null>(null)
   const [arenaGuardada, setArenaGuardada] = useState<string | null>(null)
+  const [mision, setMision] = useState<MisionEnCurso | null>(null)
+  const [buscarPieza, setBuscarPieza] = useState<{ texto: string; n: number } | null>(null)
   const archivo = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setNivel(calidadInicial())
     const b = leerBorrador()
-    if (b) { setDoc(b.doc); setPrearmado(b.prearmado); setNubeId(b.nubeId ?? null); setArenaGuardada(b.arena ?? null) }
+    if (b) { setDoc(b.doc); setPrearmado(b.prearmado); setNubeId(b.nubeId ?? null); setArenaGuardada(b.arena ?? null); setMision(b.mision && PREARMADOS.some(p => p.id === b.mision!.id) ? b.mision : null) }
     else { setDoc(construirSeguidor()); setPrearmado('seguidor'); setGaleria(true) }
   }, [])
 
@@ -89,9 +95,43 @@ export default function Taller() {
   useEffect(() => {
     if (!doc) return
     const arena = s.sim && !s.imagenPropia && s.arena.id !== arenaInicial ? s.arena.id : arenaGuardada ?? undefined
-    const t = setTimeout(() => guardarBorrador({ doc, prearmado, nubeId, arena }), 400)
+    const t = setTimeout(() => guardarBorrador({ doc, prearmado, nubeId, arena, mision }), 400)
     return () => clearTimeout(t)
-  }, [doc, prearmado, nubeId, s.sim, s.arena.id, s.imagenPropia, arenaInicial, arenaGuardada])
+  }, [doc, prearmado, nubeId, s.sim, s.arena.id, s.imagenPropia, arenaInicial, arenaGuardada, mision])
+
+  // ---------- Misión guiada ----------
+  const defMision = useMemo(() => {
+    const p = mision ? PREARMADOS.find(x => x.id === mision.id) : null
+    return p ? crearMision(p) : null
+  }, [mision?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  const claveRobot = doc ? estructura(doc) : ''
+  const hayPrograma = !!doc && doc.programa.cpp.trim().length > 0
+  // Las etapas dependen de las piezas, los cables y de si hay programa (no de cada tecla del código).
+  const etapas = useMemo(
+    () => (defMision && mision && doc ? etapasMision(defMision, doc, mision.avance) : null),
+    [defMision, mision?.avance, claveRobot, hayPrograma], // eslint-disable-line react-hooks/exhaustive-deps
+  )
+  const avanzar = useCallback((cambio: Partial<Avance>) => setMision(m => (m ? { ...m, avance: { ...m.avance, ...cambio } } : m)), [])
+  const listoParaCorrer = !!etapas && etapas[2].completa && etapas[3].completa
+  // «Compila y ejecuta»: vale cuando corre con el robot ya armado y conectado.
+  useEffect(() => {
+    if (mision && !mision.avance.corrio && listoParaCorrer && s.estado === 'corriendo') avanzar({ corrio: true })
+  }, [mision, listoParaCorrer, s.estado, avanzar])
+  // «Prueba»: segundos corriendo y metros recorridos desde que se ejecutó.
+  const prueba = useRef({ t: 0, seg: 0, m: 0 })
+  useEffect(() => {
+    if (!mision || !defMision || mision.avance.probado || !listoParaCorrer || !s.tele) return
+    const p = prueba.current
+    const t = s.tele.tiempoSim
+    if (s.estado !== 'corriendo' || t < p.t) { if (t < p.t) { p.seg = 0; p.m = 0 } p.t = t; return }
+    const dt = Math.min(0.5, t - p.t)
+    p.t = t; p.seg += dt; p.m += Math.abs(s.tele.velocidadRobot) * dt
+    if (pruebaCumplida(defMision, p.seg, p.m)) avanzar({ probado: true })
+  }, [mision, defMision, listoParaCorrer, s.tele, s.estado, avanzar])
+  // Al completar todo, se anota la hora de término (para la ficha).
+  useEffect(() => {
+    if (mision && etapas && !mision.avance.fin && etapas.every(e => e.completa)) avanzar({ fin: Date.now() })
+  }, [mision, etapas, avanzar])
 
   useEffect(() => {
     if (!aviso) return
@@ -164,7 +204,22 @@ export default function Taller() {
     return () => window.removeEventListener('keydown', tecla)
   })
 
+  /** Empieza la misión guiada de un proyecto: solo la base, sin cables ni programa. */
+  const empezarMision = (id: string) => {
+    const p = PREARMADOS.find(x => x.id === id)
+    if (!p) return
+    setDoc(crearMision(p).inicio)
+    setMision({ id, avance: avanceNuevo() })
+    prueba.current = { t: 0, seg: 0, m: 0 }
+    setNubeId(null); setPrearmado(id); setArenaGuardada(null)
+    setPasado([]); setFuturo([])
+    setGaleria(false)
+    setPestana('armar')
+  }
+  const confirmarPaso = (id: string, si: boolean) => setMision(m => (m ? { ...m, avance: { ...m.avance, confirmados: si ? [...m.avance.confirmados.filter(x => x !== id), id] : m.avance.confirmados.filter(x => x !== id) } } : m))
+
   const abrir = (d: RobotDoc, id: string | null, idNube: string | null = null) => {
+    setMision(null)
     setDoc(conCables(d))
     setNubeId(idNube)
     setPrearmado(id)
@@ -207,17 +262,24 @@ export default function Taller() {
     }
   }
 
-  if (!doc) return <div className="lab-tema h-[calc(100dvh-4rem)]" />
+  if (!doc) return <div className="lab-tema h-dvh" />
 
   const pestanas: [Pestana, string, typeof Hammer][] = [
     ['armar', 'Armar', Hammer], ['cablear', 'Cablear', Cable], ['programar', 'Programar', Code2], ['probar', 'Probar', Play],
   ]
 
   return (
-    <div data-paso={pestana} className="lab-tema flex h-[calc(100dvh-4rem)] min-h-[560px] flex-col text-lab-tinta">
+    <div data-paso={pestana} className="lab-tema lab-cabina h-dvh min-h-[520px] overflow-hidden text-lab-tinta [--lab-arriba:7.5rem] sm:[--lab-arriba:4.75rem]">
       {/* ---------- Encabezado ---------- */}
-      <div className="lab-barra z-10 flex h-12 shrink-0 items-stretch gap-3 px-3">
-        <label className="group flex min-w-0 items-center gap-1.5" title="Cambiar el nombre">
+      {/* Tres islas de vidrio que flotan sobre la escena: proyecto, pasos y acciones. */}
+      <div className="pointer-events-none absolute inset-x-3 top-3 z-30 flex flex-wrap items-center justify-between gap-2">
+        <div className="lab-isla pointer-events-auto flex h-12 min-w-0 items-center gap-2 pl-2 pr-3">
+        <a href="/" title="Volver a ChaskiBots" className="lab-boton-icono flex h-9 shrink-0 items-center gap-1.5 px-1.5">
+          <ArrowLeft className="h-4 w-4" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/chaski.png" alt="" className="h-7 w-7 rounded-[10px] bg-[rgb(var(--lab-acento))] object-contain p-0.5" />
+        </a>
+        <label className="group hidden min-w-0 items-center gap-1.5 md:flex" title="Cambiar el nombre">
           <input
             value={doc.nombre}
             onChange={e => setDoc({ ...doc, nombre: e.target.value.slice(0, 40) })}
@@ -227,16 +289,16 @@ export default function Taller() {
           />
           <Pencil className="hidden h-3.5 w-3.5 shrink-0 text-lab-tenue group-hover:block" />
         </label>
-        <span aria-hidden className="my-3 w-px bg-lab-borde/20" />
-        <nav aria-label="Pasos" className="flex min-w-0 items-stretch overflow-x-auto">
-          {pestanas.map(([id, txt], i) => (
-            <button key={id} data-id={id} aria-current={pestana === id ? 'step' : undefined} onClick={() => setPestana(id)} className="lab-paso flex shrink-0 items-center gap-2 px-3 text-sm font-medium">
-              <span className="lab-paso-num flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold">{i + 1}</span>
-              {txt}
+        </div>
+        <nav aria-label="Pasos" style={{ '--i': pestanas.findIndex(x => x[0] === pestana) } as React.CSSProperties} className="lab-isla lab-pasos pointer-events-auto order-3 h-12 w-full sm:order-none sm:w-auto">
+          {pestanas.map(([id, txt, I]) => (
+            <button key={id} data-id={id} aria-current={pestana === id ? 'step' : undefined} onClick={() => setPestana(id)} title={txt} className="lab-paso flex items-center justify-center gap-2 px-3 text-sm font-semibold lg:w-[8rem]">
+              <I className="h-4 w-4 shrink-0" />
+              <span className="sm:hidden lg:inline">{txt}</span>
             </button>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="lab-isla pointer-events-auto flex h-12 items-center gap-1.5 px-2">
           <button onClick={() => setGaleria(true)} className="lab-secundario flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-medium" title="Proyectos listos o empezar de cero">
             <LayoutGrid className="h-4 w-4" /> <span className="hidden md:inline">Proyectos</span>
           </button>
@@ -247,7 +309,7 @@ export default function Taller() {
               { icono: FileUp, texto: 'Abrir proyecto (.json)', accion: () => archivo.current?.click() },
             ]}
           />
-          <button onClick={guardarNube} disabled={guardando} className="lab-primario flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-semibold disabled:opacity-50" title="Guardar en tu cuenta (Ctrl+S)">
+          <button onClick={guardarNube} disabled={guardando} className="lab-primario lab-b-marino flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-semibold disabled:opacity-50" title="Guardar en tu cuenta (Ctrl+S)">
             {guardando ? <Loader2 className="h-4 w-4 animate-spin" /> : <CloudUpload className="h-4 w-4" />} <span className="hidden sm:inline">Guardar</span>
           </button>
           <input ref={archivo} type="file" accept="application/json,.json" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) importar(f); e.target.value = '' }} />
@@ -256,23 +318,27 @@ export default function Taller() {
 
       {/* Aviso flotante: no empuja el contenido hacia abajo. */}
       {aviso && (
-        <div role="status" className="pointer-events-none fixed inset-x-0 top-[7.25rem] z-40 flex justify-center px-4">
-          <div className={`flex max-w-xl items-start gap-2 rounded-md border bg-lab-superficie px-3 py-2 text-xs text-lab-tinta shadow-lg ${aviso.tipo === 'error' ? 'border-red-300' : aviso.tipo === 'ok' ? 'border-emerald-300' : 'border-lab-borde/25'}`}>
+        <div role="status" className="pointer-events-none fixed inset-x-0 top-[calc(var(--lab-arriba)+0.25rem)] z-40 flex justify-center px-4">
+          <div className={`lab-vidrio flex max-w-xl items-start gap-2 border px-4 py-2.5 text-xs font-medium text-lab-tinta ${aviso.tipo === 'error' ? 'border-red-300' : aviso.tipo === 'ok' ? 'border-emerald-300' : 'border-lab-borde/25'}`}>
             <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${aviso.tipo === 'error' ? 'bg-red-500' : aviso.tipo === 'ok' ? 'bg-emerald-500' : 'bg-lab-acento'}`} />
             {aviso.texto}
           </div>
         </div>
       )}
 
-      {/* ---------- Contenido ---------- */}
+      {/* ---------- Contenido (cada pestaña entra deslizándose) ---------- */}
+      <div key={pestana} className={`lab-entra absolute inset-0 flex flex-col ${pestana === 'armar' ? '' : `px-3 pt-[var(--lab-arriba)] ${mision ? 'pb-[5rem]' : 'pb-3'}`}`}>
+      <div className={pestana === 'armar' ? 'flex min-h-0 flex-1 flex-col' : 'lab-ventana flex min-h-0 flex-1 flex-col'}>
       {pestana === 'armar' && (
         <Armar
-          doc={doc} cambiar={cambiar} deshacer={deshacer} rehacer={rehacer}
+          // En una misión los cables los pone el alumno: las piezas nuevas no se conectan solas.
+          doc={doc} cambiar={mision ? (d, t) => cambiar(d, t, false) : cambiar} deshacer={deshacer} rehacer={rehacer}
+          buscar={buscarPieza}
           puedeDeshacer={pasado.length > 0} puedeRehacer={futuro.length > 0}
           nivel={nivel} onNivel={setNivel} avisar={avisar} onListaMateriales={() => setMateriales(true)}
         />
       )}
-      {pestana === 'cablear' && <Cablear doc={doc} cambiar={cambiar} nivel={nivel} onNivel={setNivel} />}
+      {pestana === 'cablear' && <Cablear doc={doc} cambiar={(d, t, r) => { if (mision && d.cableado === 'auto') avanzar({ ayudaCables: true }); cambiar(d, t, r) }} nivel={nivel} onNivel={setNivel} />}
       {pestana === 'programar' && (
         <Programar
           doc={doc}
@@ -283,8 +349,19 @@ export default function Taller() {
         />
       )}
       {pestana === 'probar' && <Probar doc={doc} s={s} nivel={nivel} onNivel={setNivel} onIrA={setPestana} />}
+      </div>
+      </div>
 
-      {galeria && <Galeria onAbrir={abrir} onCerrar={() => setGaleria(false)} />}
+      {mision && defMision && etapas && (
+        <PanelMision
+          mision={defMision} etapas={etapas} avance={mision.avance} pestana={pestana}
+          onIrA={setPestana} onConfirmar={confirmarPaso}
+          onBuscarPieza={texto => { setPestana('armar'); setBuscarPieza(b => ({ texto, n: (b?.n ?? 0) + 1 })) }}
+          onSalir={() => setMision(null)}
+        />
+      )}
+
+      {galeria && <Galeria onAbrir={abrir} onMision={empezarMision} onCerrar={() => setGaleria(false)} />}
       {materiales && <ListaMateriales doc={doc} onCerrar={() => setMateriales(false)} />}
       {misRobots && <MisRobots actual={nubeId} onCerrar={() => setMisRobots(false)} onAbrir={(d, id) => { abrir(d, null, id); setMisRobots(false); avisar('ok', `«${d.nombre}» abierto`) }} />}
     </div>
@@ -325,9 +402,9 @@ function MenuMas({ opciones }: { opciones: { icono: typeof Hammer; texto: string
         <MoreHorizontal className="h-4 w-4" />
       </button>
       {abierto && (
-        <div role="menu" className="lab-vidrio absolute right-0 top-10 z-50 w-60 rounded-md py-1">
+        <div role="menu" className="lab-vidrio absolute right-0 top-12 z-50 w-64 overflow-hidden py-1.5">
           {opciones.map(({ icono: I, texto, accion }) => (
-            <button key={texto} role="menuitem" onClick={() => { setAbierto(false); accion() }} className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-lab-tinta hover:bg-lab-fondo2">
+            <button key={texto} role="menuitem" onClick={() => { setAbierto(false); accion() }} className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-lab-tinta hover:bg-lab-acento/10">
               <I className="h-4 w-4 text-lab-suave" /> {texto}
             </button>
           ))}
@@ -348,7 +425,7 @@ function Nivel({ nivel }: { nivel: keyof typeof NIVEL }) {
   const [txt, n] = NIVEL[nivel]
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-lab-suave">
-      <span className="flex gap-0.5">{[1, 2, 3].map(i => <span key={i} className={`h-2 w-1.5 rounded-[1px] ${i <= n ? 'bg-lab-acento' : 'bg-lab-borde/25'}`} />)}</span>
+      <span className="flex gap-0.5">{[1, 2, 3].map(i => <span key={i} className={`h-2.5 w-1.5 rounded-[1px] ${i <= n ? (n === 1 ? 'bg-emerald-400' : n === 2 ? 'bg-amber-400' : 'bg-rose-400') : 'bg-lab-borde/25'}`} />)}</span>
       {txt}
     </span>
   )
@@ -370,7 +447,7 @@ const INICIOS_BANCO = [
   ['arduino-mega', 'Protoboard + Arduino Mega', '54 pines y 16 analógicas'],
 ] as const
 
-function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | null) => void; onCerrar: () => void }) {
+function Galeria({ onAbrir, onMision, onCerrar }: { onAbrir: (d: RobotDoc, id: string | null) => void; onMision: (id: string) => void; onCerrar: () => void }) {
   const [categoria, setCategoria] = useState<'robot' | 'electronica'>('robot')
   const [placa, setPlaca] = useState<'todas' | PlacaGaleria>('todas')
   const [busqueda, setBusqueda] = useState('')
@@ -442,16 +519,17 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
                 <section key={g.nombre}>
                   <h3 className="lab-seccion sticky top-0 z-[1] border-b border-lab-borde/15 bg-lab-fondo px-4 py-1.5">{g.nombre} <span className="font-normal text-lab-tenue">· {g.fichas.length}</span></h3>
                   <ul>
-                    {g.fichas.map(f => {
+                    {g.fichas.map((f, n) => {
                       const sel = actual?.p.id === f.p.id
                       return (
                         <li key={f.p.id}>
-                          <button onClick={() => elegir(f.p.id)} onDoubleClick={() => onAbrir(f.p.construir(), f.p.id)} className={`relative flex w-full items-center gap-3 border-b border-lab-borde/10 px-4 py-2.5 text-left transition ${sel ? 'bg-lab-fondo2' : 'hover:bg-lab-fondo'}`}>
-                            {sel && <span className="absolute inset-y-0 left-0 w-[3px] bg-lab-acento" />}
-                            <Miniatura nombre={`proyecto-${f.p.id}`} icono={Icono} className="h-14 w-20 shrink-0 rounded border border-lab-borde/15" />
+                          <button onClick={() => elegir(f.p.id)} onDoubleClick={() => onAbrir(f.p.construir(), f.p.id)} data-sel={sel} style={{ '--i': n } as React.CSSProperties} className="lab-fila relative flex w-full items-center gap-3 border-b border-lab-borde/10 px-4 py-2.5 text-left hover:bg-lab-fondo2/60">
+                            {sel && <span className="lab-fila-marca absolute inset-y-0 left-0 w-[3px] bg-lab-acento" />}
+                            <Miniatura nombre={`proyecto-${f.p.id}`} icono={Icono} className="h-16 w-24 shrink-0 rounded-md border border-lab-borde/20" />
                             <span className="min-w-0 flex-1">
-                              <span className="block truncate text-sm font-medium text-lab-tinta">{f.p.nombre}</span>
-                              <span className="block truncate text-xs text-lab-tenue">{f.placa} · {f.piezas} piezas</span>
+                              <span className="lab-rotulo block truncate text-sm font-semibold text-lab-tinta">{f.p.nombre}</span>
+                              <span className="mt-0.5 block truncate text-xs text-lab-tenue">{f.placa} · {f.piezas} piezas</span>
+                              <span className="mt-1 block"><Nivel nivel={f.p.dificultad} /></span>
                             </span>
                             <ChevronRight className="h-4 w-4 shrink-0 text-lab-tenue md:hidden" />
                           </button>
@@ -489,22 +567,24 @@ function Galeria({ onAbrir, onCerrar }: { onAbrir: (d: RobotDoc, id: string | nu
           {/* Ficha del proyecto elegido */}
           {actual && (
             <div className={`min-h-0 flex-1 overflow-y-auto md:block ${verFicha ? 'block' : 'hidden'}`}>
-              <div className="mx-auto max-w-2xl p-4 sm:p-6">
+              <div key={actual.p.id} className="lab-ficha mx-auto max-w-2xl p-4 sm:p-6">
                 <button onClick={() => setVerFicha(false)} className="mb-3 flex items-center gap-1 text-sm text-lab-suave hover:text-lab-tinta md:hidden"><ArrowLeft className="h-4 w-4" /> Proyectos</button>
                 <div className="mb-1 flex flex-wrap items-center gap-2">
                   <span className="text-xs text-lab-tenue">{grupoDe(actual.p.id)}</span>
                   {actual.p.kit && <span className="lab-etiqueta">{actual.p.kit}</span>}
                 </div>
-                <h3 className="mb-4 text-xl font-semibold text-lab-tinta">{actual.p.nombre}</h3>
+                <h3 className="mb-4 text-2xl font-bold tracking-tight text-lab-tinta">{actual.p.nombre}</h3>
                 <div className="grid gap-5 lg:grid-cols-[1fr_15rem]">
-                  <Miniatura nombre={`proyecto-${actual.p.id}`} icono={Icono} className="aspect-[4/3] w-full rounded-md border border-lab-borde/20" />
+                  <div className="lab-marco self-start"><Miniatura nombre={`proyecto-${actual.p.id}`} icono={Icono} className="aspect-[4/3] w-full" /></div>
                   <div className="flex flex-col">
-                    <button onClick={() => onAbrir(actual.p.construir(), actual.p.id)} className="lab-primario h-10 w-full rounded-md text-sm font-semibold">Abrir en el taller</button>
-                    <p className="mt-2 text-xs leading-relaxed text-lab-tenue">Se abre listo para armar, cablear, programar y probar. Ctrl+Z deshace lo que cambies.</p>
-                    <dl className="mt-4 space-y-1.5 border-t border-lab-borde/20 pt-4 text-xs">
-                      <div className="flex gap-3"><dt className="w-14 text-lab-tenue">Placa</dt><dd className="font-medium text-lab-tinta">{actual.placa}</dd></div>
-                      <div className="flex gap-3"><dt className="w-14 text-lab-tenue">Piezas</dt><dd className="font-medium text-lab-tinta">{actual.piezas}</dd></div>
-                      <div className="flex items-center gap-3"><dt className="w-14 text-lab-tenue">Nivel</dt><dd><Nivel nivel={actual.p.dificultad} /></dd></div>
+                    <button onClick={() => onMision(actual.p.id)} className="lab-primario lab-b-coral flex h-10 w-full items-center justify-center gap-2 rounded-md text-sm font-semibold"><Target className="h-4 w-4" /> Hacer la misión guiada</button>
+                    <p className="mt-2 text-xs leading-relaxed text-lab-tenue">Empiezas con la base vacía y lo construyes paso a paso: armar, conectar, programar y probar. El laboratorio revisa cada paso.</p>
+                    <button onClick={() => onAbrir(actual.p.construir(), actual.p.id)} className="lab-secundario mt-3 h-9 w-full rounded-md text-sm font-medium">Abrir ya armado</button>
+                    <p className="mt-1.5 text-xs leading-relaxed text-lab-tenue">Para explorarlo, modificarlo o mostrarlo en clase.</p>
+                    <dl className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                      <div className="lab-dato-caja col-span-2 px-2.5 py-1.5"><dt className="text-[10px] uppercase tracking-[0.1em] text-lab-tenue">Placa</dt><dd className="font-mono font-semibold text-lab-tinta">{actual.placa}</dd></div>
+                      <div className="lab-dato-caja px-2.5 py-1.5"><dt className="text-[10px] uppercase tracking-[0.1em] text-lab-tenue">Piezas</dt><dd className="font-mono text-base font-semibold text-lab-dato">{actual.piezas}</dd></div>
+                      <div className="lab-dato-caja px-2.5 py-1.5"><dt className="text-[10px] uppercase tracking-[0.1em] text-lab-tenue">Nivel</dt><dd className="pt-0.5"><Nivel nivel={actual.p.dificultad} /></dd></div>
                     </dl>
                   </div>
                 </div>

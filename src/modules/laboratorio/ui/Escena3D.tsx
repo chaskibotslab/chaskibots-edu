@@ -15,7 +15,8 @@ import { resumen } from '../engine/ensamblaje'
 import type { Simulacion } from '../engine/simulation'
 import type { RobotDoc } from '../robots/doc'
 import { CALIDADES, CalidadContexto, type NivelCalidad } from './calidad'
-import { Efectos, Estudio, Luces, Sala } from './entorno/Entorno'
+import { Efectos, Estudio, Luces, PlatoEstudio, Sala } from './entorno/Entorno'
+import { useAmbiente } from './ambiente'
 import { Arena3D, GROSOR_PISO } from './entorno/Arena3D'
 import { ALTURA_MESA, Mesa3D } from './entorno/Mesa3D'
 
@@ -74,8 +75,14 @@ function ExplosionSuave({ objetivo, children }: { objetivo: number; children: (e
   return <>{children(e)}</>
 }
 
+/** El piso de la escena al armar y cablear: plato de estudio o la mesa del aula. */
+function Ambiente3D({ taller }: { taller: boolean }) {
+  return taller ? <><Sala y={-ALTURA_MESA} lado={6} alto={2.6} /><Mesa3D /></> : <PlatoEstudio />
+}
+
 export function EscenaTaller(p: PropsTaller) {
   const q = CALIDADES[p.nivel]
+  const [ambiente] = useAmbiente()
   // Los robots grandes (el perro, el 4WD con torre) no caben en el encuadre de un carrito: la cámara se aleja en proporción.
   const raiz = p.doc.piezas[0]?.pieza
   const f = useMemo(() => {
@@ -88,8 +95,7 @@ export function EscenaTaller(p: PropsTaller) {
     <Lienzo key={`${raiz}-${f.toFixed(1)}`} nivel={p.nivel} onNivel={p.onNivel} camara={[0.2 * f, 0.16 * f, 0.24 * f]}>
       <Estudio />
       <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={0.5} />
-      <Sala y={-ALTURA_MESA} lado={6} alto={2.6} />
-      <Mesa3D />
+      <Ambiente3D taller={ambiente === 'taller'} />
       <ContactShadows position={[0, 0.0012, 0]} scale={0.8} blur={2.4} opacity={0.4} far={0.3} resolution={q.nivel === 'baja' ? 256 : 512} />
       <ExplosionSuave objetivo={p.explosion}>
         {e => (
@@ -113,6 +119,7 @@ export function EscenaTaller(p: PropsTaller) {
  */
 export function EscenaCablear({ doc, cableado, nivel, onNivel }: { doc: RobotDoc; cableado: Cableado3D; nivel: NivelCalidad; onNivel: (n: NivelCalidad) => void }) {
   const q = CALIDADES[nivel]
+  const [ambiente] = useAmbiente()
   // Encuadre según el tamaño (la mesa de electrónica es ancha y baja; un robot, más alto).
   const { camara, objetivo } = useMemo(() => {
     const r = resumen(doc)
@@ -137,8 +144,7 @@ export function EscenaCablear({ doc, cableado, nivel, onNivel }: { doc: RobotDoc
       <Lienzo nivel={nivel} onNivel={onNivel} camara={camara}>
         <Estudio />
         <Luces sombras={q.sombras} tamSombra={q.tamSombra} alcance={0.5} />
-        <Sala y={-ALTURA_MESA} lado={6} alto={2.6} />
-        <Mesa3D />
+        <Ambiente3D taller={ambiente === 'taller'} />
         <ContactShadows position={[0, 0.0012, 0]} scale={0.8} blur={2.4} opacity={0.4} far={0.3} resolution={q.nivel === 'baja' ? 256 : 512} />
         <Robot3D doc={doc} cableado={conFoco} />
         <OrbitControls makeDefault target={objetivo} minDistance={0.03} maxDistance={1.4} maxPolarAngle={Math.PI / 2 - 0.08} enableDamping />

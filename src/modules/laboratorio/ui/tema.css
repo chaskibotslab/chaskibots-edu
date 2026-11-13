@@ -1,148 +1,219 @@
-/* Cromática del laboratorio de robótica: limpia, tipo catálogo técnico.
-   Papel blanco, líneas finas grises, esquinas poco redondeadas y un solo
-   color de acento (petróleo) para lo que se puede tocar. Los colores de
-   estado siempre significan lo mismo: verde = funciona, ámbar = aviso,
-   rojo = error. Los colores son tripletes RGB para usarlos con opacidad en
-   Tailwind (bg-lab-acento/20). */
+/* Cromática del laboratorio de robótica: «cabina», con el lenguaje de un iPhone.
+   El robot en 3D ocupa toda la pantalla y los controles flotan encima como
+   láminas de vidrio esmerilado: islas con forma de cápsula, un selector de
+   pasos con una pastilla que se desliza, y movimiento con rebote suave.
+   El color dice qué hace cada botón:
+     azul = acción principal y selección      verde = ejecutar y probar
+     índigo = guardar                         naranja = empezar la misión
+     rojo = borrar o detener
+   Los colores de estado siempre significan lo mismo: verde = funciona,
+   ámbar = aviso, rojo = error. Los colores son tripletes RGB para usarlos con
+   opacidad en Tailwind (bg-lab-acento/20). */
 
 .lab-tema {
-  --lab-vacio: 244 246 249;
-  --lab-fondo: 248 250 252;
-  --lab-fondo2: 241 244 248;
+  --lab-vacio: 226 235 248;
+  --lab-fondo: 242 244 249;
+  --lab-fondo2: 229 233 241;
   --lab-superficie: 255 255 255;
   --lab-elevado: 255 255 255;
-  --lab-borde: 100 116 139;
-  --lab-dato: 15 110 120;
+  --lab-borde: 60 66 82;
+  --lab-dato: 0 104 224;
 
-  --lab-tinta: 15 23 42;
-  --lab-tinta2: 51 65 85;
-  --lab-suave: 71 85 105;
-  --lab-tenue: 100 116 139;
+  --lab-tinta: 24 26 32;
+  --lab-tinta2: 54 58 70;
+  --lab-suave: 92 98 112;
+  --lab-tenue: 124 130 144;
 
-  --lab-acento: 15 110 120;
-  --lab-acento-2: 20 132 143;
+  --lab-acento: 0 122 255;
+  --lab-acento-2: 64 156 255;
   --lab-sobreacento: 255 255 255;
+  --lab-marino: 88 86 214;
+  --lab-verde: 36 172 82;
+  --lab-coral: 255 112 42;
+
+  /* Curvas de movimiento: «rebote» para lo que aparece o se aprieta, «suave» para lo demás. */
+  --lab-rebote: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --lab-suave-mov: cubic-bezier(0.22, 1, 0.36, 1);
 
   background: rgb(var(--lab-vacio));
   color: rgb(var(--lab-tinta));
   color-scheme: light;
+  font-family: var(--lab-display, -apple-system), -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+.lab-tema h1, .lab-tema h2, .lab-tema h3, .lab-tema h4 { letter-spacing: -0.015em; }
+.lab-tema .font-mono, .lab-tema .lab-etiqueta, .lab-tema pre, .lab-tema code { font-family: var(--lab-mono, ui-monospace), ui-monospace, monospace; }
+.lab-tema :focus-visible { outline: 2px solid rgb(var(--lab-acento)); outline-offset: 2px; }
 
-/* Barra superior: una sola fila, papel con una línea fina abajo. */
-.lab-barra {
-  position: relative;
-  background: rgb(var(--lab-superficie));
-  border-bottom: 1px solid rgb(var(--lab-borde) / 0.2);
-}
-
-/* Paneles laterales y modales. */
-.lab-panel { background: rgb(var(--lab-superficie)); }
-.lab-vidrio {
-  background: rgb(var(--lab-superficie));
-  border: 1px solid rgb(var(--lab-borde) / 0.2);
-  box-shadow: 0 12px 32px -16px rgb(15 23 42 / 0.3);
-}
-
-/* Botón principal: petróleo liso. */
-.lab-primario {
-  background: rgb(var(--lab-acento));
-  color: rgb(var(--lab-sobreacento));
-  transition: background 0.15s, transform 0.1s;
-}
-.lab-primario:hover:not(:disabled) { background: rgb(12 92 101); }
-.lab-primario:active:not(:disabled) { transform: scale(0.98); }
-
-/* Botón secundario: contorno fino. */
-.lab-secundario {
-  background: rgb(var(--lab-superficie));
-  color: rgb(var(--lab-tinta));
-  box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.3);
-  transition: background 0.15s, box-shadow 0.15s;
-}
-.lab-secundario:hover:not(:disabled) { background: rgb(var(--lab-fondo2)); box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.45); }
-
-/* Pasos: pestañas con texto; la actual se subraya con el acento. */
-.lab-paso { position: relative; color: rgb(var(--lab-suave)); transition: color 0.15s; }
-.lab-paso:hover { color: rgb(var(--lab-tinta)); }
-.lab-paso .lab-paso-num { box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.4); color: rgb(var(--lab-suave)); }
-.lab-paso[aria-current='step'] { color: rgb(var(--lab-tinta)); }
-.lab-paso[aria-current='step']::after {
+/* ---------- Cabina: fondo vivo ----------
+   Un cielo claro con manchas de color que se mueven muy despacio; se ve a
+   través del vidrio de los paneles y detrás del robot. */
+.lab-cabina { position: relative; background: linear-gradient(180deg, rgb(248 251 255), rgb(224 234 250) 55%, rgb(204 219 244)); }
+.lab-cabina::before {
   content: '';
-  position: absolute;
-  inset: auto 8px 0 8px;
-  height: 2px;
-  background: rgb(var(--lab-acento));
+  position: absolute; inset: -20%;
+  background:
+    radial-gradient(38% 34% at 22% 28%, rgb(120 180 255 / 0.55), transparent 70%),
+    radial-gradient(34% 30% at 78% 22%, rgb(190 160 255 / 0.4), transparent 70%),
+    radial-gradient(40% 36% at 62% 82%, rgb(120 230 210 / 0.38), transparent 70%);
+  animation: lab-cielo 36s ease-in-out infinite alternate;
+  pointer-events: none;
 }
-.lab-paso[aria-current='step'] .lab-paso-num { background: rgb(var(--lab-acento)); box-shadow: none; color: white; }
+@keyframes lab-cielo { from { transform: translate3d(-3%, -2%, 0) rotate(-4deg) scale(1); } to { transform: translate3d(4%, 3%, 0) rotate(5deg) scale(1.12); } }
 
-/* Filtros con contador (cajón de piezas, galería). */
+/* Escenas 3D (el lienzo es transparente). En Armar se ve el fondo vivo de la cabina. */
+.lab-escena { background: radial-gradient(120% 90% at 50% 20%, rgb(250 252 255), rgb(226 235 249) 60%, rgb(208 221 243)); }
+.lab-cabina[data-paso='armar'] .lab-escena { background: transparent; }
+
+/* ---------- Vidrio ---------- */
+.lab-vidrio, .lab-isla, .lab-dock-fondo {
+  background: rgb(255 255 255 / 0.72);
+  -webkit-backdrop-filter: blur(26px) saturate(1.8);
+  backdrop-filter: blur(26px) saturate(1.8);
+  border: 1px solid rgb(255 255 255 / 0.85);
+  box-shadow: 0 0 0 0.5px rgb(var(--lab-borde) / 0.14), 0 22px 50px -24px rgb(30 60 130 / 0.5), 0 2px 8px -4px rgb(30 60 130 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.9);
+}
+.lab-tema .lab-vidrio { border-radius: 22px; animation: lab-aparece 0.42s var(--lab-rebote) backwards; }
+.lab-isla { border-radius: 24px; animation: lab-baja 0.5s var(--lab-rebote) backwards; }
+.lab-isla:nth-child(2) { animation-delay: 60ms; }
+.lab-isla:nth-child(3) { animation-delay: 120ms; }
+@keyframes lab-aparece { from { opacity: 0; transform: translateY(12px) scale(0.94); } }
+@keyframes lab-baja { from { opacity: 0; transform: translateY(-18px) scale(0.92); } }
+
+/* Paneles dentro de una ventana (barras de Programar y Probar, laterales). */
+.lab-panel { background: rgb(255 255 255 / 0.78); }
+
+/* Ventana: Cablear, Programar y Probar van en una hoja flotante de esquinas redondas. */
+.lab-ventana {
+  overflow: hidden;
+  border-radius: 24px;
+  background: rgb(255 255 255 / 0.9);
+  border: 1px solid rgb(255 255 255 / 0.9);
+  box-shadow: 0 0 0 0.5px rgb(var(--lab-borde) / 0.14), 0 30px 60px -30px rgb(30 60 130 / 0.55);
+}
+
+/* Cada paso entra con un pequeño acercamiento. */
+.lab-entra { animation: lab-entra 0.45s var(--lab-suave-mov) backwards; }
+@keyframes lab-entra { from { opacity: 0; transform: scale(0.975) translateY(10px); } }
+
+/* Velo de las ventanas modales. */
+.lab-tema .bg-slate-900\/40 { background-color: rgb(40 60 100 / 0.28); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); animation: lab-velo 0.25s ease backwards; }
+@keyframes lab-velo { from { opacity: 0; } }
+
+/* ---------- Botones: cápsulas ----------
+   Al pasar el cursor crecen un poco; al apretar se encogen y vuelven con rebote. */
+.lab-tema .lab-primario {
+  --b: var(--lab-acento);
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(180deg, rgb(var(--b) / 0.86), rgb(var(--b)));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 8px 18px -8px rgb(var(--b) / 0.85);
+  transition: transform 0.35s var(--lab-rebote), box-shadow 0.25s, filter 0.2s;
+}
+.lab-tema .lab-primario:hover:not(:disabled) { transform: scale(1.045); filter: brightness(1.06); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 12px 24px -8px rgb(var(--b) / 0.9); }
+.lab-tema .lab-primario:active:not(:disabled) { transform: scale(0.94); transition-duration: 0.08s; }
+.lab-tema .lab-b-marino { --b: var(--lab-marino); }
+.lab-tema .lab-b-verde { --b: var(--lab-verde); }
+.lab-tema .lab-b-coral { --b: var(--lab-coral); }
+
+.lab-tema .lab-secundario {
+  border-radius: 999px;
+  background: rgb(118 124 140 / 0.14);
+  color: rgb(var(--lab-acento));
+  transition: transform 0.35s var(--lab-rebote), background 0.2s;
+}
+.lab-tema .lab-secundario:hover:not(:disabled) { background: rgb(var(--lab-acento) / 0.16); transform: scale(1.045); }
+.lab-tema .lab-secundario:active:not(:disabled) { transform: scale(0.94); transition-duration: 0.08s; }
+
+/* Botón redondo de icono (barra de herramientas del taller). */
+.lab-boton-icono { border-radius: 999px; color: rgb(var(--lab-tinta2)); transition: transform 0.35s var(--lab-rebote), background 0.2s, color 0.2s; }
+.lab-boton-icono:hover:not(:disabled) { background: rgb(118 124 140 / 0.16); transform: scale(1.1); }
+.lab-boton-icono:active:not(:disabled) { transform: scale(0.9); transition-duration: 0.08s; }
+.lab-boton-icono[aria-pressed='true'] { background: rgb(var(--lab-acento)); color: #fff; box-shadow: 0 6px 14px -6px rgb(var(--lab-acento) / 0.9); }
+
+/* ---------- Pasos: selector segmentado ----------
+   Cuatro segmentos iguales y una pastilla blanca que se desliza al paso actual (--i). */
+.lab-pasos { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 4px; }
+.lab-pasos::before {
+  content: '';
+  position: absolute; top: 4px; bottom: 4px; left: 4px;
+  width: calc((100% - 8px) / 4);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 12px -4px rgb(30 60 130 / 0.4), 0 0 0 0.5px rgb(var(--lab-borde) / 0.12);
+  transform: translateX(calc(var(--i, 0) * 100%));
+  transition: transform 0.5s var(--lab-rebote);
+}
+.lab-paso { position: relative; border-radius: 20px; color: rgb(var(--lab-suave)); transition: color 0.2s, transform 0.3s var(--lab-rebote); }
+.lab-paso:hover { color: rgb(var(--lab-tinta)); }
+.lab-paso:active { transform: scale(0.94); }
+.lab-paso[aria-current='step'] { color: rgb(var(--lab-acento)); }
+.lab-paso[aria-current='step'] svg { animation: lab-salto 0.5s var(--lab-rebote); }
+@keyframes lab-salto { 40% { transform: translateY(-4px) scale(1.2); } }
+
+/* ---------- Filtros ---------- */
 .lab-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  border-radius: 4px;
-  background: rgb(var(--lab-superficie));
-  color: rgb(var(--lab-tinta));
-  box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.3);
-  transition: background 0.15s, box-shadow 0.15s;
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  border-radius: 999px;
+  background: rgb(118 124 140 / 0.13);
+  color: rgb(var(--lab-tinta2));
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s, transform 0.3s var(--lab-rebote);
 }
-.lab-chip:hover { background: rgb(var(--lab-fondo2)); }
+.lab-chip:hover { background: rgb(118 124 140 / 0.22); }
+.lab-chip:active { transform: scale(0.93); }
 .lab-chip .lab-chip-n { color: rgb(var(--lab-tenue)); font-size: 0.7rem; font-variant-numeric: tabular-nums; }
-.lab-chip[aria-pressed='true'] { background: rgb(var(--lab-acento)); color: white; box-shadow: none; }
-.lab-chip[aria-pressed='true'] .lab-chip-n { color: rgb(255 255 255 / 0.75); }
+.lab-chip[aria-pressed='true'] { background: rgb(var(--lab-acento)); color: #fff; box-shadow: 0 6px 14px -6px rgb(var(--lab-acento) / 0.9); }
+.lab-chip[aria-pressed='true'] .lab-chip-n { color: rgb(255 255 255 / 0.8); }
 
-/* Etiqueta pequeña con contorno («EN KITS», «PRÓXIMAMENTE»). */
+/* Etiqueta pequeña («EN KITS», «PRÓXIMAMENTE»). */
 .lab-etiqueta {
   display: inline-block;
-  border-radius: 3px;
-  padding: 0 4px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 9px;
-  line-height: 15px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0 7px;
+  font-size: 9px; line-height: 16px; letter-spacing: 0.04em; text-transform: uppercase;
   color: rgb(var(--lab-suave));
-  box-shadow: inset 0 0 0 1px rgb(var(--lab-borde) / 0.45);
+  background: rgb(118 124 140 / 0.14);
 }
 
-/* Título de sección: versalitas pequeñas. */
-.lab-seccion { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(var(--lab-tinta2)); }
+/* Título de sección. */
+.lab-seccion { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgb(var(--lab-tenue)); }
 
-/* Tarjetas de pieza y de proyecto: papel con borde fino; elegida = borde de acento. */
+/* Tarjetas de pieza: blancas, redondas; al pasar el cursor se levantan. */
 .lab-tarjeta {
-  background: rgb(var(--lab-superficie));
-  border: 1px solid rgb(var(--lab-borde) / 0.22);
-  border-radius: 6px;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  background: #fff;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  box-shadow: 0 0 0 0.5px rgb(var(--lab-borde) / 0.14), 0 4px 10px -6px rgb(30 60 130 / 0.3);
+  transition: box-shadow 0.25s, transform 0.35s var(--lab-rebote);
 }
-.lab-tarjeta:hover { border-color: rgb(var(--lab-borde) / 0.5); }
-.lab-tarjeta[data-elegida='true'] { border-color: rgb(var(--lab-acento)); box-shadow: 0 0 0 1px rgb(var(--lab-acento)); }
+.lab-tarjeta:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 0 0.5px rgb(var(--lab-borde) / 0.14), 0 16px 26px -14px rgb(30 60 130 / 0.55); }
+.lab-tarjeta[data-elegida='true'] { box-shadow: 0 0 0 2.5px rgb(var(--lab-acento)), 0 14px 26px -12px rgb(var(--lab-acento) / 0.7); }
 
-/* Fondo de las miniaturas: gris muy claro, como foto de catálogo. */
-.lab-foto { background: linear-gradient(180deg, rgb(246 248 251), rgb(236 240 245)); }
+/* Fotos de catálogo. */
+.lab-foto { background: radial-gradient(120% 90% at 50% 15%, rgb(255 255 255), rgb(238 243 251) 70%, rgb(226 234 247)); }
 
-/* Fondo de las escenas 3D (el lienzo es transparente): estudio claro. */
-.lab-escena { background: linear-gradient(180deg, rgb(246 248 251), rgb(228 233 240)); }
-
-/* Lecturas numéricas (velocidad, peso, pines). */
+/* Lecturas numéricas. */
 .lab-dato { color: rgb(var(--lab-dato)); font-variant-numeric: tabular-nums; }
+.lab-dato-caja { background: rgb(118 124 140 / 0.1); border-radius: 14px; }
 
 /* Barras de desplazamiento discretas. */
 .lab-tema ::-webkit-scrollbar { width: 8px; height: 8px; }
-.lab-tema ::-webkit-scrollbar-thumb { background: rgb(var(--lab-borde) / 0.25); border-radius: 8px; }
+.lab-tema ::-webkit-scrollbar-thumb { background: rgb(var(--lab-borde) / 0.22); border-radius: 8px; }
 .lab-tema ::-webkit-scrollbar-thumb:hover { background: rgb(var(--lab-acento) / 0.5); }
 .lab-tema ::-webkit-scrollbar-track { background: transparent; }
+.lab-sin-barra { scrollbar-width: none; }
+.lab-sin-barra::-webkit-scrollbar { display: none; }
 
-/* Esquema de cableado: papel cuadriculado. */
+/* Esquema de cableado: papel con puntos. */
 .lab-plano {
   background-color: rgb(var(--lab-fondo));
-  background-image: radial-gradient(rgb(var(--lab-borde) / 0.28) 1px, transparent 1.2px);
+  background-image: radial-gradient(rgb(var(--lab-borde) / 0.22) 1px, transparent 1.2px);
   background-size: 16px 16px;
 }
 
-/* Bloques: globals.css pinta Blockly oscuro para el resto de la plataforma;
-   en el laboratorio va claro. */
-.lab-tema .blocklyToolboxDiv { background: rgb(var(--lab-superficie)) !important; border-right: 1px solid rgb(var(--lab-borde) / 0.2) !important; }
+/* Bloques: globals.css pinta Blockly oscuro para el resto de la plataforma; en el laboratorio va claro. */
+.lab-tema .blocklyToolboxDiv { background: rgb(var(--lab-superficie)) !important; border-right: 1px solid rgb(var(--lab-borde) / 0.16) !important; }
 .lab-tema .blocklyTreeLabel { color: rgb(var(--lab-tinta)) !important; }
 .lab-tema .blocklyTreeRow:hover { background: rgb(var(--lab-acento) / 0.08) !important; }
 .lab-tema .blocklyTreeSelected { background: rgb(var(--lab-acento) / 0.14) !important; }
@@ -151,3 +222,72 @@
 /* Cuenta regresiva del combate: cada número aparece grande y se achica. */
 @keyframes lab-latido { from { transform: scale(1.5); opacity: 0; } 30% { opacity: 1; } to { transform: scale(1); opacity: 0.9; } }
 .animate-ping-once { animation: lab-latido 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+/* ---------- Repisa de piezas (Armar) ----------
+   Una tira al pie, como el dock: la pieza bajo el cursor crece y sus vecinas la acompañan. */
+.lab-dock { animation: lab-sube 0.55s var(--lab-rebote) 0.1s backwards; }
+@keyframes lab-sube { from { opacity: 0; transform: translateY(40px) scale(0.96); } }
+.lab-dock-fondo { position: absolute; inset: 0; border-radius: 28px; }
+.lab-dock-tira { display: flex; align-items: flex-end; gap: 8px; overflow-x: auto; padding: 48px 14px 12px; margin-top: -42px; pointer-events: none; }
+.lab-dock-item {
+  pointer-events: auto;
+  flex: none;
+  width: 84px;
+  transform-origin: 50% 100%;
+  border-radius: 18px;
+  padding: 5px;
+  background: #fff;
+  box-shadow: 0 0 0 0.5px rgb(var(--lab-borde) / 0.14), 0 4px 10px -6px rgb(30 60 130 / 0.35);
+  transition: transform 0.3s var(--lab-rebote), box-shadow 0.25s, margin 0.3s var(--lab-rebote);
+  animation: lab-pieza 0.45s var(--lab-rebote) backwards;
+  animation-delay: calc(min(var(--i, 0), 16) * 24ms);
+  touch-action: pan-x;
+  user-select: none;
+}
+@keyframes lab-pieza { from { opacity: 0; transform: translateY(24px) scale(0.7); } }
+@media (hover: hover) {
+  .lab-dock-item:hover { transform: translateY(-8px) scale(1.3); margin-inline: 12px; z-index: 2; box-shadow: 0 0 0 0.5px rgb(var(--lab-borde) / 0.14), 0 22px 30px -14px rgb(30 60 130 / 0.6); }
+  .lab-dock-item:has(+ .lab-dock-item:hover), .lab-dock-item:hover + .lab-dock-item { transform: translateY(-3px) scale(1.12); margin-inline: 4px; }
+}
+.lab-dock-item:active { transform: scale(0.95); }
+.lab-dock-item[data-elegida='true'] { box-shadow: 0 0 0 2.5px rgb(var(--lab-acento)), 0 14px 26px -12px rgb(var(--lab-acento) / 0.8); }
+.lab-dock-item[data-elegida='true'] { animation: lab-flota 1.4s ease-in-out infinite; }
+@keyframes lab-flota { 50% { transform: translateY(-7px); } }
+
+/* Aviso «toca un punto verde». */
+.lab-aviso-punto { animation: lab-aparece 0.4s var(--lab-rebote) backwards; }
+.lab-aviso-punto i { animation: lab-onda 1.5s ease-out infinite; }
+@keyframes lab-onda { from { box-shadow: 0 0 0 0 rgb(16 185 129 / 0.6); } to { box-shadow: 0 0 0 10px rgb(16 185 129 / 0); } }
+
+/* ---------- Misión guiada ---------- */
+/* Anillo de avance: --p de 0 a 100. */
+.lab-anillo {
+  position: relative; display: grid; place-items: center; border-radius: 50%;
+  background: conic-gradient(rgb(var(--lab-verde)) calc(var(--p, 0) * 1%), rgb(118 124 140 / 0.2) 0);
+  transition: --p 0.6s;
+}
+.lab-anillo::before { content: ''; position: absolute; inset: 4px; border-radius: 50%; background: #fff; }
+.lab-anillo > * { position: relative; }
+/* Etapas: una fila de segmentos; hecha = verde, actual = azul y late. */
+.lab-etapa { flex: 1; height: 6px; border-radius: 6px; background: rgb(118 124 140 / 0.22); transition: background 0.3s, transform 0.3s var(--lab-rebote); }
+.lab-etapa:hover { transform: scaleY(1.7); }
+.lab-etapa[data-estado='hecha'] { background: rgb(var(--lab-verde)); }
+.lab-etapa[data-estado='actual'] { background: rgb(var(--lab-acento)); animation: lab-late 1.6s ease-in-out infinite; }
+.lab-etapa[data-vista='true'] { transform: scaleY(1.7); }
+@keyframes lab-late { 50% { opacity: 0.45; } }
+.lab-mision-pastilla { transition: transform 0.35s var(--lab-rebote); }
+.lab-mision-pastilla:hover { transform: scale(1.015); }
+.lab-paso-hecho { animation: lab-pop 0.45s var(--lab-rebote) backwards; }
+@keyframes lab-pop { from { transform: scale(0.3); opacity: 0; } }
+
+/* ---------- Galería de proyectos ---------- */
+.lab-fila { animation: lab-entra 0.4s var(--lab-suave-mov) backwards; animation-delay: calc(min(var(--i, 0), 14) * 28ms); transition: background 0.2s, transform 0.3s var(--lab-rebote); border-radius: 16px; }
+.lab-fila:hover { transform: scale(1.012); }
+.lab-fila[data-sel='true'] { background: rgb(var(--lab-acento) / 0.1); }
+.lab-fila-marca { display: none; }
+.lab-marco { position: relative; border-radius: 22px; overflow: hidden; box-shadow: 0 0 0 0.5px rgb(var(--lab-borde) / 0.14), 0 24px 40px -24px rgb(30 60 130 / 0.55); animation: lab-aparece 0.5s var(--lab-rebote) backwards; }
+.lab-ficha { animation: lab-entra 0.4s var(--lab-suave-mov) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-tema *, .lab-tema *::before, .lab-tema *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

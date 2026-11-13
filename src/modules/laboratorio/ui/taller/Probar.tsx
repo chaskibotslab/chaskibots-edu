@@ -107,7 +107,7 @@ export default function Probar({ doc, s, nivel, onNivel, onIrA }: Props) {
           ) : (
             <>
               {(!corriendo || s.codigoModificado) && (
-                <button onClick={ejecutar} disabled={!sim || s.compilando} className="lab-primario flex h-9 items-center gap-2 rounded-md px-4 text-sm font-semibold disabled:opacity-50" title={python ? 'Ejecutar el programa en Python' : 'Compilar y ejecutar'}>
+                <button onClick={ejecutar} disabled={!sim || s.compilando} className="lab-primario lab-b-verde flex h-9 items-center gap-2 rounded-md px-4 text-sm font-semibold disabled:opacity-50" title={python ? 'Ejecutar el programa en Python' : 'Compilar y ejecutar'}>
                   {s.compilando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                   {s.codigoModificado ? 'Ejecutar de nuevo' : 'Ejecutar'}
                 </button>
@@ -181,7 +181,7 @@ export default function Probar({ doc, s, nivel, onNivel, onIrA }: Props) {
                   <div className="text-xs text-lab-suave">{s.robotCambio ? 'Cambiaste piezas o cables, así que la placa se reinició.' : 'Escribe o elige una plantilla en Programar y ejecútala.'}</div>
                 </div>
                 {codigo.trim() ? (
-                  <button onClick={ejecutar} disabled={s.compilando} className="lab-primario h-8 shrink-0 rounded-md px-3 text-xs font-semibold">Ejecutar</button>
+                  <button onClick={ejecutar} disabled={s.compilando} className="lab-primario lab-b-verde h-8 shrink-0 rounded-md px-3 text-xs font-semibold">Ejecutar</button>
                 ) : (
                   <button onClick={() => onIrA('programar')} className="lab-primario h-8 shrink-0 rounded-md px-3 text-xs font-semibold">Ir a Programar</button>
                 )}

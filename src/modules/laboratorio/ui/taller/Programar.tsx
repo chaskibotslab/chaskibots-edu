@@ -95,7 +95,7 @@ export default function Programar({ doc, s, plantillas, onPrograma, onIrA }: Pro
         <button
           onClick={ejecutar}
           disabled={!!motivoBloqueo || s.compilando}
-          className="lab-primario flex h-9 items-center gap-2 rounded-md px-5 text-sm font-semibold disabled:opacity-50"
+          className="lab-primario lab-b-verde flex h-9 items-center gap-2 rounded-md px-5 text-sm font-semibold disabled:opacity-50"
           title={motivoBloqueo ?? (python ? 'Ejecutar el programa en Python (Ctrl+Enter)' : 'Compilar y ejecutar (Ctrl+Enter)')}
         >
           {s.compilando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
