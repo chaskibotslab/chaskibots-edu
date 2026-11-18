@@ -9,6 +9,8 @@ import {
   Loader2, AlertCircle, RefreshCw, Shield
 } from 'lucide-react'
 
+const ChaskiBlocksIA = dynamic(() => import('./ChaskiBlocksIA'), { ssr: false })
+
 const BlocklyEditor = dynamic(() => import('./BlocklyEditor'), {
   ssr: false,
   loading: () => (
@@ -102,6 +104,19 @@ const chaskiBlocks: Simulator = {
   enabled: true
 }
 
+// ChaskiBlocks IA interno: escenario con personaje y bloques de inteligencia artificial
+const chaskiBlocksIA: Simulator = {
+  id: 'chaskiblocks-ia',
+  name: 'ChaskiBlocks IA',
+  description: 'Programa un personaje y enséñale con tu cámara y tu voz',
+  url: '',
+  icon: 'sparkles',
+  category: 'bloques',
+  levels: [],
+  programs: [],
+  enabled: true
+}
+
 interface SimulatorTabsDynamicProps {
   levelId?: string
   programId?: string
@@ -137,10 +152,10 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
       const enabledSimulators = list.filter((s: Simulator) => s.enabled)
       
       // Agregar ChaskiBlocks al inicio
-      setSimulators([chaskiBlocks, ...enabledSimulators])
+      setSimulators([chaskiBlocks, chaskiBlocksIA, ...enabledSimulators])
       
       // Seleccionar el primero de la categoría activa
-      const firstInCategory = [chaskiBlocks, ...enabledSimulators].find(
+      const firstInCategory = [chaskiBlocks, chaskiBlocksIA, ...enabledSimulators].find(
         s => (s.category || 'bloques') === activeCategory
       )
       setActiveSimulator(firstInCategory || chaskiBlocks)
@@ -148,7 +163,7 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
       console.error('Error loading simulators:', err)
       setError('No se pudieron cargar los simuladores')
       // Usar ChaskiBlocks como fallback
-      setSimulators([chaskiBlocks])
+      setSimulators([chaskiBlocks, chaskiBlocksIA])
       setActiveSimulator(chaskiBlocks)
     }
     setLoading(false)
@@ -235,7 +250,11 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
       </div>
 
       {/* Active Simulator Panel */}
-      {activeSimulator?.id === 'chaskiblocks' ? (
+      {activeSimulator?.id === 'chaskiblocks-ia' ? (
+        <div style={{ height: 'clamp(560px, calc(100vh - 120px), 860px)' }}>
+          <ChaskiBlocksIA />
+        </div>
+      ) : activeSimulator?.id === 'chaskiblocks' ? (
         <div className="h-[700px]">
           <BlocklyEditor userId={user?.id} userName={user?.name} />
         </div>
