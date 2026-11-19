@@ -94,7 +94,7 @@ const getIcon = (iconName: string) => {
 // ChaskiBlocks interno (siempre disponible)
 const chaskiBlocks: Simulator = {
   id: 'chaskiblocks',
-  name: 'ChaskiBlocks',
+  name: 'ChaskiBlocks Robótica',
   description: 'Editor de bloques para robótica - ¡Exclusivo ChaskiBots!',
   url: '',
   icon: 'sparkles',
@@ -107,7 +107,7 @@ const chaskiBlocks: Simulator = {
 // ChaskiBlocks IA interno: escenario con personaje y bloques de inteligencia artificial
 const chaskiBlocksIA: Simulator = {
   id: 'chaskiblocks-ia',
-  name: 'ChaskiBlocks IA',
+  name: 'ChaskiBlocks IA (tipo Scratch)',
   description: 'Programa un personaje y enséñale con tu cámara y tu voz',
   url: '',
   icon: 'sparkles',
@@ -152,19 +152,19 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
       const enabledSimulators = list.filter((s: Simulator) => s.enabled)
       
       // Agregar ChaskiBlocks al inicio
-      setSimulators([chaskiBlocks, chaskiBlocksIA, ...enabledSimulators])
+      setSimulators([chaskiBlocksIA, chaskiBlocks, ...enabledSimulators])
       
       // Seleccionar el primero de la categoría activa
-      const firstInCategory = [chaskiBlocks, chaskiBlocksIA, ...enabledSimulators].find(
+      const firstInCategory = [chaskiBlocksIA, chaskiBlocks, ...enabledSimulators].find(
         s => (s.category || 'bloques') === activeCategory
       )
-      setActiveSimulator(firstInCategory || chaskiBlocks)
+      setActiveSimulator(firstInCategory || chaskiBlocksIA)
     } catch (err) {
       console.error('Error loading simulators:', err)
       setError('No se pudieron cargar los simuladores')
       // Usar ChaskiBlocks como fallback
-      setSimulators([chaskiBlocks, chaskiBlocksIA])
-      setActiveSimulator(chaskiBlocks)
+      setSimulators([chaskiBlocksIA, chaskiBlocks])
+      setActiveSimulator(chaskiBlocksIA)
     }
     setLoading(false)
   }
