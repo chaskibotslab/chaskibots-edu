@@ -168,16 +168,16 @@ export default function TorneoJueces() {
   return (
     <div className="tn min-h-screen bg-[#F4F3ED] text-slate-900">
       <style>{ESTILOS_TORNEO}</style>
-      <header className="sticky top-0 z-20 bg-gradient-to-r from-[#E57361] to-[#EE8A64] text-white shadow-sm">
+      <header className="sticky top-0 z-20 border-b-4 border-[#E57361] bg-[#282A36] text-white shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/chaski.png" alt="" className="h-10 w-auto object-contain" />
+          <img src="/torneo/chaski-icono.jpg" alt="" className="h-10 w-10 rounded-xl object-cover ring-1 ring-white/20" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-base font-black leading-tight">{TORNEO.nombre}</p>
-            <p className="text-xs font-semibold text-white/90">Panel de jueces</p>
+            <p className="text-xs font-semibold text-[#F0A092]">Panel de jueces</p>
           </div>
-          <Link href="/torneo" target="_blank" className="flex items-center gap-1.5 rounded-lg bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/30"><ExternalLink className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Página pública</span></Link>
-          <button onClick={salir} className="flex items-center gap-1.5 rounded-lg bg-slate-900/80 px-3 py-1.5 text-xs font-bold hover:bg-slate-900"><LogOut className="h-3.5 w-3.5" /> Salir</button>
+          <Link href="/torneo" target="_blank" className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-bold hover:bg-white/20"><ExternalLink className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Página pública</span></Link>
+          <button onClick={salir} className="flex items-center gap-1.5 rounded-lg bg-[#E57361] px-3 py-1.5 text-xs font-bold hover:bg-[#d4614f]"><LogOut className="h-3.5 w-3.5" /> Salir</button>
         </div>
       </header>
 

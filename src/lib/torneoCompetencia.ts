@@ -16,6 +16,7 @@ export interface Competencia {
   marcas?: Record<string, (number | null)[]>
   grupos?: Grupo[]
   llaves?: Llaves | null
+  clasifican?: number
 }
 
 export type Accion =
@@ -114,15 +115,57 @@ export function tablaGrupo(g: Grupo): FilaTabla[] {
   return [...filas.values()].sort((x, y) => y.pts - x.pts || (y.gf - y.gc) - (x.gf - x.gc) || y.gf - x.gf)
 }
 
-// Llaves con los mejores de cada grupo. El primero de un grupo se cruza con el segundo de otro.
+// Cuántos robots de cada tamaño de grupo salen al repartir `total` en grupos de `tam`.
+export function tamanosGrupos(total: number, tam: number): number[] {
+  const n = Math.max(1, Math.ceil(total / tam))
+  return Array.from({ length: n }, (_, g) => Math.ceil((total - g) / n))
+}
+
+// Quiénes pasan a la fase final. Con «pasan 2», un grupo de solo 2 robots clasifica únicamente a su ganador.
+export function clasificados(grupos: Grupo[], clasifican: number): { id: string; puesto: number; grupo: string }[] {
+  return grupos.flatMap(g => {
+    const cupo = clasifican >= 2 && g.equipos.length >= 3 ? 2 : 1
+    return tablaGrupo(g).slice(0, cupo).map((f, i) => ({ id: f.id, puesto: i + 1, grupo: g.nombre }))
+  })
+}
+
+function permutaciones<T>(v: T[]): T[][] {
+  if (v.length <= 1) return [v]
+  return v.flatMap((x, i) => permutaciones([...v.slice(0, i), ...v.slice(i + 1)]).map(r => [x, ...r]))
+}
+
+// Qué tan pronto se cruzarían dos robots del mismo grupo en una llave (menos es mejor).
+// Un cruce en la primera ronda pesa mucho más que uno en la final.
+function choques(orden: string[], grupoDe: Map<string, string>): number {
+  let tam = 2
+  while (tam < orden.length) tam *= 2
+  const puestos = siembra(tam).map(s => orden[s - 1] ?? null)
+  let total = 0
+  for (let bloque = 2, peso = 10000; bloque <= tam; bloque *= 2, peso /= 100) {
+    for (let i = 0; i < tam; i += bloque) {
+      const izq = puestos.slice(i, i + bloque / 2), der = puestos.slice(i + bloque / 2, i + bloque)
+      for (const a of izq) for (const b of der) if (a && b && grupoDe.get(a) === grupoDe.get(b)) total += peso
+    }
+  }
+  return total
+}
+
+// Llaves con los clasificados: los primeros de grupo van como cabezas de serie y se busca
+// el acomodo en que dos robots del mismo grupo se vuelvan a encontrar lo más tarde posible.
 function llavesDeGrupos(grupos: Grupo[], clasifican: number): Llaves {
-  const tablas = grupos.map(tablaGrupo)
-  const primeros = tablas.map(t => t[0]?.id).filter(Boolean) as string[]
-  if (clasifican < 2) return generarLlaves(primeros)
-  const n = grupos.length
-  const segundos: (string | undefined)[] = new Array(n)
-  for (let i = 0; i < n; i++) segundos[n - 1 - i] = tablas[(i + 1) % n][1]?.id
-  return generarLlaves([...primeros, ...(segundos.filter(Boolean) as string[])])
+  const pasan = clasificados(grupos, clasifican)
+  const grupoDe = new Map(pasan.map(p => [p.id, p.grupo]))
+  const primeros = pasan.filter(p => p.puesto === 1).map(p => p.id)
+  const segundos = pasan.filter(p => p.puesto === 2).map(p => p.id)
+  // Con muchos grupos se prueban solo rotaciones, para no tardar.
+  const acomodos = (v: string[]) => (v.length <= 5 ? permutaciones(v) : v.map((_, i) => [...v.slice(i), ...v.slice(0, i)]))
+  let mejor = [...primeros, ...segundos], menos = choques(mejor, grupoDe)
+  for (const a of acomodos(primeros)) for (const b of acomodos(segundos)) {
+    if (menos === 0) break
+    const orden = [...a, ...b], c = choques(orden, grupoDe)
+    if (c < menos) { mejor = orden; menos = c }
+  }
+  return generarLlaves(mejor)
 }
 
 // ------------------------------------------------------------------ tiempos y puntajes
@@ -248,10 +291,12 @@ export function aplicar(actual: Competencia | null, accion: Accion, ids: string[
 
   if (accion.tipo === 'fase_final') {
     if (c.formato !== 'grupos' || !c.grupos?.length) throw new Error('Esta categoría no tiene grupos.')
+    const faltan = c.grupos.reduce((n, g) => n + g.partidos.filter(p => !jugado(p)).length, 0)
+    if (faltan) throw new Error(`Primero termina los grupos: ${faltan === 1 ? 'falta 1 partido' : `faltan ${faltan} partidos`}.`)
     const clasifican = accion.clasifican === 1 ? 1 : 2
-    const l = llavesDeGrupos(c.grupos, clasifican)
-    if (l.rondas[0].length === 1 && !l.rondas[0][0].b) throw new Error('No hay suficientes clasificados para armar llaves.')
-    c.llaves = l
+    if (clasificados(c.grupos, clasifican).length < 2) throw new Error('No hay suficientes clasificados para armar llaves. Con un solo grupo, usa «Pasan 1.º y 2.º».')
+    c.llaves = llavesDeGrupos(c.grupos, clasifican)
+    c.clasifican = clasifican
     return c
   }
   throw new Error('Acción no válida.')
