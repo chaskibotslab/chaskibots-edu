@@ -355,13 +355,15 @@ export function PanelCompetencia({ cat, alActuar, alPodio }: { cat: Categoria; a
   return (
     <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <h2 className="flex-1 text-base font-black">{titulo}</h2>
-        <button onClick={alPodio} className={`${boton} bg-amber-400 text-amber-950 hover:bg-amber-300`}>Pasar podio a resultados</button>
-        <button onClick={() => setConfirmar(v => !v)} className={`${boton} border border-slate-300 text-slate-700 hover:bg-slate-100`}>Reiniciar</button>
+        <h2 className="w-full text-base font-black sm:w-auto sm:flex-1">Competencia: {titulo}</h2>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
+          <button onClick={alPodio} className={`${boton} bg-amber-400 text-amber-950 hover:bg-amber-300`}>Pasar podio a resultados</button>
+          <button onClick={() => setConfirmar(v => !v)} className={`${boton} border-2 border-red-200 bg-white text-red-700 hover:bg-red-50`}>Reiniciar competencia</button>
+        </div>
       </div>
       {confirmar && (
         <div className="tn-entra mb-3 flex flex-wrap items-center gap-2 rounded-lg bg-red-50 px-3 py-2">
-          <span className="flex-1 text-sm font-semibold text-red-800">¿Borrar esta competencia y todo lo registrado en ella? No se puede deshacer.</span>
+          <span className="flex-1 text-sm font-semibold text-red-800">¿Borrar esta competencia, lo registrado en ella y los puestos y puntajes de la categoría? Los equipos no se borran. Después podrás armarla de nuevo.</span>
           <button onClick={() => { setConfirmar(false); alActuar({ tipo: 'borrar' }) }} className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700">Sí, borrar</button>
           <button onClick={() => setConfirmar(false)} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-700">No</button>
         </div>

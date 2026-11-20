@@ -183,9 +183,9 @@ export default function TorneoJueces() {
 
       {aviso && <p role={aviso.startsWith('ok:') ? 'status' : 'alert'} className="tn-entra pointer-events-none fixed inset-x-0 bottom-4 z-30 mx-auto max-w-xl px-4"><span className={`block rounded-xl px-4 py-3 text-sm font-semibold shadow-lg ${aviso.startsWith('ok:') ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>{aviso.replace(/^ok:/, '')}</span></p>}
 
-      <div className="mx-auto grid max-w-6xl gap-4 px-4 py-4 lg:grid-cols-[300px_1fr]">
+      <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-4 px-4 py-4 lg:grid-cols-[300px_minmax(0,1fr)]">
         {/* Categorías: lista en computadora, menú desplegable en teléfono */}
-        <aside className="lg:sticky lg:top-[68px] lg:max-h-[calc(100vh-84px)] lg:self-start">
+        <aside className="min-w-0 lg:sticky lg:top-[68px] lg:max-h-[calc(100vh-84px)] lg:self-start">
           <label className="block lg:hidden">
             <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Categoría</span>
             <select value={actual?.id || ''} onChange={e => { setIdCat(e.target.value); setPorBorrar('') }} className={`mt-1 font-semibold ${campo}`}>
@@ -254,7 +254,18 @@ export default function TorneoJueces() {
                   alPodio={async () => { if (await cambiar('/api/torneo/competencia', 'POST', { categoriaId: actual.id, accion: { tipo: 'podio' } })) setAviso('ok:Podio pasado a resultados. Revísalo abajo en la lista de equipos.') }} />
               </div>
 
-              <h2 className="mt-5 px-1 text-xs font-bold uppercase tracking-wide text-slate-500">Equipos inscritos y podio</h2>
+              <div className="mt-5 flex flex-wrap items-center gap-2 px-1">
+                <h2 className="flex-1 text-xs font-bold uppercase tracking-wide text-slate-500">Equipos inscritos y podio</h2>
+                {actual.equipos.some(e => e.puesto || e.puntaje) && (porBorrar === 'podio' ? (
+                  <span className="tn-entra flex flex-wrap items-center gap-2 rounded-lg bg-red-50 px-2.5 py-1.5">
+                    <span className="text-xs font-semibold text-red-800">¿Quitar los puestos y los puntajes o tiempos de todos los equipos de esta categoría?</span>
+                    <button onClick={async () => { await cambiar('/api/torneo/competencia', 'POST', { categoriaId: actual.id, accion: { tipo: 'borrar_podio' } }); setPorBorrar('') }} className="rounded-md bg-red-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-red-700">Sí, borrar</button>
+                    <button onClick={() => setPorBorrar('')} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-bold text-slate-700">No</button>
+                  </span>
+                ) : (
+                  <button onClick={() => setPorBorrar('podio')} className="rounded-lg border-2 border-red-200 bg-white px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50">Borrar resultados</button>
+                ))}
+              </div>
               <ul className="mt-2 space-y-2.5">
                 {actual.equipos.map(e => (
                   <li key={e.id} className="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-slate-200">
