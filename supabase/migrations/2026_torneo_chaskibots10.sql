@@ -32,3 +32,6 @@ create table if not exists torneo_config (
 alter table torneo_categorias enable row level security;
 alter table torneo_equipos enable row level security;
 alter table torneo_config enable row level security;
+
+-- Competencia por categoría (tiempos, puntaje, llaves 1 vs 1 o grupos y llaves), guardada como un solo documento.
+alter table torneo_categorias add column if not exists competencia jsonb;

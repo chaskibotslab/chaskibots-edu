@@ -8,6 +8,7 @@ import { createHmac, createHash, timingSafeEqual } from 'crypto'
 import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { verifySessionCookie, SESSION_COOKIE_NAME } from '@/lib/session'
+import type { Competencia } from '@/lib/torneoCompetencia'
 
 export const COOKIE_JUEZ = 'torneo_juez'
 export const JUEZ_MAX_AGE_SECONDS = 4 * 24 * 60 * 60 // cubre los días del torneo
@@ -59,7 +60,7 @@ export interface EquipoTorneo {
   puesto: number | null; puntaje: string | null; nota?: string | null
 }
 export interface CategoriaTorneo {
-  id: string; nombre: string; orden: number; estado: typeof ESTADOS[number]; equipos: EquipoTorneo[]
+  id: string; nombre: string; orden: number; estado: typeof ESTADOS[number]; competencia: Competencia | null; equipos: EquipoTorneo[]
 }
 
 // La página pública la consultan muchos teléfonos a la vez y se refresca sola:
@@ -70,10 +71,13 @@ export function vaciarCacheTorneo() { cache = null }
 
 export async function leerTorneo(): Promise<CategoriaTorneo[]> {
   if (cache && Date.now() - cache.t < CACHE_MS) return cache.datos
-  const [cats, eqs] = await Promise.all([
-    supabaseAdmin.from('torneo_categorias').select('id, nombre, orden, estado').order('orden').order('nombre'),
+  const leerCategorias = (columnas: string) => supabaseAdmin.from('torneo_categorias').select(columnas).order('orden').order('nombre')
+  const [conCompetencia, eqs] = await Promise.all([
+    leerCategorias('id, nombre, orden, estado, competencia'),
     supabaseAdmin.from('torneo_equipos').select('id, categoria_id, numero, robot, equipo, integrantes, puesto, puntaje, nota').order('numero').order('created_at'),
   ])
+  // Si la columna `competencia` aún no existe en la base, el torneo se sigue mostrando sin llaves ni tiempos.
+  const cats = conCompetencia.error ? await leerCategorias('id, nombre, orden, estado') : conCompetencia
   if (cats.error) throw cats.error
   if (eqs.error) throw eqs.error
   const porCat = new Map<string, EquipoTorneo[]>()
@@ -82,7 +86,7 @@ export async function leerTorneo(): Promise<CategoriaTorneo[]> {
     lista.push({ id: e.id, numero: e.numero, robot: e.robot, equipo: e.equipo, integrantes: e.integrantes || [], puesto: e.puesto, puntaje: e.puntaje, nota: e.nota })
     porCat.set(e.categoria_id, lista)
   }
-  const datos = (cats.data || []).map(c => ({ ...c, equipos: porCat.get(c.id) || [] })) as CategoriaTorneo[]
+  const datos = ((cats.data || []) as any[]).map(c => ({ ...c, competencia: c.competencia || null, equipos: porCat.get(c.id) || [] })) as CategoriaTorneo[]
   cache = { t: Date.now(), datos }
   return datos
 }

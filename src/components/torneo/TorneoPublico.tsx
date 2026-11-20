@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ChevronDown, MapPin, CalendarDays, Search, Trophy, Users, LayoutGrid, X } from 'lucide-react'
 import { Categoria, Equipo, InsigniaEstado, Medalla, TORNEO, ESTILOS_TORNEO, plano, useTorneo } from './comun'
+import { VistaCompetencia } from './Competencia'
+import { FORMATO_TEXTO } from '@/lib/torneoCompetencia'
 
 type Vista = 'categorias' | 'resultados' | 'equipos'
 
@@ -151,15 +153,26 @@ export default function TorneoPublico() {
               {filtradas.map((c: Categoria) => {
                 const abierta = !!q || abiertas.has(c.id)
                 return (
-                  <section key={c.id} id={`cat-${c.id}`} className={`scroll-mt-36 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 sm:scroll-mt-24 ${c.estado === 'en_curso' ? 'ring-2 ring-emerald-500' : 'ring-slate-200'}`}>
+                  <section key={c.id} id={`cat-${c.id}`} className={`scroll-mt-36 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 sm:scroll-mt-24 ${abierta && c.competencia && !q ? 'sm:col-span-2' : ''} ${c.estado === 'en_curso' ? 'ring-2 ring-emerald-500' : 'ring-slate-200'}`}>
                     <button onClick={() => alternar(c.id)} aria-expanded={abierta} className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-slate-50">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E57361]/10 text-sm font-black tabular-nums text-[#C4523F]">{c.equipos.length}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block break-words text-[15px] font-bold leading-snug text-slate-900">{c.nombre}</span>
-                        {c.estado !== 'pendiente' && <span className="mt-1 block"><InsigniaEstado estado={c.estado} /></span>}
+                        {(c.estado !== 'pendiente' || c.competencia) && (
+                          <span className="mt-1 flex flex-wrap items-center gap-1.5">
+                            {c.estado !== 'pendiente' && <InsigniaEstado estado={c.estado} />}
+                            {c.competencia && <span className="rounded-full bg-[#E57361]/10 px-2.5 py-0.5 text-[11px] font-bold text-[#C4523F]">{FORMATO_TEXTO[c.competencia.formato]}</span>}
+                          </span>
+                        )}
                       </span>
                       <ChevronDown className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 ${abierta ? 'rotate-180' : ''}`} />
                     </button>
+                    {abierta && c.competencia && !q && (
+                      <div className="tn-entra border-t border-slate-100 bg-slate-50/60 px-3 py-3">
+                        <VistaCompetencia cat={c} />
+                      </div>
+                    )}
+                    {abierta && c.competencia && !q && c.equipos.length > 0 && <p className="border-t border-slate-100 px-4 pt-3 text-[11px] font-bold uppercase tracking-wide text-slate-500">Inscritos</p>}
                     {abierta && (
                       c.equipos.length === 0
                         ? <p className="border-t border-slate-100 px-4 py-3 text-sm text-slate-500">Sin robots inscritos.</p>
@@ -181,6 +194,7 @@ export default function TorneoPublico() {
                     <InsigniaEstado estado={c.estado} />
                   </div>
                   <ul className="divide-y divide-slate-100">{c.equipos.map(e => <FilaEquipo key={e.id} e={e} />)}</ul>
+                  {c.competencia && <button onClick={() => irA(c.id)} className="w-full border-t border-slate-100 px-4 py-2.5 text-left text-sm font-bold text-[#C4523F] hover:bg-slate-50">Ver {c.competencia.formato === 'tiempos' ? 'tiempos' : c.competencia.formato === 'puntos' ? 'puntajes' : 'llaves'} completos</button>}
                 </section>
               ))}
             </div>
@@ -197,7 +211,7 @@ export default function TorneoPublico() {
                   <button onClick={() => alternar(clave)} aria-expanded={abierta} className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-slate-50">
                     <span className="min-w-0 flex-1">
                       <span className="block break-words text-[15px] font-bold leading-snug text-slate-900">{k.nombre}</span>
-                      <span className="mt-0.5 block text-xs font-semibold text-slate-500">{k.robots.length} {k.robots.length === 1 ? 'robot' : 'robots'}{medallas > 0 && ` · ${medallas} ${medallas === 1 ? 'podio' : 'podios'}`}</span>
+                      {medallas > 0 && <span className="mt-0.5 block text-xs font-semibold text-amber-700">{medallas} {medallas === 1 ? 'podio' : 'podios'}</span>}
                     </span>
                     <ChevronDown className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 ${abierta ? 'rotate-180' : ''}`} />
                   </button>

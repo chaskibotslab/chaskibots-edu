@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ExternalLink, KeyRound, Loader2, LogOut, Pencil, Plus, Search, Trash2, X } from 'lucide-react'
 import { Categoria, Equipo, Estado, ESTADO_TEXTO, ESTILOS_TORNEO, TORNEO, plano, useTorneo } from './comun'
+import { PanelCompetencia } from './Competencia'
 
 const MAX = 3
 const campo = 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-[15px] outline-none focus:border-[#E57361] focus:ring-2 focus:ring-[#E57361]/25'
@@ -180,7 +181,7 @@ export default function TorneoJueces() {
         </div>
       </header>
 
-      {aviso && <p role="alert" className="tn-entra mx-auto mt-3 max-w-6xl px-4"><span className="block rounded-xl bg-red-100 px-4 py-2.5 text-sm font-semibold text-red-800">{aviso}</span></p>}
+      {aviso && <p role={aviso.startsWith('ok:') ? 'status' : 'alert'} className="tn-entra pointer-events-none fixed inset-x-0 bottom-4 z-30 mx-auto max-w-xl px-4"><span className={`block rounded-xl px-4 py-3 text-sm font-semibold shadow-lg ${aviso.startsWith('ok:') ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>{aviso.replace(/^ok:/, '')}</span></p>}
 
       <div className="mx-auto grid max-w-6xl gap-4 px-4 py-4 lg:grid-cols-[300px_1fr]">
         {/* Categorías: lista en computadora, menú desplegable en teléfono */}
@@ -247,7 +248,14 @@ export default function TorneoJueces() {
                 </div>
               </div>
 
-              <ul className="mt-3 space-y-2.5">
+              <div className="mt-3">
+                <PanelCompetencia key={actual.id} cat={actual}
+                  alActuar={accion => { cambiar('/api/torneo/competencia', 'POST', { categoriaId: actual.id, accion }) }}
+                  alPodio={async () => { if (await cambiar('/api/torneo/competencia', 'POST', { categoriaId: actual.id, accion: { tipo: 'podio' } })) setAviso('ok:Podio pasado a resultados. Revísalo abajo en la lista de equipos.') }} />
+              </div>
+
+              <h2 className="mt-5 px-1 text-xs font-bold uppercase tracking-wide text-slate-500">Equipos inscritos y podio</h2>
+              <ul className="mt-2 space-y-2.5">
                 {actual.equipos.map(e => (
                   <li key={e.id} className="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-slate-200">
                     <div className="flex items-start gap-3">
