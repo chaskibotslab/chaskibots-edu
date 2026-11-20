@@ -7,6 +7,9 @@ import { Categoria, Equipo, InsigniaEstado, Medalla, TORNEO, ESTILOS_TORNEO, pla
 
 type Vista = 'categorias' | 'resultados' | 'equipos'
 
+// Cuando el robot lleva el nombre de su único participante, no se repite debajo.
+const personas = (e: Equipo) => e.integrantes.length === 1 && plano(e.integrantes[0]) === plano(e.robot) ? '' : e.integrantes.join(' · ')
+
 function FilaEquipo({ e, numero }: { e: Equipo; numero?: boolean }) {
   return (
     <li className="flex items-start gap-3 px-4 py-3">
@@ -14,7 +17,7 @@ function FilaEquipo({ e, numero }: { e: Equipo; numero?: boolean }) {
       <div className="min-w-0 flex-1">
         <p className="break-words text-[15px] font-bold leading-snug text-slate-900">{e.robot}</p>
         {e.equipo && <p className="break-words text-sm font-semibold text-[#C4523F]">{e.equipo}</p>}
-        {e.integrantes.length > 0 && <p className="break-words text-sm text-slate-600">{e.integrantes.join(' · ')}</p>}
+        {personas(e) && <p className="break-words text-sm text-slate-600">{personas(e)}</p>}
       </div>
       {e.puntaje && <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-xs font-bold tabular-nums text-slate-700">{e.puntaje}</span>}
     </li>
@@ -60,6 +63,13 @@ export default function TorneoPublico() {
     return { categorias: cats.length, robots: cats.reduce((n, c) => n + c.equipos.length, 0), clubes: clubesTodos.size, finalizadas: cats.filter(c => c.estado === 'finalizada').length }
   }, [categorias])
 
+  const enCurso = useMemo(() => (categorias || []).filter(c => c.estado === 'en_curso'), [categorias])
+  const irA = (id: string) => {
+    setVista('categorias'); setBusca('')
+    setAbiertas(v => new Set(v).add(id))
+    setTimeout(() => document.getElementById(`cat-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
+  }
+
   const alternar = (id: string) => setAbiertas(v => { const n = new Set(v); n.has(id) ? n.delete(id) : n.add(id); return n })
 
   const pestañas: { id: Vista; texto: string; icono: typeof Trophy }[] = [
@@ -78,7 +88,7 @@ export default function TorneoPublico() {
         <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-6 sm:px-6 sm:pb-10">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/chaski.png" alt="" className="h-11 w-11 rounded-xl bg-white object-contain p-1 shadow-sm" />
+            <img src="/chaski.png" alt="" className="h-14 w-auto object-contain drop-shadow-sm" />
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-white/90">{TORNEO.titulo}</p>
           </div>
           <h1 className="mt-5 text-5xl font-black leading-none tracking-tight sm:text-7xl">{TORNEO.nombre}</h1>
@@ -110,7 +120,7 @@ export default function TorneoPublico() {
           <label className="relative flex-1">
             <span className="sr-only">Buscar</span>
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar robot, equipo, participante o categoría"
+            <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar robot, equipo o participante"
               className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-[15px] shadow-sm outline-none placeholder:text-slate-400 focus:border-[#E57361] focus:ring-2 focus:ring-[#E57361]/25" />
             {busca && <button onClick={() => setBusca('')} aria-label="Borrar búsqueda" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"><X className="h-4 w-4" /></button>}
           </label>
@@ -119,6 +129,17 @@ export default function TorneoPublico() {
 
       <main className="mx-auto max-w-5xl px-4 py-5 sm:px-6">
         {fallo && <p role="alert" className="mb-4 rounded-xl bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-900">No se pudo actualizar la información. Se reintenta automáticamente.</p>}
+
+        {enCurso.length > 0 && (
+          <section aria-label="En competencia ahora" className="tn-entra mb-4 rounded-2xl bg-emerald-600 px-4 py-3 text-white shadow-sm">
+            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em]"><span className="tn-vivo h-2 w-2 rounded-full bg-white" /> En competencia ahora</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {enCurso.map(c => (
+                <button key={c.id} onClick={() => irA(c.id)} className="rounded-full bg-white px-3 py-1.5 text-left text-sm font-bold text-emerald-800 hover:bg-emerald-50">{c.nombre}</button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {!categorias ? (
           <div className="grid gap-3 sm:grid-cols-2" aria-label="Cargando">
@@ -130,12 +151,12 @@ export default function TorneoPublico() {
               {filtradas.map((c: Categoria) => {
                 const abierta = !!q || abiertas.has(c.id)
                 return (
-                  <section key={c.id} className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                  <section key={c.id} id={`cat-${c.id}`} className={`scroll-mt-36 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 sm:scroll-mt-24 ${c.estado === 'en_curso' ? 'ring-2 ring-emerald-500' : 'ring-slate-200'}`}>
                     <button onClick={() => alternar(c.id)} aria-expanded={abierta} className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-slate-50">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E57361]/10 text-sm font-black tabular-nums text-[#C4523F]">{c.equipos.length}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block break-words text-[15px] font-bold leading-snug text-slate-900">{c.nombre}</span>
-                        <span className="mt-1 block"><InsigniaEstado estado={c.estado} /></span>
+                        {c.estado !== 'pendiente' && <span className="mt-1 block"><InsigniaEstado estado={c.estado} /></span>}
                       </span>
                       <ChevronDown className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 ${abierta ? 'rotate-180' : ''}`} />
                     </button>
@@ -167,26 +188,33 @@ export default function TorneoPublico() {
         ) : (
           clubes.length === 0 ? <Vacio texto="No encontramos nada con esa búsqueda." /> : (
             <div className="grid items-start gap-3 sm:grid-cols-2">
-              {clubes.map(k => (
-                <section key={k.nombre} className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-                  <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
-                    <h2 className="min-w-0 flex-1 break-words text-[15px] font-bold leading-snug">{k.nombre}</h2>
-                    <span className="shrink-0 rounded-full bg-[#E57361]/10 px-2.5 py-0.5 text-xs font-bold text-[#C4523F]">{k.robots.length} {k.robots.length === 1 ? 'robot' : 'robots'}</span>
-                  </div>
-                  <ul className="divide-y divide-slate-100">
+              {clubes.map(k => {
+                const clave = `club:${plano(k.nombre)}`
+                const abierta = !!q || abiertas.has(clave)
+                const medallas = k.robots.filter(r => r.e.puesto).length
+                return (
+                <section key={clave} className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                  <button onClick={() => alternar(clave)} aria-expanded={abierta} className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-slate-50">
+                    <span className="min-w-0 flex-1">
+                      <span className="block break-words text-[15px] font-bold leading-snug text-slate-900">{k.nombre}</span>
+                      <span className="mt-0.5 block text-xs font-semibold text-slate-500">{k.robots.length} {k.robots.length === 1 ? 'robot' : 'robots'}{medallas > 0 && ` · ${medallas} ${medallas === 1 ? 'podio' : 'podios'}`}</span>
+                    </span>
+                    <ChevronDown className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 ${abierta ? 'rotate-180' : ''}`} />
+                  </button>
+                  {abierta && <ul className="tn-entra divide-y divide-slate-100 border-t border-slate-100">
                     {k.robots.map(({ e, categoria }) => (
                       <li key={e.id} className="flex items-start gap-3 px-4 py-2.5">
                         {e.puesto ? <Medalla puesto={e.puesto} /> : <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-300" />}
                         <div className="min-w-0 flex-1">
                           <p className="break-words text-sm font-bold text-slate-900">{e.robot}</p>
                           <p className="break-words text-xs font-semibold text-slate-500">{categoria}</p>
-                          {e.integrantes.length > 0 && <p className="break-words text-xs text-slate-600">{e.integrantes.join(' · ')}</p>}
+                          {personas(e) && <p className="break-words text-xs text-slate-600">{personas(e)}</p>}
                         </div>
                       </li>
                     ))}
-                  </ul>
+                  </ul>}
                 </section>
-              ))}
+              )})}
             </div>
           )
         )}
