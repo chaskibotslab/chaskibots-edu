@@ -1,13 +1,14 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { Competencia } from '@/lib/torneoCompetencia'
 
 export interface Equipo {
   id: string; numero: number; robot: string; equipo: string; integrantes: string[]
   puesto: number | null; puntaje: string | null; nota?: string | null
 }
 export type Estado = 'pendiente' | 'en_curso' | 'finalizada'
-export interface Categoria { id: string; nombre: string; orden: number; estado: Estado; equipos: Equipo[] }
+export interface Categoria { id: string; nombre: string; orden: number; estado: Estado; competencia: Competencia | null; equipos: Equipo[] }
 
 export const TORNEO = { nombre: 'Chaski Bots 10', titulo: 'Torneo Internacional de Robótica', lugar: 'El Chaco, Ecuador', fechas: '20 y 21 de noviembre de 2026' }
 
