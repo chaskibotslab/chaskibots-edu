@@ -84,29 +84,41 @@ export default function TorneoPublico() {
     <div className="tn min-h-screen bg-[#F4F3ED] text-slate-900">
       <style>{ESTILOS_TORNEO}</style>
 
-      <header className="relative overflow-hidden bg-gradient-to-br from-[#E57361] via-[#E9806A] to-[#F2A65A] text-white">
-        <div aria-hidden className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full bg-white/10" />
-        <div aria-hidden className="pointer-events-none absolute -bottom-28 right-24 h-56 w-56 rounded-full bg-white/10" />
+      <header className="relative overflow-hidden bg-[#282A36] text-white">
+        {/* Brillos coral y engranaje, como en el logo */}
+        <div aria-hidden className="pointer-events-none absolute -right-24 -top-32 h-96 w-96 rounded-full bg-[#E57361]/25 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute -bottom-40 -left-24 h-80 w-80 rounded-full bg-[#E57361]/10 blur-3xl" />
+        <svg aria-hidden viewBox="0 0 100 100" className="tn-gira pointer-events-none absolute -right-10 top-6 h-56 w-56 text-white/[0.06] sm:h-72 sm:w-72">
+          <path fill="currentColor" fillRule="evenodd" d="M43 4h14l2 11 9 4 9-7 10 10-7 9 4 9 11 2v14l-11 2-4 9 7 9-10 10-9-7-9 4-2 11H43l-2-11-9-4-9 7-10-10 7-9-4-9-11-2V43l11-2 4-9-7-9 10-10 9 7 9-4zM50 32a18 18 0 100 36 18 18 0 000-36z" />
+        </svg>
         <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-6 sm:px-6 sm:pb-10">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/chaski.png" alt="" className="h-14 w-auto object-contain drop-shadow-sm" />
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-white/90">{TORNEO.titulo}</p>
+            <img src="/torneo/chaski-icono.jpg" alt="Chaski Bots" className="h-14 w-14 rounded-2xl object-cover shadow-lg ring-2 ring-white/20 sm:h-16 sm:w-16" />
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#F0A092]">Edición 10</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-white/85">{TORNEO.titulo}</p>
+            </div>
           </div>
-          <h1 className="mt-5 text-5xl font-black leading-none tracking-tight sm:text-7xl">{TORNEO.nombre}</h1>
-          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-sm font-semibold text-white/95">
-            <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {TORNEO.lugar}</span>
-            <span className="flex items-center gap-1.5"><CalendarDays className="h-4 w-4" /> {TORNEO.fechas}</span>
+          <h1 className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-5xl font-black uppercase leading-none tracking-tight sm:text-7xl">
+            <span>Chaski</span>
+            <span className="text-[#E57361]">Bots</span>
+            <span className="rounded-2xl border-[3px] border-[#E57361] px-3 py-0.5 text-4xl sm:text-6xl">10</span>
+          </h1>
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-sm font-semibold text-white/85">
+            <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-[#E57361]" /> {TORNEO.lugar}</span>
+            <span className="flex items-center gap-1.5"><CalendarDays className="h-4 w-4 text-[#E57361]" /> {TORNEO.fechas}</span>
           </div>
           <dl className="mt-7 grid max-w-xl grid-cols-4 gap-2">
             {[['Categorías', totales.categorias], ['Robots', totales.robots], ['Equipos', totales.clubes], ['Finalizadas', totales.finalizadas]].map(([t, n]) => (
-              <div key={t} className="rounded-xl bg-white/15 px-2 py-2.5 text-center backdrop-blur-sm">
+              <div key={t} className="rounded-xl border border-white/10 bg-white/[0.07] px-2 py-2.5 text-center">
                 <dd className="text-2xl font-black tabular-nums leading-none">{categorias ? n : '–'}</dd>
-                <dt className="mt-1 text-[11px] font-semibold text-white/90">{t}</dt>
+                <dt className="mt-1 text-[11px] font-semibold text-white/70">{t}</dt>
               </div>
             ))}
           </dl>
         </div>
+        <div aria-hidden className="h-1.5 bg-gradient-to-r from-[#E57361] via-[#F0A092] to-[#E57361]" />
       </header>
 
       <div className="sticky top-0 z-20 border-b border-slate-200 bg-[#F4F3ED]/95 backdrop-blur">
@@ -155,7 +167,7 @@ export default function TorneoPublico() {
                 return (
                   <section key={c.id} id={`cat-${c.id}`} className={`scroll-mt-36 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 sm:scroll-mt-24 ${abierta && c.competencia && !q ? 'sm:col-span-2' : ''} ${c.estado === 'en_curso' ? 'ring-2 ring-emerald-500' : 'ring-slate-200'}`}>
                     <button onClick={() => alternar(c.id)} aria-expanded={abierta} className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-slate-50">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E57361]/10 text-sm font-black tabular-nums text-[#C4523F]">{c.equipos.length}</span>
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#282A36] text-sm font-black tabular-nums text-white">{c.equipos.length}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block break-words text-[15px] font-bold leading-snug text-slate-900">{c.nombre}</span>
                         {(c.estado !== 'pendiente' || c.competencia) && (

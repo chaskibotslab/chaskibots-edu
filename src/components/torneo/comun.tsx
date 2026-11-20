@@ -15,7 +15,7 @@ export const TORNEO = { nombre: 'Chaski Bots 10', titulo: 'Torneo Internacional 
 export const ESTADO_TEXTO: Record<Estado, string> = { pendiente: 'Por competir', en_curso: 'En competencia', finalizada: 'Finalizada' }
 
 export function InsigniaEstado({ estado }: { estado: Estado }) {
-  const estilo = estado === 'en_curso' ? 'bg-emerald-100 text-emerald-800' : estado === 'finalizada' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600'
+  const estilo = estado === 'en_curso' ? 'bg-emerald-100 text-emerald-800' : estado === 'finalizada' ? 'bg-[#282A36] text-white' : 'bg-slate-100 text-slate-600'
   return (
     <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${estilo}`}>
       {estado === 'en_curso' && <span className="tn-vivo h-1.5 w-1.5 rounded-full bg-emerald-500" />}
@@ -75,7 +75,9 @@ export const ESTILOS_TORNEO = `
 .tn button:active:not(:disabled) { transform: scale(0.97); }
 .tn .tn-entra { animation: tn-entra 260ms var(--tn-suave) both; }
 .tn .tn-vivo { animation: tn-vivo 1.4s ease-in-out infinite; }
+.tn .tn-gira { animation: tn-gira 40s linear infinite; transform-origin: center; }
 @keyframes tn-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes tn-gira { to { transform: rotate(360deg); } }
 @keyframes tn-vivo { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 @media (prefers-reduced-motion: reduce) { .tn *, .tn *::before, .tn *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; } }
 `
