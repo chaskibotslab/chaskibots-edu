@@ -29,7 +29,6 @@ export default function Header() {
   const menuItems = [
     { href: '/dashboard', label: 'Inicio', icon: Home },
     { href: '/academy', label: 'Academy', icon: GraduationCap },
-    { href: '/niveles', label: 'Niveles', icon: BookOpen },
     { href: '/robotica', label: 'Robótica', icon: Bot },
     { href: '/hacking', label: 'Hacking Ético', icon: Shield },
     { href: '/ia', label: 'IA', icon: Brain },

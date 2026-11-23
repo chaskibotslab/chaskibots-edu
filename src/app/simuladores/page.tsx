@@ -18,10 +18,6 @@ const SimulatorTabsDynamic = dynamic(() => import('@/components/SimulatorTabsDyn
   ssr: false
 })
 
-const PythonIDE = dynamic(() => import('@/components/PythonIDE'), {
-  loading: () => <LoadingSpinner />,
-  ssr: false
-})
 
 const AILab = dynamic(() => import('@/components/AILab'), {
   loading: () => <LoadingSpinner />,
@@ -33,10 +29,6 @@ const CADLab = dynamic(() => import('@/components/CADLab'), {
   ssr: false
 })
 
-const AITerminal = dynamic(() => import('@/components/activities/AITerminal'), {
-  loading: () => <LoadingSpinner />,
-  ssr: false
-})
 
 const pythonChapters = [
   {
@@ -217,7 +209,7 @@ export default function SimuladoresPage() {
               <div>
                 <h2 className="text-2xl font-bold text-white">Libro de Python</h2>
                 <p className="text-slate-400 text-sm">
-                  6 capítulos · Desde cero · <span className="text-hack-green font-medium">Copia el código y pruébalo abajo</span>
+                  6 capítulos · Desde cero · <span className="text-hack-green font-medium">Copia el código y pruébalo en el simulador de abajo</span>
                 </p>
               </div>
               <div className="ml-auto hidden md:flex items-center gap-2 text-xs text-slate-500">
@@ -284,7 +276,7 @@ export default function SimuladoresPage() {
                         </div>
                         <p className="text-xs text-slate-500 mt-3 flex items-center gap-1.5">
                           <PlayCircle className="w-3.5 h-3.5 text-hack-green" />
-                          Copia el código y ejecútalo en el IDE de abajo o en las pestañas de Trinket/Programiz
+                          Copia el código y pruébalo en el simulador de Python de abajo (pestaña Python).
                         </p>
                       </div>
                     )}
@@ -308,62 +300,8 @@ export default function SimuladoresPage() {
             </div>
           </div>
 
-          {/* Categories */}
-          <div className="bg-white/[0.03] rounded-2xl border border-white/10 p-6 md:p-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-chaski-primary/10 rounded-xl flex items-center justify-center border border-chaski-primary/20">
-                <Hash className="w-5 h-5 text-chaski-primary" />
-              </div>
-              Categorías de Simuladores
-            </h2>
-            <div className="grid md:grid-cols-4 gap-4">
-              {[
-                { icon: Code, color: 'text-hack-green', bg: 'bg-hack-green/10 border-hack-green/20', title: 'Python', description: 'Variables, bucles, funciones. El lenguaje más usado en IA.' },
-                { icon: Terminal, color: 'text-hack-green', bg: 'bg-hack-green/10 border-hack-green/20', title: 'MicroPython', description: 'Python para microcontroladores ESP32 y Raspberry Pi Pico.' },
-                { icon: Lightbulb, color: 'text-chaski-primary', bg: 'bg-chaski-primary/10 border-chaski-primary/20', title: 'Arduino/Electrónica', description: 'Circuitos, sensores y programación de hardware.' },
-                { icon: BookOpen, color: 'text-chaski-gold', bg: 'bg-chaski-gold/10 border-chaski-gold/20', title: 'CNC/Industrial', description: 'G-Code, robótica industrial y manufactura digital.' }
-              ].map((cat, i) => {
-                const Icon = cat.icon
-                return (
-                  <div key={cat.title} className="group bg-white/[0.02] rounded-xl p-5 border border-white/10 hover:border-white/20 transition-all duration-300 animate-scale-in" style={{ animationDelay: `${i * 0.05}s` }}>
-                    <div className={`w-12 h-12 ${cat.bg} border rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                      <Icon className={`w-6 h-6 ${cat.color}`} />
-                    </div>
-                    <h4 className={`font-semibold ${cat.color} mb-2`}>{cat.title}</h4>
-                    <p className="text-slate-500 text-sm">{cat.description}</p>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Python IDE Professional */}
-          <div className="animate-fade-in" style={{ animationDelay: '0.15s' }}>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-hack-green/10 rounded-xl flex items-center justify-center border border-hack-green/20">
-                <Code className="w-6 h-6 text-hack-green" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Python IDE Professional</h2>
-                <p className="text-white/50 text-sm">Editor profesional con curriculum completo, terminal y ejecución real</p>
-              </div>
-            </div>
-            <PythonIDE />
-          </div>
-
-          {/* AI Terminal */}
-          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-chaski-primary/10 rounded-xl flex items-center justify-center border border-chaski-primary/20">
-                <Brain className="w-6 h-6 text-chaski-secondary" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">AI Terminal — Simulador de Inteligencia Artificial</h2>
-                <p className="text-white/50 text-sm">Instala paquetes, crea redes neuronales, usa OpenCV, entrena modelos y más</p>
-              </div>
-            </div>
-            <AITerminal />
-          </div>
+          {/* ═══ TODOS LOS SIMULADORES (Python, Hacking, Bloques, Electrónica, IA, Roblox) ═══ */}
+          <SimulatorTabsDynamic />
 
           {/* AI Lab */}
           <div className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
@@ -392,8 +330,6 @@ export default function SimuladoresPage() {
             </div>
             <CADLab />
           </div>
-
-          <SimulatorTabsDynamic />
 
           {/* Tip */}
           <div className="bg-chaski-gold/5 border border-chaski-gold/20 rounded-2xl p-6">
