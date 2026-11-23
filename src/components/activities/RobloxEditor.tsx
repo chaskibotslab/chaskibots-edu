@@ -3,8 +3,9 @@
 import { useState, useRef } from 'react'
 import { 
   Play, RotateCcw, Copy, Check, ChevronRight, ChevronDown,
-  BookOpen, Code, Gamepad2, Lightbulb, Zap, Box, Users, Sparkles
+  BookOpen, Code, Gamepad2, Lightbulb, Zap, Box, Users, Sparkles, Send
 } from 'lucide-react'
+import { useAuth } from '@/components/AuthProvider'
 
 interface RobloxEditorProps {
   levelId: string
@@ -551,6 +552,10 @@ print("Nivel: " .. nivel)`)
   const [activeGuide, setActiveGuide] = useState<number | null>(null)
   const [showGuides, setShowGuides] = useState(true)
   const [filterCategory, setFilterCategory] = useState<'todos' | 'basico' | 'intermedio' | 'avanzado'>('todos')
+  const { user } = useAuth()
+  const factoryRef = useRef<any>(null)
+  const [enviando, setEnviando] = useState(false)
+  const [enviado, setEnviado] = useState(false)
 
   const getLevel = (): 'basico' | 'intermedio' | 'avanzado' => {
     if (['primero-bach', 'segundo-bach', 'tercero-bach'].includes(levelId)) return 'avanzado'
@@ -645,15 +650,55 @@ print("Nivel: " .. nivel)`)
     return results.length > 0 ? results : ['(Sin salida - usa print() para ver resultados)']
   }
 
-  const runCode = () => {
+  const runCode = async () => {
     setIsRunning(true)
-    setOutput(['⏳ Simulando código Lua...'])
-    
-    setTimeout(() => {
-      const results = simulateLua(code)
-      setOutput(results)
-      setIsRunning(false)
-    }, 500)
+    setOutput(['⏳ Ejecutando Lua...'])
+    const lines: string[] = []
+    try {
+      const { LuaFactory } = await import('wasmoon')
+      if (!factoryRef.current) factoryRef.current = new LuaFactory('/wasm/glue.wasm')
+      const lua = await factoryRef.current.createEngine()
+      try {
+        lua.global.set('print', (...args: any[]) => {
+          lines.push(args.map(a => a === undefined || a === null ? 'nil' : String(a)).join('\t'))
+        })
+        await lua.doString(`
+          task = { wait = function() end }
+          wait = function() end
+          local function obj(c) return setmetatable({ ClassName = c, Name = c }, { __index = function() return function() end end }) end
+          Instance = { new = function(c) print("\u{1F9E9} Creado: " .. tostring(c)); return obj(c) end }
+          game = setmetatable({ Workspace = {}, Players = {} }, { __index = function() return {} end })
+          workspace = game.Workspace
+          debug.sethook(function() error("Demasiadas operaciones (bucle infinito?)", 2) end, "", 8000000)
+        `)
+        await lua.doString(code)
+        setOutput(lines.length ? lines : ['(Sin salida - usa print() para mostrar resultados)'])
+      } finally {
+        lua.global.close()
+      }
+    } catch (e: any) {
+      const msg = (e?.message || String(e)).replace(/\[string "[^"]*"\]:(\d+):/g, 'Linea $1:')
+      setOutput([...lines, '❌ Error: ' + msg])
+    }
+    setIsRunning(false)
+  }
+
+  const handleSend = async () => {
+    setEnviando(true)
+    try {
+      const res = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          taskId: `ROBLOX-${Date.now().toString(36).toUpperCase()}`,
+          code,
+          output: output.slice(-30).join('\n'),
+          levelId,
+        }),
+      })
+      if (res.ok) { setEnviado(true); setTimeout(() => setEnviado(false), 4000) }
+    } catch { /* sin conexion */ }
+    setEnviando(false)
   }
 
   const copyCode = () => {
@@ -810,19 +855,27 @@ print("Nivel: " .. nivel)`)
               <Box className="w-4 h-4 text-gray-600" />
               <span className="text-sm text-gray-600">Output</span>
             </div>
-            <button
-              onClick={runCode}
-              disabled={isRunning}
-              className="flex items-center gap-2 px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-gray-900 rounded-lg transition-colors text-sm"
-            >
-              <Play className="w-4 h-4" />
-              {isRunning ? 'Ejecutando...' : 'Simular'}
-            </button>
+            <div className="flex items-center gap-2">
+              {user?.name && (
+                <button onClick={handleSend} disabled={enviando || enviado} className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors text-sm font-medium disabled:opacity-70 ${enviado ? 'bg-green-600 text-white' : 'bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30'}`} title={`Enviar como ${user.name}`}>
+                  <Send className="w-4 h-4" /> {enviado ? '✓ Enviado' : enviando ? 'Enviando...' : 'Enviar al profesor'}
+                </button>
+              )}
+              <button
+                onClick={runCode}
+                disabled={isRunning}
+                className="flex items-center gap-2 px-3 py-1 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 text-white rounded-lg transition-colors text-sm font-semibold"
+              >
+                <Play className="w-4 h-4" />
+                {isRunning ? 'Ejecutando...' : 'Ejecutar'}
+              </button>
+            </div>
           </div>
-          <div className="h-64 p-4 overflow-y-auto font-mono text-sm">
+          <div className="h-64 p-4 overflow-y-auto font-mono text-sm bg-[#10131F]">
+            {output.length === 0 && <div className="text-gray-500">Pulsa Ejecutar para correr tu codigo Lua...</div>}
             {output.map((line, idx) => (
-              <div key={idx} className="text-gray-900">
-                {line}
+              <div key={idx} className={line.startsWith('❌') ? 'text-red-400' : 'text-green-300'}>
+                {line || ' '}
               </div>
             ))}
           </div>
