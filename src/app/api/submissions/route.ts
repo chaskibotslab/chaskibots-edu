@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic'
 function rowToSubmission(row: any) {
   return {
     id: row.id,
+    userId: row.user_id || '',
     taskId: row.task_id || '',
     studentName: row.student_name || '',
     studentEmail: row.student_email || '',
@@ -52,7 +53,12 @@ export async function GET(request: NextRequest) {
 
     // Estudiantes y docentes solo ven entregas de los niveles de sus grupos.
     const scope = await getUserScope(auth.session)
-    if (scope.role !== 'admin' && scope.levelIds.length > 0) query = query.in('level_id', scope.levelIds)
+    if (scope.role === 'student') {
+      // El estudiante ve SOLO sus propias entregas (ligadas a su cuenta).
+      query = query.eq('user_id', auth.session.id)
+    } else if (scope.role !== 'admin' && scope.levelIds.length > 0) {
+      query = query.in('level_id', scope.levelIds)
+    }
 
     const { data, error } = await query
     if (error) {
@@ -78,18 +84,24 @@ export async function POST(request: NextRequest) {
       code, output, drawing, drawingUrl, files, attachmentUrls, answers
     } = body
 
-    if (!studentName) {
-      return NextResponse.json({ error: 'studentName es requerido' }, { status: 400 })
-    }
+    // La identidad viene de la SESIÓN (cuenta logueada), no de un nombre tecleado:
+    // así cada entrega queda ligada al usuario real que la envió.
+    const { data: cuenta } = await supabaseAdmin
+      .from('users')
+      .select('id, name, email, level_id, course_id, school_id')
+      .eq('id', auth.session.id)
+      .maybeSingle()
+    const nombre = cuenta?.name || studentName || cuenta?.email || auth.session.email || 'Estudiante'
 
     const insertRow: Record<string, any> = {
       task_id: taskId || null,
-      student_name: studentName,
-      student_email: studentEmail || null,
-      level_id: levelId || null,
+      user_id: auth.session.id,
+      student_name: nombre,
+      student_email: cuenta?.email || auth.session.email || studentEmail || null,
+      level_id: levelId || cuenta?.level_id || null,
       lesson_id: lessonId || null,
-      course_id: courseId || null,
-      school_id: schoolId || null,
+      course_id: courseId || cuenta?.course_id || null,
+      school_id: schoolId || cuenta?.school_id || null,
       code: code || null,
       output: output || null,
       drawing: drawing || null,

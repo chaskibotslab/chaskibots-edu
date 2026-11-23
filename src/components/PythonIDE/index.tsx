@@ -914,13 +914,17 @@ export default function PythonIDE({ toolMode }: { toolMode?: boolean } = {}) {
 
             {/* Send to teacher */}
             <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                placeholder="Tu nombre..."
-                className="px-3 py-1.5 bg-gray-800/80 border border-gray-600/50 rounded-lg text-xs text-gray-300 w-32 placeholder:text-gray-600 focus:border-blue-500/50 focus:outline-none transition-colors"
-              />
+              {user?.name ? (
+                <span className="px-2 py-1.5 text-[11px] text-gray-400 whitespace-nowrap">como <strong className="text-gray-200">{user.name}</strong></span>
+              ) : (
+                <input
+                  type="text"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  placeholder="Tu nombre..."
+                  className="px-3 py-1.5 bg-gray-800/80 border border-gray-600/50 rounded-lg text-xs text-gray-300 w-32 placeholder:text-gray-600 focus:border-blue-500/50 focus:outline-none transition-colors"
+                />
+              )}
               <button
                 onClick={handleSendToTeacher}
                 disabled={isSending || sendSuccess || !studentName.trim()}
