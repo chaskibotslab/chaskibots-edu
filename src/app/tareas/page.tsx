@@ -100,7 +100,7 @@ export default function TareasPage() {
     try {
       const [tasksRes, subsRes] = await Promise.all([
         fetch(`/api/tasks?levelId=${user.levelId}`),
-        fetch(`/api/submissions?studentEmail=${encodeURIComponent(user.email || '')}`)
+        fetch('/api/submissions')
       ])
       const tasksData = await tasksRes.json()
       const subsData = await subsRes.json()

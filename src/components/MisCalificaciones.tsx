@@ -44,22 +44,13 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
   }, [studentName, levelId])
 
   const loadMySubmissions = async () => {
-    if (!studentName || !studentName.trim()) {
-      setLoading(false)
-      return
-    }
-    
     setLoading(true)
     try {
-      const res = await fetch(`/api/submissions?levelId=${levelId}`)
+      // El servidor ya devuelve SOLO las entregas del alumno logueado (por su cuenta),
+      // así que no hace falta filtrar por nombre (que fallaba con nombres repetidos o vacíos).
+      const res = await fetch('/api/submissions')
       const data = await res.json()
-      if (data.submissions) {
-        // Filtrar solo las entregas de este estudiante
-        const mySubmissions = data.submissions.filter(
-          (s: Submission) => s.studentName.toLowerCase().trim() === studentName.toLowerCase().trim()
-        )
-        setSubmissions(mySubmissions)
-      }
+      if (data.submissions) setSubmissions(data.submissions)
     } catch (error) {
       console.error('Error loading submissions:', error)
     }
@@ -109,17 +100,6 @@ export default function MisCalificaciones({ studentName, levelId }: MisCalificac
     return (
       <div className="flex items-center justify-center py-8">
         <Loader2 className="w-6 h-6 text-chaski-primary animate-spin" />
-      </div>
-    )
-  }
-
-  // Si no hay nombre, mostrar mensaje
-  if (!studentName || !studentName.trim()) {
-    return (
-      <div className="bg-slate-50 border border-yellow-500/30 rounded-xl p-6 text-center">
-        <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
-        <p className="text-slate-900 font-medium">Ingresa tu nombre primero</p>
-        <p className="text-sm text-slate-600 mt-1">Escribe tu nombre completo en el campo de arriba para ver tus calificaciones</p>
       </div>
     )
   }
