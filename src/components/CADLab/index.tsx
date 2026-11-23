@@ -8,14 +8,15 @@ import * as THREE from 'three'
 import {
   Eye, RotateCcw, Download, Sliders,
   Info, Trash2, Move, ZoomIn, Sun, Moon,
-  Cog, Loader2, Send
+  Cog, Loader2, Send, Box
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
+import VoxelBuilder, { VoxelMap } from './VoxelBuilder'
 
 // ============================================================
 // TYPES
 // ============================================================
-type LabTab = 'viewer' | 'builder'
+type LabTab = 'viewer' | 'builder' | 'voxel'
 
 interface ShapeConfig {
   id: string
@@ -142,10 +143,19 @@ function Scene({ shapes, darkMode }: { shapes: ShapeConfig[]; darkMode: boolean 
 // ============================================================
 export default function CADLab() {
   const { user } = useAuth()
-  const [tab, setTab] = useState<LabTab>('viewer')
+  const [tab, setTab] = useState<LabTab>('voxel')
   const [darkMode, setDarkMode] = useState(true)
   const [enviando, setEnviando] = useState(false)
   const [enviado, setEnviado] = useState(false)
+  const [voxels, setVoxels] = useState<VoxelMap>(() => {
+    // Ejemplo inicial para que el alumno vea algo y entienda cómo se construye.
+    const v: VoxelMap = {}
+    for (let x = -1; x <= 1; x++) for (let z = -1; z <= 1; z++) v[`${x},0,${z}`] = '#3b82f6'
+    v['0,1,0'] = '#ef4444'
+    return v
+  })
+  const [voxelColor, setVoxelColor] = useState('#3b82f6')
+  const [voxelModo, setVoxelModo] = useState<'poner' | 'borrar'>('poner')
 
   // Viewer state — presets loaded from Supabase (admin-editable, no redeploy needed)
   const [presets, setPresets] = useState<CadPreset[]>([])
@@ -199,7 +209,7 @@ export default function CADLab() {
 
   // Export scene as JSON
   const exportScene = () => {
-    const data = { shapes: currentShapes, exportedAt: new Date().toISOString() }
+    const data = tab === 'voxel' ? { voxels, exportedAt: new Date().toISOString() } : { shapes: currentShapes, exportedAt: new Date().toISOString() }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -218,8 +228,10 @@ export default function CADLab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           taskId: `CAD-${Date.now().toString(36).toUpperCase()}`,
-          output: `Diseño 3D: ${currentShapes.length} figura(s) — ${tab === 'viewer' ? 'modelo del visor' : 'construcción propia'}`,
-          files: { shapes: currentShapes },
+          output: tab === 'voxel'
+            ? `Construcción con ${Object.keys(voxels).length} bloques`
+            : `Diseño 3D: ${currentShapes.length} figura(s) — ${tab === 'viewer' ? 'modelo del visor' : 'construcción propia'}`,
+          files: tab === 'voxel' ? { voxels } : { shapes: currentShapes },
         }),
       })
       if (res.ok) { setEnviado(true); setTimeout(() => setEnviado(false), 4000) }
@@ -230,8 +242,9 @@ export default function CADLab() {
   const selectedShape = builderShapes[selectedShapeIdx]
 
   const tabs = [
+    { id: 'voxel' as LabTab, label: 'Construye', icon: Box, desc: 'Arma con bloques (fácil)' },
     { id: 'viewer' as LabTab, label: 'Visor 3D', icon: Eye, desc: 'Explora modelos prediseñados' },
-    { id: 'builder' as LabTab, label: 'Constructor', icon: Sliders, desc: 'Crea figuras con parámetros' },
+    { id: 'builder' as LabTab, label: 'Avanzado', icon: Sliders, desc: 'Figuras con parámetros' },
   ]
 
   return (
@@ -291,6 +304,9 @@ export default function CADLab() {
       <div className="flex" style={{ height: 520 }}>
         {/* 3D CANVAS */}
         <div className="flex-1 relative">
+          {tab === 'voxel' ? (
+            <VoxelBuilder voxels={voxels} color={voxelColor} modo={voxelModo} setVoxels={setVoxels} />
+          ) : (
           <Canvas
             camera={{ position: [4, 3, 6], fov: 50 }}
             style={{ background: darkMode ? '#0f0f1a' : '#e2e8f0' }}
@@ -299,6 +315,7 @@ export default function CADLab() {
               <Scene shapes={currentShapes} darkMode={darkMode} />
             </Suspense>
           </Canvas>
+          )}
           {/* Overlay hints */}
           <div className="absolute bottom-3 left-3 flex items-center gap-3 text-[10px] text-gray-500">
             <span className="flex items-center gap-1"><Move className="w-3 h-3" /> Arrastrar para rotar</span>
@@ -319,6 +336,40 @@ export default function CADLab() {
         {/* RIGHT PANEL */}
         <div className="w-72 bg-labdark-bg border-l border-gray-700/50 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-3 space-y-3">
+
+            {/* ── CONSTRUYE (BLOQUES) ── */}
+            {tab === 'voxel' && (
+              <>
+                <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-2.5 flex items-start gap-2">
+                  <Info className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-gray-400 text-[10px] leading-relaxed">Clic en el piso o sobre un bloque para <b className="text-cyan-300">poner</b>. Cambia a <b className="text-cyan-300">borrar</b> para quitar. Arrastra para rotar, rueda para zoom.</p>
+                </div>
+                <div>
+                  <h4 className="text-white text-xs font-bold mb-1.5">Color del bloque</h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#ffffff', '#6b4f2a'].map(col => (
+                      <button key={col} onClick={() => setVoxelColor(col)} style={{ background: col }} className={`w-7 h-7 rounded-md border-2 transition-transform hover:scale-110 ${voxelColor === col ? 'border-white' : 'border-black/30'}`} aria-label={col} />
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button onClick={() => setVoxelModo('poner')} className={`py-2 rounded-lg text-xs font-bold transition-colors ${voxelModo === 'poner' ? 'bg-cyan-500 text-white' : 'bg-gray-700/40 text-gray-300 hover:bg-gray-700/60'}`}>🧱 Poner</button>
+                  <button onClick={() => setVoxelModo('borrar')} className={`py-2 rounded-lg text-xs font-bold transition-colors ${voxelModo === 'borrar' ? 'bg-red-500 text-white' : 'bg-gray-700/40 text-gray-300 hover:bg-gray-700/60'}`}>🧽 Borrar</button>
+                </div>
+                <button onClick={() => setVoxels({})} className="w-full py-2 rounded-lg text-xs font-medium bg-gray-700/40 text-gray-300 hover:bg-red-500/20 hover:text-red-300 flex items-center justify-center gap-1 transition-colors"><Trash2 className="w-3.5 h-3.5" /> Vaciar todo</button>
+                <div>
+                  <h4 className="text-white text-xs font-bold mb-1.5">🎯 Retos y guías</h4>
+                  <div className="space-y-1 text-[11px] text-gray-300">
+                    <div className="bg-gray-700/20 rounded p-2">🏠 Construye una <b>casa</b> con paredes y techo.</div>
+                    <div className="bg-gray-700/20 rounded p-2">🌳 Haz un <b>árbol</b>: tronco café y copa verde.</div>
+                    <div className="bg-gray-700/20 rounded p-2">🤖 Arma un <b>robot</b> con cabeza, cuerpo y brazos.</div>
+                    <div className="bg-gray-700/20 rounded p-2">🚗 Un <b>carro</b> con 4 ruedas.</div>
+                    <div className="bg-gray-700/20 rounded p-2">⭐ <b>Libre:</b> crea lo que imagines y pulsa «Enviar al profesor».</div>
+                  </div>
+                </div>
+                <div className="text-[10px] text-gray-500">Bloques colocados: <span className="text-white font-bold">{Object.keys(voxels).length}</span></div>
+              </>
+            )}
 
             {/* ── VIEWER TAB PANEL ── */}
             {tab === 'viewer' && (
