@@ -19,15 +19,7 @@ const SimulatorTabsDynamic = dynamic(() => import('@/components/SimulatorTabsDyn
 })
 
 
-const AILab = dynamic(() => import('@/components/AILab'), {
-  loading: () => <LoadingSpinner />,
-  ssr: false
-})
 
-const CADLab = dynamic(() => import('@/components/CADLab'), {
-  loading: () => <LoadingSpinner />,
-  ssr: false
-})
 
 
 const pythonChapters = [
@@ -293,8 +285,7 @@ export default function SimuladoresPage() {
               <div>
                 <p className="text-white font-semibold text-sm">¿Dónde practicar?</p>
                 <p className="text-slate-400 text-sm">
-                  Usa <strong className="text-chaski-primary">Trinket Python</strong> o <strong className="text-chaski-primary">Programiz Python</strong>
-                  {' '}en las pestañas de abajo. Solo copia, pega y presiona &quot;Run&quot;.
+                  Copia el código y pruébalo en el <strong className="text-chaski-primary">simulador de Python</strong> de abajo. Todos los simuladores funcionan dentro de tu navegador, sin instalar nada.
                 </p>
               </div>
             </div>
@@ -303,33 +294,6 @@ export default function SimuladoresPage() {
           {/* ═══ TODOS LOS SIMULADORES (Python, Hacking, Bloques, Electrónica, IA, Roblox) ═══ */}
           <SimulatorTabsDynamic />
 
-          {/* AI Lab */}
-          <div className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-chaski-gold/10 rounded-xl flex items-center justify-center border border-chaski-gold/20">
-                <Brain className="w-6 h-6 text-chaski-gold" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Laboratorio de IA Visual</h2>
-                <p className="text-white/50 text-sm">Anotador, segmentación, desafío IA, cámara en vivo y modelos reales en la nube</p>
-              </div>
-            </div>
-            <AILab />
-          </div>
-
-          {/* CAD Lab 3D */}
-          <div className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-chaski-primary/10 rounded-xl flex items-center justify-center border border-chaski-primary/20">
-                <Cog className="w-6 h-6 text-chaski-primary" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Laboratorio CAD 3D</h2>
-                <p className="text-white/50 text-sm">Visor 3D interactivo, constructor paramétrico y texto a 3D</p>
-              </div>
-            </div>
-            <CADLab />
-          </div>
 
           {/* Tip */}
           <div className="bg-chaski-gold/5 border border-chaski-gold/20 rounded-2xl p-6">

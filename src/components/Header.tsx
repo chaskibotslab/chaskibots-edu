@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from './AuthProvider'
-import { Menu, X, User, LogOut, Settings, ChevronLeft, Home, BookOpen, Bot, Brain, Shield, GraduationCap, Box, FlaskConical } from 'lucide-react'
+import { Menu, X, User, LogOut, Settings, ChevronLeft, Home, BookOpen, Bot, Brain, Shield, GraduationCap, Box, FlaskConical, Cpu } from 'lucide-react'
 
 export default function Header() {
   const { user, logout, isAuthenticated, isAdmin } = useAuth()
@@ -28,6 +28,7 @@ export default function Header() {
 
   const menuItems = [
     { href: '/dashboard', label: 'Inicio', icon: Home },
+    { href: '/simuladores', label: 'Simuladores', icon: Cpu },
     { href: '/academy', label: 'Academy', icon: GraduationCap },
     { href: '/robotica', label: 'Robótica', icon: Bot },
     { href: '/hacking', label: 'Hacking Ético', icon: Shield },
