@@ -101,26 +101,24 @@ const DEFAULT_FILES: VirtualFile[] = [
   {
     name: 'main.py',
     content: `# ═══════════════════════════════════════════════
-# 🐍 Python IDE Professional - ChaskiBots
+# 🐍 Mi primer programa en Python - ChaskiBots
 # ═══════════════════════════════════════════════
-# Motor: CPython 3.11 (Pyodide WebAssembly)
-# Selecciona una lección del panel izquierdo
-# o escribe tu propio código aquí.
+# 1) Toca el botón verde "Ejecutar" (o Ctrl + Enter).
+# 2) Mira el resultado abajo, en la terminal.
+# 3) Cambia el texto de las comillas y vuelve a ejecutar.
 # ═══════════════════════════════════════════════
 
-def main():
-    print("¡Bienvenido al IDE Python Professional! 🚀")
-    print("=" * 45)
-    print("  • Editor de código con resaltado de sintaxis")
-    print("  • Ejecución real de Python 3.11")
-    print("  • Curriculum completo con 30+ lecciones")
-    print("  • Sistema de archivos virtual")
-    print("  • Paquetes: numpy, matplotlib, pandas...")
-    print("=" * 45)
-    print("\\n💡 Tip: Abre el curriculum (izquierda) para empezar")
+nombre = "ChaskiBots"
+print("¡Hola! Soy", nombre)
+print("Estoy aprendiendo a programar en Python 🚀")
 
-if __name__ == "__main__":
-    main()
+# Una suma sencilla:
+a = 5
+b = 3
+print("5 + 3 =", a + b)
+
+# 👉 ¿Primera vez? Toca una lección en el panel de la izquierda
+#    para aprender paso a paso, con ejemplos y retos.
 `
   },
   {
