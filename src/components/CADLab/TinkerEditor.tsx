@@ -92,7 +92,7 @@ function Piezas({
         </mesh>
       ))}
 
-      {sel && <TransformControls object={sel} mode={mode} onMouseUp={commit} />}
+      {sel && <TransformControls object={sel} mode={mode} onMouseUp={commit} translationSnap={0.5} rotationSnap={Math.PI / 12} scaleSnap={0.25} />}
 
       <OrbitControls makeDefault enablePan minDistance={3} maxDistance={40} maxPolarAngle={Math.PI / 2.02} />
     </>
