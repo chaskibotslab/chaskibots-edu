@@ -13,6 +13,19 @@ import {
 import { useAuth } from '@/components/AuthProvider'
 import VoxelBuilder, { VoxelMap } from './VoxelBuilder'
 import TinkerEditor, { TShape, TMode } from './TinkerEditor'
+import { STLExporter } from 'three/examples/jsm/exporters/STLExporter.js'
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+
+// Geometría base por tipo (igual que en TinkerEditor) para construir y exportar el STL.
+function geomDeTipo(type: TShape['type']): THREE.BufferGeometry {
+  switch (type) {
+    case 'sphere': return new THREE.SphereGeometry(0.6, 32, 32)
+    case 'cylinder': return new THREE.CylinderGeometry(0.5, 0.5, 1.2, 32)
+    case 'cone': return new THREE.ConeGeometry(0.6, 1.2, 32)
+    case 'torus': return new THREE.TorusGeometry(0.5, 0.2, 16, 32)
+    default: return new THREE.BoxGeometry(1, 1, 1)
+  }
+}
 
 // ============================================================
 // TYPES
@@ -364,6 +377,31 @@ export default function CADLab() {
               }
               const delSel = () => { if (!sel) return; setTinkerShapes(prev => prev.filter(s => s.id !== sel.id)); setTinkerSel(null) }
               const setColor = (c: string) => { if (!sel) return; setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, color: c } : s)) }
+              const setField = (field: 'position' | 'scale', axis: number, val: number) => {
+                if (!sel) return
+                setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, [field]: s[field].map((v, i) => i === axis ? val : v) as [number, number, number] } : s))
+              }
+              const espejo = (axis: number) => {
+                if (!sel) return
+                setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, scale: s.scale.map((v, i) => i === axis ? -v : v) as [number, number, number] } : s))
+              }
+              const generarSTL = () => {
+                if (tinkerShapes.length === 0) return
+                const geos = tinkerShapes.map(s => {
+                  const g = geomDeTipo(s.type)
+                  const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(s.rotation[0], s.rotation[1], s.rotation[2]))
+                  const mtx = new THREE.Matrix4().compose(new THREE.Vector3(s.position[0], s.position[1], s.position[2]), q, new THREE.Vector3(Math.abs(s.scale[0]) || 0.1, Math.abs(s.scale[1]) || 0.1, Math.abs(s.scale[2]) || 0.1))
+                  g.applyMatrix4(mtx)
+                  g.deleteAttribute('uv')
+                  return g
+                })
+                const merged = mergeGeometries(geos, false)
+                if (!merged) return
+                merged.computeVertexNormals()
+                const stl = new STLExporter().parse(new THREE.Mesh(merged))
+                const blob = new Blob([stl], { type: 'model/stl' })
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'diseno-chaskibots.stl'; a.click(); URL.revokeObjectURL(a.href)
+              }
               const figuras: { t: TShape['type']; e: string; n: string }[] = [
                 { t: 'box', e: '🧊', n: 'Cubo' }, { t: 'sphere', e: '⚪', n: 'Esfera' }, { t: 'cylinder', e: '🥫', n: 'Cilindro' }, { t: 'cone', e: '🔺', n: 'Cono' }, { t: 'torus', e: '🍩', n: 'Dona' },
               ]
@@ -399,6 +437,27 @@ export default function CADLab() {
                           <button key={c} onClick={() => setColor(c)} style={{ background: c }} className={`w-6 h-6 rounded-md border-2 ${sel.color === c ? 'border-white' : 'border-black/30'}`} />
                         ))}
                       </div>
+                      <div>
+                        <div className="text-[9px] text-gray-500 uppercase tracking-wide mb-0.5">Posición</div>
+                        <div className="grid grid-cols-3 gap-1">
+                          {(['X', 'Y', 'Z'] as const).map((ax, i) => (
+                            <input key={'p' + ax} type="number" step={0.5} value={Math.round(sel.position[i] * 100) / 100} onChange={e => setField('position', i, parseFloat(e.target.value) || 0)} className="w-full px-1 py-0.5 bg-gray-800 border border-gray-600/50 rounded text-[10px] text-gray-200" title={'Posición ' + ax} />
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[9px] text-gray-500 uppercase tracking-wide mb-0.5">Tamaño</div>
+                        <div className="grid grid-cols-3 gap-1">
+                          {(['X', 'Y', 'Z'] as const).map((ax, i) => (
+                            <input key={'s' + ax} type="number" step={0.25} min={0.1} value={Math.round(Math.abs(sel.scale[i]) * 100) / 100} onChange={e => setField('scale', i, parseFloat(e.target.value) || 0.1)} className="w-full px-1 py-0.5 bg-gray-800 border border-gray-600/50 rounded text-[10px] text-gray-200" title={'Tamaño ' + ax} />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1">
+                        {(['X', 'Y', 'Z'] as const).map((ax, i) => (
+                          <button key={'m' + ax} onClick={() => espejo(i)} className="py-1 rounded text-[10px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60">⇋ Espejo {ax}</button>
+                        ))}
+                      </div>
                       <div className="grid grid-cols-2 gap-1.5">
                         <button onClick={dupSel} className="py-1.5 rounded-lg text-[11px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60">Duplicar</button>
                         <button onClick={delSel} className="py-1.5 rounded-lg text-[11px] font-medium bg-red-500/20 text-red-300 hover:bg-red-500/30 flex items-center justify-center gap-1"><Trash2 className="w-3 h-3" /> Borrar</button>
@@ -416,7 +475,10 @@ export default function CADLab() {
                       <div className="bg-gray-700/20 rounded p-2">⭐ <b>Libre:</b> diseña y pulsa «Enviar al profesor».</div>
                     </div>
                   </div>
-                  <div className="text-[10px] text-gray-500">Figuras: <span className="text-white font-bold">{tinkerShapes.length}</span></div>
+                  <button onClick={generarSTL} disabled={tinkerShapes.length === 0} className="w-full py-2 rounded-lg text-xs font-bold bg-cyan-500 text-white hover:bg-cyan-400 disabled:opacity-50 flex items-center justify-center gap-1">
+                    <Download className="w-3.5 h-3.5" /> Generar STL (une todo e imprime)
+                  </button>
+                  <div className="text-[10px] text-gray-500">Figuras: <span className="text-white font-bold">{tinkerShapes.length}</span> · El STL une todas en un solo modelo para impresión 3D.</div>
                 </>
               )
             })()}
