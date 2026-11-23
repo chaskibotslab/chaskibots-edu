@@ -12,11 +12,12 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
 import VoxelBuilder, { VoxelMap } from './VoxelBuilder'
+import TinkerEditor, { TShape, TMode } from './TinkerEditor'
 
 // ============================================================
 // TYPES
 // ============================================================
-type LabTab = 'viewer' | 'builder' | 'voxel'
+type LabTab = 'disenar' | 'voxel' | 'viewer' | 'builder'
 
 interface ShapeConfig {
   id: string
@@ -143,8 +144,14 @@ function Scene({ shapes, darkMode }: { shapes: ShapeConfig[]; darkMode: boolean 
 // ============================================================
 export default function CADLab() {
   const { user } = useAuth()
-  const [tab, setTab] = useState<LabTab>('voxel')
+  const [tab, setTab] = useState<LabTab>('disenar')
   const [darkMode, setDarkMode] = useState(true)
+  const [tinkerShapes, setTinkerShapes] = useState<TShape[]>([
+    { id: 't-base', type: 'box', color: '#38bdf8', position: [0, 0.5, 0], rotation: [0, 0, 0], scale: [2, 0.4, 2] },
+    { id: 't-top', type: 'cylinder', color: '#f59e0b', position: [0, 1.3, 0], rotation: [0, 0, 0], scale: [1, 1, 1] },
+  ])
+  const [tinkerSel, setTinkerSel] = useState<string | null>('t-top')
+  const [tinkerMode, setTinkerMode] = useState<TMode>('translate')
   const [enviando, setEnviando] = useState(false)
   const [enviado, setEnviado] = useState(false)
   const [voxels, setVoxels] = useState<VoxelMap>(() => {
@@ -209,7 +216,7 @@ export default function CADLab() {
 
   // Export scene as JSON
   const exportScene = () => {
-    const data = tab === 'voxel' ? { voxels, exportedAt: new Date().toISOString() } : { shapes: currentShapes, exportedAt: new Date().toISOString() }
+    const data = tab === 'disenar' ? { tinker: tinkerShapes, exportedAt: new Date().toISOString() } : tab === 'voxel' ? { voxels, exportedAt: new Date().toISOString() } : { shapes: currentShapes, exportedAt: new Date().toISOString() }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -228,10 +235,12 @@ export default function CADLab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           taskId: `CAD-${Date.now().toString(36).toUpperCase()}`,
-          output: tab === 'voxel'
+          output: tab === 'disenar'
+            ? `Diseño 3D (Tinkercad): ${tinkerShapes.length} figura(s)`
+            : tab === 'voxel'
             ? `Construcción con ${Object.keys(voxels).length} bloques`
             : `Diseño 3D: ${currentShapes.length} figura(s) — ${tab === 'viewer' ? 'modelo del visor' : 'construcción propia'}`,
-          files: tab === 'voxel' ? { voxels } : { shapes: currentShapes },
+          files: tab === 'disenar' ? { tinker: tinkerShapes } : tab === 'voxel' ? { voxels } : { shapes: currentShapes },
         }),
       })
       if (res.ok) { setEnviado(true); setTimeout(() => setEnviado(false), 4000) }
@@ -242,9 +251,9 @@ export default function CADLab() {
   const selectedShape = builderShapes[selectedShapeIdx]
 
   const tabs = [
+    { id: 'disenar' as LabTab, label: 'Diseñar', icon: Sliders, desc: 'Figuras: mover, girar, escalar' },
     { id: 'voxel' as LabTab, label: 'Construye', icon: Box, desc: 'Arma con bloques (fácil)' },
     { id: 'viewer' as LabTab, label: 'Visor 3D', icon: Eye, desc: 'Explora modelos prediseñados' },
-    { id: 'builder' as LabTab, label: 'Avanzado', icon: Sliders, desc: 'Figuras con parámetros' },
   ]
 
   return (
@@ -304,7 +313,9 @@ export default function CADLab() {
       <div className="flex" style={{ height: 520 }}>
         {/* 3D CANVAS */}
         <div className="flex-1 relative">
-          {tab === 'voxel' ? (
+          {tab === 'disenar' ? (
+            <TinkerEditor shapes={tinkerShapes} setShapes={setTinkerShapes} selectedId={tinkerSel} setSelectedId={setTinkerSel} mode={tinkerMode} />
+          ) : tab === 'voxel' ? (
             <VoxelBuilder voxels={voxels} color={voxelColor} modo={voxelModo} setVoxels={setVoxels} />
           ) : (
           <Canvas
@@ -336,6 +347,79 @@ export default function CADLab() {
         {/* RIGHT PANEL */}
         <div className="w-72 bg-labdark-bg border-l border-gray-700/50 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-3 space-y-3">
+
+            {/* ── DISEÑAR (TINKERCAD) ── */}
+            {tab === 'disenar' && (() => {
+              const sel = tinkerShapes.find(s => s.id === tinkerSel) || null
+              const addShape = (type: TShape['type']) => {
+                const id = 't' + Date.now().toString(36)
+                setTinkerShapes(prev => [...prev, { id, type, color: '#38bdf8', position: [0, 0.6, 0], rotation: [0, 0, 0], scale: [1, 1, 1] }])
+                setTinkerSel(id)
+              }
+              const dupSel = () => {
+                if (!sel) return
+                const id = 't' + Date.now().toString(36)
+                setTinkerShapes(prev => [...prev, { ...sel, id, position: [sel.position[0] + 1, sel.position[1], sel.position[2] + 1] }])
+                setTinkerSel(id)
+              }
+              const delSel = () => { if (!sel) return; setTinkerShapes(prev => prev.filter(s => s.id !== sel.id)); setTinkerSel(null) }
+              const setColor = (c: string) => { if (!sel) return; setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, color: c } : s)) }
+              const figuras: { t: TShape['type']; e: string; n: string }[] = [
+                { t: 'box', e: '🧊', n: 'Cubo' }, { t: 'sphere', e: '⚪', n: 'Esfera' }, { t: 'cylinder', e: '🥫', n: 'Cilindro' }, { t: 'cone', e: '🔺', n: 'Cono' }, { t: 'torus', e: '🍩', n: 'Dona' },
+              ]
+              return (
+                <>
+                  <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-2.5 flex items-start gap-2">
+                    <Info className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-gray-400 text-[10px] leading-relaxed">Agrega figuras, tócalas para seleccionarlas y usa las <b className="text-cyan-300">manijas</b> para mover, girar o escalar. Arrastra el fondo para rotar la cámara.</p>
+                  </div>
+                  <div>
+                    <h4 className="text-white text-xs font-bold mb-1.5">Agregar figura</h4>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {figuras.map(f => (
+                        <button key={f.t} onClick={() => addShape(f.t)} className="py-2 rounded-lg text-[11px] font-medium bg-gray-700/40 text-gray-200 hover:bg-cyan-500/20 hover:text-cyan-200 transition-colors flex flex-col items-center gap-0.5">
+                          <span className="text-base leading-none">{f.e}</span>{f.n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-white text-xs font-bold mb-1.5">Herramienta</h4>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {([['translate', '✋ Mover'], ['rotate', '🔄 Girar'], ['scale', '⤢ Escalar']] as [TMode, string][]).map(([m, lbl]) => (
+                        <button key={m} onClick={() => setTinkerMode(m)} className={`py-2 rounded-lg text-[11px] font-bold transition-colors ${tinkerMode === m ? 'bg-cyan-500 text-white' : 'bg-gray-700/40 text-gray-300 hover:bg-gray-700/60'}`}>{lbl}</button>
+                      ))}
+                    </div>
+                  </div>
+                  {sel ? (
+                    <div className="space-y-2 bg-gray-700/20 rounded-lg p-2.5">
+                      <div className="text-[11px] text-gray-300 font-bold">Figura seleccionada</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {['#ef4444', '#f59e0b', '#22c55e', '#38bdf8', '#a855f7', '#ec4899', '#ffffff', '#6b4f2a'].map(c => (
+                          <button key={c} onClick={() => setColor(c)} style={{ background: c }} className={`w-6 h-6 rounded-md border-2 ${sel.color === c ? 'border-white' : 'border-black/30'}`} />
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <button onClick={dupSel} className="py-1.5 rounded-lg text-[11px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60">Duplicar</button>
+                        <button onClick={delSel} className="py-1.5 rounded-lg text-[11px] font-medium bg-red-500/20 text-red-300 hover:bg-red-500/30 flex items-center justify-center gap-1"><Trash2 className="w-3 h-3" /> Borrar</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[10px] text-gray-500">Toca una figura en la escena para editarla.</p>
+                  )}
+                  <div>
+                    <h4 className="text-white text-xs font-bold mb-1.5">🎯 Retos</h4>
+                    <div className="space-y-1 text-[11px] text-gray-300">
+                      <div className="bg-gray-700/20 rounded p-2">🚗 Un <b>carro</b>: una caja + 4 cilindros (ruedas).</div>
+                      <div className="bg-gray-700/20 rounded p-2">⛄ Un <b>muñeco</b>: dos esferas + un cono.</div>
+                      <div className="bg-gray-700/20 rounded p-2">🏠 Una <b>casa</b>: una caja + un cono de techo.</div>
+                      <div className="bg-gray-700/20 rounded p-2">⭐ <b>Libre:</b> diseña y pulsa «Enviar al profesor».</div>
+                    </div>
+                  </div>
+                  <div className="text-[10px] text-gray-500">Figuras: <span className="text-white font-bold">{tinkerShapes.length}</span></div>
+                </>
+              )
+            })()}
 
             {/* ── CONSTRUYE (BLOQUES) ── */}
             {tab === 'voxel' && (
