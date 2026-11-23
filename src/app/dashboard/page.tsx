@@ -10,7 +10,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { useMyScope } from '@/hooks/useMyScope'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import {
-  Bot, Brain, Shield, BookOpen, ArrowRight, Play,
+  Bot, Brain, Shield, ArrowRight, Play,
   Cpu, Loader2, Sparkles, Trophy, Zap, Target, Crown, ClipboardList
 } from 'lucide-react'
 import BadgesDisplay from '@/components/BadgesDisplay'
@@ -57,14 +57,6 @@ const QUICK_ACTIONS: Action[] = [
     color: 'gold',
     title: 'Simuladores',
     description: () => 'Laboratorio virtual'
-  },
-  {
-    id: 'levels',
-    href: () => '/niveles',
-    icon: BookOpen,
-    color: 'green',
-    title: 'Niveles',
-    description: () => 'Ver todos los cursos'
   }
 ]
 
