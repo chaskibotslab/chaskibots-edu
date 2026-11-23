@@ -1702,9 +1702,10 @@ interface HackingTerminalProps {
   levelId: string
   userId?: string
   userName?: string
+  toolMode?: boolean
 }
 
-export default function HackingTerminal({ levelId, userId, userName }: HackingTerminalProps) {
+export default function HackingTerminal({ levelId, userId, userName, toolMode }: HackingTerminalProps) {
   const { user } = useAuth()
 
   const [output, setOutput] = useState<OutputLine[]>([
@@ -1728,7 +1729,7 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
   const [historyIndex, setHistoryIndex] = useState(-1)
 
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [showCurriculum, setShowCurriculum] = useState(true)
+  const [showCurriculum, setShowCurriculum] = useState(!toolMode)
   const [showLessonPanel, setShowLessonPanel] = useState(false)
 
   const [modules, setModules] = useState<ApiModule[]>([])
