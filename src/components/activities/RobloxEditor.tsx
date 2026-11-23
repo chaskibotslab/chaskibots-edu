@@ -728,7 +728,7 @@ print("Nivel: " .. nivel)`)
                   )}
                 </button>
                 {activeGuide === idx && (
-                  <div className="p-3 bg-gray-900/50 border-t border-gray-700">
+                  <div className="p-3 bg-[#161B2E]/50 border-t border-gray-700">
                     <p className="text-sm text-gray-600 mb-3">{guide.content}</p>
                     <div className="grid gap-2">
                       {guide.examples.map((example, exIdx) => (
@@ -765,7 +765,7 @@ print("Nivel: " .. nivel)`)
       {/* Editor */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Code Editor */}
-        <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-700">
+        <div className="bg-[#161B2E] rounded-xl overflow-hidden border border-gray-700">
           <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-red-500" />
@@ -797,14 +797,14 @@ print("Nivel: " .. nivel)`)
           <textarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="w-full h-64 p-4 bg-gray-900 text-blue-400 font-mono text-sm resize-none focus:outline-none"
+            className="w-full h-64 p-4 bg-[#161B2E] text-blue-400 font-mono text-sm resize-none focus:outline-none"
             spellCheck={false}
             placeholder="-- Escribe tu código Lua aquí"
           />
         </div>
 
         {/* Output */}
-        <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-700">
+        <div className="bg-[#161B2E] rounded-xl overflow-hidden border border-gray-700">
           <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
             <div className="flex items-center gap-2">
               <Box className="w-4 h-4 text-gray-600" />

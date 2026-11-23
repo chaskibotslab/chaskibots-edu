@@ -614,6 +614,11 @@ export default function PythonIDE() {
   // ─── RENDER ───────────────────────────────────────────────
   return (
     <div className={`flex flex-col bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[820px]'}`}>
+      <style>{`
+        @keyframes tnEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .tn-entra { animation: tnEntra .35s ease-out both; }
+        @media (prefers-reduced-motion: reduce) { .tn-entra { animation: none; } }
+      `}</style>
       {/* ═══ TOP BAR ═══ */}
       <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-labdark-bg via-labdark-bg2 to-labdark-bg border-b border-gray-700/50">
         <div className="flex items-center gap-3">
@@ -684,6 +689,12 @@ export default function PythonIDE() {
               {completedLessons.size > 0 && (
                 <p className="text-[11px] text-gray-500 mt-1">⭐ {completedLessons.size} lecciones completadas</p>
               )}
+            </div>
+
+            {/* Bienvenida para principiantes */}
+            <div className="tn-entra m-2 p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30">
+              <div className="text-[11px] text-blue-200 font-bold">👋 ¿Primera vez?</div>
+              <div className="text-[10px] text-gray-400 leading-snug mt-0.5">Toca una lección de abajo para aprender paso a paso, o escribe código en el editor y pulsa <span className="text-green-300 font-semibold">Ejecutar</span>.</div>
             </div>
 
             {/* Modules List */}

@@ -781,10 +781,10 @@ loss = [2.0 * math.exp(-e/4) + random.uniform(0, 0.05) for e in epochs]
 
 # Crear figura con 2 subgraficos, estilo dark
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-fig.patch.set_facecolor('#0d1117')
+fig.patch.set_facecolor('#10131F')
 
 for ax in (ax1, ax2):
-    ax.set_facecolor('#161b22')
+    ax.set_facecolor('#161B2E')
     ax.tick_params(colors='white')
     for spine in ax.spines.values():
         spine.set_color('gray')
@@ -808,9 +808,9 @@ accuracy = [0.5 + 0.45 * (1 - math.exp(-e/5)) + random.uniform(-0.02, 0.02) for 
 loss = [2.0 * math.exp(-e/4) + random.uniform(0, 0.05) for e in epochs]
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-fig.patch.set_facecolor('#0d1117')
+fig.patch.set_facecolor('#10131F')
 for ax in (ax1, ax2):
-    ax.set_facecolor('#161b22')
+    ax.set_facecolor('#161B2E')
     ax.tick_params(colors='white')
     for spine in ax.spines.values():
         spine.set_color('gray')
@@ -2582,9 +2582,14 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
   const progressPct = totalExercises > 0 ? (completedExercises.size / totalExercises) * 100 : 0
 
   return (
-    <div className={`flex flex-col bg-[#0d1117] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[850px]'}`}>
+    <div className={`flex flex-col bg-[#10131F] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[850px]'}`}>
+      <style>{`
+        @keyframes tnEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .tn-entra { animation: tnEntra .35s ease-out both; }
+        @media (prefers-reduced-motion: reduce) { .tn-entra { animation: none; } }
+      `}</style>
       {/* TOP BAR */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#0d1117] via-[#130d1a] to-[#0d1117] border-b border-gray-700/50">
+      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#10131F] via-[#141829] to-[#10131F] border-b border-gray-700/50">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:brightness-125" onClick={() => setIsFullscreen(false)} />
@@ -2619,13 +2624,18 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
       <div className="flex flex-1 overflow-hidden">
         {/* LEFT SIDEBAR */}
         {showCurriculum && (
-          <div className="w-72 bg-[#0d1117] border-r border-gray-700/50 flex flex-col overflow-hidden">
+          <div className="w-72 bg-[#10131F] border-r border-gray-700/50 flex flex-col overflow-hidden">
             <div className="p-3 border-b border-gray-700/50">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-white text-sm font-bold flex items-center gap-2"><Brain className="w-4 h-4 text-purple-400" /> Ejercicios IA</h3>
                 <span className="text-[11px] text-gray-500">{completedExercises.size}/{totalExercises}</span>
               </div>
               <div className="h-2 bg-gray-700/50 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500" style={{ width: `${progressPct}%` }} /></div>
+            </div>
+            {/* Bienvenida para principiantes */}
+            <div className="tn-entra m-2 p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30">
+              <div className="text-[11px] text-purple-200 font-bold">👋 ¿Primera vez?</div>
+              <div className="text-[10px] text-gray-400 leading-snug mt-0.5">Toca un ejercicio de IA de abajo. Trae el código listo: solo pulsa <span className="text-green-300 font-semibold">Ejecutar</span> y mira el resultado.</div>
             </div>
             <div className="flex flex-wrap gap-1 p-2 border-b border-gray-700/30">
               {EXERCISE_CATEGORIES.map(cat => {
@@ -2671,9 +2681,9 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
 
         {/* CENTER: EDITOR */}
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-center bg-[#161b22] border-b border-gray-700/50 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center bg-[#161B2E] border-b border-gray-700/50 overflow-x-auto scrollbar-hide">
             {files.map((file, idx) => (
-              <button key={idx} onClick={() => setActiveFile(idx)} className={`group flex items-center gap-1.5 px-4 py-2 text-xs border-r border-gray-700/30 min-w-0 transition-colors ${idx === activeFile ? 'bg-[#0d1117] text-white border-t-2 border-t-purple-500' : 'text-gray-500 hover:text-gray-300 hover:bg-[#0d1117]/50'}`}>
+              <button key={idx} onClick={() => setActiveFile(idx)} className={`group flex items-center gap-1.5 px-4 py-2 text-xs border-r border-gray-700/30 min-w-0 transition-colors ${idx === activeFile ? 'bg-[#10131F] text-white border-t-2 border-t-purple-500' : 'text-gray-500 hover:text-gray-300 hover:bg-[#10131F]/50'}`}>
                 <File className="w-3 h-3 text-purple-400 flex-shrink-0" />
                 <span className="truncate max-w-[100px]">{file.name}</span>
                 {files.length > 1 && <span onClick={(e) => { e.stopPropagation(); deleteFile(idx) }} className="ml-1 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-opacity"><X className="w-3 h-3" /></span>}
@@ -2682,7 +2692,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
             <button onClick={createFile} className="px-3 py-2 text-gray-600 hover:text-gray-300 hover:bg-gray-700/30 transition-colors" title="Nuevo archivo"><Plus className="w-3.5 h-3.5" /></button>
           </div>
           {activeExercise && activeExercise.steps.length > 1 && (
-            <div className="flex items-center gap-3 px-4 py-2 bg-[#0d1117] border-b border-gray-700/50">
+            <div className="flex items-center gap-3 px-4 py-2 bg-[#10131F] border-b border-gray-700/50">
               <button onClick={() => goToStep(currentStepIndex - 1)} disabled={currentStepIndex === 0} className="p-1 rounded text-gray-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -2708,7 +2718,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
             />
           </div>
           {/* Action Bar */}
-          <div className="flex items-center justify-between px-4 py-2.5 bg-[#161b22] border-t border-gray-700/50">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-[#161B2E] border-t border-gray-700/50">
             <div className="flex items-center gap-2">
               <button onClick={runCode} disabled={isRunning || !pyodideReady} className="flex items-center gap-1.5 px-4 py-1.5 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all shadow-sm shadow-green-600/20 hover:shadow-green-500/30">
                 {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
@@ -2729,7 +2739,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
             </div>
           </div>
           {/* Camara web (activar_camara()/tomar_foto()/cerrar_camara()) */}
-          <div className={`px-4 py-2 border-t border-gray-700/50 bg-[#161b22] items-center gap-3 ${cameraActive ? 'flex' : 'hidden'}`}>
+          <div className={`px-4 py-2 border-t border-gray-700/50 bg-[#161B2E] items-center gap-3 ${cameraActive ? 'flex' : 'hidden'}`}>
             <video ref={cameraVideoRef} autoPlay playsInline muted className="w-40 h-28 rounded-lg border border-green-500/40 bg-black object-cover" />
             <div className="flex-1">
               <div className="text-green-400 text-xs font-bold flex items-center gap-1.5"><Camera className="w-3.5 h-3.5" /> Camara activa</div>
@@ -2742,7 +2752,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
 
           {/* Imagen subida (subir_imagen() / obtener_imagen()) */}
           {uploadedFileName && (
-            <div className="px-4 py-1.5 border-t border-gray-700/50 bg-[#161b22] flex items-center gap-2 text-[11px] text-cyan-300">
+            <div className="px-4 py-1.5 border-t border-gray-700/50 bg-[#161B2E] flex items-center gap-2 text-[11px] text-cyan-300">
               <Upload className="w-3.5 h-3.5" /> Imagen subida: <span className="font-medium text-gray-200">{uploadedFileName}</span>
               <span className="text-gray-500">- usa obtener_imagen() en tu codigo</span>
             </div>
@@ -2750,7 +2760,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
 
           {/* Monitor Serial (conectar_arduino() / enviar_dato() / leer_linea()) */}
           {serialState.connected && (
-            <div className="border-t border-gray-700/50 bg-[#161b22]">
+            <div className="border-t border-gray-700/50 bg-[#161B2E]">
               <div className="px-4 py-1.5 flex items-center gap-2">
                 <Usb className="w-3.5 h-3.5 text-green-400" />
                 <span className="text-green-400 text-[11px] font-bold">● Conectado - {serialState.baudRate} baud</span>
@@ -2771,7 +2781,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
           {/* Terminal Output */}
           {showTerminal && (
             <div className="h-72 border-t border-gray-700/50 flex flex-col">
-              <div className="flex items-center justify-between px-4 py-1.5 bg-[#161b22] border-b border-gray-700/30">
+              <div className="flex items-center justify-between px-4 py-1.5 bg-[#161B2E] border-b border-gray-700/30">
                 <div className="flex items-center gap-2"><TerminalIcon className="w-3.5 h-3.5 text-green-400" /><span className="text-[11px] text-gray-400 font-medium">Terminal {'\u2014'} Python 3.11 (Pyodide)</span></div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => setOutput(['\u{1F9E0} Terminal limpia'])} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50 transition-colors" title="Limpiar"><Trash2 className="w-3 h-3" /></button>
@@ -2811,7 +2821,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
 
         {/* RIGHT: THEORY PANEL */}
         {showTheoryPanel && activeExercise && (
-          <div className="w-80 bg-[#0d1117] border-l border-gray-700/50 flex flex-col overflow-hidden">
+          <div className="w-80 bg-[#10131F] border-l border-gray-700/50 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between p-3 border-b border-gray-700/50">
               <h3 className="text-white text-sm font-bold truncate">{activeExercise.icon} {activeExercise.title}</h3>
               <button onClick={() => setShowTheoryPanel(false)} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50"><X className="w-3.5 h-3.5" /></button>

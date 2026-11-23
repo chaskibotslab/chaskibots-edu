@@ -765,9 +765,14 @@ export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
 
   // ─── RENDER ───────────────────────────────────────────────
   return (
-    <div className={`flex flex-col bg-[#0d1117] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[750px]'}`}>
+    <div className={`flex flex-col bg-[#10131F] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[750px]'}`}>
+      <style>{`
+        @keyframes tnEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .tn-entra { animation: tnEntra .35s ease-out both; }
+        @media (prefers-reduced-motion: reduce) { .tn-entra { animation: none; } }
+      `}</style>
       {/* ═══ TOP BAR ═══ */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#0d1117] via-[#161b22] to-[#0d1117] border-b border-gray-700/50">
+      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#10131F] via-[#161B2E] to-[#10131F] border-b border-gray-700/50">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:brightness-125" onClick={() => setIsFullscreen(false)} />
@@ -814,7 +819,7 @@ export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
         
         {/* ─── LEFT: CURRICULUM SIDEBAR ─── */}
         {showCurriculum && (
-          <div className="w-72 bg-[#0d1117] border-r border-gray-700/50 flex flex-col overflow-hidden">
+          <div className="w-72 bg-[#10131F] border-r border-gray-700/50 flex flex-col overflow-hidden">
             {/* Progress Header */}
             <div className="p-3 border-b border-gray-700/50">
               <div className="flex items-center justify-between mb-2">
@@ -830,6 +835,12 @@ export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
               {completedLessons.size > 0 && (
                 <p className="text-[11px] text-gray-500 mt-1">⭐ {completedLessons.size} lecciones completadas</p>
               )}
+            </div>
+
+            {/* Bienvenida para principiantes */}
+            <div className="tn-entra m-2 p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30">
+              <div className="text-[11px] text-blue-200 font-bold">👋 ¿Primera vez?</div>
+              <div className="text-[10px] text-gray-400 leading-snug mt-0.5">Escribe <code className="text-green-300">help</code> para ver los comandos, o toca uno de los "Comandos rápidos" de abajo. Luego abre una lección.</div>
             </div>
 
             {/* Modules List */}
@@ -931,7 +942,7 @@ export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
           <div
             ref={terminalRef}
             onClick={focusInput}
-            className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[13px] leading-relaxed bg-[#0d1117] cursor-text"
+            className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[13px] leading-relaxed bg-[#10131F] cursor-text"
           >
             {output.map((line, idx) => (
               <div key={idx} className={`${
@@ -970,7 +981,7 @@ export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
           </div>
 
           {/* Action Bar */}
-          <div className="flex items-center justify-between px-4 py-2.5 bg-[#161b22] border-t border-gray-700/50">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-[#161B2E] border-t border-gray-700/50">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setOutput([])}
@@ -1020,7 +1031,7 @@ export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
 
         {/* ─── RIGHT: LESSON PANEL ─── */}
         {showLessonPanel && (activeLesson || lessonLoading) && (
-          <div className="w-80 bg-[#0d1117] border-l border-gray-700/50 flex flex-col overflow-hidden">
+          <div className="w-80 bg-[#10131F] border-l border-gray-700/50 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between p-3 border-b border-gray-700/50">
               <h3 className="text-white text-sm font-bold truncate">{activeLesson?.title || 'Cargando...'}</h3>
               <button onClick={() => setShowLessonPanel(false)} className="text-gray-500 hover:text-gray-300 p-1 rounded hover:bg-gray-700/50">
