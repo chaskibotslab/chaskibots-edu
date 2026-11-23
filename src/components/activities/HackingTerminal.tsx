@@ -142,13 +142,87 @@ function checkPasswordStrength(password: string): { score: number; label: string
   return { score, label: labels[Math.min(score, labels.length - 1)], tips }
 }
 
-function processCommand(
+// Divide una línea por tuberías "|" respetando comillas: "a | b" -> ["a", "b"].
+export function dividirPipes(input: string): string[] {
+  const etapas: string[] = []
+  let actual = '', comilla = ''
+  for (const ch of input) {
+    if (comilla) { if (ch === comilla) comilla = ''; actual += ch }
+    else if (ch === '"' || ch === "'") { comilla = ch; actual += ch }
+    else if (ch === '|') { etapas.push(actual.trim()); actual = '' }
+    else actual += ch
+  }
+  etapas.push(actual.trim())
+  return etapas.filter(Boolean)
+}
+
+// Manuales reales y en español para `man <comando>`.
+const MANUALES: Record<string, { uso: string; que: string; ejemplo: string }> = {
+  ls: { uso: 'ls [-l -a] [ruta]', que: 'Lista archivos y carpetas. -l muestra detalles, -a incluye ocultos.', ejemplo: 'ls -la /home/hacker' },
+  cd: { uso: 'cd <ruta>', que: 'Cambia de carpeta. Usa .. para subir y ~ para tu carpeta.', ejemplo: 'cd /var/log' },
+  cat: { uso: 'cat <archivo>', que: 'Muestra el contenido de un archivo en pantalla.', ejemplo: 'cat /etc/passwd' },
+  grep: { uso: 'grep [-i -v -c -n -r] <patrón> <archivo>', que: 'Busca texto. Encadénalo con | para filtrar la salida de otro comando.', ejemplo: 'cat /var/log/auth.log | grep Failed' },
+  find: { uso: 'find [ruta] -name "<patrón>" -type f', que: 'Busca archivos por nombre dentro de una ruta.', ejemplo: 'find / -name "*.conf"' },
+  wc: { uso: 'wc [-l -w -c] <archivo>', que: 'Cuenta líneas (-l), palabras (-w) o caracteres (-c).', ejemplo: 'cat /etc/passwd | wc -l' },
+  sort: { uso: 'sort [-r] <archivo>', que: 'Ordena líneas alfabéticamente. -r en orden inverso.', ejemplo: 'cat wordlists/common_passwords.txt | sort' },
+  uniq: { uso: 'uniq [-c] <archivo>', que: 'Quita líneas repetidas seguidas. -c las cuenta.', ejemplo: 'cat lista.txt | sort | uniq -c' },
+  cut: { uso: 'cut -d <sep> -f <n>', que: 'Corta columnas de cada línea separadas por un carácter.', ejemplo: 'cat /etc/passwd | cut -d : -f 1' },
+  nmap: { uso: 'nmap [-sV -sС --script vuln] <ip>', que: 'Escanea puertos y servicios de un objetivo autorizado.', ejemplo: 'nmap -sV 10.0.0.10' },
+  whois: { uso: 'whois <dominio>', que: 'Consulta quién registró un dominio (reconocimiento pasivo).', ejemplo: 'whois target-corp.com' },
+  dig: { uso: 'dig <dominio>', que: 'Consulta registros DNS de un dominio.', ejemplo: 'dig target-corp.com' },
+  nslookup: { uso: 'nslookup <dominio>', que: 'Resuelve el nombre de un dominio a su dirección IP.', ejemplo: 'nslookup target-corp.com' },
+  ping: { uso: 'ping [-c N] <host>', que: 'Comprueba si un equipo responde y mide el tiempo de ida y vuelta.', ejemplo: 'ping -c 4 10.0.0.10' },
+  traceroute: { uso: 'traceroute <host>', que: 'Muestra los saltos de red hasta llegar al objetivo.', ejemplo: 'traceroute target-corp.com' },
+  netstat: { uso: 'netstat [-tlnp]', que: 'Muestra conexiones y puertos abiertos del sistema.', ejemplo: 'netstat -tlnp' },
+  sudo: { uso: 'sudo <comando>', que: 'Ejecuta un comando con permisos de administrador (root).', ejemplo: 'sudo cat /etc/shadow' },
+  chmod: { uso: 'chmod <permisos> <archivo>', que: 'Cambia los permisos de un archivo (ej. 755, 644).', ejemplo: 'chmod 600 clave.txt' },
+  hash: { uso: 'hash <texto>', que: 'Calcula una huella del texto. Nunca guardes contraseñas sin hash.', ejemplo: 'hash chaskibots' },
+  encrypt: { uso: 'encrypt <texto> <n>', que: 'Cifra con el método César (educativo, no es seguro).', ejemplo: 'encrypt hola 3' },
+  decrypt: { uso: 'decrypt <texto> <n>', que: 'Descifra un mensaje cifrado con César.', ejemplo: 'decrypt krod 3' },
+  passcheck: { uso: 'passcheck [contraseña]', que: 'Evalúa qué tan fuerte es una contraseña.', ejemplo: 'passcheck MiClave123!' },
+  'url-check': { uso: 'url-check <url>', que: 'Revisa si un enlace es falso (phishing) comparándolo con el sitio oficial.', ejemplo: 'url-check http://targ3t-corp.com' },
+  iptables: { uso: 'iptables -A INPUT -s <ip> -j DROP', que: 'Regla de firewall para bloquear a un atacante por su IP.', ejemplo: 'iptables -A INPUT -s 10.0.0.99 -j DROP' },
+  sqli: { uso: 'sqli <url>', que: 'Demuestra una inyección SQL en un objetivo de práctica.', ejemplo: 'sqli http://10.0.0.10/login' },
+}
+
+// Procesa una línea completa: aplica tuberías "a | b | c" y redirección "> archivo" (simulada),
+// delegando cada etapa en ejecutarUno y pasando la salida de una como entrada de la siguiente.
+export function processCommand(
   input: string,
   cwd: string,
   setCwd: (p: string) => void,
   history: string[],
   isSudo: boolean,
   userFiles: any[] = []
+): OutputLine[] {
+  let base = input
+  let nota: OutputLine[] = []
+  const redir = base.match(/\s>>?\s*[^\s|>]+\s*$/)
+  if (redir) {
+    const archivo = redir[0].replace(/[\s>]+/g, '')
+    base = base.slice(0, redir.index).trim()
+    nota = [{ text: `💾 (simulado) la salida se guardaría en ${archivo}`, type: 'info' }]
+  }
+  const etapas = dividirPipes(base)
+  if (etapas.length === 0) return nota
+  let salida: OutputLine[] = []
+  let stdin: string[] | undefined
+  for (const etapa of etapas) {
+    salida = ejecutarUno(etapa, cwd, setCwd, history, isSudo, userFiles, stdin)
+    stdin = salida.map(l => l.text)
+  }
+  return [...salida, ...nota]
+}
+
+// Ejecuta UN solo comando (sin tuberías). `stdin` trae la salida del comando anterior en una tubería.
+function ejecutarUno(
+  input: string,
+  cwd: string,
+  setCwd: (p: string) => void,
+  history: string[],
+  isSudo: boolean,
+  userFiles: any[] = [],
+  stdin?: string[]
 ): OutputLine[] {
   const parts = input.trim().match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) || []
   const cmd = parts[0]?.toLowerCase()
@@ -271,28 +345,175 @@ function processCommand(
     }
 
     case 'grep': {
-      if (args.length < 2) return [{ text: 'uso: grep <patrón> <archivo>', type: 'error' }]
-      const pattern = args[0]
-      const target = resolvePath(args[1])
-      const node = getNode(target)
-      if (!node || node.type === 'dir') return [{ text: `grep: ${args[1]}: No es un archivo`, type: 'error' }]
-      const lines = node.content.split('\n').filter((l: string) => l.toLowerCase().includes(pattern.toLowerCase()))
-      if (lines.length === 0) return [{ text: '(sin coincidencias)', type: 'warning' }]
-      return lines.map((l: string) => ({ text: l.replace(new RegExp(`(${pattern})`, 'gi'), '[$1]'), type: 'success' as const }))
+      const flags = args.filter(a => a.startsWith('-'))
+      const rest = args.filter(a => !a.startsWith('-'))
+      const pattern = rest[0]
+      if (!pattern) return [{ text: 'uso: grep [-i -v -c -n -r] <patrón> <archivo>', type: 'error' }]
+      const invertir = flags.includes('-v'), contar = flags.includes('-c'), numerar = flags.includes('-n')
+      const coincide = (l: string) => l.toLowerCase().includes(pattern.toLowerCase())
+      let entradas: { prefijo?: string; linea: string }[] = []
+      if (stdin) {
+        entradas = stdin.map(linea => ({ linea }))
+      } else if (flags.includes('-r')) {
+        const base = resolvePath(rest[1] || '.')
+        Object.keys(FILE_SYSTEM).forEach(ruta => {
+          const n = FILE_SYSTEM[ruta]
+          if (ruta.startsWith(base) && n.type === 'file' && !n.protected && typeof n.content === 'string')
+            n.content.split('\n').forEach((linea: string) => entradas.push({ prefijo: ruta, linea }))
+        })
+      } else {
+        const node = getNode(resolvePath(rest[1] || ''))
+        if (!node || node.type === 'dir') return [{ text: `grep: ${rest[1] || ''}: No es un archivo`, type: 'error' }]
+        entradas = node.content.split('\n').map((linea: string) => ({ linea }))
+      }
+      const hits = entradas.map((e, i) => ({ ...e, i: i + 1 })).filter(e => coincide(e.linea) !== invertir)
+      if (contar) return [{ text: String(hits.length), type: 'normal' }]
+      if (hits.length === 0) return [{ text: '(sin coincidencias)', type: 'warning' }]
+      return hits.map(e => {
+        const marcada = invertir ? e.linea : e.linea.replace(new RegExp(`(${pattern})`, 'gi'), '[$1]')
+        const t = `${e.prefijo ? e.prefijo + ': ' : ''}${numerar ? e.i + ': ' : ''}${marcada}`
+        return { text: t, type: 'success' as const }
+      })
     }
 
-    case 'head': {
-      const target = resolvePath(args[0] || '')
-      const node = getNode(target)
-      if (!node || node.type === 'dir') return [{ text: `head: ${args[0] || ''}: error`, type: 'error' }]
-      return node.content.split('\n').slice(0, 5).map((l: string) => ({ text: l, type: 'normal' as const }))
+    case 'wc': {
+      const flags = args.filter(a => a.startsWith('-'))
+      const rest = args.filter(a => !a.startsWith('-'))
+      let contenido: string
+      if (stdin) contenido = stdin.join('\n')
+      else { const node = getNode(resolvePath(rest[0] || '')); if (!node || node.type === 'dir') return [{ text: `wc: ${rest[0] || ''}: No es un archivo`, type: 'error' }]; contenido = node.content }
+      const nl = contenido === '' ? 0 : contenido.split('\n').length
+      const nw = contenido.split(/\s+/).filter(Boolean).length
+      const nc = contenido.length
+      if (flags.includes('-l')) return [{ text: String(nl), type: 'normal' }]
+      if (flags.includes('-w')) return [{ text: String(nw), type: 'normal' }]
+      if (flags.includes('-c')) return [{ text: String(nc), type: 'normal' }]
+      return [{ text: `  ${nl}  ${nw}  ${nc}`, type: 'normal' }]
     }
 
+    case 'sort': {
+      const flags = args.filter(a => a.startsWith('-'))
+      const rest = args.filter(a => !a.startsWith('-'))
+      let lineas: string[]
+      if (stdin) lineas = [...stdin]
+      else { const node = getNode(resolvePath(rest[0] || '')); if (!node || node.type === 'dir') return [{ text: `sort: ${rest[0] || ''}: No es un archivo`, type: 'error' }]; lineas = node.content.split('\n') }
+      lineas.sort((a, b) => a.localeCompare(b, 'es'))
+      if (flags.includes('-r')) lineas.reverse()
+      return lineas.map(l => ({ text: l, type: 'normal' as const }))
+    }
+
+    case 'uniq': {
+      const contar = args.includes('-c')
+      const rest = args.filter(a => !a.startsWith('-'))
+      let lineas: string[]
+      if (stdin) lineas = [...stdin]
+      else { const node = getNode(resolvePath(rest[0] || '')); if (!node || node.type === 'dir') return [{ text: `uniq: ${rest[0] || ''}: No es un archivo`, type: 'error' }]; lineas = node.content.split('\n') }
+      const salida: OutputLine[] = []
+      let previa: string | null = null, n = 0
+      const volcar = () => { if (previa !== null) salida.push({ text: contar ? `${String(n).padStart(4)} ${previa}` : previa, type: 'normal' }) }
+      for (const l of lineas) { if (l === previa) n++; else { volcar(); previa = l; n = 1 } }
+      volcar()
+      return salida
+    }
+
+    case 'cut': {
+      const dIdx = args.indexOf('-d'), fIdx = args.indexOf('-f')
+      const sep = dIdx >= 0 ? (args[dIdx + 1] || '').replace(/^["']|["']$/g, '') : '\t'
+      const campo = fIdx >= 0 ? parseInt(args[fIdx + 1]) : 1
+      const rest = args.filter((a, i) => !a.startsWith('-') && i !== dIdx + 1 && i !== fIdx + 1)
+      let lineas: string[]
+      if (stdin) lineas = stdin
+      else { const node = getNode(resolvePath(rest[0] || '')); if (!node || node.type === 'dir') return [{ text: `cut: ${rest[0] || ''}: No es un archivo`, type: 'error' }]; lineas = node.content.split('\n') }
+      return lineas.map(l => ({ text: l.split(sep)[campo - 1] ?? '', type: 'normal' as const }))
+    }
+
+    case 'ping': {
+      const host = args.find(a => !a.startsWith('-')) || ''
+      if (!host) return [{ text: 'uso: ping [-c N] <host>', type: 'error' }]
+      const cIdx = args.indexOf('-c')
+      const n = cIdx >= 0 ? Math.min(parseInt(args[cIdx + 1]) || 4, 8) : 4
+      const ip = host.includes('target') ? '10.0.0.10' : host
+      const lineas: OutputLine[] = [{ text: `PING ${host} (${ip}) 56(84) bytes of data.`, type: 'info' }]
+      for (let i = 0; i < n; i++) lineas.push({ text: `64 bytes from ${ip}: icmp_seq=${i + 1} ttl=63 time=${(Math.random() * 8 + 1).toFixed(1)} ms`, type: 'normal' })
+      lineas.push({ text: '', type: 'normal' }, { text: `--- ${host} ping statistics ---`, type: 'info' }, { text: `${n} packets transmitted, ${n} received, 0% packet loss`, type: 'success' })
+      return lineas
+    }
+
+    case 'traceroute': {
+      const host = args[0]
+      if (!host) return [{ text: 'uso: traceroute <host>', type: 'error' }]
+      return [
+        { text: `traceroute to ${host} (10.0.0.10), 30 hops max`, type: 'info' },
+        { text: ' 1  router.local (192.168.1.1)   1.2 ms', type: 'normal' },
+        { text: ' 2  10.0.0.1 (10.0.0.1)          4.8 ms', type: 'normal' },
+        { text: ' 3  target-corp.com (10.0.0.10)  9.1 ms', type: 'success' },
+      ]
+    }
+
+    case 'last':
+      return [
+        { text: 'hacker   pts/0   192.168.1.50   ' + new Date().toLocaleDateString('es-EC') + '   still logged in', type: 'success' },
+        { text: 'admin    pts/1   10.0.0.99      Jun 15 03:12   gone - no logout', type: 'warning' },
+        { text: 'root     tty1    -              Jun 15 03:13   00:05', type: 'warning' },
+      ]
+
+    case 'lastb':
+      return [
+        { text: 'root     ssh:notty   10.0.0.99   Jun 15 03:11   (00:00)', type: 'error' },
+        { text: 'root     ssh:notty   10.0.0.99   Jun 15 03:11   (00:00)', type: 'error' },
+        { text: 'admin    ssh:notty   10.0.0.99   Jun 15 03:11   (00:00)', type: 'error' },
+        { text: '⚠️ Múltiples intentos fallidos desde 10.0.0.99 — posible fuerza bruta', type: 'warning' },
+      ]
+
+    case 'tcpdump':
+      return [
+        { text: 'tcpdump: listening on eth0, link-type EN10MB (Ethernet)', type: 'system' },
+        { text: '10:00:01 IP 10.0.0.99.51260 > 10.0.0.10.22: Flags [S], seq 1001', type: 'normal' },
+        { text: '10:00:01 IP 10.0.0.10.22 > 10.0.0.99.51260: Flags [S.], seq 2001', type: 'normal' },
+        { text: '10:00:02 IP 10.0.0.99.51261 > 10.0.0.10.80: Flags [P.], length 325', type: 'warning' },
+        { text: '⚠️ [SIMULACIÓN] Capturar tráfico real requiere autorización explícita', type: 'warning' },
+      ]
+
+    case 'wireshark':
+      return [{ text: '🦈 Wireshark es una app gráfica; aquí usa tcpdump para ver el tráfico en texto.', type: 'info' }]
+
+    case 'url-check': {
+      const url = args[0]
+      if (!url) return [{ text: 'uso: url-check <url>   (ejemplo: url-check http://targ3t-corp.com)', type: 'error' }]
+      const dominio = url.replace(/^https?:\/\//, '').split('/')[0].toLowerCase()
+      const oficial = 'target-corp.com'
+      const esHttps = url.toLowerCase().startsWith('https://')
+      const pareceOficial = dominio === oficial
+      const seParece = !pareceOficial && (dominio.replace(/[0-9]/g, 'e').includes('target') || dominio.includes('corp'))
+      const lineas: OutputLine[] = [
+        { text: `🔎 Analizando el enlace: ${url}`, type: 'info' },
+        { text: `   Dominio real al que apunta: ${dominio}`, type: 'normal' },
+        { text: esHttps ? '✅ Usa HTTPS: la conexión va cifrada.' : '⚠️ No usa HTTPS: los datos viajarían sin protección.', type: esHttps ? 'success' : 'warning' },
+      ]
+      if (pareceOficial && esHttps) {
+        lineas.push({ text: '✅ Es el sitio OFICIAL. Es seguro ingresar tus datos.', type: 'success' })
+      } else if (seParece) {
+        lineas.push(
+          { text: `🚨 ¡ALERTA DE PHISHING! El dominio imita a "${oficial}" con letras o números cambiados.`, type: 'error' },
+          { text: '   No ingreses tus datos. Escribe tú mismo la dirección oficial en el navegador.', type: 'warning' },
+        )
+      } else {
+        lineas.push({ text: '❔ Dominio desconocido. Verifica siempre antes de poner usuario o contraseña.', type: 'warning' })
+      }
+      return lineas
+    }
+
+    case 'head':
     case 'tail': {
-      const target = resolvePath(args[0] || '')
-      const node = getNode(target)
-      if (!node || node.type === 'dir') return [{ text: `tail: ${args[0] || ''}: error`, type: 'error' }]
-      return node.content.split('\n').slice(-5).map((l: string) => ({ text: l, type: 'normal' as const }))
+      const nIdx = args.indexOf('-n')
+      const numArg = args.find(a => /^-\d+$/.test(a))
+      const n = nIdx >= 0 ? (parseInt(args[nIdx + 1]) || 10) : numArg ? parseInt(numArg.slice(1)) : 10
+      const rest = args.filter((a, i) => !a.startsWith('-') && i !== nIdx + 1)
+      let lineas: string[]
+      if (stdin) lineas = stdin
+      else { const node = getNode(resolvePath(rest[0] || '')); if (!node || node.type === 'dir') return [{ text: `${cmd}: ${rest[0] || ''}: No es un archivo`, type: 'error' }]; lineas = node.content.split('\n') }
+      const corte = cmd === 'head' ? lineas.slice(0, n) : lineas.slice(-n)
+      return corte.map(l => ({ text: l, type: 'normal' as const }))
     }
 
     case 'chmod':
@@ -368,14 +589,18 @@ function processCommand(
       ]
 
     case 'man': {
-      if (!args[0]) return [{ text: '¿Qué manual deseas? Uso: man <comando>', type: 'error' }]
+      if (!args[0]) return [{ text: 'uso: man <comando>  (ejemplo: man grep)', type: 'error' }]
+      const m = MANUALES[args[0].toLowerCase()]
+      if (!m) return [{ text: `No hay manual para "${args[0]}". Escribe 'help' para ver los comandos disponibles.`, type: 'warning' }]
       return [
-        { text: `╔══════════════════════════════════════╗`, type: 'info' },
-        { text: `║  MANUAL: ${args[0].padEnd(26)}║`, type: 'info' },
-        { text: `╠══════════════════════════════════════╣`, type: 'info' },
-        { text: `║  Herramienta de hacking ético         ║`, type: 'normal' },
-        { text: `║  Usa 'help' para ver todos los comandos║`, type: 'normal' },
-        { text: `╚══════════════════════════════════════╝`, type: 'info' },
+        { text: 'NOMBRE', type: 'info' },
+        { text: `    ${args[0].toLowerCase()} — ${m.que}`, type: 'normal' },
+        { text: '', type: 'normal' },
+        { text: 'USO', type: 'info' },
+        { text: `    ${m.uso}`, type: 'normal' },
+        { text: '', type: 'normal' },
+        { text: 'EJEMPLO', type: 'info' },
+        { text: `    ${m.ejemplo}`, type: 'success' },
       ]
     }
 
@@ -925,9 +1150,13 @@ function processCommand(
         { text: '║ PYTHON:      python <archivo.py>, run, edit              ║', type: 'normal' },
         { text: '║ HERRAMIENTAS: crypto (visual), passcheck (visual), webcam║', type: 'normal' },
         { text: '║ OTROS:       echo, clear, history, man, help, ps, top    ║', type: 'normal' },
+        { text: '║ RED:         ping, traceroute, netstat, ss, tcpdump, last║', type: 'normal' },
+        { text: '║ FILTROS:     wc, sort, uniq, cut, head, tail  (con | tube║', type: 'normal' },
         { text: '╚══════════════════════════════════════════════════════════╝', type: 'info' },
         { text: '', type: 'normal' },
-        { text: '💡 Tip: "help <comando>" no está disponible — usa man <comando>', type: 'success' },
+        { text: '💡 Tip: usa "man <comando>" para la ayuda de cada uno (ej. man nmap)', type: 'success' },
+        { text: '🔗 Puedes encadenar comandos con | y guardar con > , como en Linux real', type: 'success' },
+        { text: '   Ejemplo: cat /var/log/auth.log | grep Failed | wc -l', type: 'info' },
         { text: '🎯 Reto final: sudo cat /root/flag.txt', type: 'warning' },
       ]
 
@@ -959,6 +1188,8 @@ interface MissionStep {
   title: string
   description: string
   hint: string
+  ejemplo?: string   // comando exacto que el alumno puede tocar para ejecutar
+  concepto?: string  // "qué aprendí": la idea del mundo real detrás del paso
   validator: (cmd: string, history: string[]) => boolean
   xp: number
   successMessage: string
@@ -1242,6 +1473,204 @@ const MISSIONS: Mission[] = [
     ],
     completionFlag: 'FLAG{p3n7357_c0mpl3t0_ch4sk1b0ts_2024}',
     debriefing: '📋 REPORTE FINAL DE PENTEST:\n═══════════════════════════\n• Cliente: Target Corporation S.A.\n• Alcance: target-corp.com + red interna 10.0.0.0/24\n\n• HALLAZGOS CRÍTICOS:\n  1. [CRÍTICO] SQL Injection en /admin/login\n  2. [ALTO] Código fuente expuesto (/.git)\n  3. [ALTO] Credenciales en config.yml sin cifrar\n  4. [MEDIO] Apache 2.4.29 desactualizado\n  5. [BAJO] robots.txt revela rutas internas\n\n• IMPACTO: Acceso root completo al servidor\n• REMEDIACIÓN: Prepared statements, hardening SSH, cifrar configs, actualizar software\n\n¡FELICIDADES! Has completado todas las misiones. 🎓',
+  },
+  {
+    id: 'passwords-seguras',
+    title: '🔐 Caso real: Protege tu cuenta',
+    briefing: 'La forma más común de que roben una cuenta es una contraseña débil. En este caso vas a ver, con tus propios ojos, por qué una buena contraseña te protege.',
+    difficulty: 'easy',
+    xpTotal: 120,
+    steps: [
+      {
+        id: 'pw-debil',
+        title: 'Paso 1: Mira una contraseña débil',
+        description: 'Revisa qué tan segura es la contraseña más usada del mundo: 123456',
+        hint: 'Toca el comando de ejemplo y pulsa Enter.',
+        ejemplo: 'passcheck 123456',
+        concepto: 'Las contraseñas más comunes (123456, "password") se adivinan en menos de un segundo. Nunca las uses.',
+        validator: (cmd) => cmd.toLowerCase().includes('passcheck'),
+        xp: 30,
+        successMessage: '✅ ¿Viste? "123456" es "Muy débil". Un atacante la rompe al instante.',
+      },
+      {
+        id: 'pw-crack',
+        title: 'Paso 2: Así se roban las débiles',
+        description: 'Mira cómo un atacante descifra una contraseña débil guardada sin protección.',
+        hint: 'Comando de ejemplo abajo.',
+        ejemplo: 'crack-dict admin 5f4dcc3b',
+        concepto: 'Si un sitio guarda las contraseñas sin cifrar bien, un robo de datos las deja todas al descubierto.',
+        validator: (cmd) => cmd.toLowerCase().includes('crack-dict'),
+        xp: 30,
+        successMessage: '✅ El atacante encontró la contraseña en 0.8 segundos. Por eso importa guardar bien los datos.',
+      },
+      {
+        id: 'pw-fuerte',
+        title: 'Paso 3: Crea una contraseña fuerte',
+        description: 'Prueba una contraseña larga, con mayúsculas, números y símbolos.',
+        hint: 'Comando de ejemplo abajo.',
+        ejemplo: 'passcheck Ch@ski2026!Lab',
+        concepto: 'Una buena contraseña es larga y única para cada sitio. Un gestor de contraseñas te ayuda a recordarlas.',
+        validator: (cmd) => cmd.toLowerCase().includes('passcheck') && cmd.length > 18,
+        xp: 30,
+        successMessage: '✅ ¡Esa sí es fuerte! Larga y con símbolos: muy difícil de adivinar.',
+      },
+      {
+        id: 'pw-hash',
+        title: 'Paso 4: Guárdala de forma segura',
+        description: 'Mira cómo los sitios deberían guardar las contraseñas: convertidas en un "hash".',
+        hint: 'Comando de ejemplo abajo.',
+        ejemplo: 'hash-password Ch@ski2026!Lab',
+        concepto: 'Los sitios serios guardan un hash (bcrypt/argon2), no tu contraseña real. Así, aunque los roben, no la ven.',
+        validator: (cmd) => cmd.toLowerCase().includes('hash-password'),
+        xp: 30,
+        successMessage: '🏴 ¡Completado! Ya sabes elegir y proteger contraseñas.',
+      },
+    ],
+    completionFlag: 'FLAG{cuenta_pr0t3g1d4}',
+    debriefing: '📋 QUÉ APRENDISTE:\n• Las contraseñas comunes se rompen al instante.\n• Usa contraseñas largas, con símbolos y únicas.\n• Activa la verificación en dos pasos (2FA).\n• Un gestor de contraseñas te las recuerda por ti.',
+  },
+  {
+    id: 'cazar-intrusos',
+    title: '🕵️ Caso real: Cazadores de intrusos',
+    briefing: 'Alguien está intentando entrar a tu servidor probando miles de contraseñas. Vas a jugar de DEFENSOR: detéctalo en los registros y bloquéalo.',
+    difficulty: 'easy',
+    xpTotal: 140,
+    steps: [
+      {
+        id: 'in-logs',
+        title: 'Paso 1: Revisa los registros',
+        description: 'Busca los intentos de entrada FALLIDOS en el registro de seguridad del sistema.',
+        hint: 'Puedes encadenar comandos con | (tubería).',
+        ejemplo: 'cat /var/log/auth.log | grep Failed',
+        concepto: 'Cada equipo guarda "logs" (registros). Ahí quedan las huellas de quien intenta entrar.',
+        validator: (cmd) => cmd.toLowerCase().includes('grep') && cmd.toLowerCase().includes('failed'),
+        xp: 35,
+        successMessage: '✅ Hay varios intentos fallidos de "root" y "admin". Algo raro pasa.',
+      },
+      {
+        id: 'in-contar',
+        title: 'Paso 2: ¿Cuántos intentos fueron?',
+        description: 'Cuenta cuántos intentos fallidos hubo usando wc -l al final de la tubería.',
+        hint: 'Agrega | wc -l para contar las líneas.',
+        ejemplo: 'cat /var/log/auth.log | grep Failed | wc -l',
+        concepto: 'Muchos intentos seguidos en poco tiempo = ataque de "fuerza bruta" (probar contraseñas sin parar).',
+        validator: (cmd) => cmd.toLowerCase().includes('wc') && cmd.toLowerCase().includes('failed'),
+        xp: 35,
+        successMessage: '✅ Son demasiados intentos juntos. Confirmado: es un ataque de fuerza bruta.',
+      },
+      {
+        id: 'in-ip',
+        title: 'Paso 3: ¿Quién es el atacante?',
+        description: 'Mira la lista de accesos fallidos para descubrir desde qué dirección IP atacan.',
+        hint: 'Comando de ejemplo abajo.',
+        ejemplo: 'lastb',
+        concepto: 'Cada equipo en la red tiene una IP, como una dirección de casa. Así identificamos al atacante.',
+        validator: (cmd) => cmd.toLowerCase().includes('lastb'),
+        xp: 35,
+        successMessage: '✅ El atacante viene de la IP 10.0.0.99. Ya lo tenemos ubicado.',
+      },
+      {
+        id: 'in-bloquear',
+        title: 'Paso 4: Bloquea al atacante',
+        description: 'Usa el firewall para bloquear la IP 10.0.0.99 y cortarle el paso.',
+        hint: 'Comando de ejemplo abajo.',
+        ejemplo: 'iptables -A INPUT -s 10.0.0.99 -j DROP',
+        concepto: 'El firewall decide quién entra y quién no. Herramientas como fail2ban bloquean solas a los atacantes.',
+        validator: (cmd) => cmd.toLowerCase().includes('iptables'),
+        xp: 35,
+        successMessage: '🏴 ¡Atacante bloqueado! Defendiste el servidor como un profesional.',
+      },
+    ],
+    completionFlag: 'FLAG{d3f3ns0r_d3_r3d}',
+    debriefing: '📋 QUÉ APRENDISTE:\n• Los logs delatan a los atacantes.\n• Muchos intentos seguidos = fuerza bruta.\n• Bloquea por IP con el firewall.\n• Activa 2FA y limita los intentos de login.',
+  },
+  {
+    id: 'correo-trampa',
+    title: '🎣 Caso real: El correo trampa (phishing)',
+    briefing: 'Te llega un correo que parece de tu banco con un enlace para "verificar tu cuenta". ¿Es real o es una trampa? Aprende a descubrirlo ANTES de hacer clic.',
+    difficulty: 'easy',
+    xpTotal: 110,
+    steps: [
+      {
+        id: 'ph-sospechoso',
+        title: 'Paso 1: Revisa el enlace del correo',
+        description: 'Analiza el enlace que venía en el correo sospechoso, sin hacer clic en él.',
+        hint: 'Fíjate bien en cómo está escrito el dominio.',
+        ejemplo: 'url-check http://targ3t-corp.com/login',
+        concepto: 'Los estafadores usan dominios casi iguales al real (targ3t en vez de target). Se llama "typosquatting".',
+        validator: (cmd) => cmd.toLowerCase().includes('url-check'),
+        xp: 35,
+        successMessage: '🚨 ¡Era una trampa! El dominio imita al oficial cambiando una letra por un número.',
+      },
+      {
+        id: 'ph-ssl',
+        title: 'Paso 2: Comprueba el sitio oficial',
+        description: 'Revisa el certificado de seguridad del sitio verdadero.',
+        hint: 'Comando de ejemplo abajo.',
+        ejemplo: 'ssl-check target-corp.com',
+        concepto: 'Los sitios legítimos tienen HTTPS con un certificado válido. El candado del navegador es tu amigo.',
+        validator: (cmd) => cmd.toLowerCase().includes('ssl-check'),
+        xp: 35,
+        successMessage: '✅ El sitio oficial tiene certificado válido. Esa es la diferencia con la copia falsa.',
+      },
+      {
+        id: 'ph-oficial',
+        title: 'Paso 3: Entra solo al sitio real',
+        description: 'Verifica la dirección oficial escrita con HTTPS, la que SÍ es segura.',
+        hint: 'Comando de ejemplo abajo.',
+        ejemplo: 'url-check https://target-corp.com',
+        concepto: 'Regla de oro: nunca entres por el enlace de un correo. Escribe tú mismo la dirección oficial.',
+        validator: (cmd) => cmd.toLowerCase().includes('url-check') && cmd.toLowerCase().includes('https'),
+        xp: 40,
+        successMessage: '🏴 ¡Completado! Ya sabes reconocer un correo trampa.',
+      },
+    ],
+    completionFlag: 'FLAG{n0_c41g0_3n_ph1sh1ng}',
+    debriefing: '📋 QUÉ APRENDISTE:\n• Revisa bien el dominio: una letra cambiada = trampa.\n• No hagas clic en enlaces de correos; escribe tú la dirección.\n• Busca el candado (HTTPS) y el certificado.\n• Ante la duda, no ingreses tus datos.',
+  },
+  {
+    id: 'fuga-datos',
+    title: '💾 Caso real: Secretos al descubierto',
+    briefing: 'Eres auditor de seguridad. Una empresa dejó información sensible expuesta por error. Encuéntrala para que puedan taparla antes de que lo haga un atacante.',
+    difficulty: 'easy',
+    xpTotal: 130,
+    steps: [
+      {
+        id: 'fd-dork',
+        title: 'Paso 1: Busca archivos expuestos',
+        description: 'Usa una búsqueda avanzada (Google Dork) para hallar archivos sensibles publicados por error.',
+        hint: 'Comando de ejemplo abajo.',
+        ejemplo: 'dork site:target-corp.com filetype:txt password',
+        concepto: 'Los buscadores indexan TODO lo que queda público, incluso archivos que nadie debería ver.',
+        validator: (cmd) => cmd.toLowerCase().includes('dork'),
+        xp: 40,
+        successMessage: '✅ Apareció un archivo de respaldo con una contraseña dentro. Eso no debería ser público.',
+      },
+      {
+        id: 'fd-grep',
+        title: 'Paso 2: Busca contraseñas en el servidor',
+        description: 'Busca la palabra "password" dentro de todos los archivos de configuración del servidor.',
+        hint: 'grep -r busca dentro de toda una carpeta.',
+        ejemplo: 'grep -r password /opt',
+        concepto: 'Un error común: dejar contraseñas escritas dentro del código o la configuración.',
+        validator: (cmd) => cmd.toLowerCase().includes('grep') && cmd.includes('-r'),
+        xp: 45,
+        successMessage: '✅ ¡Encontrada! Hay una contraseña escrita dentro de config.yml.',
+      },
+      {
+        id: 'fd-config',
+        title: 'Paso 3: Confirma el hallazgo',
+        description: 'Abre el archivo de configuración para documentar el problema en tu informe.',
+        hint: 'Comando de ejemplo abajo.',
+        ejemplo: 'cat /opt/targetcorp/config.yml',
+        concepto: 'Solución: nunca guardes secretos en el código. Usa variables de entorno o un gestor de secretos.',
+        validator: (cmd) => cmd.toLowerCase().includes('cat') && cmd.toLowerCase().includes('config'),
+        xp: 45,
+        successMessage: '🏴 ¡Completado! Documentaste la fuga para que la empresa la corrija.',
+      },
+    ],
+    completionFlag: 'FLAG{aud1t0r_d3_s3cr3t0s}',
+    debriefing: '📋 QUÉ APRENDISTE:\n• Lo público queda indexado por los buscadores.\n• Nunca escribas contraseñas dentro del código.\n• Usa variables de entorno o gestores de secretos.\n• Revisa tus repositorios antes de publicarlos.',
   },
 ]
 
@@ -1531,6 +1960,7 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
             { text: `▶ ${m.steps[0].title}`, type: 'info' },
             { text: `  ${m.steps[0].description}`, type: 'normal' },
             { text: `  💡 Pista: ${m.steps[0].hint}`, type: 'warning' },
+            ...(m.steps[0].ejemplo ? [{ text: `  ⌨️ Prueba escribir:  ${m.steps[0].ejemplo}`, type: 'success' as const }] : []),
             { text: '', type: 'normal' },
           ])
           return
@@ -1611,6 +2041,7 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
             { text: '', type: 'normal' },
             { text: '═'.repeat(56), type: 'success' },
             { text: currentStep.successMessage, type: 'success' },
+            ...(currentStep.concepto ? [{ text: `💡 Qué aprendí: ${currentStep.concepto}`, type: 'info' as const }] : []),
             { text: '', type: 'normal' },
             { text: `🏴 ¡MISIÓN COMPLETADA! +${currentStep.xp} XP`, type: 'success' },
             { text: `   Flag: ${activeMission.completionFlag}`, type: 'warning' },
@@ -1636,10 +2067,12 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
           setOutput(prev => [...prev,
             { text: '', type: 'normal' },
             { text: `${currentStep.successMessage}  (+${currentStep.xp} XP)`, type: 'success' },
+            ...(currentStep.concepto ? [{ text: `💡 Qué aprendí: ${currentStep.concepto}`, type: 'info' as const }] : []),
             { text: '', type: 'normal' },
             { text: `▶ ${next.title}`, type: 'info' },
             { text: `  ${next.description}`, type: 'normal' },
             { text: `  💡 Pista: ${next.hint}`, type: 'warning' },
+            ...(next.ejemplo ? [{ text: `  ⌨️ Prueba escribir:  ${next.ejemplo}`, type: 'success' as const }] : []),
             { text: '', type: 'normal' },
           ])
         }
@@ -1767,6 +2200,11 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
 
   return (
     <div className={`flex flex-col bg-[#0d1117] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[750px]'}`}>
+      <style>{`
+        @keyframes tnEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .tn-entra { animation: tnEntra .35s ease-out both; }
+        @media (prefers-reduced-motion: reduce) { .tn-entra { animation: none; } }
+      `}</style>
       {/* ═══ TOP BAR ═══ */}
       <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#0d1117] via-[#1a0d0d] to-[#0d1117] border-b border-gray-700/50">
         <div className="flex items-center gap-3">
@@ -1916,28 +2354,50 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
               })}
             </div>
 
-            {/* ─── MISIONES CTF ─── */}
+            {/* ─── CASOS REALES (MISIONES) ─── */}
             <div className="p-3 border-t border-gray-700/50">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-gray-300 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5">
-                  <Trophy className="w-3 h-3 text-orange-400" /> Misiones CTF
+                  <Trophy className="w-3 h-3 text-orange-400" /> Casos reales
                 </h4>
                 <span className="text-[10px] text-orange-400 font-bold">{totalXP} XP</span>
               </div>
 
-              {/* Active mission indicator */}
-              {activeMission && (
-                <div className="mb-2 p-2 rounded-lg bg-orange-500/10 border border-orange-500/30">
-                  <div className="text-[10px] text-orange-300 font-medium truncate">{activeMission.title}</div>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <div className="flex-1 h-1.5 bg-gray-700/50 rounded-full overflow-hidden">
-                      <div className="h-full bg-orange-400 rounded-full transition-all" style={{ width: `${(missionStep / activeMission.steps.length) * 100}%` }} />
+              {/* Tarjeta de misión activa: objetivo claro + comando de ejemplo clicable */}
+              {activeMission && (() => {
+                const paso = activeMission.steps[missionStep]
+                const pct = Math.round((missionStep / activeMission.steps.length) * 100)
+                return (
+                  <div key={paso?.id || 'fin'} className="tn-entra mb-2 p-3 rounded-xl bg-gradient-to-br from-orange-500/15 to-red-500/10 border border-orange-500/40 shadow-lg shadow-orange-500/5">
+                    <div className="text-[11px] text-orange-200 font-bold leading-tight mb-2">{activeMission.title}</div>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <div className="flex-1 h-2 bg-black/30 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-orange-400 to-green-400 rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="text-[9px] text-orange-300 font-bold whitespace-nowrap">Paso {Math.min(missionStep + 1, activeMission.steps.length)}/{activeMission.steps.length}</span>
                     </div>
-                    <span className="text-[9px] text-gray-400">{missionStep}/{activeMission.steps.length}</span>
+                    {paso && (
+                      <>
+                        <div className="text-[11px] text-white font-semibold leading-snug">🎯 {paso.title}</div>
+                        <div className="text-[10px] text-gray-300 leading-snug mt-0.5">{paso.description}</div>
+                        {paso.ejemplo && (
+                          <button
+                            onClick={() => { setInputValue(paso.ejemplo!); focusInput() }}
+                            className="group mt-2 w-full flex items-center gap-2 px-2.5 py-2 rounded-lg bg-black/40 border border-green-500/40 hover:border-green-400 hover:bg-green-500/10 transition-all text-left animate-pulse hover:animate-none"
+                            title="Toca para escribir el comando; luego pulsa Enter"
+                          >
+                            <span className="text-green-400 text-xs">⌨️</span>
+                            <code className="flex-1 text-[10px] text-green-300 font-mono truncate">{paso.ejemplo}</code>
+                            <span className="text-[8px] text-gray-500 group-hover:text-green-400 whitespace-nowrap">escribir ↵</span>
+                          </button>
+                        )}
+                        <div className="text-[9px] text-amber-300/80 mt-1.5">💡 {paso.hint}</div>
+                      </>
+                    )}
+                    <button onClick={() => executeCommand('mission abort')} className="mt-2 text-[9px] text-gray-500 hover:text-red-400 transition-colors">✕ Salir del caso</button>
                   </div>
-                  <div className="text-[9px] text-gray-500 mt-1">{activeMission.steps[missionStep]?.title}</div>
-                </div>
-              )}
+                )
+              })()}
 
               {activeMission && (
                 <div className="mb-2">
@@ -1945,29 +2405,49 @@ export default function HackingTerminal({ levelId, userId, userName }: HackingTe
                 </div>
               )}
 
-              <div className="space-y-1 max-h-32 overflow-y-auto">
-                {MISSIONS.map((m, i) => (
-                  <button
-                    key={m.id}
-                    onClick={() => executeCommand(`mission start ${i + 1}`)}
-                    className={`w-full text-left px-2 py-1.5 rounded-md text-[10px] flex items-center gap-1.5 transition-all ${
-                      completedMissions.has(m.id) ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
-                      activeMission?.id === m.id ? 'bg-orange-500/10 text-orange-300 border border-orange-500/30' :
-                      'bg-gray-700/30 text-gray-400 hover:bg-red-500/10 hover:text-red-300 border border-transparent'
-                    }`}
-                  >
-                    {completedMissions.has(m.id) ? <CheckCircle2 className="w-3 h-3" /> : <Circle className="w-3 h-3" />}
-                    <span className="flex-1 truncate">{m.title.replace(/[🔍⚡🔬🛡️🏴]\s*/, '')}</span>
-                    <span className={`text-[8px] px-1 py-0.5 rounded ${DIFFICULTY_COLOR[m.difficulty]}`}>{m.xpTotal}xp</span>
-                  </button>
+              {/* Bienvenida para principiantes cuando no hay caso activo */}
+              {!activeMission && (
+                <div className="tn-entra mb-2 p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                  <div className="text-[11px] text-blue-200 font-bold">👋 ¿Primera vez?</div>
+                  <div className="text-[10px] text-gray-400 leading-snug mt-0.5">Elige un caso de abajo. Te guío paso a paso y te doy el comando listo para tocar.</div>
+                </div>
+              )}
+
+              {/* Lista de casos: primero los fáciles para empezar */}
+              <div className="space-y-2 max-h-52 overflow-y-auto pr-0.5">
+                {[
+                  { etiqueta: '🟢 Para empezar', filtro: (m: Mission) => m.difficulty === 'easy' },
+                  { etiqueta: '🔴 Más retos', filtro: (m: Mission) => m.difficulty !== 'easy' },
+                ].map(grupo => (
+                  <div key={grupo.etiqueta}>
+                    <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1 px-0.5">{grupo.etiqueta}</div>
+                    <div className="space-y-1">
+                      {MISSIONS.map((m, i) => ({ m, i })).filter(({ m }) => grupo.filtro(m)).map(({ m, i }) => (
+                        <button
+                          key={m.id}
+                          onClick={() => executeCommand(`mission start ${i + 1}`)}
+                          className={`w-full text-left px-2 py-2 rounded-lg text-[10px] flex items-center gap-1.5 transition-all ${
+                            completedMissions.has(m.id) ? 'bg-green-500/10 text-green-300 border border-green-500/20' :
+                            activeMission?.id === m.id ? 'bg-orange-500/15 text-orange-200 border border-orange-500/40' :
+                            'bg-gray-700/30 text-gray-300 hover:bg-orange-500/10 hover:text-orange-200 border border-transparent hover:border-orange-500/30'
+                          }`}
+                        >
+                          {completedMissions.has(m.id) ? <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" /> : <Circle className="w-3.5 h-3.5 flex-shrink-0 opacity-60" />}
+                          <span className="flex-1 leading-tight">{m.title}</span>
+                          <span className="text-[8px] px-1 py-0.5 rounded bg-black/30 text-orange-300 whitespace-nowrap">{m.xpTotal}xp</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
 
-              {/* Quick commands */}
+              {/* Chuleta de comandos y ayuda siempre a mano */}
               <div className="mt-2 pt-2 border-t border-gray-700/30">
+                <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">Ayuda rápida</div>
                 <div className="flex flex-wrap gap-1">
-                  {['help', 'missions', 'mission status'].map(cmdStr => (
-                    <button key={cmdStr} onClick={() => executeCommand(cmdStr)} className="text-[9px] px-1.5 py-0.5 rounded bg-gray-700/50 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                  {['help', 'ls', 'mission status'].map(cmdStr => (
+                    <button key={cmdStr} onClick={() => { setInputValue(cmdStr); focusInput() }} className="text-[9px] px-1.5 py-1 rounded bg-gray-700/50 text-gray-400 hover:text-green-300 hover:bg-green-500/10 transition-all font-mono">
                       $ {cmdStr}
                     </button>
                   ))}
