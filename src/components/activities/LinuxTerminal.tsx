@@ -543,9 +543,10 @@ export function renderTheory(text: string) {
 interface LinuxTerminalProps {
   levelId: string
   userId?: string
+  toolMode?: boolean
 }
 
-export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
+export default function LinuxTerminal({ levelId, userId, toolMode }: LinuxTerminalProps) {
   const { user } = useAuth()
 
   // Terminal state
@@ -566,7 +567,7 @@ export default function LinuxTerminal({ levelId, userId }: LinuxTerminalProps) {
 
   // UI state
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [showCurriculum, setShowCurriculum] = useState(true)
+  const [showCurriculum, setShowCurriculum] = useState(!toolMode)
   const [showLessonPanel, setShowLessonPanel] = useState(false)
 
   // Curriculum (API)

@@ -2324,9 +2324,9 @@ const DEFAULT_FILES: VirtualFile[] = [
 // ============================================================
 // COMPONENT
 // ============================================================
-interface AITerminalProps { levelId?: string; userId?: string; userName?: string }
+interface AITerminalProps { levelId?: string; userId?: string; userName?: string; toolMode?: boolean }
 
-export default function AITerminal({ levelId, userId, userName }: AITerminalProps) {
+export default function AITerminal({ levelId, userId, userName, toolMode }: AITerminalProps) {
   const { user } = useAuth()
 
   const [files, setFiles] = useState<VirtualFile[]>(() => {
@@ -2345,7 +2345,7 @@ export default function AITerminal({ levelId, userId, userName }: AITerminalProp
   const [isRunning, setIsRunning] = useState(false)
   const [pyodideReady, setPyodideReady] = useState(false)
   const [pyodideLoading, setPyodideLoading] = useState(false)
-  const [showCurriculum, setShowCurriculum] = useState(true)
+  const [showCurriculum, setShowCurriculum] = useState(!toolMode)
   const [showTerminal, setShowTerminal] = useState(true)
   const [showTheoryPanel, setShowTheoryPanel] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)

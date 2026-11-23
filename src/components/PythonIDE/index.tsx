@@ -159,7 +159,7 @@ if __name__ == "__main__":
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
-export default function PythonIDE() {
+export default function PythonIDE({ toolMode }: { toolMode?: boolean } = {}) {
   const { user } = useAuth()
 
   // Files & Editor (persistidos en localStorage — así un F5, necesario para
@@ -184,7 +184,7 @@ export default function PythonIDE() {
   const [pyodideLoading, setPyodideLoading] = useState(false)
 
   // UI
-  const [showCurriculum, setShowCurriculum] = useState(true)
+  const [showCurriculum, setShowCurriculum] = useState(!toolMode)
   const [showTerminal, setShowTerminal] = useState(true)
   const [showLessonPanel, setShowLessonPanel] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)

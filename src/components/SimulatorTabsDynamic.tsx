@@ -278,11 +278,11 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
         </div>
       ) : activeSimulator && INTERNAL_TOOL_IDS.includes(activeSimulator.id) ? (
         <div>
-          {activeSimulator.id === 'python-ide' && <PythonIDE />}
-          {activeSimulator.id === 'hacking-terminal' && <HackingTerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} />}
-          {activeSimulator.id === 'linux-terminal' && <LinuxTerminal levelId={levelId || ''} userId={user?.id} />}
+          {activeSimulator.id === 'python-ide' && <PythonIDE toolMode={!!levelId} />}
+          {activeSimulator.id === 'hacking-terminal' && <HackingTerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} toolMode={!!levelId} />}
+          {activeSimulator.id === 'linux-terminal' && <LinuxTerminal levelId={levelId || ''} userId={user?.id} toolMode={!!levelId} />}
           {activeSimulator.id === 'roblox-editor' && <RobloxEditor levelId={levelId || ''} />}
-          {activeSimulator.id === 'ai-terminal' && <AITerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} />}
+          {activeSimulator.id === 'ai-terminal' && <AITerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} toolMode={!!levelId} />}
           {activeSimulator.id === 'ai-lab' && <AILab />}
           {activeSimulator.id === 'cad-lab' && <CADLab />}
         </div>
