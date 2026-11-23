@@ -30,8 +30,10 @@ const HackingTerminal = dynamic(() => import('./activities/HackingTerminal'), { 
 const LinuxTerminal = dynamic(() => import('./activities/LinuxTerminal'), { ssr: false })
 const RobloxEditor = dynamic(() => import('./activities/RobloxEditor'), { ssr: false })
 const AITerminal = dynamic(() => import('./activities/AITerminal'), { ssr: false })
+const AILab = dynamic(() => import('./AILab'), { ssr: false })
+const CADLab = dynamic(() => import('./CADLab'), { ssr: false })
 
-const INTERNAL_TOOL_IDS = ['python-ide', 'hacking-terminal', 'linux-terminal', 'roblox-editor', 'ai-terminal']
+const INTERNAL_TOOL_IDS = ['python-ide', 'hacking-terminal', 'linux-terminal', 'roblox-editor', 'ai-terminal', 'ai-lab', 'cad-lab']
 
 interface Simulator {
   id: string
@@ -117,6 +119,22 @@ const chaskiBlocksIA: Simulator = {
   enabled: true
 }
 
+// Laboratorios propios de ChaskiBots (no externos): se muestran en el hub como un simulador más.
+const aiLab: Simulator = {
+  id: 'ai-lab', name: 'Laboratorio de IA', description: 'Entrena un modelo con tu cámara, voz y visión — ¡hecho por ChaskiBots!',
+  url: '', icon: 'eye', category: 'ia', levels: [], programs: [], enabled: true
+}
+const aiTerminal: Simulator = {
+  id: 'ai-terminal', name: 'Terminal de IA (Python)', description: 'Programa inteligencia artificial con Python real: redes neuronales, OpenCV y más',
+  url: '', icon: 'sparkles', category: 'ia', levels: [], programs: [], enabled: true
+}
+const cadLab: Simulator = {
+  id: 'cad-lab', name: 'Laboratorio CAD 3D', description: 'Visor 3D, constructor paramétrico y texto a 3D',
+  url: '', icon: 'box', category: '3d', levels: [], programs: [], enabled: true
+}
+// Orden de nuestras herramientas propias al inicio del hub.
+const NUESTROS: Simulator[] = [chaskiBlocksIA, chaskiBlocks, aiLab, aiTerminal, cadLab]
+
 interface SimulatorTabsDynamicProps {
   levelId?: string
   programId?: string
@@ -152,10 +170,10 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
       const enabledSimulators = list.filter((s: Simulator) => s.enabled)
       
       // Agregar ChaskiBlocks al inicio
-      setSimulators([chaskiBlocksIA, chaskiBlocks, ...enabledSimulators])
+      setSimulators([...NUESTROS, ...enabledSimulators])
       
       // Seleccionar el primero de la categoría activa
-      const firstInCategory = [chaskiBlocksIA, chaskiBlocks, ...enabledSimulators].find(
+      const firstInCategory = [...NUESTROS, ...enabledSimulators].find(
         s => (s.category || 'bloques') === activeCategory
       )
       setActiveSimulator(firstInCategory || chaskiBlocksIA)
@@ -163,7 +181,7 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
       console.error('Error loading simulators:', err)
       setError('No se pudieron cargar los simuladores')
       // Usar ChaskiBlocks como fallback
-      setSimulators([chaskiBlocksIA, chaskiBlocks])
+      setSimulators([...NUESTROS])
       setActiveSimulator(chaskiBlocksIA)
     }
     setLoading(false)
@@ -265,6 +283,8 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
           {activeSimulator.id === 'linux-terminal' && <LinuxTerminal levelId={levelId || ''} userId={user?.id} />}
           {activeSimulator.id === 'roblox-editor' && <RobloxEditor levelId={levelId || ''} />}
           {activeSimulator.id === 'ai-terminal' && <AITerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} />}
+          {activeSimulator.id === 'ai-lab' && <AILab />}
+          {activeSimulator.id === 'cad-lab' && <CADLab />}
         </div>
       ) : activeSimulator ? (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl shadow-chaski-primary/5">
