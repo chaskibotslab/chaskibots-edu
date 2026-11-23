@@ -2738,7 +2738,11 @@ export default function AITerminal({ levelId, userId, userName, toolMode }: AITe
               {activeExercise && <><div className="w-px h-5 bg-gray-700 mx-1" /><button onClick={markExerciseComplete} className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/80 hover:bg-purple-500 text-white rounded-lg text-xs font-medium transition-colors"><CheckCircle2 className="w-3.5 h-3.5" /> Completar</button></>}
             </div>
             <div className="flex items-center gap-2">
-              <input type="text" value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Tu nombre..." className="px-3 py-1.5 bg-gray-800/80 border border-gray-600/50 rounded-lg text-xs text-gray-300 w-32 placeholder:text-gray-600 focus:border-purple-500/50 focus:outline-none transition-colors" />
+              {user?.name ? (
+                <span className="px-2 py-1.5 text-[11px] text-gray-400 whitespace-nowrap">como <strong className="text-gray-200">{user.name}</strong></span>
+              ) : (
+                <input type="text" value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Tu nombre..." className="px-3 py-1.5 bg-gray-800/80 border border-gray-600/50 rounded-lg text-xs text-gray-300 w-32 placeholder:text-gray-600 focus:border-purple-500/50 focus:outline-none transition-colors" />
+              )}
               <button onClick={handleSendToTeacher} disabled={isSending || sendSuccess || !studentName.trim()} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${sendSuccess ? 'bg-green-600 text-white' : 'bg-purple-600/80 hover:bg-purple-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white'}`}>
                 {isSending ? <Loader2 className="w-3 h-3 animate-spin" /> : sendSuccess ? <Check className="w-3 h-3" /> : <Send className="w-3 h-3" />}
                 {sendSuccess ? 'Enviado' : 'Enviar'}
