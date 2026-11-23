@@ -453,6 +453,10 @@ export default function CADLab() {
                           ))}
                         </div>
                       </div>
+                      <div>
+                        <div className="text-[9px] text-gray-500 uppercase tracking-wide mb-0.5">Tamaño general — arrastra para agrandar/achicar</div>
+                        <input type="range" min={0.2} max={4} step={0.05} value={Math.abs(sel.scale[0])} onChange={e => { const v = parseFloat(e.target.value); setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, scale: [v, v, v] } : s)) }} className="w-full accent-cyan-500" />
+                      </div>
                       <div className="grid grid-cols-3 gap-1">
                         {(['X', 'Y', 'Z'] as const).map((ax, i) => (
                           <button key={'m' + ax} onClick={() => espejo(i)} className="py-1 rounded text-[10px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60">⇋ Espejo {ax}</button>

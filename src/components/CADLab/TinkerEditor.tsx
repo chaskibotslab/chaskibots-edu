@@ -45,6 +45,9 @@ function Piezas({
   // y la manija (gizmo) aparezca sobre la figura seleccionada desde el inicio.
   const [, setReady] = useState(false)
   useEffect(() => { setReady(true) }, [])
+  // Mientras se arrastra una manija, desactivamos la cámara para que el arrastre
+  // escale/mueva de verdad (y no rote la vista).
+  const [dragging, setDragging] = useState(false)
 
   const commit = () => {
     if (!selectedId) return
@@ -92,9 +95,9 @@ function Piezas({
         </mesh>
       ))}
 
-      {sel && <TransformControls object={sel} mode={mode} onMouseUp={commit} translationSnap={0.5} rotationSnap={Math.PI / 12} scaleSnap={0.25} />}
+      {sel && <TransformControls object={sel} mode={mode} size={0.9} onMouseDown={() => setDragging(true)} onMouseUp={() => { setDragging(false); commit() }} translationSnap={0.5} rotationSnap={Math.PI / 12} scaleSnap={0.25} />}
 
-      <OrbitControls makeDefault enablePan minDistance={3} maxDistance={40} maxPolarAngle={Math.PI / 2.02} />
+      <OrbitControls makeDefault enabled={!dragging} enablePan minDistance={3} maxDistance={40} maxPolarAngle={Math.PI / 2.02} />
     </>
   )
 }
