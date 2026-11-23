@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
+import SimHelp from '@/components/SimHelp'
 import {
   ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError,
   registerCameraVideoElement, onCameraStateChange, stopCamera as stopSharedCamera,
@@ -613,12 +614,18 @@ export default function PythonIDE({ toolMode }: { toolMode?: boolean } = {}) {
 
   // ─── RENDER ───────────────────────────────────────────────
   return (
-    <div className={`flex flex-col bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[820px]'}`}>
+    <div className={`relative flex flex-col bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[820px]'}`}>
       <style>{`
         @keyframes tnEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .tn-entra { animation: tnEntra .35s ease-out both; }
         @media (prefers-reduced-motion: reduce) { .tn-entra { animation: none; } }
       `}</style>
+      <SimHelp storageKey="help-python" titulo="Cómo usar el IDE de Python" pasos={[
+        { icon: '📋', title: 'Panel izquierdo', text: 'Elige una lección para aprender paso a paso.' },
+        { icon: '📝', title: 'Editor de código', text: 'En el centro escribes tu código Python.' },
+        { icon: '▶️', title: 'Ejecutar', text: 'Pulsa Ejecutar (o Ctrl+Enter) y mira el resultado abajo.' },
+        { icon: '⛶', title: 'Pantalla completa', text: 'Botón de arriba a la derecha para verlo más grande.' },
+      ]} />
       {/* ═══ TOP BAR ═══ */}
       <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-labdark-bg via-labdark-bg2 to-labdark-bg border-b border-gray-700/50">
         <div className="flex items-center gap-3">

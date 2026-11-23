@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '@/components/AuthProvider'
+import SimHelp from '@/components/SimHelp'
 import {
   ensurePyodide, runPython, installPyPackage, IMG_PREFIX, RELOAD_BUTTON_MARKER, isInputBlockedError,
   registerCameraVideoElement, onCameraStateChange, stopCamera as stopSharedCamera,
@@ -2582,12 +2583,18 @@ export default function AITerminal({ levelId, userId, userName, toolMode }: AITe
   const progressPct = totalExercises > 0 ? (completedExercises.size / totalExercises) * 100 : 0
 
   return (
-    <div className={`flex flex-col bg-[#10131F] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[850px]'}`}>
+    <div className={`relative flex flex-col bg-[#10131F] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[850px]'}`}>
       <style>{`
         @keyframes tnEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .tn-entra { animation: tnEntra .35s ease-out both; }
         @media (prefers-reduced-motion: reduce) { .tn-entra { animation: none; } }
       `}</style>
+      <SimHelp storageKey="help-ai" titulo="Cómo usar el Laboratorio de IA" pasos={[
+        { icon: '📋', title: 'Panel izquierdo', text: 'Elige un ejercicio de IA. Trae el código listo.' },
+        { icon: '📝', title: 'Editor de código', text: 'En el centro escribes o editas el código Python.' },
+        { icon: '▶️', title: 'Ejecutar', text: 'Pulsa Ejecutar y mira el resultado abajo, en la terminal.' },
+        { icon: '⛶', title: 'Pantalla completa', text: 'Botón de arriba a la derecha para verlo más grande.' },
+      ]} />
       {/* TOP BAR */}
       <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#10131F] via-[#141829] to-[#10131F] border-b border-gray-700/50">
         <div className="flex items-center gap-3">

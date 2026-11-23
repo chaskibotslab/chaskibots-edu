@@ -11,6 +11,7 @@ import {
 import { useAuth } from '@/components/AuthProvider'
 import { startCamera, stopCamera, registerCameraVideoElement, onCameraStateChange } from '@/lib/pythonRunner'
 import NetworkMapPanel from './NetworkMapPanel'
+import SimHelp from '@/components/SimHelp'
 
 // ============================================================
 // ACADEMY API TYPES (backed by Supabase: simulator_courses/modules/lessons)
@@ -2200,12 +2201,18 @@ export default function HackingTerminal({ levelId, userId, userName, toolMode }:
   const progressPct = totalLessons > 0 ? (completedLessons.size / totalLessons) * 100 : 0
 
   return (
-    <div className={`flex flex-col bg-[#10131F] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[750px]'}`}>
+    <div className={`relative flex flex-col bg-[#10131F] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'h-[750px]'}`}>
       <style>{`
         @keyframes tnEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .tn-entra { animation: tnEntra .35s ease-out both; }
         @media (prefers-reduced-motion: reduce) { .tn-entra { animation: none; } }
       `}</style>
+      <SimHelp storageKey="help-hacking" titulo="Cómo usar la Terminal de Hacking" pasos={[
+        { icon: '📋', title: 'Panel izquierdo', text: 'Elige una lección o un caso. Te guía paso a paso.' },
+        { icon: '⌨️', title: 'La terminal', text: 'Aquí escribes comandos y pulsas Enter. Empieza con: help' },
+        { icon: '👆', title: 'Comandos de ejemplo', text: 'Toca un comando sugerido y se escribe solo; luego pulsa Enter.' },
+        { icon: '⛶', title: 'Pantalla completa', text: 'Usa el botón de arriba a la derecha para verlo más grande.' },
+      ]} />
       {/* ═══ TOP BAR ═══ */}
       <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#10131F] via-[#1a0d0d] to-[#10131F] border-b border-gray-700/50">
         <div className="flex items-center gap-3">
