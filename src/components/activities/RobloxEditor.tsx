@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { 
+import {
   Play, RotateCcw, Copy, Check, ChevronRight, ChevronDown,
-  BookOpen, Code, Gamepad2, Lightbulb, Zap, Box, Users, Sparkles, Send
+  BookOpen, Gamepad2, Lightbulb, Zap, Box, Sparkles, Send,
+  Maximize2, Minimize2, Terminal, Trash2
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
+import { useExpand } from '@/hooks/useExpand'
 
 interface RobloxEditorProps {
   levelId: string
@@ -553,6 +555,7 @@ print("Nivel: " .. nivel)`)
   const [showGuides, setShowGuides] = useState(true)
   const [filterCategory, setFilterCategory] = useState<'todos' | 'basico' | 'intermedio' | 'avanzado'>('todos')
   const { user } = useAuth()
+  const { expanded, toggle, shellClass } = useExpand()
   const factoryRef = useRef<any>(null)
   const [enviando, setEnviando] = useState(false)
   const [enviado, setEnviado] = useState(false)
@@ -719,22 +722,30 @@ print("Nivel: " .. nivel)`)
       : guide.examples.filter(ex => ex.category === filterCategory)
   })).filter(guide => guide.examples.length > 0)
 
+  const panelH = expanded ? 'h-[calc(100vh-360px)] min-h-[260px]' : 'h-72'
+  const nivel = getLevel()
+
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2">
-          <Gamepad2 className="w-5 h-5 text-red-400" />
-          <h3 className="font-bold text-gray-900">Editor Roblox Lua</h3>
-          <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded">
-            {getLevel().charAt(0).toUpperCase() + getLevel().slice(1)}
+    <div className={`bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${shellClass}`}>
+      {/* ═══ HEADER ═══ */}
+      <div className="flex items-center justify-between gap-2 flex-wrap px-5 py-3 bg-gradient-to-r from-labdark-bg via-labdark-bg2 to-labdark-bg border-b border-gray-700/50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-red-500/20 border border-red-500/30 flex items-center justify-center">
+            <Gamepad2 className={`w-4 h-4 text-red-400 ${isRunning ? 'animate-bounce' : ''}`} />
+          </div>
+          <div>
+            <h2 className="text-white text-sm font-bold">Estudio Roblox — Lua</h2>
+            <p className="text-[10px] text-gray-500">Ejecuta Lua real en tu navegador</p>
+          </div>
+          <span className="px-2 py-0.5 bg-red-500/15 text-red-300 text-[10px] rounded-full border border-red-500/30 font-semibold capitalize">
+            {nivel}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value as any)}
-            className="px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-900"
+            className="px-2 py-1.5 bg-gray-800 border border-gray-600/60 rounded-lg text-xs text-gray-200 focus:outline-none focus:border-red-500/50"
           >
             <option value="todos">Todos los niveles</option>
             <option value="basico">Básico</option>
@@ -743,152 +754,150 @@ print("Nivel: " .. nivel)`)
           </select>
           <button
             onClick={() => setShowGuides(!showGuides)}
-            className="flex items-center gap-1 px-3 py-1 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors text-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/15 text-red-300 border border-red-500/30 rounded-lg hover:bg-red-500/25 transition-colors text-xs font-medium"
           >
-            <BookOpen className="w-4 h-4" />
-            {showGuides ? 'Ocultar' : 'Mostrar'} Guías
+            <BookOpen className="w-3.5 h-3.5" />
+            {showGuides ? 'Ocultar guías' : 'Ver guías'}
+          </button>
+          <button onClick={toggle} className="p-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 text-gray-400 transition-colors" title={expanded ? 'Salir de pantalla completa (Esc)' : 'Pantalla completa'}>
+            {expanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>
 
-      {/* Guides */}
-      {showGuides && (
-        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700 max-h-96 overflow-y-auto">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm text-gray-300">Guías de Roblox Studio</span>
-          </div>
-          <div className="space-y-2">
-            {filteredGuides.map((guide, idx) => (
-              <div key={idx} className="border border-gray-700 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setActiveGuide(activeGuide === idx ? null : idx)}
-                  className="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
-                >
-                  <span className="font-medium text-gray-900">{guide.title}</span>
-                  {activeGuide === idx ? (
-                    <ChevronDown className="w-4 h-4 text-gray-600" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-600" />
-                  )}
-                </button>
-                {activeGuide === idx && (
-                  <div className="p-3 bg-[#161B2E]/50 border-t border-gray-700">
-                    <p className="text-sm text-gray-600 mb-3">{guide.content}</p>
-                    <div className="grid gap-2">
-                      {guide.examples.map((example, exIdx) => (
-                        <button
-                          key={exIdx}
-                          onClick={() => loadExample(example)}
-                          className="flex items-center justify-between p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-left"
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-gray-900">{example.title}</span>
-                              <span className={`px-1.5 py-0.5 text-xs rounded ${
-                                example.category === 'basico' ? 'bg-green-500/20 text-green-400' :
-                                example.category === 'intermedio' ? 'bg-yellow-500/20 text-yellow-400' :
-                                'bg-red-500/20 text-red-400'
-                              }`}>
-                                {example.category}
-                              </span>
+      <div className={`p-4 space-y-4 ${expanded ? 'overflow-auto h-[calc(100vh-64px)]' : ''}`}>
+        {/* ═══ GUÍAS ═══ */}
+        {showGuides && (
+          <div className="bg-labdark-bg rounded-xl p-4 border border-gray-700/50 max-h-96 overflow-y-auto animate-fade-in">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span className="text-sm text-gray-200 font-semibold">Guías y ejemplos listos para usar</span>
+            </div>
+            <div className="space-y-2">
+              {filteredGuides.map((guide, idx) => (
+                <div key={idx} className="border border-gray-700/60 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setActiveGuide(activeGuide === idx ? null : idx)}
+                    className="w-full flex items-center justify-between p-3 bg-gray-800/40 hover:bg-gray-700/40 transition-colors"
+                  >
+                    <span className="font-medium text-gray-100 text-sm">{guide.title}</span>
+                    {activeGuide === idx
+                      ? <ChevronDown className="w-4 h-4 text-gray-400" />
+                      : <ChevronRight className="w-4 h-4 text-gray-400" />}
+                  </button>
+                  {activeGuide === idx && (
+                    <div className="p-3 bg-labdark-void/60 border-t border-gray-700/60 animate-fade-in">
+                      <p className="text-xs text-gray-400 mb-3">{guide.content}</p>
+                      <div className="grid gap-2">
+                        {guide.examples.map((example, exIdx) => (
+                          <button
+                            key={exIdx}
+                            onClick={() => loadExample(example)}
+                            className="flex items-center justify-between p-2.5 bg-gray-800/60 rounded-lg hover:bg-gray-700/60 hover:translate-x-0.5 transition-all text-left group"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-gray-100">{example.title}</span>
+                                <span className={`px-1.5 py-0.5 text-[10px] rounded-full ${
+                                  example.category === 'basico' ? 'bg-green-500/20 text-green-300' :
+                                  example.category === 'intermedio' ? 'bg-amber-500/20 text-amber-300' :
+                                  'bg-red-500/20 text-red-300'
+                                }`}>
+                                  {example.category}
+                                </span>
+                              </div>
+                              <div className="text-xs text-gray-500">{example.description}</div>
                             </div>
-                            <div className="text-xs text-gray-500">{example.description}</div>
-                          </div>
-                          <Zap className="w-4 h-4 text-red-400 ml-2" />
-                        </button>
-                      ))}
+                            <Zap className="w-4 h-4 text-red-400 ml-2 group-hover:scale-125 transition-transform" />
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ═══ EDITOR + OUTPUT ═══ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Código */}
+          <div className="bg-labdark-void rounded-xl overflow-hidden border border-gray-700/60">
+            <div className="flex items-center justify-between px-4 py-2 bg-gray-800/60 border-b border-gray-700/60">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <div className="w-3 h-3 rounded-full bg-amber-500" />
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <span className="ml-2 text-xs text-gray-400 font-mono">script.lua</span>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Editor */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Code Editor */}
-        <div className="bg-[#161B2E] rounded-xl overflow-hidden border border-gray-700">
-          <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span className="ml-2 text-sm text-gray-600">script.lua</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={copyCode}
-                className="p-1.5 hover:bg-gray-700 rounded transition-colors"
-                title="Copiar código"
-              >
-                {copied ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4 text-gray-600" />
-                )}
-              </button>
-              <button
-                onClick={() => setCode('-- Escribe tu código Lua aquí\n')}
-                className="p-1.5 hover:bg-gray-700 rounded transition-colors"
-                title="Limpiar"
-              >
-                <RotateCcw className="w-4 h-4 text-gray-600" />
-              </button>
-            </div>
-          </div>
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="w-full h-64 p-4 bg-[#161B2E] text-blue-400 font-mono text-sm resize-none focus:outline-none"
-            spellCheck={false}
-            placeholder="-- Escribe tu código Lua aquí"
-          />
-        </div>
-
-        {/* Output */}
-        <div className="bg-[#161B2E] rounded-xl overflow-hidden border border-gray-700">
-          <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-            <div className="flex items-center gap-2">
-              <Box className="w-4 h-4 text-gray-600" />
-              <span className="text-sm text-gray-600">Output</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {user?.name && (
-                <button onClick={handleSend} disabled={enviando || enviado} className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors text-sm font-medium disabled:opacity-70 ${enviado ? 'bg-green-600 text-white' : 'bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30'}`} title={`Enviar como ${user.name}`}>
-                  <Send className="w-4 h-4" /> {enviado ? '✓ Enviado' : enviando ? 'Enviando...' : 'Enviar al profesor'}
+              <div className="flex items-center gap-1">
+                <button onClick={copyCode} className="p-1.5 hover:bg-gray-700 rounded transition-colors" title="Copiar código">
+                  {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400" />}
                 </button>
+                <button onClick={() => { setCode('-- Escribe tu código Lua aquí\n'); setOutput([]) }} className="p-1.5 hover:bg-gray-700 rounded transition-colors" title="Limpiar">
+                  <Trash2 className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+            </div>
+            <textarea
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className={`w-full ${panelH} p-4 bg-labdark-void text-cyan-300 font-mono text-sm resize-none focus:outline-none leading-relaxed`}
+              spellCheck={false}
+              placeholder="-- Escribe tu código Lua aquí"
+            />
+          </div>
+
+          {/* Salida */}
+          <div className="bg-labdark-void rounded-xl overflow-hidden border border-gray-700/60 flex flex-col">
+            <div className="flex items-center justify-between px-4 py-2 bg-gray-800/60 border-b border-gray-700/60">
+              <div className="flex items-center gap-2">
+                <Terminal className={`w-4 h-4 ${isRunning ? 'text-green-400 animate-pulse' : 'text-gray-400'}`} />
+                <span className="text-xs text-gray-400 font-mono">Consola</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {user?.name && (
+                  <button onClick={handleSend} disabled={enviando || enviado} className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors text-xs font-medium disabled:opacity-70 ${enviado ? 'bg-green-600 text-white' : 'bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30'}`} title={`Enviar como ${user.name}`}>
+                    <Send className="w-3.5 h-3.5" /> {enviado ? '✓ Enviado' : enviando ? 'Enviando...' : 'Enviar'}
+                  </button>
+                )}
+                <button
+                  onClick={runCode}
+                  disabled={isRunning}
+                  className="flex items-center gap-1.5 px-3.5 py-1 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 text-white rounded-lg transition-all text-xs font-bold hover:scale-105 active:scale-95"
+                >
+                  <Play className={`w-3.5 h-3.5 ${isRunning ? 'animate-spin' : ''}`} />
+                  {isRunning ? 'Ejecutando…' : 'Ejecutar'}
+                </button>
+              </div>
+            </div>
+            <div className={`${panelH} p-4 overflow-y-auto font-mono text-sm bg-labdark-void`}>
+              {output.length === 0 && (
+                <div className="text-gray-600 flex items-center gap-2"><Box className="w-4 h-4" /> Pulsa <b className="text-gray-400">Ejecutar</b> para correr tu código Lua…</div>
               )}
-              <button
-                onClick={runCode}
-                disabled={isRunning}
-                className="flex items-center gap-2 px-3 py-1 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 text-white rounded-lg transition-colors text-sm font-semibold"
-              >
-                <Play className="w-4 h-4" />
-                {isRunning ? 'Ejecutando...' : 'Ejecutar'}
-              </button>
+              {output.map((line, idx) => (
+                <div
+                  key={idx}
+                  className={`animate-fade-in ${line.startsWith('❌') ? 'text-red-400' : line.includes('Creado:') ? 'text-amber-300' : 'text-green-300'}`}
+                  style={{ animationDelay: `${Math.min(idx * 25, 400)}ms` }}
+                >
+                  {line || ' '}
+                </div>
+              ))}
             </div>
           </div>
-          <div className="h-64 p-4 overflow-y-auto font-mono text-sm bg-[#10131F]">
-            {output.length === 0 && <div className="text-gray-500">Pulsa Ejecutar para correr tu codigo Lua...</div>}
-            {output.map((line, idx) => (
-              <div key={idx} className={line.startsWith('❌') ? 'text-red-400' : 'text-green-300'}>
-                {line || ' '}
-              </div>
-            ))}
-          </div>
         </div>
-      </div>
 
-      {/* Tips */}
-      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
-        <div className="flex items-start gap-2">
-          <Lightbulb className="w-4 h-4 text-red-400 mt-0.5" />
-          <div className="text-sm text-red-300">
-            <strong>Tip:</strong> Este simulador ejecuta código Lua básico. Para funciones avanzadas de Roblox 
-            (Instance.new, eventos, etc.), copia el código a Roblox Studio. ¡Los ejemplos están listos para usar!
+        {/* ═══ TIP ═══ */}
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+          <div className="flex items-start gap-2">
+            <Lightbulb className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-red-200/90 leading-relaxed">
+              <strong className="text-red-300">Tip:</strong> este editor ejecuta <b>Lua de verdad</b>. Las funciones del mundo de Roblox
+              (<span className="font-mono">Instance.new</span>, eventos, <span className="font-mono">wait</span>…) están simuladas para que tu código corra aquí;
+              cópialo a Roblox Studio para verlo en un juego real. Usa <span className="font-mono">print()</span> para mostrar resultados.
+            </div>
           </div>
         </div>
       </div>

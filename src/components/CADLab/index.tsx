@@ -8,9 +8,10 @@ import * as THREE from 'three'
 import {
   Eye, RotateCcw, Download, Sliders,
   Info, Trash2, Move, ZoomIn, Sun, Moon,
-  Cog, Send, Box
+  Cog, Send, Box, Maximize2, Minimize2
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
+import { useExpand } from '@/hooks/useExpand'
 import VoxelBuilder, { VoxelMap } from './VoxelBuilder'
 import TinkerEditor, { TShape } from './TinkerEditor'
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter.js'
@@ -309,6 +310,7 @@ function Scene({ shapes, darkMode }: { shapes: ShapeConfig[]; darkMode: boolean 
 // ============================================================
 export default function CADLab() {
   const { user } = useAuth()
+  const { expanded, toggle, shellClass } = useExpand()
   const [tab, setTab] = useState<LabTab>('disenar')
   const [darkMode, setDarkMode] = useState(true)
   const [tinkerShapes, setTinkerShapes] = useState<TShape[]>([
@@ -426,7 +428,7 @@ export default function CADLab() {
   ]
 
   return (
-    <div className="bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
+    <div className={`bg-labdark-surface rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl ${shellClass}`}>
       {/* HEADER */}
       <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-labdark-bg via-labdark-bg2 to-labdark-bg border-b border-gray-700/50">
         <div className="flex items-center gap-3">
@@ -440,8 +442,11 @@ export default function CADLab() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setDarkMode(!darkMode)} className="p-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 text-gray-400 transition-colors">
+          <button onClick={() => setDarkMode(!darkMode)} className="p-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 text-gray-400 transition-colors" title="Fondo claro/oscuro">
             {darkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+          </button>
+          <button onClick={toggle} className="p-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 text-gray-400 transition-colors" title={expanded ? 'Salir de pantalla completa (Esc)' : 'Pantalla completa'}>
+            {expanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
           <button onClick={exportScene} className="text-[10px] px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-medium flex items-center gap-1 hover:bg-cyan-500/30 transition-colors">
             <Download className="w-3 h-3" /> Exportar
@@ -479,7 +484,7 @@ export default function CADLab() {
       </div>
 
       {/* CONTENT */}
-      <div className="flex" style={{ height: 520 }}>
+      <div className="flex" style={{ height: expanded ? 'calc(100vh - 118px)' : 520 }}>
         {/* 3D CANVAS */}
         <div className="flex-1 relative">
           {tab === 'disenar' ? (
