@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
 import VoxelBuilder, { VoxelMap } from './VoxelBuilder'
-import TinkerEditor, { TShape, TMode } from './TinkerEditor'
+import TinkerEditor, { TShape } from './TinkerEditor'
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter.js'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
@@ -174,9 +174,10 @@ export default function CADLab() {
     { id: 't-top', type: 'cylinder', color: '#f59e0b', position: [0, 1.3, 0], rotation: [0, 0, 0], scale: [1, 1, 1] },
   ])
   const [tinkerSel, setTinkerSel] = useState<string | null>('t-top')
-  const [tinkerMode, setTinkerMode] = useState<TMode>('translate')
   const [tinkerHist, setTinkerHist] = useState<TShape[][]>([])
   const [showGrid, setShowGrid] = useState(true)
+  // Guarda el estado actual antes de un arrastre, para que "Deshacer" funcione.
+  const snapTinker = () => setTinkerHist(h => [...h.slice(-19), tinkerShapes])
   const [enviando, setEnviando] = useState(false)
   const [enviado, setEnviado] = useState(false)
   const [voxels, setVoxels] = useState<VoxelMap>(() => {
@@ -339,7 +340,7 @@ export default function CADLab() {
         {/* 3D CANVAS */}
         <div className="flex-1 relative">
           {tab === 'disenar' ? (
-            <TinkerEditor shapes={tinkerShapes} setShapes={setTinkerShapes} selectedId={tinkerSel} setSelectedId={setTinkerSel} mode={tinkerMode} darkMode={darkMode} showGrid={showGrid} />
+            <TinkerEditor shapes={tinkerShapes} setShapes={setTinkerShapes} selectedId={tinkerSel} setSelectedId={setTinkerSel} darkMode={darkMode} showGrid={showGrid} onBeforeChange={snapTinker} />
           ) : tab === 'voxel' ? (
             <VoxelBuilder voxels={voxels} color={voxelColor} modo={voxelModo} setVoxels={setVoxels} />
           ) : (
@@ -444,13 +445,8 @@ export default function CADLab() {
                       ))}
                     </div>
                   </div>
-                  <div>
-                    <h4 className="text-white text-xs font-bold mb-1.5">Herramienta</h4>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {([['translate', '✋ Mover'], ['rotate', '🔄 Girar'], ['scale', '⤢ Escalar']] as [TMode, string][]).map(([m, lbl]) => (
-                        <button key={m} onClick={() => setTinkerMode(m)} className={`py-2 rounded-lg text-[11px] font-bold transition-colors ${tinkerMode === m ? 'bg-cyan-500 text-white' : 'bg-gray-700/40 text-gray-300 hover:bg-gray-700/60'}`}>{lbl}</button>
-                      ))}
-                    </div>
+                  <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-2 text-[11px] text-cyan-100 leading-snug">
+                    <span className="font-bold">Manipula la figura directo:</span> arrastra el <b>cuerpo</b> para moverla, una <b>esquina blanca</b> para agrandar/encoger, el <b>anillo verde</b> para girar y la <b>flecha naranja</b> para subirla o bajarla.
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">
                     <button onClick={deshacer} disabled={tinkerHist.length === 0} className="py-1.5 rounded-lg text-[11px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60 disabled:opacity-40">↶ Deshacer</button>
