@@ -24,6 +24,7 @@ export interface TShape {
   position: [number, number, number]
   rotation: [number, number, number]
   scale: [number, number, number]
+  hole?: boolean   // pieza "hueco": se ve transparente y RESTA al generar el STL
 }
 
 function Geo({ type }: { type: TShapeType }) {
@@ -220,13 +221,25 @@ function Escena({
           castShadow
         >
           <Geo type={s.type} />
-          <meshStandardMaterial
-            color={s.color}
-            metalness={0.1}
-            roughness={0.55}
-            emissive={selectedId === s.id ? '#06b6d4' : '#000000'}
-            emissiveIntensity={selectedId === s.id ? 0.3 : 0}
-          />
+          {s.hole ? (
+            <meshStandardMaterial
+              color="#94a3b8"
+              transparent
+              opacity={0.28}
+              depthWrite={false}
+              roughness={0.4}
+              emissive={selectedId === s.id ? '#06b6d4' : '#334155'}
+              emissiveIntensity={selectedId === s.id ? 0.35 : 0.15}
+            />
+          ) : (
+            <meshStandardMaterial
+              color={s.color}
+              metalness={0.1}
+              roughness={0.55}
+              emissive={selectedId === s.id ? '#06b6d4' : '#000000'}
+              emissiveIntensity={selectedId === s.id ? 0.3 : 0}
+            />
+          )}
         </mesh>
       ))}
 

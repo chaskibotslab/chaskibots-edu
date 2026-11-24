@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useMemo, useEffect, Suspense } from 'react'
+import { useState, useRef, useMemo, Suspense, type ReactNode } from 'react'
 import Image from 'next/image'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, Grid, Center } from '@react-three/drei'
@@ -8,13 +8,14 @@ import * as THREE from 'three'
 import {
   Eye, RotateCcw, Download, Sliders,
   Info, Trash2, Move, ZoomIn, Sun, Moon,
-  Cog, Loader2, Send, Box
+  Cog, Send, Box
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
 import VoxelBuilder, { VoxelMap } from './VoxelBuilder'
 import TinkerEditor, { TShape } from './TinkerEditor'
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter.js'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { Evaluator, Brush, SUBTRACTION } from 'three-bvh-csg'
 
 // Geometría base por tipo (igual que en TinkerEditor) para construir y exportar el STL.
 function geomDeTipo(type: TShape['type']): THREE.BufferGeometry {
@@ -35,6 +36,147 @@ function geomDeTipo(type: TShape['type']): THREE.BufferGeometry {
     case 'knot': return new THREE.TorusKnotGeometry(0.4, 0.15, 80, 10)
     default: return new THREE.BoxGeometry(1, 1, 1)
   }
+}
+
+// ============================================================
+// MODELOS REALES (formato del editor) — para el Visor y para "Abrir en Diseñar"
+// ============================================================
+export interface Modelo {
+  id: string
+  name: string
+  emoji: string
+  description: string
+  piezas: TShape[]
+  guia: string[]
+}
+
+// Atajo para crear una pieza del modelo.
+function pz(
+  id: string, type: TShape['type'], color: string,
+  position: [number, number, number], scale: [number, number, number],
+  rotation: [number, number, number] = [0, 0, 0], hole = false,
+): TShape {
+  return { id, type, color, position, rotation, scale, hole }
+}
+
+function construirModelos(): Modelo[] {
+  // ⚙️ Engranaje con dientes alrededor y hueco central
+  const engr: TShape[] = [pz('g-disco', 'wheel', '#9aa7b8', [0, 0.4, 0], [1.5, 0.6, 1.5])]
+  const dientes = 12
+  for (let i = 0; i < dientes; i++) {
+    const a = (i / dientes) * Math.PI * 2
+    engr.push(pz('g-d' + i, 'box', '#9aa7b8', [Math.cos(a) * 1.05, 0.4, Math.sin(a) * 1.05], [0.26, 0.5, 0.34], [0, -a, 0]))
+  }
+  engr.push(pz('g-hueco', 'cylinder', '#94a3b8', [0, 0.4, 0], [0.55, 1.3, 0.55], [0, 0, 0], true))
+
+  // 🚁 Dron: cuerpo + 2 brazos cruzados + 4 motores con hélices
+  const dron: TShape[] = [
+    pz('dr-cuerpo', 'box', '#334155', [0, 1, 0], [0.9, 0.3, 0.9]),
+    pz('dr-cupula', 'dome', '#38bdf8', [0, 1.15, 0], [0.5, 0.5, 0.5]),
+    pz('dr-brazoA', 'box', '#475569', [0, 1, 0], [2.6, 0.12, 0.16], [0, Math.PI / 4, 0]),
+    pz('dr-brazoB', 'box', '#475569', [0, 1, 0], [2.6, 0.12, 0.16], [0, -Math.PI / 4, 0]),
+  ]
+  const r = 0.92
+  const esq: [number, number][] = [[r, r], [r, -r], [-r, r], [-r, -r]]
+  esq.forEach(([x, z], i) => {
+    dron.push(pz('dr-m' + i, 'cylinder', '#0f172a', [x, 1.05, z], [0.14, 0.2, 0.14]))
+    dron.push(pz('dr-h' + i, 'wheel', '#94a3b8', [x, 1.2, z], [0.55, 0.1, 0.55]))
+  })
+
+  // 🚗 Carrito con 4 ruedas
+  const carro: TShape[] = [
+    pz('c-chasis', 'box', '#ef4444', [0, 0.62, 0], [2.4, 0.4, 1.1]),
+    pz('c-cabina', 'box', '#dc2626', [-0.1, 1.05, 0], [1.2, 0.55, 0.95]),
+    pz('c-faro', 'box', '#fde68a', [1.22, 0.62, 0], [0.08, 0.2, 0.7]),
+  ]
+  const ruedas: [number, number][] = [[0.8, 0.58], [0.8, -0.58], [-0.8, 0.58], [-0.8, -0.58]]
+  ruedas.forEach(([x, z], i) => carro.push(pz('c-r' + i, 'wheel', '#111827', [x, 0.4, z], [0.5, 0.5, 0.5], [Math.PI / 2, 0, 0])))
+
+  // 🤖 Robot
+  const robot: TShape[] = [
+    pz('r-cuerpo', 'box', '#38bdf8', [0, 1.4, 0], [1.2, 1.4, 0.7]),
+    pz('r-cabeza', 'box', '#e2e8f0', [0, 2.5, 0], [0.85, 0.7, 0.75]),
+    pz('r-ojoL', 'sphere', '#0f172a', [-0.2, 2.55, 0.38], [0.16, 0.16, 0.16]),
+    pz('r-ojoR', 'sphere', '#0f172a', [0.2, 2.55, 0.38], [0.16, 0.16, 0.16]),
+    pz('r-antena', 'cylinder', '#f59e0b', [0, 3.0, 0], [0.06, 0.4, 0.06]),
+    pz('r-bola', 'sphere', '#ef4444', [0, 3.3, 0], [0.13, 0.13, 0.13]),
+    pz('r-brazoL', 'cylinder', '#94a3b8', [-0.85, 1.4, 0], [0.18, 0.9, 0.18], [0, 0, 0.12]),
+    pz('r-brazoR', 'cylinder', '#94a3b8', [0.85, 1.4, 0], [0.18, 0.9, 0.18], [0, 0, -0.12]),
+    pz('r-piernaL', 'cylinder', '#475569', [-0.35, 0.5, 0], [0.22, 0.8, 0.22]),
+    pz('r-piernaR', 'cylinder', '#475569', [0.35, 0.5, 0], [0.22, 0.8, 0.22]),
+  ]
+
+  // 🦾 Brazo robótico
+  const brazo: TShape[] = [
+    pz('b-base', 'cylinder', '#475569', [0, 0.25, 0], [1.2, 0.4, 1.2]),
+    pz('b-eje', 'cylinder', '#334155', [0, 0.6, 0], [0.5, 0.5, 0.5]),
+    pz('b-seg1', 'box', '#38bdf8', [0, 1.3, 0], [0.35, 1.5, 0.35]),
+    pz('b-junta', 'sphere', '#f59e0b', [0, 2.05, 0], [0.3, 0.3, 0.3]),
+    pz('b-seg2', 'box', '#38bdf8', [0.55, 2.35, 0], [1.2, 0.3, 0.3], [0, 0, -0.45]),
+    pz('b-pinzaA', 'box', '#94a3b8', [1.1, 2.6, 0.12], [0.35, 0.12, 0.1], [0, 0, -0.45]),
+    pz('b-pinzaB', 'box', '#94a3b8', [1.1, 2.6, -0.12], [0.35, 0.12, 0.1], [0, 0, -0.45]),
+  ]
+
+  // 🔑 Llavero (placa + anilla + hueco para colgar)
+  const llavero: TShape[] = [
+    pz('l-placa', 'box', '#22c55e', [0, 0.3, 0], [2.0, 0.25, 0.9]),
+    pz('l-anilla', 'torus', '#16a34a', [-1.1, 0.3, 0], [0.5, 0.5, 0.5]),
+    pz('l-hueco', 'cylinder', '#94a3b8', [-1.1, 0.3, 0], [0.22, 1.0, 0.22], [0, 0, 0], true),
+  ]
+
+  // 🏠 Casa (con puerta y ventana como huecos)
+  const casa: TShape[] = [
+    pz('h-paredes', 'box', '#fbbf24', [0, 0.8, 0], [1.8, 1.6, 1.6]),
+    pz('h-techo', 'pyramid', '#b91c1c', [0, 2.0, 0], [1.7, 1.2, 1.6], [0, Math.PI / 4, 0]),
+    pz('h-puerta', 'box', '#78350f', [0, 0.55, 0.82], [0.5, 1.0, 0.5], [0, 0, 0], true),
+    pz('h-ventana', 'box', '#78350f', [0.55, 1.1, 0.82], [0.4, 0.4, 0.5], [0, 0, 0], true),
+  ]
+
+  return [
+    { id: 'robot', name: 'Robot', emoji: '🤖', description: 'Cuerpo, cabeza, brazos y piernas', piezas: robot, guia: ['Cuerpo: una caja grande.', 'Cabeza: una caja encima.', 'Ojos: dos esferas pequeñas al frente.', 'Brazos y piernas: cilindros a los lados.', 'Antena: cilindro fino + esfera. ¡Genera el STL!'] },
+    { id: 'carro', name: 'Carrito', emoji: '🚗', description: 'Chasis, cabina y 4 ruedas', piezas: carro, guia: ['Chasis: una caja alargada.', 'Cabina: una caja más pequeña encima.', 'Ruedas: 4 "ruedas" giradas 90°, una en cada esquina.', 'Faro: una cajita amarilla al frente.', 'Ajusta el tamaño y genera el STL para imprimir.'] },
+    { id: 'dron', name: 'Dron', emoji: '🚁', description: 'Cuerpo, brazos y 4 hélices', piezas: dron, guia: ['Cuerpo: una caja plana.', 'Brazos: dos cajas largas cruzadas en X.', 'Motores: un cilindro en cada punta.', 'Hélices: una "rueda" delgada sobre cada motor.', 'Cúpula: una media esfera arriba.'] },
+    { id: 'brazo', name: 'Brazo robótico', emoji: '🦾', description: 'Base giratoria, brazo y pinza', piezas: brazo, guia: ['Base: cilindro ancho y bajo.', 'Brazo: una caja vertical larga.', 'Junta: una esfera naranja.', 'Antebrazo: una caja inclinada.', 'Pinza: dos cajitas al final.'] },
+    { id: 'engranaje', name: 'Engranaje', emoji: '⚙️', description: 'Disco con dientes y hueco central', piezas: engr, guia: ['Disco: una "rueda" aplanada.', 'Dientes: 12 cajitas alrededor del borde.', 'Hueco: un cilindro marcado como HUECO en el centro.', 'Al generar el STL, el hueco atraviesa el disco.', 'Así se hacen piezas que encajan en un eje.'] },
+    { id: 'llavero', name: 'Llavero', emoji: '🔑', description: 'Placa con anilla y hueco', piezas: llavero, guia: ['Placa: una caja plana (puedes ponerle tu nombre después).', 'Anilla: una dona (torus) a un lado.', 'Hueco: un cilindro HUECO para pasar la cuerda.', 'Genera el STL: ¡listo para imprimir y colgar!'] },
+    { id: 'casa', name: 'Casa', emoji: '🏠', description: 'Paredes, techo, puerta y ventana', piezas: casa, guia: ['Paredes: una caja grande.', 'Techo: una pirámide encima.', 'Puerta y ventana: cajas marcadas como HUECO.', 'Los huecos abren la puerta y la ventana al generar el STL.'] },
+  ]
+}
+
+const MODELOS: Modelo[] = construirModelos()
+
+// Malla de una pieza del modelo (respeta "hueco" mostrándola transparente).
+function PiezaModelo({ s }: { s: TShape }) {
+  const geo = useMemo(() => geomDeTipo(s.type), [s.type])
+  return (
+    <mesh geometry={geo} position={s.position} rotation={s.rotation} scale={s.scale}>
+      {s.hole
+        ? <meshStandardMaterial color="#94a3b8" transparent opacity={0.3} depthWrite={false} />
+        : <meshStandardMaterial color={s.color} metalness={0.15} roughness={0.5} />}
+    </mesh>
+  )
+}
+
+function GrupoGira({ children }: { children: ReactNode }) {
+  const ref = useRef<THREE.Group>(null!)
+  useFrame((_, d) => { if (ref.current) ref.current.rotation.y += d * 0.3 })
+  return <group ref={ref}>{children}</group>
+}
+
+function ModeloViewer({ piezas, darkMode }: { piezas: TShape[]; darkMode: boolean }) {
+  return (
+    <Canvas camera={{ position: [5, 4, 7], fov: 50 }} style={{ background: darkMode ? '#0f0f1a' : '#e2e8f0' }}>
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[6, 10, 6]} intensity={1} />
+      <directionalLight position={[-4, 4, -4]} intensity={0.3} />
+      <GrupoGira>
+        {piezas.map(s => <PiezaModelo key={s.id} s={s} />)}
+      </GrupoGira>
+      <Grid position={[0, 0, 0]} args={[20, 20]} cellSize={0.5} cellThickness={0.5} cellColor={darkMode ? '#1e293b' : '#CBD5E1'} sectionSize={2} sectionColor={darkMode ? '#334155' : '#94A3B8'} fadeDistance={22} infiniteGrid />
+      <OrbitControls enablePan enableZoom minDistance={3} maxDistance={24} />
+      <Environment preset={darkMode ? 'night' : 'studio'} />
+    </Canvas>
+  )
 }
 
 // ============================================================
@@ -190,27 +332,28 @@ export default function CADLab() {
   const [voxelColor, setVoxelColor] = useState('#3b82f6')
   const [voxelModo, setVoxelModo] = useState<'poner' | 'borrar'>('poner')
 
-  // Viewer state — presets loaded from Supabase (admin-editable, no redeploy needed)
-  const [presets, setPresets] = useState<CadPreset[]>([])
-  const [presetsLoading, setPresetsLoading] = useState(true)
+  // Visor 3D: modelos propios bien construidos (en código, siempre funcionan)
+  const modelos = MODELOS
   const [selectedPreset, setSelectedPreset] = useState(0)
+  const modeloSel = modelos[selectedPreset]
+  // Guía del proyecto cargado en "Diseñar" (id del modelo), para mostrar los pasos.
+  const [guiaActiva, setGuiaActiva] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetch('/api/cad-presets')
-      .then(r => r.json())
-      .then(data => setPresets(data.presets || []))
-      .catch(() => setPresets([]))
-      .finally(() => setPresetsLoading(false))
-  }, [])
+  // Carga un modelo como punto de partida editable en el editor.
+  const cargarProyecto = (m: Modelo) => {
+    setTinkerHist(h => [...h.slice(-19), tinkerShapes])
+    setTinkerShapes(m.piezas.map(p => ({ ...p, position: [...p.position] as [number, number, number], rotation: [...p.rotation] as [number, number, number], scale: [...p.scale] as [number, number, number] })))
+    setTinkerSel(m.piezas[0]?.id || null)
+    setGuiaActiva(m.id)
+  }
+  // Desde el Visor: abrir el modelo seleccionado en "Diseñar" para editarlo y fabricarlo.
+  const abrirEnDisenar = () => { if (modeloSel) { cargarProyecto(modeloSel); setTab('disenar') } }
 
   // Builder state
   const [builderShapes, setBuilderShapes] = useState<ShapeConfig[]>([
     { id: 'init-box', type: 'box', color: '#3B82F6', metalness: 0.5, roughness: 0.4, position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1], width: 1, height: 1, depth: 1 }
   ])
   const [selectedShapeIdx, setSelectedShapeIdx] = useState(0)
-
-  // Current scene shapes
-  const currentShapes = tab === 'viewer' ? (presets[selectedPreset]?.shapes || []) : builderShapes
 
   // Builder: add shape
   const addShape = (type: ShapeConfig['type']) => {
@@ -242,7 +385,7 @@ export default function CADLab() {
 
   // Export scene as JSON
   const exportScene = () => {
-    const data = tab === 'disenar' ? { tinker: tinkerShapes, exportedAt: new Date().toISOString() } : tab === 'voxel' ? { voxels, exportedAt: new Date().toISOString() } : { shapes: currentShapes, exportedAt: new Date().toISOString() }
+    const data = tab === 'disenar' ? { tinker: tinkerShapes, exportedAt: new Date().toISOString() } : tab === 'voxel' ? { voxels, exportedAt: new Date().toISOString() } : { modelo: modeloSel?.id, piezas: modeloSel?.piezas, exportedAt: new Date().toISOString() }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -265,8 +408,8 @@ export default function CADLab() {
             ? `Diseño 3D (Tinkercad): ${tinkerShapes.length} figura(s)`
             : tab === 'voxel'
             ? `Construcción con ${Object.keys(voxels).length} bloques`
-            : `Diseño 3D: ${currentShapes.length} figura(s) — ${tab === 'viewer' ? 'modelo del visor' : 'construcción propia'}`,
-          files: tab === 'disenar' ? { tinker: tinkerShapes } : tab === 'voxel' ? { voxels } : { shapes: currentShapes },
+            : `Modelo del visor: ${modeloSel?.name || '—'}`,
+          files: tab === 'disenar' ? { tinker: tinkerShapes } : tab === 'voxel' ? { voxels } : { piezas: modeloSel?.piezas },
         }),
       })
       if (res.ok) { setEnviado(true); setTimeout(() => setEnviado(false), 4000) }
@@ -344,30 +487,15 @@ export default function CADLab() {
           ) : tab === 'voxel' ? (
             <VoxelBuilder voxels={voxels} color={voxelColor} modo={voxelModo} setVoxels={setVoxels} />
           ) : (
-          <Canvas
-            camera={{ position: [4, 3, 6], fov: 50 }}
-            style={{ background: darkMode ? '#0f0f1a' : '#e2e8f0' }}
-          >
             <Suspense fallback={null}>
-              <Scene shapes={currentShapes} darkMode={darkMode} />
+              <ModeloViewer piezas={modeloSel?.piezas || []} darkMode={darkMode} />
             </Suspense>
-          </Canvas>
           )}
           {/* Overlay hints */}
           <div className="absolute bottom-3 left-3 flex items-center gap-3 text-[10px] text-gray-500">
             <span className="flex items-center gap-1"><Move className="w-3 h-3" /> Arrastrar para rotar</span>
             <span className="flex items-center gap-1"><ZoomIn className="w-3 h-3" /> Scroll para zoom</span>
           </div>
-          {tab === 'viewer' && presetsLoading && (
-            <div className="absolute inset-0 flex items-center justify-center gap-2 text-gray-400 text-sm pointer-events-none">
-              <Loader2 className="w-4 h-4 animate-spin" /> Cargando modelos...
-            </div>
-          )}
-          {!presetsLoading && currentShapes.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <p className="text-gray-500 text-sm">Escena vacía — agrega figuras</p>
-            </div>
-          )}
         </div>
 
         {/* RIGHT PANEL */}
@@ -405,22 +533,42 @@ export default function CADLab() {
               }
               const ponerEnPiso = () => { if (!sel) return; snap(); setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, position: [s.position[0], Math.abs(s.scale[1]) * 0.5, s.position[2]] } : s)) }
               const girar45 = () => { if (!sel) return; snap(); setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, rotation: [s.rotation[0], s.rotation[1] + Math.PI / 4, s.rotation[2]] } : s)) }
-              const generarSTL = () => {
-                if (tinkerShapes.length === 0) return
-                const geos = tinkerShapes.map(s => {
-                  const g = geomDeTipo(s.type)
-                  const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(s.rotation[0], s.rotation[1], s.rotation[2]))
-                  const mtx = new THREE.Matrix4().compose(new THREE.Vector3(s.position[0], s.position[1], s.position[2]), q, new THREE.Vector3(Math.abs(s.scale[0]) || 0.1, Math.abs(s.scale[1]) || 0.1, Math.abs(s.scale[2]) || 0.1))
-                  g.applyMatrix4(mtx)
-                  g.deleteAttribute('uv')
-                  return g
-                })
-                const merged = mergeGeometries(geos, false)
-                if (!merged) return
-                merged.computeVertexNormals()
-                const stl = new STLExporter().parse(new THREE.Mesh(merged))
+              const toggleHole = () => { if (!sel) return; snap(); setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, hole: !s.hole } : s)) }
+              const construirGeo = (s: TShape) => {
+                const g = geomDeTipo(s.type)
+                const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(s.rotation[0], s.rotation[1], s.rotation[2]))
+                const mtx = new THREE.Matrix4().compose(new THREE.Vector3(s.position[0], s.position[1], s.position[2]), q, new THREE.Vector3(Math.abs(s.scale[0]) || 0.1, Math.abs(s.scale[1]) || 0.1, Math.abs(s.scale[2]) || 0.1))
+                g.applyMatrix4(mtx)
+                g.deleteAttribute('uv')
+                g.computeVertexNormals()
+                return g
+              }
+              const descargarSTL = (geom: THREE.BufferGeometry) => {
+                geom.computeVertexNormals()
+                const stl = new STLExporter().parse(new THREE.Mesh(geom))
                 const blob = new Blob([stl], { type: 'model/stl' })
                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'diseno-chaskibots.stl'; a.click(); URL.revokeObjectURL(a.href)
+              }
+              const generarSTL = () => {
+                if (tinkerShapes.length === 0) return
+                const solidos = tinkerShapes.filter(s => !s.hole).map(construirGeo)
+                const huecos = tinkerShapes.filter(s => s.hole).map(construirGeo)
+                if (solidos.length === 0) return
+                const base = mergeGeometries(solidos, false)
+                if (!base) return
+                if (huecos.length === 0) { descargarSTL(base); return }
+                try {
+                  const ev = new Evaluator(); ev.attributes = ['position', 'normal']
+                  let res = new Brush(base); res.updateMatrixWorld()
+                  for (const h of huecos) {
+                    const hb = new Brush(h); hb.updateMatrixWorld()
+                    res = ev.evaluate(res, hb, SUBTRACTION)
+                  }
+                  descargarSTL(res.geometry)
+                } catch {
+                  // Si la resta falla, al menos exporta los sólidos.
+                  descargarSTL(base)
+                }
               }
               const figuras: { t: TShape['type']; e: string; n: string }[] = [
                 { t: 'box', e: '🧊', n: 'Cubo' }, { t: 'sphere', e: '⚪', n: 'Esfera' }, { t: 'cylinder', e: '🥫', n: 'Cilindro' },
@@ -487,6 +635,9 @@ export default function CADLab() {
                           <button key={'m' + ax} onClick={() => espejo(i)} className="py-1 rounded text-[10px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60">⇋ Espejo {ax}</button>
                         ))}
                       </div>
+                      <button onClick={toggleHole} className={`w-full py-1.5 rounded-lg text-[11px] font-bold transition-colors ${sel.hole ? 'bg-amber-500/25 text-amber-200 border border-amber-500/40' : 'bg-gray-700/40 text-gray-200 hover:bg-gray-700/60'}`}>
+                        {sel.hole ? '🧊 Volver sólido' : '🕳️ Hacer hueco (resta/perfora)'}
+                      </button>
                       <div className="grid grid-cols-2 gap-1.5">
                         <button onClick={dupSel} className="py-1.5 rounded-lg text-[11px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60">Duplicar</button>
                         <button onClick={delSel} className="py-1.5 rounded-lg text-[11px] font-medium bg-red-500/20 text-red-300 hover:bg-red-500/30 flex items-center justify-center gap-1"><Trash2 className="w-3 h-3" /> Borrar</button>
@@ -496,18 +647,32 @@ export default function CADLab() {
                     <p className="text-[10px] text-gray-500">Toca una figura en la escena para editarla.</p>
                   )}
                   <div>
-                    <h4 className="text-white text-xs font-bold mb-1.5">🎯 Retos</h4>
-                    <div className="space-y-1 text-[11px] text-gray-300">
-                      <div className="bg-gray-700/20 rounded p-2">🚗 Un <b>carro</b>: una caja + 4 cilindros (ruedas).</div>
-                      <div className="bg-gray-700/20 rounded p-2">⛄ Un <b>muñeco</b>: dos esferas + un cono.</div>
-                      <div className="bg-gray-700/20 rounded p-2">🏠 Una <b>casa</b>: una caja + un cono de techo.</div>
-                      <div className="bg-gray-700/20 rounded p-2">⭐ <b>Libre:</b> diseña y pulsa «Enviar al profesor».</div>
+                    <h4 className="text-white text-xs font-bold mb-1.5">🏗️ Proyectos para fabricar</h4>
+                    <p className="text-[10px] text-gray-500 mb-1.5">Carga uno, modifícalo a tu gusto y genera el STL para imprimir.</p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {MODELOS.map(m => (
+                        <button key={m.id} onClick={() => cargarProyecto(m)} className={`py-1.5 px-1 rounded-lg text-[11px] font-medium transition-colors flex items-center justify-center gap-1 ${guiaActiva === m.id ? 'bg-cyan-500/25 text-cyan-100 border border-cyan-500/40' : 'bg-gray-700/40 text-gray-200 hover:bg-cyan-500/20 hover:text-cyan-200'}`}>
+                          <span>{m.emoji}</span> {m.name}
+                        </button>
+                      ))}
                     </div>
+                    {(() => {
+                      const m = MODELOS.find(x => x.id === guiaActiva)
+                      if (!m) return null
+                      return (
+                        <div className="mt-2 bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-2">
+                          <div className="text-[11px] text-cyan-200 font-bold mb-1">{m.emoji} Guía: {m.name}</div>
+                          <ol className="text-[10px] text-gray-300 space-y-0.5 list-decimal list-inside">
+                            {m.guia.map((g, i) => <li key={i}>{g}</li>)}
+                          </ol>
+                        </div>
+                      )
+                    })()}
                   </div>
-                  <button onClick={generarSTL} disabled={tinkerShapes.length === 0} className="w-full py-2 rounded-lg text-xs font-bold bg-cyan-500 text-white hover:bg-cyan-400 disabled:opacity-50 flex items-center justify-center gap-1">
-                    <Download className="w-3.5 h-3.5" /> Generar STL (une todo e imprime)
+                  <button onClick={generarSTL} disabled={tinkerShapes.filter(s => !s.hole).length === 0} className="w-full py-2 rounded-lg text-xs font-bold bg-cyan-500 text-white hover:bg-cyan-400 disabled:opacity-50 flex items-center justify-center gap-1">
+                    <Download className="w-3.5 h-3.5" /> Generar STL (une sólidos y resta huecos)
                   </button>
-                  <div className="text-[10px] text-gray-500">Figuras: <span className="text-white font-bold">{tinkerShapes.length}</span> · El STL une todas en un solo modelo para impresión 3D.</div>
+                  <div className="text-[10px] text-gray-500">Figuras: <span className="text-white font-bold">{tinkerShapes.length}</span> · Huecos: <span className="text-amber-300 font-bold">{tinkerShapes.filter(s => s.hole).length}</span> · El STL une los sólidos y perfora los huecos para impresión 3D.</div>
                 </>
               )
             })()}
@@ -552,12 +717,15 @@ export default function CADLab() {
                 <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-2.5 flex items-start gap-2">
                   <Info className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-400 text-[10px] leading-relaxed">
-                    Explora modelos 3D de piezas de robótica. Haz clic en un modelo para verlo. Usa el mouse para rotar y la rueda para hacer zoom.
+                    Explora modelos reales. Elige uno y pulsa <b className="text-cyan-300">Abrir en Diseñar</b> para modificarlo y generar su STL para imprimir.
                   </p>
                 </div>
-                <h4 className="text-white text-xs font-bold">Modelos Disponibles</h4>
+                <button onClick={abrirEnDisenar} className="w-full py-2 rounded-lg text-xs font-bold bg-cyan-500 text-white hover:bg-cyan-400 flex items-center justify-center gap-1">
+                  ✏️ Abrir «{modeloSel?.name}» en Diseñar
+                </button>
+                <h4 className="text-white text-xs font-bold">Modelos</h4>
                 <div className="space-y-1.5">
-                  {presets.map((model, idx) => (
+                  {modelos.map((model, idx) => (
                     <button
                       key={model.id}
                       onClick={() => setSelectedPreset(idx)}
@@ -574,18 +742,16 @@ export default function CADLab() {
                           <div className="text-gray-500 text-[10px]">{model.description}</div>
                         </div>
                       </div>
-                      <div className="text-[9px] text-gray-600 mt-1">{model.shapes.length} piezas</div>
+                      <div className="text-[9px] text-gray-600 mt-1">{model.piezas.length} piezas</div>
                     </button>
                   ))}
                 </div>
-                {presets[selectedPreset] && (
+                {modeloSel && (
                   <div className="bg-gray-700/20 rounded-lg p-2.5">
-                    <h5 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Info del modelo</h5>
-                    <div className="text-[10px] text-gray-500 space-y-0.5">
-                      <div>Piezas: <span className="text-white">{presets[selectedPreset].shapes.length}</span></div>
-                      <div>Tipos: <span className="text-white">{new Set(presets[selectedPreset].shapes.map(s => s.type)).size}</span></div>
-                      <div>Animadas: <span className="text-white">{presets[selectedPreset].shapes.filter(s => s.animate).length}</span></div>
-                    </div>
+                    <h5 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1.5">Cómo está hecho</h5>
+                    <ol className="text-[10px] text-gray-400 space-y-1 list-decimal list-inside">
+                      {modeloSel.guia.map((g, i) => <li key={i}>{g}</li>)}
+                    </ol>
                   </div>
                 )}
               </>
