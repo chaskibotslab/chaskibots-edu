@@ -23,6 +23,16 @@ function geomDeTipo(type: TShape['type']): THREE.BufferGeometry {
     case 'cylinder': return new THREE.CylinderGeometry(0.5, 0.5, 1.2, 32)
     case 'cone': return new THREE.ConeGeometry(0.6, 1.2, 32)
     case 'torus': return new THREE.TorusGeometry(0.5, 0.2, 16, 32)
+    case 'pyramid': return new THREE.ConeGeometry(0.7, 1.2, 4)
+    case 'prism': return new THREE.CylinderGeometry(0.7, 0.7, 1.2, 3)
+    case 'tetra': return new THREE.TetrahedronGeometry(0.8)
+    case 'octa': return new THREE.OctahedronGeometry(0.8)
+    case 'dodeca': return new THREE.DodecahedronGeometry(0.8)
+    case 'icosa': return new THREE.IcosahedronGeometry(0.8)
+    case 'capsule': return new THREE.CapsuleGeometry(0.4, 0.8, 8, 16)
+    case 'dome': return new THREE.SphereGeometry(0.7, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2)
+    case 'wheel': return new THREE.CylinderGeometry(0.7, 0.7, 0.3, 32)
+    case 'knot': return new THREE.TorusKnotGeometry(0.4, 0.15, 80, 10)
     default: return new THREE.BoxGeometry(1, 1, 1)
   }
 }
@@ -165,6 +175,8 @@ export default function CADLab() {
   ])
   const [tinkerSel, setTinkerSel] = useState<string | null>('t-top')
   const [tinkerMode, setTinkerMode] = useState<TMode>('translate')
+  const [tinkerHist, setTinkerHist] = useState<TShape[][]>([])
+  const [showGrid, setShowGrid] = useState(true)
   const [enviando, setEnviando] = useState(false)
   const [enviado, setEnviado] = useState(false)
   const [voxels, setVoxels] = useState<VoxelMap>(() => {
@@ -327,7 +339,7 @@ export default function CADLab() {
         {/* 3D CANVAS */}
         <div className="flex-1 relative">
           {tab === 'disenar' ? (
-            <TinkerEditor shapes={tinkerShapes} setShapes={setTinkerShapes} selectedId={tinkerSel} setSelectedId={setTinkerSel} mode={tinkerMode} />
+            <TinkerEditor shapes={tinkerShapes} setShapes={setTinkerShapes} selectedId={tinkerSel} setSelectedId={setTinkerSel} mode={tinkerMode} darkMode={darkMode} showGrid={showGrid} />
           ) : tab === 'voxel' ? (
             <VoxelBuilder voxels={voxels} color={voxelColor} modo={voxelModo} setVoxels={setVoxels} />
           ) : (
@@ -364,18 +376,22 @@ export default function CADLab() {
             {/* ── DISEÑAR (TINKERCAD) ── */}
             {tab === 'disenar' && (() => {
               const sel = tinkerShapes.find(s => s.id === tinkerSel) || null
+              const snap = () => setTinkerHist(h => [...h.slice(-19), tinkerShapes])
+              const deshacer = () => setTinkerHist(h => { if (!h.length) return h; setTinkerShapes(h[h.length - 1]); setTinkerSel(null); return h.slice(0, -1) })
               const addShape = (type: TShape['type']) => {
+                snap()
                 const id = 't' + Date.now().toString(36)
                 setTinkerShapes(prev => [...prev, { id, type, color: '#38bdf8', position: [0, 0.6, 0], rotation: [0, 0, 0], scale: [1, 1, 1] }])
                 setTinkerSel(id)
               }
               const dupSel = () => {
                 if (!sel) return
+                snap()
                 const id = 't' + Date.now().toString(36)
                 setTinkerShapes(prev => [...prev, { ...sel, id, position: [sel.position[0] + 1, sel.position[1], sel.position[2] + 1] }])
                 setTinkerSel(id)
               }
-              const delSel = () => { if (!sel) return; setTinkerShapes(prev => prev.filter(s => s.id !== sel.id)); setTinkerSel(null) }
+              const delSel = () => { if (!sel) return; snap(); setTinkerShapes(prev => prev.filter(s => s.id !== sel.id)); setTinkerSel(null) }
               const setColor = (c: string) => { if (!sel) return; setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, color: c } : s)) }
               const setField = (field: 'position' | 'scale', axis: number, val: number) => {
                 if (!sel) return
@@ -383,8 +399,11 @@ export default function CADLab() {
               }
               const espejo = (axis: number) => {
                 if (!sel) return
+                snap()
                 setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, scale: s.scale.map((v, i) => i === axis ? -v : v) as [number, number, number] } : s))
               }
+              const ponerEnPiso = () => { if (!sel) return; snap(); setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, position: [s.position[0], Math.abs(s.scale[1]) * 0.5, s.position[2]] } : s)) }
+              const girar45 = () => { if (!sel) return; snap(); setTinkerShapes(prev => prev.map(s => s.id === sel.id ? { ...s, rotation: [s.rotation[0], s.rotation[1] + Math.PI / 4, s.rotation[2]] } : s)) }
               const generarSTL = () => {
                 if (tinkerShapes.length === 0) return
                 const geos = tinkerShapes.map(s => {
@@ -403,7 +422,11 @@ export default function CADLab() {
                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'diseno-chaskibots.stl'; a.click(); URL.revokeObjectURL(a.href)
               }
               const figuras: { t: TShape['type']; e: string; n: string }[] = [
-                { t: 'box', e: '🧊', n: 'Cubo' }, { t: 'sphere', e: '⚪', n: 'Esfera' }, { t: 'cylinder', e: '🥫', n: 'Cilindro' }, { t: 'cone', e: '🔺', n: 'Cono' }, { t: 'torus', e: '🍩', n: 'Dona' },
+                { t: 'box', e: '🧊', n: 'Cubo' }, { t: 'sphere', e: '⚪', n: 'Esfera' }, { t: 'cylinder', e: '🥫', n: 'Cilindro' },
+                { t: 'cone', e: '🔺', n: 'Cono' }, { t: 'pyramid', e: '🔻', n: 'Pirámide' }, { t: 'prism', e: '📐', n: 'Prisma' },
+                { t: 'torus', e: '🍩', n: 'Dona' }, { t: 'knot', e: '🥨', n: 'Nudo' }, { t: 'capsule', e: '💊', n: 'Cápsula' },
+                { t: 'dome', e: '⛺', n: 'Cúpula' }, { t: 'wheel', e: '🛞', n: 'Rueda' }, { t: 'tetra', e: '🔸', n: 'Tetra' },
+                { t: 'octa', e: '🔷', n: 'Octa' }, { t: 'dodeca', e: '⬡', n: 'Dodeca' }, { t: 'icosa', e: '✴️', n: 'Icosa' },
               ]
               return (
                 <>
@@ -428,6 +451,12 @@ export default function CADLab() {
                         <button key={m} onClick={() => setTinkerMode(m)} className={`py-2 rounded-lg text-[11px] font-bold transition-colors ${tinkerMode === m ? 'bg-cyan-500 text-white' : 'bg-gray-700/40 text-gray-300 hover:bg-gray-700/60'}`}>{lbl}</button>
                       ))}
                     </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <button onClick={deshacer} disabled={tinkerHist.length === 0} className="py-1.5 rounded-lg text-[11px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60 disabled:opacity-40">↶ Deshacer</button>
+                    <button onClick={girar45} disabled={!sel} className="py-1.5 rounded-lg text-[11px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60 disabled:opacity-40">↻ Girar 45°</button>
+                    <button onClick={ponerEnPiso} disabled={!sel} className="py-1.5 rounded-lg text-[11px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60 disabled:opacity-40">⬇ Al piso</button>
+                    <button onClick={() => setShowGrid(g => !g)} className="py-1.5 rounded-lg text-[11px] font-medium bg-gray-700/40 text-gray-200 hover:bg-gray-700/60">{showGrid ? '▦ Rejilla: sí' : '▢ Rejilla: no'}</button>
                   </div>
                   {sel ? (
                     <div className="space-y-2 bg-gray-700/20 rounded-lg p-2.5">
