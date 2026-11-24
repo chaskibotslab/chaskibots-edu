@@ -9,7 +9,10 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Grid, TransformControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-export type TShapeType = 'box' | 'sphere' | 'cylinder' | 'cone' | 'torus'
+export type TShapeType =
+  | 'box' | 'sphere' | 'cylinder' | 'cone' | 'torus'
+  | 'pyramid' | 'prism' | 'tetra' | 'octa' | 'dodeca' | 'icosa'
+  | 'capsule' | 'dome' | 'wheel' | 'knot'
 export interface TShape {
   id: string
   type: TShapeType
@@ -27,18 +30,29 @@ function Geo({ type }: { type: TShapeType }) {
     case 'cylinder': return <cylinderGeometry args={[0.5, 0.5, 1.2, 32]} />
     case 'cone': return <coneGeometry args={[0.6, 1.2, 32]} />
     case 'torus': return <torusGeometry args={[0.5, 0.2, 16, 32]} />
+    case 'pyramid': return <coneGeometry args={[0.7, 1.2, 4]} />
+    case 'prism': return <cylinderGeometry args={[0.7, 0.7, 1.2, 3]} />
+    case 'tetra': return <tetrahedronGeometry args={[0.8]} />
+    case 'octa': return <octahedronGeometry args={[0.8]} />
+    case 'dodeca': return <dodecahedronGeometry args={[0.8]} />
+    case 'icosa': return <icosahedronGeometry args={[0.8]} />
+    case 'capsule': return <capsuleGeometry args={[0.4, 0.8, 8, 16]} />
+    case 'dome': return <sphereGeometry args={[0.7, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+    case 'wheel': return <cylinderGeometry args={[0.7, 0.7, 0.3, 32]} />
+    case 'knot': return <torusKnotGeometry args={[0.4, 0.15, 80, 10]} />
     default: return <boxGeometry args={[1, 1, 1]} />
   }
 }
 
 function Piezas({
-  shapes, setShapes, selectedId, setSelectedId, mode,
+  shapes, setShapes, selectedId, setSelectedId, mode, showGrid,
 }: {
   shapes: TShape[]
   setShapes: (updater: (prev: TShape[]) => TShape[]) => void
   selectedId: string | null
   setSelectedId: (id: string | null) => void
   mode: TMode
+  showGrid: boolean
 }) {
   const meshes = useRef<Record<string, THREE.Mesh>>({})
   // Re-render una vez tras montar para que las referencias de las mallas existan
@@ -67,7 +81,7 @@ function Piezas({
     <>
       <ambientLight intensity={0.75} />
       <directionalLight position={[8, 14, 8]} intensity={1.1} />
-      <Grid args={[24, 24]} cellColor="#334155" sectionColor="#0ea5b7" position={[0, 0, 0]} infiniteGrid={false} />
+      {showGrid && <Grid args={[24, 24]} cellColor="#334155" sectionColor="#0ea5b7" position={[0, 0, 0]} infiniteGrid={false} />}
       {/* Clic en el vacío = deseleccionar */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} onPointerDown={() => setSelectedId(null)}>
         <planeGeometry args={[24, 24]} />
@@ -108,11 +122,14 @@ export default function TinkerEditor(props: {
   selectedId: string | null
   setSelectedId: (id: string | null) => void
   mode: TMode
+  darkMode?: boolean
+  showGrid?: boolean
 }) {
+  const { darkMode = true, showGrid = true, ...rest } = props
   return (
     <Canvas camera={{ position: [7, 7, 9], fov: 50 }} shadows style={{ width: '100%', height: '100%' }}>
-      <color attach="background" args={['#10131F']} />
-      <Piezas {...props} />
+      <color attach="background" args={[darkMode ? '#10131F' : '#eef2f8']} />
+      <Piezas {...rest} showGrid={showGrid} />
     </Canvas>
   )
 }
