@@ -224,8 +224,18 @@ export class MotorIA {
             const poses = await this.detector.estimatePoses(this.video)
             const cuerpo: Record<string, PuntoCuerpo> = {}
             for (const k of poses[0]?.keypoints || []) {
-              const c = this.aEscenario(k.x, k.y)
-              cuerpo[k.name] = { x: c.x, y: c.y, ok: (k.score || 0) > 0.3 }
+              const ok = (k.score || 0) > 0.25
+              const prev = this.cuerpo[k.name]
+              if (ok) {
+                const c = this.aEscenario(k.x, k.y)
+                // Suavizado: el personaje sigue tu cuerpo sin saltos bruscos.
+                cuerpo[k.name] = prev && prev.ok
+                  ? { x: Math.round(prev.x * 0.45 + c.x * 0.55), y: Math.round(prev.y * 0.45 + c.y * 0.55), ok: true }
+                  : { x: c.x, y: c.y, ok: true }
+              } else {
+                // Mantener la última posición conocida en vez de congelar el personaje en el centro.
+                cuerpo[k.name] = prev ? { x: prev.x, y: prev.y, ok: false } : { x: 0, y: 0, ok: false }
+              }
             }
             this.cuerpo = cuerpo
           }
