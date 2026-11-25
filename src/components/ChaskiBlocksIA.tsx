@@ -10,8 +10,9 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import {
   Flag, Octagon, Sparkles, BrainCircuit, GraduationCap, FilePlus2, FolderOpen, Download, Maximize2, Minimize2, Plus, Trash2,
-  Eye, EyeOff, ChevronLeft, ChevronRight, X, Mic, Loader2, RotateCcw, Check, Trophy,
+  Eye, EyeOff, ChevronLeft, ChevronRight, X, Mic, Loader2, RotateCcw, Check, Trophy, Send,
 } from 'lucide-react'
+import { useAuth } from '@/components/AuthProvider'
 import { ANCHO, ALTO, FONDOS, CATEGORIAS, TOOLBOX, BLOQUES_SOMBRERO, OBJETOS, dinamicos, definirBloques, crearTema, crearGenerador } from './chaskiblocks/bloques'
 import { Motor, miraIzquierda, type Proyecto, type SpriteDef, type ScriptCompilado } from './chaskiblocks/motor'
 import { MotorIA } from './chaskiblocks/ia'
@@ -104,6 +105,9 @@ export default function ChaskiBlocksIA() {
   const [miniaturas, setMiniaturas] = useState<string[][]>([])
   const [escala, setEscala] = useState(0.8)
   const [respuesta, setRespuesta] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [enviado, setEnviado] = useState(false)
+  const { user } = useAuth()
   const actualRef = useRef(actual)
   actualRef.current = actual
 
@@ -453,6 +457,38 @@ export default function ChaskiBlocksIA() {
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
+  // Enviar la tarea al profesor: queda ligada a la cuenta del estudiante (como los demás simuladores).
+  const enviarAlProfesor = async () => {
+    if (!listo || enviando) return
+    setEnviando(true)
+    try {
+      let codigo = ''
+      try { codigo = compilar().codigo } catch { /* proyecto sin bloques */ }
+      const p = proyecto.current
+      const resumen = {
+        proyecto: p.nombre,
+        actividad: guia?.a.titulo || null,
+        personajes: p.sprites.map(s => s.nombre),
+        bloques: p.sprites.reduce((a, s) => a + (s.bloques?.blocks?.length || 0), 0),
+        clasesIA: p.clases,
+        ejemplosIA: ia.totalEjemplos(),
+      }
+      const res = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          taskId: `CB-${Date.now().toString(36).toUpperCase()}`,
+          output: `ChaskiBlocks IA — ${guia?.a.titulo ? `actividad «${guia.a.titulo}»` : `proyecto «${p.nombre}»`} · ${resumen.personajes.length} personaje(s), ${resumen.bloques} bloque(s)${resumen.ejemplosIA ? `, ${resumen.ejemplosIA} ejemplos de IA` : ''}`,
+          code: codigo || '(sin bloques de programa)',
+          files: { chaskiblocks: resumen },
+        }),
+      })
+      if (res.ok) { setEnviado(true); setTimeout(() => setEnviado(false), 4000) }
+      else setAviso({ tipo: 'error', texto: 'No pude enviar la tarea. Inicia sesión e inténtalo de nuevo.' })
+    } catch { setAviso({ tipo: 'error', texto: 'No pude enviar la tarea. Revisa tu conexión.' }) }
+    setEnviando(false)
+  }
+
   const abrir = async (f: File | undefined) => {
     if (!f) return
     try {
@@ -542,6 +578,9 @@ export default function ChaskiBlocksIA() {
         <button onClick={() => archivo.current?.click()} title="Abrir un proyecto de tu computadora" className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold hover:bg-white/20"><FolderOpen className="h-4 w-4" /><span className="hidden md:inline">Abrir</span></button>
         <button onClick={descargar} title="Guardar el proyecto en tu computadora" className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold hover:bg-white/20"><Download className="h-4 w-4" /><span className="hidden md:inline">Guardar</span></button>
         <div className="ml-auto flex items-center gap-1.5">
+          {user?.name && (
+            <button onClick={enviarAlProfesor} disabled={enviando || enviado} title={`Enviar la tarea como ${user.name}`} className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition disabled:opacity-80 ${enviado ? 'bg-green-600 text-white' : 'bg-white/90 text-green-700 hover:bg-white'}`}><Send className="h-4 w-4" /> {enviado ? '✓ Enviado' : enviando ? 'Enviando…' : 'Enviar tarea'}</button>
+          )}
           <button onClick={() => setPanel('actividades')} className="flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-xs font-bold text-[#2b6fd6] hover:bg-blue-50"><GraduationCap className="h-4 w-4" /> Actividades</button>
           <button onClick={() => setPanel('entrenar')} className="flex items-center gap-1.5 rounded-md bg-[#E8456B] px-2.5 py-1 text-xs font-bold text-white hover:bg-[#d63a5f]"><BrainCircuit className="h-4 w-4" /> Entrenar IA</button>
           <button onClick={() => setCompleta(c => !c)} title={completa ? 'Salir de pantalla completa' : 'Pantalla completa'} aria-label={completa ? 'Salir de pantalla completa' : 'Pantalla completa'} className="rounded-md p-1.5 hover:bg-white/20">{completa ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}</button>
