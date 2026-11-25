@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
 import { useExpand } from '@/hooks/useExpand'
+import EnviarTarea from '@/components/simuladores/EnviarTarea'
 import VoxelBuilder, { VoxelMap } from './VoxelBuilder'
 import TinkerEditor, { TShape } from './TinkerEditor'
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter.js'
@@ -397,28 +398,6 @@ export default function CADLab() {
     URL.revokeObjectURL(url)
   }
 
-  // Enviar el diseño 3D como entrega, ligada a la cuenta del estudiante (identidad desde la sesión).
-  const enviarAlProfesor = async () => {
-    setEnviando(true)
-    try {
-      const res = await fetch('/api/submissions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          taskId: `CAD-${Date.now().toString(36).toUpperCase()}`,
-          output: tab === 'disenar'
-            ? `Diseño 3D (Tinkercad): ${tinkerShapes.length} figura(s)`
-            : tab === 'voxel'
-            ? `Construcción con ${Object.keys(voxels).length} bloques`
-            : `Modelo del visor: ${modeloSel?.name || '—'}`,
-          files: tab === 'disenar' ? { tinker: tinkerShapes } : tab === 'voxel' ? { voxels } : { piezas: modeloSel?.piezas },
-        }),
-      })
-      if (res.ok) { setEnviado(true); setTimeout(() => setEnviado(false), 4000) }
-    } catch { /* sin conexión */ }
-    setEnviando(false)
-  }
-
   const selectedShape = builderShapes[selectedShapeIdx]
 
   const tabs = [
@@ -451,11 +430,19 @@ export default function CADLab() {
           <button onClick={exportScene} className="text-[10px] px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-medium flex items-center gap-1 hover:bg-cyan-500/30 transition-colors">
             <Download className="w-3 h-3" /> Exportar
           </button>
-          {user?.name && (
-            <button onClick={enviarAlProfesor} disabled={enviando || enviado} className={`text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 transition-colors disabled:opacity-70 ${enviado ? 'bg-green-600 text-white border border-green-500' : 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30'}`} title={`Enviar como ${user.name}`}>
-              <Send className="w-3 h-3" /> {enviado ? '✓ Enviado' : enviando ? 'Enviando…' : 'Enviar al profesor'}
-            </button>
-          )}
+          <EnviarTarea
+            simulador="Diseño 3D"
+            sigla="3D"
+            botonClassName="text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 transition-colors disabled:opacity-70 bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30"
+            obtenerEntrega={() => ({
+              output: tab === 'disenar'
+                ? `Diseño 3D (Tinkercad): ${tinkerShapes.length} figura(s)`
+                : tab === 'voxel'
+                ? `Construcción con ${Object.keys(voxels).length} bloques`
+                : `Modelo del visor: ${modeloSel?.name || '—'}`,
+              files: tab === 'disenar' ? { tinker: tinkerShapes } : tab === 'voxel' ? { voxels } : { piezas: modeloSel?.piezas },
+            })}
+          />
         </div>
       </div>
 

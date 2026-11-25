@@ -13,6 +13,7 @@ import {
   Eye, EyeOff, ChevronLeft, ChevronRight, X, Mic, Loader2, RotateCcw, Check, Trophy, Send,
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
+import EnviarTarea from '@/components/simuladores/EnviarTarea'
 import { ANCHO, ALTO, FONDOS, CATEGORIAS, TOOLBOX, BLOQUES_SOMBRERO, OBJETOS, dinamicos, definirBloques, crearTema, crearGenerador } from './chaskiblocks/bloques'
 import { Motor, miraIzquierda, type Proyecto, type SpriteDef, type ScriptCompilado } from './chaskiblocks/motor'
 import { MotorIA } from './chaskiblocks/ia'
@@ -463,40 +464,6 @@ export default function ChaskiBlocksIA() {
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
-  // Enviar la tarea al profesor: queda ligada a la cuenta del estudiante (como los demás simuladores).
-  const enviarAlProfesor = async () => {
-    if (!listo || enviando) return
-    setEnviando(true)
-    try {
-      let codigo = ''
-      try { codigo = compilar().codigo } catch { /* proyecto sin bloques */ }
-      const p = proyecto.current
-      const resumen = {
-        proyecto: p.nombre,
-        actividad: guia?.a.titulo || null,
-        personajes: p.sprites.map(s => s.nombre),
-        bloques: p.sprites.reduce((a, s) => a + (s.bloques?.blocks?.length || 0), 0),
-        clasesIA: p.clases,
-        ejemplosIA: ia.totalEjemplos(),
-      }
-      const ficha = `ChaskiBlocks IA — ${guia?.a.titulo ? `actividad «${guia.a.titulo}»` : `proyecto «${p.nombre}»`} · ${resumen.personajes.length} personaje(s), ${resumen.bloques} bloque(s)${resumen.ejemplosIA ? `, ${resumen.ejemplosIA} ejemplos de IA` : ''}`
-      const nota = mensaje.trim()
-      const res = await fetch('/api/submissions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          taskId: `CB-${Date.now().toString(36).toUpperCase()}`,
-          output: nota ? `📝 ${nota}\n\n${ficha}` : ficha,
-          code: codigo || '(sin bloques de programa)',
-          files: { chaskiblocks: { ...resumen, mensaje: nota || undefined } },
-        }),
-      })
-      if (res.ok) { setEnviado(true); setModalEnviar(false); setMensaje(''); setTimeout(() => setEnviado(false), 4000) }
-      else setAviso({ tipo: 'error', texto: 'No pude enviar la tarea. Inicia sesión e inténtalo de nuevo.' })
-    } catch { setAviso({ tipo: 'error', texto: 'No pude enviar la tarea. Revisa tu conexión.' }) }
-    setEnviando(false)
-  }
-
   const abrir = async (f: File | undefined) => {
     if (!f) return
     try {
@@ -587,7 +554,29 @@ export default function ChaskiBlocksIA() {
         <button onClick={descargar} title="Guardar el proyecto en tu computadora" className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold hover:bg-white/20"><Download className="h-4 w-4" /><span className="hidden md:inline">Guardar</span></button>
         <div className="ml-auto flex items-center gap-1.5">
           {user?.name && (
-            <button onClick={() => setModalEnviar(true)} disabled={enviado} title={`Enviar la tarea como ${user.name}`} className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition disabled:opacity-80 ${enviado ? 'bg-green-600 text-white' : 'bg-white/90 text-green-700 hover:bg-white'}`}><Send className="h-4 w-4" /> {enviado ? '✓ Enviado' : 'Enviar tarea'}</button>
+            <EnviarTarea
+              simulador="ChaskiBlocks IA"
+              sigla="CB"
+              botonClassName="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition disabled:opacity-80 bg-white/90 text-green-700 hover:bg-white"
+              obtenerEntrega={() => {
+                let codigo = ''
+                try { codigo = compilar().codigo } catch { /* proyecto sin bloques */ }
+                const p = proyecto.current
+                const resumen = {
+                  proyecto: p.nombre,
+                  actividad: guia?.a.titulo || null,
+                  personajes: p.sprites.map(s => s.nombre),
+                  bloques: p.sprites.reduce((a, s) => a + (s.bloques?.blocks?.length || 0), 0),
+                  clasesIA: p.clases,
+                  ejemplosIA: ia.totalEjemplos(),
+                }
+                return {
+                  output: `ChaskiBlocks IA — ${guia?.a.titulo ? `actividad «${guia.a.titulo}»` : `proyecto «${p.nombre}»`} · ${resumen.personajes.length} personaje(s), ${resumen.bloques} bloque(s)${resumen.ejemplosIA ? `, ${resumen.ejemplosIA} ejemplos de IA` : ''}`,
+                  code: codigo || '(sin bloques de programa)',
+                  files: { chaskiblocks: resumen },
+                }
+              }}
+            />
           )}
           <button onClick={() => setPanel('actividades')} className="flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-xs font-bold text-[#2b6fd6] hover:bg-blue-50"><GraduationCap className="h-4 w-4" /> Actividades</button>
           <button onClick={() => setPanel('entrenar')} className="flex items-center gap-1.5 rounded-md bg-[#E8456B] px-2.5 py-1 text-xs font-bold text-white hover:bg-[#d63a5f]"><BrainCircuit className="h-4 w-4" /> Entrenar IA</button>
@@ -760,33 +749,6 @@ export default function ChaskiBlocksIA() {
       {panel === 'personaje' && <PanelBiblioteca titulo="Elige un personaje" alElegir={agregarPersonaje} alSubir={agregarPersonaje} alCerrar={() => setPanel(null)} />}
       {panel === 'disfraz' && <PanelBiblioteca titulo={`Elige un disfraz para ${sprite?.nombre || ''}`} alElegir={agregarDisfraz} alSubir={agregarDisfraz} alCerrar={() => setPanel(null)} />}
 
-      {modalEnviar && (
-        <div className="absolute inset-0 z-[210] flex items-center justify-center bg-slate-900/50 p-4" onPointerDown={() => !enviando && setModalEnviar(false)}>
-          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl" onPointerDown={e => e.stopPropagation()}>
-            <div className="mb-3 flex items-center gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-green-100 text-green-700"><Send className="h-4 w-4" /></span>
-              <div>
-                <h3 className="text-sm font-extrabold text-slate-900">Enviar tarea a tu profesor</h3>
-                <p className="text-[11px] text-slate-500">Se enviará como <b>{user?.name}</b>{guia?.a.titulo ? ` · actividad «${guia.a.titulo}»` : ` · proyecto «${proyecto.current.nombre}»`}</p>
-              </div>
-            </div>
-            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-400">Mensaje para tu profesor (opcional)</label>
-            <textarea value={mensaje} onChange={e => setMensaje(e.target.value.slice(0, 500))} rows={4} autoFocus
-              placeholder="Cuéntale qué hiciste, qué aprendiste o qué te costó…"
-              className="w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-green-500 focus:outline-none" />
-            <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
-              <span>Se adjunta tu programa y los datos de la actividad.</span>
-              <span>{mensaje.length}/500</span>
-            </div>
-            <div className="mt-4 flex justify-end gap-2">
-              <button onClick={() => setModalEnviar(false)} disabled={enviando} className="rounded-lg px-3 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 disabled:opacity-50">Cancelar</button>
-              <button onClick={enviarAlProfesor} disabled={enviando || !listo} className="flex items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 disabled:opacity-60">
-                {enviando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {enviando ? 'Enviando…' : 'Enviar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

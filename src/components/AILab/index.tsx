@@ -16,6 +16,7 @@ import { useUserGrade } from '@/hooks/useUserGrade'
 import { isProgramAvailable, minGradeLabel } from '@/lib/programGating'
 import { useExpand } from '@/hooks/useExpand'
 import { useAuth } from '@/components/AuthProvider'
+import EnviarTarea from '@/components/simuladores/EnviarTarea'
 
 const TeachableMachine = dynamic(() => import('./TeachableMachine'), { ssr: false })
 const PoseGame = dynamic(() => import('./PoseGame'), { ssr: false })
@@ -626,11 +627,18 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
           <span className="hidden sm:flex text-[10px] px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 font-medium items-center gap-1">
             <Sparkles className="w-3 h-3" /> 10 Actividades
           </span>
-          {user?.name && (
-            <button onClick={enviarAlProfesor} disabled={enviando || enviado} className={`text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 transition-colors disabled:opacity-70 ${enviado ? 'bg-green-600 text-white border border-green-500' : 'bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30'}`} title={`Enviar como ${user.name}`}>
-              <Send className="w-3 h-3" /> {enviado ? '✓ Enviado' : enviando ? 'Enviando…' : 'Enviar al profesor'}
-            </button>
-          )}
+          <EnviarTarea
+            simulador="Laboratorio de IA"
+            sigla="IA"
+            botonClassName="text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 transition-colors disabled:opacity-70 bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30"
+            obtenerEntrega={() => {
+              const actual = tabs.find(t => t.id === mode)
+              return {
+                output: `Laboratorio de IA — actividad: ${actual?.label || mode}${annotations.length ? ` (${annotations.length} objetos etiquetados)` : ''}`,
+                files: { ia: { actividad: mode, anotaciones: annotations } },
+              }
+            }}
+          />
           <button onClick={toggle} className="p-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 text-gray-400 transition-colors" title={expanded ? 'Salir de pantalla completa (Esc)' : 'Pantalla completa'}>
             {expanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>

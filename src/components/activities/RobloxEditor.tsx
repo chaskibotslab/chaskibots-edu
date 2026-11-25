@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
 import { useExpand } from '@/hooks/useExpand'
+import EnviarTarea from '@/components/simuladores/EnviarTarea'
 
 interface RobloxEditorProps {
   levelId: string
@@ -857,11 +858,12 @@ print("Nivel: " .. nivel)`)
                 <span className="text-xs text-gray-400 font-mono">Consola</span>
               </div>
               <div className="flex items-center gap-2">
-                {user?.name && (
-                  <button onClick={handleSend} disabled={enviando || enviado} className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors text-xs font-medium disabled:opacity-70 ${enviado ? 'bg-green-600 text-white' : 'bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30'}`} title={`Enviar como ${user.name}`}>
-                    <Send className="w-3.5 h-3.5" /> {enviado ? '✓ Enviado' : enviando ? 'Enviando...' : 'Enviar'}
-                  </button>
-                )}
+                <EnviarTarea
+                  simulador="Roblox (Lua)"
+                  sigla="ROBLOX"
+                  botonClassName="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors text-xs font-medium disabled:opacity-70 bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30"
+                  obtenerEntrega={() => ({ code, output: output.slice(-30).join('\n') })}
+                />
                 <button
                   onClick={runCode}
                   disabled={isRunning}
