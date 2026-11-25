@@ -169,7 +169,7 @@ export default function ChaskiBlocksIA() {
     motor.video = false
     motor.videoOpacidad = 0.7
     motor.borrarLapiz()
-    ia.usar = { objetos: false, cuerpo: false }
+    ia.usar = { objetos: false, cuerpo: false, mano: false }
     ia.fijarClases(p.clases)
     ia.importarEntrenamiento(p.entrenamiento)
     setMiniaturas([])
@@ -272,7 +272,7 @@ export default function ChaskiBlocksIA() {
               c.fillStyle = '#fff'; c.fillText(nombre, x + 4, Math.max(0, y - 16) + 2)
             }
           }
-          if (ia.usar.cuerpo) {
+          if (ia.usar.cuerpo || ia.usar.mano) {
             for (const p of Object.values(ia.cuerpo)) {
               if (!p.ok) continue
               c.beginPath(); c.arc(ANCHO / 2 + p.x, ALTO / 2 - p.y, 4, 0, Math.PI * 2)
@@ -345,14 +345,18 @@ export default function ChaskiBlocksIA() {
 
     const usaClasificador = /api\.ia(Ve|Clase|Seguridad)\(/.test(c.codigo) || c.scripts.some(s => s.tipo === 'ia_cuando_ve')
     const usaObjetos = /api\.obj[A-Z]/.test(c.codigo)
-    const usaCuerpo = /api\.(parte[A-Z]|irAParte)/.test(c.codigo)
-    ia.usar = { objetos: usaObjetos, cuerpo: usaCuerpo }
-    if (usaClasificador || usaObjetos || usaCuerpo) {
+    // Qué parte del cuerpo pide el programa: las muñecas van por el detector de manos (preciso de cerca), el resto por MoveNet.
+    const partes = [...c.codigo.matchAll(/api\.(?:irAParte|parteX|parteY|parteVisible)\("([^"]+)"/g)].map(m => m[1])
+    const usaMano = partes.some(p => p.includes('wrist'))
+    const usaCuerpo = partes.some(p => !p.includes('wrist'))
+    ia.usar = { objetos: usaObjetos, cuerpo: usaCuerpo, mano: usaMano }
+    if (usaClasificador || usaObjetos || usaCuerpo || usaMano) {
       ia.encenderCamara()
       const fallo = () => setAviso({ tipo: 'error', texto: 'No pude descargar el modelo de IA. Revisa tu conexión a internet.' })
       if (usaClasificador) ia.prepararClasificador().catch(fallo)
       if (usaObjetos) ia.prepararObjetos().catch(fallo)
       if (usaCuerpo) ia.prepararCuerpo().catch(fallo)
+      if (usaMano) ia.prepararMano().catch(fallo)
       if (usaClasificador && ia.totalEjemplos() === 0) setAviso({ tipo: 'info', texto: 'Tu IA todavía no tiene ejemplos. Abre «Entrenar IA» y enséñale qué debe reconocer.' })
     }
     motor.iniciar(c.scripts)

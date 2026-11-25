@@ -29,6 +29,7 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@mediapipe/pose': false,
+      '@mediapipe/hands': false,
       '@tensorflow/tfjs-backend-webgpu': false,
     }
     return config

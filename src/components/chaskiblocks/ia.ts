@@ -32,7 +32,7 @@ export class MotorIA {
   escuchando = false
 
   // Qué modelos necesita el programa que está corriendo
-  usar = { objetos: false, cuerpo: false }
+  usar = { objetos: false, cuerpo: false, mano: false }
   nombres: string[] = ['Clase 1', 'Clase 2']
   ejemplos: number[] = [0, 0]
 
@@ -41,6 +41,7 @@ export class MotorIA {
   private knn: any = null
   private coco: any = null
   private detector: any = null
+  private manos: any = null
   private cargandoModelo: Record<string, Promise<void> | undefined> = {}
   private pendiente: any = null
   private vivo = false
@@ -115,6 +116,16 @@ export class MotorIA {
       await this.cargarTF()
       const p = await import('@tensorflow-models/pose-detection')
       this.detector = await p.createDetector(p.SupportedModels.MoveNet, { modelType: p.movenet.modelType.SINGLEPOSE_LIGHTNING })
+      this.mensaje = ''; this.alCambiar()
+    })
+  }
+
+  prepararMano() {
+    return this.una('mano', async () => {
+      this.mensaje = 'Preparando el seguimiento de manos…'; this.alCambiar()
+      await this.cargarTF()
+      const h = await import('@tensorflow-models/hand-pose-detection')
+      this.manos = await h.createDetector(h.SupportedModels.MediaPipeHands, { runtime: 'tfjs', modelType: 'lite', maxHands: 2 })
       this.mensaje = ''; this.alCambiar()
     })
   }
@@ -239,10 +250,32 @@ export class MotorIA {
             }
             this.cuerpo = cuerpo
           }
+          if (this.usar.mano && this.manos) {
+            trabajo = true
+            const hands = await this.manos.estimateHands(this.video, { flipHorizontal: false })
+            const nuevo: Record<string, PuntoCuerpo> = {}
+            for (const h of hands) {
+              const lm = h.keypoints || []
+              const palma = lm[9] || lm[0] // centro de la palma (más estable que la muñeca)
+              if (!palma) continue
+              const c = this.aEscenario(palma.x, palma.y)
+              const nombre = h.handedness === 'Left' ? 'left_wrist' : 'right_wrist'
+              nuevo[nombre] = { x: c.x, y: c.y, ok: true }
+            }
+            // Con una sola mano, se usa para ambos lados: así cualquier actividad la sigue.
+            const claves = Object.keys(nuevo)
+            if (claves.length === 1) { const u = nuevo[claves[0]]; nuevo.left_wrist = u; nuevo.right_wrist = u }
+            // El detector de manos tiene prioridad sobre MoveNet para las muñecas, con suavizado.
+            for (const k of ['left_wrist', 'right_wrist']) {
+              const cur = nuevo[k], prev = this.cuerpo[k]
+              if (cur) this.cuerpo[k] = prev && prev.ok ? { x: Math.round(prev.x * 0.4 + cur.x * 0.6), y: Math.round(prev.y * 0.4 + cur.y * 0.6), ok: true } : cur
+              else if (prev) this.cuerpo[k] = { x: prev.x, y: prev.y, ok: false }
+            }
+          }
         } catch { /* cuadro sin predicción */ }
         if (trabajo) this.alCambiar()
       }
-      await dormir(trabajo ? (this.usar.cuerpo ? 40 : 120) : 250)
+      await dormir(trabajo ? (this.usar.cuerpo || this.usar.mano ? 40 : 120) : 250)
     }
   }
 
