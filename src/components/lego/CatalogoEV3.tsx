@@ -106,7 +106,7 @@ async function cargarPieza(tipo: string): Promise<THREE.Group> {
 /** Modelo de una guía, apoyado en la mesa y centrado. */
 async function cargarModeloGuia(archivo: string): Promise<THREE.Group> {
   const g = await cargarLDraw(archivo)
-  g.rotation.x = Math.PI
+  g.rotation.z = Math.PI // LDraw usa Y hacia abajo; girado así el frente del robot mira a la cámara
   g.scale.setScalar(ESCALA)
   g.updateMatrixWorld(true)
   const box = new THREE.Box3().setFromObject(g)

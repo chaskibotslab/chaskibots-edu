@@ -1,0 +1,30 @@
+0 Seguidor de linea ChaskiBots
+0 Name: seguidor.ldr
+0 Author: ChaskiBots
+0 // Unidades LDU. Frente = +z, arriba = -y. Eje de las ruedas en y=0, z=0 (piso en y=70).
+1 15 -80 0 0 1 0 0 0 1 0 0 0 1 95658.dat
+0 STEP
+1 15 80 0 0 1 0 0 0 1 0 0 0 1 95658.dat
+0 STEP
+1 4 0 -79 -40 0 0 1 0 1 0 -1 0 0 32525.dat
+0 STEP
+1 4 0 19 -125 0 0 1 0 1 0 -1 0 0 32525.dat
+0 STEP
+1 71 0 -1 -175 1 0 0 0 1 0 0 0 1 32524.dat
+0 STEP
+1 71 0 47 -200 1 0 0 0 0 -1 0 1 0 92911c01.dat
+0 STEP
+1 71 -150 0 0 0 0 1 0 1 0 -1 0 0 56908.dat
+1 0 -150 0 0 0 0 1 0 1 0 -1 0 0 41897.dat
+0 STEP
+1 71 150 0 0 0 0 1 0 1 0 -1 0 0 56908.dat
+1 0 150 0 0 0 0 1 0 1 0 -1 0 0 41897.dat
+0 STEP
+1 71 0 -99 10 1 0 0 0 1 0 0 0 1 32524.dat
+0 STEP
+1 4 0 -40 70 1 0 0 0 0 1 0 -1 0 32316.dat
+0 STEP
+1 15 0 -217 -110 1 0 0 0 1 0 0 0 1 95646c01.dat
+0 STEP
+1 15 0 -10 52 1 0 0 0 0 -1 0 1 0 95650.dat
+0 STEP

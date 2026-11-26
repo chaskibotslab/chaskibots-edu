@@ -14,6 +14,7 @@ import { crearApiEV3 } from './apiEV3'
 import { definirBloquesEV3, crearTemaEV3, crearGeneradorEV3, TOOLBOX_EV3 } from './bloquesEV3'
 import { MISIONES_EV3 } from './misionesEV3'
 
+import { GUIA_ROBOT, ROBOTS_SIMULABLES } from './guiasEV3'
 const Escena3D = dynamic(() => import('./Escena3D'), { ssr: false })
 
 const AsyncFunction = Object.getPrototypeOf(async function () { /* molde */ }).constructor
@@ -30,6 +31,8 @@ export default function EV3Lab() {
   const { expanded, toggle } = useExpand()
   const [listo, setListo] = useState(false)
   const [misionIdx, setMisionIdx] = useState(0)
+  const [robotId, setRobotId] = useState(GUIA_ROBOT.id)
+  const robot = ROBOTS_SIMULABLES.find(r => r.id === robotId) || GUIA_ROBOT
   const [version, setVersion] = useState(0)
   const [corriendo, setCorriendo] = useState(false)
   const [logrado, setLogrado] = useState(false)
@@ -135,7 +138,7 @@ export default function EV3Lab() {
               return {
                 output: `LEGO EV3 — misión «${mision.titulo}» (${mision.nivel}). ${logrado ? '✅ Lograda' : '⏳ En progreso'}.`,
                 code: codigo || '(sin bloques)',
-                files: { ev3: { mision: mision.id, logrado } },
+                files: { ev3: { mision: mision.id, logrado, robot: robot.id } },
               }
             }}
           />
@@ -158,12 +161,16 @@ export default function EV3Lab() {
           <div className="flex items-center gap-1.5">
             <button onClick={ejecutar} disabled={!listo || corriendo} title="Ejecutar" className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-bold text-white transition ${corriendo ? 'bg-green-300' : 'bg-green-600 hover:bg-green-700'}`}><Play className="h-4 w-4" /> Ejecutar</button>
             <button onClick={parar} title="Detener" className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-bold text-white transition ${corriendo ? 'bg-red-600 hover:bg-red-700' : 'bg-red-300'}`}><Square className="h-4 w-4" /> Parar</button>
-            <button onClick={reiniciar} title="Reiniciar el robot" className="ml-auto flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-200"><RotateCcw className="h-3.5 w-3.5" /> Reiniciar</button>
+            <select value={robotId} onChange={e => setRobotId(e.target.value)} title="Elige el robot que quieres simular"
+              className="ml-auto min-w-0 max-w-[150px] rounded-md border border-slate-300 bg-white px-1.5 py-1 text-xs font-semibold text-slate-700">
+              {ROBOTS_SIMULABLES.map(r => <option key={r.id} value={r.id}>{r.emoji} {r.nombre}</option>)}
+            </select>
+            <button onClick={reiniciar} title="Reiniciar el robot" className=" flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-200"><RotateCcw className="h-3.5 w-3.5" /> Reiniciar</button>
           </div>
 
           {/* Escena 3D */}
           <div className="relative w-full overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm" style={{ aspectRatio: '1 / 1' }}>
-            <Escena3D motor={motor} tapete={mision.tapete} version={version} />
+            <Escena3D motor={motor} tapete={mision.tapete} version={version} robot={robot.archivo} />
             {/* HUD sensores */}
             <div className="pointer-events-none absolute left-1.5 top-1.5 flex flex-col gap-1 text-[11px] font-bold">
               <span className="rounded-md bg-white/90 px-1.5 py-0.5 text-slate-700 shadow-sm">🎨 {hud.color}</span>
