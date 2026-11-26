@@ -6,12 +6,14 @@
  *   fuente para el sensor de color (motor.leerColorEn).
  * - Integra la física en cada cuadro (motor.tick) y mueve el robot.
  */
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { LegoMotor, Tapete } from './engine'
 import { colorMasCercano } from './colores'
+import { aligerar, cargarLDraw, piezasPorPaso } from './ldraw'
+import { GUIA_ROBOT } from './guiasEV3'
 
 const SCALE = 6 // px por cm en el canvas del tapete
 
@@ -46,15 +48,64 @@ function usarTapete(motor: LegoMotor, tapete: Tapete) {
   }, [motor, tapete])
 }
 
+// El robot real (el mismo que se arma en «Armar»), a escala del campo.
+// 1 LDU = 0,04 cm; se dibuja un poco más grande (×1,5) para que se vea bien en el tapete.
+const CM_POR_LDU = 0.04 * 1.5
+const PASO_RUEDA_IZQ = 6, PASO_RUEDA_DER = 7 // pasos (0 STEP) de las ruedas en ev3-robot.ldr
+
+function usarRobotReal() {
+  const [robot, setRobot] = useState<{ raiz: THREE.Group; ruedasL: THREE.Object3D[]; ruedasR: THREE.Object3D[] } | null>(null)
+  useEffect(() => {
+    let vivo = true
+    cargarLDraw(GUIA_ROBOT.archivo).then(g => {
+      if (!vivo) return
+      aligerar(g)
+      g.rotation.x = Math.PI            // LDraw usa Y hacia abajo
+      g.scale.setScalar(CM_POR_LDU)
+      const raiz = new THREE.Group()
+      raiz.rotation.y = -Math.PI / 2    // el frente del modelo (+z LDraw) pasa a +x, el frente del simulador
+      raiz.position.y = 70 * CM_POR_LDU // el eje de las ruedas queda a la altura de su radio
+      raiz.add(g)
+      const piezas = piezasPorPaso(g)
+      setRobot({
+        raiz,
+        ruedasL: piezas.filter(p => p.paso === PASO_RUEDA_IZQ).map(p => p.obj),
+        ruedasR: piezas.filter(p => p.paso === PASO_RUEDA_DER).map(p => p.obj),
+      })
+    }).catch(() => { /* se queda el robot sencillo */ })
+    return () => { vivo = false }
+  }, [])
+  return robot
+}
+
 function Robot({ motor }: { motor: LegoMotor }) {
   const ref = useRef<THREE.Group>(null)
+  const real = usarRobotReal()
+  const giro = useRef({ l: 0, r: 0 })
   useFrame((_, delta) => {
     motor.tick(Math.min(delta, 0.05))
     const g = ref.current
     if (g) { g.position.x = motor.x; g.position.z = motor.z; g.rotation.y = -motor.ang }
+    if (real) {
+      // las ruedas giran según los grados que lleva cada motor
+      // (÷1,5 porque la rueda dibujada es 1,5 veces más grande; signo negativo = rueda hacia adelante)
+      const l = THREE.MathUtils.degToRad(motor.gradosL) / 1.5, r = THREE.MathUtils.degToRad(motor.gradosR) / 1.5
+      for (const o of real.ruedasL) o.rotateZ(-(l - giro.current.l))
+      for (const o of real.ruedasR) o.rotateZ(-(r - giro.current.r))
+      giro.current = { l, r }
+    }
   })
   return (
     <group ref={ref} position={[motor.x, 0, motor.z]} rotation={[0, -motor.ang, 0]}>
+      {real ? <primitive object={real.raiz} /> : <RobotSencillo />}
+    </group>
+  )
+}
+
+/** Robot de bloques que se muestra mientras cargan las piezas reales. */
+function RobotSencillo() {
+  return (
+    <>
       {/* chasis (forward = +x local) */}
       <mesh position={[0, 5, 0]} castShadow>
         <boxGeometry args={[16, 6, 12]} />
@@ -77,7 +128,7 @@ function Robot({ motor }: { motor: LegoMotor }) {
           <meshStandardMaterial color="#111" />
         </mesh>
       ))}
-    </group>
+    </>
   )
 }
 
@@ -112,7 +163,7 @@ function Mundo({ motor, tapete }: { motor: LegoMotor; tapete: Tapete }) {
         </mesh>
       )}
       <Robot motor={motor} />
-      <OrbitControls enablePan={false} minDistance={120} maxDistance={360} maxPolarAngle={Math.PI / 2.1} />
+      <OrbitControls enablePan={false} minDistance={45} maxDistance={360} maxPolarAngle={Math.PI / 2.1} />
     </>
   )
 }
@@ -121,7 +172,7 @@ export default function Escena3D({ motor, tapete, version }: { motor: LegoMotor;
   // version fuerza remmontar el mundo al cambiar de misión (reconstruye textura/sensor)
   useEffect(() => { motor.cargar(tapete) }, [motor, tapete])
   return (
-    <Canvas shadows camera={{ position: [40, 200, 200], fov: 42 }} dpr={[1, 1.8]} style={{ background: 'linear-gradient(#dbeafe,#eef2f7)' }}>
+    <Canvas shadows camera={{ position: [30, 150, 160], fov: 42 }} dpr={[1, 1.8]} style={{ background: 'linear-gradient(#dbeafe,#eef2f7)' }}>
       <Mundo key={version} motor={motor} tapete={tapete} />
     </Canvas>
   )

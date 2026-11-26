@@ -47,6 +47,32 @@ const piezas = {
   viga_15: [`1 0 0 0 0 ${I} 32278.dat`],
   marco: [`1 71 0 0 0 ${I} 64179.dat`],
   eje: [`1 0 0 0 0 ${I} 3706.dat`],
+  // vigas extra
+  viga_9: [`1 71 0 0 0 ${I} 40490.dat`],
+  viga_5: [`1 4 0 0 0 ${I} 32316.dat`],
+  viga_L: [`1 0 0 0 0 ${I} 32140.dat`],
+  viga_L35: [`1 15 0 0 0 ${I} 32526.dat`],
+  viga_T: [`1 71 0 0 0 ${I} 60484.dat`],
+  marco_11: [`1 71 0 0 0 ${I} 64178.dat`],
+  // uniones: pines, ejes, bujes y conectores
+  pin_negro: [`1 0 0 0 0 ${I} 2780.dat`],
+  pin_largo: [`1 1 0 0 0 ${I} 6558.dat`],
+  pin_eje: [`1 1 0 0 0 ${I} 43093.dat`],
+  buje: [`1 71 0 0 0 ${I} 3713.dat`],
+  eje_3: [`1 71 0 0 0 ${I} 4519.dat`],
+  eje_5: [`1 71 0 0 0 ${I} 32073.dat`],
+  eje_8: [`1 0 0 0 0 ${I} 3707.dat`],
+  union_ejes: [`1 4 0 0 0 ${I} 59443.dat`],
+  conector_recto: [`1 0 0 0 0 ${I} 32034.dat`],
+  conector_90: [`1 0 0 0 0 ${I} 32014.dat`],
+  bloque_cruz: [`1 71 0 0 0 ${I} 6536.dat`],
+  bloque_cruz3: [`1 71 0 0 0 ${I} 32184.dat`],
+  conector_perp: [`1 71 0 0 0 ${I} 55615.dat`],
+  // engranajes
+  engranaje_8: [`1 71 0 0 0 ${I} 3647.dat`],
+  engranaje_12: [`1 0 0 0 0 ${I} 32270.dat`],
+  engranaje_24: [`1 71 0 0 0 ${I} 3648b.dat`],
+  engranaje_40: [`1 71 0 0 0 ${I} 3649.dat`],
 }
 
 fs.mkdirSync(outDir, { recursive: true })

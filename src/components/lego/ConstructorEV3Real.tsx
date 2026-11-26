@@ -4,38 +4,25 @@
  * Constructor del robot EV3 con PIEZAS REALES (biblioteca LDraw) y armado por pasos.
  * Carga un modelo .mpd autocontenido con LDrawLoader y revela las piezas paso a paso.
  */
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { LDrawLoader } from 'three/examples/jsm/loaders/LDrawLoader.js'
+import { cargarLDraw, mostrarHasta } from './ldraw'
+import { GUIA_ROBOT } from './guiasEV3'
 import { ChevronLeft, ChevronRight, RotateCcw, Maximize2, Minimize2, Check, Trophy, Hammer, Loader2 } from 'lucide-react'
 import { useExpand } from '@/hooks/useExpand'
 import EnviarTarea from '@/components/simuladores/EnviarTarea'
 
-// Descripción de cada paso (en el mismo orden que los STEP del modelo ev3-robot.ldr)
-const PASOS = [
-  { titulo: 'Motor grande izquierdo', info: 'Empezamos por la fuerza del robot: el motor grande que mueve la rueda izquierda.' },
-  { titulo: 'Motor grande derecho', info: 'El segundo motor grande, paralelo al primero. Cada motor mueve una rueda.' },
-  { titulo: 'Vigas rojas', info: 'Dos vigas technic unen los motores para que el chasis quede firme.' },
-  { titulo: 'Ladrillo inteligente EV3', info: 'El cerebro del robot: aquí se guarda y se ejecuta tu programa.' },
-  { titulo: 'Rueda izquierda', info: 'Llanta y neumático en el eje del motor izquierdo.' },
-  { titulo: 'Rueda derecha', info: 'La rueda del motor derecho. Con dos ruedas motrices el robot puede girar.' },
-  { titulo: 'Rueda loca', info: 'Una bola de acero atrás: sostiene el robot y lo deja girar hacia cualquier lado.' },
-  { titulo: 'Sensor de color', info: 'Mira hacia el piso para seguir líneas y reconocer colores.' },
-  { titulo: 'Sensor infrarrojo', info: '¡Último! Mira hacia adelante y mide la distancia a los obstáculos.' },
-]
+const PASOS = GUIA_ROBOT.pasos
 
 function Modelo({ paso, onReady }: { paso: number; onReady: (n: number) => void }) {
   const [root, setRoot] = useState<THREE.Group | null>(null)
-  const rootRef = useRef<THREE.Group | null>(null)
   const invalidate = useThree(s => s.invalidate)
 
   useEffect(() => {
     let vivo = true
-    const loader = new LDrawLoader()
-    ;(loader as any).smoothNormals = false // más ligero: evita cálculos que cuelgan máquinas modestas
-    loader.load('/ldraw/ev3-robot.mpd', (g: any) => {
+    cargarLDraw(GUIA_ROBOT.archivo).then(g => {
       if (!vivo) return
       g.rotation.x = Math.PI // LDraw usa Y hacia abajo
       g.updateMatrixWorld(true)
@@ -45,21 +32,16 @@ function Modelo({ paso, onReady }: { paso: number; onReady: (n: number) => void 
       const s = 150 / Math.max(size.x, size.y, size.z || 1)
       g.scale.setScalar(s)
       g.position.set(-center.x * s, -center.y * s, -center.z * s)
-      rootRef.current = g
       setRoot(g)
-      onReady(g.userData?.numBuildingSteps || PASOS.length)
-      invalidate()
-    }, undefined, () => onReady(PASOS.length))
+      onReady(PASOS.length)
+    }).catch(() => onReady(PASOS.length))
     return () => { vivo = false }
-  }, [onReady, invalidate])
+  }, [onReady])
 
   // Mostrar solo las piezas hasta el paso actual
   useEffect(() => {
-    const g = rootRef.current
-    if (!g) return
-    g.traverse((o: any) => {
-      if (o.userData && o.userData.buildingStep !== undefined) o.visible = o.userData.buildingStep < paso
-    })
+    if (!root) return
+    mostrarHasta(root, paso)
     invalidate()
   }, [paso, root, invalidate])
 
@@ -84,7 +66,7 @@ export default function ConstructorEV3Real() {
     <div className={`flex flex-col overflow-hidden bg-slate-100 text-slate-900 ${expanded ? 'fixed inset-0 z-[200]' : 'relative h-full min-h-[520px]'}`}>
       <div className="flex flex-wrap items-center gap-2 bg-[#c0392b] px-3 py-1.5 text-white">
         <Hammer className="h-4 w-4" />
-        <span className="text-sm font-extrabold tracking-tight">Armar robot EV3 (piezas reales)</span>
+        <span className="text-sm font-extrabold tracking-tight">Armar: Robot explorador EV3</span>
         <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold">{Math.min(paso, total)}/{total} piezas</span>
         <div className="ml-auto flex items-center gap-1.5">
           <EnviarTarea
