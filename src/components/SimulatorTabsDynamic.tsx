@@ -32,8 +32,9 @@ const RobloxEditor = dynamic(() => import('./activities/RobloxEditor'), { ssr: f
 const AITerminal = dynamic(() => import('./activities/AITerminal'), { ssr: false })
 const AILab = dynamic(() => import('./AILab'), { ssr: false })
 const CADLab = dynamic(() => import('./CADLab'), { ssr: false })
+const EV3Lab = dynamic(() => import('./lego/EV3Lab'), { ssr: false })
 
-const INTERNAL_TOOL_IDS = ['python-ide', 'hacking-terminal', 'linux-terminal', 'roblox-editor', 'ai-terminal', 'ai-lab', 'cad-lab']
+const INTERNAL_TOOL_IDS = ['python-ide', 'hacking-terminal', 'linux-terminal', 'roblox-editor', 'ai-terminal', 'ai-lab', 'cad-lab', 'lego-ev3']
 
 interface Simulator {
   id: string
@@ -132,8 +133,12 @@ const cadLab: Simulator = {
   id: 'cad-lab', name: 'Laboratorio CAD 3D', description: 'Visor 3D, constructor paramétrico y texto a 3D',
   url: '', icon: 'box', category: '3d', levels: [], programs: [], enabled: true
 }
+const legoEV3: Simulator = {
+  id: 'lego-ev3', name: 'LEGO EV3', description: 'Programa un robot EV3 por bloques y míralo en 3D — misiones + modo libre',
+  url: '', icon: 'bot', category: 'robotica', levels: [], programs: [], enabled: true
+}
 // Orden de nuestras herramientas propias al inicio del hub.
-const NUESTROS: Simulator[] = [chaskiBlocksIA, chaskiBlocks, aiLab, aiTerminal, cadLab]
+const NUESTROS: Simulator[] = [chaskiBlocksIA, chaskiBlocks, aiLab, aiTerminal, cadLab, legoEV3]
 
 interface SimulatorTabsDynamicProps {
   levelId?: string
@@ -285,6 +290,7 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
           {activeSimulator.id === 'ai-terminal' && <AITerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} toolMode={!!levelId} />}
           {activeSimulator.id === 'ai-lab' && <AILab />}
           {activeSimulator.id === 'cad-lab' && <CADLab />}
+          {activeSimulator.id === 'lego-ev3' && <div style={{ height: 'clamp(560px, calc(100vh - 160px), 820px)' }}><EV3Lab /></div>}
         </div>
       ) : activeSimulator ? (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl shadow-chaski-primary/5">
