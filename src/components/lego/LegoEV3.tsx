@@ -7,7 +7,7 @@
  */
 import { useState } from 'react'
 import { Hammer, Play } from 'lucide-react'
-import ConstructorEV3 from './ConstructorEV3'
+import ConstructorEV3Real from './ConstructorEV3Real'
 import EV3Lab from './EV3Lab'
 
 export default function LegoEV3() {
@@ -21,7 +21,7 @@ export default function LegoEV3() {
         <button onClick={() => setTab('programar')} className={btn(tab === 'programar')}><Play className="h-4 w-4" /> Programar</button>
       </div>
       <div className="min-h-0 flex-1">
-        {tab === 'armar' ? <ConstructorEV3 /> : <EV3Lab />}
+        {tab === 'armar' ? <ConstructorEV3Real /> : <EV3Lab />}
       </div>
     </div>
   )
