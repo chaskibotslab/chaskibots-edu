@@ -32,7 +32,7 @@ const RobloxEditor = dynamic(() => import('./activities/RobloxEditor'), { ssr: f
 const AITerminal = dynamic(() => import('./activities/AITerminal'), { ssr: false })
 const AILab = dynamic(() => import('./AILab'), { ssr: false })
 const CADLab = dynamic(() => import('./CADLab'), { ssr: false })
-const EV3Lab = dynamic(() => import('./lego/EV3Lab'), { ssr: false })
+const LegoEV3 = dynamic(() => import('./lego/LegoEV3'), { ssr: false })
 
 const INTERNAL_TOOL_IDS = ['python-ide', 'hacking-terminal', 'linux-terminal', 'roblox-editor', 'ai-terminal', 'ai-lab', 'cad-lab', 'lego-ev3']
 
@@ -290,7 +290,7 @@ export default function SimulatorTabsDynamic({ levelId, programId }: SimulatorTa
           {activeSimulator.id === 'ai-terminal' && <AITerminal levelId={levelId || ''} userId={user?.id} userName={user?.name} toolMode={!!levelId} />}
           {activeSimulator.id === 'ai-lab' && <AILab />}
           {activeSimulator.id === 'cad-lab' && <CADLab />}
-          {activeSimulator.id === 'lego-ev3' && <div style={{ height: 'clamp(560px, calc(100vh - 160px), 820px)' }}><EV3Lab /></div>}
+          {activeSimulator.id === 'lego-ev3' && <div style={{ height: 'clamp(560px, calc(100vh - 160px), 820px)' }}><LegoEV3 /></div>}
         </div>
       ) : activeSimulator ? (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl shadow-chaski-primary/5">
