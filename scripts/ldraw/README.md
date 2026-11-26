@@ -12,3 +12,10 @@ Los modelos 3D de `public/ldraw/` salen de la biblioteca libre LDraw (CC BY 4.0)
 
 Regla de las uniones: dos piezas solo se unen si tienen agujeros en la misma línea y pegados;
 ahí va un pin (2780 negro de 2 módulos, 6558 azul de 3) o un eje con medios bujes de separador.
+
+## Clases de «Programar» (src/components/lego/misionesEV3.ts)
+
+Cada actividad trae su solución, escrita con las funciones de `programasEV3.ts`. Para comprobar
+que todas funcionan: crear una página temporal que llame a `probarSoluciones(n)` de
+`src/components/lego/probarSoluciones.ts` (ejecuta cada solución a toda velocidad, sin dibujar)
+y probar con n = 1, 2 y 4 (imita la simulación acelerada). Borrar la página al terminar.

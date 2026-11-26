@@ -21,6 +21,10 @@ export interface Guia {
   simulable: boolean
   /** Pasos de la rueda izquierda y derecha: sirven para hacerlas girar al simular. */
   ruedas: number[]
+  /** Sensores de color mirando al piso: posición lateral de cada uno en cm (+ = derecha), de izquierda a derecha. */
+  lineas: number[]
+  /** Qué sensores lleva, en palabras. */
+  equipo: string
 }
 
 export const GUIAS: Guia[] = datos

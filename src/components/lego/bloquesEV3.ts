@@ -10,6 +10,7 @@ export const COLORES_EV3: [string, string][] = [
   ['Azul', 'azul'], ['Verde', 'verde'], ['Amarillo', 'amarillo'],
 ]
 
+const SENSORES: [string, string][] = [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']]
 const MODOS: [string, string][] = [['segundos', 'seg'], ['rotaciones', 'rot'], ['grados', 'grados']]
 
 const C_MOTOR = '#E8A33D'   // naranja
@@ -50,6 +51,11 @@ export function definirBloquesEV3(Blockly: any) {
         { type: 'input_value', name: 'NUM', check: 'Number' },
       ], previousStatement: null, nextStatement: null, inputsInline: true, colour: C_MOTOR },
 
+    { type: 'ev3_encender', message0: '🟢 encender motores izq %1 der %2',
+      args0: [{ type: 'input_value', name: 'POTI', check: 'Number' }, { type: 'input_value', name: 'POTD', check: 'Number' }],
+      previousStatement: null, nextStatement: null, inputsInline: true, colour: C_MOTOR,
+      tooltip: 'Enciende los motores y sigue con el siguiente bloque sin esperar. Ideal dentro de «por siempre».' },
+
     { type: 'ev3_parar', message0: '✋ detener motores', previousStatement: null, nextStatement: null, colour: C_MOTOR },
 
     { type: 'ev3_esperar', message0: '⏱️ esperar %1 segundos',
@@ -62,12 +68,22 @@ export function definirBloquesEV3(Blockly: any) {
       args0: [{ type: 'input_value', name: 'NUM', check: 'Number' }, { type: 'input_dummy' }, { type: 'input_statement', name: 'DO' }],
       previousStatement: null, nextStatement: null, inputsInline: true, colour: C_CONTROL },
 
+    { type: 'ev3_repetir_hasta', message0: '🔁 repetir hasta que %1 %2 %3',
+      args0: [{ type: 'input_value', name: 'COND', check: 'Boolean' }, { type: 'input_dummy' }, { type: 'input_statement', name: 'DO' }],
+      previousStatement: null, nextStatement: null, inputsInline: true, colour: C_CONTROL },
+
     { type: 'ev3_esperar_hasta', message0: '⏳ esperar hasta %1',
       args0: [{ type: 'input_value', name: 'COND', check: 'Boolean' }], previousStatement: null, nextStatement: null, inputsInline: true, colour: C_CONTROL },
 
     // Sensores (valores)
     { type: 'ev3_es_color', message0: '🎨 ¿el color es %1 ?', args0: [{ type: 'field_dropdown', name: 'C', options: COLORES_EV3 }], output: 'Boolean', colour: C_SENSOR },
     { type: 'ev3_color', message0: '🎨 color que veo', output: 'String', colour: C_SENSOR },
+    { type: 'ev3_linea_es', message0: '〰️ ¿sensor de línea %1 ve %2 ?',
+      args0: [{ type: 'field_dropdown', name: 'N', options: SENSORES }, { type: 'field_dropdown', name: 'C', options: COLORES_EV3 }],
+      output: 'Boolean', colour: C_SENSOR, tooltip: 'Los sensores de línea se cuentan de izquierda a derecha: el 1 es el de más a la izquierda.' },
+    { type: 'ev3_luz', message0: '💡 luz reflejada del sensor %1', args0: [{ type: 'field_dropdown', name: 'N', options: SENSORES }],
+      output: 'Number', colour: C_SENSOR, tooltip: 'De 0 (negro) a 100 (blanco). En el borde de la línea da valores intermedios.' },
+    { type: 'ev3_tiempo', message0: '⏱️ segundos desde el inicio', output: 'Number', colour: C_SENSOR },
     { type: 'ev3_distancia', message0: '📏 distancia (cm)', output: 'Number', colour: C_SENSOR },
     { type: 'ev3_cerca', message0: '📏 ¿obstáculo a menos de %1 cm?', args0: [{ type: 'input_value', name: 'NUM', check: 'Number' }], output: 'Boolean', inputsInline: true, colour: C_SENSOR },
     { type: 'ev3_tactil', message0: '👆 ¿botón tocado?', output: 'Boolean', colour: C_SENSOR },
@@ -110,16 +126,21 @@ export function crearGeneradorEV3(jsMod: any) {
   O('ev3_retroceder', b => `await api.retroceder(${val(b, 'POT', '50')}, ${campo(b, 'MODO')}, ${val(b, 'VAL', '2')});`)
   O('ev3_tanque', b => `await api.tanque(${val(b, 'POTI', '50')}, ${val(b, 'POTD', '50')}, ${campo(b, 'MODO')}, ${val(b, 'VAL', '2')});`)
   O('ev3_girar', b => `await api.girar((${b.getFieldValue('DIR') === 'izq' ? '-1' : '1'}) * (${val(b, 'NUM', '90')}));`)
+  O('ev3_encender', b => `api.encender(${val(b, 'POTI', '50')}, ${val(b, 'POTD', '50')});`)
   O('ev3_parar', () => 'api.parar();')
   O('ev3_esperar', b => `await api.esperar(${val(b, 'NUM', '1')});`)
   O('ev3_decir', b => `await api.decir(${val(b, 'TXT', '""')}, ${val(b, 'NUM', '2')});`)
 
   O('ev3_por_siempre', b => `while (api.vivo()) {\n${dentro(b, 'DO')}await api.tick();\n}`)
   O('ev3_repetir', b => `for (let _i = 0; _i < (${val(b, 'NUM', '4')}) && api.vivo(); _i++) {\n${dentro(b, 'DO')}await api.tick();\n}`)
-  O('ev3_esperar_hasta', b => `while (api.vivo() && !(${val(b, 'COND', 'false')})) await api.tick();`)
+  O('ev3_repetir_hasta', b => `while (api.vivo() && !(${val(b, 'COND', 'false')})) {\n${dentro(b, 'DO')}await api.tick();\n}`)
+  O('ev3_esperar_hasta', b => `await api.hasta(() => (${val(b, 'COND', 'false')}));`)
 
   R('ev3_es_color', b => `api.esColor(${campo(b, 'C')})`)
   R('ev3_color', () => 'api.color()')
+  R('ev3_linea_es', b => `api.lineaEs(${b.getFieldValue('N')}, ${campo(b, 'C')})`)
+  R('ev3_luz', b => `api.luz(${b.getFieldValue('N')})`)
+  R('ev3_tiempo', () => 'api.tiempo()')
   R('ev3_distancia', () => 'api.distancia()')
   R('ev3_cerca', b => `api.cerca(${val(b, 'NUM', '15')})`)
   R('ev3_tactil', () => 'api.tactil()')
@@ -140,12 +161,14 @@ export const TOOLBOX_EV3 = {
       { kind: 'block', type: 'ev3_retroceder', inputs: { POT: num(50), VAL: num(2) } },
       { kind: 'block', type: 'ev3_tanque', inputs: { POTI: num(50), POTD: num(30), VAL: num(2) } },
       { kind: 'block', type: 'ev3_girar', inputs: { NUM: num(90) } },
+      { kind: 'block', type: 'ev3_encender', inputs: { POTI: num(40), POTD: num(40) } },
       { kind: 'block', type: 'ev3_parar' },
     ] },
     { kind: 'category', name: 'Control', colour: C_CONTROL, contents: [
       { kind: 'block', type: 'ev3_esperar', inputs: { NUM: num(1) } },
       { kind: 'block', type: 'ev3_por_siempre' },
       { kind: 'block', type: 'ev3_repetir', inputs: { NUM: num(4) } },
+      { kind: 'block', type: 'ev3_repetir_hasta' },
       { kind: 'block', type: 'ev3_esperar_hasta' },
       { kind: 'block', type: 'controls_if' },
       { kind: 'block', type: 'controls_if', extraState: { hasElse: true } },
@@ -153,11 +176,14 @@ export const TOOLBOX_EV3 = {
     { kind: 'category', name: 'Sensores', colour: C_SENSOR, contents: [
       { kind: 'block', type: 'ev3_es_color' },
       { kind: 'block', type: 'ev3_color' },
+      { kind: 'block', type: 'ev3_linea_es' },
+      { kind: 'block', type: 'ev3_luz' },
       { kind: 'block', type: 'ev3_cerca', inputs: { NUM: num(15) } },
       { kind: 'block', type: 'ev3_distancia' },
       { kind: 'block', type: 'ev3_tactil' },
       { kind: 'block', type: 'ev3_angulo' },
       { kind: 'block', type: 'ev3_en_meta' },
+      { kind: 'block', type: 'ev3_tiempo' },
     ] },
     { kind: 'category', name: 'Operadores', colour: C_OP, contents: [
       { kind: 'block', type: 'logic_compare' },
@@ -167,6 +193,7 @@ export const TOOLBOX_EV3 = {
       { kind: 'block', type: 'math_number', fields: { NUM: 0 } },
       { kind: 'block', type: 'math_arithmetic', inputs: { A: num(1), B: num(1) } },
     ] },
+    { kind: 'category', name: 'Variables', colour: '#FF8C1A', custom: 'VARIABLE' },
     { kind: 'category', name: 'Pantalla', colour: C_PANTALLA, contents: [
       { kind: 'block', type: 'ev3_decir', inputs: { TXT: txt('¡Hola!'), NUM: num(2) } },
       { kind: 'block', type: 'text' },

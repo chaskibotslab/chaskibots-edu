@@ -10,23 +10,34 @@ export function crearApiEV3(motor: LegoMotor, token: number) {
   const vivo = () => motor.vivo(token)
   const pausa = (ms: number) => motor.pausa(token, ms)
 
-  // Espera hasta que la condición se cumpla (o se agote el tiempo), cediendo al bucle de física.
-  const hasta = async (cond: () => boolean, maxSeg = 20) => {
-    const t0 = performance.now()
-    while (vivo() && !cond() && performance.now() - t0 < maxSeg * 1000) await pausa(16)
+  const apagar = () => { motor.vL = motor.vR = 0; motor.sucio = true }
+  // Espera hasta que la condición se cumpla (o se agote el tiempo). Se revisa en cada paso de física.
+  const hasta = (cond: () => boolean, maxSeg = 20, alFinal?: () => void) => motor.hasta(token, cond, maxSeg, alFinal)
+  // Avisa una sola vez si el programa usa un sensor de línea que este robot no tiene.
+  let avisado = false
+  const sensor = (n: unknown) => {
+    const i = Math.round(Number(n) || 1)
+    if (!avisado && (i < 1 || i > motor.lineas.length)) {
+      avisado = true
+      motor.alError(motor.lineas.length
+        ? `Este robot solo tiene ${motor.lineas.length} sensor${motor.lineas.length > 1 ? 'es' : ''} de línea: el sensor ${i} no existe y siempre verá blanco.`
+        : 'Este robot no tiene sensores de color mirando al piso. Elige otro robot.')
+    }
+    return i
   }
 
   // Mueve con velocidades dadas por el modo elegido, luego frena (salvo "inf").
   const correr = async (vI: number, vD: number, modo: string, valor: number) => {
     motor.vL = vI; motor.vR = vD; motor.sucio = true
     if (modo === 'inf') return
-    if (modo === 'seg') { await pausa(Math.max(0, valor) * 1000) }
+    if (modo === 'seg') { await motor.pausa(token, Math.max(0, valor) * 1000, apagar) }
     else {
       const objetivo = modo === 'rot' ? Math.abs(valor) * 360 : Math.abs(valor)
-      const g0 = (Math.abs(motor.gradosL) + Math.abs(motor.gradosR)) / 2
-      await hasta(() => (Math.abs(motor.gradosL) + Math.abs(motor.gradosR)) / 2 - g0 >= objetivo)
+      // cuánto han girado las ruedas desde este momento (sirve igual hacia adelante que hacia atrás)
+      const l0 = motor.gradosL, r0 = motor.gradosR
+      await hasta(() => (Math.abs(motor.gradosL - l0) + Math.abs(motor.gradosR - r0)) / 2 >= objetivo, 20, apagar)
     }
-    motor.vL = motor.vR = 0; motor.sucio = true
+    apagar()
   }
 
   return {
@@ -47,11 +58,13 @@ export function crearApiEV3(motor: LegoMotor, token: number) {
       const s = motor.velDe(40) * (g >= 0 ? 1 : -1)
       const a0 = motor.ang
       motor.vL = s; motor.vR = -s; motor.sucio = true
-      const objetivo = Math.abs(g) * Math.PI / 180
-      await hasta(() => Math.abs(motor.ang - a0) >= objetivo)
-      motor.vL = motor.vR = 0; motor.sucio = true
+      // medio paso de margen: así el giro termina lo más cerca posible del ángulo pedido
+      const objetivo = Math.abs(g) * Math.PI / 180 - Math.abs(s) / motor.distRuedas / 60
+      await hasta(() => Math.abs(motor.ang - a0) >= objetivo, 20, apagar)
     },
     parar: () => { motor.vL = motor.vR = 0; motor.sucio = true },
+    // enciende los motores y sigue con el programa (no espera)
+    encender: (potI: unknown, potD: unknown) => { motor.vL = motor.velDe(Number(potI) || 0); motor.vR = motor.velDe(Number(potD) || 0); motor.sucio = true },
     esperar: (seg: unknown) => pausa((Number(seg) || 0) * 1000),
 
     decir: async (texto: unknown, seg?: unknown) => {
@@ -67,9 +80,15 @@ export function crearApiEV3(motor: LegoMotor, token: number) {
     tactil: () => motor.tactil(),
     angulo: () => motor.angulo(),
     enMeta: () => motor.enMeta(),
+    lineaEs: (n: unknown, c: string) => motor.colorLinea(sensor(n)) === c,
+    lineaColor: (n: unknown) => motor.colorLinea(sensor(n)),
+    luz: (n: unknown) => motor.luz(sensor(n)),
+    tiempo: () => Math.round(motor.tiempo * 10) / 10,
 
     // utilidades para bucles cooperativos
-    tick: () => pausa(16),
+    tick: () => pausa(0),
+    // «esperar hasta»: la condición se revisa en cada paso de física, sin límite de tiempo
+    hasta: (cond: () => unknown) => motor.hasta(token, () => !!cond()),
     vivo,
     MAX_DIST,
   }

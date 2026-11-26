@@ -10,7 +10,7 @@ import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { cargarLDraw, mostrarHasta } from './ldraw'
 import { GUIAS, GUIA_ROBOT, type Guia } from './guiasEV3'
-import { ChevronLeft, ChevronRight, RotateCcw, Maximize2, Minimize2, Check, Trophy, Hammer, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, RotateCcw, Maximize2, Minimize2, Check, Trophy, Hammer, Loader2, Play } from 'lucide-react'
 import { useExpand } from '@/hooks/useExpand'
 import EnviarTarea from '@/components/simuladores/EnviarTarea'
 
@@ -48,9 +48,9 @@ function Modelo({ guia, paso, onReady }: { guia: Guia; paso: number; onReady: ()
   return <primitive object={root} />
 }
 
-export default function ConstructorEV3Real() {
+export default function ConstructorEV3Real({ inicial, onProgramar }: { inicial?: string; onProgramar?: (robotId: string) => void }) {
   const { expanded, toggle } = useExpand()
-  const [guiaId, setGuiaId] = useState(GUIA_ROBOT.id)
+  const [guiaId, setGuiaId] = useState(inicial && GUIAS.some(g => g.id === inicial) ? inicial : GUIA_ROBOT.id)
   const guia = GUIAS.find(g => g.id === guiaId) || GUIA_ROBOT
   const PASOS = guia.pasos
   const total = PASOS.length
@@ -74,6 +74,9 @@ export default function ConstructorEV3Real() {
           className="max-w-[55vw] rounded-md border border-white/40 bg-white/15 px-2 py-1 text-xs font-bold text-white outline-none [&>option]:text-slate-900">
           {GUIAS.map(g => <option key={g.id} value={g.id}>{g.emoji} {g.nombre}</option>)}
         </select>
+        {guia.simulable && onProgramar && (
+          <button onClick={() => onProgramar(guia.id)} title="Ir a programar y probar este robot" className="hidden items-center gap-1 rounded-md bg-white/90 px-2 py-1 text-xs font-bold text-green-700 hover:bg-white sm:flex"><Play className="h-3.5 w-3.5" /> Programarlo</button>
+        )}
         <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold">{Math.min(paso, total)}/{total} pasos</span>
         <div className="ml-auto flex items-center gap-1.5">
           <EnviarTarea
@@ -122,7 +125,10 @@ export default function ConstructorEV3Real() {
             <div className="flex flex-col items-center gap-2 py-4 text-center">
               <Trophy className="h-10 w-10 text-amber-500" />
               <h3 className="text-lg font-extrabold text-slate-900">¡Lo armaste!</h3>
-              <p className="text-sm text-slate-700">Construiste «{guia.nombre}» con piezas reales. Gíralo para verlo{guia.simulable ? ', o ve a «Programar» para darle vida' : ''}.</p>
+              <p className="text-sm text-slate-700">Construiste «{guia.nombre}» con piezas reales. Gíralo para verlo{guia.simulable ? '. Ahora prográmalo y ponlo a prueba en sus clases' : ''}.</p>
+              {guia.simulable && onProgramar && (
+                <button onClick={() => onProgramar(guia.id)} className="mt-1 flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-extrabold text-white shadow hover:bg-green-700"><Play className="h-4 w-4" /> Programar este robot</button>
+              )}
             </div>
           )}
 

@@ -16,6 +16,10 @@ type Tab = 'armar' | 'catalogo' | 'programar'
 
 export default function LegoEV3() {
   const [tab, setTab] = useState<Tab>('armar')
+  // robot con el que se pasa de una pestaña a otra («Programar este robot» / «Armarlo»)
+  const [robot, setRobot] = useState<string | undefined>()
+  const programar = (id: string) => { setRobot(id); setTab('programar') }
+  const armar = (id: string) => { setRobot(id); setTab('armar') }
   const btn = (activo: boolean) =>
     `flex items-center gap-1.5 rounded-t-lg px-4 py-2 text-sm font-bold transition-colors ${activo ? 'bg-slate-100 text-slate-900' : 'bg-slate-300/60 text-slate-600 hover:bg-slate-300'}`
   return (
@@ -26,7 +30,9 @@ export default function LegoEV3() {
         <button onClick={() => setTab('programar')} className={btn(tab === 'programar')}><Play className="h-4 w-4" /> Programar</button>
       </div>
       <div className="min-h-0 flex-1">
-        {tab === 'armar' ? <ConstructorEV3Real /> : tab === 'catalogo' ? <CatalogoEV3 /> : <EV3Lab />}
+        {tab === 'armar' ? <ConstructorEV3Real inicial={robot} onProgramar={programar} />
+          : tab === 'catalogo' ? <CatalogoEV3 onProgramar={programar} />
+            : <EV3Lab robotInicial={robot} onArmar={armar} />}
       </div>
     </div>
   )

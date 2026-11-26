@@ -11,7 +11,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { RotateCw, FlipVertical2, ArrowUp, ArrowDown, Trash2, Maximize2, Minimize2, Loader2, Hand, MousePointer2, Trophy, Wand2, ChevronLeft, RotateCcw } from 'lucide-react'
+import { RotateCw, FlipVertical2, ArrowUp, ArrowDown, Trash2, Maximize2, Minimize2, Loader2, Hand, MousePointer2, Trophy, Wand2, ChevronLeft, RotateCcw, Play } from 'lucide-react'
 import { useExpand } from '@/hooks/useExpand'
 import EnviarTarea from '@/components/simuladores/EnviarTarea'
 import { cargarLDraw, mostrarHasta, piezasPorPaso } from './ldraw'
@@ -51,6 +51,7 @@ const GRUPOS: { grupo: string; items: ItemCat[] }[] = [
     { tipo: 'pin', nombre: 'Pin con tope', emoji: '📍' },
     { tipo: 'pin_eje', nombre: 'Pin-eje', emoji: '📍' },
     { tipo: 'buje', nombre: 'Buje', emoji: '⭕' },
+    { tipo: 'buje_medio', nombre: 'Medio buje', emoji: '🔘' },
     { tipo: 'eje_3', nombre: 'Eje 3', emoji: '📏' },
     { tipo: 'eje_5', nombre: 'Eje 5', emoji: '📏' },
     { tipo: 'eje', nombre: 'Eje 6', emoji: '📏' },
@@ -282,7 +283,7 @@ function Escena({ piezas, sel, seleccionar, moverPieza, children }: EscenaProps)
   )
 }
 
-export default function CatalogoEV3() {
+export default function CatalogoEV3({ onProgramar }: { onProgramar?: (robotId: string) => void } = {}) {
   const { expanded, toggle } = useExpand()
   const [piezas, setPiezas] = useState<Puesta[]>([])
   const [sel, setSel] = useState<number | null>(null)
@@ -453,7 +454,10 @@ export default function CatalogoEV3() {
                 <div className="flex flex-col items-center gap-1 py-1 text-center">
                   <Trophy className="h-8 w-8 text-amber-500" />
                   <h3 className="text-sm font-extrabold text-slate-900">¡Terminaste: {guia.nombre}!</h3>
-                  <p className="text-xs text-slate-700">Gira la vista para ver tu robot. En «Programar» puedes darle vida.</p>
+                  <p className="text-xs text-slate-700">Gira la vista para ver tu robot{guia.simulable ? '. Ahora prográmalo y ponlo a prueba.' : '.'}</p>
+                  {guia.simulable && onProgramar && (
+                    <button onClick={() => onProgramar(guia.id)} className="mt-1 flex items-center gap-1 rounded-md bg-green-600 px-3 py-1.5 text-xs font-extrabold text-white hover:bg-green-700"><Play className="h-3.5 w-3.5" /> Programar este robot</button>
+                  )}
                   <button onClick={() => { limpiar(); setPasoGuia(0) }} className="mt-1 flex items-center gap-1 rounded-md border border-slate-300 px-2 py-1 text-[11px] font-bold text-slate-700"><RotateCcw className="h-3.5 w-3.5" /> Armar otra vez</button>
                 </div>
               )}

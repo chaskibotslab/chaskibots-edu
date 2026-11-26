@@ -21,6 +21,7 @@ const EJE_Z_A_X = '0 0 1 0 1 0 -1 0 0'    // rueda / buje: su eje pasa a lo anch
 const EJE_X_A_Z = '0 0 -1 0 1 0 1 0 0'    // eje o pin apuntando al frente
 const AL_FRENTE = '-1 0 0 0 1 0 0 0 -1'   // sensor mirando al frente
 const AL_PISO = '-1 0 0 0 0 -1 0 -1 0'    // sensor mirando al piso
+const A_LO_LARGO = '0 1 0 -1 0 0 0 0 1'   // viga acostada de atrás hacia adelante, agujeros a lo ancho
 const LOCA = '0 1 0 0 0 -1 -1 0 0'        // rueda loca con la bola hacia abajo y agujeros a lo ancho
 
 const p = (color, x, y, z, m, pieza) => `1 ${color} ${x} ${y} ${z} ${m} ${pieza}`
@@ -78,24 +79,65 @@ const PARACHOQUES = [
   paso('buje', 'Buje del parachoques', 'Un buje en la punta del eje: es lo primero que toca la pared y empuja el botón.', [p(71, 0, -100, 50, I, '3713.dat')]),
 ]
 
+// ── Frente con sensores de color (seguidores de 2 y 4 sensores, sumo) ──
+// Dos vigas largas salen hacia adelante por dentro de los brazos (2 pines largos cada una = no giran).
+// En su punta, una viga en L baja hasta cerca del piso y ahí se sujetan los sensores, lado a lado.
+const vigasAdelante = (tipo, pieza, zc, largo) => paso(tipo, `Vigas de ${largo} hacia adelante (2)`, 'Dos vigas largas acostadas por dentro de los brazos de los motores, apuntando al frente. Serán los «brazos» que sostienen los sensores de línea.',
+  lados(s => p(71, s * 40, -60, zc, A_LO_LARGO, pieza)))
+const FRENTE_L = [
+  paso('viga_L35', 'Vigas en L 3×5 (2)', 'En la punta de cada brazo, una viga en L: su parte corta se apoya en el brazo y su parte larga baja hacia el piso.',
+    lados(s => p(15, s * 20, 20, 80, LOCA, '32526.dat'))),
+  paso('pin_negro', 'Pines negros de las L (4)', 'Dos pines por cada L. Con dos pines la L queda rígida: no puede balancearse.',
+    [40, 80].flatMap(z => lados(s => p(0, s * 30, -60, z, I, '2780.dat')))),
+]
+const SENSORES_2 = [
+  paso('sensor_color', 'Sensores de color izquierdo y derecho (2)', 'Dos sensores mirando al piso, uno a cada lado. La línea negra pasará entre los dos.',
+    lados(s => p(15, s * 60, -20, 80, AL_PISO, '95650.dat'))),
+  paso('pin_negro', 'Pines negros de los sensores (4)', 'Dos pines sujetan cada sensor a su viga en L.',
+    [-40, 0].flatMap(y => lados(s => p(0, s * 30, y, 80, I, '2780.dat')))),
+  paso('eje_8', 'Eje de 8 que une los sensores', 'Un eje largo atraviesa el centro en cruz de los dos sensores y las dos L: todo el frente queda como una sola pieza.',
+    [p(0, 0, -20, 80, I, '3707.dat')]),
+]
+const SENSORES_EXTRA = [
+  paso('sensor_color', 'Sensores de color exteriores (2)', 'Dos sensores más, por fuera de los primeros. Con cuatro «ojos» el robot ve curvas cerradas y cruces.',
+    lados(s => p(15, s * 120, -20, 80, AL_PISO, '95650.dat'))),
+  paso('pin_negro', 'Pines negros entre sensores (4)', 'Cada sensor exterior se une a su vecino con dos pines, lado con lado.',
+    [-40, 0].flatMap(y => lados(s => p(0, s * 90, y, 80, I, '2780.dat')))),
+]
+const EMBESTIDOR = [
+  paso('eje_5', 'Eje del embestidor', 'Un eje de 5 cruza la punta de los dos brazos largos: es la barra que empuja al rival.', [p(71, 0, -60, 200, I, '32073.dat')]),
+  paso('buje_medio', 'Medios bujes del embestidor (2)', 'Un medio buje por dentro de cada brazo para que el eje no se salga.', lados(s => p(14, s * 25, -60, 200, EJE_Z_A_X, '32123a.dat'))),
+]
+const VIGAS_9_ADELANTE = vigasAdelante('viga_9', '40490.dat', 0, 9)
+const VIGAS_15_ADELANTE = vigasAdelante('viga_15', '32278.dat', 60, 15)
+
 const ultimo = pasos => pasos.map((q, i) => (i === pasos.length - 1 ? { ...q, info: '¡Último! ' + q.info } : q))
 
 const MODELOS = [
-  { id: 'carrito', archivo: 'carrito', nombre: 'Carrito de dos motores', emoji: '🚗', simulable: false,
+  { id: 'carrito', archivo: 'carrito', nombre: 'Carrito de dos motores', emoji: '🚗', simulable: false, lineas: [], equipo: 'Sin ladrillo ni sensores',
     descripcion: 'Tu primer chasis: dos motores unidos por ejes y bujes, rueda loca y dos ruedas.',
     pasos: [...MOTORES, ...COLA, ...RUEDAS] },
-  { id: 'explorador', archivo: 'ev3-robot', nombre: 'Robot explorador EV3', emoji: '🤖', simulable: true,
+  { id: 'explorador', archivo: 'ev3-robot', nombre: 'Robot explorador EV3', emoji: '🤖', simulable: true, lineas: [0], equipo: 'Infrarrojo al frente + 1 sensor de color',
     descripcion: 'El robot completo: ladrillo, sensor infrarrojo al frente y sensor de color al piso, todo sujeto con pines.',
     pasos: [...MOTORES, ...COLA, VIGAS_7, VIGAS_3, ...SENSOR_IR, ...SENSOR_COLOR, ...LADRILLO, ...RUEDAS] },
-  { id: 'seguidor', archivo: 'seguidor', nombre: 'Seguidor de línea', emoji: '〰️', simulable: true,
+  { id: 'seguidor', archivo: 'seguidor', nombre: 'Seguidor de línea', emoji: '〰️', simulable: true, lineas: [0], equipo: '1 sensor de color al piso',
     descripcion: 'Ladrillo y un sensor de color mirando al piso, listo para seguir una línea negra.',
     pasos: [...MOTORES, ...COLA, VIGAS_7, PINES_VIGA_7, ...SENSOR_COLOR, ...LADRILLO, ...RUEDAS] },
-  { id: 'parachoques', archivo: 'parachoques', nombre: 'Robot con parachoques', emoji: '🛡️', simulable: true,
+  { id: 'parachoques', archivo: 'parachoques', nombre: 'Robot con parachoques', emoji: '🛡️', simulable: true, lineas: [], equipo: 'Sensor táctil con parachoques',
     descripcion: 'Un sensor táctil al frente con un eje y un buje de parachoques: el robot sabe cuándo chocó.',
     pasos: [...MOTORES, ...COLA, VIGAS_7, VIGAS_3, ...SENSOR_TACTIL, ...PARACHOQUES, ...LADRILLO, ...RUEDAS] },
-  { id: 'giroscopio', archivo: 'giroscopio', nombre: 'Robot con giroscopio', emoji: '🧭', simulable: true,
+  { id: 'giroscopio', archivo: 'giroscopio', nombre: 'Robot con giroscopio', emoji: '🧭', simulable: true, lineas: [0], equipo: 'Giroscopio + 1 sensor de color',
     descripcion: 'Un giroscopio entre los motores para girar ángulos exactos, y sensor de color al piso.',
     pasos: [...MOTORES, ...COLA, VIGAS_7, VIGAS_3, ...SENSOR_GIRO, ...SENSOR_COLOR, ...LADRILLO, ...RUEDAS] },
+  { id: 'seguidor2', archivo: 'seguidor2', nombre: 'Seguidor de 2 sensores', emoji: '👀', simulable: true, lineas: [-3.6, 3.6], equipo: '2 sensores de color al frente + infrarrojo',
+    descripcion: 'Dos sensores de color al frente, uno a cada lado de la línea: sigue pistas con curvas mucho más rápido.',
+    pasos: [...MOTORES, ...COLA, VIGAS_9_ADELANTE, ...SENSOR_IR, ...FRENTE_L, ...SENSORES_2, ...LADRILLO, ...RUEDAS] },
+  { id: 'seguidor4', archivo: 'seguidor4', nombre: 'Seguidor de 4 sensores', emoji: '🏁', simulable: true, lineas: [-7.2, -3.6, 3.6, 7.2], equipo: '4 sensores de color al frente + infrarrojo',
+    descripcion: 'Cuatro sensores de color en fila: el robot de competencia que ve curvas cerradas y cruces.',
+    pasos: [...MOTORES, ...COLA, VIGAS_9_ADELANTE, ...SENSOR_IR, ...FRENTE_L, ...SENSORES_2, ...SENSORES_EXTRA, ...LADRILLO, ...RUEDAS] },
+  { id: 'sumo', archivo: 'sumo', nombre: 'Robot sumo', emoji: '🥋', simulable: true, lineas: [-3.6, 3.6], equipo: 'Infrarrojo para buscar al rival + 2 sensores de borde + embestidor',
+    descripcion: 'Robot de combate: infrarrojo para encontrar al rival, dos sensores para no salirse del ring y un embestidor al frente.',
+    pasos: [...MOTORES, ...COLA, VIGAS_15_ADELANTE, ...SENSOR_IR, ...FRENTE_L, ...SENSORES_2, ...EMBESTIDOR, ...LADRILLO, ...RUEDAS] },
 ]
 
 const salida = []
@@ -109,7 +151,7 @@ for (const m of MODELOS) {
   console.log(m.id, pasos.length, 'pasos ·', execFileSync('node', [path.join(__dirname, 'packldraw.js'), fLdr, lib, fMpd]).toString().trim())
   const iRueda = t => pasos.findIndex(q => q.titulo === t)
   salida.push({
-    id: m.id, nombre: m.nombre, emoji: m.emoji, descripcion: m.descripcion, archivo: `/ldraw/${m.archivo}.mpd`, simulable: m.simulable,
+    id: m.id, nombre: m.nombre, emoji: m.emoji, descripcion: m.descripcion, archivo: `/ldraw/${m.archivo}.mpd`, simulable: m.simulable, lineas: m.lineas, equipo: m.equipo,
     ruedas: [iRueda('Rueda izquierda'), iRueda('¡Último! Rueda derecha') >= 0 ? iRueda('¡Último! Rueda derecha') : iRueda('Rueda derecha')],
     pasos: pasos.map(q => ({ tipo: q.tipo, titulo: q.titulo, info: q.info, piezas: q.lineas.length })),
   })

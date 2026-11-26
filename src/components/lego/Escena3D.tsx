@@ -10,38 +10,17 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { LegoMotor, Tapete } from './engine'
-import { colorMasCercano } from './colores'
+import { LegoMotor, PASO, Tapete } from './engine'
+import { crearTapete } from './tapete'
 import { aligerar, cargarLDraw, piezasPorPaso } from './ldraw'
 import { GUIA_ROBOT, type Guia } from './guiasEV3'
 
-const SCALE = 6 // px por cm en el canvas del tapete
-
 function usarTapete(motor: LegoMotor, tapete: Tapete) {
   return useMemo(() => {
-    const W = Math.round(tapete.ancho * SCALE)
-    const H = Math.round(tapete.alto * SCALE)
-    const canvas = document.createElement('canvas')
-    canvas.width = W; canvas.height = H
-    const ctx = canvas.getContext('2d', { willReadFrequently: true })!
-    ctx.fillStyle = tapete.colorPiso || '#eef2f7'
-    ctx.fillRect(0, 0, W, H)
-    // Pintar en cm: origen al centro, +x derecha, +z abajo
-    ctx.save()
-    ctx.translate(W / 2, H / 2)
-    ctx.scale(SCALE, SCALE)
-    tapete.pintar?.(ctx)
-    ctx.restore()
-
-    // Sensor de color: muestrea el pixel bajo (x,z) en cm
-    motor.leerColorEn = (x: number, z: number) => {
-      const cx = Math.round((x + tapete.ancho / 2) * SCALE)
-      const cz = Math.round((z + tapete.alto / 2) * SCALE)
-      if (cx < 0 || cz < 0 || cx >= W || cz >= H) return 'blanco'
-      try { const d = ctx.getImageData(cx, cz, 1, 1).data; return colorMasCercano(d[0], d[1], d[2]) } catch { return 'blanco' }
-    }
-
-    const tex = new THREE.CanvasTexture(canvas)
+    const t = crearTapete(tapete)
+    motor.leerColorEn = t.color
+    motor.leerLuzEn = t.luz
+    const tex = new THREE.CanvasTexture(t.canvas)
     tex.colorSpace = THREE.SRGBColorSpace
     tex.anisotropy = 4
     return tex
@@ -78,13 +57,18 @@ function usarRobotReal(guia: Guia) {
   return robot
 }
 
-function Robot({ motor, guia }: { motor: LegoMotor; guia: Guia }) {
+function Robot({ motor, guia, velocidad }: { motor: LegoMotor; guia: Guia; velocidad: number }) {
   const ref = useRef<THREE.Group>(null)
   const real = usarRobotReal(guia)
   useEffect(() => { giro.current = { l: 0, r: 0 } }, [real])
   const giro = useRef({ l: 0, r: 0 })
+  const pendiente = useRef(0)
   useFrame((_, delta) => {
-    motor.tick(Math.min(delta, 0.05))
+    // pasos fijos de física: el resultado no depende de la velocidad de la máquina
+    pendiente.current += Math.min(delta, 0.1) * velocidad
+    let n = 0
+    while (pendiente.current >= PASO && n < 16) { motor.tick(PASO); pendiente.current -= PASO; n++ }
+    if (n === 16) pendiente.current = 0
     const g = ref.current
     if (g) { g.position.x = motor.x; g.position.z = motor.z; g.rotation.y = -motor.ang }
     if (real) {
@@ -133,7 +117,46 @@ function RobotSencillo() {
   )
 }
 
-function Mundo({ motor, tapete, guia }: { motor: LegoMotor; tapete: Tapete; guia: Guia }) {
+/** Objetos que el robot empuja (latas, cajas, rival) y puntos de control: se actualizan en cada cuadro. */
+function Dinamicos({ motor, tapete }: { motor: LegoMotor; tapete: Tapete }) {
+  const moviles = useRef<(THREE.Group | null)[]>([])
+  const puntos = useRef<(THREE.Mesh | null)[]>([])
+  useFrame(() => {
+    motor.moviles.forEach((m, i) => {
+      const g = moviles.current[i]
+      if (!g) return
+      g.position.set(m.x, m.fuera ? -1 : 0, m.z)
+      g.rotation.set(m.fuera ? 0.5 : 0, -m.ang, 0)
+    })
+    puntos.current.forEach((p, i) => { if (p) p.visible = i >= motor.puntosHechos })
+  })
+  return (
+    <>
+      {(tapete.moviles || []).map((m, i) => (
+        <group key={i} ref={g => { moviles.current[i] = g }} position={[m.x, 0, m.z]}>
+          {m.tipo === 'rival' ? (
+            <>
+              <mesh position={[0, 5, 0]} castShadow><boxGeometry args={[m.r * 1.7, 8, m.r * 1.5]} /><meshStandardMaterial color={m.color || '#7c3aed'} /></mesh>
+              <mesh position={[-1, 11, 0]} castShadow><boxGeometry args={[m.r, 4, m.r * 1.1]} /><meshStandardMaterial color="#1f2937" /></mesh>
+              <mesh position={[m.r * 0.9, 3, 0]} castShadow><boxGeometry args={[1.5, 5, m.r * 1.9]} /><meshStandardMaterial color="#111827" /></mesh>
+              {[1, -1].map(l => <mesh key={l} position={[0, 3.5, l * m.r * 0.85]} rotation={[Math.PI / 2, 0, 0]} castShadow><cylinderGeometry args={[3.5, 3.5, 2.4, 18]} /><meshStandardMaterial color="#111" /></mesh>)}
+            </>
+          ) : (
+            <mesh position={[0, 6, 0]} castShadow><cylinderGeometry args={[m.r, m.r, 12, 24]} /><meshStandardMaterial color={m.color || '#f59e0b'} /></mesh>
+          )}
+        </group>
+      ))}
+      {(tapete.puntos || []).map((p, i) => (
+        <mesh key={i} ref={m => { puntos.current[i] = m }} position={[p.x, 0.35, p.z]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[p.r - 4.5, p.r - 3, 32]} />
+          <meshBasicMaterial color="#2563eb" side={THREE.DoubleSide} transparent opacity={0.85} />
+        </mesh>
+      ))}
+    </>
+  )
+}
+
+function Mundo({ motor, tapete, guia, velocidad }: { motor: LegoMotor; tapete: Tapete; guia: Guia; velocidad: number }) {
   const tex = usarTapete(motor, tapete)
   return (
     <>
@@ -144,11 +167,21 @@ function Mundo({ motor, tapete, guia }: { motor: LegoMotor; tapete: Tapete; guia
         <planeGeometry args={[tapete.ancho, tapete.alto]} />
         <meshStandardMaterial map={tex} />
       </mesh>
-      {/* borde del campo */}
-      <lineSegments position={[0, 0.2, 0]}>
-        <edgesGeometry args={[new THREE.BoxGeometry(tapete.ancho, 0.1, tapete.alto)]} />
-        <lineBasicMaterial color="#94a3b8" />
-      </lineSegments>
+      {/* paredes del campo (si las tiene) */}
+      {tapete.paredes !== false && [[0, -1], [0, 1], [-1, 0], [1, 0]].map(([dx, dz], i) => (
+        <mesh key={i} position={[dx * (tapete.ancho / 2 + 1), 2, dz * (tapete.alto / 2 + 1)]}>
+          <boxGeometry args={[dx ? 2 : tapete.ancho + 4, 4, dz ? 2 : tapete.alto + 4]} />
+          <meshStandardMaterial color="#94a3b8" />
+        </mesh>
+      ))}
+      {/* muros */}
+      {(tapete.muros || []).map((w, i) => (
+        <mesh key={i} position={[w.x, (w.alto || 14) / 2, w.z]} castShadow receiveShadow>
+          <boxGeometry args={[w.w, w.alto || 14, w.h]} />
+          <meshStandardMaterial color={w.color || '#64748b'} />
+        </mesh>
+      ))}
+      <Dinamicos motor={motor} tapete={tapete} />
       {/* obstáculos */}
       {tapete.obstaculos.map((o, i) => (
         <mesh key={i} position={[o.x, (o.alto || 24) / 2, o.z]} castShadow>
@@ -163,18 +196,18 @@ function Mundo({ motor, tapete, guia }: { motor: LegoMotor; tapete: Tapete; guia
           <meshBasicMaterial color="#22c55e" side={THREE.DoubleSide} transparent opacity={0.9} />
         </mesh>
       )}
-      <Robot motor={motor} guia={guia} />
+      <Robot motor={motor} guia={guia} velocidad={velocidad} />
       <OrbitControls enablePan={false} minDistance={45} maxDistance={360} maxPolarAngle={Math.PI / 2.1} />
     </>
   )
 }
 
-export default function Escena3D({ motor, tapete, version, robot = GUIA_ROBOT }: { motor: LegoMotor; tapete: Tapete; version: number; robot?: Guia }) {
+export default function Escena3D({ motor, tapete, version, robot = GUIA_ROBOT, velocidad = 1 }: { motor: LegoMotor; tapete: Tapete; version: number; robot?: Guia; velocidad?: number }) {
   // version fuerza remmontar el mundo al cambiar de misión (reconstruye textura/sensor)
   useEffect(() => { motor.cargar(tapete) }, [motor, tapete])
   return (
     <Canvas shadows camera={{ position: [30, 150, 160], fov: 42 }} dpr={[1, 1.8]} style={{ background: 'linear-gradient(#dbeafe,#eef2f7)' }}>
-      <Mundo key={version} motor={motor} tapete={tapete} guia={robot} />
+      <Mundo key={version} motor={motor} tapete={tapete} guia={robot} velocidad={velocidad} />
     </Canvas>
   )
 }
