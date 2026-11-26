@@ -4,8 +4,8 @@
  * Constructor del robot EV3 con PIEZAS REALES (biblioteca LDraw) y armado por pasos.
  * Carga un modelo .mpd autocontenido con LDrawLoader y revela las piezas paso a paso.
  */
-import { useEffect, useRef, useState } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { LDrawLoader } from 'three/examples/jsm/loaders/LDrawLoader.js'
@@ -15,25 +15,26 @@ import EnviarTarea from '@/components/simuladores/EnviarTarea'
 
 // Descripción de cada paso (en el mismo orden que los STEP del modelo ev3-robot.ldr)
 const PASOS = [
-  { titulo: 'Viga lateral izquierda', info: 'La primera viga technic: lado izquierdo del chasis.' },
-  { titulo: 'Viga lateral derecha', info: 'La viga del lado derecho, paralela a la primera.' },
-  { titulo: 'Motor grande izquierdo', info: 'El motor grande que mueve la rueda izquierda.' },
-  { titulo: 'Motor grande derecho', info: 'El motor grande que mueve la rueda derecha.' },
-  { titulo: 'Ladrillo inteligente EV3', info: 'El cerebro del robot: el ladrillo programable EV3.' },
-  { titulo: 'Rueda izquierda', info: 'La rueda del lado izquierdo (llanta + neumático).' },
-  { titulo: 'Rueda derecha', info: 'La rueda del lado derecho.' },
-  { titulo: 'Sensor de color', info: 'El sensor de color, para seguir líneas y ver colores.' },
-  { titulo: 'Sensor infrarrojo', info: '¡Último! El sensor que mide distancias.' },
+  { titulo: 'Motor grande izquierdo', info: 'Empezamos por la fuerza del robot: el motor grande que mueve la rueda izquierda.' },
+  { titulo: 'Motor grande derecho', info: 'El segundo motor grande, paralelo al primero. Cada motor mueve una rueda.' },
+  { titulo: 'Vigas rojas', info: 'Dos vigas technic unen los motores para que el chasis quede firme.' },
+  { titulo: 'Ladrillo inteligente EV3', info: 'El cerebro del robot: aquí se guarda y se ejecuta tu programa.' },
+  { titulo: 'Rueda izquierda', info: 'Llanta y neumático en el eje del motor izquierdo.' },
+  { titulo: 'Rueda derecha', info: 'La rueda del motor derecho. Con dos ruedas motrices el robot puede girar.' },
+  { titulo: 'Rueda loca', info: 'Una bola de acero atrás: sostiene el robot y lo deja girar hacia cualquier lado.' },
+  { titulo: 'Sensor de color', info: 'Mira hacia el piso para seguir líneas y reconocer colores.' },
+  { titulo: 'Sensor infrarrojo', info: '¡Último! Mira hacia adelante y mide la distancia a los obstáculos.' },
 ]
 
 function Modelo({ paso, onReady }: { paso: number; onReady: (n: number) => void }) {
   const [root, setRoot] = useState<THREE.Group | null>(null)
   const rootRef = useRef<THREE.Group | null>(null)
+  const invalidate = useThree(s => s.invalidate)
 
   useEffect(() => {
     let vivo = true
     const loader = new LDrawLoader()
-    ;(loader as any).smoothNormals = true
+    ;(loader as any).smoothNormals = false // más ligero: evita cálculos que cuelgan máquinas modestas
     loader.load('/ldraw/ev3-robot.mpd', (g: any) => {
       if (!vivo) return
       g.rotation.x = Math.PI // LDraw usa Y hacia abajo
@@ -47,9 +48,10 @@ function Modelo({ paso, onReady }: { paso: number; onReady: (n: number) => void 
       rootRef.current = g
       setRoot(g)
       onReady(g.userData?.numBuildingSteps || PASOS.length)
+      invalidate()
     }, undefined, () => onReady(PASOS.length))
     return () => { vivo = false }
-  }, [onReady])
+  }, [onReady, invalidate])
 
   // Mostrar solo las piezas hasta el paso actual
   useEffect(() => {
@@ -58,7 +60,8 @@ function Modelo({ paso, onReady }: { paso: number; onReady: (n: number) => void 
     g.traverse((o: any) => {
       if (o.userData && o.userData.buildingStep !== undefined) o.visible = o.userData.buildingStep < paso
     })
-  }, [paso, root])
+    invalidate()
+  }, [paso, root, invalidate])
 
   if (!root) return null
   return <primitive object={root} />
@@ -75,6 +78,7 @@ export default function ConstructorEV3Real() {
   const colocar = () => setPaso(p => Math.min(total, p + 1))
   const atras = () => setPaso(p => Math.max(0, p - 1))
   const reiniciar = () => setPaso(0)
+  const alCargar = useCallback((n: number) => { setTotal(n); setCargando(false) }, [])
 
   return (
     <div className={`flex flex-col overflow-hidden bg-slate-100 text-slate-900 ${expanded ? 'fixed inset-0 z-[200]' : 'relative h-full min-h-[520px]'}`}>
@@ -102,11 +106,11 @@ export default function ConstructorEV3Real() {
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <div className="relative min-h-[300px] flex-1">
-          <Canvas shadows camera={{ position: [160, 150, 220], fov: 40 }} dpr={[1, 1.8]} style={{ background: 'linear-gradient(#e0f2fe,#eef2f7)' }}>
+          <Canvas frameloop="demand" camera={{ position: [-180, 140, -230], fov: 40 }} dpr={[1, 1.6]} style={{ background: 'linear-gradient(#e0f2fe,#eef2f7)' }}>
             <ambientLight intensity={0.9} />
             <directionalLight position={[120, 180, 90]} intensity={1.2} />
             <directionalLight position={[-80, 60, -100]} intensity={0.4} />
-            <Modelo paso={paso} onReady={(n) => { setTotal(n); setCargando(false) }} />
+            <Modelo paso={paso} onReady={alCargar} />
             <OrbitControls enablePan={false} minDistance={120} maxDistance={600} />
           </Canvas>
           {cargando && <div className="absolute inset-0 grid place-items-center bg-white/70 text-sm text-slate-600"><span className="flex items-center gap-2"><Loader2 className="h-5 w-5 animate-spin" /> Cargando piezas reales…</span></div>}
