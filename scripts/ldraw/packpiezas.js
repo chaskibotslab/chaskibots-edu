@@ -59,6 +59,7 @@ const piezas = {
   pin_largo: [`1 1 0 0 0 ${I} 6558.dat`],
   pin_eje: [`1 1 0 0 0 ${I} 43093.dat`],
   buje: [`1 71 0 0 0 ${I} 3713.dat`],
+  buje_medio: [`1 14 0 0 0 ${I} 32123a.dat`],
   eje_3: [`1 71 0 0 0 ${I} 4519.dat`],
   eje_5: [`1 71 0 0 0 ${I} 32073.dat`],
   eje_8: [`1 0 0 0 0 ${I} 3707.dat`],

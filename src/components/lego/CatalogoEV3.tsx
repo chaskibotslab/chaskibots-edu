@@ -80,7 +80,8 @@ const CERCA = STUD * 5                              // distancia a la silueta pa
 const cache = new Map<string, THREE.Group>()        // tipo -> pieza base, centrada en su origen
 const clones = new Map<number, THREE.Object3D>()    // uid -> clon colocado
 
-const MAT_FANTASMA = new THREE.MeshBasicMaterial({ color: '#22c55e', transparent: true, opacity: 0.4, depthWrite: false })
+// sin prueba de profundidad: la silueta se ve aunque la pieza vaya escondida dentro de otras (pines, ejes)
+const MAT_FANTASMA = new THREE.MeshBasicMaterial({ color: '#22c55e', transparent: true, opacity: 0.45, depthWrite: false, depthTest: false })
 
 /** Centra la pieza en su origen y guarda su tamaño en userData.tam. */
 function preparar(g: THREE.Group): THREE.Group {
@@ -186,7 +187,7 @@ function ModeloGuia({ modelo, paso, onObjetivo }: { modelo: THREE.Group; paso: n
       f.userData = { fantasma: true } // sin buildingStep: mostrarHasta no lo toca
       f.traverse((o: any) => {
         o.raycast = () => {} // la silueta no estorba al tocar la mesa
-        if (o.isMesh) o.material = MAT_FANTASMA
+        if (o.isMesh) { o.material = MAT_FANTASMA; o.renderOrder = 10 }
         else if (o.isLine) o.visible = false
       })
       modelo.add(f)

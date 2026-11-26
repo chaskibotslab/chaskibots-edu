@@ -9,20 +9,19 @@ import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { cargarLDraw, mostrarHasta } from './ldraw'
-import { GUIA_ROBOT } from './guiasEV3'
+import { GUIAS, GUIA_ROBOT, type Guia } from './guiasEV3'
 import { ChevronLeft, ChevronRight, RotateCcw, Maximize2, Minimize2, Check, Trophy, Hammer, Loader2 } from 'lucide-react'
 import { useExpand } from '@/hooks/useExpand'
 import EnviarTarea from '@/components/simuladores/EnviarTarea'
 
-const PASOS = GUIA_ROBOT.pasos
-
-function Modelo({ paso, onReady }: { paso: number; onReady: (n: number) => void }) {
+function Modelo({ guia, paso, onReady }: { guia: Guia; paso: number; onReady: () => void }) {
   const [root, setRoot] = useState<THREE.Group | null>(null)
   const invalidate = useThree(s => s.invalidate)
 
   useEffect(() => {
     let vivo = true
-    cargarLDraw(GUIA_ROBOT.archivo).then(g => {
+    setRoot(null)
+    cargarLDraw(guia.archivo).then(g => {
       if (!vivo) return
       g.rotation.x = Math.PI // LDraw usa Y hacia abajo
       g.updateMatrixWorld(true)
@@ -33,10 +32,10 @@ function Modelo({ paso, onReady }: { paso: number; onReady: (n: number) => void 
       g.scale.setScalar(s)
       g.position.set(-center.x * s, -center.y * s, -center.z * s)
       setRoot(g)
-      onReady(PASOS.length)
-    }).catch(() => onReady(PASOS.length))
+      onReady()
+    }).catch(() => onReady())
     return () => { vivo = false }
-  }, [onReady])
+  }, [guia, onReady])
 
   // Mostrar solo las piezas hasta el paso actual
   useEffect(() => {
@@ -51,8 +50,11 @@ function Modelo({ paso, onReady }: { paso: number; onReady: (n: number) => void 
 
 export default function ConstructorEV3Real() {
   const { expanded, toggle } = useExpand()
+  const [guiaId, setGuiaId] = useState(GUIA_ROBOT.id)
+  const guia = GUIAS.find(g => g.id === guiaId) || GUIA_ROBOT
+  const PASOS = guia.pasos
+  const total = PASOS.length
   const [paso, setPaso] = useState(0)
-  const [total, setTotal] = useState(PASOS.length)
   const [cargando, setCargando] = useState(true)
 
   const listo = paso >= total
@@ -60,22 +62,27 @@ export default function ConstructorEV3Real() {
   const colocar = () => setPaso(p => Math.min(total, p + 1))
   const atras = () => setPaso(p => Math.max(0, p - 1))
   const reiniciar = () => setPaso(0)
-  const alCargar = useCallback((n: number) => { setTotal(n); setCargando(false) }, [])
+  const alCargar = useCallback(() => setCargando(false), [])
+  const elegir = (id: string) => { setGuiaId(id); setPaso(0); setCargando(true) }
 
   return (
     <div className={`flex flex-col overflow-hidden bg-slate-100 text-slate-900 ${expanded ? 'fixed inset-0 z-[200]' : 'relative h-full min-h-[520px]'}`}>
       <div className="flex flex-wrap items-center gap-2 bg-[#c0392b] px-3 py-1.5 text-white">
         <Hammer className="h-4 w-4" />
-        <span className="text-sm font-extrabold tracking-tight">Armar: Robot explorador EV3</span>
-        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold">{Math.min(paso, total)}/{total} piezas</span>
+        <span className="text-sm font-extrabold tracking-tight">Armar</span>
+        <select value={guiaId} onChange={e => elegir(e.target.value)} title="Elige qué robot armar"
+          className="max-w-[55vw] rounded-md border border-white/40 bg-white/15 px-2 py-1 text-xs font-bold text-white outline-none [&>option]:text-slate-900">
+          {GUIAS.map(g => <option key={g.id} value={g.id}>{g.emoji} {g.nombre}</option>)}
+        </select>
+        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold">{Math.min(paso, total)}/{total} pasos</span>
         <div className="ml-auto flex items-center gap-1.5">
           <EnviarTarea
-            simulador="LEGO EV3 (armado)"
+            simulador={`LEGO EV3 (armado: ${guia.nombre})`}
             sigla="EV3A"
             botonClassName="flex items-center gap-1.5 rounded-md bg-white/90 px-2.5 py-1 text-xs font-bold text-green-700 hover:bg-white disabled:opacity-80"
             obtenerEntrega={() => ({
-              output: `LEGO EV3 — armado con piezas reales: ${Math.min(paso, total)}/${total} piezas. ${listo ? '✅ ¡Robot terminado!' : '⏳ En progreso'}`,
-              files: { ev3Armado: { pasos: Math.min(paso, total), total, terminado: listo } },
+              output: `LEGO EV3 — armado de «${guia.nombre}»: ${Math.min(paso, total)}/${total} pasos. ${listo ? '✅ ¡Robot terminado!' : '⏳ En progreso'}`,
+              files: { ev3Armado: { robot: guia.id, pasos: Math.min(paso, total), total, terminado: listo } },
             })}
           />
           <button onClick={toggle} title={expanded ? 'Salir de pantalla completa' : 'Pantalla completa'} className="rounded-md p-1.5 hover:bg-white/20">
@@ -92,12 +99,12 @@ export default function ConstructorEV3Real() {
             <ambientLight intensity={0.9} />
             <directionalLight position={[120, 180, 90]} intensity={1.2} />
             <directionalLight position={[-80, 60, -100]} intensity={0.4} />
-            <Modelo paso={paso} onReady={alCargar} />
+            <Modelo guia={guia} paso={paso} onReady={alCargar} />
             <OrbitControls enablePan={false} minDistance={120} maxDistance={600} />
           </Canvas>
           {cargando && <div className="absolute inset-0 grid place-items-center bg-white/70 text-sm text-slate-600"><span className="flex items-center gap-2"><Loader2 className="h-5 w-5 animate-spin" /> Cargando piezas reales…</span></div>}
           {listo && (
-            <div className="pointer-events-none absolute inset-x-0 top-3 mx-auto w-max rounded-full bg-green-600 px-4 py-1.5 text-sm font-bold text-white shadow-lg flex items-center gap-2 animate-bounce"><Trophy className="h-5 w-5" /> ¡Robot EV3 terminado!</div>
+            <div className="pointer-events-none absolute inset-x-0 top-3 mx-auto w-max rounded-full bg-green-600 px-4 py-1.5 text-sm font-bold text-white shadow-lg flex items-center gap-2 animate-bounce"><Trophy className="h-5 w-5" /> ¡{guia.nombre} terminado!</div>
           )}
         </div>
 
@@ -115,7 +122,7 @@ export default function ConstructorEV3Real() {
             <div className="flex flex-col items-center gap-2 py-4 text-center">
               <Trophy className="h-10 w-10 text-amber-500" />
               <h3 className="text-lg font-extrabold text-slate-900">¡Lo armaste!</h3>
-              <p className="text-sm text-slate-700">Construiste el robot EV3 con piezas reales. Gíralo para verlo, o ve a «Programar» para darle vida.</p>
+              <p className="text-sm text-slate-700">Construiste «{guia.nombre}» con piezas reales. Gíralo para verlo{guia.simulable ? ', o ve a «Programar» para darle vida' : ''}.</p>
             </div>
           )}
 

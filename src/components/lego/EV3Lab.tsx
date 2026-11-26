@@ -170,7 +170,7 @@ export default function EV3Lab() {
 
           {/* Escena 3D */}
           <div className="relative w-full overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm" style={{ aspectRatio: '1 / 1' }}>
-            <Escena3D motor={motor} tapete={mision.tapete} version={version} robot={robot.archivo} />
+            <Escena3D motor={motor} tapete={mision.tapete} version={version} robot={robot} />
             {/* HUD sensores */}
             <div className="pointer-events-none absolute left-1.5 top-1.5 flex flex-col gap-1 text-[11px] font-bold">
               <span className="rounded-md bg-white/90 px-1.5 py-0.5 text-slate-700 shadow-sm">🎨 {hud.color}</span>

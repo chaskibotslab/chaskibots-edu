@@ -13,7 +13,7 @@ import * as THREE from 'three'
 import { LegoMotor, Tapete } from './engine'
 import { colorMasCercano } from './colores'
 import { aligerar, cargarLDraw, piezasPorPaso } from './ldraw'
-import { GUIA_ROBOT, PASO_RUEDA_DER, PASO_RUEDA_IZQ } from './guiasEV3'
+import { GUIA_ROBOT, type Guia } from './guiasEV3'
 
 const SCALE = 6 // px por cm en el canvas del tapete
 
@@ -52,12 +52,12 @@ function usarTapete(motor: LegoMotor, tapete: Tapete) {
 // 1 LDU = 0,04 cm; se dibuja un poco más grande (×1,5) para que se vea bien en el tapete.
 const CM_POR_LDU = 0.04 * 1.5
 
-function usarRobotReal(archivo: string) {
+function usarRobotReal(guia: Guia) {
   const [robot, setRobot] = useState<{ raiz: THREE.Group; ruedasL: THREE.Object3D[]; ruedasR: THREE.Object3D[] } | null>(null)
   useEffect(() => {
     let vivo = true
     setRobot(null)
-    cargarLDraw(archivo).then(g => {
+    cargarLDraw(guia.archivo).then(g => {
       if (!vivo) return
       aligerar(g)
       g.rotation.x = Math.PI            // LDraw usa Y hacia abajo
@@ -69,18 +69,18 @@ function usarRobotReal(archivo: string) {
       const piezas = piezasPorPaso(g)
       setRobot({
         raiz,
-        ruedasL: piezas.filter(p => p.paso === PASO_RUEDA_IZQ).map(p => p.obj),
-        ruedasR: piezas.filter(p => p.paso === PASO_RUEDA_DER).map(p => p.obj),
+        ruedasL: piezas.filter(p => p.paso === guia.ruedas[0]).map(p => p.obj),
+        ruedasR: piezas.filter(p => p.paso === guia.ruedas[1]).map(p => p.obj),
       })
     }).catch(() => { /* se queda el robot sencillo */ })
     return () => { vivo = false }
-  }, [archivo])
+  }, [guia])
   return robot
 }
 
-function Robot({ motor, archivo }: { motor: LegoMotor; archivo: string }) {
+function Robot({ motor, guia }: { motor: LegoMotor; guia: Guia }) {
   const ref = useRef<THREE.Group>(null)
-  const real = usarRobotReal(archivo)
+  const real = usarRobotReal(guia)
   useEffect(() => { giro.current = { l: 0, r: 0 } }, [real])
   const giro = useRef({ l: 0, r: 0 })
   useFrame((_, delta) => {
@@ -133,7 +133,7 @@ function RobotSencillo() {
   )
 }
 
-function Mundo({ motor, tapete, archivo }: { motor: LegoMotor; tapete: Tapete; archivo: string }) {
+function Mundo({ motor, tapete, guia }: { motor: LegoMotor; tapete: Tapete; guia: Guia }) {
   const tex = usarTapete(motor, tapete)
   return (
     <>
@@ -163,18 +163,18 @@ function Mundo({ motor, tapete, archivo }: { motor: LegoMotor; tapete: Tapete; a
           <meshBasicMaterial color="#22c55e" side={THREE.DoubleSide} transparent opacity={0.9} />
         </mesh>
       )}
-      <Robot motor={motor} archivo={archivo} />
+      <Robot motor={motor} guia={guia} />
       <OrbitControls enablePan={false} minDistance={45} maxDistance={360} maxPolarAngle={Math.PI / 2.1} />
     </>
   )
 }
 
-export default function Escena3D({ motor, tapete, version, robot = GUIA_ROBOT.archivo }: { motor: LegoMotor; tapete: Tapete; version: number; robot?: string }) {
+export default function Escena3D({ motor, tapete, version, robot = GUIA_ROBOT }: { motor: LegoMotor; tapete: Tapete; version: number; robot?: Guia }) {
   // version fuerza remmontar el mundo al cambiar de misión (reconstruye textura/sensor)
   useEffect(() => { motor.cargar(tapete) }, [motor, tapete])
   return (
     <Canvas shadows camera={{ position: [30, 150, 160], fov: 42 }} dpr={[1, 1.8]} style={{ background: 'linear-gradient(#dbeafe,#eef2f7)' }}>
-      <Mundo key={version} motor={motor} tapete={tapete} archivo={robot} />
+      <Mundo key={version} motor={motor} tapete={tapete} guia={robot} />
     </Canvas>
   )
 }
