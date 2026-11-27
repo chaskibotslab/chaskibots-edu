@@ -1,41 +1,61 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@/components/AuthProvider'
 
-// Niveles que la persona ya tiene como curso de su institución (Academia).
-// Esos grados se ven desde el curso de la institución, así que no deben
-// aparecer además como nivel genérico (en /niveles, /robotica, /hacking).
-// null = todavía cargando. Los administradores no se filtran: siempre [].
-const cache = new Map<string, Promise<string[]>>()
+export interface CursoInstitucion {
+  schoolId: string
+  schoolName: string
+  kitId: string
+  courseName: string
+  levelId: string
+}
 
-function cargar(userId: string): Promise<string[]> {
+// Cursos que la persona tiene en su institución (Academia), tal como los
+// entrega /api/academia/instituciones: ya filtrados por sus asignaciones.
+// Un docente puede tener varios; la ficha del usuario solo guarda uno, por
+// eso las pantallas no deben guiarse por user.levelId para saber "su curso".
+const cache = new Map<string, Promise<CursoInstitucion[]>>()
+
+function cargar(userId: string): Promise<CursoInstitucion[]> {
   let p = cache.get(userId)
   if (!p) {
     p = fetch('/api/academia/instituciones')
       .then(r => r.json())
       .then(d => {
-        const insts: { cursos: { levelId: string }[] }[] = d?.success ? d.instituciones : []
-        return Array.from(new Set(insts.flatMap(i => i.cursos.map(c => c.levelId)).filter(Boolean)))
+        const insts: any[] = d?.success ? d.instituciones : []
+        return insts.flatMap(i => (i.cursos || []).map((c: any) => ({
+          schoolId: i.schoolId, schoolName: i.schoolName, kitId: c.kitId, courseName: c.courseName, levelId: c.levelId,
+        })))
       })
-      .catch(() => { cache.delete(userId); return [] as string[] })
+      .catch(() => { cache.delete(userId); return [] as CursoInstitucion[] })
     cache.set(userId, p)
   }
   return p
 }
 
-export function useNivelesInstitucion(): string[] | null {
+/** Cursos de institución de la persona. null = cargando. Admin: siempre [] (no se le filtra nada). */
+export function useCursosInstitucion(): CursoInstitucion[] | null {
   const { user, isLoading } = useAuth()
-  const [niveles, setNiveles] = useState<string[] | null>(null)
+  const [cursos, setCursos] = useState<CursoInstitucion[] | null>(null)
 
   useEffect(() => {
     if (isLoading) return
-    if (!user || user.role === 'admin') { setNiveles([]); return }
+    if (!user || user.role === 'admin') { setCursos([]); return }
     let vivo = true
-    setNiveles(null)
-    cargar(user.id).then(n => { if (vivo) setNiveles(n) })
+    setCursos(null)
+    cargar(user.id).then(c => { if (vivo) setCursos(c) })
     return () => { vivo = false }
   }, [isLoading, user?.id, user?.role])
 
-  return niveles
+  return cursos
+}
+
+/**
+ * Niveles que la persona ya tiene como curso de su institución: no deben
+ * aparecer además como nivel genérico (/niveles, /robotica, /hacking).
+ */
+export function useNivelesInstitucion(): string[] | null {
+  const cursos = useCursosInstitucion()
+  return useMemo(() => cursos && Array.from(new Set(cursos.map(c => c.levelId).filter(Boolean))), [cursos])
 }

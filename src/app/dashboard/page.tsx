@@ -8,10 +8,11 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
 import { useMyScope } from '@/hooks/useMyScope'
+import { useCursosInstitucion } from '@/hooks/useNivelesInstitucion'
 import { EDUCATION_LEVELS } from '@/lib/constants'
 import {
   Bot, Brain, Shield, ArrowRight, Play,
-  Cpu, Loader2, Sparkles, Trophy, Zap, Target, Crown, ClipboardList
+  Cpu, Loader2, Sparkles, Trophy, Zap, Target, Crown, ClipboardList, School
 } from 'lucide-react'
 import BadgesDisplay from '@/components/BadgesDisplay'
 
@@ -71,6 +72,9 @@ export default function DashboardPage() {
   const { allows } = useMyScope()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
+  // Cursos de su institución (un docente puede tener varios). La ficha del
+  // usuario solo guarda un nivel, así que no sirve para saber "su curso".
+  const cursosInstitucion = useCursosInstitucion()
 
   useEffect(() => {
     setMounted(true)
@@ -82,7 +86,7 @@ export default function DashboardPage() {
     }
   }, [isLoading, isAuthenticated, router])
 
-  if (isLoading) {
+  if (isLoading || (isAuthenticated && cursosInstitucion === null)) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-chaski-primary animate-spin" />
@@ -95,7 +99,17 @@ export default function DashboardPage() {
   }
 
   const currentLevel = EDUCATION_LEVELS.find(l => l.id === user?.levelId) || EDUCATION_LEVELS[0]
-  const studyAreas = STUDY_AREAS.filter(area => allows(area.id))
+  const misCursos = cursosInstitucion || []
+  const enInstitucion = misCursos.length > 0
+  // Robótica y Hacking llevan a los niveles genéricos: quien estudia o enseña
+  // en una institución entra por sus cursos, no por ahí.
+  const studyAreas = STUDY_AREAS.filter(area => allows(area.id) && !(enInstitucion && (area.id === 'robotica' || area.id === 'hacking')))
+  const subtitulo = enInstitucion
+    ? (misCursos.length === 1 ? misCursos[0].courseName : misCursos[0].schoolName + ' · ' + misCursos.length + ' cursos')
+    : currentLevel.name
+  const hrefContinuar = !enInstitucion ? '/nivel/' + currentLevel.id
+    : misCursos.length === 1 ? '/academia/' + misCursos[0].schoolId + '/' + misCursos[0].kitId : '/niveles'
+  const textoContinuar = !enInstitucion ? currentLevel.name : misCursos.length === 1 ? misCursos[0].courseName : 'Ver mis ' + misCursos.length + ' cursos'
   const progress = user?.progress || 0
 
   return (
@@ -119,7 +133,7 @@ export default function DashboardPage() {
                   <h1 className="text-2xl sm:text-3xl font-black tracking-tight">{user?.name}</h1>
                   <p className="text-chaski-primary text-sm font-medium flex items-center gap-1 mt-1">
                     <Sparkles className="w-4 h-4" />
-                    {currentLevel.name}
+                    {subtitulo}
                   </p>
                 </div>
               </div>
@@ -145,6 +159,33 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Cursos de su institución */}
+          {enInstitucion && (
+            <div>
+              <h2 className="text-lg font-bold text-chaski-dark mb-4 flex items-center gap-2">
+                <School className="w-5 h-5 text-chaski-gold" />
+                Mis cursos · {misCursos[0].schoolName}
+              </h2>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {misCursos.map(c => (
+                  <Link
+                    key={c.kitId}
+                    href={`/academia/${c.schoolId}/${c.kitId}`}
+                    className="group rounded-2xl bg-white border border-border-soft shadow-sm p-5 hover:shadow-lg hover:border-chaski-gold/40 transition-all duration-300 active:scale-[0.98]"
+                  >
+                    <div className="w-11 h-11 rounded-xl bg-chaski-gold/10 border border-chaski-gold/20 flex items-center justify-center mb-3">
+                      <School className="w-5 h-5 text-chaski-gold" />
+                    </div>
+                    <h3 className="font-semibold text-chaski-dark leading-tight">{c.courseName}</h3>
+                    <span className="mt-2 text-sm font-medium text-chaski-gold flex items-center gap-2 group-hover:gap-3 transition-all">
+                      Entrar <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Quick Actions */}
           <div>
             <h2 className="text-lg font-bold text-chaski-dark mb-4 flex items-center gap-2">
@@ -154,7 +195,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {QUICK_ACTIONS.map((action, idx) => {
                 const Icon = action.icon
-                const href = action.href(currentLevel.id)
+                const href = action.id === 'continue' ? hrefContinuar : action.href(currentLevel.id)
                 const c = COLOR_STYLES[action.color]
                 return (
                   <Link
@@ -168,7 +209,7 @@ export default function DashboardPage() {
                       <Icon className={`w-6 h-6 ${c.text}`} />
                     </div>
                     <h3 className="font-semibold text-chaski-dark mb-1">{action.title}</h3>
-                    <p className="text-sm text-slate-500 mb-3">{action.description(currentLevel.name)}</p>
+                    <p className="text-sm text-slate-500 mb-3">{action.id === 'continue' ? textoContinuar : action.description(currentLevel.name)}</p>
                     <span className={`text-sm font-medium ${c.text} flex items-center gap-2 group-hover:gap-3 transition-all`}>
                       {action.id === 'continue' ? 'Ir al curso' : action.id === 'simulators' ? 'Explorar' : 'Ver más'}
                       <ArrowRight className="w-4 h-4" />
@@ -180,7 +221,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Study Areas */}
-          <div>
+          {studyAreas.length > 0 && <div>
             <h2 className="text-lg font-bold text-chaski-dark mb-4 flex items-center gap-2">
               <Target className="w-5 h-5 text-chaski-primary" />
               Áreas de estudio
@@ -208,7 +249,7 @@ export default function DashboardPage() {
                 )
               })}
             </div>
-          </div>
+          </div>}
 
           {/* Badges */}
           <BadgesDisplay

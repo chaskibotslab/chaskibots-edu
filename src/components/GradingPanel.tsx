@@ -9,6 +9,7 @@ interface TeacherCourseAssignment {
   courseId: string
   levelId: string
   courseName: string
+  schoolId?: string
 }
 
 // Interfaces para datos de Airtable
@@ -156,12 +157,13 @@ export default function GradingPanel({ initialLevelId = '' }: GradingPanelProps)
       
       // Si es profesor (no admin), filtrar por su schoolId y courseId
       if (isTeacher && !isAdmin) {
-        if (user?.schoolId) {
-          params.append('schoolId', user.schoolId)
-        }
-        if (user?.courseId) {
-          params.append('courseId', user.courseId)
-        }
+        // Un docente puede tener varios grupos: se usa el del nivel elegido,
+        // no el único que guarda su ficha (antes solo veía las notas de ese).
+        const grupo = teacherCourses.find(tc => tc.levelId === selectedLevel)
+        const schoolId = grupo?.schoolId || user?.schoolId
+        const courseId = grupo ? grupo.courseId : user?.courseId
+        if (schoolId) params.append('schoolId', schoolId)
+        if (courseId) params.append('courseId', courseId)
       }
       
       if (params.toString()) {
