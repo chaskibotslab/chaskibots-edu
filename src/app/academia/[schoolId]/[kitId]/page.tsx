@@ -257,7 +257,10 @@ export default function AcademiaKitPage() {
   // sacamos del propio kitId (ej. "kit-lv-octavo-egb" -> "octavo-egb")
   // de forma best-effort; si no calza, el guard igual deja pasar a
   // admin/teacher y pide clave a los demas, no rompe el flujo.
-  const guessedLevelId = kitId?.replace(/^kit-(lv-)?/, '') || ''
+  // El prefijo del colegio cambia ("kit-lv-…", "kit-copol-…"): se toma el
+  // grado del final del id. Con solo quitar "kit-lv-", a los docentes de
+  // otros colegios les quedaba "copol-sexto-egb" y se les pedía clave.
+  const guessedLevelId = /(inicial-\d+|[a-z]+-(?:egb|bgu))$/.exec(kitId || '')?.[1] || kitId?.replace(/^kit-(lv-)?/, '') || ''
 
   return (
     <CourseAuthGuard levelId={guessedLevelId} levelName="Curso de Academia">
