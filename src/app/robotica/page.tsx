@@ -83,6 +83,12 @@ export default function RoboticaPage() {
               <Sparkles className="w-5 h-5 text-chaski-primary" />
               Selecciona tu Nivel
             </h2>
+            {!isAdmin && visibleLevels.length === 0 && (
+              <p className="text-slate-300 text-sm mb-4">
+                Tus clases están dentro de los cursos de tu institución.{' '}
+                <Link href="/niveles" className="underline font-semibold text-white">Ir a mis cursos</Link>
+              </p>
+            )}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {visibleLevels.map((level, idx) => (
                 <Link

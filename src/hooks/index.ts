@@ -4,6 +4,7 @@
 
 export { useLevels } from './useLevels'
 export { useUserCourses } from './useUserCourses'
+export { useNivelesInstitucion } from './useNivelesInstitucion'
 export { useAdminData } from './useAdminData'
 export { useDynamicLevels } from './useDynamicLevels'
 export { useFormValidation, useValidation } from './useFormValidation'

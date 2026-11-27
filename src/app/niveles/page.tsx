@@ -144,6 +144,7 @@ export default function NivelesPage() {
             const filter = category.filter || ((l: { category: string }) => l.category === category.id)
             const levels = allLevels.filter(filter)
             if (levels.length === 0) return null
+            if (!isAdmin && !levels.some(l => canAccessLevel(l.id))) return null
 
             return (
               <section key={category.id} className="animate-slide-up">

@@ -6,6 +6,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/components/AuthProvider'
 import { useMyScope } from '@/hooks/useMyScope'
+import { useNivelesInstitucion } from '@/hooks/useNivelesInstitucion'
 import { isProgramAvailable, minGradeLabel } from '@/lib/programGating'
 import { Shield, Lock, Eye, Key, ArrowRight, Sparkles, AlertTriangle } from 'lucide-react'
 
@@ -84,6 +85,7 @@ export default function HackingPage() {
     }
   }, [isLoading, isAuthenticated, user])
 
+  const nivelesInstitucion = useNivelesInstitucion()
   const allowedLevelIds = useMemo(() => {
     if (!user) return []
     if (user.role === 'admin') return allLevels.map(l => l.id)
@@ -101,8 +103,10 @@ export default function HackingPage() {
       })
     }
 
-    return Array.from(levelIds)
-  }, [user, userCourses, allLevels])
+    // Un grado que ya es curso de su institución no se repite como nivel genérico
+    if (nivelesInstitucion === null) return []
+    return Array.from(levelIds).filter(id => !nivelesInstitucion.includes(id))
+  }, [user, userCourses, allLevels, nivelesInstitucion])
 
   const isAdmin = user?.role === 'admin'
 
@@ -196,6 +200,12 @@ const TOOLS = ['CrypTool', 'Wireshark', 'Nmap', 'OWASP', 'Kali Linux', 'HackTheB
                 <Sparkles className="w-5 h-5 text-hack-green" />
                 Selecciona tu Nivel
               </h2>
+              {!isAdmin && visibleLevels.length === 0 && (
+                <p className="text-slate-300 text-sm mb-4">
+                  Tus clases están dentro de los cursos de tu institución.{' '}
+                  <Link href="/niveles" className="underline font-semibold text-white">Ir a mis cursos</Link>
+                </p>
+              )}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {visibleLevels.map((level, i) => (
                   <Link

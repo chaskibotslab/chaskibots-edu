@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '@/components/AuthProvider'
 import { teacherCoursesApi } from '@/services/api'
 import type { TeacherCourse, Level } from '@/types'
+import { useNivelesInstitucion } from './useNivelesInstitucion'
 
 interface UserCourse {
   courseId: string
@@ -30,6 +31,7 @@ export function useUserCourses(allLevels: Level[] = []): UseUserCoursesReturn {
   const [userCourses, setUserCourses] = useState<UserCourse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const nivelesInstitucion = useNivelesInstitucion()
 
   const loadUserCourses = async () => {
     if (!user) {
@@ -133,12 +135,13 @@ export function useUserCourses(allLevels: Level[] = []): UseUserCoursesReturn {
       }
     })
 
-    return Array.from(levelIds)
-  }, [user, userCourses, allLevels])
+    // Un grado que ya es curso de su institución no se repite como nivel genérico
+    return Array.from(levelIds).filter(id => !(nivelesInstitucion || []).includes(id))
+  }, [user, userCourses, allLevels, nivelesInstitucion])
 
   return {
     userCourses,
-    loading: loading || authLoading,
+    loading: loading || authLoading || nivelesInstitucion === null,
     error,
     allowedLevelIds,
     refetch: loadUserCourses,
