@@ -79,12 +79,17 @@ export function obstaculos(doc: RobotDoc): Obstaculo[] {
 }
 
 /** Lejos de sus puntas, ¿el cable se mete en una pieza que no es ninguna de las dos suyas? */
-const LIBRE_PUNTA = 8
+const LIBRE_PUNTA = 4
+/** Dentro de su propia pieza el cable solo puede ir este tramo desde el conector (mm). */
+const LIBRE_PROPIA = 14
 export function tocaPieza(obs: Obstaculo[], puntos: Vector3[], a: ExtremoCable, b: ExtremoCable, pasa: Pasacables[] = [], margen = 0.4): boolean {
   for (const p of puntos) {
     if (p.distanceTo(a.p) < LIBRE_PUNTA || p.distanceTo(b.p) < LIBRE_PUNTA) continue
     for (const o of obs) {
-      if (o.inst === a.inst || o.inst === b.inst || !dentroDeCaja(o.caja, p, margen)) continue
+      if (!dentroDeCaja(o.caja, p, margen)) continue
+      // Su propia pieza: puede salir del conector, pero no cruzarla de lado a lado.
+      if (o.inst === a.inst) { if (p.distanceTo(a.p) < LIBRE_PROPIA || !dentroDeCaja(o.caja, p, -1.5)) continue }
+      else if (o.inst === b.inst) { if (p.distanceTo(b.p) < LIBRE_PROPIA || !dentroDeCaja(o.caja, p, -1.5)) continue }
       if (o.plana && pasa.some(h => Math.hypot(h.x - p.x, h.z - p.z) <= h.radio)) continue
       return true
     }
@@ -114,7 +119,7 @@ export function curvaDirecta(a: ExtremoCable, b: ExtremoCable, n = 40): Vector3[
 
 const LIBRE = 0, SOLIDO = 1, PASO = 2
 const MAX_CELDAS = 420_000
-const COSTO_PARED = 400, COSTO_PROPIA = 4, COSTO_AGUJERO = 14, COSTO_AGUJERO_ABIERTO = 3
+const COSTO_PARED = 400, COSTO_PROPIA = 4, COSTO_PROPIA_LEJOS = 120, COSTO_AGUJERO = 14, COSTO_AGUJERO_ABIERTO = 3
 
 interface Malla {
   celda: number; nx: number; ny: number; nz: number; o: Vector3
@@ -237,7 +242,7 @@ class Monticulo {
 }
 
 /** Camino más barato entre dos celdas (A*). Devuelve las celdas en orden, o null. */
-function camino(m: Malla, ini: number, fin: number, pa: number, pb: number): number[] | null {
+function camino(m: Malla, ini: number, fin: number, pa: number, pb: number, puntaA: Vector3, puntaB: Vector3): number[] | null {
   const n = m.clase.length, { nx, nz, ny, celda } = m
   const g = new Float32Array(n).fill(Infinity)
   const previo = new Int32Array(n).fill(-1)
@@ -274,7 +279,15 @@ function camino(m: Malla, ini: number, fin: number, pa: number, pb: number): num
           let c = Math.sqrt(dx * dx + dy * dy + dz * dz) * celda
           // Por fuera de la planta del chasis el cable cuelga a la vista: cuesta el triple.
           if (m.fuera[z * nx + x]) c *= 3
-          if (cq === SOLIDO) c += m.duenio[q] === pa || m.duenio[q] === pb ? COSTO_PROPIA : COSTO_PARED
+          if (cq === SOLIDO) {
+            const d = m.duenio[q]
+            if (d === pa || d === pb) {
+              // Cerca de su conector, la pieza propia casi no cuesta; lejos, es otra pared (más blanda).
+              const qx = m.o.x + (x + 0.5) * celda, qy = m.o.y + (y + 0.5) * celda, qz = m.o.z + (z + 0.5) * celda
+              const punta = d === pa ? puntaA : puntaB
+              c += Math.hypot(qx - punta.x, qy - punta.y, qz - punta.z) < LIBRE_PROPIA ? COSTO_PROPIA : COSTO_PROPIA_LEJOS
+            } else c += COSTO_PARED
+          }
           else if (cq === PASO && ck !== PASO) {
             const col = m.columna[z * nx + x]
             c += col === 1 ? COSTO_AGUJERO_ABIERTO : col === 2 ? COSTO_PARED : COSTO_AGUJERO
@@ -305,6 +318,29 @@ function seVe(m: Malla, p: Vector3, q: Vector3, propias: Set<number>): boolean {
 const STUB = 5
 
 /**
+ * Primer tramo del cable al salir del conector. Lo normal es derecho; si ahí hay
+ * otra pieza (un borne que mira hacia la placa vecina), sale inclinado hacia
+ * arriba o más corto, lo primero que quede libre.
+ */
+function salida(obs: Obstaculo[], e: ExtremoCable): Vector3 {
+  const arriba = new Vector3(0, 1, 0)
+  const candidatos: [Vector3, number][] = [
+    [e.dir, STUB],
+    [e.dir.clone().add(arriba).normalize(), STUB],
+    [arriba, STUB],
+    [e.dir.clone().multiplyScalar(0.4).add(arriba).normalize(), STUB],
+    [e.dir, 2.5],
+    [arriba, 2.5],
+  ]
+  const libre = (p: Vector3) => !obs.some(o => o.inst !== e.inst && !o.plana && dentroDeCaja(o.caja, p, 1))
+  for (const [d, largo] of candidatos) {
+    const p = e.p.clone().addScaledVector(d, largo)
+    if (libre(p) && libre(e.p.clone().addScaledVector(d, largo / 2))) return p
+  }
+  return e.p.clone().addScaledVector(e.dir, STUB)
+}
+
+/**
  * Recorrido de cada cable. `cables[i] = null` (una punta sin lugar) da ruta null.
  * Los bancos de protoboard no pasan por aquí: sus puentes van por encima.
  */
@@ -318,8 +354,22 @@ export function rutearCables(doc: RobotDoc, cables: ([ExtremoCable, ExtremoCable
   const idPieza = new Map(doc.piezas.map((p, i) => [p.id, i]))
   const agujeros = new Map<number, Pasacables>()
   pendientes.forEach(({ c: [a, b], i }, orden) => {
-    const sa = a.p.clone().addScaledVector(a.dir, STUB), sb = b.p.clone().addScaledVector(b.dir, STUB)
-    const ruta = camino(m, indice(m, celdaDe(m, sa)), indice(m, celdaDe(m, sb)), idPieza.get(a.inst) ?? -3, idPieza.get(b.inst) ?? -3)
+    const sa = salida(obs, a), sb = salida(obs, b)
+    // Un conector cuyos pines atraviesan una placa (sensores soldados por debajo): ahí va un agujero.
+    for (const [e, s] of [[a, sa], [b, sb]] as const) {
+      const medio = e.p.clone().lerp(s, 0.5)
+      const placa = obs.find(o => o.plana && o.inst !== e.inst && (dentroDeCaja(o.caja, medio, 0.5) || dentroDeCaja(o.caja, s, 0.5) || dentroDeCaja(o.caja, e.p, 0.5)))
+      if (!placa) continue
+      // El primer tramo se alarga hasta salir del otro lado de la placa.
+      const dir = s.clone().sub(e.p).normalize()
+      for (let k = 0; k < 8 && dentroDeCaja(placa.caja, s, 2.5); k++) s.addScaledVector(dir, 1.5)
+      const esp = placa.caja.h[ejePlano(placa.caja)], cy = placa.caja.c.y
+      const clave = -(Math.round(medio.x) * 8192 + Math.round(medio.z) + 1)
+      const ag = agujeros.get(clave) ?? { x: medio.x, z: medio.z, y0: cy - esp, y1: cy + esp, radio: 0, cables: 0 }
+      ag.cables++
+      agujeros.set(clave, ag)
+    }
+    const ruta = camino(m, indice(m, celdaDe(m, sa)), indice(m, celdaDe(m, sb)), idPieza.get(a.inst) ?? -3, idPieza.get(b.inst) ?? -3, a.p, b.p)
     if (!ruta) return
     const propias = new Set(ruta)
     // Nudos del recorrido; los de cada lado de un pasacables quedan fijos.

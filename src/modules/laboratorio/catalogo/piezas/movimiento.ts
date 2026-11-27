@@ -14,6 +14,8 @@ export const MOTOR_TT: PiezaDef = {
   masa_g: 30,
   material: 'plastico',
   colisionadores: [{ forma: 'caja', medidas: [65, 22, 19], centro: [-8, 0, 0] }],
+  // Lo que ocupa de verdad el modelo (medido): la caja de arriba es la de la física y está corrida.
+  huella: [{ forma: 'caja', medidas: [65, 20, 26], centro: [-21.5, 0, 0] }],
   montajes: [{ id: 'eje', tipo: 'eje-motor', nombre: 'Eje', posicion: [0, 0, 24] }],
   encaja: ['soporte-motor'],
   pines: [

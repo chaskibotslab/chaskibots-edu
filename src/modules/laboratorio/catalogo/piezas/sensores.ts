@@ -14,6 +14,8 @@ export const TCRT5000: PiezaDef = {
   masa_g: 4,
   material: 'pcb',
   colisionadores: [{ forma: 'caja', medidas: [32, 10, 14], centro: [0, 6, 0] }],
+  // La plaquita va hacia atrás del punto donde mira (medido del modelo).
+  huella: [{ forma: 'caja', medidas: [32, 10, 14], centro: [-12, 6, 0] }],
   montajes: [],
   encaja: ['sensor-piso'],
   pines: [

@@ -7,7 +7,7 @@
 
 import { forwardRef, useMemo, type Ref } from 'react'
 import { RoundedBox, useGLTF } from '@react-three/drei'
-import { agujerosAligerado, agujerosChasis, PlacaRecortada, type Agujero } from './Placa3D'
+import { agujerosAligerado, agujerosChasis, PlacaRecortada, type Agujero, type Muesca } from './Placa3D'
 import { NANO_ADELANTE, NANO_ATRAS, PICO_1_20, PICO_40_21 } from './Modulos3D'
 
 export { ArduinoNano, Pico, TCRT5000, Bateria18650 } from './Modulos3D'
@@ -88,10 +88,15 @@ export function Chasis({ largo, ancho, material, color }: { largo: number; ancho
     () => agujerosChasis(largo, ancho, dosRuedas ? [5] : [60, -60], dosRuedas ? -65 : null, dosRuedas ? -23 : 0),
     [largo, ancho, dosRuedas],
   )
+  // Recortes de las ruedas, como en los chasis de kit: la rueda de 65 mm entra unos milímetros en el contorno.
+  const muescas = useMemo<Muesca[]>(
+    () => (dosRuedas ? [5] : [60, -60]).flatMap(x => ([1, -1] as const).map(lado => ({ x, lado, largo: 68, fondo: dosRuedas ? 7 : 8 }))),
+    [dosRuedas],
+  )
   const espesor = material === 'aluminio' ? 2 : 3
   return (
     <group>
-      <PlacaRecortada largo={largo} ancho={ancho} espesor={espesor} radio={10} agujeros={agujeros} castShadow={q.sombras}>
+      <PlacaRecortada largo={largo} ancho={ancho} espesor={espesor} radio={10} agujeros={agujeros} muescas={muescas} castShadow={q.sombras}>
         <MaterialChasis material={material} color={color} />
       </PlacaRecortada>
       {/* Tornillos M3 con tuerca en las esquinas */}
@@ -119,13 +124,16 @@ const AGUJEROS_MINISUMO: Agujero[] = [
   { x: -10, z: 0, lx: 14, lz: 3.2 }, { x: 20, z: 0, lx: 14, lz: 3.2 },
 ]
 
+/** Recortes de las ruedas de 34 mm, que van metidas en el contorno para no pasar de los 10 cm. */
+const MUESCAS_MINISUMO: Muesca[] = [{ x: -4.25, lado: 1, largo: 35.5, fondo: 16 }, { x: -4.25, lado: -1, largo: 35.5, fondo: 16 }]
+
 /** Chasis de minisumo: placa de 76 × 96 mm, pala de acero inclinada y laterales. */
 export function ChasisMinisumo({ material, color }: { material: MaterialFisico; color: string }) {
   const q = useCalidad()
   const pala = (37 * Math.PI) / 180
   return (
     <group>
-      <PlacaRecortada largo={76} ancho={96} radio={6} agujeros={AGUJEROS_MINISUMO} castShadow={q.sombras}>
+      <PlacaRecortada largo={76} ancho={96} radio={6} agujeros={AGUJEROS_MINISUMO} muescas={MUESCAS_MINISUMO} castShadow={q.sombras}>
         <MaterialChasis material={material} color={color} />
       </PlacaRecortada>
       {/* Pala de acero pulido con su filo */}

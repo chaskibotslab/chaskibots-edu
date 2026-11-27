@@ -44,7 +44,8 @@ export const CHASIS_2WD: PiezaDef = {
   colisionadores: [{ forma: 'caja', medidas: [160, 3, 120] }],
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Placa', posicion: [5, ARRIBA + 10, 0], rotacionesPermitidas: [0, 180] },
-    { id: 'driver', tipo: 'driver', nombre: 'Driver', posicion: [-55, ARRIBA, 0], rotacionesPermitidas: [0, 90, 180, 270] },
+    // El driver un poco más atrás: sus bornes no quedan contra el conector USB de la placa.
+    { id: 'driver', tipo: 'driver', nombre: 'Driver', posicion: [-58, ARRIBA, 0], rotacionesPermitidas: [0, 90, 180, 270] },
     { id: 'radio', tipo: 'modulo-radio', nombre: 'Módulo inalámbrico', posicion: [-55, ARRIBA, 46] },
     { id: 'bateria', tipo: 'bateria', nombre: 'Batería', posicion: [-23, ABAJO, 0], rotacion: COLGADO },
     { id: 'motor-izq', tipo: 'soporte-motor', nombre: 'Motor izquierdo', posicion: [5, -15, -46], rotacion: COLGADO },
@@ -123,8 +124,9 @@ export const CHASIS_MINISUMO: PiezaDef = {
     { id: 'frente', tipo: 'sensor-frontal', nombre: 'Sensor frontal', posicion: [22, ARRIBA, 0] },
     { id: 'frente-izq', tipo: 'sensor-frontal', nombre: 'Sensor frontal izquierdo', posicion: [30, ARRIBA, -31], rotacion: [0, 15, 0] },
     { id: 'frente-der', tipo: 'sensor-frontal', nombre: 'Sensor frontal derecho', posicion: [30, ARRIBA, 31], rotacion: [0, -15, 0] },
-    { id: 'piso-izq', tipo: 'sensor-piso', nombre: 'Sensor de borde izquierdo', posicion: [28, PISO_MINISUMO + 12.5, -38] },
-    { id: 'piso-der', tipo: 'sensor-piso', nombre: 'Sensor de borde derecho', posicion: [28, PISO_MINISUMO + 12.5, 38] },
+    // La plaquita del sensor va en diagonal hacia el centro: derecho hacia atrás atravesaría la rueda.
+    { id: 'piso-izq', tipo: 'sensor-piso', nombre: 'Sensor de borde izquierdo', posicion: [28, PISO_MINISUMO + 12.5, -38], rotacion: [0, 45, 0] },
+    { id: 'piso-der', tipo: 'sensor-piso', nombre: 'Sensor de borde derecho', posicion: [28, PISO_MINISUMO + 12.5, 38], rotacion: [0, -45, 0] },
     { id: 'arriba', tipo: 'piso', nombre: 'Piso de arriba', posicion: [-10, ARRIBA, 0] },
   ],
   encaja: [],
