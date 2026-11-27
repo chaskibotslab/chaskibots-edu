@@ -14,6 +14,7 @@ export { ArduinoNano, Pico, TCRT5000, Bateria18650 } from './Modulos3D'
 import type * as THREE from 'three'
 import type { MaterialFisico } from '../../catalogo/tipos'
 import { useCalidad } from '../calidad'
+import { anclaRadio } from './Radio3D'
 import { anclaCircuito } from './Circuito3D'
 import { anclaComputadora } from './Computadoras3D'
 import { PLACA_PISO, SEPARADORES_PISO } from '../../catalogo/piezas/chasis'
@@ -1181,7 +1182,7 @@ export function anclaPin(modelo: string, pin: string): V | null {
     // Cable plano de la cámara: sale de abajo del mástil.
     case 'proc:camara-csi': return pin === 'CSI' ? [-14.8, 4, 0] : null
   }
-  return anclaComputadora(modelo, pin) ?? anclaCircuito(modelo, pin)
+  return anclaRadio(modelo, pin) ?? anclaComputadora(modelo, pin) ?? anclaCircuito(modelo, pin)
 }
 
 /** Hacia dónde sale el cable de cada pin (marco de la pieza) y cómo se conecta. */
@@ -1204,6 +1205,9 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
     case 'proc:fuente-mb102': return { dir: [0, 1, 0], tipo: 'dupont' }
     case 'proc:servo': return { dir: [1, 0, 0], tipo: 'dupont' }
     case 'proc:fc51': return { dir: [-1, 0, 0], tipo: 'dupont' }
+    case 'proc:hc05':
+    case 'proc:hc06':
+    case 'proc:hc12': return { dir: [-1, 0, 0], tipo: 'dupont' }
     case 'proc:sensor-barra': return { dir: [-0.3, 1, 0], tipo: 'soldado' }
     case 'proc:hcsr04': return { dir: [-1, 0, 0], tipo: 'dupont' }
     case 'proc:joystick': return { dir: [0, 0, 1], tipo: 'dupont' }

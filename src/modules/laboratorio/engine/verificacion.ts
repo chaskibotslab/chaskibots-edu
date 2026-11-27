@@ -7,6 +7,7 @@ import { pieza } from '../catalogo/piezas'
 import type { RobotDoc } from '../robots/doc'
 import { nets, planDe } from './plan'
 import { datosPlaca, infoPlaca, mcuDe, type InfoPlaca } from './placa'
+import { estadoRadio } from './radio'
 
 export interface Problema {
   nivel: 'error' | 'advertencia'
@@ -161,6 +162,10 @@ export function verificar(doc: RobotDoc): Problema[] {
       if (aGpio) out.push({ nivel: 'advertencia', texto: `${p.etiqueta} está alimentado con 5 V y su señal va a un pin del ${info.nombre}, que trabaja con 3,3 V: en la vida real lo puede dañar. Aliméntalo desde 3V3.`, pines: [aGpio] })
     }
   }
+
+  // Módulo inalámbrico mal conectado: el robot no recibiría las órdenes del mando.
+  const radio = estadoRadio(doc)
+  if (radio?.problema) out.push({ nivel: 'advertencia', texto: radio.problema, pines: [`${radio.instancia}.TXD`, `${radio.instancia}.RXD`] })
 
   // Sin duplicados (mismo texto).
   const vistos = new Set<string>()

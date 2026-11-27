@@ -41,6 +41,7 @@ export type TipoMontaje =
   | 'fuente-protoboard' // fuente MB102 pinchada en los rieles de la protoboard
   | 'modulo-mesa'     // módulo sobre la mesa junto a la protoboard (joystick)
   | 'arma'            // arma de un robot de combate (battlebot)
+  | 'modulo-radio'    // módulo inalámbrico (HC-05, HC-06, HC-12) sobre el chasis
 
 export interface PuntoMontaje {
   id: string
@@ -149,6 +150,8 @@ export type Comportamiento =
       distancia: { origen: V3; alcance_cm: number }
     }
   /** Pieza que se ve en el catálogo pero todavía no se simula (llega en una fase futura). */
+  /** Módulo inalámbrico que se comporta como un cable serie (Bluetooth HC-05/06, radio HC-12). */
+  | { tipo: 'radio-serie'; radio: string; baudios: number }
   | { tipo: 'sin-simular' }
 
 export interface Variante {

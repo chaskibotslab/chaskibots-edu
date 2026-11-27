@@ -8,6 +8,7 @@ import { pieza } from '../catalogo/piezas'
 import type { Cable, RobotDoc } from '../robots/doc'
 import { poses } from './ensamblaje'
 import { infoPlaca, mcuDe, pinCodigo } from './placa'
+import { SERIE_PLACA } from './radio'
 
 const ROJO = '#ef4444'
 const NEGRO = '#111827'
@@ -148,6 +149,18 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
     if (!nueva(s.id)) continue
     alimentar(s.id, 'V+', 'GND')
     tomar(PREFERENCIAS.servo, s.id, s.etiqueta, 'SIG', 'Señal del servo')
+  }
+
+  // Módulo inalámbrico (HC-05, HC-06, HC-12): cruzado con el puerto serie de la placa.
+  for (const r of de('radio-serie')) {
+    if (!nueva(r.id) || !mcu) continue
+    const serie = SERIE_PLACA[info.placa]
+    if (!serie) { avisos.push(`${r.etiqueta}: ${info.placa === 'esp32' ? 'el ESP32 ya trae Bluetooth y no lo necesita' : `no se usa con ${info.nombre}`}`); continue }
+    alimentar(r.id, 'VCC', 'GND')
+    cable([r.id, 'TXD'], [mcu.id, serie.rx])
+    cable([r.id, 'RXD'], [mcu.id, serie.tx])
+    tabla.push({ instancia: r.id, etiqueta: r.etiqueta, pin: 'TXD', placa: serie.rx, uso: 'Las órdenes del mando llegan por aquí (Serial.read)' })
+    tabla.push({ instancia: r.id, etiqueta: r.etiqueta, pin: 'RXD', placa: serie.tx, uso: 'Lo que el robot responde (Serial.print)' })
   }
 
   // Cámara: su cable plano al conector CSI (si la placa lo tiene; si no, el plan avisa).

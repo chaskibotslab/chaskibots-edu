@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Gamepad2, Square, X, Zap } from 'lucide-react'
 import type { Simulacion } from '../../engine/simulation'
 import type { EstadoCombate } from '../../engine/competencia'
+import type { EstadoRadio } from '../../engine/radio'
 
 type Tecla = 'F' | 'B' | 'L' | 'R'
 type Dir = Tecla | 'G' | 'I' | 'H' | 'J' | 'S'
@@ -56,13 +57,15 @@ function escribiendo(e: KeyboardEvent) {
   return t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable || !!t.closest('.monaco-editor')
 }
 
-export default function ControlRemoto({ sim, conPrograma, leeLetras, conArma = false, fase, onCerrar }: {
+export default function ControlRemoto({ sim, conPrograma, leeLetras, conArma = false, fase, radio, onCerrar }: {
   sim: Simulacion
   conPrograma: boolean
   /** El programa obedece las letras del control (si no, es autónomo y las ignora). */
   leeLetras: boolean
   /** El programa enciende un arma con X y la apaga con Y (battlebot). */
   conArma?: boolean
+  /** Módulo inalámbrico del robot (HC-05, HC-12…): si está mal conectado, las órdenes no llegan. */
+  radio?: EstadoRadio | null
   /** Fase del combate, en las arenas de competencia. */
   fase?: EstadoCombate['fase']
   onCerrar: () => void
@@ -80,7 +83,8 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, conArma = f
   const ahora = useRef({ conPrograma, quieto: false, vel })
 
   // Durante la cuenta y entre rondas el robot no obedece: moverse sería salida en falso.
-  const quieto = conPrograma && !!fase && fase !== 'combate'
+  const sinEnlace = conPrograma && !!radio && !radio.listo
+  const quieto = (conPrograma && !!fase && fase !== 'combate') || sinEnlace
   const efectiva: Dir = quieto ? 'S' : dir
   ahora.current = { conPrograma, quieto, vel }
 
@@ -227,9 +231,11 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, conArma = f
         <button onClick={onCerrar} className="rounded p-0.5 text-lab-suave hover:bg-lab-tinta/[0.07]" aria-label="Cerrar"><X className="h-4 w-4" /></button>
       </div>
       <p className="mb-2 leading-snug text-lab-suave">
-        {quieto && fase === 'cuenta' ? <b className="text-amber-700">Espera la cuenta: el robot obedece cuando empiece la ronda.</b>
+        {sinEnlace ? <b className="text-amber-700">Las órdenes no llegan al robot. {radio?.problema}</b>
+          : quieto && fase === 'cuenta' ? <b className="text-amber-700">Espera la cuenta: el robot obedece cuando empiece la ronda.</b>
           : quieto ? <>La ronda terminó: el robot está detenido.</>
           : conPrograma && !leeLetras ? <b className="text-amber-700">Este programa es autónomo y no obedece al control. Para manejarlo, carga la plantilla «Manejar con el teclado (RC)».</b>
+          : conPrograma && radio ? <>Las letras viajan por el <b className="text-lab-tinta">{radio.nombre}</b> ({radio.radio}) y llegan al programa por RX: <b className="text-lab-tinta">F B L R S</b> y la velocidad 0–9.</>
           : conPrograma ? <>Envía letras a tu programa (como una app del celular): <b className="text-lab-tinta">F B L R S</b> y la velocidad 0–9.</>
           : fase ? <>Práctica libre: para pelear con el rival, presiona «Compilar y ejecutar».</>
           : <>Manejo directo de los motores (no hay programa corriendo).</>}

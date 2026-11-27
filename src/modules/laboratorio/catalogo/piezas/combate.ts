@@ -40,6 +40,7 @@ export const CHASIS_BATTLEBOT: PiezaDef = {
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Placa', posicion: [5, ARRIBA + 10, 0], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver', posicion: [-80, ARRIBA, 0], rotacionesPermitidas: [0, 90, 180, 270] },
+    { id: 'radio', tipo: 'modulo-radio', nombre: 'Módulo inalámbrico', posicion: [-80, ARRIBA, 46] },
     { id: 'bateria', tipo: 'bateria', nombre: 'Batería', posicion: [-23, ABAJO, 0], rotacion: COLGADO },
     { id: 'motor-izq', tipo: 'soporte-motor', nombre: 'Motor izquierdo', posicion: [5, -15, -46], rotacion: COLGADO },
     { id: 'motor-der', tipo: 'soporte-motor', nombre: 'Motor derecho', posicion: [5, -15, 46] },

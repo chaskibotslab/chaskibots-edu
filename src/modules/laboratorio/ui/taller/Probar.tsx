@@ -19,6 +19,7 @@ import EditorCodigo from '../EditorCodigo'
 import type { ModoCamara, PedidoZoom } from '../Escena3D'
 import type { NivelCalidad } from '../calidad'
 import { infoPlaca } from '../../engine/placa'
+import { estadoRadio } from '../../engine/radio'
 import ControlRemoto from './ControlRemoto'
 import PanelCircuito from './PanelCircuito'
 import { Carrera, Combate, HUD, PanelPines } from './Indicadores'
@@ -56,6 +57,7 @@ export default function Probar({ doc, s, nivel, onNivel, onIrA }: Props) {
   const archivoPista = useRef<HTMLInputElement>(null)
   // El control remoto se abre solo si el programa obedece letras (Bluetooth o la plantilla RC).
   const leeLetras = /SerialBT|Serial\.read\(\)|handleClient\(\)/.test(codigo)
+  const radio = useMemo(() => estadoRadio(doc), [doc])
   const [control, setControl] = useState(leeLetras)
   useEffect(() => { if (leeLetras) setControl(true) }, [leeLetras])
   const conPulsador = doc.piezas.some(p => ['pulsador', 'joystick'].includes(pieza(p.pieza).comportamiento.tipo))
@@ -198,7 +200,7 @@ export default function Probar({ doc, s, nivel, onNivel, onIrA }: Props) {
               ))}
             </div>
           )}
-          {sim && control && !banco && <ControlRemoto sim={sim} conPrograma={corriendo} leeLetras={leeLetras} conArma={/case 'X'/.test(codigo)} fase={tele?.combate?.fase} onCerrar={() => setControl(false)} />}
+          {sim && control && !banco && <ControlRemoto sim={sim} conPrograma={corriendo} leeLetras={leeLetras} radio={radio} conArma={/case 'X'/.test(codigo)} fase={tele?.combate?.fase} onCerrar={() => setControl(false)} />}
           <div className={`pointer-events-none absolute bottom-2 left-3 rounded-md bg-lab-superficie/85 px-2 py-0.5 text-[11px] text-lab-suave ${control ? 'hidden' : ''}`}>
             {banco
               ? `${conPulsador ? 'Haz clic en el pulsador para presionarlo · ' : ''}arrastra para girar la cámara`

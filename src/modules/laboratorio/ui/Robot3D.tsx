@@ -24,6 +24,7 @@ import {
 } from './modelos/Piezas3D'
 import { PerroGo1 } from './modelos/Robots3D'
 import { CablesPcb } from './modelos/Pcb3D'
+import { ModuloBluetooth, ModuloHC12 } from './modelos/Radio3D'
 import { controlDirecto, rutearCables, type ExtremoCable, type RutasCables } from '../engine/rutaCables'
 import { SEPARADOR_PISO } from '../catalogo/piezas/chasis'
 import { AGUJEROS_RIEL, ALTO_PROTOBOARD, RIELES, agujeroRiel, xRiel } from '../catalogo/piezas/circuito'
@@ -209,6 +210,9 @@ function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst:
     }
     case 'proc:hcsr04': return <HCSR04 />
     case 'proc:joystick': return <Joystick />
+    case 'proc:hc05': return <ModuloBluetooth />
+    case 'proc:hc06': return <ModuloBluetooth hc06 />
+    case 'proc:hc12': return <ModuloHC12 />
   }
   return (
     <mesh>

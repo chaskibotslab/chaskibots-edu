@@ -45,6 +45,7 @@ export const CHASIS_2WD: PiezaDef = {
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Placa', posicion: [5, ARRIBA + 10, 0], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver', posicion: [-55, ARRIBA, 0], rotacionesPermitidas: [0, 90, 180, 270] },
+    { id: 'radio', tipo: 'modulo-radio', nombre: 'Módulo inalámbrico', posicion: [-55, ARRIBA, 46] },
     { id: 'bateria', tipo: 'bateria', nombre: 'Batería', posicion: [-23, ABAJO, 0], rotacion: COLGADO },
     { id: 'motor-izq', tipo: 'soporte-motor', nombre: 'Motor izquierdo', posicion: [5, -15, -46], rotacion: COLGADO },
     { id: 'motor-der', tipo: 'soporte-motor', nombre: 'Motor derecho', posicion: [5, -15, 46] },
@@ -71,6 +72,7 @@ export const CHASIS_4WD: PiezaDef = {
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Placa', posicion: [10, ARRIBA + 10, 0], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver', posicion: [-62, ARRIBA, 0], rotacionesPermitidas: [0, 90, 180, 270] },
+    { id: 'radio', tipo: 'modulo-radio', nombre: 'Módulo inalámbrico', posicion: [-62, ARRIBA, 52] },
     { id: 'bateria', tipo: 'bateria', nombre: 'Batería', posicion: [0, ABAJO, 0], rotacion: COLGADO },
     { id: 'motor-del-izq', tipo: 'soporte-motor', nombre: 'Motor delantero izquierdo', posicion: [60, -15, -50], rotacion: COLGADO },
     { id: 'motor-tra-izq', tipo: 'soporte-motor', nombre: 'Motor trasero izquierdo', posicion: [-60, -15, -50], rotacion: COLGADO },
