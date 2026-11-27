@@ -51,6 +51,10 @@ export const CHASIS_2WD: PiezaDef = {
     { id: 'motor-izq', tipo: 'soporte-motor', nombre: 'Motor izquierdo', posicion: [5, -15, -46], rotacion: COLGADO },
     { id: 'motor-der', tipo: 'soporte-motor', nombre: 'Motor derecho', posicion: [5, -15, 46] },
     { id: 'loca', tipo: 'rueda-loca', nombre: 'Rueda loca', posicion: [-65, ABAJO, 0], rotacion: COLGADO },
+    // Sensores de borde delante de cada rueda y a su mismo ancho: ven el borde de la mesa antes de que
+    // llegue la rueda, aunque el robot vaya casi paralelo al borde. La plaquita va hacia adentro, bajo el chasis.
+    { id: 'borde-izq', tipo: 'sensor-piso', nombre: 'Sensor de borde izquierdo', posicion: [68, -35, -68], rotacion: [0, 90, 0] },
+    { id: 'borde-der', tipo: 'sensor-piso', nombre: 'Sensor de borde derecho', posicion: [68, -35, 68], rotacion: [0, -90, 0] },
     ...montajesComunes(160, 100),
   ],
   encaja: [],

@@ -79,6 +79,15 @@ export function HUD({ tele, robot = true, python = false }: { tele: Telemetria |
                   <div className="font-mono text-[11px] text-lab-tinta">{s.cm === null ? 'sin eco' : `${s.cm.toFixed(0)} cm`}</div>
                 </>
               )}
+              {s.tipo === 'luz' && (
+                <>
+                  <div className="mb-1 flex items-center gap-1.5 text-[10px] text-lab-suave">
+                    <span className="h-2.5 w-2.5 rounded-full border border-lab-borde/40" style={{ background: `rgba(250, 204, 21, ${0.15 + 0.85 * s.nivel})` }} />
+                    Luz
+                  </div>
+                  <div className="font-mono text-[11px] text-lab-tinta">{s.pin ?? '—'}={s.adc ?? '—'}</div>
+                </>
+              )}
               {s.tipo === 'obstaculo' && (
                 <>
                   <div className="mb-1 text-[10px] text-lab-suave">IR obstáculo</div>

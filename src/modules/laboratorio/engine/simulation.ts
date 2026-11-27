@@ -26,7 +26,7 @@ import { Mundo, iniciarRapier, type Gravedad } from './fisica/mundo'
 import { Reloj, RobotFisico } from './fisica/robotFisico'
 import type { UltrasonidoPines } from './hcsr04'
 import type { EstadoPerro } from './cuadrupedo'
-import { aplicarPines, leerCamara, leerPerro, leerSensores, type ImagenCamara, type LecturaSensor } from './paso'
+import { ALTURA_LINTERNA, aplicarPines, leerCamara, leerPerro, leerSensores, type ImagenCamara, type LecturaSensor } from './paso'
 import { planDe, type SimPlan } from './plan'
 import { infoPlaca } from './placa'
 import { MapaPista, type Pose2D } from './tracks'
@@ -67,6 +67,8 @@ export class Simulacion {
   mundo!: Mundo
   fisica!: RobotFisico
   arena!: ArenaDef
+  /** Dónde está la linterna o la caja que mueve el alumno (arenas con señuelo). */
+  senuelo: { x: number; z: number } | null = null
   /** Imagen de la pista (solo arenas de línea): textura y lo que leen los sensores. */
   mapa: MapaPista | null = null
   private gravedad: Gravedad = 'tierra'
@@ -147,6 +149,7 @@ export class Simulacion {
   private montarArena(arena: ArenaDef, imagen?: CanvasImageSource) {
     this.mundo?.liberar()
     this.arena = arena
+    this.senuelo = arena.senuelo ? { x: arena.senuelo.x, z: arena.senuelo.z } : null
     this.mapa = arena.pista ? new MapaPista(arena.pista, imagen) : null
     this.mundo = new Mundo(arena, this.gravedad)
     this.fisica = new RobotFisico(this.mundo, this.doc, this.plan, arena.inicio)
@@ -242,6 +245,15 @@ export class Simulacion {
   /** Girar un potenciómetro o cambiar la luz sobre una LDR (0–1). */
   ajustar(inst: string, valor: number) {
     this.controles.perillas[inst] = valor
+    if (!this.cargado) this.leerSensores()
+  }
+
+  /** Mover la linterna o la caja de la arena (el alumno la arrastra con el mouse). */
+  moverSenuelo(x: number, z: number) {
+    if (!this.senuelo) return
+    const mx = this.arena.ancho / 2 - 0.08, mz = this.arena.largo / 2 - 0.08
+    this.senuelo = { x: Math.max(-mx, Math.min(mx, x)), z: Math.max(-mz, Math.min(mz, z)) }
+    this.mundo.moverSenuelo(this.senuelo.x, this.senuelo.z)
     if (!this.cargado) this.leerSensores()
   }
 
@@ -347,7 +359,8 @@ export class Simulacion {
 
   private leerSensores() {
     const circuito = this.circuito && { plan: this.circuito, pines: this.cargado ? this.pines : null, controles: this.controles, quemados: this.quemados }
-    const e = leerSensores(this.plan, this.doc, this.fisica, this.reflectancia(), circuito, this.controles.mano ?? null)
+    const luz = this.senuelo && this.arena.senuelo?.tipo === 'linterna' ? { x: this.senuelo.x, y: ALTURA_LINTERNA, z: this.senuelo.z } : null
+    const e = leerSensores(this.plan, this.doc, this.fisica, this.reflectancia(), circuito, this.controles.mano ?? null, luz)
     this.sensores = e.lecturas
     this.ultrasonidos = e.ultrasonidos
     if (e.circuito) {

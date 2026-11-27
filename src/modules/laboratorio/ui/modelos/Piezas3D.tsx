@@ -1071,6 +1071,42 @@ export const FC51 = forwardRef(function FC51(_: object, refLed: Ref<THREE.MeshSt
   )
 })
 
+/** Módulo de luz: plaquita azul con la LDR (el disco con el zigzag) mirando al frente. */
+export function SensorLuz() {
+  const q = useCalidad()
+  return (
+    <group>
+      <mesh position={M(15.5, 1.6, 0)} castShadow={q.sombras}>
+        <boxGeometry args={[m(31), m(1.6), m(14)]} />
+        <meshStandardMaterial color={PCB_AZUL} roughness={0.55} />
+      </mesh>
+      {/* LDR: patas y cabeza */}
+      <mesh position={M(28, 4.5, 0)} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[m(0.5), m(0.5), m(6), 8]} />
+        <meshStandardMaterial color={METAL} metalness={0.8} roughness={0.3} />
+      </mesh>
+      <mesh position={M(31.5, 4.5, 0)} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[m(2.6), m(2.6), m(2), 20]} />
+        <meshStandardMaterial color="#f5e9c8" roughness={0.35} />
+      </mesh>
+      <mesh position={M(32.6, 4.5, 0)} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[m(2), m(2), m(0.2), 20]} />
+        <meshStandardMaterial color="#c2410c" roughness={0.4} />
+      </mesh>
+      {/* Perilla de ajuste y chip */}
+      <mesh position={M(18, 4, 0)}>
+        <boxGeometry args={[m(6), m(4.5), m(6)]} />
+        <meshStandardMaterial color="#2563eb" roughness={0.4} />
+      </mesh>
+      <mesh position={M(10, 2.8, 0)}>
+        <boxGeometry args={[m(4), m(1.2), m(3)]} />
+        <meshStandardMaterial color={NEGRO} roughness={0.5} />
+      </mesh>
+      <Pines n={3} pos={[2, 1.6, 0]} horizontal="z" />
+    </group>
+  )
+}
+
 export function HCSR04() {
   const q = useCalidad()
   return (
@@ -1167,6 +1203,10 @@ export function anclaPin(modelo: string, pin: string): V | null {
       const i = ['VCC', 'GND', 'OUT'].indexOf(pin)
       return i >= 0 ? [2, 5, -2.54 + i * 2.54] : null
     }
+    case 'proc:sensor-luz': {
+      const i = ['VCC', 'GND', 'AO'].indexOf(pin)
+      return i >= 0 ? [2, 5, -2.54 + i * 2.54] : null
+    }
     case 'proc:hcsr04': {
       const i = ['VCC', 'TRIG', 'ECHO', 'GND'].indexOf(pin)
       return i >= 0 ? [-3, 3, 4.1 - i * 2.5] : null
@@ -1213,6 +1253,7 @@ export function salidaPin(modelo: string, pin: string): SalidaPin {
     case 'proc:fuente-mb102': return { dir: [0, 1, 0], tipo: 'dupont' }
     case 'proc:servo': return { dir: [1, 0, 0], tipo: 'dupont' }
     case 'proc:fc51': return { dir: [-1, 0, 0], tipo: 'dupont' }
+    case 'proc:sensor-luz': return { dir: [-1, 0, 0], tipo: 'dupont' }
     case 'proc:hc05':
     case 'proc:hc06':
     case 'proc:hc12': return { dir: [-1, 0, 0], tipo: 'dupont' }

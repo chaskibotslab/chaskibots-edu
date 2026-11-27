@@ -105,6 +105,8 @@ export type Comportamiento =
   | { tipo: 'ir-reflectivo'; umbral: number; altura_max_mm: number; radio_lectura_mm: number }
   | { tipo: 'ir-obstaculo'; alcance_mm: number; origen: V3 }
   | { tipo: 'ultrasonido'; alcance_max_cm: number; apertura_grados: number; origen: V3 }
+  /** Sensor de luz (módulo con LDR): mira hacia +x desde `origen` y entrega un voltaje que sube con la luz. */
+  | { tipo: 'sensor-luz'; origen: V3 }
   /**
    * Cámara (cable plano al conector CSI de la placa). `origen`: centro de la
    * lente; mira hacia +x, inclinada `inclinacion_grados` hacia el piso. La
@@ -178,6 +180,10 @@ export interface PiezaDef {
   escalaGlb?: number
   /** Carrocería cerrada con la electrónica adentro: se ve traslúcida al cablear y al poner piezas. */
   carcasa?: boolean
+  /** Paredes, pisos y tapas de una carrocería cerrada (mm, marco de la pieza): los cables no las cruzan, van por dentro. */
+  paredes?: Colisionador[]
+  /** Agujeros por donde los cables cruzan una pared de la carrocería: un tramo `de`→`a` con su radio (mm). */
+  pasosCable?: { de: [number, number, number]; a: [number, number, number]; radio: number }[]
   /** Se muestra en el cajón pero todavía no se puede usar: texto de cuándo llega. */
   proximamente?: string
   masa_g: number

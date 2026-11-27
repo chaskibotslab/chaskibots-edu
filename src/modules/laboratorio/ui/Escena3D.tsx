@@ -11,6 +11,7 @@ import * as THREE from 'three'
 import Robot3D, { type Cableado3D, type MarcadorMontaje } from './Robot3D'
 import Mano3D from './modelos/Mano3D'
 import Sensores3D from './Sensores3D'
+import Senuelo3D from './Senuelo3D'
 import { resumen } from '../engine/ensamblaje'
 import type { Simulacion } from '../engine/simulation'
 import type { RobotDoc } from '../robots/doc'
@@ -425,6 +426,7 @@ export function EscenaArena({ sim, modoCamara, versionArena, nivel, onNivel, zoo
       {!arena.banco && !sim.limpieza && <Rastro sim={sim} version={versionArena} />}
       {arena.banco ? <Robot3D doc={sim.doc} sim={sim} /> : <ArrastreRobot sim={sim}><Robot3D doc={sim.doc} sim={sim} /></ArrastreRobot>}
       {sensores && !arena.banco && <Sensores3D sim={sim} />}
+      {arena.senuelo && <Senuelo3D sim={sim} />}
       {arena.banco && sim.plan.ultrasonidos.length > 0 && <Mano3D sim={sim} />}
       {sim.competencia && <Robot3D doc={sim.competencia.rival.doc} sim={sim.competencia.rival} />}
       <ControlCamara sim={sim} modo={modoCamara} zoom={zoom} />

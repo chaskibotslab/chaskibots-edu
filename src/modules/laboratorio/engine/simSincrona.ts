@@ -16,7 +16,7 @@ import { Mundo, type Gravedad } from './fisica/mundo'
 import { Reloj, RobotFisico } from './fisica/robotFisico'
 import { Ultrasonidos } from './hcsr04'
 import { planCircuito, type ControlesCircuito, type PlanCircuito } from './circuito'
-import { aplicarPines, leerSensores, type Entradas, type FuncionReflectancia } from './paso'
+import { ALTURA_LINTERNA, aplicarPines, leerSensores, type Entradas, type FuncionReflectancia } from './paso'
 import { planDe, type SimPlan } from './plan'
 import { infoPlaca } from './placa'
 
@@ -30,6 +30,9 @@ export class SimSincrona {
   /** Cronómetro de la competencia de velocidad (si la arena lo tiene). */
   readonly cronometro: Cronometro | null
   private readonly inicio: ArenaDef['inicio']
+  /** Linterna o caja que mueve el alumno (aquí, el test). */
+  senuelo: { x: number; z: number } | null
+  private readonly hayLinterna: boolean
   /** Polvo de la sala (solo en la arena del robot aspirador). */
   readonly limpieza: Limpieza | null
   avr: AvrRunner | null
@@ -62,6 +65,8 @@ export class SimSincrona {
     this.limpieza = arena.limpieza ? new Limpieza(arena) : null
     this.cronometro = arena.cronometro && arena.pista?.trazado ? new Cronometro(arena) : null
     this.inicio = arena.inicio
+    this.senuelo = arena.senuelo ? { x: arena.senuelo.x, z: arena.senuelo.z } : null
+    this.hayLinterna = arena.senuelo?.tipo === 'linterna'
     this.encender()
     this.competencia?.empezar()
     this.cronometro?.empezar()
@@ -73,11 +78,18 @@ export class SimSincrona {
     this.us = this.avr ? new Ultrasonidos(this.avr) : null
   }
 
+  moverSenuelo(x: number, z: number) {
+    if (!this.senuelo) return
+    this.senuelo = { x, z }
+    this.mundo.moverSenuelo(x, z)
+  }
+
   /** Avanza `dt` segundos (sensores → micro → actuadores → física → juez). */
   paso(dt: number) {
     const pines = this.ultimoPaso?.pins ?? null
     const e = leerSensores(this.plan, this.doc, this.robot, this.reflectancia,
-      this.circuito && { plan: this.circuito, pines, controles: this.controles, quemados: this.quemados }, this.controles.mano ?? null)
+      this.circuito && { plan: this.circuito, pines, controles: this.controles, quemados: this.quemados }, this.controles.mano ?? null,
+      this.senuelo && this.hayLinterna ? { x: this.senuelo.x, y: ALTURA_LINTERNA, z: this.senuelo.z } : null)
     this.ultimas = e
     let dtReal = dt
     if (this.avr) {

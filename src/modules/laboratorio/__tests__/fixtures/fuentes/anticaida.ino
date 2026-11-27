@@ -1,5 +1,6 @@
 // Robot que no se cae de la mesa.
-// Los sensores IR de abajo miran la mesa. Si uno deja de ver piso (pasa el
+// Los sensores IR van abajo, en las esquinas de adelante, y miran la mesa.
+// Si uno deja de ver piso (pasa el
 // borde), el sensor da HIGH, igual que con la línea negra: no vuelve luz.
 // Entonces el robot frena, retrocede y gira hacia el lado contrario.
 
@@ -21,7 +22,7 @@ void motores(int izq, int der) {
   analogWrite(ENB, abs(der));
 }
 
-const int VELOCIDAD = 140;
+const int VELOCIDAD = 105;   // despacio: tiene que frenar antes de que una rueda pase el borde
 
 void setup() {
   pinMode(IR_IZQ, INPUT);

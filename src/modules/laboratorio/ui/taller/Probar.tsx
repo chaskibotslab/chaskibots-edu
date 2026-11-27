@@ -204,8 +204,9 @@ export default function Probar({ doc, s, nivel, onNivel, onIrA }: Props) {
           <div className={`pointer-events-none absolute bottom-2 left-3 rounded-md bg-lab-superficie/85 px-2 py-0.5 text-[11px] text-lab-suave ${control ? 'hidden' : ''}`}>
             {banco
               ? `${conPulsador ? 'Haz clic en el pulsador para presionarlo · ' : ''}arrastra para girar la cámara`
-              : corriendo && s.estado !== 'pausado' ? 'Pausa el programa para mover el robot · arrastra el fondo para girar la cámara'
-                : 'Arrastra el robot para moverlo (o doble clic en el piso) · arrastra el fondo para girar la cámara'}
+              : sim?.arena.senuelo ? `Arrastra la ${sim.arena.senuelo.tipo} con el mouse: el robot reacciona · arrastra el fondo para girar la cámara`
+                : corriendo && s.estado !== 'pausado' ? 'Pausa el programa para mover el robot · arrastra el fondo para girar la cámara'
+                  : 'Arrastra el robot para moverlo (o doble clic en el piso) · arrastra el fondo para girar la cámara'}
           </div>
         </div>
 

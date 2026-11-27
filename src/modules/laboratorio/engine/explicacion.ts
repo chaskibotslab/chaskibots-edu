@@ -130,6 +130,7 @@ function usoEnCodigo(doc: RobotDoc, pinPlaca: PinDef, otro: Extremo | null): str
   if (c.tipo === 'servo') return `miServo.attach(${n}) y luego miServo.write(ángulo).`
   if (c.tipo === 'ir-reflectivo') return p === 'AO' ? `analogRead(${n}) da un número: más alto, más oscuro.` : `digitalRead(${n}) da HIGH sobre la línea negra.`
   if (c.tipo === 'ir-obstaculo') return `digitalRead(${n}) da LOW cuando hay un obstáculo.`
+  if (c.tipo === 'sensor-luz') return `analogRead(${n}) da un número: más alto, más luz.`
   if (c.tipo === 'led') return `digitalWrite(${n}, HIGH) lo enciende; LOW lo apaga.`
   if (c.tipo === 'led-rgb') return `analogWrite(${n}, 0…255) cambia el brillo de ese color.`
   if (c.tipo === 'pulsador') return `pinMode(${n}, INPUT_PULLUP); digitalRead(${n}) da LOW al presionar.`
@@ -340,6 +341,7 @@ export function aprendizajes(doc: RobotDoc): string[] {
   if (tiene('ir-reflectivo')) out.push('Leer sensores infrarrojos de línea y decidir hacia dónde girar')
   if (tiene('ultrasonido')) out.push('Medir distancias con ultrasonido (el tiempo que tarda el eco)')
   if (tiene('ir-obstaculo')) out.push('Detectar obstáculos con un sensor infrarrojo digital')
+  if (tiene('sensor-luz')) out.push('Medir la luz con una fotorresistencia y comparar dos sensores para saber de qué lado viene')
   if (tiene('servo')) out.push('Mover un servo a un ángulo exacto')
   if (tiene('camara')) out.push('Usar una cámara: la imagen es una tabla de números')
   if (tiene('cuadrupedo')) out.push('Dar órdenes de alto nivel a un robot con patas')

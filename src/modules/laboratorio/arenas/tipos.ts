@@ -82,6 +82,11 @@ export interface ArenaDef {
   cronometro?: { vueltas: number; maxS: number }
   /** Sala con polvo para el robot aspirador: celdas de `celda` m (engine/limpieza.ts). */
   limpieza?: { celda: number }
+  /**
+   * Algo que el alumno mueve con el mouse mientras el robot corre: una linterna
+   * (los sensores de luz la ven) o una caja (la ven el ultrasonido y los IR).
+   */
+  senuelo?: { tipo: 'linterna' | 'caja'; x: number; z: number }
   inicio: Pose2D
 }
 

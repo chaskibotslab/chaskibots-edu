@@ -11,7 +11,8 @@ const POR_GRUPO: Record<string, string[]> = {
   'Raspberry Pi y Python': ['rpi-seguidor', 'rpi-semaforo', 'rpi-distancia'],
   'Visión artificial (Jetson Nano)': ['jetson-seguidor-camara', 'jetson-carrera-camara'],
   'Perro robot (cuadrúpedo)': ['perro-primeros-pasos', 'perro-explorador', 'perro-guia-camara'],
-  'Obstáculos y exploración': ['evita-ir', 'evita-obstaculos', 'anticaida', 'aspirador', 'explorador', 'laberinto'],
+  'Seguidores de luz': ['sigue-luz', 'huye-luz'],
+  'Obstáculos y exploración': ['evita-ir', 'sigueme', 'evita-obstaculos', 'anticaida', 'aspirador', 'explorador', 'sigue-pared', 'laberinto'],
   // Electrónica
   Luces: ['led-pila', 'dos-pilas', 'primer-led', 'tres-brillos', 'tres-leds', 'fade', 'super-maquina', 'rgb', 'led-tapa', 'pico-parpadeo', 'mega-barra'],
   Semáforos: ['semaforo-carros', 'semaforo-cruce', 'semaforo-peatones', 'semaforo'],

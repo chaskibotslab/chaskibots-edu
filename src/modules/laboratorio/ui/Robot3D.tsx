@@ -18,7 +18,7 @@ import type { PiezaEnRobot, RobotDoc } from '../robots/doc'
 import { useCalidad } from './calidad'
 import { infoPlaca } from '../engine/placa'
 import {
-  ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, RaspberryPi4, JetsonNano, CamaraCSI, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
+  ArduinoMega, ArduinoNano, ArduinoUno, Joystick, Pico, RaspberryPi4, JetsonNano, CamaraCSI, PisoArriba, Bateria18650, Bateria9V, Chasis, FC51, SensorLuz, HCSR04, HornServo, L298N, LedUno, ModeloGlb, MotorTT, Rueda, RuedaLoca, Servo, TCRT5000, anclaPin, salidaPin, SeparadoresPlaca, type SalidaPin,
   ChasisMinisumo, MotorN20, BateriaLipo, ChasisBattlebot, ArmaGiratoria, ChasisTambor, ChasisDisco, MotorCombate, RuedaCombate, ArmaTambor, ArmaDisco,
   PerroRobot, ikPata, RADIO_PIE, type PataPerro, SensorBarra,
 } from './modelos/Piezas3D'
@@ -209,6 +209,7 @@ function ModeloProc({ inst, def, refs, espaciadorLoca, bajoChasis = 0 }: { inst:
       return <FC51 ref={refs.ledsObs.get(inst.id)} />
     }
     case 'proc:hcsr04': return <HCSR04 />
+    case 'proc:sensor-luz': return <SensorLuz />
     case 'proc:joystick': return <Joystick />
     case 'proc:hc05': return <ModuloBluetooth />
     case 'proc:hc06': return <ModuloBluetooth hc06 />

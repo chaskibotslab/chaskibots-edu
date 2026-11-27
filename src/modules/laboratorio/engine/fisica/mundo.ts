@@ -22,6 +22,9 @@ export function iniciarRapier(): Promise<void> {
 /** Paso fijo de la física: 240 por segundo. */
 export const SUBPASO = 1 / 240
 
+/** La caja que mueve el alumno: lado y alto (m). */
+export const LADO_SENUELO = 0.1, ALTO_SENUELO = 0.12
+
 export interface ObjetoVivo { id: string; body: RAPIER.RigidBody }
 
 export class Mundo {
@@ -29,6 +32,8 @@ export class Mundo {
   readonly arena: ArenaDef
   g: number
   readonly objetos: ObjetoVivo[] = []
+  /** La caja que mueve el alumno (arenas con señuelo de tipo caja). */
+  private senuelo: RAPIER.RigidBody | null = null
 
   constructor(arena: ArenaDef, gravedad: Gravedad) {
     this.arena = arena
@@ -84,6 +89,16 @@ export class Mundo {
       this.world.createCollider(desc, body)
       this.objetos.push({ id: o.id, body })
     }
+    if (arena.senuelo?.tipo === 'caja') {
+      const body = this.world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(arena.senuelo.x, ALTO_SENUELO / 2, arena.senuelo.z))
+      this.world.createCollider(RAPIER.ColliderDesc.cuboid(LADO_SENUELO / 2, ALTO_SENUELO / 2, LADO_SENUELO / 2).setFriction(0.5), body)
+      this.senuelo = body
+    }
+  }
+
+  /** Lleva la caja del señuelo a (x, z): se mueve «a mano», empuja pero no la empujan. */
+  moverSenuelo(x: number, z: number) {
+    this.senuelo?.setNextKinematicTranslation({ x, y: ALTO_SENUELO / 2, z })
   }
 
   setGravedad(gravedad: Gravedad) {

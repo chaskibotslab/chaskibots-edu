@@ -101,9 +101,9 @@ const SETUP_MOTORES = 'pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, 
 // Seguidor de línea (el robot de F1)
 // ---------------------------------------------------------------------------
 
-function sensoresLinea(tabla: FilaPin[], doc: RobotDoc) {
-  const izq = doc.piezas.find(p => p.padre?.montaje === 'piso-izq')?.id ?? ''
-  const der = doc.piezas.find(p => p.padre?.montaje === 'piso-der')?.id ?? ''
+function sensoresLinea(tabla: FilaPin[], doc: RobotDoc, lugar: 'piso' | 'borde' = 'piso') {
+  const izq = doc.piezas.find(p => p.padre?.montaje === `${lugar}-izq`)?.id ?? ''
+  const der = doc.piezas.find(p => p.padre?.montaje === `${lugar}-der`)?.id ?? ''
   return {
     DO_IZQ: pinCodigo(pinDePlaca(tabla, izq, 'DO')), DO_DER: pinCodigo(pinDePlaca(tabla, der, 'DO')),
     AO_IZQ: pinCodigo(pinDePlaca(tabla, izq, 'AO')), AO_DER: pinCodigo(pinDePlaca(tabla, der, 'AO')),
@@ -485,9 +485,10 @@ export function construirEvitaObstaculos(): RobotDoc {
 // ---------------------------------------------------------------------------
 
 function codigoAnticaida(tabla: FilaPin[], doc: RobotDoc) {
-  const s = sensoresLinea(tabla, doc)
+  const s = sensoresLinea(tabla, doc, 'borde')
   return `// Robot que no se cae de la mesa.
-// Los sensores IR de abajo miran la mesa. Si uno deja de ver piso (pasa el
+// Los sensores IR van abajo, en las esquinas de adelante, y miran la mesa.
+// Si uno deja de ver piso (pasa el
 // borde), el sensor da HIGH, igual que con la línea negra: no vuelve luz.
 // Entonces el robot frena, retrocede y gira hacia el lado contrario.
 
@@ -496,7 +497,7 @@ const int IR_DER = ${s.DO_DER};   // sensor de piso derecho
 
 ${bloqueMotores(tabla, doc)}
 
-const int VELOCIDAD = 140;
+const int VELOCIDAD = 105;   // despacio: tiene que frenar antes de que una rueda pase el borde
 
 void setup() {
   pinMode(IR_IZQ, INPUT);
@@ -537,8 +538,8 @@ export function construirAnticaida(): RobotDoc {
   a.poner('rueda-65', mi, 'eje')
   a.poner('rueda-65', md, 'eje')
   a.poner('rueda-loca', 'chasis', 'loca')
-  a.poner('tcrt5000', 'chasis', 'piso-izq')
-  a.poner('tcrt5000', 'chasis', 'piso-der')
+  a.poner('tcrt5000', 'chasis', 'borde-izq')
+  a.poner('tcrt5000', 'chasis', 'borde-der')
   return a.terminar(codigoAnticaida)
 }
 
@@ -692,6 +693,253 @@ export function construirLaberinto(): RobotDoc {
   a.poner('fc51', 'chasis', 'frente-der')
   a.poner('hcsr04', 'chasis', 'frente')
   return a.terminar(codigoLaberinto)
+}
+
+// ---------------------------------------------------------------------------
+// Robots de luz: el que la sigue y el que huye de ella
+// ---------------------------------------------------------------------------
+
+function pinesLuz(tabla: FilaPin[], doc: RobotDoc) {
+  const de = (montaje: string) => pinCodigo(pinDePlaca(tabla, doc.piezas.find(p => p.padre?.montaje === montaje)?.id ?? '', 'AO'))
+  return { IZQ: de('frente-izq'), DER: de('frente-der') }
+}
+
+function codigoSigueLuz(tabla: FilaPin[], doc: RobotDoc) {
+  const l = pinesLuz(tabla, doc)
+  return `// Seguidor de luz: va hacia la linterna.
+// Tiene dos sensores de luz (LDR), uno mirando a cada lado.
+// analogRead da un número de 0 a 1023: más luz, número más alto.
+// Si el izquierdo recibe más luz, la linterna está a la izquierda: gira hacia allá.
+
+const int LUZ_IZQ = ${l.IZQ};
+const int LUZ_DER = ${l.DER};
+
+${bloqueMotores(tabla, doc)}
+
+const int OSCURO = 95;    // menos que esto: no ve la linterna
+const int CERCA = 600;    // más que esto: ya llegó
+const int MARGEN = 12;    // diferencia mínima para girar
+
+void setup() {
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+}
+
+void loop() {
+  int izq = analogRead(LUZ_IZQ);
+  int der = analogRead(LUZ_DER);
+
+  if (izq < OSCURO && der < OSCURO) {
+    motores(130, -130);          // no la ve: gira buscándola
+  } else if (izq > CERCA || der > CERCA) {
+    motores(0, 0);               // llegó a la luz
+  } else if (izq > der + MARGEN) {
+    motores(60, 180);            // la luz está a la izquierda
+  } else if (der > izq + MARGEN) {
+    motores(180, 60);            // la luz está a la derecha
+  } else {
+    motores(170, 170);           // la tiene de frente
+  }
+  delay(20);
+}
+`
+}
+
+function codigoHuyeLuz(tabla: FilaPin[], doc: RobotDoc) {
+  const l = pinesLuz(tabla, doc)
+  return `// Huye de la luz, como una cucaracha: si le da la linterna, se da vuelta y escapa.
+// Tiene dos sensores de luz (LDR): más luz, número más alto en analogRead.
+// Si el izquierdo recibe más luz, la linterna está a la izquierda: gira a la derecha.
+
+const int LUZ_IZQ = ${l.IZQ};
+const int LUZ_DER = ${l.DER};
+
+${bloqueMotores(tabla, doc)}
+
+const int OSCURO = 95;    // menos que esto: está tranquilo, a oscuras
+
+bool escapando = false;
+
+void setup() {
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+}
+
+void loop() {
+  int izq = analogRead(LUZ_IZQ);
+  int der = analogRead(LUZ_DER);
+
+  if (izq > OSCURO || der > OSCURO) {
+    // Le da la luz: gira hasta darle la espalda.
+    if (izq > der) motores(160, -160);
+    else motores(-160, 160);
+    escapando = true;
+  } else if (escapando) {
+    Serial.println("¡Luz! Me escapo");
+    motores(200, 200);           // ya no la ve: corre un momento
+    delay(700);
+    escapando = false;
+  } else {
+    motores(0, 0);               // a oscuras: se queda quieto
+  }
+  delay(20);
+}
+`
+}
+
+function codigoLecturaLuz(tabla: FilaPin[], doc: RobotDoc) {
+  const l = pinesLuz(tabla, doc)
+  return `// Prueba de los sensores de luz: mueve la linterna y mira el Monitor Serie.
+
+const int LUZ_IZQ = ${l.IZQ};
+const int LUZ_DER = ${l.DER};
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.print("Izquierdo: ");
+  Serial.print(analogRead(LUZ_IZQ));
+  Serial.print("   Derecho: ");
+  Serial.println(analogRead(LUZ_DER));
+  delay(300);
+}
+`
+}
+
+function armarBase2wd(nombre: string, variante = 'acrilico') {
+  const a = new Armador('chasis-2wd', variante, nombre)
+  a.poner('arduino-uno', 'chasis', 'placa')
+  a.poner('l298n', 'chasis', 'driver')
+  a.poner('bateria-2x18650', 'chasis', 'bateria')
+  const mi = a.poner('motor-tt', 'chasis', 'motor-izq')
+  const md = a.poner('motor-tt', 'chasis', 'motor-der')
+  a.poner('rueda-65', mi, 'eje')
+  a.poner('rueda-65', md, 'eje')
+  a.poner('rueda-loca', 'chasis', 'loca')
+  return a
+}
+
+function construirRobotLuz(nombre: string, codigo: (tabla: FilaPin[], doc: RobotDoc) => string): RobotDoc {
+  const a = armarBase2wd(nombre, 'mdf')
+  a.poner('sensor-luz', 'chasis', 'frente-izq')
+  a.poner('sensor-luz', 'chasis', 'frente-der')
+  return a.terminar(codigo)
+}
+
+export function construirSigueLuz(): RobotDoc { return construirRobotLuz('Seguidor de luz', codigoSigueLuz) }
+export function construirHuyeLuz(): RobotDoc { return construirRobotLuz('Huye de la luz', codigoHuyeLuz) }
+
+// ---------------------------------------------------------------------------
+// Sígueme: sigue a un objeto guardando la distancia
+// ---------------------------------------------------------------------------
+
+function codigoSigueme(tabla: FilaPin[], doc: RobotDoc) {
+  const u = pinesUltrasonido(tabla, doc)
+  return `// Sígueme: el robot sigue a la caja que tiene adelante sin tocarla.
+// El ultrasonido mide a qué distancia está:
+//   - lejos (más de 25 cm)  -> avanza para alcanzarla
+//   - cerca (menos de 15 cm) -> retrocede para no chocarla
+//   - entre 15 y 25 cm       -> se queda quieto: está a la distancia justa
+//   - más de 60 cm           -> no hay nada que seguir: espera
+
+const int TRIG = ${u.TRIG};
+const int ECHO = ${u.ECHO};
+
+${bloqueMotores(tabla, doc)}
+
+${MEDIR_CM}
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+}
+
+void loop() {
+  long d = medirCm();
+
+  if (d > 60) {
+    motores(0, 0);               // nadie a quien seguir
+  } else if (d > 25) {
+    motores(150, 150);           // se aleja: la sigo
+  } else if (d < 15) {
+    motores(-150, -150);         // demasiado cerca: retrocedo
+  } else {
+    motores(0, 0);               // distancia justa
+  }
+  delay(30);
+}
+`
+}
+
+export function construirSigueme(): RobotDoc {
+  const a = armarBase2wd('Sígueme')
+  a.poner('hcsr04', 'chasis', 'frente')
+  return a.terminar(codigoSigueme)
+}
+
+// ---------------------------------------------------------------------------
+// Sigue paredes: recorre la sala pegado a la pared de su derecha
+// ---------------------------------------------------------------------------
+
+function codigoSiguePared(tabla: FilaPin[], doc: RobotDoc) {
+  const u = pinesUltrasonido(tabla, doc)
+  return `// Sigue paredes: recorre la sala sin separarse de la pared de su derecha.
+//  - El ultrasonido mira en diagonal, adelante y a la derecha: mide qué tan
+//    lejos está la pared.
+//  - Un sensor IR (FC-51) mira al frente: LOW = hay una pared adelante.
+// Lógica:
+//   1. Pared adelante o encima -> girar a la izquierda sin avanzar.
+//   2. Pared demasiado cerca   -> abrirse a la izquierda.
+//   3. Pared demasiado lejos   -> cerrarse a la derecha (así dobla las esquinas).
+//   4. Distancia justa         -> seguir derecho.
+
+const int IR_FRENTE = ${pinesObstaculo(tabla, doc, 'frente')};
+const int TRIG = ${u.TRIG};
+const int ECHO = ${u.ECHO};
+
+${bloqueMotores(tabla, doc)}
+
+${MEDIR_CM}
+
+const int CERCA = 22;   // cm: menos que esto, se abre
+const int LEJOS = 32;   // cm: más que esto, se cierra
+const int PEGADO = 12;  // cm: menos que esto, gira sin avanzar
+
+void setup() {
+  pinMode(IR_FRENTE, INPUT);
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  ${SETUP_MOTORES}
+  Serial.begin(9600);
+}
+
+void loop() {
+  long pared = medirCm();
+
+  if (digitalRead(IR_FRENTE) == LOW || pared < PEGADO) {
+    motores(-150, 150);          // pared adelante (o encima): giro a la izquierda
+    delay(100);
+  } else if (pared < CERCA) {
+    motores(80, 170);            // muy cerca: me abro
+  } else if (pared > LEJOS) {
+    motores(170, 128);           // muy lejos: me cierro
+  } else {
+    motores(160, 160);           // distancia justa
+  }
+  delay(20);
+}
+`
+}
+
+export function construirSiguePared(): RobotDoc {
+  const a = armarBase2wd('Sigue paredes')
+  a.poner('fc51', 'chasis', 'frente')
+  a.poner('hcsr04', 'chasis', 'frente-der')
+  return a.terminar(codigoSiguePared)
 }
 
 // ---------------------------------------------------------------------------
@@ -2120,6 +2368,81 @@ export const PREARMADOS: Prearmado[] = [
     plantillas: (doc, tabla) => [
       { id: 'evita-ir', nombre: 'Evita obstáculos (2 IR)', descripcion: 'Avanza y esquiva con los FC-51', codigo: codigoEvitaIr(tabla, doc) },
       { id: 'sensores', nombre: 'Prueba de los IR', descripcion: 'Qué ve cada sensor en el Monitor Serie', codigo: codigoLecturaIr(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'sigue-luz',
+    nombre: 'Seguidor de luz',
+    descripcion: 'Va hacia la linterna. Tiene dos sensores de luz, uno a cada lado, y gira hacia el que recibe más. Mueve la linterna con el mouse y te sigue.',
+    dificultad: 'inicial',
+    logica: [
+      'Cada sensor de luz da un número: más luz, número más alto.',
+      'Si el izquierdo recibe más luz, la linterna está a la izquierda: gira hacia allá (y al revés).',
+      'Si los dos reciben lo mismo, la tiene de frente: avanza.',
+      'Si está a oscuras, gira buscando la luz; cuando llega a la linterna, se detiene.',
+    ],
+    arena: 'sala-linterna',
+    construir: construirSigueLuz,
+    plantillas: (doc, tabla) => [
+      { id: 'sigue-luz', nombre: 'Seguidor de luz', descripcion: 'Va hacia la linterna', codigo: codigoSigueLuz(tabla, doc) },
+      { id: 'huye-luz', nombre: 'Huye de la luz', descripcion: 'El mismo robot, al revés', codigo: codigoHuyeLuz(tabla, doc) },
+      { id: 'sensores', nombre: 'Prueba de los sensores de luz', descripcion: 'Qué número lee cada uno en el Monitor Serie', codigo: codigoLecturaLuz(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'huye-luz',
+    nombre: 'Huye de la luz',
+    descripcion: 'Como una cucaracha: cuando le da la linterna, se da vuelta y escapa. Es el mismo robot que el seguidor de luz con el programa al revés.',
+    dificultad: 'inicial',
+    logica: [
+      'A oscuras se queda quieto.',
+      'Si un sensor recibe luz, gira hacia el otro lado hasta darle la espalda a la linterna.',
+      'Cuando ya no la ve, corre un momento para alejarse.',
+    ],
+    arena: 'sala-linterna',
+    construir: construirHuyeLuz,
+    plantillas: (doc, tabla) => [
+      { id: 'huye-luz', nombre: 'Huye de la luz', descripcion: 'Escapa de la linterna', codigo: codigoHuyeLuz(tabla, doc) },
+      { id: 'sigue-luz', nombre: 'Seguidor de luz', descripcion: 'El mismo robot, al revés', codigo: codigoSigueLuz(tabla, doc) },
+      { id: 'sensores', nombre: 'Prueba de los sensores de luz', descripcion: 'Qué número lee cada uno en el Monitor Serie', codigo: codigoLecturaLuz(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'sigueme',
+    nombre: 'Sígueme',
+    descripcion: 'Sigue a la caja que tiene adelante sin tocarla: si se aleja, avanza; si se acerca, retrocede. Mueve la caja con el mouse.',
+    dificultad: 'inicial',
+    logica: [
+      'El ultrasonido mide a qué distancia está la caja.',
+      'Más de 25 cm: avanza para alcanzarla.',
+      'Menos de 15 cm: retrocede para no chocarla.',
+      'Entre 15 y 25 cm se queda quieto; si no hay nada a menos de 60 cm, espera.',
+    ],
+    arena: 'pista-sigueme',
+    construir: construirSigueme,
+    plantillas: (doc, tabla) => [
+      { id: 'sigueme', nombre: 'Sígueme', descripcion: 'Sigue a la caja guardando la distancia', codigo: codigoSigueme(tabla, doc) },
+      { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
+    ],
+  },
+  {
+    id: 'sigue-pared',
+    nombre: 'Sigue paredes',
+    descripcion: 'Recorre toda la sala sin separarse de la pared de su derecha: dobla las esquinas hacia adentro y hacia afuera.',
+    dificultad: 'intermedio',
+    logica: [
+      'El ultrasonido mira en diagonal hacia la pared de la derecha y mide qué tan lejos está.',
+      'Si está muy cerca, se abre a la izquierda; si está muy lejos, se cierra a la derecha.',
+      'A la distancia justa, sigue derecho.',
+      'Si el sensor IR ve una pared adelante, gira a la izquierda sin avanzar.',
+    ],
+    arena: 'circuito-paredes',
+    construir: construirSiguePared,
+    plantillas: (doc, tabla) => [
+      { id: 'sigue-pared', nombre: 'Sigue paredes', descripcion: 'Pegado a la pared de la derecha', codigo: codigoSiguePared(tabla, doc) },
       { id: 'motores', nombre: 'Prueba de motores', descripcion: 'Adelante, giro, reversa', codigo: codigoPruebaMotores(tabla, doc) },
     ],
   },

@@ -11,7 +11,7 @@
 
 import { Vector3 } from 'three'
 import { pieza } from '../catalogo/piezas'
-import { cajasDe, poses, type Caja } from './ensamblaje'
+import { aRobot, cajasDe, poses, type Caja } from './ensamblaje'
 import type { RobotDoc } from '../robots/doc'
 
 /** Punta de un cable: dónde sale de su conector, hacia dónde, y de qué pieza. */
@@ -24,7 +24,13 @@ export interface RutasCables {
   pasacables: Pasacables[]
 }
 
-export interface Obstaculo { caja: Caja; inst: string; pi: number; plana: boolean }
+/** Agujero en una pared de la carrocería por donde pasan cables (mm, marco del robot). */
+export interface Tunel { a: Vector3; b: Vector3; radio: number }
+export interface Obstaculo {
+  caja: Caja; inst: string; pi: number; plana: boolean
+  /** Pared de una carrocería cerrada, con los agujeros por donde sí se puede cruzar. */
+  pared?: boolean; tuneles?: Tunel[]
+}
 
 /**
  * Puntos de control de la curva directa (Bézier) entre dos puntas: sale derecho
@@ -65,13 +71,30 @@ function ejePlano(c: Caja): number {
   return -1
 }
 
-/** Las piezas del robot como cajas. Las carrocerías cerradas no cuentan: la electrónica va adentro. */
+const seg = new Vector3(), rel = new Vector3()
+/** Distancia de un punto a un tramo. */
+function distanciaTramo(p: Vector3, a: Vector3, b: Vector3): number {
+  seg.copy(b).sub(a)
+  const t = Math.max(0, Math.min(1, rel.copy(p).sub(a).dot(seg) / Math.max(1e-9, seg.lengthSq())))
+  return rel.copy(a).addScaledVector(seg, t).distanceTo(p)
+}
+const enTunel = (o: Obstaculo, p: Vector3, holgura = 2) => !!o.tuneles?.some(t => distanciaTramo(p, t.a, t.b) <= t.radio + holgura)
+
+/**
+ * Las piezas del robot como cajas. De una carrocería cerrada no cuenta su volumen
+ * (la electrónica va adentro) sino sus paredes: los cables corren por dentro.
+ */
 export function obstaculos(doc: RobotDoc): Obstaculo[] {
   const ps = poses(doc)
   const out: Obstaculo[] = []
   doc.piezas.forEach((p, pi) => {
     const def = pieza(p.pieza)
     const pose = ps.get(p.id)
+    if (pose && def.carcasa && def.paredes) {
+      const tuneles = (def.pasosCable ?? []).map(t => ({ a: aRobot(pose, t.de), b: aRobot(pose, t.a), radio: t.radio }))
+      for (const caja of cajasDe({ ...def, huella: def.paredes }, pose)) out.push({ caja, inst: p.id, pi, plana: ejePlano(caja) >= 0, pared: true, tuneles })
+      return
+    }
     if (!pose || def.carcasa || def.comportamiento.tipo === 'rueda-loca') return
     for (const caja of cajasDe(def, pose)) out.push({ caja, inst: p.id, pi, plana: ejePlano(caja) >= 0 })
   })
@@ -91,6 +114,7 @@ export function tocaPieza(obs: Obstaculo[], puntos: Vector3[], a: ExtremoCable, 
       if (o.inst === a.inst) { if (p.distanceTo(a.p) < LIBRE_PROPIA || !dentroDeCaja(o.caja, p, -1.5)) continue }
       else if (o.inst === b.inst) { if (p.distanceTo(b.p) < LIBRE_PROPIA || !dentroDeCaja(o.caja, p, -1.5)) continue }
       if (o.plana && pasa.some(h => Math.hypot(h.x - p.x, h.z - p.z) <= h.radio)) continue
+      if (o.pared && enTunel(o, p)) continue
       return true
     }
   }
@@ -173,6 +197,22 @@ function crearMalla(obs: Obstaculo[], extremos: ExtremoCable[]): Malla | null {
       else {
         if (!(pasable && antes === PASO)) m.clase[k] = SOLIDO
         if (m.duenio[k] !== ob.pi) m.duenio[k] = -2
+      }
+    }
+  }
+  // Agujeros de la carrocería: por ahí la pared no existe.
+  const vistos = new Set<Tunel[]>()
+  for (const ob of obs) {
+    if (!ob.tuneles?.length || vistos.has(ob.tuneles)) continue
+    vistos.add(ob.tuneles)
+    for (const t of ob.tuneles) {
+      const lim = (a: number, b: number, o: number, nn: number): [number, number] => [Math.max(0, Math.floor((Math.min(a, b) - t.radio - o) / celda)), Math.min(nn - 1, Math.ceil((Math.max(a, b) + t.radio - o) / celda))]
+      const [x0, x1] = lim(t.a.x, t.b.x, min.x, nx), [y0, y1] = lim(t.a.y, t.b.y, min.y, ny), [z0, z1] = lim(t.a.z, t.b.z, min.z, nz)
+      for (let iy = y0; iy <= y1; iy++) for (let iz = z0; iz <= z1; iz++) for (let ix = x0; ix <= x1; ix++) {
+        p.set(min.x + (ix + 0.5) * celda, min.y + (iy + 0.5) * celda, min.z + (iz + 0.5) * celda)
+        const k = (iy * nz + iz) * nx + ix
+        // Solo se abre la pared: una pieza que esté en el agujero sigue siendo un obstáculo.
+        if (m.duenio[k] === ob.pi && distanciaTramo(p, t.a, t.b) <= t.radio) { m.clase[k] = LIBRE; m.duenio[k] = -1 }
       }
     }
   }
@@ -332,7 +372,7 @@ function salida(obs: Obstaculo[], e: ExtremoCable): Vector3 {
     [e.dir, 2.5],
     [arriba, 2.5],
   ]
-  const libre = (p: Vector3) => !obs.some(o => o.inst !== e.inst && !o.plana && dentroDeCaja(o.caja, p, 1))
+  const libre = (p: Vector3) => !obs.some(o => o.inst !== e.inst && !o.plana && dentroDeCaja(o.caja, p, 1) && !(o.pared && enTunel(o, p)))
   for (const [d, largo] of candidatos) {
     const p = e.p.clone().addScaledVector(d, largo)
     if (libre(p) && libre(e.p.clone().addScaledVector(d, largo / 2))) return p

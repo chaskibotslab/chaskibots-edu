@@ -189,7 +189,8 @@ export function resumen(doc: RobotDoc, ps = poses(doc)): Resumen {
       min.min(loca.ancla); max.max(loca.ancla)
       continue
     }
-    for (const c of def.colisionadores) for (const e of esquinas(c)) {
+    // El tamaño se mide con la silueta real de la pieza (`huella`) cuando la tiene.
+    for (const c of def.huella ?? def.colisionadores) for (const e of esquinas(c)) {
       const w = aRobot(pose, e)
       min.min(w); max.max(w)
     }

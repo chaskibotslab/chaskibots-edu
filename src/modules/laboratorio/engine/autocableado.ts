@@ -145,6 +145,11 @@ export function autocablear(doc: RobotDoc, opciones: { conservar?: boolean } = {
     alimentar(s.id, 'VCC', 'GND')
     tomar(PREFERENCIAS.obstaculo, s.id, s.etiqueta, 'OUT', 'LOW = hay obstáculo')
   }
+  for (const s of de('sensor-luz')) {
+    if (!nueva(s.id)) continue
+    alimentar(s.id, 'VCC', 'GND')
+    tomar(PREFERENCIAS.lineaAnalogica, s.id, s.etiqueta, 'AO', 'Cuánta luz le llega: más luz, número más alto')
+  }
   for (const s of de('servo')) {
     if (!nueva(s.id)) continue
     alimentar(s.id, 'V+', 'GND')

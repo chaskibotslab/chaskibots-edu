@@ -50,6 +50,26 @@ export const FC51: PiezaDef = {
   datos: [['Alcance', '2–30 cm (ajustable; aquí 20 cm)'], ['Salida', 'Digital, activa en LOW']],
 }
 
+export const SENSOR_LUZ: PiezaDef = {
+  id: 'sensor-luz',
+  nombre: 'Sensor de luz (módulo LDR)',
+  familia: 'sensor',
+  descripcion: 'Una fotorresistencia (LDR) en su plaquita: mide cuánta luz le llega. Con dos, el robot sabe de qué lado está la luz.',
+  modelo: 'proc:sensor-luz',
+  masa_g: 3,
+  material: 'pcb',
+  colisionadores: [{ forma: 'caja', medidas: [31, 4, 14], centro: [15.5, 2, 0] }],
+  montajes: [],
+  encaja: ['sensor-frontal'],
+  pines: [
+    { nombre: 'VCC', tipo: 'alim', ayuda: '3,3–5 V' },
+    { nombre: 'GND', tipo: 'gnd' },
+    { nombre: 'AO', tipo: 'analogico', ayuda: 'Sube cuanta más luz le llega: analogRead da de 0 (oscuro) a 1023 (mucha luz)' },
+  ],
+  comportamiento: { tipo: 'sensor-luz', origen: [32, 5, 0] },
+  datos: [['Sensor', 'Fotorresistencia (LDR) de 5 mm'], ['Salida', 'Analógica: más luz, número más alto'], ['Ve mejor', 'La luz que tiene de frente']],
+}
+
 export const HCSR04: PiezaDef = {
   id: 'hcsr04',
   nombre: 'Sensor ultrasónico HC-SR04',

@@ -34,11 +34,21 @@ export const CHASIS_ABYSS: PiezaDef = {
     { forma: 'caja', medidas: [50, 54, 170] },
     ...BRAZOS_ABYSS.map(b => ({ forma: 'caja' as const, ...b, friccion: 0.15 })),
   ],
+  // El tubo por dentro (medido del modelo): los cables corren adentro y salen al tambor por un agujero.
+  paredes: [
+    { forma: 'caja', medidas: [58, 6, 176], centro: [-2, 26.0, 0] },
+    { forma: 'caja', medidas: [58, 6, 176], centro: [-2, -26.0, 0] },
+    { forma: 'caja', medidas: [6, 58, 176], centro: [-28.0, 0, 0] },
+    { forma: 'caja', medidas: [6, 58, 176], centro: [24.0, 0, 0] },
+  ],
+  pasosCable: [{ de: [8, 0, -80], a: [34, 0, -84], radio: 7 }],
   montajes: [
     // Adentro del tubo, a lo largo: placa, driver y batería entre los dos motores.
     { id: 'placa', tipo: 'placa', nombre: 'Placa (adentro)', posicion: [0, -14, -30], rotacion: [0, 90, 0], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver (adentro)', posicion: [0, -14, 5], rotacionesPermitidas: [0, 90, 180, 270] },
-    { id: 'bateria', tipo: 'bateria', nombre: 'Batería (adentro)', posicion: [0, -14, 37], rotacion: [0, 90, 0] },
+    // La batería mira hacia el driver y va sobre una almohadilla: su conector pasa por encima del driver
+    // (del otro lado se metía en el motor).
+    { id: 'bateria', tipo: 'bateria', nombre: 'Batería (adentro)', posicion: [0, -11, 37], rotacion: [0, -90, 0] },
     { id: 'motor-izq', tipo: 'soporte-motor', nombre: 'Motor izquierdo', posicion: [0, 0, -96.5], rotacion: COLGADO },
     { id: 'motor-der', tipo: 'soporte-motor', nombre: 'Motor derecho', posicion: [0, 0, 96.5] },
     { id: 'arma', tipo: 'arma', nombre: 'Tambor (entre los brazos)', posicion: [60, 0, 0] },
@@ -116,10 +126,18 @@ export const CHASIS_RIPTIDE: PiezaDef = {
     { forma: 'caja', medidas: [57, 48, 200], centro: [1, -5, 0] },
     ...[-80, 80].map(z => ({ forma: 'caja' as const, medidas: [140, 8, 28] as [number, number, number], centro: [75, -25, z] as [number, number, number], friccion: 0.15 })),
   ],
+  // El tubo por dentro (medido del modelo): los cables corren adentro y salen al tambor por un agujero.
+  paredes: [
+    { forma: 'caja', medidas: [81, 6, 198], centro: [7.5, 24.0, 0] },
+    { forma: 'caja', medidas: [81, 6, 198], centro: [7.5, -24.0, 0] },
+    { forma: 'caja', medidas: [6, 54, 198], centro: [-30.0, 0, 0] },
+    { forma: 'caja', medidas: [6, 54, 198], centro: [45.0, 0, 0] },
+  ],
+  pasosCable: [{ de: [25, 8, -90], a: [52, 10, -94], radio: 7 }],
   montajes: [
-    { id: 'placa', tipo: 'placa', nombre: 'Placa (adentro)', posicion: [1, -24, -30], rotacion: [0, 90, 0], rotacionesPermitidas: [0, 180] },
-    { id: 'driver', tipo: 'driver', nombre: 'Driver (adentro)', posicion: [1, -24, 5], rotacionesPermitidas: [0, 90, 180, 270] },
-    { id: 'bateria', tipo: 'bateria', nombre: 'Batería (adentro)', posicion: [1, -24, 37], rotacion: [0, 90, 0] },
+    { id: 'placa', tipo: 'placa', nombre: 'Placa (adentro)', posicion: [1, -19, -30], rotacion: [0, 90, 0], rotacionesPermitidas: [0, 180] },
+    { id: 'driver', tipo: 'driver', nombre: 'Driver (adentro)', posicion: [1, -19, 5], rotacionesPermitidas: [0, 90, 180, 270] },
+    { id: 'bateria', tipo: 'bateria', nombre: 'Batería (adentro)', posicion: [1, -19, 37], rotacion: [0, 90, 0] },
     { id: 'motor-izq', tipo: 'soporte-motor', nombre: 'Motor izquierdo', posicion: [0, 0, -111.5], rotacion: COLGADO },
     { id: 'motor-der', tipo: 'soporte-motor', nombre: 'Motor derecho', posicion: [0, 0, 111.5] },
     { id: 'arma', tipo: 'arma', nombre: 'Tambor (entre los brazos)', posicion: [92.5, 20, 0] },
@@ -198,6 +216,15 @@ export const CHASIS_FATHOM: PiezaDef = {
     { forma: 'caja', medidas: [185, 62, 120], centro: [7, 11, 0] },
     { forma: 'caja', medidas: [70, 8, 30], centro: [142, -1, 0], friccion: 0.2 },
   ],
+  // El casco por dentro: toda la electrónica y sus cables quedan adentro.
+  paredes: [
+    { forma: 'caja', medidas: [193, 6, 128], centro: [7, -24.0, 0] },
+    { forma: 'caja', medidas: [193, 6, 128], centro: [7, 48.0, 0] },
+    { forma: 'caja', medidas: [193, 66, 4], centro: [7, 12, -62.0] },
+    { forma: 'caja', medidas: [193, 66, 4], centro: [7, 12, 62.0] },
+    { forma: 'caja', medidas: [4, 66, 128], centro: [-87.5, 12, 0] },
+    { forma: 'caja', medidas: [4, 66, 128], centro: [101.5, 12, 0] },
+  ],
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Placa (adentro)', posicion: [-25, -14, 0], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver (adentro)', posicion: [12, -14, 0], rotacionesPermitidas: [0, 90, 180, 270] },
@@ -257,6 +284,15 @@ export const CHASIS_CUNA: PiezaDef = {
     { forma: 'caja', medidas: [90, 53, 90], centro: [-13, 1.5, 0] },
     // La pala de acero: pesa tanto como la caja, para que el peso quede adelante y el robot se apoye en su filo.
     { forma: 'caja', medidas: [66, 12, 90], centro: [57, -1, 0], rotacion: [0, 0, -50], friccion: 0.15 },
+  ],
+  // El casco por dentro: toda la electrónica y sus cables quedan adentro.
+  paredes: [
+    { forma: 'caja', medidas: [98, 6, 98], centro: [-13, -27.0, 0] },
+    { forma: 'caja', medidas: [98, 6, 98], centro: [-13, 31.0, 0] },
+    { forma: 'caja', medidas: [98, 52, 4], centro: [-13, 2, -47.0] },
+    { forma: 'caja', medidas: [98, 52, 4], centro: [-13, 2, 47.0] },
+    { forma: 'caja', medidas: [4, 52, 98], centro: [-60.0, 2, 0] },
+    { forma: 'caja', medidas: [4, 52, 98], centro: [34.0, 2, 0] },
   ],
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Placa (adentro)', posicion: [-45, -22, 0], rotacion: [0, 90, 0], rotacionesPermitidas: [0, 180] },

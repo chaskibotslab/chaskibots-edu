@@ -31,9 +31,8 @@ describe('recorrido de los cables', () => {
     const tabla = robots.map(x => ({ id: x.id, ...medir(x.doc) }))
     console.table(tabla)
     expect(tabla.reduce((s, t) => s + t.antes, 0)).toBeGreaterThan(0)
-    // Carrocerías cerradas y apretadas: en el Paladín (que se muestra con PCB) y en el Abyss el conector
-    // de la batería queda pegado a la pieza vecina y sus cables la rozan al salir.
-    const tolerado: Record<string, number> = { 'minisumo-paladin': 4, 'warbot-abyss': 4 }
+    // En el Paladín, uno de los ocho cables de los sensores de borde todavía roza una pieza dentro del casco.
+    const tolerado: Record<string, number> = { 'minisumo-paladin': 1 }
     for (const t of tabla) expect(t.despues, `${t.id}: ${t.cuales}`).toBeLessThanOrEqual(tolerado[t.id] ?? 0)
   }, 120_000)
 })

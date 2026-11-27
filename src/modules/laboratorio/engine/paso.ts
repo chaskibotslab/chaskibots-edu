@@ -24,6 +24,8 @@ export type LecturaSensor =
   | { tipo: 'linea'; instancia: string; reflectancia: number; digital: boolean | null; adc: number | null; pinDigital: string | null; pinAnalogico: string | null }
   | { tipo: 'ultrasonido'; instancia: string; cm: number | null }
   | { tipo: 'obstaculo'; instancia: string; detecta: boolean; pin: string | null }
+  /** `nivel`: 0 (oscuro) a 1 (la linterna pegada al sensor). */
+  | { tipo: 'luz'; instancia: string; nivel: number; adc: number | null; pin: string | null }
 
 export interface Entradas {
   digital: Record<string, boolean>
@@ -64,7 +66,29 @@ export function rayoUltrasonido(plan: SimPlan, doc: RobotDoc, fisica: RobotFisic
  * sensor ultrasónico (mesa de electrónica). Siempre está en el eje del
  * sensor, así que el eco vuelve de ella si está más cerca que lo demás.
  */
-export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, reflectancia: FuncionReflectancia, circuito?: EntornoCircuito | null, mano: number | null = null): Entradas {
+/** Luz del aula sin linterna, y a qué distancia (m) la linterna da la mitad de su luz. */
+const LUZ_AMBIENTE = 0.06, LUZ_MEDIA_M = 0.6
+/** Altura (m) del foco de la linterna de la arena. */
+export const ALTURA_LINTERNA = 0.07
+
+/**
+ * Cuánta luz (0–1) le llega a una LDR que está en `o` mirando hacia `d`, con la
+ * linterna en `luz`: baja con la distancia, es mayor de frente que de costado y
+ * se corta si hay algo en el medio (sombra).
+ */
+export function nivelDeLuz(o: { x: number; y: number; z: number }, d: { x: number; y: number; z: number }, luz: { x: number; y: number; z: number } | null, tapada: (dir: { x: number; y: number; z: number }, dist: number) => boolean): number {
+  if (!luz) return LUZ_AMBIENTE
+  const v = { x: luz.x - o.x, y: luz.y - o.y, z: luz.z - o.z }
+  const dist = Math.max(1e-6, Math.hypot(v.x, v.y, v.z))
+  const u = { x: v.x / dist, y: v.y / dist, z: v.z / dist }
+  if (dist > 0.04 && tapada(u, dist - 0.02)) return LUZ_AMBIENTE
+  // De frente recibe toda la luz; de costado, un cuarto; de espaldas, casi nada.
+  const frente = ((1 + d.x * u.x + d.y * u.y + d.z * u.z) / 2) ** 2
+  return Math.min(1, LUZ_AMBIENTE + (1 - LUZ_AMBIENTE) * (0.05 + 0.95 * frente) / (1 + (dist / LUZ_MEDIA_M) ** 2))
+}
+
+/** `luz`: dónde está la linterna de la arena (m), si la hay. */
+export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, reflectancia: FuncionReflectancia, circuito?: EntornoCircuito | null, mano: number | null = null, luz: { x: number; y: number; z: number } | null = null): Entradas {
   const digital: Record<string, boolean> = {}
   const analog: Record<string, number> = {}
   const ultrasonidos: UltrasonidoPines[] = []
@@ -108,6 +132,14 @@ export function leerSensores(plan: SimPlan, doc: RobotDoc, fisica: RobotFisico, 
     const detecta = fisica.rayo(o, d, s.alcanceMm / 1000) !== null
     if (s.out) digital[s.out] = !detecta // LOW = hay obstáculo
     lecturas.push({ tipo: 'obstaculo', instancia: s.instancia, detecta, pin: s.out })
+  }
+
+  for (const s of plan.luces) {
+    const { o, d } = rayoDe(s.instancia, s.origen, { x: 1, y: 0, z: 0 })
+    const nivel = nivelDeLuz(o, d, luz, (dir, dist) => fisica.rayo(o, dir, dist) !== null)
+    const volts = 5 * nivel
+    if (s.pin) analog[s.pin] = volts
+    lecturas.push({ tipo: 'luz', instancia: s.instancia, nivel, adc: s.pin ? voltsToAdc(volts) : null, pin: s.pin })
   }
 
   // Circuito: sus entradas se resuelven con los pines del paso anterior (un paso = pocos ms).

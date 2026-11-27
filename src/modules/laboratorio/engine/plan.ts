@@ -54,6 +54,8 @@ export interface MotorPlan {
 
 export interface LineaPlan { instancia: string; pinDigital: string | null; pinAnalogico: string | null; umbral: number; radioMm: number; alturaMaxMm: number }
 export interface UltrasonidoPlan { instancia: string; trig: string | null; echo: string | null; alcanceCm: number; aperturaGrados: number; origen: V3 }
+/** Sensor de luz: `pin` = entrada analógica de la placa; `origen` = la LDR en el marco de la pieza. */
+export interface LuzPlan { instancia: string; pin: string | null; origen: V3 }
 export interface ObstaculoPlan { instancia: string; out: string | null; alcanceMm: number; origen: V3 }
 /** Cámara conectada al CSI de la placa: lente en `origen` (marco de la pieza), mirando a +x e inclinada hacia el piso. */
 export interface CamaraPlan { instancia: string; ancho: number; alto: number; fovH: number; fovV: number; inclinacion: number; origen: V3; fps: number }
@@ -67,6 +69,7 @@ export interface SimPlan {
   lineas: LineaPlan[]
   ultrasonidos: UltrasonidoPlan[]
   obstaculos: ObstaculoPlan[]
+  luces: LuzPlan[]
   camaras: CamaraPlan[]
   servos: ServoPlan[]
   armas: ArmaPlan[]
@@ -183,6 +186,7 @@ export function planDe(doc: RobotDoc): SimPlan {
   const lineas: LineaPlan[] = []
   const ultrasonidos: UltrasonidoPlan[] = []
   const obstaculos: ObstaculoPlan[] = []
+  const luces: LuzPlan[] = []
   const camaras: CamaraPlan[] = []
   const servos: ServoPlan[] = []
   const armas: ArmaPlan[] = []
@@ -225,6 +229,12 @@ export function planDe(doc: RobotDoc): SimPlan {
       const ok = alimentado(p.id, 'VCC', 'GND')
       if (!ok) avisos.push(`${p.etiqueta}: no tiene alimentación (VCC y GND)`)
       obstaculos.push({ instancia: p.id, out: ok ? pinPlaca(p.id, 'OUT') : null, alcanceMm: c.alcance_mm, origen: c.origen })
+    } else if (c.tipo === 'sensor-luz') {
+      const ok = alimentado(p.id, 'VCC', 'GND')
+      if (!ok) avisos.push(`${p.etiqueta}: no tiene alimentación (VCC y GND)`)
+      const pin = ok ? pinPlaca(p.id, 'AO') : null
+      if (ok && !pin) avisos.push(`${p.etiqueta}: su salida AO no está conectada a una entrada analógica de la placa`)
+      luces.push({ instancia: p.id, pin, origen: c.origen })
     } else if (c.tipo === 'camara') {
       // El cable plano lleva datos y alimentación: basta con que llegue al CSI de la placa.
       const conCsi = !!mcu && mcuPines.some(x => x.tipo === 'csi')
@@ -262,7 +272,7 @@ export function planDe(doc: RobotDoc): SimPlan {
   }
 
   return {
-    mcu: mcu?.id ?? null, motores, lineas, ultrasonidos, obstaculos, camaras, servos, armas, cuadrupedo,
+    mcu: mcu?.id ?? null, motores, lineas, ultrasonidos, obstaculos, luces, camaras, servos, armas, cuadrupedo,
     voltajeBateria, caidaDriver, masaKg: resumen(doc).masa_g / 1000, avisos,
   }
 }

@@ -8,7 +8,8 @@
 import { useMemo, type ReactNode } from 'react'
 import * as THREE from 'three'
 import { pieza } from '../../catalogo/piezas'
-import { aRobot, poses } from '../../engine/ensamblaje'
+import { aRobot, esBanco, poses } from '../../engine/ensamblaje'
+import { rutearCables, type ExtremoCable } from '../../engine/rutaCables'
 import type { Cable, RobotDoc } from '../../robots/doc'
 import { anclaPin, type SalidaPin } from './Piezas3D'
 
@@ -149,14 +150,32 @@ function geometriaPistas(pistas: { puntos: P2[] }[], y: number) {
   return g
 }
 
-function Hilo({ desde, n, pin, color }: { desde: THREE.Vector3; n: THREE.Vector3; pin: Punta; color: string }) {
+/** Tramos rectos con codos redondeados (el mismo trazo de los cables sueltos). */
+function curvaRecorrido(pts: THREE.Vector3[]): THREE.Curve<THREE.Vector3> {
+  const camino = new THREE.CurvePath<THREE.Vector3>()
+  let desde = pts[0]
+  for (let i = 1; i < pts.length - 1; i++) {
+    const v = pts[i]
+    const r = Math.min(0.006, v.distanceTo(pts[i - 1]) * 0.45, v.distanceTo(pts[i + 1]) * 0.45)
+    const entra = v.clone().add(pts[i - 1].clone().sub(v).setLength(r))
+    const sale = v.clone().add(pts[i + 1].clone().sub(v).setLength(r))
+    if (desde.distanceTo(entra) > 1e-5) camino.add(new THREE.LineCurve3(desde, entra))
+    camino.add(new THREE.QuadraticBezierCurve3(entra, v, sale))
+    desde = sale
+  }
+  camino.add(new THREE.LineCurve3(desde, pts[pts.length - 1]))
+  return camino
+}
+
+function Hilo({ desde, n, pin, color, ruta }: { desde: THREE.Vector3; n: THREE.Vector3; pin: Punta; color: string; ruta?: THREE.Vector3[] | null }) {
   const geo = useMemo(() => {
+    if (ruta && ruta.length >= 2) return new THREE.TubeGeometry(curvaRecorrido(ruta), Math.max(24, ruta.length * 10), 0.00045, 5, false)
     const fin = pin.pos.clone().addScaledVector(pin.dir, 0.003)
     const L = desde.distanceTo(fin), tiron = Math.min(0.02, 0.005 + L * 0.25)
     const c1 = desde.clone().addScaledVector(n, tiron), c2 = fin.clone().addScaledVector(pin.dir, tiron)
     c1.y -= L * 0.05; c2.y -= L * 0.05
     return new THREE.TubeGeometry(new THREE.CubicBezierCurve3(desde, c1, c2, fin), 24, 0.00045, 5, false)
-  }, [desde, n, pin])
+  }, [desde, n, pin, ruta])
   return <mesh geometry={geo}><meshStandardMaterial color={color} roughness={0.45} /></mesh>
 }
 
@@ -183,7 +202,21 @@ export function CablesPcb({ doc, lista, suelto }: { doc: RobotDoc; lista: CableP
         zocalos.push({ x: v.x * MM, z: v.z * MM, alto })
       }
     }
-    return { pl, ...r, zocalos, pistas: geometriaPistas(r.pistas, pl.y + 0.12 * MM) }
+    // Cada hilo de un mazo, del conector del borde al pin de su pieza, rodeando lo que haya en el medio.
+    const hilos = r.mazos.flatMap(m => m.hilos.map((h, k) => {
+      const o = (k - (m.hilos.length - 1) / 2) * PASO_HILO
+      const desde = new THREE.Vector3(m.centro[0] + m.t[0] * o + m.n[0] * 1.7 * MM, pl.y + 2 * MM, m.centro[1] + m.t[1] * o + m.n[1] * 1.7 * MM)
+      return { clave: `${m.inst}-${k}`, desde, n: new THREE.Vector3(m.n[0], 0, m.n[1]), pin: h.pin, color: h.color, inst: m.inst }
+    }))
+    let rutas: (THREE.Vector3[] | null)[] = []
+    if (!esBanco(doc)) {
+      const extremos = hilos.map(h => [
+        { p: h.desde.clone().multiplyScalar(1000), dir: h.n, inst: '' },
+        { p: h.pin.pos.clone().multiplyScalar(1000), dir: h.pin.dir, inst: h.inst },
+      ] as [ExtremoCable, ExtremoCable])
+      rutas = rutearCables(doc, extremos).rutas.map(x => x && x.map(p => p.multiplyScalar(MM)))
+    }
+    return { pl, ...r, zocalos, hilos, rutas, pistas: geometriaPistas(r.pistas, pl.y + 0.12 * MM) }
   }, [doc, lista])
   if (!d) return <>{lista.map(suelto)}</>
   const { pl } = d
@@ -200,21 +233,12 @@ export function CablesPcb({ doc, lista, suelto }: { doc: RobotDoc; lista: CableP
           <meshStandardMaterial color="#15171a" roughness={0.6} />
         </mesh>
       ))}
-      {d.mazos.map(m => {
-        const n = new THREE.Vector3(m.n[0], 0, m.n[1])
-        return (
-          <group key={m.inst}>
-            <mesh geometry={CAJA} position={[m.centro[0], pl.y + 1.9 * MM, m.centro[1]]} scale={[m.t[0] ? m.ancho : 3.4 * MM, 3.8 * MM, m.t[1] ? m.ancho : 3.4 * MM]}>
-              <meshStandardMaterial color="#ece7da" roughness={0.6} />
-            </mesh>
-            {m.hilos.map((h, k) => {
-              const o = (k - (m.hilos.length - 1) / 2) * PASO_HILO
-              const desde = new THREE.Vector3(m.centro[0] + m.t[0] * o + m.n[0] * 1.7 * MM, pl.y + 2 * MM, m.centro[1] + m.t[1] * o + m.n[1] * 1.7 * MM)
-              return <Hilo key={k} desde={desde} n={n} pin={h.pin} color={h.color} />
-            })}
-          </group>
-        )
-      })}
+      {d.mazos.map(m => (
+        <mesh key={m.inst} geometry={CAJA} position={[m.centro[0], pl.y + 1.9 * MM, m.centro[1]]} scale={[m.t[0] ? m.ancho : 3.4 * MM, 3.8 * MM, m.t[1] ? m.ancho : 3.4 * MM]}>
+          <meshStandardMaterial color="#ece7da" roughness={0.6} />
+        </mesh>
+      ))}
+      {d.hilos.map((h, i) => <Hilo key={h.clave} desde={h.desde} n={h.n} pin={h.pin} color={h.color} ruta={d.rutas[i]} />)}
       {d.sueltos.map(suelto)}
     </group>
   )

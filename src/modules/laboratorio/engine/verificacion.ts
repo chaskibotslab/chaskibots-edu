@@ -94,7 +94,7 @@ export function verificar(doc: RobotDoc): Problema[] {
       const def = doc.piezas.find(x => x.id === i)
       if (!def) return false
       const c = pieza(def.pieza).comportamiento.tipo
-      return (c === 'ir-reflectivo' && (p === 'DO' || p === 'AO')) || (c === 'ir-obstaculo' && p === 'OUT') || (c === 'ultrasonido' && p === 'ECHO')
+      return (c === 'ir-reflectivo' && (p === 'DO' || p === 'AO')) || (c === 'ir-obstaculo' && p === 'OUT') || (c === 'sensor-luz' && p === 'AO') || (c === 'ultrasonido' && p === 'ECHO')
     })
     if (salidasSensor.length > 1) {
       out.push({ nivel: 'advertencia', texto: `${nombre(salidasSensor[0])} y ${nombre(salidasSensor[1])} están en el mismo pin: las dos señales se mezclan.`, pines: salidasSensor })

@@ -29,14 +29,38 @@ export const CHASIS_PALADIN: PiezaDef = {
     { forma: 'caja', medidas: [3, 54, 100], centro: [29.5, 17, 0], rotacion: [0, 0, 28] },
     { forma: 'caja', medidas: [20, 1.5, 100], centro: [50.8, -9.5, 0], rotacion: [0, 0, -30], friccion: 0.15 },
   ],
+  // El casco por dentro (medido del modelo): piso, paredes, la bandeja de los motores y la tapa.
+  // Los cables bajan por los costados de la tapa, cruzan la bandeja y llegan a los sensores de borde
+  // por un agujero en la pared de adelante.
+  paredes: [
+    { forma: 'caja', medidas: [78, 6, 100], centro: [1, -18, 0] },                        // piso
+    { forma: 'caja', medidas: [4, 62, 100], centro: [-35, 14, 0] },                       // pared de atrás
+    { forma: 'caja', medidas: [78, 60, 4], centro: [1, 13, -50] },                        // costados
+    { forma: 'caja', medidas: [78, 60, 4], centro: [1, 13, 50] },
+    { forma: 'caja', medidas: [60, 2, 96], centro: [-1, 20, 0] },                         // bandeja de los motores
+    { forma: 'caja', medidas: [56, 2, 54], centro: [-9, 48, 0] },                         // tapa de arriba
+    { forma: 'caja', medidas: [4, 30, 100], centro: [34.6, 6.5, 0], rotacion: [0, 0, 28] }, // cara inclinada (abajo)
+    { forma: 'caja', medidas: [4, 25, 23], centro: [22, 31, -38.5], rotacion: [0, 0, 28] }, // pilares de la ventana
+    { forma: 'caja', medidas: [4, 25, 23], centro: [22, 31, 38.5], rotacion: [0, 0, 28] },
+    { forma: 'caja', medidas: [4, 5, 54], centro: [18, 40, 0], rotacion: [0, 0, 28] },    // dintel de la ventana
+    { forma: 'caja', medidas: [5, 18, 100], centro: [37, -8, 0] },                        // pared de adelante (abajo)
+    { forma: 'caja', medidas: [24, 3, 100], centro: [51.5, -8.5, 0], rotacion: [0, 0, -30] }, // rampa
+    { forma: 'caja', medidas: [22, 14, 4], centro: [50, -10, -50] },                      // costados de la rampa
+    { forma: 'caja', medidas: [22, 14, 4], centro: [50, -10, 50] },
+  ],
+  pasosCable: [
+    { de: [24, -1, -39], a: [41, -7, -39], radio: 8 },
+    { de: [24, -1, 39], a: [41, -7, 39], radio: 8 },
+  ],
   montajes: [
     { id: 'placa', tipo: 'placa', nombre: 'Placa (arriba)', posicion: [-11, SOBRE_TAPA + 10, -13], rotacionesPermitidas: [0, 180] },
     { id: 'driver', tipo: 'driver', nombre: 'Driver (arriba)', posicion: [-11, SOBRE_TAPA, 15], rotacionesPermitidas: [0, 90, 180, 270] },
-    { id: 'bateria', tipo: 'bateria', nombre: 'Batería (adentro)', posicion: [-21, SOBRE_CUNA, 0], rotacion: [0, 90, 0] },
+    { id: 'bateria', tipo: 'bateria', nombre: 'Batería (adentro)', posicion: [-23.5, SOBRE_CUNA, 0], rotacion: [0, 90, 0] },
     { id: 'motor-izq', tipo: 'soporte-motor', nombre: 'Motor izquierdo', posicion: [0, 0, -27.5], rotacion: COLGADO },
     { id: 'motor-der', tipo: 'soporte-motor', nombre: 'Motor derecho', posicion: [0, 0, 27.5] },
     // Detrás de la ventana del frente: el ultrasonido al centro y un IR a cada lado.
-    { id: 'frente', tipo: 'sensor-frontal', nombre: 'Sensor frontal (en la ventana)', posicion: [2, SOBRE_CUNA, 0] },
+    // Entre la batería y el ultrasonido queda lugar para los conectores de sus cables.
+    { id: 'frente', tipo: 'sensor-frontal', nombre: 'Sensor frontal (en la ventana)', posicion: [4, SOBRE_CUNA, 0] },
     { id: 'frente-izq', tipo: 'sensor-frontal', nombre: 'Sensor frontal izquierdo', posicion: [-16, 30, -30] },
     { id: 'frente-der', tipo: 'sensor-frontal', nombre: 'Sensor frontal derecho', posicion: [-16, 30, 30] },
     // Debajo de la rampa, bien adelante: ven el borde antes que las ruedas.

@@ -71,6 +71,53 @@ export function campoLibre(semilla = 7, cantidad = 9, id = 'campo-libre'): Arena
   }
 }
 
+/** Sala con una linterna que el alumno mueve: para los robots que siguen la luz o huyen de ella. */
+export function salaLinterna(): ArenaDef {
+  return {
+    id: 'sala-linterna',
+    nombre: 'Sala de la linterna',
+    descripcion: 'Una sala con una linterna. Arrástrala con el mouse: los sensores de luz del robot la ven.',
+    ancho: 2.6, largo: 2.2,
+    piso: { material: 'melamina', color: '#7f8794', reflectancia: 0.8 },
+    objetos: [],
+    paredes: true,
+    senuelo: { tipo: 'linterna', x: 0.3, z: -0.5 },
+    inicio: { x: -0.8, z: 0, yaw: 0 },
+  }
+}
+
+/** Pasillo con una caja que el alumno mueve: el robot la sigue guardando la distancia. */
+export function pistaSigueme(): ArenaDef {
+  return {
+    id: 'pista-sigueme',
+    nombre: 'Pista del sígueme',
+    descripcion: 'Una pista larga con una caja. Arrástrala con el mouse: el robot la sigue sin tocarla.',
+    ancho: 3, largo: 1.6,
+    piso: { material: 'melamina', color: '#9c968a', reflectancia: 0.8 },
+    objetos: [],
+    paredes: true,
+    senuelo: { tipo: 'caja', x: -0.55, z: 0 },
+    inicio: { x: -1.1, z: 0, yaw: 0 },
+  }
+}
+
+/**
+ * Circuito de paredes (2,4 × 1,8 m): el borde y un bloque pegado a una pared.
+ * Recorrerlo pegado a la pared derecha tiene esquinas hacia adentro y hacia afuera.
+ */
+export function circuitoParedes(): ArenaDef {
+  return {
+    id: 'circuito-paredes',
+    nombre: 'Circuito de paredes',
+    descripcion: 'Una sala con un bloque pegado a la pared. El robot la recorre sin separarse de la pared de su derecha.',
+    ancho: 2.4, largo: 1.8,
+    piso: { material: 'melamina', color: '#8a8f99', reflectancia: 0.8 },
+    objetos: [{ id: 'bloque', forma: 'caja', medidas: [0.5, 0.15, 0.45], x: 0.3, z: 0.675, color: '#e2e8f0', material: 'mdf', aspecto: 'pared-mdf' }],
+    paredes: true,
+    inicio: { x: -0.8, z: 0.68, yaw: 0 },
+  }
+}
+
 /** Patio vacío de 4 × 3 m con paredes: para practicar movimientos (el perro robot). */
 export function patio(): ArenaDef {
   return {
@@ -183,7 +230,7 @@ export function mesaElectronica(): ArenaDef {
 }
 
 export function listaArenas(): ArenaDef[] {
-  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), patio(), laberinto(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), arenaCombate(), circuitoVelocidad(), mesaElectronica()]
+  return [...PISTAS.map(arenaDePista), ovaloConBarrera(), campoLibre(), campoLibre(11, 12, 'campo-explorador'), patio(), laberinto(), salaLinterna(), pistaSigueme(), circuitoParedes(), sala(), mesa(), dohyo('minisumo'), dohyo('sumo'), arenaCombate(), circuitoVelocidad(), mesaElectronica()]
 }
 
 export function arena(id: string): ArenaDef {
