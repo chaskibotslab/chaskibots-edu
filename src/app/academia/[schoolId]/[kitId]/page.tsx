@@ -12,6 +12,8 @@ import {
 } from 'lucide-react'
 import KitFichaContent, { KitFichaDetalle, KitHeaderMateriales } from '@/components/KitFichaContent'
 import LeccionesProyectos from '@/components/LeccionesProyectos'
+import PlanAnualView from '@/components/PlanAnualView'
+import { PLANES_ANUALES } from '@/data/planAnual'
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
@@ -202,10 +204,16 @@ function AcademiaKitPageInner({ kitId }: { kitId: string }) {
           )}
 
           {activeTab === 'calendar' && (
-            <div className="max-w-4xl mx-auto animate-slide-up text-center py-16" key="calendar">
-              <Calendar className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-500">Este curso de Academia todavía no tiene un plan del año propio.</p>
-            </div>
+            PLANES_ANUALES[kitId] ? (
+              <div className="max-w-4xl mx-auto animate-slide-up" key="calendar">
+                <PlanAnualView plan={PLANES_ANUALES[kitId]} />
+              </div>
+            ) : (
+              <div className="max-w-4xl mx-auto animate-slide-up text-center py-16" key="calendar">
+                <Calendar className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500">Este curso de Academia todavía no tiene un plan del año propio.</p>
+              </div>
+            )
           )}
 
           {activeTab === 'ai' && (

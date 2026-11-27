@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Video, VideoOff, Loader2, Info, Trophy, AlertTriangle } from 'lucide-react'
+import { iniciarBucle, type Bucle } from './bucle'
 
 const CONNECTIONS: [string, string][] = [
   ['left_shoulder', 'right_shoulder'], ['left_shoulder', 'left_elbow'], ['left_elbow', 'left_wrist'],
@@ -21,7 +22,10 @@ export default function PoseGame() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const detectorRef = useRef<any>(null)
-  const animRef = useRef<number>(0)
+  const loopRef = useRef<Bucle | null>(null)
+  // El bucle vive más que un render: lee el reto desde una referencia, no desde el estado.
+  const challengeRef = useRef(false)
+  challengeRef.current = challengeActive
   const successRef = useRef(false)
 
   const loadDetector = async () => {
@@ -69,7 +73,8 @@ export default function PoseGame() {
     if (videoRef.current) videoRef.current.srcObject = null
     setCameraActive(false)
     setChallengeActive(false)
-    cancelAnimationFrame(animRef.current)
+    loopRef.current?.detener()
+    loopRef.current = null
   }
 
   useEffect(() => stopCamera, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -83,9 +88,10 @@ export default function PoseGame() {
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
 
-    const tick = async () => {
-      if (!video.paused && !video.ended && detectorRef.current) {
-        try {
+    loopRef.current?.detener()
+    loopRef.current = iniciarBucle(async () => {
+      if (!video.paused && !video.ended && video.videoWidth > 0 && detectorRef.current) {
+        {
           const poses = await detectorRef.current.estimatePoses(video)
           ctx.clearRect(0, 0, canvas.width, canvas.height)
           ctx.drawImage(video, 0, 0)
@@ -116,7 +122,7 @@ export default function PoseGame() {
             })
 
             // Challenge: raise both wrists above shoulders
-            if (challengeActive) {
+            if (challengeRef.current) {
               const lw = kp['left_wrist'], rw = kp['right_wrist'], ls = kp['left_shoulder'], rs = kp['right_shoulder']
               const ok = lw?.score > 0.4 && rw?.score > 0.4 && ls?.score > 0.4 && rs?.score > 0.4 &&
                 lw.y < ls.y && rw.y < rs.y
@@ -128,11 +134,9 @@ export default function PoseGame() {
               }
             }
           }
-        } catch {}
+        }
       }
-      animRef.current = requestAnimationFrame(tick)
-    }
-    tick()
+    }, 60)
   }
 
   return (

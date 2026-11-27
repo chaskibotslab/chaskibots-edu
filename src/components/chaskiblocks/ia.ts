@@ -208,6 +208,7 @@ export class MotorIA {
   private async ciclo() {
     while (this.vivo) {
       let trabajo = false
+      const t0 = performance.now()
       if (this.listo()) {
         try {
           if (this.knn && this.mobilenet && this.knn.getNumClasses() > 0) {
@@ -275,7 +276,9 @@ export class MotorIA {
         } catch { /* cuadro sin predicción */ }
         if (trabajo) this.alCambiar()
       }
-      await dormir(trabajo ? (this.usar.cuerpo || this.usar.mano ? 40 : 120) : 250)
+      // Deja libre a la página al menos el mismo tiempo que tardaron los modelos:
+      // en computadoras lentas, sin esta pausa la pantalla se congelaba.
+      await dormir(trabajo ? Math.max(this.usar.cuerpo || this.usar.mano ? 40 : 120, performance.now() - t0) : 250)
     }
   }
 

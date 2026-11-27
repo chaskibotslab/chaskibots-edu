@@ -18,6 +18,9 @@ import { useExpand } from '@/hooks/useExpand'
 import { useAuth } from '@/components/AuthProvider'
 import EnviarTarea from '@/components/simuladores/EnviarTarea'
 
+import { iniciarBucle, type Bucle } from './bucle'
+import type { Deteccion, Pedido, Respuesta } from './vision.worker'
+
 const TeachableMachine = dynamic(() => import('./TeachableMachine'), { ssr: false })
 const PoseGame = dynamic(() => import('./PoseGame'), { ssr: false })
 const VoiceLab = dynamic(() => import('./VoiceLab'), { ssr: false })
@@ -168,31 +171,42 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
   const [liveDetections, setLiveDetections] = useState<{ class: string; score: number; bbox: number[] }[]>([])
   const liveVideoRef = useRef<HTMLVideoElement>(null)
   const liveCanvasRef = useRef<HTMLCanvasElement>(null)
-  const cocoModelRef = useRef<any>(null)
-  const liveAnimRef = useRef<number>(0)
+  const cocoModelRef = useRef<Worker | null>(null)
+  const liveLoopRef = useRef<Bucle | null>(null)
+  const liveDrawRef = useRef<number>(0)
 
-  const loadCocoModel = async () => {
-    if (cocoModelRef.current) return cocoModelRef.current
+  // El modelo corre en un proceso aparte (vision.worker.ts): la página no se congela
+  // aunque cada detección tarde uno o dos segundos en una computadora lenta.
+  const cargarDetector = () => new Promise<Worker | null>(resolve => {
+    if (cocoModelRef.current) return resolve(cocoModelRef.current)
     setCocoLoading(true)
     setCocoError(null)
+    let w: Worker
     try {
-      const tf = await import('@tensorflow/tfjs')
-      await tf.ready()
-      const cocoSsd = await import('@tensorflow-models/coco-ssd')
-      cocoModelRef.current = await cocoSsd.load()
-      return cocoModelRef.current
+      w = new Worker(new URL('./vision.worker.ts', import.meta.url))
     } catch {
-      setCocoError('No se pudo cargar el modelo de detección')
-      return null
-    } finally {
       setCocoLoading(false)
+      setCocoError('Este navegador no puede cargar el modelo de detección')
+      return resolve(null)
     }
-  }
+    const falla = () => {
+      w.terminate()
+      setCocoLoading(false)
+      setCocoError('No se pudo cargar el modelo de detección')
+      resolve(null)
+    }
+    w.onerror = falla
+    w.onmessage = (e: MessageEvent<Respuesta>) => {
+      if (e.data.tipo === 'listo') { cocoModelRef.current = w; setCocoLoading(false); resolve(w) }
+      else if (e.data.tipo === 'error') falla()
+    }
+    w.postMessage({ tipo: 'cargar' } satisfies Pedido)
+  })
 
   const startLiveCamera = async () => {
     setCocoError(null)
-    const model = await loadCocoModel()
-    if (!model) return
+    const detector = await cargarDetector()
+    if (!detector) return
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: 640, height: 480 } })
       if (liveVideoRef.current) {
@@ -213,48 +227,67 @@ export default function AILab({ initialMode = 'annotator', hideTabs = false }: A
     stream?.getTracks().forEach(t => t.stop())
     if (liveVideoRef.current) liveVideoRef.current.srcObject = null
     setCameraActive(false)
-    cancelAnimationFrame(liveAnimRef.current)
+    liveLoopRef.current?.detener()
+    liveLoopRef.current = null
+    cancelAnimationFrame(liveDrawRef.current)
     setLiveDetections([])
   }
 
   const runLiveDetectionLoop = () => {
     const video = liveVideoRef.current
     const canvas = liveCanvasRef.current
-    if (!video || !canvas || !cocoModelRef.current) return
+    const detector = cocoModelRef.current
+    if (!video || !canvas || !detector) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
 
-    const tick = async () => {
-      if (!video.paused && !video.ended && cocoModelRef.current) {
-        try {
-          const predictions = await cocoModelRef.current.detect(video)
-          setLiveDetections(predictions.map((p: any) => ({ class: p.class, score: p.score, bbox: p.bbox })))
-          ctx.clearRect(0, 0, canvas.width, canvas.height)
-          ctx.drawImage(video, 0, 0)
-          predictions.forEach((pred: any) => {
-            const [x, y, w, h] = pred.bbox
-            const label = translateLabel(pred.class)
-            ctx.strokeStyle = '#22D3EE'
-            ctx.lineWidth = 3
-            ctx.strokeRect(x, y, w, h)
-            const text = `${label} ${Math.round(pred.score * 100)}%`
-            ctx.font = 'bold 14px sans-serif'
-            const tw = ctx.measureText(text).width + 12
-            ctx.fillStyle = '#22D3EE'
-            ctx.fillRect(x, y - 22, tw, 22)
-            ctx.fillStyle = '#0a0a0f'
-            ctx.fillText(text, x + 6, y - 6)
-          })
-        } catch {}
+    // 1) Dibujo: barato, en cada cuadro. El video se ve fluido y encima van las últimas cajas.
+    let cajas: Deteccion[] = []
+    cancelAnimationFrame(liveDrawRef.current)
+    const dibujar = () => {
+      if (video.srcObject && video.videoWidth > 0) {
+        ctx.drawImage(video, 0, 0)
+        for (const pred of cajas) {
+          const [x, y, w, h] = pred.bbox
+          const text = `${translateLabel(pred.class)} ${Math.round(pred.score * 100)}%`
+          ctx.strokeStyle = '#22D3EE'
+          ctx.lineWidth = 3
+          ctx.strokeRect(x, y, w, h)
+          ctx.font = 'bold 14px sans-serif'
+          const tw = ctx.measureText(text).width + 12
+          ctx.fillStyle = '#22D3EE'
+          ctx.fillRect(x, y - 22, tw, 22)
+          ctx.fillStyle = '#0a0a0f'
+          ctx.fillText(text, x + 6, y - 6)
+        }
       }
-      liveAnimRef.current = requestAnimationFrame(tick)
+      liveDrawRef.current = requestAnimationFrame(dibujar)
     }
-    tick()
+    dibujar()
+
+    // 2) Detección: un cuadro a la vez; el siguiente sale cuando el anterior respondió.
+    let turno = 0
+    liveLoopRef.current?.detener()
+    liveLoopRef.current = iniciarBucle(async () => {
+      if (video.paused || video.ended || video.videoWidth === 0) return
+      const cuadro = await createImageBitmap(video)
+      const id = ++turno
+      const detecciones = await new Promise<Deteccion[]>(resolve => {
+        const limite = setTimeout(() => resolve([]), 15000)
+        detector.onmessage = (e: MessageEvent<Respuesta>) => {
+          if (e.data.tipo === 'resultado' && e.data.id === id) { clearTimeout(limite); resolve(e.data.detecciones) }
+          else if (e.data.tipo === 'error') { clearTimeout(limite); resolve([]) }
+        }
+        detector.postMessage({ tipo: 'detectar', id, cuadro } satisfies Pedido, [cuadro])
+      })
+      cajas = detecciones
+      setLiveDetections(detecciones.map(p => ({ class: p.class, score: p.score, bbox: p.bbox })))
+    }, 150)
   }
 
-  useEffect(() => stopLiveCamera, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => { stopLiveCamera(); cocoModelRef.current?.terminate(); cocoModelRef.current = null }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── CLOUD AI STATE (Hugging Face Inference API) ────────
   const [cloudImage, setCloudImage] = useState<string | null>(null)

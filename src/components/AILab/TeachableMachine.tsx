@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { Camera, Plus, Trash2, Play, Square, Loader2, Info, Sparkles, RotateCcw, X } from 'lucide-react'
+import { iniciarBucle, type Bucle } from './bucle'
 
 interface ClassData {
   name: string
@@ -22,7 +23,7 @@ export default function TeachableMachine() {
   const mobilenetRef = useRef<any>(null)
   const knnRef = useRef<any>(null)
   const captureIntervalRef = useRef<any>(null)
-  const predictAnimRef = useRef<number>(0)
+  const predictLoopRef = useRef<Bucle | null>(null)
 
   const loadModel = async () => {
     if (mobilenetRef.current && knnRef.current) return true
@@ -70,7 +71,8 @@ export default function TeachableMachine() {
     if (videoRef.current) videoRef.current.srcObject = null
     setCameraActive(false)
     setIsPredicting(false)
-    cancelAnimationFrame(predictAnimRef.current)
+    predictLoopRef.current?.detener()
+    predictLoopRef.current = null
     if (captureIntervalRef.current) clearInterval(captureIntervalRef.current)
   }
 
@@ -123,7 +125,8 @@ export default function TeachableMachine() {
 
   const startPredicting = () => {
     setIsPredicting(true)
-    const loop = async () => {
+    predictLoopRef.current?.detener()
+    predictLoopRef.current = iniciarBucle(async () => {
       const video = videoRef.current
       if (video && video.readyState >= 2 && video.videoWidth > 0 && mobilenetRef.current && knnRef.current && knnRef.current.getNumClasses() > 0) {
         try {
@@ -137,14 +140,13 @@ export default function TeachableMachine() {
           console.error('[TeachableMachine] predict failed', err)
         }
       }
-      predictAnimRef.current = requestAnimationFrame(loop)
-    }
-    loop()
+    })
   }
 
   const stopPredicting = () => {
     setIsPredicting(false)
-    cancelAnimationFrame(predictAnimRef.current)
+    predictLoopRef.current?.detener()
+    predictLoopRef.current = null
     setPrediction(null)
   }
 
