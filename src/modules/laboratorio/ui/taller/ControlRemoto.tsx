@@ -8,7 +8,8 @@
 //    programa lee con Serial.read() / SerialBT.read().
 // Se maneja con los botones (mouse o dedo), el teclado de la compu (flechas o
 // WASD, dos a la vez para curvar, Espacio frena, 0–9 velocidad) o un control
-// de videojuego (Gamepad API).
+// de videojuego (Gamepad API). Con un control de PlayStation (PS4 o PS5 enlazado por
+// Bluetooth o por cable a la compu) las palancas son analógicas: empujar poco = ir despacio.
 
 import { useEffect, useRef, useState } from 'react'
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Gamepad2, Square, X, Zap } from 'lucide-react'
@@ -33,6 +34,20 @@ function direccion(p: Set<Tecla>): Dir {
   return h < 0 ? 'L' : h > 0 ? 'R' : 'S'
 }
 
+/** Nombre legible del control y si es de PlayStation (para mostrar ✕ ○ en vez de A B). */
+function describirMando(id: string): { nombre: string; ps: boolean } {
+  const t = id.toLowerCase()
+  if (t.includes('dualsense') || t.includes('0ce6') || t.includes('0df2')) return { nombre: 'Control PS5 (DualSense)', ps: true }
+  if (t.includes('dualshock') || t.includes('09cc') || t.includes('05c4') || (t.includes('054c') && t.includes('wireless controller'))) return { nombre: 'Control PS4 (DualShock 4)', ps: true }
+  if (t.includes('054c') || t.includes('playstation')) return { nombre: 'Control PlayStation', ps: true }
+  if (t.includes('xbox') || t.includes('xinput')) return { nombre: 'Control Xbox', ps: false }
+  return { nombre: id.split('(')[0].trim() || 'Control', ps: false }
+}
+
+const ZONA_MUERTA = 0.18
+/** Quita el temblor del centro de la palanca y reescala el resto a 0–1. */
+const palanca = (v: number) => (Math.abs(v) < ZONA_MUERTA ? 0 : Math.sign(v) * (Math.abs(v) - ZONA_MUERTA) / (1 - ZONA_MUERTA))
+
 /** En sus campos de texto se escribe; el deslizador sí deja manejar con el teclado. */
 function escribiendo(e: KeyboardEvent) {
   const t = e.target
@@ -54,15 +69,20 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, conArma = f
 }) {
   const [dir, setDir] = useState<Dir>('S')
   const [vel, setVel] = useState(7)
-  const [mando, setMando] = useState<string | null>(null)
+  const [mando, setMando] = useState<{ nombre: string; ps: boolean } | null>(null)
+  const [ayudaPs, setAyudaPs] = useState(false)
   const [arma, setArma] = useState(false)
   const ultimo = useRef<Dir>('S')
   const presionadas = useRef(new Set<Tecla>())
   const botonArma = useRef(false)
+  // Lo último que leyó el control de videojuego (para no repetir órdenes en cada cuadro)
+  const pad = useRef({ activo: false, l1: false, r1: false, nivel: -1 })
+  const ahora = useRef({ conPrograma, quieto: false, vel })
 
   // Durante la cuenta y entre rondas el robot no obedece: moverse sería salida en falso.
   const quieto = conPrograma && !!fase && fase !== 'combate'
   const efectiva: Dir = quieto ? 'S' : dir
+  ahora.current = { conPrograma, quieto, vel }
 
   // Aplicar la dirección: letra al programa o voltaje directo a los motores.
   useEffect(() => {
@@ -114,30 +134,79 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, conArma = f
     }
   }, [])
 
-  // Control de videojuego: palanca izquierda o cruceta.
+  // Control de videojuego (PS4/PS5, Xbox o genérico).
+  //  - Palanca izquierda: dirección. Sin programa es analógica (mezcla acelerador y giro);
+  //    con programa se convierte en las letras F B L R G I H J y en la velocidad 0–9.
+  //  - R2 acelera y L2 retrocede (se combinan con la palanca para girar).
+  //  - Cruceta: igual que las flechas. ✕/A: arma. ○/B: freno. L1/R1: bajar/subir velocidad.
   useEffect(() => {
     let raf = 0
+    let nombre = ''
     const leer = () => {
       raf = requestAnimationFrame(leer)
       const g = Array.from(navigator.getGamepads?.() ?? []).find(Boolean)
-      if (!g) { setMando(null); return }
-      setMando(g.id.split('(')[0].trim() || 'Control')
-      const x = g.axes[0] ?? 0, y = g.axes[1] ?? 0
+      if (!g) { if (nombre) { nombre = ''; setMando(null) } return }
+      if (g.id !== nombre) { nombre = g.id; setMando(describirMando(g.id)) }
       const b = (i: number) => !!g.buttons[i]?.pressed
-      // Botón A (o X en PlayStation): enciende y apaga el arma.
+      const gatillo = (i: number) => g.buttons[i]?.value ?? 0
+      const st = pad.current
+      const { conPrograma: conProg, quieto: parado, vel: velAhora } = ahora.current
+
+      // Botones que cambian algo una sola vez al presionarlos
       const a = b(0)
-      if (a && !botonArma.current) setArma(v => !v)
+      if (a && !botonArma.current) { setArma(v => !v); g.vibrationActuator?.playEffect?.('dual-rumble', { duration: 120, strongMagnitude: 0.6, weakMagnitude: 0.4 }).catch(() => { /* sin vibración */ }) }
       botonArma.current = a
-      let d: Dir = 'S'
-      if (b(12) || y < -0.5) d = 'F'
-      else if (b(13) || y > 0.5) d = 'B'
-      else if (b(14) || x < -0.5) d = 'L'
-      else if (b(15) || x > 0.5) d = 'R'
-      if (presionadas.current.size === 0) setDir(prev => (prev === d ? prev : d))
+      const l1 = b(4), r1 = b(5)
+      if (l1 && !st.l1) setVel(v => Math.max(0, v - 1))
+      if (r1 && !st.r1) setVel(v => Math.min(9, v + 1))
+      st.l1 = l1; st.r1 = r1
+
+      // Dirección: cruceta (todo o nada) o palanca + gatillos (analógico)
+      const cruzX = Number(b(15)) - Number(b(14)), cruzY = Number(b(12)) - Number(b(13))
+      let giro = palanca(g.axes[0] ?? 0)
+      let avance = -palanca(g.axes[1] ?? 0)
+      const gat = gatillo(7) - gatillo(6)
+      if (Math.abs(gat) > 0.08) avance = Math.max(-1, Math.min(1, avance + gat))
+      if (cruzX || cruzY) { giro = cruzX; avance = cruzY }
+      const fuerza = Math.min(1, Math.hypot(giro, avance))
+      const activo = fuerza > 0 && !b(1)
+
+      if (presionadas.current.size > 0) { st.activo = false; return } // manda el teclado
+      if (!activo) {
+        if (st.activo || b(1)) { st.activo = false; st.nivel = -1; setDir('S'); if (!conProg) sim.manejar(0, 0) }
+        return
+      }
+      st.activo = true
+      // Dirección más cercana de las 8, para las letras y para iluminar el botón
+      const v = avance > 0.35 ? 1 : avance < -0.35 ? -1 : 0
+      const h = giro > 0.35 ? 1 : giro < -0.35 ? -1 : 0
+      const d: Dir = v > 0 ? (h < 0 ? 'G' : h > 0 ? 'I' : 'F') : v < 0 ? (h < 0 ? 'H' : h > 0 ? 'J' : 'B') : h < 0 ? 'L' : h > 0 ? 'R' : 'S'
+      setDir(prev => (prev === d ? prev : d))
+      if (parado) return
+      if (conProg) {
+        // la fuerza de la palanca elige la velocidad (en 4 niveles, para no llenar de letras al programa)
+        if (!cruzX && !cruzY) {
+          const nivel = fuerza > 0.85 ? 9 : fuerza > 0.6 ? 7 : fuerza > 0.35 ? 5 : 3
+          if (nivel !== st.nivel) { st.nivel = nivel; setVel(nivel) }
+        }
+      } else {
+        // manejo directo y analógico: acelerador ± giro, como un carro a control remoto
+        const tope = (velAhora + 1) / 10
+        const izq = Math.max(-1, Math.min(1, avance + giro * (avance < 0 ? -0.7 : 0.7)))
+        const der = Math.max(-1, Math.min(1, avance - giro * (avance < 0 ? -0.7 : 0.7)))
+        sim.manejar(izq * tope, der * tope)
+      }
     }
     raf = requestAnimationFrame(leer)
     return () => cancelAnimationFrame(raf)
-  }, [])
+  }, [sim])
+
+  // El control vibra cuando empieza la ronda
+  useEffect(() => {
+    if (fase !== 'combate') return
+    const g = Array.from(navigator.getGamepads?.() ?? []).find(Boolean)
+    g?.vibrationActuator?.playEffect?.('dual-rumble', { duration: 300, strongMagnitude: 1, weakMagnitude: 0.6 }).catch(() => { /* sin vibración */ })
+  }, [fase])
 
   const boton = (d: Dir, Icon: typeof ArrowUp, clase = '') => (
     <button
@@ -188,7 +257,28 @@ export default function ControlRemoto({ sim, conPrograma, leeLetras, conArma = f
         <input type="range" min={0} max={9} value={vel} onChange={e => setVel(Number(e.target.value))} className="flex-1 accent-[rgb(var(--lab-acento))]" />
         <span className="w-3 font-mono text-lab-tinta">{vel}</span>
       </label>
-      <p className="mt-1.5 text-[10px] leading-snug text-lab-tenue">Teclado: flechas o WASD (dos a la vez: curva) · Espacio frena · 0–9 velocidad{conArma ? ' · E arma' : ''}{mando ? ` · Control: ${mando}` : ' · o conecta un control de videojuego'}</p>
+      <p className="mt-1.5 text-[10px] leading-snug text-lab-tenue">Teclado: flechas o WASD (dos a la vez: curva) · Espacio frena · 0–9 velocidad{conArma ? ' · E arma' : ''}</p>
+      {mando ? (
+        <div className="mt-2 rounded-md border border-emerald-600/30 bg-emerald-500/10 p-2 text-[10px] leading-snug">
+          <p className="flex items-center gap-1 font-semibold text-emerald-800"><Gamepad2 className="h-3.5 w-3.5" /> {mando.nombre} conectado</p>
+          <p className="mt-0.5 text-lab-suave">
+            Palanca izquierda: manejar{conPrograma ? '' : ' (empuja poco = despacio)'} · R2 acelera, L2 retrocede · {mando.ps ? '○' : 'B'} frena · L1/R1 velocidad{conArma ? ` · ${mando.ps ? '✕' : 'A'} arma` : ''}
+          </p>
+        </div>
+      ) : (
+        <div className="mt-2 text-[10px] leading-snug">
+          <button onClick={() => setAyudaPs(v => !v)} className="flex items-center gap-1 font-semibold text-lab-acento underline-offset-2 hover:underline" aria-expanded={ayudaPs}>
+            <Gamepad2 className="h-3.5 w-3.5" /> Conectar un control de PlayStation
+          </button>
+          {ayudaPs && (
+            <ol className="mt-1 list-decimal space-y-0.5 pl-4 text-lab-suave">
+              <li>Con el control apagado, mantén <b>PS + Share</b> (PS4) o <b>PS + Crear</b> (PS5) hasta que la luz parpadee rápido.</li>
+              <li>En la compu abre <b>Bluetooth</b>, elige «Agregar dispositivo» y selecciona <b>Wireless Controller</b>. (También sirve con cable USB.)</li>
+              <li>Vuelve aquí y <b>presiona cualquier botón</b> del control: aparecerá como conectado.</li>
+            </ol>
+          )}
+        </div>
+      )}
     </div>
   )
 }

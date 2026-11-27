@@ -17,14 +17,17 @@ export async function POST(req: Request) {
   const key = process.env.LAB_COMPILER_KEY
   if (!url || !key) return NextResponse.json({ error: 'El compilador no está configurado' }, { status: 503 })
 
-  let body: { board?: unknown; code?: unknown }
+  let body: { board?: unknown; code?: unknown; real?: unknown }
   try { body = await req.json() } catch { return NextResponse.json({ error: 'JSON inválido' }, { status: 400 }) }
   let board = String(body.board ?? 'uno')
   let code = String(body.code ?? '')
   if (!PLACAS.has(board)) return NextResponse.json({ error: 'Placa no soportada' }, { status: 400 })
   if (code.length > 64 * 1024) return NextResponse.json({ error: 'El código supera 64 KB' }, { status: 413 })
   // ESP32, Pico y Mega: se compilan sobre el ATmega2560 del simulador con la capa de su placa delante.
-  const listo = prepararSketch(board, code)
+  // «real»: el programa va a una placa de verdad por USB, así que se compila tal cual, sin la capa del simulador.
+  const real = body.real === true
+  if (real && !['uno', 'nano', 'mega'].includes(board)) return NextResponse.json({ error: 'Solo se puede cargar a Arduino UNO, Nano y Mega' }, { status: 400 })
+  const listo = real ? { board, codigo: code, error: undefined } : prepararSketch(board, code)
   if (listo.error) return NextResponse.json({ ok: false, errors: [{ line: 1, col: 1, severity: 'error', message: listo.error }] })
   code = listo.codigo
   board = listo.board

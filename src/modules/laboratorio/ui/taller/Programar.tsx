@@ -18,6 +18,7 @@ import { autocablear } from '../../engine/autocableado'
 import { verificar } from '../../engine/verificacion'
 import { infoPlaca } from '../../engine/placa'
 import type { SimulacionTaller } from './useSimulacion'
+import CargarPlaca from './CargarPlaca'
 
 const EditorBloques = dynamic(() => import('../../bloques/EditorBloques'), { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-lab-fondo2" /> })
 
@@ -102,7 +103,9 @@ export default function Programar({ doc, s, plantillas, onPrograma, onIrA }: Pro
           {python ? 'Ejecutar' : 'Compilar y ejecutar'}
         </button>
         <Estado s={s} motivoBloqueo={motivoBloqueo} />
-        <button onClick={descargar} className="lab-secundario ml-auto flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-medium" title={python ? `Descargar el programa (.py) para correrlo en la ${infoPlaca(doc).nombre}` : 'Descargar el programa (.ino) para abrirlo en el Arduino IDE'}>
+        <span className="ml-auto" />
+        <CargarPlaca doc={doc} onErrores={s.setErrores} />
+        <button onClick={descargar} className="lab-secundario flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-medium" title={python ? `Descargar el programa (.py) para correrlo en la ${infoPlaca(doc).nombre}` : 'Descargar el programa (.ino) para abrirlo en el Arduino IDE'}>
           <Download className="h-4 w-4" /> Descargar .{extension}
         </button>
       </div>
