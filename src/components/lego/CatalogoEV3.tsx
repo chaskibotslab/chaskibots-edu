@@ -283,7 +283,7 @@ function Escena({ piezas, sel, seleccionar, moverPieza, children }: EscenaProps)
   )
 }
 
-export default function CatalogoEV3({ onProgramar }: { onProgramar?: (robotId: string) => void } = {}) {
+export default function CatalogoEV3({ inicial, onProgramar }: { inicial?: string; onProgramar?: (robotId: string) => void } = {}) {
   const { expanded, toggle } = useExpand()
   const [piezas, setPiezas] = useState<Puesta[]>([])
   const [sel, setSel] = useState<number | null>(null)
@@ -293,7 +293,7 @@ export default function CatalogoEV3({ onProgramar }: { onProgramar?: (robotId: s
   piezasRef.current = piezas
 
   // ── Modo con guía ──
-  const [guiaId, setGuiaId] = useState<string>('') // '' = construcción libre
+  const [guiaId, setGuiaId] = useState<string>(inicial && GUIAS.some(g => g.id === inicial) ? inicial : '') // '' = construcción libre
   const guia = useMemo(() => GUIAS.find(g => g.id === guiaId) || null, [guiaId])
   const [modelo, setModelo] = useState<THREE.Group | null>(null)
   const [pasoGuia, setPasoGuia] = useState(0)

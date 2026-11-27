@@ -6,7 +6,7 @@
 import { LegoMotor, Tapete } from './engine'
 import { CSS } from './colores'
 import {
-  type Programa, programa, avanzar, retroceder, girar, encender, parar, esperar, porSiempre, repetir, esperarHasta, si, decir,
+  type Programa, programa, avanzar, retroceder, girar, tanque, encender, parar, esperar, porSiempre, repetir, esperarHasta, si, decir,
   esColor, lineaEs, luz, cerca, tactil, angulo, no, y, o, comparar, operar, variable, fijar,
 } from './programasEV3'
 
@@ -52,7 +52,7 @@ const pista = (ctx: Ctx, f: (c: Ctx) => void, esquinas: CanvasLineJoin = 'round'
   ctx.strokeStyle = CSS.negro; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = esquinas
   ctx.beginPath(); f(ctx); ctx.stroke()
 }
-const franja = (ctx: Ctx, x: number, ancho = 8) => { ctx.fillStyle = CSS.negro; ctx.fillRect(x - ancho / 2, -CAMPO / 2, ancho, CAMPO) }
+const franja = (ctx: Ctx, x: number, ancho = 8, color = CSS.negro) => { ctx.fillStyle = color; ctx.fillRect(x - ancho / 2, -CAMPO / 2, ancho, CAMPO) }
 
 // Pista ovalada: dos rectas de 80 cm y dos medias vueltas de radio 40
 const ovalo = (c: Ctx) => {
@@ -85,6 +85,17 @@ const buscarYEmbestir = (potencia: number) => porSiempre(
   retroceder(60, 1.2, 'seg'),
 )
 
+// Figura en ocho: las dos mitades se cruzan en el centro casi en ángulo recto
+const ocho = (c: Ctx) => {
+  for (let i = 0; i <= 240; i++) {
+    const t = i / 240 * Math.PI * 2
+    const x = 70 * Math.sin(t), z = 40 * Math.sin(2 * t)
+    if (i === 0) c.moveTo(x, z); else c.lineTo(x, z)
+  }
+}
+/** Avanza hasta tener una pared a menos de 15 cm y se detiene. */
+const hastaPared = () => [encender(40, 40), esperarHasta(cerca(15)), parar()]
+
 // Seguidores
 const seguir1 = () => porSiempre(si([[esColor('negro'), [encender(15, 50)]]], [encender(50, 15)]))
 const seguir2 = (extra: [ReturnType<typeof esColor>, ReturnType<typeof parar>[]][] = []) => porSiempre(si([
@@ -114,7 +125,7 @@ export const MISIONES_EV3: Mision[] = [
     solucion: programa([avanzar(50, 2), girar('der', 90), avanzar(50, 2), decir('¡Hola!', 2)]),
   },
   {
-    id: 'meta', curso: 'inicio', emoji: '🎯', titulo: 'Llega a la meta', nivel: 'Fácil', robot: 'explorador',
+    id: 'meta', curso: 'inicio', emoji: '🎯', titulo: 'Llega a la meta', nivel: 'Fácil', robot: 'basico',
     objetivo: 'Avanza en línea recta y detente dentro del círculo verde.',
     pista: ['Un solo bloque basta: «avanzar potencia 50 por … rotaciones».', 'Cada rotación de rueda avanza unos 17 cm. La meta está a 120 cm.', 'Si te pasas o te quedas corto, cambia el número y vuelve a probar.'],
     tapete: campo({ x: -70, z: 0, ang: 0 }, { meta: { x: 50, z: 0, r: 14 } }),
@@ -122,7 +133,7 @@ export const MISIONES_EV3: Mision[] = [
     solucion: programa([avanzar(50, rot(120))]),
   },
   {
-    id: 'ida_vuelta', curso: 'inicio', emoji: '↔️', titulo: 'Ida y vuelta', nivel: 'Fácil', robot: 'explorador',
+    id: 'ida_vuelta', curso: 'inicio', emoji: '↔️', titulo: 'Ida y vuelta', nivel: 'Fácil', robot: 'basico',
     objetivo: 'Llega hasta el punto azul, da media vuelta y regresa a la zona verde donde empezaste.',
     pista: ['Avanza hasta el punto azul (120 cm).', 'Gira 180 grados: media vuelta.', 'Avanza otra vez la misma distancia.'],
     tapete: campo({ x: -70, z: 0, ang: 0 }, { puntos: [{ x: 50, z: 0, r: 14 }], meta: { x: -70, z: 0, r: 14 } }),
@@ -130,7 +141,7 @@ export const MISIONES_EV3: Mision[] = [
     solucion: programa([avanzar(50, rot(120)), girar('der', 180), avanzar(50, rot(120))]),
   },
   {
-    id: 'cuadrado', curso: 'inicio', emoji: '⬜', titulo: 'Dibuja un cuadrado', nivel: 'Medio', robot: 'explorador',
+    id: 'cuadrado', curso: 'inicio', emoji: '⬜', titulo: 'Dibuja un cuadrado', nivel: 'Medio', robot: 'basico',
     objetivo: 'Pasa por las cuatro esquinas (puntos azules) en orden, haciendo un cuadrado.',
     pista: ['Un cuadrado es lo mismo 4 veces: avanzar un lado y girar 90 grados.', 'Usa «repetir 4 veces» para no copiar los bloques.', 'Cada lado mide 80 cm.'],
     tapete: campo({ x: -40, z: -40, ang: 0 }, { puntos: [{ x: 40, z: -40, r: 13 }, { x: 40, z: 40, r: 13 }, { x: -40, z: 40, r: 13 }, { x: -40, z: -40, r: 13 }] }),
@@ -163,6 +174,32 @@ export const MISIONES_EV3: Mision[] = [
     ]),
   },
 
+  {
+    id: 'triangulo', curso: 'inicio', emoji: '🔺', titulo: 'Dibuja un triángulo', nivel: 'Medio', robot: 'basico',
+    objetivo: 'Pasa por las tres esquinas del triángulo, en orden.',
+    pista: ['Un triángulo de lados iguales se hace repitiendo 3 veces: avanzar y girar.', 'Ojo: el robot no gira 60 grados, gira 120 (lo que le falta para seguir el siguiente lado).', 'Cada lado mide 80 cm.'],
+    tapete: campo({ x: -40, z: 30, ang: 0 }, { puntos: [{ x: 40, z: 30, r: 13 }, { x: 0, z: -39, r: 13 }, { x: -40, z: 30, r: 13 }] }),
+    logro: vueltaCompleta,
+    solucion: programa([repetir(3, avanzar(50, rot(80)), girar('izq', 120))]),
+  },
+  {
+    id: 'escalera', curso: 'inicio', emoji: '🪜', titulo: 'Sube la escalera', nivel: 'Medio', robot: 'basico',
+    objetivo: 'Sube en zigzag pasando por todos los puntos azules, como los peldaños de una escalera.',
+    pista: ['Cada peldaño es: avanzar 50 cm, girar a la izquierda, avanzar 50 cm, girar a la derecha.', 'Repite el peldaño 2 veces y avanza una vez más.'],
+    tapete: campo({ x: -80, z: 60, ang: 0 }, { puntos: [{ x: -30, z: 60, r: 12 }, { x: -30, z: 10, r: 12 }, { x: 20, z: 10, r: 12 }, { x: 20, z: -40, r: 12 }, { x: 70, z: -40, r: 12 }] }),
+    logro: vueltaCompleta,
+    solucion: programa([repetir(2, avanzar(50, rot(50)), girar('izq', 90), avanzar(50, rot(50)), girar('der', 90)), avanzar(50, rot(50))]),
+  },
+  {
+    id: 'curva', curso: 'inicio', emoji: '↩️', titulo: 'Media vuelta en curva', nivel: 'Reto', robot: 'basico',
+    objetivo: 'Rodea el muro haciendo una curva suave, sin usar el bloque «girar», y llega a la meta.',
+    pista: ['Si un motor va más rápido que el otro, el robot avanza en curva.', 'Usa «motores izq … der … por … segundos»: izquierdo 40 y derecho 50.', 'Ajusta los segundos hasta que la curva termine en la meta.'],
+    tapete: campo({ x: 0, z: 60, ang: 0 }, {
+      muros: [{ x: -10, z: 6, w: 60, h: 30 }], puntos: [{ x: 54, z: 6, r: 13 }], meta: { x: 0, z: -48, r: 13 },
+    }),
+    logro: m => m.puntosHechos >= 1 && m.enMeta() && m.golpes === 0,
+    solucion: programa([tanque(40, 50, 10.8)]),
+  },
   // ───────────────────────────────────────────── 2 · Sensores
   {
     id: 'linea', curso: 'sensores', emoji: '🎨', titulo: 'Detente en la línea', nivel: 'Fácil', robot: 'explorador',
@@ -223,6 +260,36 @@ export const MISIONES_EV3: Mision[] = [
     ]),
   },
 
+  {
+    id: 'semaforo', curso: 'sensores', emoji: '🚦', titulo: 'Para en la franja roja', nivel: 'Fácil', robot: 'explorador',
+    objetivo: 'Hay franjas de varios colores. Pasa de largo las negras y la verde y detente solo sobre la roja.',
+    pista: ['El sensor de color distingue colores, no solo negro y blanco.', 'Enciende los motores y «esperar hasta ¿el color es Rojo?».', 'Detén los motores.'],
+    tapete: campo({ x: -80, z: 0, ang: 0 }, {
+      meta: { x: 41, z: 0, r: 10 },
+      pintar: ctx => { franja(ctx, -40, 8, CSS.verde); franja(ctx, -10); franja(ctx, 20); franja(ctx, 50, 8, CSS.rojo) },
+    }),
+    logro: m => m.enMeta() && m.quieto() && m.color() === 'rojo',
+    solucion: programa([encender(35, 35), esperarHasta(esColor('rojo')), parar()]),
+  },
+  {
+    id: 'ronda', curso: 'sensores', emoji: '👁️', titulo: 'Ronda del guardián', nivel: 'Medio', robot: 'guardian',
+    objetivo: 'Patrulla de pared a pared: llega cerca de una pared, da media vuelta y ve hasta la otra, sin chocar.',
+    pista: ['Avanza hasta tener la pared a menos de 20 cm y detente.', 'Gira 180 grados.', 'Repite 2 veces.'],
+    tapete: campo({ x: 0, z: 0, ang: 0 }, { puntos: [{ x: 68, z: 0, r: 13 }, { x: -68, z: 0, r: 13 }] }),
+    logro: m => vueltaCompleta(m) && m.golpes === 0,
+    solucion: programa([repetir(2, encender(40, 40), esperarHasta(cerca(20)), parar(), girar('der', 180))]),
+  },
+  {
+    id: 'cuadrado_giro', curso: 'sensores', emoji: '🧭', titulo: 'Cuadrado con giroscopio', nivel: 'Reto', robot: 'giroscopio',
+    objetivo: 'Haz un cuadrado, pero esta vez cada esquina la decide el giroscopio: gira hasta que marque 90, 180 y 270 grados.',
+    pista: ['Avanza un lado (60 cm).', 'Enciende los motores 25 y −25 para girar y «esperar hasta ángulo ≥ 90». Detén.', 'Repite con 180 y con 270, y avanza el último lado.'],
+    tapete: campo({ x: -30, z: -30, ang: 0 }, { puntos: [{ x: 30, z: -30, r: 12 }, { x: 30, z: 30, r: 12 }, { x: -30, z: 30, r: 12 }, { x: -30, z: -30, r: 12 }] }),
+    logro: vueltaCompleta,
+    solucion: programa([
+      ...[90, 180, 270].flatMap(a => [avanzar(50, rot(60)), encender(25, -25), esperarHasta(comparar(angulo(), 'GTE', a)), parar()]),
+      avanzar(50, rot(60)),
+    ]),
+  },
   // ───────────────────────────────────────────── 3 · Seguidor de 1 sensor
   {
     id: 'linea_s', curso: 'linea1', emoji: '〰️', titulo: 'Sigue la línea', nivel: 'Medio', robot: 'seguidor',
@@ -255,6 +322,20 @@ export const MISIONES_EV3: Mision[] = [
     )], ['error']),
   },
 
+  {
+    id: 'linea_roja', curso: 'linea1', emoji: '🟥', titulo: 'Sigue la línea hasta la marca roja', nivel: 'Medio', robot: 'seguidor',
+    objetivo: 'Sigue la línea negra y detente cuando el sensor vea la marca roja del final.',
+    pista: ['Primero pregunta por el rojo: si el color es Rojo → detener motores.', 'Si no, si es Negro → gira a la izquierda. Si no → gira a la derecha.', 'Usa el engranaje azul del bloque «si» para agregarle un «si no si».'],
+    tapete: campo({ x: -80, z: 20, ang: 0 }, {
+      meta: { x: 60, z: -20, r: 12 },
+      pintar: ctx => {
+        pista(ctx, c => { c.moveTo(-92, 20); c.lineTo(-60, 20); c.bezierCurveTo(-20, 20, -20, -20, 20, -20); c.lineTo(66, -20) })
+        ctx.fillStyle = CSS.rojo; ctx.fillRect(64, -27, 12, 14)
+      },
+    }),
+    logro: m => m.enMeta() && m.quieto() && m.color() === 'rojo',
+    solucion: programa([porSiempre(si([[esColor('rojo'), [parar()]], [esColor('negro'), [encender(15, 50)]]], [encender(50, 15)]))]),
+  },
   // ───────────────────────────────────────────── 4 · Seguidor de 2 sensores
   {
     id: 'dos_ovalo', curso: 'linea2', emoji: '👀', titulo: 'Dos sensores: vuelta al óvalo', nivel: 'Medio', robot: 'seguidor2',
@@ -305,6 +386,28 @@ export const MISIONES_EV3: Mision[] = [
     solucion: programa([seguir2([[y(lineaEs(1, 'negro'), lineaEs(2, 'negro')), [parar()]]])]),
   },
 
+  {
+    id: 'dos_ocho', curso: 'linea2', emoji: '♾️', titulo: 'La pista en ocho', nivel: 'Reto', robot: 'seguidor2',
+    objetivo: 'Recorre el ocho completo. En el centro la pista se cruza consigo misma: hay que pasar de frente.',
+    pista: ['Es el seguidor de dos sensores con la regla del cruce.', 'Si los dos sensores ven negro a la vez → avanza recto.', 'Si te sales en las curvas, baja la potencia.'],
+    tapete: campo({ x: 11, z: 13, ang: 46 }, {
+      puntos: [{ x: 70, z: 0, r: 13 }, { x: -70, z: 0, r: 13 }, { x: 17, z: 19, r: 13 }],
+      pintar: ctx => pista(ctx, ocho),
+    }),
+    logro: vueltaCompleta,
+    solucion: programa([seguir2([[y(lineaEs(1, 'negro'), lineaEs(2, 'negro')), [encender(45, 45)]]])]),
+  },
+  {
+    id: 'dos_obstaculo', curso: 'linea2', emoji: '⛔', titulo: 'Obstáculo en la pista', nivel: 'Medio', robot: 'seguidor2',
+    objetivo: 'Sigue el óvalo, pero alguien dejó una caja sobre la línea. Detente antes de chocarla.',
+    pista: ['Este robot también tiene sensor de distancia.', 'Pregunta primero: si hay un obstáculo a menos de 12 cm → detener motores.', 'Después van las preguntas del seguidor de dos sensores.'],
+    tapete: campo({ x: -30, z: 40, ang: 0 }, {
+      obstaculos: [{ x: -10, z: -40, r: 8, color: '#b45309', alto: 14 }], puntos: [{ x: 80, z: 0, r: 13 }], meta: { x: 19, z: -40, r: 9 },
+      pintar: ctx => pista(ctx, ovalo),
+    }),
+    logro: m => m.puntosHechos >= 1 && m.enMeta() && m.quieto() && m.golpes === 0,
+    solucion: programa([seguir2([[cerca(12), [parar()]]])]),
+  },
   // ───────────────────────────────────────────── 5 · Seguidor de 4 sensores
   {
     id: 'cuatro_esquinas', curso: 'linea4', emoji: '📐', titulo: 'Esquinas de 90 grados', nivel: 'Reto', robot: 'seguidor4',
@@ -345,6 +448,21 @@ export const MISIONES_EV3: Mision[] = [
     solucion: programa([seguir4(false)]),
   },
 
+  {
+    id: 'cuatro_laberinto', curso: 'linea4', emoji: '🗺️', titulo: 'Laberinto de líneas', nivel: 'Reto', robot: 'competencia',
+    objetivo: 'La pista tiene caminos falsos. Usa la regla de la mano derecha: si hay camino a la derecha, tómalo.',
+    pista: ['Es el seguidor de 4 sensores preguntando PRIMERO por el sensor 4 (derecha).', 'En cada cruce: avanza 0.6 rotaciones y gira 90 grados hacia el lado que vio la línea.', 'Los caminos que siguen de frente no llevan a ningún lado.'],
+    tapete: campo({ x: -82, z: 0, ang: 0 }, {
+      meta: { x: 30, z: -50, r: 12 },
+      pintar: ctx => {
+        pista(ctx, c => { c.moveTo(-92, 0); c.lineTo(-20, 0) }, 'miter')
+        pista(ctx, c => { c.moveTo(-50, 0); c.lineTo(-50, 50); c.lineTo(40, 50) }, 'miter')
+        pista(ctx, c => { c.moveTo(10, 50); c.lineTo(10, 80); c.lineTo(70, 80); c.lineTo(70, -50); c.lineTo(20, -50) }, 'miter')
+      },
+    }),
+    logro: m => m.enMeta(),
+    solucion: programa([seguir4(true)]),
+  },
   // ───────────────────────────────────────────── 6 · Sumo
   {
     id: 'sumo_borde', curso: 'sumo', emoji: '⚪', titulo: 'No te caigas del ring', nivel: 'Medio', robot: 'sumo',
@@ -389,6 +507,34 @@ export const MISIONES_EV3: Mision[] = [
     solucion: programa([buscarYEmbestir(100)]),
   },
 
+  {
+    id: 'sumo_veloz', curso: 'sumo', emoji: '⚡', titulo: 'Rival veloz', nivel: 'Reto', robot: 'sumo',
+    objetivo: 'Este rival es más rápido y empuja más fuerte. Solo a máxima potencia le ganas.',
+    pista: ['La misma estrategia: buscar girando, embestir, retroceder.', 'Con potencia 100 empujas más que él. Con menos, te saca.'],
+    tapete: sumo({ x: -45, z: 0, ang: 0 }, [{ x: 45, z: 0, r: 8, tipo: 'rival', vel: 14, color: '#ea580c' }]),
+    logro: todosFuera,
+    solucion: programa([buscarYEmbestir(100)]),
+  },
+  {
+    id: 'sumo_dos', curso: 'sumo', emoji: '👥', titulo: 'Dos contra uno', nivel: 'Reto', robot: 'sumo',
+    objetivo: 'Hay dos rivales: uno dormido y otro que te persigue. Saca a los dos.',
+    pista: ['No hace falta cambiar el programa: después de sacar a uno, el robot vuelve a buscar.', 'Mira cómo el «por siempre» repite la estrategia sola.'],
+    tapete: sumo({ x: -40, z: 0, ang: 0 }, [
+      { x: 25, z: -32, r: 8, tipo: 'rival', vel: 0, color: '#7c3aed' }, { x: 40, z: 20, r: 8, tipo: 'rival', vel: 7, color: '#dc2626' },
+    ]),
+    logro: todosFuera,
+    solucion: programa([buscarYEmbestir(100)]),
+  },
+  {
+    id: 'sumo_barre', curso: 'sumo', emoji: '🤼', titulo: 'Barre el ring a ciegas', nivel: 'Medio', robot: 'sumo_tactil',
+    objetivo: 'Este sumo no tiene sensor de distancia. Recorre el ring rebotando en el borde hasta sacar las tres latas.',
+    pista: ['Avanza mientras los dos sensores vean negro: lo que esté delante se va empujando.', 'Si algún sensor ve blanco: retrocede y gira.', 'Prueba distintos ángulos de giro: ¿con cuál barre mejor?'],
+    tapete: sumo({ x: 0, z: 0, ang: 0 }, [
+      { x: 35, z: 0, r: 7, tipo: 'caja', color: '#ef4444' }, { x: -25, z: 35, r: 7, tipo: 'caja', color: '#3b82f6' }, { x: -20, z: -40, r: 7, tipo: 'caja', color: '#22c55e' },
+    ]),
+    logro: todosFuera,
+    solucion: programa([porSiempre(si([[veBorde(), [esperar(0.3), retroceder(50, 0.8, 'seg'), girar('der', 130)]]], [encender(50, 50)]))]),
+  },
   // ───────────────────────────────────────────── 7 · Laberintos
   {
     id: 'pasillo', curso: 'laberinto', emoji: '🧱', titulo: 'Pasillo en U', nivel: 'Medio', robot: 'explorador',
@@ -411,5 +557,19 @@ export const MISIONES_EV3: Mision[] = [
     tapete: campo({ x: -70, z: 70, ang: 0 }, { muros: [{ x: -10, z: 10, w: 120, h: 100 }], meta: { x: 0, z: -84, r: 13 } }),
     logro: m => m.enMeta() && m.golpes >= 2,
     solucion: programa([porSiempre(encender(50, 50), esperarHasta(tactil()), retroceder(40, 0.5, 'seg'), girar('izq', 90))]),
+  },
+  {
+    id: 'lab_zigzag', curso: 'laberinto', emoji: '🌀', titulo: 'Laberinto en zigzag', nivel: 'Reto', robot: 'guardian',
+    objetivo: 'Cuatro giros hasta la meta, sin tocar ninguna pared. En cada pared decide: ¿izquierda o derecha?',
+    pista: ['Cada tramo es igual: avanzar hasta tener una pared a menos de 15 cm y detenerse.', 'Los giros van en este orden: izquierda, derecha, derecha, izquierda.', 'Después del último giro, avanza hasta la pared final.'],
+    tapete: campo({ x: -80, z: 70, ang: 0 }, {
+      muros: [{ x: -20, z: 67.5, w: 6, h: 65 }, { x: -45, z: -10, w: 110, h: 6 }, { x: 50, z: -20, w: 6, h: 160 }],
+      meta: { x: 76, z: 76, r: 13 },
+    }),
+    logro: m => m.enMeta() && m.quieto() && m.golpes === 0,
+    solucion: programa([
+      ...hastaPared(), girar('izq', 90), ...hastaPared(), girar('der', 90), ...hastaPared(), girar('der', 90),
+      ...hastaPared(), girar('izq', 90), ...hastaPared(),
+    ]),
   },
 ]

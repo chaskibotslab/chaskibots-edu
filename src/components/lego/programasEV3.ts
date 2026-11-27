@@ -27,6 +27,7 @@ type Modo = 'seg' | 'rot' | 'grados'
 // ── Motores ──
 export const avanzar = (pot: Valor, val: Valor, modo: Modo = 'rot'): Bloque => ({ type: 'ev3_avanzar', fields: { MODO: modo }, inputs: { POT: entrada(pot), VAL: entrada(val) } })
 export const retroceder = (pot: Valor, val: Valor, modo: Modo = 'rot'): Bloque => ({ type: 'ev3_retroceder', fields: { MODO: modo }, inputs: { POT: entrada(pot), VAL: entrada(val) } })
+export const tanque = (izq: Valor, der: Valor, val: Valor, modo: Modo = 'seg'): Bloque => ({ type: 'ev3_tanque', fields: { MODO: modo }, inputs: { POTI: entrada(izq), POTD: entrada(der), VAL: entrada(val) } })
 export const girar = (dir: 'der' | 'izq', grados: Valor): Bloque => ({ type: 'ev3_girar', fields: { DIR: dir }, inputs: { NUM: entrada(grados) } })
 export const encender = (izq: Valor, der: Valor): Bloque => ({ type: 'ev3_encender', inputs: { POTI: entrada(izq), POTD: entrada(der) } })
 export const parar = (): Bloque => ({ type: 'ev3_parar' })

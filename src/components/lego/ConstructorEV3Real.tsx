@@ -10,7 +10,9 @@ import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { cargarLDraw, mostrarHasta } from './ldraw'
 import { GUIAS, GUIA_ROBOT, type Guia } from './guiasEV3'
-import { ChevronLeft, ChevronRight, RotateCcw, Maximize2, Minimize2, Check, Trophy, Hammer, Loader2, Play } from 'lucide-react'
+import { MISIONES_EV3 } from './misionesEV3'
+import { miniatura } from './miniaturas'
+import { ChevronLeft, ChevronRight, RotateCcw, Maximize2, Minimize2, Check, Trophy, Hammer, Loader2, Play, Hand, LayoutGrid } from 'lucide-react'
 import { useExpand } from '@/hooks/useExpand'
 import EnviarTarea from '@/components/simuladores/EnviarTarea'
 
@@ -48,9 +50,41 @@ function Modelo({ guia, paso, onReady }: { guia: Guia; paso: number; onReady: ()
   return <primitive object={root} />
 }
 
-export default function ConstructorEV3Real({ inicial, onProgramar }: { inicial?: string; onProgramar?: (robotId: string) => void }) {
+/** Tarjeta de un robot en la galería: foto, qué sensores lleva y qué se puede hacer con él. */
+function TarjetaRobot({ guia, onVer, onConstruir, onProgramar }: { guia: Guia; onVer: () => void; onConstruir?: () => void; onProgramar?: () => void }) {
+  const [foto, setFoto] = useState('')
+  useEffect(() => {
+    let vivo = true
+    miniatura(guia.archivo).then(u => { if (vivo) setFoto(u) }).catch(() => { /* se queda el emoji */ })
+    return () => { vivo = false }
+  }, [guia])
+  const clases = MISIONES_EV3.filter(m => m.robot === guia.id && m.id !== 'libre').length
+  return (
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <button onClick={onVer} title="Ver cómo se arma" className="relative grid aspect-[4/3] w-full place-items-center bg-gradient-to-b from-sky-100 to-slate-100">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {foto ? <img src={foto} alt={guia.nombre} className="h-full w-full object-contain" /> : <span className="text-5xl">{guia.emoji}</span>}
+        <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-slate-600 shadow-sm">{guia.pasos.length} pasos</span>
+        {clases > 0 && <span className="absolute right-2 top-2 rounded-full bg-green-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">{clases} {clases === 1 ? 'clase' : 'clases'}</span>}
+      </button>
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
+        <h3 className="text-sm font-extrabold text-slate-900">{guia.emoji} {guia.nombre}</h3>
+        <p className="text-xs text-slate-600">{guia.descripcion}</p>
+        <p className="text-[11px] font-semibold text-slate-500">{guia.equipo}.</p>
+        <div className="mt-auto flex flex-wrap gap-1.5 pt-1.5">
+          <button onClick={onVer} className="flex items-center gap-1 rounded-lg bg-[#c0392b] px-2.5 py-1.5 text-xs font-bold text-white hover:bg-[#a5312a]"><Hammer className="h-3.5 w-3.5" /> Ver paso a paso</button>
+          {onConstruir && <button onClick={onConstruir} className="flex items-center gap-1 rounded-lg bg-[#2f6fd6] px-2.5 py-1.5 text-xs font-bold text-white hover:bg-[#275fb8]"><Hand className="h-3.5 w-3.5" /> Armarlo yo</button>}
+          {guia.simulable && onProgramar && <button onClick={onProgramar} className="flex items-center gap-1 rounded-lg bg-green-600 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-green-700"><Play className="h-3.5 w-3.5" /> Programar</button>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function ConstructorEV3Real({ inicial, onProgramar, onConstruir }: { inicial?: string; onProgramar?: (robotId: string) => void; onConstruir?: (robotId: string) => void }) {
   const { expanded, toggle } = useExpand()
-  const [guiaId, setGuiaId] = useState(inicial && GUIAS.some(g => g.id === inicial) ? inicial : GUIA_ROBOT.id)
+  // '' = galería con todos los robots
+  const [guiaId, setGuiaId] = useState(inicial && GUIAS.some(g => g.id === inicial) ? inicial : '')
   const guia = GUIAS.find(g => g.id === guiaId) || GUIA_ROBOT
   const PASOS = guia.pasos
   const total = PASOS.length
@@ -65,11 +99,35 @@ export default function ConstructorEV3Real({ inicial, onProgramar }: { inicial?:
   const alCargar = useCallback(() => setCargando(false), [])
   const elegir = (id: string) => { setGuiaId(id); setPaso(0); setCargando(true) }
 
+  if (!guiaId) {
+    return (
+      <div className="flex h-full min-h-[520px] flex-col overflow-hidden bg-slate-100 text-slate-900">
+        <div className="flex flex-wrap items-center gap-2 bg-[#c0392b] px-3 py-2 text-white">
+          <Hammer className="h-4 w-4" />
+          <span className="text-sm font-extrabold tracking-tight">Robots para armar</span>
+          <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold">{GUIAS.length} robots</span>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+          <p className="mb-3 max-w-3xl text-sm text-slate-700">
+            Elige un robot. <b>Ver paso a paso</b> te muestra cómo se arma, pieza por pieza. <b>Armarlo yo</b> te da las piezas para que lo construyas con tus manos. <b>Programar</b> lo pone en la pista con sus clases.
+          </p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {GUIAS.map(g => (
+              <TarjetaRobot key={g.id} guia={g} onVer={() => elegir(g.id)}
+                onConstruir={onConstruir ? () => onConstruir(g.id) : undefined}
+                onProgramar={onProgramar ? () => onProgramar(g.id) : undefined} />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`flex flex-col overflow-hidden bg-slate-100 text-slate-900 ${expanded ? 'fixed inset-0 z-[200]' : 'relative h-full min-h-[520px]'}`}>
       <div className="flex flex-wrap items-center gap-2 bg-[#c0392b] px-3 py-1.5 text-white">
-        <Hammer className="h-4 w-4" />
-        <span className="text-sm font-extrabold tracking-tight">Armar</span>
+        <button onClick={() => setGuiaId('')} title="Volver a la lista de robots" className="flex items-center gap-1 rounded-md bg-white/15 px-2 py-1 text-xs font-bold hover:bg-white/25"><LayoutGrid className="h-3.5 w-3.5" /> Todos los robots</button>
+        <span className="hidden text-sm font-extrabold tracking-tight sm:inline">Armar</span>
         <select value={guiaId} onChange={e => elegir(e.target.value)} title="Elige qué robot armar"
           className="max-w-[55vw] rounded-md border border-white/40 bg-white/15 px-2 py-1 text-xs font-bold text-white outline-none [&>option]:text-slate-900">
           {GUIAS.map(g => <option key={g.id} value={g.id}>{g.emoji} {g.nombre}</option>)}

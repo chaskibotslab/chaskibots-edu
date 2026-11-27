@@ -117,6 +117,12 @@ const MODELOS = [
   { id: 'carrito', archivo: 'carrito', nombre: 'Carrito de dos motores', emoji: '🚗', simulable: false, lineas: [], equipo: 'Sin ladrillo ni sensores',
     descripcion: 'Tu primer chasis: dos motores unidos por ejes y bujes, rueda loca y dos ruedas.',
     pasos: [...MOTORES, ...COLA, ...RUEDAS] },
+  { id: 'basico', archivo: 'basico', nombre: 'Robot básico', emoji: '🚙', simulable: true, lineas: [], equipo: 'Solo motores y ladrillo: el más fácil para empezar',
+    descripcion: 'El primer robot que se puede programar: chasis, ladrillo y dos ruedas. Sin sensores.',
+    pasos: [...MOTORES, ...COLA, ...LADRILLO, ...RUEDAS] },
+  { id: 'guardian', archivo: 'guardian', nombre: 'Robot guardián', emoji: '👁️', simulable: true, lineas: [], equipo: 'Sensor infrarrojo al frente',
+    descripcion: 'Un robot con un solo «ojo»: el sensor infrarrojo que mide la distancia a lo que tiene enfrente.',
+    pasos: [...MOTORES, ...COLA, VIGAS_7, VIGAS_3, ...SENSOR_IR, ...LADRILLO, ...RUEDAS] },
   { id: 'explorador', archivo: 'ev3-robot', nombre: 'Robot explorador EV3', emoji: '🤖', simulable: true, lineas: [0], equipo: 'Infrarrojo al frente + 1 sensor de color',
     descripcion: 'El robot completo: ladrillo, sensor infrarrojo al frente y sensor de color al piso, todo sujeto con pines.',
     pasos: [...MOTORES, ...COLA, VIGAS_7, VIGAS_3, ...SENSOR_IR, ...SENSOR_COLOR, ...LADRILLO, ...RUEDAS] },
@@ -138,6 +144,12 @@ const MODELOS = [
   { id: 'sumo', archivo: 'sumo', nombre: 'Robot sumo', emoji: '🥋', simulable: true, lineas: [-3.6, 3.6], equipo: 'Infrarrojo para buscar al rival + 2 sensores de borde + embestidor',
     descripcion: 'Robot de combate: infrarrojo para encontrar al rival, dos sensores para no salirse del ring y un embestidor al frente.',
     pasos: [...MOTORES, ...COLA, VIGAS_15_ADELANTE, ...SENSOR_IR, ...FRENTE_L, ...SENSORES_2, ...EMBESTIDOR, ...LADRILLO, ...RUEDAS] },
+  { id: 'sumo_tactil', archivo: 'sumo-tactil', nombre: 'Sumo táctil', emoji: '🤼', simulable: true, lineas: [-3.6, 3.6], equipo: 'Sensor táctil + 2 sensores de borde + embestidor',
+    descripcion: 'Un sumo que no ve al rival: lo siente con el sensor táctil. Dos sensores cuidan el borde del ring.',
+    pasos: [...MOTORES, ...COLA, VIGAS_15_ADELANTE, ...SENSOR_TACTIL, ...FRENTE_L, ...SENSORES_2, ...EMBESTIDOR, ...LADRILLO, ...RUEDAS] },
+  { id: 'competencia', archivo: 'competencia', nombre: 'Robot de competencia', emoji: '🏆', simulable: true, lineas: [-7.2, -3.6, 3.6, 7.2], equipo: 'Giroscopio + 4 sensores de color al frente',
+    descripcion: 'El más completo: cuatro sensores de línea y un giroscopio para girar ángulos exactos.',
+    pasos: [...MOTORES, ...COLA, VIGAS_9_ADELANTE, ...SENSOR_GIRO, ...FRENTE_L, ...SENSORES_2, ...SENSORES_EXTRA, ...LADRILLO, ...RUEDAS] },
 ]
 
 const salida = []
