@@ -70,6 +70,9 @@ interface Props {
   cables?: boolean
   /** Modo cablear: muestra cada pin como un punto que se puede tocar y deja elegir cables. */
   cableado?: Cableado3D
+  /** Al armar (sin modo cablear): cable elegido y aviso al tocar un cable, para poder quitarlo. */
+  cableSel?: number | null
+  onCable?: (i: number | null) => void
 }
 
 /** Lo que necesita la escena para cablear sobre las piezas reales. Los pines van como "instancia.pin". */
@@ -488,14 +491,14 @@ function Pasacables3D({ h }: { h: RutasCables['pasacables'][number] }) {
   )
 }
 
-function Cables({ doc, cableado }: { doc: RobotDoc; cableado?: Cableado3D }) {
+function Cables({ doc, cableado, cableSel, onCable }: { doc: RobotDoc; cableado?: Cableado3D; cableSel?: number | null; onCable?: (i: number | null) => void }) {
   const lista = useMemo(() => {
     const { cable } = puntasDe(doc)
     return doc.cables.map((c, i) => ({ c, i, p: cable(c.de, c.a) })).filter(x => x.p) as { c: RobotDoc['cables'][number]; i: number; p: [Punta, Punta] }[]
   }, [doc])
   const { rutas, pasacables } = useMemo(() => rutasDe(doc), [doc])
-  const sel = cableado?.cableSel ?? null
-  const elegir = cableado?.onCable
+  const sel = cableado ? cableado.cableSel : cableSel ?? null
+  const elegir = cableado?.onCable ?? onCable
   // Con PCB: pistas y mazos en lugar de cables sueltos. En «Cablear» se ve cada conexión como cable, para poder tocarla.
   if (doc.conexion === 'pcb' && !cableado) return <CablesPcb doc={doc} lista={lista} suelto={({ c, i, p }) => <Cable key={i} a={p[0]} b={p[1]} color={c.color} ruta={rutas[i]} />} />
   return <>
@@ -769,9 +772,9 @@ export default function Robot3D(props: Props) {
   const r = raiz(doc)
   return (
     <CircuitoVivoContexto.Provider value={vivo}>
-      <group ref={grupo} onPointerMissed={() => { props.onSeleccionar?.(null); props.cableado?.onCable(null) }}>
+      <group ref={grupo} onPointerMissed={() => { props.onSeleccionar?.(null); props.cableado?.onCable(null); props.onCable?.(null) }}>
         <Nodo {...props} inst={r} refs={refs} espaciadores={datos.espaciadores} porInstancia={porInstancia} />
-        {cables && !props.explosion && <Cables doc={doc} cableado={props.cableado} />}
+        {cables && !props.explosion && <Cables doc={doc} cableado={props.cableado} cableSel={props.cableSel} onCable={props.onCable} />}
         {props.cableado && !props.explosion && <PinesCableado doc={doc} cableado={props.cableado} />}
         {props.posMarcadores && <ProyectarMarcadores doc={doc} marcadores={marcadores} destino={props.posMarcadores} raizRef={grupo} />}
       </group>

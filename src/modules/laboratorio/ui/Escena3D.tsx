@@ -60,6 +60,8 @@ export interface PropsTaller {
   posMarcadores: MutableRefObject<Map<string, { x: number; y: number }>>
   explosion: number
   cables: boolean
+  cableSel?: number | null
+  onCable?: (i: number | null) => void
   nivel: NivelCalidad
   onNivel: (n: NivelCalidad) => void
 }
@@ -104,6 +106,7 @@ export function EscenaTaller(p: PropsTaller) {
             doc={p.doc} seleccion={p.seleccion} onSeleccionar={p.onSeleccionar}
             marcadores={p.marcadores} marcadorActivo={p.marcadorActivo} onMarcador={p.onMarcador}
             posMarcadores={p.posMarcadores} explosion={e} cables={p.cables}
+            cableSel={p.cableSel} onCable={p.onCable}
           />
         )}
       </ExplosionSuave>

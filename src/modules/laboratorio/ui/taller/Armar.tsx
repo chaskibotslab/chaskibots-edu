@@ -29,7 +29,8 @@ const EscenaTaller = dynamic(() => import('../Escena3D').then(m => m.EscenaTalle
 
 interface Props {
   doc: RobotDoc
-  cambiar: (d: RobotDoc, texto?: string) => void
+  /** `recablear` = false al editar cables a mano (no se vuelven a conectar solos). */
+  cambiar: (d: RobotDoc, texto?: string, recablear?: boolean) => void
   deshacer: () => void
   rehacer: () => void
   puedeDeshacer: boolean
@@ -69,6 +70,30 @@ export default function Armar(p: Props) {
   const lienzo = useRef<HTMLDivElement>(null)
   const posMarcadores = useRef(new Map<string, { x: number; y: number }>())
   const tira = useRef<HTMLDivElement>(null)
+
+  // Cable tocado en la escena: se puede quitar aquí mismo, sin ir a «Cablear».
+  const [cableSel, setCableSel] = useState<number | null>(null)
+  const cableElegido = cableSel !== null ? doc.cables[cableSel] ?? null : null
+  useEffect(() => { setCableSel(null) }, [doc.cables])
+  const quitarCable = useCallback(() => {
+    if (cableSel === null || !doc.cables[cableSel]) return
+    const c = doc.cables[cableSel]
+    cambiar({ ...doc, cableado: 'manual', cables: doc.cables.filter((_, k) => k !== cableSel) }, `Cable quitado: ${c.de[1]} → ${c.a[1]}`, false)
+    setCableSel(null)
+  }, [doc, cableSel, cambiar])
+  useEffect(() => {
+    if (cableSel === null) return
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
+      if (e.key === 'Escape') setCableSel(null)
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return
+      e.preventDefault()
+      quitarCable()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [cableSel, quitarCable])
 
   // Si la pieza seleccionada desaparece (deshacer, quitar), se limpia la selección.
   useEffect(() => { if (seleccion && !doc.piezas.some(x => x.id === seleccion)) setSeleccion(null) }, [doc, seleccion])
@@ -193,7 +218,10 @@ export default function Armar(p: Props) {
         <EscenaTaller
           doc={doc}
           seleccion={seleccion}
-          onSeleccionar={id => { setSeleccion(id); if (id) setElegida(null) }}
+          onSeleccionar={id => { setSeleccion(id); if (id) { setElegida(null); setCableSel(null) } }}
+          cableSel={cableSel}
+          // Mientras se coloca una pieza, los cables no estorban a los puntos de montaje.
+          onCable={elegida ? undefined : i => { setCableSel(i); if (i !== null) setSeleccion(null) }}
           marcadores={marcadores}
           marcadorActivo={activo}
           onMarcador={mk => elegida && poner(elegida, mk)}
@@ -295,6 +323,16 @@ export default function Armar(p: Props) {
           </div>
         )}
       </div>
+
+      {/* ---------- Cable seleccionado ---------- */}
+      {cableElegido && (
+        <div role="status" className="lab-isla absolute left-1/2 top-[calc(var(--lab-arriba)+3.25rem)] z-10 flex h-11 max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-2 px-3 text-xs">
+          <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-black/10" style={{ background: cableElegido.color }} />
+          <span className="truncate font-mono font-semibold text-lab-tinta">{cableElegido.de[1]} → {cableElegido.a[1]}</span>
+          <button onClick={quitarCable} title="Quitar este cable (Supr)" className="flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 font-semibold text-red-700 hover:bg-red-50"><Trash2 className="h-3.5 w-3.5" /> Quitar cable</button>
+          <button onClick={() => setCableSel(null)} title="Cerrar" aria-label="Cerrar" className="lab-boton-icono flex h-7 w-7 shrink-0 items-center justify-center"><X className="h-3.5 w-3.5" /></button>
+        </div>
+      )}
 
       {/* ---------- Pieza seleccionada ---------- */}
       {sel && (

@@ -223,6 +223,23 @@ export default function Cablear({ doc, cambiar, nivel, onNivel }: Props) {
     setCableSel(null)
   }
 
+  // Supr / Retroceso quita el cable elegido (salvo si se está escribiendo).
+  useEffect(() => {
+    if (cableSel === null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return
+      const t = e.target as HTMLElement | null
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
+      if (!doc.cables[cableSel]) return
+      e.preventDefault()
+      quitarCable(cableSel)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+    // quitarCable cambia con doc, que ya está en la lista.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cableSel, doc])
+
   // Uniones por dentro (la fuente MB102 pinchada en los rieles): se dibujan punteadas, no se pueden quitar.
   const internas = useMemo(() => doc.piezas.flatMap(p => p.padre
     ? (pieza(p.pieza).unePinesConPadre ?? []).map(([propio, delPadre]): Cable => ({ de: [p.id, propio], a: [p.padre!.instancia, delPadre], color: propio.startsWith('-') ? NEGRO : ROJO }))
