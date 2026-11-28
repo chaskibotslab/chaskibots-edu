@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin, requireSession } from '@/lib/requireAdmin'
 import { getUserScope } from '@/lib/scope'
+import { alcanceColegio, filtrarEntregas } from '@/lib/academiaAccess'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,8 +57,10 @@ export async function GET(request: NextRequest) {
     if (scope.role === 'student') {
       // El estudiante ve SOLO sus propias entregas (ligadas a su cuenta).
       query = query.eq('user_id', auth.session.id)
-    } else if (scope.role !== 'admin' && scope.levelIds.length > 0) {
-      query = query.in('level_id', scope.levelIds)
+    } else if (scope.role !== 'admin') {
+      // Docente: solo los grados que tiene. Sin grados asignados no ve nada
+      // (antes, sin asignaciones, recibía las entregas de todos).
+      query = query.in('level_id', scope.levelIds.length > 0 ? scope.levelIds : ['__ninguno__'])
     }
 
     const { data, error } = await query
@@ -66,7 +69,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Error fetching submissions' }, { status: 500 })
     }
 
-    const submissions = (data || []).map(rowToSubmission)
+    // Dentro de cada grado, solo las de su colegio: el docente de 4to de un
+    // colegio no ve las entregas de 4to de otro.
+    let filas: any[] = data || []
+    if (scope.role === 'teacher') {
+      const alcance = await alcanceColegio(auth.session)
+      filas = await filtrarEntregas(alcance, filas)
+    }
+    const submissions = filas.map(rowToSubmission)
     return NextResponse.json({ success: true, submissions })
   } catch (error) {
     console.error('Error:', error)

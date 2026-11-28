@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { verifySessionCookie, SESSION_COOKIE_NAME, type SessionPayload } from '@/lib/session'
+import { verifySessionCookie, SESSION_COOKIE_NAME } from '@/lib/session'
+import { academiaAccessFor } from '@/lib/academiaAccess'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,48 +13,6 @@ export const dynamic = 'force-dynamic'
 // Requiere sesion valida (cualquier rol). El middleware protege la
 // pagina /niveles, pero las rutas de API tienen su propio matcher, asi
 // que el chequeo va tambien aqui.
-// Pares "colegio|nivel" que la persona puede ver. Antes se devolvían los
-// cursos de todos los colegios a cualquier sesión: un estudiante veía los
-// 15 cursos de la Academia y al entrar le pedía clave.
-//   - admin: todo
-//   - estudiante: el colegio y nivel de su grupo (y los de su ficha)
-//   - docente: los grupos asignados en teacher_courses, más su ficha
-async function accessFor(session: SessionPayload): Promise<'all' | Set<string>> {
-  if (session.role === 'admin') return 'all'
-  const pairs = new Set<string>()
-
-  const { data: user } = await supabaseAdmin
-    .from('users')
-    .select('name, school_id, level_id, course_id')
-    .eq('id', session.id)
-    .maybeSingle()
-  if (!user) return pairs
-  if (user.school_id && user.level_id) pairs.add(`${user.school_id}|${user.level_id}`)
-
-  const groupIds: string[] = user.course_id ? [user.course_id] : []
-  if (session.role === 'teacher') {
-    const { data: assignments } = await supabaseAdmin
-      .from('teacher_courses')
-      .select('course_id, school_id, level_id')
-      .eq('teacher_id', session.id)
-    for (const a of assignments || []) {
-      if (a.school_id && a.level_id) pairs.add(`${a.school_id}|${a.level_id}`)
-      if (a.course_id) groupIds.push(a.course_id)
-    }
-  }
-
-  if (groupIds.length) {
-    const { data: groups } = await supabaseAdmin
-      .from('courses_catalog')
-      .select('school_id, level_id')
-      .in('id', groupIds)
-    for (const g of groups || []) {
-      if (g.school_id && g.level_id) pairs.add(`${g.school_id}|${g.level_id}`)
-    }
-  }
-  return pairs
-}
-
 export async function GET(request: NextRequest) {
   const session = await verifySessionCookie(request.cookies.get(SESSION_COOKIE_NAME)?.value)
   if (!session) {
@@ -74,15 +33,16 @@ export async function GET(request: NextRequest) {
 
     if (kitsError) return NextResponse.json({ success: false, error: kitsError.message }, { status: 500 })
 
-    const access = await accessFor(session)
+    const access = await academiaAccessFor(session)
     const kits = (allKits || []).filter(k => access === 'all' || access.has(`${k.school_id}|${k.level_id}`))
 
     const cursoIds = [...new Set((kits || []).map(k => k.curso_id).filter(Boolean))]
     const schoolIds = [...new Set((kits || []).map(k => k.school_id).filter(Boolean))]
 
-    const [coursesRes, schoolsRes] = await Promise.all([
+    const [coursesRes, schoolsRes, levelsRes] = await Promise.all([
       cursoIds.length ? supabaseAdmin.from('courses').select('id, name').in('id', cursoIds) : Promise.resolve({ data: [], error: null } as any),
       schoolIds.length ? supabaseAdmin.from('schools').select('id, name, city').in('id', schoolIds) : Promise.resolve({ data: [], error: null } as any),
+      supabaseAdmin.from('levels').select('id, grade_number'),
     ])
     if (coursesRes.error) return NextResponse.json({ success: false, error: coursesRes.error.message }, { status: 500 })
     if (schoolsRes.error) return NextResponse.json({ success: false, error: schoolsRes.error.message }, { status: 500 })
@@ -115,6 +75,9 @@ export async function GET(request: NextRequest) {
 
     // Solo instituciones con al menos un curso (si un colegio no tiene
     // ningun kit visible, no aparece -- nada que mostrar ahi todavia).
+    // Cursos en orden de grado (Inicial 1, Inicial 2, 1ro, 2do...), no en el orden en que se crearon.
+    const grado = new Map<string, number>((levelsRes.data || []).map((l: any) => [l.id, l.grade_number ?? 999]))
+    for (const g of groups.values()) g.cursos.sort((a, b) => (grado.get(a.levelId) ?? 999) - (grado.get(b.levelId) ?? 999))
     const instituciones = [...groups.values()].sort((a, b) => a.schoolName.localeCompare(b.schoolName))
 
     return NextResponse.json({ success: true, instituciones })

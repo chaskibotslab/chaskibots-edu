@@ -32,6 +32,8 @@ interface Question {
 interface Task {
   id: string
   levelId: string
+  /** Colegio dueño de la tarea; vacío = tarea general. */
+  schoolId?: string
   title: string
   description: string
   type: 'concept' | 'code' | 'project' | 'quiz'
@@ -90,8 +92,16 @@ function AdminTareasContent() {
   // Modal states
   const [showModal, setShowModal] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
+  // Colegios, para que el administrador elija de quién es la tarea y para mostrar el nombre.
+  const [schools, setSchools] = useState<{ id: string; name: string }[]>([])
+  useEffect(() => {
+    fetch('/api/schools').then(r => r.json()).then(d => setSchools(d?.schools || [])).catch(() => {})
+  }, [])
+  const schoolName = (id?: string) => (id ? schools.find(s => s.id === id)?.name || id : 'General (sin colegio)')
+
   const [formData, setFormData] = useState({
     levelId: '',
+    schoolId: '',
     title: '',
     description: '',
     type: 'concept' as string,
@@ -207,6 +217,7 @@ function AdminTareasContent() {
     const defaultLevel = selectedLevel || urlLevelId || (allowedLevels.length > 0 ? allowedLevels[0].id : '')
     setFormData({
       levelId: defaultLevel,
+      schoolId: '',
       title: '',
       description: '',
       type: 'concept',
@@ -246,6 +257,7 @@ function AdminTareasContent() {
     setEditingTask(task)
     setFormData({
       levelId: task.levelId,
+      schoolId: task.schoolId || '',
       title: task.title,
       description: task.description,
       type: task.type,
@@ -292,7 +304,8 @@ function AdminTareasContent() {
         loadTasks()
         setShowModal(false)
       } else {
-        alert('Error al guardar')
+        const err = await res.json().catch(() => null)
+        alert(err?.error || 'Error al guardar')
       }
     } catch (error) {
       alert('Error de conexión')
@@ -541,6 +554,9 @@ function AdminTareasContent() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap mb-1">
                               <h4 className="font-medium text-slate-900">{task.title}</h4>
+                              <span className={`px-2 py-0.5 rounded-full text-xs ${task.schoolId ? 'bg-chaski-gold/10 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
+                                {schoolName(task.schoolId)}
+                              </span>
                               <span className={`px-2 py-0.5 rounded-full text-xs ${
                                 DIFFICULTIES.find(d => d.id === task.difficulty)?.color || ''
                               }`}>
@@ -638,6 +654,24 @@ function AdminTareasContent() {
                       <option key={level.id} value={level.id}>{level.name}</option>
                     ))}
                   </select>
+                  {isAdmin ? (
+                    <div className="mt-3">
+                      <label className="block text-sm text-slate-600 mb-1">Colegio</label>
+                      <select
+                        value={formData.schoolId}
+                        onChange={(e) => setFormData(prev => ({ ...prev, schoolId: e.target.value }))}
+                        className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-chaski-primary focus:ring-2 focus:ring-chaski-primary/10 transition-all"
+                      >
+                        <option value="">General (sin colegio)</option>
+                        {schools.map(s => (
+                          <option key={s.id} value={s.id}>{s.name}</option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-slate-400 mt-1">La verán solo los docentes y estudiantes de ese colegio y grado. «General» es para quienes no tienen curso de institución.</p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 mt-1">La tarea será solo para tu colegio en ese grado.</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm text-slate-600 mb-1">Título *</label>
